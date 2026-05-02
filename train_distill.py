@@ -348,43 +348,75 @@ def build_hf_dataloader(
             raise ValueError("no string column found; pass --text-column")
         text_column = text_columns[0]
 
-    if args.dataset_streaming:
-        rows = itertools.islice(dataset, args.num_train_samples)
-        texts = []
-        for row in rows:
-            text = row.get(text_column)
-            if text is not None and text.strip():
-                texts.append(text)
-    else:
-        texts = [text for text in dataset[text_column] if text is not None and text.strip()]
-    if not texts:
-        raise ValueError(f"dataset column {text_column!r} has no non-empty text rows")
+    def iter_texts() -> Iterator[str]:
+        if args.dataset_streaming:
+            rows = itertools.islice(dataset, args.num_train_samples)
+            for row in rows:
+                text = row.get(text_column)
+                if text is not None and text.strip():
+                    yield text
+        else:
+            for text in dataset[text_column]:
+                if text is not None and text.strip():
+                    yield text
 
-    encoded = tokenizer(
-        texts,
-        add_special_tokens=False,
-        return_attention_mask=False,
-        truncation=False,
-    )
     eos_token_id = tokenizer.eos_token_id
-    flat_tokens: list[int] = []
-    for ids in encoded["input_ids"]:
-        if not ids:
-            continue
-        flat_tokens.extend(ids)
-        if eos_token_id is not None:
-            flat_tokens.append(eos_token_id)
-
     block_size = args.max_seq_len
-    total_tokens = len(flat_tokens)
-    usable_tokens = (total_tokens // block_size) * block_size
-    if usable_tokens == 0:
+    token_buffer: list[int] = []
+    blocks: list[list[int]] = []
+    batch_texts: list[str] = []
+    total_tokens = 0
+    text_count = 0
+
+    def encode_pending_texts() -> bool:
+        nonlocal batch_texts, token_buffer, total_tokens
+        if not batch_texts:
+            return False
+        encoded = tokenizer(
+            batch_texts,
+            add_special_tokens=False,
+            return_attention_mask=False,
+            truncation=False,
+        )
+        batch_texts = []
+        for ids in encoded["input_ids"]:
+            if not ids:
+                continue
+            token_buffer.extend(ids)
+            total_tokens += len(ids)
+            if eos_token_id is not None:
+                token_buffer.append(eos_token_id)
+                total_tokens += 1
+            while len(token_buffer) >= block_size:
+                blocks.append(token_buffer[:block_size])
+                token_buffer = token_buffer[block_size:]
+                if args.max_packed_blocks > 0 and len(blocks) >= args.max_packed_blocks:
+                    return True
+        return False
+
+    reached_block_cap = False
+    for text in iter_texts():
+        text_count += 1
+        batch_texts.append(text)
+        if len(batch_texts) >= args.tokenizer_batch_size:
+            reached_block_cap = encode_pending_texts()
+            if reached_block_cap:
+                break
+    if not reached_block_cap:
+        reached_block_cap = encode_pending_texts()
+
+    if not blocks:
         raise ValueError(
             f"not enough tokens ({total_tokens}) to create one block of length {block_size}; "
             "increase --num-train-samples or reduce --max-seq-len"
         )
-    token_tensor = torch.tensor(flat_tokens[:usable_tokens], dtype=torch.long).view(-1, block_size)
+    token_tensor = torch.tensor(blocks, dtype=torch.long)
     packed_dataset = PackedTokenDataset(token_tensor)
+    if distributed and len(packed_dataset) < world_size * args.per_device_batch_size:
+        raise ValueError(
+            f"packed dataset has only {len(packed_dataset)} blocks, but distributed drop_last needs at least "
+            f"{world_size * args.per_device_batch_size}; increase --num-train-samples or reduce batch size"
+        )
     sampler = DistributedSampler(
         packed_dataset,
         num_replicas=world_size,
@@ -394,8 +426,10 @@ def build_hf_dataloader(
         drop_last=True,
     ) if distributed else None
     log(
-        f"Packed {len(texts)} text rows into {len(packed_dataset)} blocks "
-        f"of {packed_dataset.block_size} tokens; dropped {total_tokens - usable_tokens} remainder tokens; "
+        f"Packed {text_count} text rows into {len(packed_dataset)} blocks "
+        f"of {packed_dataset.block_size} tokens; dropped {len(token_buffer)} remainder tokens; "
+        f"total_tokens={total_tokens}; "
+        f"{'stopped at max_packed_blocks=' + str(args.max_packed_blocks) + '; ' if reached_block_cap else ''}"
         f"batch_size_per_rank={args.per_device_batch_size}; sampler="
         f"{'DistributedSampler' if sampler is not None else 'single-process'}"
     )
@@ -779,6 +813,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dataset-streaming", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--text-column", default=None)
     parser.add_argument("--num-train-samples", type=int, default=50000)
+    parser.add_argument("--tokenizer-batch-size", type=int, default=256)
+    parser.add_argument("--max-packed-blocks", type=int, default=0)
     parser.add_argument("--max-seq-len", type=int, default=1024)
     parser.add_argument("--per-device-batch-size", type=int, default=2)
     parser.add_argument("--grad-accum-steps", type=int, default=16)
