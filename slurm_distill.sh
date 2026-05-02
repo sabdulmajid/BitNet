@@ -1,19 +1,20 @@
 #!/bin/bash
 #SBATCH --job-name=bitnet-qat-distill
-#SBATCH --partition=midcard
+#SBATCH --partition=dualcard
+#SBATCH --nodelist=ece-nebula10
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --gres=gpu:2
 #SBATCH --cpus-per-task=12
 #SBATCH --mem=28G
 #SBATCH --time=24:00:00
-#SBATCH --output=logs/%x-%j.out
-#SBATCH --error=logs/%x-%j.err
+#SBATCH --output=/mnt/slurm_nfs/a6abdulm/projects/BitNet/logs/%x-%j.out
+#SBATCH --error=/mnt/slurm_nfs/a6abdulm/projects/BitNet/logs/%x-%j.err
 
 set -euo pipefail
 
 cd "${SLURM_SUBMIT_DIR:-$PWD}"
-mkdir -p logs outputs/bitnet-distill
+mkdir -p logs checkpoints
 
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-12}"
 export TOKENIZERS_PARALLELISM=false
@@ -23,22 +24,35 @@ export HF_DATASETS_CACHE="${HF_DATASETS_CACHE:-$HF_HOME/datasets}"
 
 MODEL="${MODEL:-Qwen/Qwen2.5-1.5B}"
 STUDENT_INIT_MODEL="${STUDENT_INIT_MODEL:-$MODEL}"
-DATASET_NAME="${DATASET_NAME:-HuggingFaceFW/fineweb-edu}"
-DATASET_CONFIG="${DATASET_CONFIG:-sample-10BT}"
+DATASET_NAME="${DATASET_NAME:-wikitext}"
+DATASET_CONFIG="${DATASET_CONFIG:-wikitext-2-raw-v1}"
 DATASET_SPLIT="${DATASET_SPLIT:-train}"
 TEXT_COLUMN="${TEXT_COLUMN:-text}"
 MAX_SEQ_LEN="${MAX_SEQ_LEN:-1024}"
 MAX_STEPS="${MAX_STEPS:-1000}"
-PER_DEVICE_BATCH_SIZE="${PER_DEVICE_BATCH_SIZE:-1}"
+NUM_TRAIN_SAMPLES="${NUM_TRAIN_SAMPLES:-10000}"
+PER_DEVICE_BATCH_SIZE="${PER_DEVICE_BATCH_SIZE:-2}"
 GRAD_ACCUM_STEPS="${GRAD_ACCUM_STEPS:-16}"
 LR="${LR:-2e-5}"
-OUTPUT_DIR="${OUTPUT_DIR:-outputs/bitnet-distill/qwen2.5-1.5b}"
+DATALOADER_NUM_WORKERS="${DATALOADER_NUM_WORKERS:-2}"
+LOG_EVERY_STEPS="${LOG_EVERY_STEPS:-10}"
+SAVE_EVERY_STEPS="${SAVE_EVERY_STEPS:-250}"
+SAVE_FINAL="${SAVE_FINAL:-true}"
+OUTPUT_DIR="${OUTPUT_DIR:-checkpoints/qwen2.5-1.5b-wikitext2}"
 
 echo "SLURM_JOB_ID=${SLURM_JOB_ID:-local}"
 echo "CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-unset}"
 echo "MODEL=$MODEL"
 echo "DATASET_NAME=$DATASET_NAME"
+echo "DATASET_CONFIG=$DATASET_CONFIG"
+echo "MAX_SEQ_LEN=$MAX_SEQ_LEN"
+echo "PER_DEVICE_BATCH_SIZE=$PER_DEVICE_BATCH_SIZE"
 echo "OUTPUT_DIR=$OUTPUT_DIR"
+
+SAVE_FINAL_ARG=(--no-save-final)
+if [ "$SAVE_FINAL" = "true" ]; then
+  SAVE_FINAL_ARG=(--save-final)
+fi
 
 torchrun \
   --standalone \
@@ -51,6 +65,7 @@ torchrun \
   --dataset-config "$DATASET_CONFIG" \
   --dataset-split "$DATASET_SPLIT" \
   --text-column "$TEXT_COLUMN" \
+  --num-train-samples "$NUM_TRAIN_SAMPLES" \
   --max-seq-len "$MAX_SEQ_LEN" \
   --per-device-batch-size "$PER_DEVICE_BATCH_SIZE" \
   --grad-accum-steps "$GRAD_ACCUM_STEPS" \
@@ -68,7 +83,8 @@ torchrun \
   --fsdp-mixed-precision \
   --fsdp-cpu-offload \
   --fsdp-wrap-class-names Qwen2DecoderLayer \
+  --dataloader-num-workers "$DATALOADER_NUM_WORKERS" \
   --output-dir "$OUTPUT_DIR" \
-  --save-every-steps 250 \
-  --save-final \
-  --log-every-steps 1
+  --save-every-steps "$SAVE_EVERY_STEPS" \
+  --log-every-steps "$LOG_EVERY_STEPS" \
+  "${SAVE_FINAL_ARG[@]}"

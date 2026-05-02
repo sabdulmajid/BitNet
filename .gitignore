@@ -35,6 +35,8 @@ nppBackup
 # Models
 models/*
 gpu/checkpoints/*
+checkpoints/
+.hf_cache/
 
 # Python
 

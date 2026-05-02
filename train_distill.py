@@ -41,6 +41,7 @@ from torch.distributed.fsdp import (
 )
 from torch.distributed.fsdp.wrap import transformer_auto_wrap_policy
 from torch.utils.data import DataLoader, Dataset
+from torch.utils.data.distributed import DistributedSampler
 
 
 class TernaryWeightSTE(torch.autograd.Function):
@@ -255,6 +256,29 @@ def collate_synthetic(batch: list[Batch]) -> dict[str, torch.Tensor]:
     }
 
 
+class PackedTokenDataset(Dataset[dict[str, torch.Tensor]]):
+    """Fixed-length causal-LM token blocks packed without padding."""
+
+    def __init__(self, input_ids: torch.Tensor) -> None:
+        if input_ids.ndim != 2:
+            raise ValueError(f"input_ids must be [n_blocks, block_size], got {tuple(input_ids.shape)}")
+        self.input_ids = input_ids.to(torch.long).contiguous()
+        self.attention_mask = torch.ones_like(self.input_ids, dtype=torch.long)
+
+    @property
+    def block_size(self) -> int:
+        return self.input_ids.shape[1]
+
+    def __len__(self) -> int:
+        return self.input_ids.shape[0]
+
+    def __getitem__(self, index: int) -> dict[str, torch.Tensor]:
+        return {
+            "input_ids": self.input_ids[index],
+            "attention_mask": self.attention_mask[index],
+        }
+
+
 def build_synthetic_models(args: argparse.Namespace) -> tuple[nn.Module, nn.Module, Iterable[dict[str, torch.Tensor]], None]:
     from transformers import LlamaConfig, LlamaForCausalLM
 
@@ -284,12 +308,20 @@ def build_synthetic_models(args: argparse.Namespace) -> tuple[nn.Module, nn.Modu
     return teacher, student, dataloader, None
 
 
-def build_hf_dataloader(args: argparse.Namespace, tokenizer) -> DataLoader:
+def build_hf_dataloader(
+    args: argparse.Namespace,
+    tokenizer,
+    *,
+    rank: int,
+    world_size: int,
+    distributed: bool,
+) -> DataLoader:
     from datasets import load_dataset
 
     if args.dataset_name is None:
         raise ValueError("--dataset-name is required unless --smoke-test is set")
 
+    log(f"Loading dataset {args.dataset_name}/{args.dataset_config or ''} split={args.dataset_split}")
     dataset = load_dataset(args.dataset_name, args.dataset_config, split=args.dataset_split)
     if args.num_train_samples > 0:
         dataset = dataset.select(range(min(args.num_train_samples, len(dataset))))
@@ -300,27 +332,68 @@ def build_hf_dataloader(args: argparse.Namespace, tokenizer) -> DataLoader:
             raise ValueError("no string column found; pass --text-column")
         text_column = text_columns[0]
 
-    def tokenize(batch: dict[str, list[str]]) -> dict[str, list[list[int]]]:
-        texts = [text if text is not None else "" for text in batch[text_column]]
-        encoded = tokenizer(
-            texts,
-            truncation=True,
-            padding="max_length",
-            max_length=args.max_seq_len,
-        )
-        return {"input_ids": encoded["input_ids"], "attention_mask": encoded["attention_mask"]}
+    texts = [text for text in dataset[text_column] if text is not None and text.strip()]
+    if not texts:
+        raise ValueError(f"dataset column {text_column!r} has no non-empty text rows")
 
-    tokenized = dataset.map(
-        tokenize,
-        batched=True,
-        remove_columns=dataset.column_names,
-        desc="Tokenizing distillation corpus",
+    encoded = tokenizer(
+        texts,
+        add_special_tokens=False,
+        return_attention_mask=False,
+        truncation=False,
     )
-    tokenized.set_format(type="torch", columns=["input_ids", "attention_mask"])
-    return DataLoader(tokenized, batch_size=args.per_device_batch_size, shuffle=True, drop_last=True)
+    eos_token_id = tokenizer.eos_token_id
+    flat_tokens: list[int] = []
+    for ids in encoded["input_ids"]:
+        if not ids:
+            continue
+        flat_tokens.extend(ids)
+        if eos_token_id is not None:
+            flat_tokens.append(eos_token_id)
+
+    block_size = args.max_seq_len
+    total_tokens = len(flat_tokens)
+    usable_tokens = (total_tokens // block_size) * block_size
+    if usable_tokens == 0:
+        raise ValueError(
+            f"not enough tokens ({total_tokens}) to create one block of length {block_size}; "
+            "increase --num-train-samples or reduce --max-seq-len"
+        )
+    token_tensor = torch.tensor(flat_tokens[:usable_tokens], dtype=torch.long).view(-1, block_size)
+    packed_dataset = PackedTokenDataset(token_tensor)
+    sampler = DistributedSampler(
+        packed_dataset,
+        num_replicas=world_size,
+        rank=rank,
+        shuffle=True,
+        seed=args.seed,
+        drop_last=True,
+    ) if distributed else None
+    log(
+        f"Packed {len(texts)} text rows into {len(packed_dataset)} blocks "
+        f"of {packed_dataset.block_size} tokens; dropped {total_tokens - usable_tokens} remainder tokens; "
+        f"batch_size_per_rank={args.per_device_batch_size}; sampler="
+        f"{'DistributedSampler' if sampler is not None else 'single-process'}"
+    )
+    return DataLoader(
+        packed_dataset,
+        batch_size=args.per_device_batch_size,
+        sampler=sampler,
+        shuffle=sampler is None,
+        drop_last=True,
+        pin_memory=torch.cuda.is_available(),
+        num_workers=args.dataloader_num_workers,
+        persistent_workers=args.dataloader_num_workers > 0,
+    )
 
 
-def build_hf_models_and_data(args: argparse.Namespace) -> tuple[nn.Module, nn.Module, DataLoader, object]:
+def build_hf_models_and_data(
+    args: argparse.Namespace,
+    *,
+    rank: int,
+    world_size: int,
+    distributed: bool,
+) -> tuple[nn.Module, nn.Module, DataLoader, object]:
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     model_dtype = dtype_from_name(args.model_dtype)
@@ -342,7 +415,13 @@ def build_hf_models_and_data(args: argparse.Namespace) -> tuple[nn.Module, nn.Mo
     student_kwargs = dict(model_kwargs)
     student_kwargs["torch_dtype"] = master_dtype
     student = AutoModelForCausalLM.from_pretrained(student_source, **student_kwargs)
-    dataloader = build_hf_dataloader(args, tokenizer)
+    dataloader = build_hf_dataloader(
+        args,
+        tokenizer,
+        rank=rank,
+        world_size=world_size,
+        distributed=distributed,
+    )
     return teacher, student, dataloader, tokenizer
 
 
@@ -482,18 +561,48 @@ def save_student(student: nn.Module, output_dir: Path, tokenizer: object | None,
     output_dir = output_dir / f"step-{step}"
     output_dir.mkdir(parents=True, exist_ok=True)
     model_to_save = student.module if isinstance(student, FSDP) else student
+    full_state_dict: dict[str, torch.Tensor] | None = None
     if isinstance(student, FSDP):
         from torch.distributed.fsdp import FullStateDictConfig
 
         cfg = FullStateDictConfig(offload_to_cpu=True, rank0_only=True)
         with FSDP.state_dict_type(student, StateDictType.FULL_STATE_DICT, cfg):
-            state_dict = student.state_dict()
+            full_state_dict = student.state_dict()
         if rank0() and hasattr(model_to_save, "save_pretrained"):
-            model_to_save.save_pretrained(output_dir, state_dict=state_dict)
-    elif rank0() and hasattr(model_to_save, "save_pretrained"):
-        model_to_save.save_pretrained(output_dir)
-    if rank0() and tokenizer is not None and hasattr(tokenizer, "save_pretrained"):
-        tokenizer.save_pretrained(output_dir)
+            model_to_save.save_pretrained(output_dir, state_dict=full_state_dict)
+    else:
+        full_state_dict = model_to_save.state_dict()
+        if rank0() and hasattr(model_to_save, "save_pretrained"):
+            model_to_save.save_pretrained(output_dir)
+    if rank0():
+        if full_state_dict is not None:
+            torch.save(build_ternary_state_dict(model_to_save, full_state_dict), output_dir / "ternary_state_dict.pt")
+        if tokenizer is not None and hasattr(tokenizer, "save_pretrained"):
+            tokenizer.save_pretrained(output_dir)
+
+
+def build_ternary_state_dict(model: nn.Module, state_dict: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
+    """Export BitLinear weights as ternary codes plus scales.
+
+    Master weights remain trainable FP tensors during QAT. This checkpoint
+    materializes the deployable ternary representation without changing the
+    in-memory training model.
+    """
+
+    bitlinear_names = {name for name, module in model.named_modules() if isinstance(module, BitLinear)}
+    export: dict[str, torch.Tensor] = {}
+    for key, value in state_dict.items():
+        if key.endswith(".weight"):
+            module_name = key[:-len(".weight")]
+            if module_name in bitlinear_names:
+                weight = value.detach().float().cpu()
+                scale = weight.abs().mean().clamp_min(1e-5)
+                codes = torch.round(weight / scale).clamp_(-1, 1).to(torch.int8)
+                export[f"{module_name}.ternary_weight"] = codes
+                export[f"{module_name}.weight_scale"] = scale.reshape(1)
+                continue
+        export[key] = value.detach().cpu()
+    return export
 
 
 def train(args: argparse.Namespace) -> None:
@@ -503,7 +612,12 @@ def train(args: argparse.Namespace) -> None:
     if args.smoke_test:
         teacher, student, dataloader, tokenizer = build_synthetic_models(args)
     else:
-        teacher, student, dataloader, tokenizer = build_hf_models_and_data(args)
+        teacher, student, dataloader, tokenizer = build_hf_models_and_data(
+            args,
+            rank=rank,
+            world_size=world_size,
+            distributed=distributed,
+        )
 
     master_dtype = dtype_from_name(args.master_weight_dtype)
     replaced = replace_linear_layers(
@@ -538,6 +652,8 @@ def train(args: argparse.Namespace) -> None:
     start = time.time()
 
     while step < args.max_steps:
+        if isinstance(dataloader.sampler, DistributedSampler):
+            dataloader.sampler.set_epoch(step)
         for batch_index, batch in enumerate(dataloader):
             batch = move_batch(batch, device)
             with torch.no_grad():
@@ -597,13 +713,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--student-init-model", default=None)
     parser.add_argument("--trust-remote-code", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--attn-implementation", default=None)
-    parser.add_argument("--dataset-name", default=None)
-    parser.add_argument("--dataset-config", default=None)
+    parser.add_argument("--dataset-name", default="wikitext")
+    parser.add_argument("--dataset-config", default="wikitext-2-raw-v1")
     parser.add_argument("--dataset-split", default="train")
     parser.add_argument("--text-column", default=None)
     parser.add_argument("--num-train-samples", type=int, default=10000)
     parser.add_argument("--max-seq-len", type=int, default=1024)
-    parser.add_argument("--per-device-batch-size", type=int, default=1)
+    parser.add_argument("--per-device-batch-size", type=int, default=2)
     parser.add_argument("--grad-accum-steps", type=int, default=16)
     parser.add_argument("--max-steps", type=int, default=1000)
     parser.add_argument("--learning-rate", type=float, default=2e-5)
@@ -626,10 +742,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--fsdp-cpu-offload", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--fsdp-mixed-precision", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--fsdp-wrap-class-names", default="")
-    parser.add_argument("--output-dir", default="outputs/bitnet-distill")
+    parser.add_argument("--dataloader-num-workers", type=int, default=2)
+    parser.add_argument("--output-dir", default="checkpoints/bitnet-distill")
     parser.add_argument("--save-every-steps", type=int, default=0)
     parser.add_argument("--save-final", action=argparse.BooleanOptionalAction, default=False)
-    parser.add_argument("--log-every-steps", type=int, default=1)
+    parser.add_argument("--log-every-steps", type=int, default=10)
     parser.add_argument("--seed", type=int, default=1234)
     parser.add_argument("--smoke-test", action="store_true")
     args = parser.parse_args()
