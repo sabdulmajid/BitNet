@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import functools
+import itertools
 import math
 import os
 import random
@@ -322,17 +323,40 @@ def build_hf_dataloader(
         raise ValueError("--dataset-name is required unless --smoke-test is set")
 
     log(f"Loading dataset {args.dataset_name}/{args.dataset_config or ''} split={args.dataset_split}")
-    dataset = load_dataset(args.dataset_name, args.dataset_config, split=args.dataset_split)
-    if args.num_train_samples > 0:
+    dataset = load_dataset(
+        args.dataset_name,
+        args.dataset_config,
+        split=args.dataset_split,
+        streaming=args.dataset_streaming,
+    )
+    if args.dataset_streaming and args.num_train_samples <= 0:
+        raise ValueError("--dataset-streaming requires a positive --num-train-samples for finite packing")
+    if not args.dataset_streaming and args.num_train_samples > 0:
         dataset = dataset.select(range(min(args.num_train_samples, len(dataset))))
     text_column = args.text_column
     if text_column is None:
-        text_columns = [name for name, feature in dataset.features.items() if getattr(feature, "dtype", None) == "string"]
+        if args.dataset_streaming:
+            dataset_iter = iter(dataset)
+            first_row = next(dataset_iter, None)
+            if first_row is None:
+                raise ValueError("streaming dataset yielded no rows")
+            text_columns = [name for name, value in first_row.items() if isinstance(value, str)]
+            dataset = itertools.chain([first_row], dataset_iter)
+        else:
+            text_columns = [name for name, feature in dataset.features.items() if getattr(feature, "dtype", None) == "string"]
         if not text_columns:
             raise ValueError("no string column found; pass --text-column")
         text_column = text_columns[0]
 
-    texts = [text for text in dataset[text_column] if text is not None and text.strip()]
+    if args.dataset_streaming:
+        rows = itertools.islice(dataset, args.num_train_samples)
+        texts = []
+        for row in rows:
+            text = row.get(text_column)
+            if text is not None and text.strip():
+                texts.append(text)
+    else:
+        texts = [text for text in dataset[text_column] if text is not None and text.strip()]
     if not texts:
         raise ValueError(f"dataset column {text_column!r} has no non-empty text rows")
 
@@ -495,6 +519,32 @@ def move_batch(batch: dict[str, torch.Tensor], device: torch.device) -> dict[str
     return {key: value.to(device, non_blocking=True) for key, value in batch.items()}
 
 
+def build_lr_scheduler(
+    optimizer: torch.optim.Optimizer,
+    args: argparse.Namespace,
+) -> torch.optim.lr_scheduler.LambdaLR:
+    warmup_steps = max(args.warmup_steps, 0)
+    total_steps = max(args.max_steps, 1)
+    min_lr_ratio = min(max(args.min_lr_ratio, 0.0), 1.0)
+    warmup_start_ratio = min(max(args.warmup_start_lr_ratio, 0.0), 1.0)
+
+    def lr_scale(current_step: int) -> float:
+        if args.lr_scheduler == "constant":
+            return 1.0
+        if args.lr_scheduler != "cosine":
+            raise ValueError(f"unsupported --lr-scheduler={args.lr_scheduler}")
+        if warmup_steps > 0 and current_step < warmup_steps:
+            progress = float(current_step + 1) / float(warmup_steps)
+            return warmup_start_ratio + (1.0 - warmup_start_ratio) * progress
+
+        decay_steps = max(total_steps - warmup_steps, 1)
+        progress = min(max(float(current_step - warmup_steps + 1) / float(decay_steps), 0.0), 1.0)
+        cosine = 0.5 * (1.0 + math.cos(math.pi * progress))
+        return min_lr_ratio + (1.0 - min_lr_ratio) * cosine
+
+    return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_scale)
+
+
 def select_hidden_states(
     student_hidden: tuple[torch.Tensor, ...],
     teacher_hidden: tuple[torch.Tensor, ...],
@@ -589,17 +639,21 @@ def build_ternary_state_dict(model: nn.Module, state_dict: dict[str, torch.Tenso
     in-memory training model.
     """
 
-    bitlinear_names = {name for name, module in model.named_modules() if isinstance(module, BitLinear)}
+    bitlinear_modules = {name: module for name, module in model.named_modules() if isinstance(module, BitLinear)}
     export: dict[str, torch.Tensor] = {}
     for key, value in state_dict.items():
         if key.endswith(".weight"):
             module_name = key[:-len(".weight")]
-            if module_name in bitlinear_names:
+            if module_name in bitlinear_modules:
+                module = bitlinear_modules[module_name]
                 weight = value.detach().float().cpu()
-                scale = weight.abs().mean().clamp_min(1e-5)
+                if module.scale_mode == "row":
+                    scale = weight.abs().mean(dim=1, keepdim=True).clamp_min(module.eps)
+                else:
+                    scale = weight.abs().mean().clamp_min(module.eps).reshape(1)
                 codes = torch.round(weight / scale).clamp_(-1, 1).to(torch.int8)
                 export[f"{module_name}.ternary_weight"] = codes
-                export[f"{module_name}.weight_scale"] = scale.reshape(1)
+                export[f"{module_name}.weight_scale"] = scale
                 continue
         export[key] = value.detach().cpu()
     return export
@@ -643,6 +697,11 @@ def train(args: argparse.Namespace) -> None:
         eps=args.adam_eps,
         weight_decay=args.weight_decay,
     )
+    scheduler = build_lr_scheduler(optimizer, args)
+    log(
+        f"LR scheduler={args.lr_scheduler} peak_lr={args.learning_rate:.3e} "
+        f"warmup_steps={args.warmup_steps} min_lr_ratio={args.min_lr_ratio:g}"
+    )
 
     student.train()
     autocast_enabled = device.type == "cuda" and args.model_dtype in {"bf16", "fp16", "float16", "bfloat16"}
@@ -683,15 +742,16 @@ def train(args: argparse.Namespace) -> None:
                 else:
                     torch.nn.utils.clip_grad_norm_(student.parameters(), args.max_grad_norm)
             optimizer.step()
-            optimizer.zero_grad(set_to_none=True)
             step += 1
+            lr_used = optimizer.param_groups[0]["lr"]
+            scheduler.step()
+            optimizer.zero_grad(set_to_none=True)
 
             if rank0() and (step == 1 or step % args.log_every_steps == 0):
                 elapsed = time.time() - start
-                lr = optimizer.param_groups[0]["lr"]
                 print(
                     f"step={step} loss={metrics['loss']:.6f} kl={metrics['kl']:.6f} "
-                    f"hidden_mse={metrics['hidden_mse']:.6f} lr={lr:.3e} elapsed={elapsed:.1f}s",
+                    f"hidden_mse={metrics['hidden_mse']:.6f} lr={lr_used:.3e} elapsed={elapsed:.1f}s",
                     flush=True,
                 )
 
@@ -713,16 +773,21 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--student-init-model", default=None)
     parser.add_argument("--trust-remote-code", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--attn-implementation", default=None)
-    parser.add_argument("--dataset-name", default="wikitext")
-    parser.add_argument("--dataset-config", default="wikitext-2-raw-v1")
+    parser.add_argument("--dataset-name", default="HuggingFaceFW/fineweb-edu")
+    parser.add_argument("--dataset-config", default="sample-10BT")
     parser.add_argument("--dataset-split", default="train")
+    parser.add_argument("--dataset-streaming", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--text-column", default=None)
-    parser.add_argument("--num-train-samples", type=int, default=10000)
+    parser.add_argument("--num-train-samples", type=int, default=50000)
     parser.add_argument("--max-seq-len", type=int, default=1024)
     parser.add_argument("--per-device-batch-size", type=int, default=2)
     parser.add_argument("--grad-accum-steps", type=int, default=16)
     parser.add_argument("--max-steps", type=int, default=1000)
-    parser.add_argument("--learning-rate", type=float, default=2e-5)
+    parser.add_argument("--learning-rate", type=float, default=1e-4)
+    parser.add_argument("--lr-scheduler", default="cosine", choices=["constant", "cosine"])
+    parser.add_argument("--warmup-steps", type=int, default=500)
+    parser.add_argument("--warmup-start-lr-ratio", type=float, default=0.0)
+    parser.add_argument("--min-lr-ratio", type=float, default=0.1)
     parser.add_argument("--weight-decay", type=float, default=0.01)
     parser.add_argument("--adam-beta1", type=float, default=0.9)
     parser.add_argument("--adam-beta2", type=float, default=0.95)
