@@ -61,6 +61,8 @@ def summarize_generation(pattern: str) -> str:
         records = read_jsonl(path)
         if not records:
             continue
+        if "tokens_per_second" not in records[0]:
+            continue
         avg_tps = sum(float(record["tokens_per_second"]) for record in records) / len(records)
         rows.append([
             path.stem,
@@ -75,10 +77,36 @@ def summarize_generation(pattern: str) -> str:
     return md_table(["run", "checkpoint", "prompts", "avg tok/s", "device", "dtype"], rows)
 
 
+def summarize_mc(pattern: str) -> str:
+    rows = []
+    for item in sorted(glob.glob(pattern)):
+        path = Path(item)
+        data = read_json(path)
+        if "accuracy" not in data or "task" not in data:
+            continue
+        rows.append([
+            path.stem,
+            str(data.get("task", "")),
+            data.get("model_kind", ""),
+            str(data.get("model") or data.get("checkpoint_dir") or ""),
+            f"{float(data.get('accuracy', 0.0)):.4f}",
+            f"{float(data.get('accuracy_norm', 0.0)):.4f}",
+            str(int(data.get("limit", 0))),
+            f"{float(data.get('examples_per_second', 0.0)):.2f}",
+        ])
+    if not rows:
+        return "No multiple-choice results found."
+    return md_table(
+        ["run", "task", "kind", "model_or_checkpoint", "acc", "acc_norm", "n", "ex/s"],
+        rows,
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--perplexity-glob", default="benchmark_results/perplexity/*.json")
     parser.add_argument("--generation-glob", default="benchmark_results/generation/*.jsonl")
+    parser.add_argument("--mc-glob", default="benchmark_results/mc/*.json")
     parser.add_argument("--output-md", type=Path, default=None)
     args = parser.parse_args()
 
@@ -86,6 +114,8 @@ def main() -> None:
         "# Benchmark Summary",
         "## Perplexity",
         summarize_perplexity(args.perplexity_glob),
+        "## Multiple Choice",
+        summarize_mc(args.mc_glob),
         "## Generation",
         summarize_generation(args.generation_glob),
     ])
