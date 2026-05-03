@@ -47,6 +47,20 @@ W1.58A8 math. They are **not** `bitnet.cpp` CPU throughput claims. The next
 required gates are `lm-eval` task accuracy, GGUF/TL2/I2_S conversion, and
 side-by-side CPU measurements against llama.cpp Q8_0/Q4_K_M baselines.
 
+### Current Task-Accuracy Snapshot
+
+The in-repo multiple-choice evaluator now covers 100-example validation slices
+for PIQA, ARC-Easy, ARC-Challenge, and HellaSwag. This is a fast regression
+tool, not a replacement for full `lm-eval`. The strongest current ternary result
+is Qwen2.5-1.5B QAT/distilled:
+
+| task | FP Qwen2.5-1.5B acc | naive PTQ acc | QAT ternary acc |
+| --- | ---: | ---: | ---: |
+| PIQA | 0.760 | 0.550 | 0.650 |
+| ARC-Easy | 0.760 | 0.300 | 0.550 |
+| ARC-Challenge | 0.440 | 0.190 | 0.320 |
+| HellaSwag | 0.470 | 0.230 | 0.360 |
+
 <img src="./assets/performance.png" alt="performance_comparison" width="800"/>
 
 

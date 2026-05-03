@@ -60,6 +60,43 @@ Observed behavior:
 - 1.5B QAT ternary output is more coherent on generic continuation and
   summarization prompts, but fails simple arithmetic and code prompts.
 
+## Multiple-Choice Accuracy
+
+These are 100-example validation slices using the in-repo log-likelihood
+multiple-choice evaluator, not EleutherAI `lm-eval`. They are useful for fast
+triage and regression detection. They should be replaced by full `lm-eval`
+runs before making paper-grade claims.
+
+Accuracy-normalized (`acc_norm`) is included because continuation length can
+change raw log-likelihood rankings.
+
+| task | model | method | acc | acc_norm |
+| --- | --- | --- | ---: | ---: |
+| PIQA | Qwen2.5-0.5B | FP reference | 0.700 | 0.720 |
+| PIQA | Qwen2.5-0.5B | naive PTQ ternary | 0.530 | 0.490 |
+| PIQA | Qwen2.5-0.5B | QAT/distilled ternary | 0.520 | 0.500 |
+| PIQA | Qwen2.5-1.5B | FP reference | 0.760 | 0.780 |
+| PIQA | Qwen2.5-1.5B | naive PTQ ternary | 0.550 | 0.590 |
+| PIQA | Qwen2.5-1.5B | QAT/distilled ternary | 0.650 | 0.670 |
+| ARC-Easy | Qwen2.5-0.5B | FP reference | 0.680 | 0.580 |
+| ARC-Easy | Qwen2.5-0.5B | naive PTQ ternary | 0.290 | 0.270 |
+| ARC-Easy | Qwen2.5-0.5B | QAT/distilled ternary | 0.290 | 0.270 |
+| ARC-Easy | Qwen2.5-1.5B | FP reference | 0.760 | 0.680 |
+| ARC-Easy | Qwen2.5-1.5B | naive PTQ ternary | 0.300 | 0.260 |
+| ARC-Easy | Qwen2.5-1.5B | QAT/distilled ternary | 0.550 | 0.410 |
+| ARC-Challenge | Qwen2.5-0.5B | FP reference | 0.340 | 0.370 |
+| ARC-Challenge | Qwen2.5-0.5B | naive PTQ ternary | 0.190 | 0.200 |
+| ARC-Challenge | Qwen2.5-0.5B | QAT/distilled ternary | 0.290 | 0.300 |
+| ARC-Challenge | Qwen2.5-1.5B | FP reference | 0.440 | 0.450 |
+| ARC-Challenge | Qwen2.5-1.5B | naive PTQ ternary | 0.190 | 0.280 |
+| ARC-Challenge | Qwen2.5-1.5B | QAT/distilled ternary | 0.320 | 0.330 |
+| HellaSwag | Qwen2.5-0.5B | FP reference | 0.400 | 0.430 |
+| HellaSwag | Qwen2.5-0.5B | naive PTQ ternary | 0.250 | 0.300 |
+| HellaSwag | Qwen2.5-0.5B | QAT/distilled ternary | 0.310 | 0.260 |
+| HellaSwag | Qwen2.5-1.5B | FP reference | 0.470 | 0.570 |
+| HellaSwag | Qwen2.5-1.5B | naive PTQ ternary | 0.230 | 0.180 |
+| HellaSwag | Qwen2.5-1.5B | QAT/distilled ternary | 0.360 | 0.390 |
+
 ## What This Proves
 
 1. The pretrained Qwen dense architecture can be trained under BitNet-style
@@ -72,14 +109,17 @@ Observed behavior:
 4. QAT/distillation substantially recovers quality relative to naive PTQ, but
    current quality is still not close enough to the FP references for a strong
    deployment claim.
+5. On fast multiple-choice slices, 1.5B QAT generally recovers meaningful
+   accuracy relative to naive PTQ, but still trails FP.
 
 ## What This Does Not Prove Yet
 
 1. It does not prove acceptable downstream task accuracy.
-2. It does not prove real `bitnet.cpp` CPU speedups; the current evaluation path
+2. It does not replace full `lm-eval` task accuracy.
+3. It does not prove real `bitnet.cpp` CPU speedups; the current evaluation path
    simulates W1.58A8 math in PyTorch and does not use packed TL2/I2_S kernels.
-3. It does not prove the approach works for MoE models.
-4. It does not prove that the current training recipe is publishable as a final
+4. It does not prove the approach works for MoE models.
+5. It does not prove that the current training recipe is publishable as a final
    result.
 
 ## Next Gates
