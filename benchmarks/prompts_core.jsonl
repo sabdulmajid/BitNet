@@ -1,0 +1,5 @@
+{"id":"continuation_ai","prompt":"The future of artificial intelligence lies in"}
+{"id":"science_explain","prompt":"Explain why the sky appears blue in one concise paragraph."}
+{"id":"reasoning_word_problem","prompt":"A train travels 60 miles in 1.5 hours. What is its average speed in miles per hour? Show the calculation."}
+{"id":"coding_fibonacci","prompt":"Write a Python function that returns the nth Fibonacci number."}
+{"id":"summarization_local","prompt":"Summarize this sentence in fewer words: The research team completed a careful benchmark and found that the faster model used less memory but made more factual mistakes."}

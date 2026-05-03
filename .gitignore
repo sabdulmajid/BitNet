@@ -47,3 +47,4 @@ poetry.toml
 
 build/
 logs/
+benchmark_results/

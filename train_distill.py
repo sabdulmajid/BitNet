@@ -665,6 +665,22 @@ def save_student(student: nn.Module, output_dir: Path, tokenizer: object | None,
             tokenizer.save_pretrained(output_dir)
 
 
+def normalize_wrapped_module_name(name: str) -> str:
+    """Map wrapper-internal module paths back to their public state_dict names."""
+
+    wrapper_segments = {"_fsdp_wrapped_module", "_checkpoint_wrapped_module"}
+    return ".".join(part for part in name.split(".") if part not in wrapper_segments)
+
+
+def collect_bitlinear_modules(model: nn.Module) -> dict[str, BitLinear]:
+    modules: dict[str, BitLinear] = {}
+    for name, module in model.named_modules():
+        if isinstance(module, BitLinear):
+            modules[name] = module
+            modules.setdefault(normalize_wrapped_module_name(name), module)
+    return modules
+
+
 def build_ternary_state_dict(model: nn.Module, state_dict: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
     """Export BitLinear weights as ternary codes plus scales.
 
@@ -673,13 +689,14 @@ def build_ternary_state_dict(model: nn.Module, state_dict: dict[str, torch.Tenso
     in-memory training model.
     """
 
-    bitlinear_modules = {name: module for name, module in model.named_modules() if isinstance(module, BitLinear)}
+    bitlinear_modules = collect_bitlinear_modules(model)
     export: dict[str, torch.Tensor] = {}
     for key, value in state_dict.items():
         if key.endswith(".weight"):
             module_name = key[:-len(".weight")]
-            if module_name in bitlinear_modules:
-                module = bitlinear_modules[module_name]
+            normalized_module_name = normalize_wrapped_module_name(module_name)
+            module = bitlinear_modules.get(module_name) or bitlinear_modules.get(normalized_module_name)
+            if module is not None:
                 weight = value.detach().float().cpu()
                 if module.scale_mode == "row":
                     scale = weight.abs().mean(dim=1, keepdim=True).clamp_min(module.eps)
