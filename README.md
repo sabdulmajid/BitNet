@@ -12,6 +12,41 @@ The first release of bitnet.cpp is to support inference on CPUs. bitnet.cpp achi
 
 **Latest optimization** introduces parallel kernel implementations with configurable tiling and embedding quantization support, achieving **1.15x to 2.1x** additional speedup over the original implementation across different hardware platforms and workloads. For detailed technical information, see the [optimization guide](src/README.md).
 
+## Experimental Qwen Retrofit Work in This Fork
+
+This section describes experiments in this fork, not an upstream `bitnet.cpp`
+release claim. It tests whether pretrained dense Hugging Face models can be
+retrofitted into BitNet-style W1.58A8 models. The current answer is deliberately
+conservative:
+
+- **Blind post-training ternarization is not viable** for the tested Qwen
+  checkpoints. It causes catastrophic perplexity collapse.
+- **QAT/distillation is materially better than naive PTQ**, which shows that
+  training under ternary forward constraints recovers real signal.
+- **The current QAT checkpoints are not deployment-quality yet.** They remain
+  significantly worse than the FP references and have not yet been converted to
+  packed `bitnet.cpp` CPU artifacts.
+
+Current evidence is tracked in
+[benchmarks/results/qwen_retrofit_2026-05-03.md](benchmarks/results/qwen_retrofit_2026-05-03.md).
+The benchmark harnesses are in [benchmarks/](benchmarks/).
+
+### Current Perplexity Snapshot
+
+| model | method | WikiText PPL | FineWeb-heldout PPL |
+| --- | --- | ---: | ---: |
+| Qwen2.5-0.5B | FP reference | 20.461 | 14.124 |
+| Qwen2.5-0.5B | naive PTQ ternary | 169,414.428 | 608,726.749 |
+| Qwen2.5-0.5B | QAT/distilled ternary | 1,079.167 | 373.775 |
+| Qwen2.5-1.5B | FP reference | 13.901 | 10.269 |
+| Qwen2.5-1.5B | naive PTQ ternary | 3,813,121.803 | 9,582,923.269 |
+| Qwen2.5-1.5B | QAT/distilled ternary | 86.414 | 40.398 |
+
+These numbers are BF16/CUDA quality measurements using PyTorch simulation of
+W1.58A8 math. They are **not** `bitnet.cpp` CPU throughput claims. The next
+required gates are `lm-eval` task accuracy, GGUF/TL2/I2_S conversion, and
+side-by-side CPU measurements against llama.cpp Q8_0/Q4_K_M baselines.
+
 <img src="./assets/performance.png" alt="performance_comparison" width="800"/>
 
 

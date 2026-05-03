@@ -4,7 +4,8 @@ This directory contains reusable benchmark harnesses for comparing:
 
 1. original Hugging Face FP checkpoints,
 2. QAT/distilled W1.58A8 ternary checkpoints,
-3. future naive-PTQ and GGUF/CPU-runtime baselines.
+3. naive-PTQ W1.58A8 ternary checkpoints,
+4. future GGUF/CPU-runtime baselines.
 
 ## Rules
 
@@ -53,6 +54,35 @@ Use enough blocks to stabilize NLL.
 - FineWeb-Edu heldout stream: `--dataset-name HuggingFaceFW/fineweb-edu --dataset-config sample-10BT --dataset-split train --text-column text --skip-rows 25000 --max-blocks 256 --max-seq-len 1024`
 
 FineWeb skip rows must be beyond the packed training prefix. Job 9730 packed 19,968 rows, so `--skip-rows 25000` avoids direct train-prefix reuse.
+
+### Naive PTQ Baselines
+
+Naive PTQ performs no calibration, QAT, or distillation. It is a destructive
+control condition for testing whether training under ternary forward constraints
+is doing useful recovery work.
+
+```bash
+python benchmarks/export_naive_ptq.py \
+  --model Qwen/Qwen2.5-0.5B \
+  --output-dir checkpoints/qwen2.5-0.5b-naive-ptq-tensor \
+  --dtype bf16 \
+  --scale-mode tensor \
+  --expect-ternary-keys 168
+
+MODEL=Qwen/Qwen2.5-1.5B \
+OUTPUT_DIR=checkpoints/qwen2.5-1.5b-naive-ptq-tensor \
+EXPECT_TERNARY_KEYS=196 \
+sbatch slurm_export_naive_ptq.sh
+```
+
+Then run PTQ-only quality evals:
+
+```bash
+RUN_FP=false RUN_QAT=false RUN_PTQ=true \
+OUT_DIR=benchmark_results/quality-ptq-qwen05b \
+QWEN15_PTQ=checkpoints/does-not-exist \
+sbatch slurm_benchmark_quality.sh
+```
 
 ### Tier 2: Fixed Generation Suite
 
