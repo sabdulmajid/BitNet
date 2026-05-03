@@ -77,6 +77,63 @@ def summarize_generation(pattern: str) -> str:
     return md_table(["run", "checkpoint", "prompts", "avg tok/s", "device", "dtype"], rows)
 
 
+def bytes_to_gib(value: object) -> str:
+    if value is None:
+        return ""
+    try:
+        return f"{float(value) / (1024 ** 3):.3f}"
+    except (TypeError, ValueError):
+        return ""
+
+
+def summarize_runtime(pattern: str) -> str:
+    rows = []
+    for item in sorted(glob.glob(pattern)):
+        path = Path(item)
+        data = read_json(path)
+        if "prefill" not in data or "generate" not in data:
+            continue
+        rows.append([
+            path.stem,
+            str(data.get("model_kind", "")),
+            str(data.get("model") or data.get("checkpoint_dir") or ""),
+            str(data.get("device", "")),
+            str(data.get("dtype", "")),
+            str(data.get("torch_num_threads", "")),
+            str(data.get("prompt_tokens", "")),
+            str(data.get("generated_tokens_observed", "")),
+            f"{float(data.get('prefill', {}).get('tokens_per_second_median', 0.0)):.2f}",
+            f"{float(data.get('generate', {}).get('new_tokens_per_second_median_including_prefill', 0.0)):.2f}",
+            f"{float(data.get('generate', {}).get('decode_tokens_per_second_estimate', 0.0)):.2f}",
+            bytes_to_gib(data.get("rss_after_move_bytes")),
+            bytes_to_gib(data.get("model_storage_bytes")),
+            bytes_to_gib(data.get("ternary_state_bytes")),
+            bytes_to_gib(data.get("checkpoint_safetensors_bytes")),
+        ])
+    if not rows:
+        return "No runtime probe results found."
+    return md_table(
+        [
+            "run",
+            "kind",
+            "model_or_checkpoint",
+            "device",
+            "dtype",
+            "threads",
+            "prompt",
+            "new",
+            "prefill tok/s",
+            "gen tok/s",
+            "decode est tok/s",
+            "RSS GiB",
+            "model GiB",
+            "ternary GiB",
+            "safetensors GiB",
+        ],
+        rows,
+    )
+
+
 def summarize_mc(pattern: str) -> str:
     rows = []
     for item in sorted(glob.glob(pattern)):
@@ -109,21 +166,33 @@ def summarize_lm_eval(pattern: str) -> str:
         data = read_json(path)
         results = data.get("results")
         configs = data.get("configs", {})
+        higher_is_better = data.get("higher_is_better", {})
         if not isinstance(results, dict):
             continue
         for task, metrics in sorted(results.items()):
             if not isinstance(metrics, dict):
                 continue
-            rows.append([
-                path.stem,
-                task,
-                str(configs.get(task, {}).get("num_fewshot", "")) if isinstance(configs, dict) else "",
-                f"{float(metrics.get('acc,none', 0.0)):.4f}" if "acc,none" in metrics else "",
-                f"{float(metrics.get('acc_norm,none', 0.0)):.4f}" if "acc_norm,none" in metrics else "",
-            ])
+            for metric, value in sorted(metrics.items()):
+                if metric == "alias" or metric.endswith("_stderr,none"):
+                    continue
+                if not isinstance(value, (int, float)):
+                    continue
+                stderr = metrics.get(metric.replace(",none", "_stderr,none"), "")
+                hib = ""
+                if isinstance(higher_is_better, dict):
+                    hib = str(higher_is_better.get(task, {}).get(metric, ""))
+                rows.append([
+                    path.stem,
+                    task,
+                    str(configs.get(task, {}).get("num_fewshot", "")) if isinstance(configs, dict) else "",
+                    metric,
+                    f"{float(value):.4f}",
+                    f"{float(stderr):.4f}" if isinstance(stderr, (int, float)) else "",
+                    hib,
+                ])
     if not rows:
         return "No lm-eval results found."
-    return md_table(["run", "task", "fewshot", "acc", "acc_norm"], rows)
+    return md_table(["run", "task", "fewshot", "metric", "value", "stderr", "higher_is_better"], rows)
 
 
 def main() -> None:
@@ -132,6 +201,7 @@ def main() -> None:
     parser.add_argument("--generation-glob", default="benchmark_results/generation/*.jsonl")
     parser.add_argument("--mc-glob", default="benchmark_results/mc/*.json")
     parser.add_argument("--lm-eval-glob", default="benchmark_results/lm_eval/*.json")
+    parser.add_argument("--runtime-glob", default="benchmark_results/runtime/*.json")
     parser.add_argument("--output-md", type=Path, default=None)
     args = parser.parse_args()
 
@@ -143,6 +213,8 @@ def main() -> None:
         summarize_mc(args.mc_glob),
         "## lm-eval",
         summarize_lm_eval(args.lm_eval_glob),
+        "## Runtime",
+        summarize_runtime(args.runtime_glob),
         "## Generation",
         summarize_generation(args.generation_glob),
     ])
