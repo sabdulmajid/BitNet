@@ -102,11 +102,36 @@ def summarize_mc(pattern: str) -> str:
     )
 
 
+def summarize_lm_eval(pattern: str) -> str:
+    rows = []
+    for item in sorted(glob.glob(pattern)):
+        path = Path(item)
+        data = read_json(path)
+        results = data.get("results")
+        configs = data.get("configs", {})
+        if not isinstance(results, dict):
+            continue
+        for task, metrics in sorted(results.items()):
+            if not isinstance(metrics, dict):
+                continue
+            rows.append([
+                path.stem,
+                task,
+                str(configs.get(task, {}).get("num_fewshot", "")) if isinstance(configs, dict) else "",
+                f"{float(metrics.get('acc,none', 0.0)):.4f}" if "acc,none" in metrics else "",
+                f"{float(metrics.get('acc_norm,none', 0.0)):.4f}" if "acc_norm,none" in metrics else "",
+            ])
+    if not rows:
+        return "No lm-eval results found."
+    return md_table(["run", "task", "fewshot", "acc", "acc_norm"], rows)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--perplexity-glob", default="benchmark_results/perplexity/*.json")
     parser.add_argument("--generation-glob", default="benchmark_results/generation/*.jsonl")
     parser.add_argument("--mc-glob", default="benchmark_results/mc/*.json")
+    parser.add_argument("--lm-eval-glob", default="benchmark_results/lm_eval/*.json")
     parser.add_argument("--output-md", type=Path, default=None)
     args = parser.parse_args()
 
@@ -116,6 +141,8 @@ def main() -> None:
         summarize_perplexity(args.perplexity_glob),
         "## Multiple Choice",
         summarize_mc(args.mc_glob),
+        "## lm-eval",
+        summarize_lm_eval(args.lm_eval_glob),
         "## Generation",
         summarize_generation(args.generation_glob),
     ])
