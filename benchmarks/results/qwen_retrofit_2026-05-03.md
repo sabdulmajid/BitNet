@@ -6,12 +6,14 @@ these are quality and loader results, not final CPU product benchmarks.
 
 ## Setup
 
-- Benchmark tooling commit before this report update: `61f140e`
+- Benchmark tooling commit before this report update: `333cc54`
 - Packed runtime binary: llama.cpp submodule commit `1f86f058`
 - Dataset for QAT/distillation: `HuggingFaceFW/fineweb-edu`, `sample-10BT`
 - QAT student forward math: ternary weights plus dynamic 8-bit activation quantization
 - Main QAT loss: teacher KL divergence plus last-hidden-state MSE
 - Additional ablation: teacher KL only for Qwen2.5-0.5B
+- Additional ablation: teacher KL only with tied dense `lm_head` preserved for
+  Qwen2.5-0.5B
 - Main scale mode: per-tensor absmean scale
 - Additional ablation: per-output-row absmean scale for Qwen2.5-0.5B
 - Evaluation dtype/device for perplexity: BF16 on CUDA
@@ -36,6 +38,7 @@ smoke-scale heldout test.
 | 9734 | Qwen2.5-0.5B QAT student | 1000 | 4,000 x 512 | 24.6557 | 2.8857 | 21.7699 | complete |
 | 9747 | Qwen2.5-0.5B QAT student, row scale | 1000 | 4,000 x 512 | 15.3338 | 2.0530 | 13.2808 | complete |
 | 9748 | Qwen2.5-0.5B QAT student, KL only | 1000 | 4,000 x 512 | 1.6375 | 1.6375 | 0.0000 | complete |
+| 9764 | Qwen2.5-0.5B QAT student, KL only, dense tied `lm_head` | 1000 | 4,000 x 512 | 1.6821 | 1.6821 | 0.0000 | complete |
 
 ## Export Status
 
@@ -44,6 +47,7 @@ smoke-scale heldout test.
 | `qwen2.5-0.5b-fineweb-edu-12/step-1000` | 169 | 169 | complete QAT ternary export |
 | `qwen2.5-0.5b-fineweb-edu-row-1000/step-1000` | 169 | 169 | row-scale QAT ternary export; one scale per output row |
 | `qwen2.5-0.5b-fineweb-edu-klonly-1000/step-1000` | 169 | 169 | KL-only QAT ternary export; tensor scale |
+| `qwen2.5-0.5b-fineweb-edu-klonly-notiehead-1000/step-1000` | 168 | 168 | KL-only export with tied dense `lm_head` preserved; config keeps `tie_word_embeddings=true` |
 | `qwen2.5-1.5b-fineweb-edu/step-5000` | 197 | 197 | repaired after FSDP name-mapping bug |
 | `qwen2.5-0.5b-naive-ptq-tensor` | 168 | 168 | original HF checkpoint has tied `lm_head` |
 | `qwen2.5-1.5b-naive-ptq-tensor` | 196 | 196 | original HF checkpoint has tied `lm_head` |
@@ -59,6 +63,7 @@ Lower is better.
 | Qwen2.5-0.5B | QAT/distilled ternary | 1,079.167 | 373.775 | QAT recovers a lot versus PTQ, but remains unusable |
 | Qwen2.5-0.5B | QAT/distilled ternary, row scale | 444.691 | 152.821 | row scales improve PPL about 2.4x versus tensor-scale QAT |
 | Qwen2.5-0.5B | QAT/distilled ternary, KL only | 296.602 | 108.366 | best 0.5B ablation so far, still far from FP |
+| Qwen2.5-0.5B | QAT/distilled ternary, KL only, dense tied `lm_head` | 270.345 | 97.337 | strongest 0.5B ablation so far, but output head remains dense/tied |
 | Qwen2.5-1.5B | FP reference | 13.901 | 10.269 | baseline quality |
 | Qwen2.5-1.5B | naive PTQ ternary | 3,813,121.803 | 9,582,923.269 | blind ternarization destroys quality |
 | Qwen2.5-1.5B | QAT/distilled ternary | 86.414 | 40.398 | QAT is orders better than PTQ, but still far from FP |
@@ -69,9 +74,12 @@ WikiText PPL from `1,079.167` to `444.691` and FineWeb-heldout PPL from
 yet establish downstream quality.
 
 The KL-only ablation is stronger. It reduces 0.5B WikiText PPL to `296.602`
-and FineWeb-heldout PPL to `108.366`. That suggests the hidden-state MSE term
-can overconstrain a short-budget ternary student, but it does not close the FP
-gap.
+and FineWeb-heldout PPL to `108.366`. Preserving Qwen's tied `lm_head` as dense
+FP/BF16 improves the same setup again to `270.345` WikiText PPL and `97.337`
+FineWeb-heldout PPL. That suggests the hidden-state MSE term can overconstrain
+a short-budget ternary student, and that tied output-head policy matters. The
+dense-`lm_head` result does not close the FP gap and is not an all-linear W1.58
+checkpoint.
 
 ## PTQ Math Audit
 
@@ -153,17 +161,18 @@ change raw log-likelihood rankings.
 The Qwen2.5-0.5B row-scale ablation was also checked on the same in-repo
 100-example slices:
 
-| task | tensor acc | tensor acc_norm | row acc | row acc_norm | KL-only acc | KL-only acc_norm |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| PIQA | 0.520 | 0.500 | 0.480 | 0.460 | 0.570 | 0.560 |
-| ARC-Easy | 0.290 | 0.270 | 0.300 | 0.260 | 0.330 | 0.290 |
-| ARC-Challenge | 0.290 | 0.300 | 0.240 | 0.240 | 0.290 | 0.240 |
-| HellaSwag | 0.310 | 0.260 | 0.340 | 0.240 | 0.360 | 0.260 |
+| task | tensor acc | tensor acc_norm | row acc | row acc_norm | KL-only acc | KL-only acc_norm | KL-only dense `lm_head` acc | KL-only dense `lm_head` acc_norm |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| PIQA | 0.520 | 0.500 | 0.480 | 0.460 | 0.570 | 0.560 | 0.580 | 0.570 |
+| ARC-Easy | 0.290 | 0.270 | 0.300 | 0.260 | 0.330 | 0.290 | 0.360 | 0.300 |
+| ARC-Challenge | 0.290 | 0.300 | 0.240 | 0.240 | 0.290 | 0.240 | 0.270 | 0.290 |
+| HellaSwag | 0.310 | 0.260 | 0.340 | 0.240 | 0.360 | 0.260 | 0.350 | 0.290 |
 
 This is a cautionary ablation set. Row-wise scales improve likelihood but not
-these fast MC slices. KL-only improves likelihood further and is best or tied
-on three of four `acc_norm` values, but the slices remain small and do not
-justify a deployment-quality claim.
+these fast MC slices. KL-only improves likelihood further. Preserving the tied
+dense `lm_head` is best on all four `acc_norm` values in this small harness, but
+the slices remain small and the output head is no longer ternary. This result
+justifies a larger tied-head ablation, not a deployment-quality claim.
 
 ## Official lm-eval Accuracy
 
@@ -449,8 +458,10 @@ Interpretation:
    [-0.235, -0.124].
 10. Row-wise ternary scales improve 0.5B heldout perplexity by about 2.4x versus
    tensor-scale QAT, but the small multiple-choice slices remain mixed.
-11. KL-only 0.5B distillation improves heldout perplexity further and is the
-   best short-budget 0.5B ablation so far, but it remains far from FP quality.
+11. KL-only 0.5B distillation improves heldout perplexity further. Keeping
+   Qwen's tied `lm_head` dense improves it again and is the best short-budget
+   0.5B ablation so far, but it remains far from FP quality and is not a fully
+   ternary linear stack.
 12. PyTorch ternary inference is slower than FP on the Xeon probe. The product
    speed thesis depends on packed `bitnet.cpp` kernels, not on the PyTorch
    simulation path.
@@ -475,6 +486,9 @@ Interpretation:
 6. It does not prove the approach works for MoE models.
 7. It does not prove that the current training recipe is publishable as a final
    result.
+8. It does not prove that a dense tied `lm_head` is acceptable for every product
+   constraint; it improves quality in the 0.5B ablation but gives up full
+   output-head ternarization.
 
 ## Next Gates
 
@@ -491,3 +505,6 @@ The next benchmark gates are:
    same paired analysis for the strongest exact static-ternary checkpoint.
 5. Run ablations: longer QAT, hidden-MSE weighting, group/row scales, and
    larger FineWeb samples.
+6. Repeat the dense tied-`lm_head` policy at Qwen2.5-1.5B scale, then compare it
+   against the fully ternarized `lm_head` checkpoint on full ten-task lm-eval and
+   packed GGUF perplexity.
