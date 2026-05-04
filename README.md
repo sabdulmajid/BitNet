@@ -34,6 +34,9 @@ conservative:
   Qwen2.5-0.5B row-scale ablation cut heldout perplexity by about 2.4x versus
   the tensor-scale QAT checkpoint, but its 100-example multiple-choice slices
   were mixed and mostly not better.
+- **KL-only distillation is the best 0.5B ablation so far.** Removing the
+  hidden-state MSE term improved both heldout perplexity and most fast
+  multiple-choice slices at the same 1000-step budget.
 - **PyTorch ternary simulation is not the speed path.** On the Xeon Silver 4116
   host, the exported ternary checkpoints are smaller in memory but slower than
   FP under PyTorch because the probe dequantizes into dense matmuls. Real
@@ -59,6 +62,7 @@ The benchmark harnesses are in [benchmarks/](benchmarks/).
 | Qwen2.5-0.5B | naive PTQ ternary | 169,414.428 | 608,726.749 |
 | Qwen2.5-0.5B | QAT/distilled ternary | 1,079.167 | 373.775 |
 | Qwen2.5-0.5B | QAT/distilled ternary, row scale | 444.691 | 152.821 |
+| Qwen2.5-0.5B | QAT/distilled ternary, KL only | 296.602 | 108.366 |
 | Qwen2.5-1.5B | FP reference | 13.901 | 10.269 |
 | Qwen2.5-1.5B | naive PTQ ternary | 3,813,121.803 | 9,582,923.269 |
 | Qwen2.5-1.5B | QAT/distilled ternary | 86.414 | 40.398 |
@@ -87,6 +91,27 @@ task-accuracy gain:
 Interpretation: row scales reduce quantization error in the language-modeling
 objective, but this training budget still does not produce a competitive
 downstream checkpoint.
+
+### Qwen2.5-0.5B KL-only Ablation
+
+A second 1000-step ablation disabled hidden-state MSE and trained only on
+teacher KL. Final training metrics were loss/KL `1.6375` and hidden MSE `0`.
+
+This is the strongest 0.5B ablation so far: WikiText PPL improved to
+`296.602`, and FineWeb-heldout PPL improved to `108.366`. The same
+100-example multiple-choice slices were also better on three of four normalized
+metrics:
+
+| task | tensor-scale acc_norm | row-scale acc_norm | KL-only acc_norm |
+| --- | ---: | ---: | ---: |
+| PIQA | 0.500 | 0.460 | 0.560 |
+| ARC-Easy | 0.270 | 0.260 | 0.290 |
+| ARC-Challenge | 0.300 | 0.240 | 0.240 |
+| HellaSwag | 0.260 | 0.240 | 0.260 |
+
+Interpretation: at this short budget, hidden-state MSE appears to overconstrain
+the ternary student relative to KL-only distillation. The result is still far
+from FP quality.
 
 ### Early 100-example lm-eval Snapshot
 

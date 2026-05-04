@@ -10,7 +10,8 @@ these are quality and loader results, not final CPU product benchmarks.
 - Packed runtime binary: llama.cpp submodule commit `1f86f058`
 - Dataset for QAT/distillation: `HuggingFaceFW/fineweb-edu`, `sample-10BT`
 - QAT student forward math: ternary weights plus dynamic 8-bit activation quantization
-- QAT loss: teacher KL divergence plus last-hidden-state MSE
+- Main QAT loss: teacher KL divergence plus last-hidden-state MSE
+- Additional ablation: teacher KL only for Qwen2.5-0.5B
 - Main scale mode: per-tensor absmean scale
 - Additional ablation: per-output-row absmean scale for Qwen2.5-0.5B
 - Evaluation dtype/device for perplexity: BF16 on CUDA
@@ -34,6 +35,7 @@ smoke-scale heldout test.
 | 9730 | Qwen2.5-1.5B QAT student | 5000 | 20,000 x 1024 | 4.0420 | 1.7478 | 2.2943 | complete |
 | 9734 | Qwen2.5-0.5B QAT student | 1000 | 4,000 x 512 | 24.6557 | 2.8857 | 21.7699 | complete |
 | 9747 | Qwen2.5-0.5B QAT student, row scale | 1000 | 4,000 x 512 | 15.3338 | 2.0530 | 13.2808 | complete |
+| 9748 | Qwen2.5-0.5B QAT student, KL only | 1000 | 4,000 x 512 | 1.6375 | 1.6375 | 0.0000 | complete |
 
 ## Export Status
 
@@ -41,6 +43,7 @@ smoke-scale heldout test.
 | --- | ---: | ---: | --- |
 | `qwen2.5-0.5b-fineweb-edu-12/step-1000` | 169 | 169 | complete QAT ternary export |
 | `qwen2.5-0.5b-fineweb-edu-row-1000/step-1000` | 169 | 169 | row-scale QAT ternary export; one scale per output row |
+| `qwen2.5-0.5b-fineweb-edu-klonly-1000/step-1000` | 169 | 169 | KL-only QAT ternary export; tensor scale |
 | `qwen2.5-1.5b-fineweb-edu/step-5000` | 197 | 197 | repaired after FSDP name-mapping bug |
 | `qwen2.5-0.5b-naive-ptq-tensor` | 168 | 168 | original HF checkpoint has tied `lm_head` |
 | `qwen2.5-1.5b-naive-ptq-tensor` | 196 | 196 | original HF checkpoint has tied `lm_head` |
@@ -55,6 +58,7 @@ Lower is better.
 | Qwen2.5-0.5B | naive PTQ ternary | 169,414.428 | 608,726.749 | blind ternarization destroys quality |
 | Qwen2.5-0.5B | QAT/distilled ternary | 1,079.167 | 373.775 | QAT recovers a lot versus PTQ, but remains unusable |
 | Qwen2.5-0.5B | QAT/distilled ternary, row scale | 444.691 | 152.821 | row scales improve PPL about 2.4x versus tensor-scale QAT |
+| Qwen2.5-0.5B | QAT/distilled ternary, KL only | 296.602 | 108.366 | best 0.5B ablation so far, still far from FP |
 | Qwen2.5-1.5B | FP reference | 13.901 | 10.269 | baseline quality |
 | Qwen2.5-1.5B | naive PTQ ternary | 3,813,121.803 | 9,582,923.269 | blind ternarization destroys quality |
 | Qwen2.5-1.5B | QAT/distilled ternary | 86.414 | 40.398 | QAT is orders better than PTQ, but still far from FP |
@@ -63,6 +67,11 @@ The row-scale ablation is meaningful but not decisive. It reduces 0.5B
 WikiText PPL from `1,079.167` to `444.691` and FineWeb-heldout PPL from
 `373.775` to `152.821`, but it remains far from the FP reference and does not
 yet establish downstream quality.
+
+The KL-only ablation is stronger. It reduces 0.5B WikiText PPL to `296.602`
+and FineWeb-heldout PPL to `108.366`. That suggests the hidden-state MSE term
+can overconstrain a short-budget ternary student, but it does not close the FP
+gap.
 
 ## Prompt-Suite Sanity Check
 
@@ -116,15 +125,17 @@ change raw log-likelihood rankings.
 The Qwen2.5-0.5B row-scale ablation was also checked on the same in-repo
 100-example slices:
 
-| task | tensor-scale QAT acc | tensor-scale QAT acc_norm | row-scale QAT acc | row-scale QAT acc_norm |
-| --- | ---: | ---: | ---: | ---: |
-| PIQA | 0.520 | 0.500 | 0.480 | 0.460 |
-| ARC-Easy | 0.290 | 0.270 | 0.300 | 0.260 |
-| ARC-Challenge | 0.290 | 0.300 | 0.240 | 0.240 |
-| HellaSwag | 0.310 | 0.260 | 0.340 | 0.240 |
+| task | tensor acc | tensor acc_norm | row acc | row acc_norm | KL-only acc | KL-only acc_norm |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| PIQA | 0.520 | 0.500 | 0.480 | 0.460 | 0.570 | 0.560 |
+| ARC-Easy | 0.290 | 0.270 | 0.300 | 0.260 | 0.330 | 0.290 |
+| ARC-Challenge | 0.290 | 0.300 | 0.240 | 0.240 | 0.290 | 0.240 |
+| HellaSwag | 0.310 | 0.260 | 0.340 | 0.240 | 0.360 | 0.260 |
 
-This is a cautionary ablation: row-wise scales improve likelihood, but the
-small multiple-choice slices are mixed and do not justify a quality claim.
+This is a cautionary ablation set. Row-wise scales improve likelihood but not
+these fast MC slices. KL-only improves likelihood further and is best or tied
+on three of four `acc_norm` values, but the slices remain small and do not
+justify a deployment-quality claim.
 
 ## Official lm-eval Accuracy
 
@@ -410,13 +421,15 @@ Interpretation:
    [-0.235, -0.124].
 10. Row-wise ternary scales improve 0.5B heldout perplexity by about 2.4x versus
    tensor-scale QAT, but the small multiple-choice slices remain mixed.
-11. PyTorch ternary inference is slower than FP on the Xeon probe. The product
+11. KL-only 0.5B distillation improves heldout perplexity further and is the
+   best short-budget 0.5B ablation so far, but it remains far from FP quality.
+12. PyTorch ternary inference is slower than FP on the Xeon probe. The product
    speed thesis depends on packed `bitnet.cpp` kernels, not on the PyTorch
    simulation path.
-12. Packed I2_S GGUF execution is fast on the Xeon for Qwen2.5-0.5B-shaped
+13. Packed I2_S GGUF execution is fast on the Xeon for Qwen2.5-0.5B-shaped
    and Qwen2.5-1.5B-shaped models, but naive I2_S conversion fails the smoke
    prompt and explodes WikiText excerpt perplexity.
-13. A deployable intermediate path exists through static ternary materialization
+14. A deployable intermediate path exists through static ternary materialization
    plus llama.cpp `TQ2_0` or single-thread-written `I2_S`: both preserve the QAT
    PPL and run much faster than F16 decode, but the path requires
    QAT/distillation.
@@ -448,5 +461,5 @@ The next benchmark gates are:
    RSS, prompt throughput, and decode throughput.
 4. Extend uncapped `lm-eval` beyond the current ten selected tasks and keep the
    same paired analysis for the strongest exact static-ternary checkpoint.
-5. Run ablations: longer QAT, KL-only, hidden-MSE weighting, group/row scales, and
+5. Run ablations: longer QAT, hidden-MSE weighting, group/row scales, and
    larger FineWeb samples.
