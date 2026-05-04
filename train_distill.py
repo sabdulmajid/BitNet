@@ -24,6 +24,7 @@ import math
 import os
 import random
 import re
+import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -842,6 +843,7 @@ def train(args: argparse.Namespace) -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="QAT distillation into BitLinear W1.58A8 student")
+    output_dir_was_explicit = "--output-dir" in sys.argv[1:]
     parser.add_argument("--teacher-model", default="Qwen/Qwen2.5-1.5B")
     parser.add_argument("--student-init-model", default=None)
     parser.add_argument("--trust-remote-code", action=argparse.BooleanOptionalAction, default=True)
@@ -896,7 +898,8 @@ def parse_args() -> argparse.Namespace:
         args.max_seq_len = min(args.max_seq_len, 64)
         args.per_device_batch_size = max(args.per_device_batch_size, 2)
         args.grad_accum_steps = 1
-        args.output_dir = ""
+        if not output_dir_was_explicit:
+            args.output_dir = ""
         args.model_dtype = "fp32"
     return args
 
