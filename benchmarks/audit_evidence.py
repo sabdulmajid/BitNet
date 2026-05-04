@@ -89,18 +89,27 @@ def audit_checkpoint(specs: list[CheckpointSpec]) -> str:
     rows: list[list[str]] = []
     for spec in specs:
         if not spec.path.exists():
-            rows.append([spec.label, str(spec.path), "MISSING", "-", "-", "-", "-"])
+            rows.append([spec.label, str(spec.path), "MISSING", "-", "-", "-", "-", "-", "-"])
             continue
         state = torch.load(spec.path, map_location="cpu", weights_only=True)
         ternary_keys = [key for key in state if key.endswith(".ternary_weight")]
         scale_keys = [key for key in state if key.endswith(".weight_scale")]
         first_scale_shape = ""
         first_ternary_values = ""
+        config_tie = ""
+        metadata_note = "-"
         if scale_keys:
             first_scale_shape = str(tuple(state[scale_keys[0]].shape))
         if ternary_keys:
             values = torch.unique(state[ternary_keys[0]].cpu()).tolist()
             first_ternary_values = ",".join(str(int(value)) for value in values)
+        config_path = spec.path.parent / "config.json"
+        if config_path.exists():
+            config = json.loads(config_path.read_text(encoding="utf-8"))
+            config_tie_value = config.get("tie_word_embeddings", "")
+            config_tie = str(config_tie_value)
+            if "lm_head.ternary_weight" in state and config_tie_value is True:
+                metadata_note = "lm_head ternary but config tie_word_embeddings=true"
 
         ok = True
         if spec.expected_ternary is not None:
@@ -110,16 +119,34 @@ def audit_checkpoint(specs: list[CheckpointSpec]) -> str:
         if spec.expected_scale_rank is not None and scale_keys:
             ok = ok and len(tuple(state[scale_keys[0]].shape)) == spec.expected_scale_rank
         ok = ok and set(first_ternary_values.split(",")) <= {"-1", "0", "1"}
+        status = "FAIL"
+        if ok:
+            status = "WARN" if metadata_note != "-" else "PASS"
         rows.append([
             spec.label,
             str(spec.path),
-            "PASS" if ok else "FAIL",
+            status,
             str(len(ternary_keys)),
             str(len(scale_keys)),
             first_scale_shape,
             first_ternary_values,
+            config_tie,
+            metadata_note,
         ])
-    return md_table(["label", "path", "status", "ternary keys", "scale keys", "first scale", "first codes"], rows)
+    return md_table(
+        [
+            "label",
+            "path",
+            "status",
+            "ternary keys",
+            "scale keys",
+            "first scale",
+            "first codes",
+            "config tie",
+            "metadata note",
+        ],
+        rows,
+    )
 
 
 def audit_lm_eval(specs: list[tuple[str, Path]]) -> str:
