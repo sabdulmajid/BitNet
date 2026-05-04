@@ -36,8 +36,15 @@ MAX_STEPS="${MAX_STEPS:-5000}"
 PER_DEVICE_BATCH_SIZE="${PER_DEVICE_BATCH_SIZE:-2}"
 GRAD_ACCUM_STEPS="${GRAD_ACCUM_STEPS:-1}"
 LR="${LR:-1e-4}"
+LR_SCHEDULER="${LR_SCHEDULER:-cosine}"
 WARMUP_STEPS="${WARMUP_STEPS:-500}"
 MIN_LR_RATIO="${MIN_LR_RATIO:-0.1}"
+TEMPERATURE="${TEMPERATURE:-2.0}"
+KL_WEIGHT="${KL_WEIGHT:-1.0}"
+HIDDEN_MSE_WEIGHT="${HIDDEN_MSE_WEIGHT:-1.0}"
+HIDDEN_STATE_LAYERS="${HIDDEN_STATE_LAYERS:-last}"
+SCALE_MODE="${SCALE_MODE:-tensor}"
+QUANT_EPS="${QUANT_EPS:-1e-5}"
 DATALOADER_NUM_WORKERS="${DATALOADER_NUM_WORKERS:-0}"
 LOG_EVERY_STEPS="${LOG_EVERY_STEPS:-10}"
 SAVE_EVERY_STEPS="${SAVE_EVERY_STEPS:-1000}"
@@ -57,8 +64,11 @@ echo "MAX_STEPS=$MAX_STEPS"
 echo "PER_DEVICE_BATCH_SIZE=$PER_DEVICE_BATCH_SIZE"
 echo "GRAD_ACCUM_STEPS=$GRAD_ACCUM_STEPS"
 echo "LR=$LR"
+echo "LR_SCHEDULER=$LR_SCHEDULER"
 echo "WARMUP_STEPS=$WARMUP_STEPS"
 echo "MIN_LR_RATIO=$MIN_LR_RATIO"
+echo "TEMPERATURE=$TEMPERATURE KL_WEIGHT=$KL_WEIGHT HIDDEN_MSE_WEIGHT=$HIDDEN_MSE_WEIGHT"
+echo "HIDDEN_STATE_LAYERS=$HIDDEN_STATE_LAYERS SCALE_MODE=$SCALE_MODE QUANT_EPS=$QUANT_EPS"
 echo "DATALOADER_NUM_WORKERS=$DATALOADER_NUM_WORKERS"
 echo "SAVE_EVERY_STEPS=$SAVE_EVERY_STEPS"
 echo "OUTPUT_DIR=$OUTPUT_DIR"
@@ -88,16 +98,17 @@ torchrun \
   --grad-accum-steps "$GRAD_ACCUM_STEPS" \
   --max-steps "$MAX_STEPS" \
   --learning-rate "$LR" \
-  --lr-scheduler cosine \
+  --lr-scheduler "$LR_SCHEDULER" \
   --warmup-steps "$WARMUP_STEPS" \
   --min-lr-ratio "$MIN_LR_RATIO" \
-  --temperature 2.0 \
-  --kl-weight 1.0 \
-  --hidden-mse-weight 1.0 \
-  --hidden-state-layers last \
+  --temperature "$TEMPERATURE" \
+  --kl-weight "$KL_WEIGHT" \
+  --hidden-mse-weight "$HIDDEN_MSE_WEIGHT" \
+  --hidden-state-layers "$HIDDEN_STATE_LAYERS" \
   --model-dtype bf16 \
   --master-weight-dtype fp32 \
-  --scale-mode tensor \
+  --scale-mode "$SCALE_MODE" \
+  --quant-eps "$QUANT_EPS" \
   --gradient-checkpointing \
   --use-fsdp \
   --fsdp-mixed-precision \
