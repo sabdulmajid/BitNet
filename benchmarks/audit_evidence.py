@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -54,6 +55,14 @@ def parse_label_path(spec: str) -> tuple[str, Path]:
     if not label:
         raise ValueError(f"empty label in {spec!r}")
     return label, Path(path)
+
+
+def parse_label_path_count(spec: str) -> tuple[str, Path, int | None]:
+    label, raw_path = parse_label_path(spec)
+    parts = str(raw_path).split(":")
+    path = Path(parts[0])
+    expected_count = int(parts[1]) if len(parts) > 1 and parts[1] else None
+    return label, path, expected_count
 
 
 def parse_checkpoint(spec: str) -> CheckpointSpec:
@@ -331,6 +340,82 @@ def audit_math(specs: list[tuple[str, Path]]) -> str:
     )
 
 
+def audit_gguf_summary(specs: list[tuple[str, Path, int | None]]) -> str:
+    if not specs:
+        return "No GGUF summary specs supplied."
+    rows_out: list[list[str]] = []
+    for label, path, expected_rows in specs:
+        if not path.exists():
+            rows_out.append([label, str(path), "MISSING", "-", "-", "-", "-", "-", "-", "-", "-"])
+            continue
+        data = load_json(path)
+        rows = data.get("rows", [])
+        if not isinstance(rows, list):
+            rows_out.append([label, str(path), "FAIL", "0", "-", "rows is not a list", "-", "-", "-", "-", "-"])
+            continue
+
+        failed: list[str] = []
+        nan_ppl: list[str] = []
+        by_name: dict[str, dict[str, Any]] = {}
+        cpu = ""
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            name = str(row.get("name", ""))
+            by_name[name] = row
+            if not row.get("exists", False):
+                failed.append(f"{name}:missing")
+            for key in ("bench_returncode", "ppl_returncode", "smoke_returncode"):
+                if int(row.get(key, 1)) != 0:
+                    failed.append(f"{name}:{key}")
+            ppl = row.get("perplexity", {}).get("ppl")
+            if not isinstance(ppl, (int, float)) or not math.isfinite(float(ppl)):
+                nan_ppl.append(name)
+            if not cpu:
+                cpu = str(row.get("bench", {}).get("prefill", {}).get("cpu", ""))
+
+        if expected_rows is not None and len(rows) != expected_rows:
+            failed.append(f"expected_rows={expected_rows},got={len(rows)}")
+
+        def ppl_for(name: str) -> str:
+            value = by_name.get(name, {}).get("perplexity", {}).get("ppl")
+            return f"{float(value):.4g}" if isinstance(value, (int, float)) and math.isfinite(float(value)) else "-"
+
+        def decode_for(name: str) -> str:
+            value = by_name.get(name, {}).get("bench", {}).get("decode", {}).get("tok_s")
+            return f"{float(value):.2f}" if isinstance(value, (int, float)) else "-"
+
+        rows_out.append([
+            label,
+            str(path),
+            "PASS" if not failed and not nan_ppl else "FAIL",
+            str(len(rows)),
+            cpu,
+            ",".join(failed) if failed else "-",
+            ",".join(nan_ppl) if nan_ppl else "-",
+            ppl_for("qwen15b_fp_f16"),
+            ppl_for("qwen15b_fp_i2_s"),
+            ppl_for("qwen15b_static_ternary_i2_s"),
+            decode_for("qwen15b_static_ternary_i2_s"),
+        ])
+    return md_table(
+        [
+            "label",
+            "path",
+            "status",
+            "rows",
+            "cpu",
+            "failed",
+            "nan ppl",
+            "FP F16 PPL",
+            "blind I2_S PPL",
+            "QAT I2_S PPL",
+            "QAT I2_S decode tok/s",
+        ],
+        rows_out,
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -343,6 +428,7 @@ def main() -> None:
     parser.add_argument("--perplexity", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--mc", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--runtime", action="append", default=[], help="LABEL=path.json")
+    parser.add_argument("--gguf-summary", action="append", default=[], help="LABEL=summary.json[:expected_rows]")
     parser.add_argument("--math", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--output-md", type=Path, default=None)
     args = parser.parse_args()
@@ -352,6 +438,7 @@ def main() -> None:
     perplexity = [parse_label_path(spec) for spec in args.perplexity]
     mc_specs = [parse_label_path(spec) for spec in args.mc]
     runtime = [parse_label_path(spec) for spec in args.runtime]
+    gguf_summary = [parse_label_path_count(spec) for spec in args.gguf_summary]
     math_specs = [parse_label_path(spec) for spec in args.math]
 
     report = "\n\n".join([
@@ -366,6 +453,8 @@ def main() -> None:
         audit_mc(mc_specs),
         "## Runtime Artifacts",
         audit_runtime(runtime),
+        "## GGUF Summary Artifacts",
+        audit_gguf_summary(gguf_summary),
         "## PTQ Math Artifacts",
         audit_math(math_specs),
     ])

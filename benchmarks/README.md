@@ -177,7 +177,7 @@ Before copying any result into a public report, run the artifact audit against
 the exact files being cited. It verifies checkpoint ternary key counts, scale
 layout, optional `tie_word_embeddings` expectations, lm-eval task/sample
 presence, perplexity JSON structure, multiple-choice JSON structure, runtime
-probe JSON structure, and PTQ math JSON outputs:
+probe JSON structure, GGUF CPU summary rows, and PTQ math JSON outputs:
 
 ```bash
 python experiments/math_viability_test.py \
@@ -194,6 +194,7 @@ python benchmarks/audit_evidence.py \
   --perplexity qwen15b_qat_wikitext=benchmark_results/quality-9735/qwen15b_ternary_wikitext.json \
   --mc qwen05b_ternary_piqa=benchmark_results/mc-qwen05b-klonly-notiehead-1000/qwen05b_ternary_piqa.json \
   --runtime qwen05b_runtime=benchmark_results/runtime-qwen05b-klonly-notiehead-512x32/qwen05b_klonly_notiehead.json \
+  --gguf-summary qwen15b_cpu=benchmark_results/gguf-qwen15b-suite-v2/summary.json:8 \
   --math dense_gaussian_2048=benchmark_results/math_viability/qwen_dense_2048_trials10_seed0.json \
   --output-md benchmark_results/evidence_audit/current.md
 ```
