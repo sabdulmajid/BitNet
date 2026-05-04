@@ -101,6 +101,9 @@ created by converting dense HF checkpoints to F16 GGUF and then running
 | Qwen2.5-1.5B FP | I2_S | 766 MiB | 205.66 | 18.41 | repeated-token collapse |
 | Qwen2.5-1.5B QAT step-5000 | F16 | 3,396 MiB | 105.21 | 5.52 | degenerate text |
 | Qwen2.5-1.5B QAT step-5000 | I2_S | 1,211 MiB | 203.59 | 17.97 | repeated-token collapse |
+| Qwen2.5-1.5B static ternary | F16 materialized | 3,396 MiB | 105.28 | 5.51 | sensible |
+| Qwen2.5-1.5B static ternary | TQ2_0 | 1,219 MiB | 158.52 | 18.38 | sensible |
+| Qwen2.5-1.5B static ternary | I2_S | 1,211 MiB | 190.79 | 18.61 | degenerate punctuation |
 
 Interpretation: the CPU backend can execute packed I2_S quickly on this 2017
 Xeon. The blocking problem is quality, not kernel availability. Standard Q8_0
@@ -122,13 +125,18 @@ that fallback warning.
 | Qwen2.5-1.5B FP | I2_S | 1.206e51 | 140.03 |
 | Qwen2.5-1.5B QAT step-5000 dense GGUF | F16 | 2728.9322 | 83.79 |
 | Qwen2.5-1.5B QAT step-5000 dense GGUF | I2_S | 7.619e59 | 137.73 |
+| Qwen2.5-1.5B static ternary | F16 materialized | 83.8300 | 83.27 |
+| Qwen2.5-1.5B static ternary | TQ2_0 | 84.0553 | 113.75 |
+| Qwen2.5-1.5B static ternary | I2_S | NaN | 132.97 |
 
 This is the cleanest packed-runtime evidence so far: conventional Q8_0 and
 Q4_K_M retain the FP language-modeling likelihood, while blind I2_S
-ternarization destroys it. The dense GGUF exported from the QAT checkpoint is
-also not a valid proxy for the PyTorch static-ternary checkpoint; a bit-exact
-GGUF importer for `ternary_state_dict.pt` is required before claiming QAT
-quality through `bitnet.cpp`.
+ternarization destroys it. Materializing `ternary_state_dict.pt` as dense F16
+recovers the PyTorch static-ternary quality, and llama.cpp `TQ2_0` preserves
+that quality while giving a 2.06 bpw ternary GGUF artifact. The current I2_S
+quantization path is faster but numerically invalid for this trained sparse
+ternary artifact, so a native I2_S writer/kernel audit remains required before
+claiming BitNet I2_S deployment quality.
 
 ### Xeon PyTorch Runtime Probe
 

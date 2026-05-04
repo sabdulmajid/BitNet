@@ -168,6 +168,9 @@ bit-exact loader for `ternary_state_dict.pt`.
 | Qwen2.5-1.5B FP | I2_S | 766 MiB | 205.66 | 18.41 | repeated-token collapse |
 | Qwen2.5-1.5B QAT step-5000 | F16 | 3,396 MiB | 105.21 | 5.52 | degenerate text |
 | Qwen2.5-1.5B QAT step-5000 | I2_S | 1,211 MiB | 203.59 | 17.97 | repeated-token collapse |
+| Qwen2.5-1.5B static ternary | F16 materialized | 3,396 MiB | 105.28 | 5.51 | sensible completion |
+| Qwen2.5-1.5B static ternary | TQ2_0 | 1,219 MiB | 158.52 | 18.38 | sensible completion |
+| Qwen2.5-1.5B static ternary | I2_S | 1,211 MiB | 190.79 | 18.61 | punctuation collapse |
 
 Smoke prompt: `The capital of France is`, greedy decoding, 24 generated tokens.
 The FP/Q8_0/Q4_K_M controls complete with `Paris` and related capital-city
@@ -186,6 +189,9 @@ Important caveats:
   perplexity. The 1.5B QAT checkpoint is stronger under the PyTorch
   static-ternary path, but dense GGUF export from `model.safetensors` is not a
   valid proxy for that static ternary artifact.
+- Materializing `ternary_state_dict.pt` back into dense F16 recovers the
+  expected static-ternary behavior. Quantizing that materialized artifact to
+  generic `TQ2_0` preserves quality, while quantizing it to I2_S does not.
 
 ## Packed GGUF Perplexity Probe
 
@@ -201,6 +207,9 @@ Important caveats:
 | Qwen2.5-1.5B FP | I2_S | 1.206e51 | 5.898e50 | 140.03 |
 | Qwen2.5-1.5B QAT step-5000 dense GGUF | F16 | 2728.9322 | 262.72596 | 83.79 |
 | Qwen2.5-1.5B QAT step-5000 dense GGUF | I2_S | 7.619e59 | 4.502e59 | 137.73 |
+| Qwen2.5-1.5B static ternary | F16 materialized | 83.8300 | 4.60205 | 83.27 |
+| Qwen2.5-1.5B static ternary | TQ2_0 | 84.0553 | 4.61363 | 113.75 |
+| Qwen2.5-1.5B static ternary | I2_S | NaN | NaN | 132.97 |
 
 Interpretation:
 
@@ -213,6 +222,13 @@ Interpretation:
   scales from `ternary_state_dict.pt`; until GGUF ingests those exactly, the
   GGUF QAT numbers above should be treated as a failed conversion path rather
   than a final measure of the QAT recipe.
+- A dense materialization bridge for `ternary_state_dict.pt` validates the
+  exported static ternary checkpoint in GGUF F16 form: PPL 83.83, matching the
+  earlier PyTorch-scale result.
+- Generic llama.cpp `TQ2_0` preserves that static-ternary PPL while giving a
+  2.06 bpw ternary file and about 18.38 decode tok/s on the Xeon.
+- Current I2_S quantization of the same materialized artifact produces NaN PPL,
+  so I2_S needs a writer/kernel audit before being used for trained QAT Qwen.
 
 ## What This Proves
 
@@ -236,6 +252,9 @@ Interpretation:
 8. Packed I2_S GGUF execution is fast on the Xeon for Qwen2.5-0.5B-shaped
    and Qwen2.5-1.5B-shaped models, but naive I2_S conversion fails the smoke
    prompt and explodes WikiText excerpt perplexity.
+9. A deployable intermediate path exists through static ternary materialization
+   plus llama.cpp `TQ2_0`: it preserves the QAT PPL and runs much faster than
+   F16 decode, but it is not the optimized BitNet I2_S path.
 
 ## What This Does Not Prove Yet
 
@@ -245,20 +264,23 @@ Interpretation:
 4. It does not prove real `bitnet.cpp` quality for the stronger Qwen2.5-1.5B
    QAT checkpoint yet because dense GGUF export is not bit-exact to
    `ternary_state_dict.pt`.
-5. It does not prove the approach works for MoE models.
-6. It does not prove that the current training recipe is publishable as a final
+5. It does not prove I2_S correctness for trained sparse ternary Qwen; the
+   materialized static-ternary I2_S artifact produced NaN perplexity.
+6. It does not prove the approach works for MoE models.
+7. It does not prove that the current training recipe is publishable as a final
    result.
 
 ## Next Gates
 
 The next benchmark gates are:
 
-1. Build a bit-exact GGUF importer for `ternary_state_dict.pt` instead of
-   requantizing dense GGUF weights.
-2. Re-run packed I2_S smoke, WikiText perplexity, and throughput on the exact
-   static-ternary GGUF artifact.
-3. Compare exact static-ternary GGUF against llama.cpp Q8_0 and Q4_K_M on
-   quality, model size, RSS, prompt throughput, and decode throughput.
+1. Audit and fix I2_S quantization/runtime for materialized sparse ternary Qwen
+   weights.
+2. Build a native GGUF writer for `ternary_state_dict.pt` so I2_S can ingest
+   trained ternary codes and scales directly.
+3. Keep `TQ2_0` as the current working packed ternary baseline and compare it
+   against Q8_0 and Q4_K_M on quality, model size, RSS, prompt throughput, and
+   decode throughput.
 4. Run full, unsliced `lm-eval` tasks for the strongest exact static-ternary
    checkpoint.
 5. Run ablations: longer QAT, row scale, KL-only, hidden-MSE weighting, and

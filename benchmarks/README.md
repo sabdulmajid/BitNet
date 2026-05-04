@@ -120,6 +120,27 @@ After GGUF/TL2/I2_S conversion, compare against llama.cpp baselines:
 
 Measure prompt throughput, decode throughput, RSS, model file size, and perplexity on the same text blocks.
 
+For QAT checkpoints, do not convert `model.safetensors` directly and treat it
+as the trained ternary artifact. The validated bridge is:
+
+```bash
+python benchmarks/materialize_static_ternary_hf.py \
+  --checkpoint-dir checkpoints/qwen2.5-1.5b-fineweb-edu/step-5000 \
+  --output-dir checkpoints/qwen2.5-1.5b-fineweb-edu/step-5000-static-ternary-dense-f16 \
+  --dtype float16 \
+  --expect-ternary-keys 197
+
+python 3rdparty/llama.cpp/convert_hf_to_gguf.py \
+  checkpoints/qwen2.5-1.5b-fineweb-edu/step-5000-static-ternary-dense-f16 \
+  --outfile models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_f16.gguf \
+  --outtype f16
+```
+
+Current finding: this materialized static-ternary F16 GGUF recovers the QAT
+quality signal, and `TQ2_0` preserves it as a packed ternary GGUF. The I2_S path
+is faster but currently produces invalid perplexity for this trained sparse
+ternary artifact, so I2_S needs a writer/kernel audit before publication.
+
 ## Publishability Gate
 
 A credible claim needs all of:

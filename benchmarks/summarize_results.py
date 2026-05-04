@@ -193,13 +193,19 @@ def summarize_gguf_perplexity(pattern: str) -> str:
         path = Path(item)
         text = path.read_text(encoding="utf-8", errors="replace")
         ppl_match = ppl_pattern.search(text)
-        if not ppl_match:
-            continue
         speed_match = speed_pattern.search(text)
+        if ppl_match:
+            ppl = ppl_match.group(1)
+            stderr = ppl_match.group(2).strip()
+        elif "-nan" in text.lower() or "negative standard deviation" in text.lower():
+            ppl = "NaN"
+            stderr = "NaN"
+        else:
+            continue
         rows.append([
             path.stem,
-            ppl_match.group(1),
-            ppl_match.group(2).strip(),
+            ppl,
+            stderr,
             speed_match.group(2) if speed_match else "",
             speed_match.group(3) if speed_match else "",
         ])
