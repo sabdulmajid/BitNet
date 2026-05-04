@@ -44,7 +44,7 @@ def dtype_from_name(name: str) -> torch.dtype:
     raise ValueError(f"unsupported dtype: {name}")
 
 
-def copy_sidecars(source_dir: Path, output_dir: Path, dtype_name: str) -> None:
+def copy_sidecars(source_dir: Path, output_dir: Path, dtype_name: str, *, untie_word_embeddings: bool) -> None:
     for filename in SIDECAR_FILES:
         source = source_dir / filename
         if source.exists():
@@ -55,6 +55,8 @@ def copy_sidecars(source_dir: Path, output_dir: Path, dtype_name: str) -> None:
         config = json.loads(config_path.read_text(encoding="utf-8"))
         config["dtype"] = "float16" if dtype_name in {"fp16", "float16", "f16"} else dtype_name
         config["torch_dtype"] = config["dtype"]
+        if untie_word_embeddings:
+            config["tie_word_embeddings"] = False
         config_path.write_text(json.dumps(config, indent=2, sort_keys=False) + "\n", encoding="utf-8")
 
 
@@ -93,6 +95,7 @@ def materialize(input_path: Path, output_dir: Path, dtype: torch.dtype) -> dict[
         "ternary_materialized": ternary_count,
         "copied_tensors": copied_count,
         "output_tensors": len(output),
+        "materialized_lm_head": int("lm_head.weight" in output),
     }
 
 
@@ -110,7 +113,12 @@ def main() -> None:
     dtype = dtype_from_name(args.dtype)
 
     manifest = materialize(ternary_path, args.output_dir, dtype)
-    copy_sidecars(args.checkpoint_dir, args.output_dir, args.dtype)
+    copy_sidecars(
+        args.checkpoint_dir,
+        args.output_dir,
+        args.dtype,
+        untie_word_embeddings=bool(manifest["materialized_lm_head"]),
+    )
 
     if args.expect_ternary_keys is not None and manifest["ternary_materialized"] != args.expect_ternary_keys:
         raise SystemExit(

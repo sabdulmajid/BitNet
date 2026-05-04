@@ -199,6 +199,26 @@ def replace_linear_layers(
     return len(replacements)
 
 
+def mark_untied_output_if_needed(model: nn.Module) -> bool:
+    """Keep HF config metadata consistent after replacing `lm_head`.
+
+    Qwen checkpoints declare tied token embeddings. Replacing `lm_head` with a
+    separate BitLinear module breaks that tie, so saved artifacts must not ask
+    downstream loaders or converters to re-tie the output projection.
+    """
+
+    if not hasattr(model, "get_output_embeddings") or not hasattr(model, "config"):
+        return False
+    try:
+        output_embeddings = model.get_output_embeddings()
+    except Exception:
+        return False
+    if isinstance(output_embeddings, BitLinear) and getattr(model.config, "tie_word_embeddings", False):
+        model.config.tie_word_embeddings = False
+        return True
+    return False
+
+
 def rank0() -> bool:
     return not dist.is_available() or not dist.is_initialized() or dist.get_rank() == 0
 
@@ -735,6 +755,8 @@ def train(args: argparse.Namespace) -> None:
     if replaced == 0:
         raise RuntimeError("no nn.Linear layers were replaced; check model architecture or exclude regex")
     log(f"Replaced {replaced} student nn.Linear modules with BitLinear")
+    if mark_untied_output_if_needed(student):
+        log("Set config.tie_word_embeddings=False because lm_head is BitLinear")
 
     freeze_teacher(teacher)
     enable_training_memory_features(student, args)
