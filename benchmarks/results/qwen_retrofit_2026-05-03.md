@@ -6,7 +6,7 @@ these are quality and loader results, not final CPU product benchmarks.
 
 ## Setup
 
-- Repository commit after benchmark tooling: `6501778`
+- Benchmark tooling commit before this report update: `61f140e`
 - Packed runtime binary: llama.cpp submodule commit `1f86f058`
 - Dataset for QAT/distillation: `HuggingFaceFW/fineweb-edu`, `sample-10BT`
 - QAT student forward math: ternary weights plus dynamic 8-bit activation quantization
@@ -15,7 +15,8 @@ these are quality and loader results, not final CPU product benchmarks.
 - Evaluation dtype/device for perplexity: BF16 on CUDA
 - WikiText eval: `wikitext-2-raw-v1`, test split, 64 blocks x 512 tokens
 - FineWeb heldout eval: `sample-10BT`, train stream after `--skip-rows 25000`, 32 blocks x 1024 tokens
-- Official task eval: EleutherAI `lm-eval` 0.4.11, 100-example slices
+- Official task eval: EleutherAI `lm-eval` 0.4.11, 100-example ten-task
+  slices plus 1000-example five-task core slices
 - PyTorch runtime probe: Intel Xeon Silver 4116, PyTorch FP32, 12 Torch threads,
   512-token prompt, 32 generated tokens
 - Packed GGUF runtime probe: Intel Xeon Silver 4116, `llama-bench -p 512
@@ -130,6 +131,33 @@ Mean displayed metric:
 | FP reference | 0.646 |
 | naive PTQ ternary | 0.351 |
 | QAT/distilled ternary | 0.490 |
+
+## Larger Core lm-eval Accuracy
+
+The same Qwen2.5-1.5B comparison was rerun with 1000-example caps for five
+core tasks. This is still capped, but it is a stronger estimate than the
+100-example smoke slice above.
+
+| task | metric | FP reference | naive PTQ ternary | QAT/distilled ternary |
+| --- | --- | ---: | ---: | ---: |
+| ARC-Challenge | acc_norm | 0.448 | 0.266 | 0.259 |
+| ARC-Easy | acc_norm | 0.713 | 0.246 | 0.486 |
+| HellaSwag | acc_norm | 0.584 | 0.262 | 0.389 |
+| PIQA | acc_norm | 0.756 | 0.510 | 0.614 |
+| WinoGrande | acc | 0.647 | 0.509 | 0.531 |
+
+Mean displayed metric:
+
+| method | mean |
+| --- | ---: |
+| FP reference | 0.630 |
+| naive PTQ ternary | 0.359 |
+| QAT/distilled ternary | 0.456 |
+
+QAT/distillation improves the mean by 0.097 over naive PTQ and recovers about
+36% of the FP-vs-PTQ gap on these five capped tasks. It still remains far below
+the FP reference, and ARC-Challenge is a small counterexample where QAT is
+slightly below naive PTQ on `acc_norm`.
 
 ## Xeon PyTorch Runtime Probe
 
@@ -248,15 +276,18 @@ Interpretation:
    deployment claim.
 5. On fast multiple-choice slices, 1.5B QAT generally recovers meaningful
    accuracy relative to naive PTQ, but still trails FP.
-6. On ten lm-eval slices, 1.5B QAT improves the mean displayed task metric from
-   0.351 for naive PTQ to 0.490, while FP remains 0.646.
-7. PyTorch ternary inference is slower than FP on the Xeon probe. The product
+6. On ten 100-example lm-eval slices, 1.5B QAT improves the mean displayed task
+   metric from 0.351 for naive PTQ to 0.490, while FP remains 0.646.
+7. On five 1000-example core lm-eval slices, 1.5B QAT improves the mean
+   displayed task metric from 0.359 for naive PTQ to 0.456, while FP remains
+   0.630. This is a measurable recovery, not FP-quality preservation.
+8. PyTorch ternary inference is slower than FP on the Xeon probe. The product
    speed thesis depends on packed `bitnet.cpp` kernels, not on the PyTorch
    simulation path.
-8. Packed I2_S GGUF execution is fast on the Xeon for Qwen2.5-0.5B-shaped
+9. Packed I2_S GGUF execution is fast on the Xeon for Qwen2.5-0.5B-shaped
    and Qwen2.5-1.5B-shaped models, but naive I2_S conversion fails the smoke
    prompt and explodes WikiText excerpt perplexity.
-9. A deployable intermediate path exists through static ternary materialization
+10. A deployable intermediate path exists through static ternary materialization
    plus llama.cpp `TQ2_0`: it preserves the QAT PPL and runs much faster than
    F16 decode, but it requires QAT/distillation and is not the optimized BitNet
    I2_S path.
@@ -266,9 +297,9 @@ Interpretation:
 1. It does not prove acceptable downstream task accuracy.
 2. It does not replace full, unsliced `lm-eval` task accuracy.
 3. It does not prove bit-exact GGUF ingestion of `ternary_state_dict.pt`.
-4. It does not prove real `bitnet.cpp` quality for the stronger Qwen2.5-1.5B
-   QAT checkpoint yet because dense GGUF export is not bit-exact to
-   `ternary_state_dict.pt`.
+4. It does not prove optimized BitNet I2_S deployment quality for the stronger
+   Qwen2.5-1.5B QAT checkpoint; the working packed baseline is currently
+   generic llama.cpp `TQ2_0`.
 5. It does not prove I2_S correctness for trained sparse ternary Qwen; the
    materialized static-ternary I2_S artifact produced NaN perplexity.
 6. It does not prove the approach works for MoE models.

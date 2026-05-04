@@ -19,22 +19,28 @@ release claim. It tests whether pretrained dense Hugging Face models can be
 retrofitted into BitNet-style W1.58A8 models. The current answer is deliberately
 conservative:
 
+- **Verdict so far: no lossless arbitrary retrofit.** The evidence supports
+  QAT/distillation under ternary forward constraints, not blind conversion of
+  existing FP16/BF16 checkpoints into 1.58-bit form with acceptable degradation.
 - **Blind post-training ternarization is not viable** for the tested Qwen
   checkpoints. It causes catastrophic perplexity collapse.
 - **QAT/distillation is materially better than naive PTQ**, which shows that
   training under ternary forward constraints recovers real signal.
-- **The current QAT checkpoints are not deployment-quality yet.** They remain
-  significantly worse than the FP references. A Qwen2.5-0.5B QAT checkpoint can
-  be converted to GGUF and packed as I2_S, but the resulting text is still
-  degenerate on a simple smoke prompt.
+- **The current QAT checkpoints are not FP-quality yet.** The strongest
+  Qwen2.5-1.5B static ternary checkpoint is usable enough for measurement, but
+  it remains significantly worse than the FP reference on perplexity and
+  capped task accuracy.
 - **PyTorch ternary simulation is not the speed path.** On the Xeon Silver 4116
   host, the exported ternary checkpoints are smaller in memory but slower than
   FP under PyTorch because the probe dequantizes into dense matmuls. Real
   product claims require GGUF/I2_S or TL2 execution through `bitnet.cpp`.
-- **Packed I2_S runtime is fast, but speed does not rescue blind
-  ternarization.** On the same Xeon, Qwen2.5-0.5B I2_S GGUF runs much faster
-  than F16/Q8 decode, but blind I2_S conversion collapses a basic generation
-  prompt to punctuation.
+- **Packed ternary runtime is fast, but speed does not rescue blind
+  ternarization.** On the same Xeon, blind I2_S/TQ2_0 conversion runs faster
+  than F16 but destroys quality. Materializing the trained
+  `ternary_state_dict.pt` and packing it as llama.cpp `TQ2_0` preserves the QAT
+  perplexity while giving a CPU-native 2.06 bpw artifact. The optimized I2_S
+  path still needs a writer/kernel correctness audit for trained sparse ternary
+  Qwen weights.
 
 Current evidence is tracked in
 [benchmarks/results/qwen_retrofit_2026-05-03.md](benchmarks/results/qwen_retrofit_2026-05-03.md).
@@ -77,6 +83,24 @@ Mean over these displayed metrics: FP 0.646, naive PTQ 0.351, QAT ternary
 0.490. This supports the narrow claim that QAT/distillation recovers substantial
 signal over blind ternarization. It does **not** support a claim that the
 current ternary model preserves FP quality.
+
+### Larger Core lm-eval Slice
+
+The same Qwen2.5-1.5B comparison was rerun on 1000-example caps for the five
+core tasks below. This is still capped, but it is a stronger estimate than the
+100-example smoke slice above.
+
+| task | metric | FP | naive PTQ | QAT ternary |
+| --- | --- | ---: | ---: | ---: |
+| ARC-Challenge | acc_norm | 0.448 | 0.266 | 0.259 |
+| ARC-Easy | acc_norm | 0.713 | 0.246 | 0.486 |
+| HellaSwag | acc_norm | 0.584 | 0.262 | 0.389 |
+| PIQA | acc_norm | 0.756 | 0.510 | 0.614 |
+| WinoGrande | acc | 0.647 | 0.509 | 0.531 |
+
+Mean over these displayed metrics: FP 0.630, naive PTQ 0.359, QAT ternary
+0.456. QAT recovers clear signal over blind PTQ on the mean, but it recovers
+only about 36% of the FP-vs-PTQ gap and remains far below the FP reference.
 
 ### Packed GGUF CPU Runtime Snapshot
 
