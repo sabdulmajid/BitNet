@@ -5,7 +5,7 @@ This directory contains reusable benchmark harnesses for comparing:
 1. original Hugging Face FP checkpoints,
 2. QAT/distilled W1.58A8 ternary checkpoints,
 3. naive-PTQ W1.58A8 ternary checkpoints,
-4. future GGUF/CPU-runtime baselines.
+4. GGUF/CPU-runtime baselines.
 
 ## Rules
 
@@ -129,6 +129,35 @@ python benchmarks/compare_lm_eval.py \
   --metric winogrande=acc
 ```
 
+If a full task suite is split across Slurm jobs, merge task-keyed lm-eval JSON
+files before comparing. This preserves `samples` for paired analysis:
+
+```bash
+OUT=benchmark_results/lm-eval-qwen15b-full10
+mkdir -p "$OUT"
+
+python benchmarks/merge_lm_eval_results.py \
+  --input benchmark_results/lm-eval-qwen15b-core5-full/qwen15b_fp.json \
+  --input benchmark_results/lm-eval-qwen15b-rest5-full-v2/qwen15b_fp.json \
+  --output-json "$OUT/qwen15b_fp.json"
+
+python benchmarks/merge_lm_eval_results.py \
+  --input benchmark_results/lm-eval-qwen15b-core5-full/qwen15b_naive_ptq.json \
+  --input benchmark_results/lm-eval-qwen15b-rest5-full-v2/qwen15b_naive_ptq.json \
+  --output-json "$OUT/qwen15b_naive_ptq.json"
+
+python benchmarks/merge_lm_eval_results.py \
+  --input benchmark_results/lm-eval-qwen15b-core5-full/qwen15b_qat_ternary.json \
+  --input benchmark_results/lm-eval-qwen15b-rest5-full-v2/qwen15b_qat_ternary.json \
+  --output-json "$OUT/qwen15b_qat_ternary.json"
+
+python benchmarks/compare_lm_eval.py \
+  --run FP="$OUT/qwen15b_fp.json" \
+  --run naive_PTQ="$OUT/qwen15b_naive_ptq.json" \
+  --run QAT="$OUT/qwen15b_qat_ternary.json" \
+  --output-md "$OUT/selected_metrics.md"
+```
+
 For paired deltas with 95% confidence intervals, use the logged samples from
 the same lm-eval runs:
 
@@ -220,3 +249,14 @@ Useful ablation launch knobs in `slurm_distill.sh` include `SCALE_MODE=row`,
 `NPROC_PER_NODE`. Keep dataset, sequence length, optimizer, and evaluation
 settings fixed across an ablation table unless the changed variable is the
 thing being tested.
+
+For the full FineWeb/Qwen2.5-1.5B launcher, `slurm_distill_full.sh` exposes the
+same loss and quantization knobs while preserving the original defaults. The
+current 1.5B KL-only transfer test was launched as:
+
+```bash
+HIDDEN_MSE_WEIGHT=0 \
+HIDDEN_STATE_LAYERS=none \
+OUTPUT_DIR=checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-5000 \
+sbatch --job-name=bitnet-kl15-full --export=ALL slurm_distill_full.sh
+```
