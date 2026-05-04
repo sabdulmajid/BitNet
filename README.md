@@ -88,7 +88,7 @@ Interpretation: row scales reduce quantization error in the language-modeling
 objective, but this training budget still does not produce a competitive
 downstream checkpoint.
 
-### Current Official lm-eval Snapshot
+### Early 100-example lm-eval Snapshot
 
 EleutherAI `lm-eval` 0.4.11 was run on 100-example slices for ten tasks using
 Qwen2.5-1.5B FP, naive PTQ ternary, and QAT/distilled ternary. Where a task
@@ -138,7 +138,7 @@ not an FP-quality replacement.
 ### Full Core lm-eval Run
 
 The five core tasks above were also run without `lm-eval` example caps
-(`LIMIT=0`). This is the strongest task-accuracy evidence in this fork so far.
+(`LIMIT=0`). This is the first uncapped task-accuracy evidence in this fork.
 
 | task | metric | FP | naive PTQ | QAT ternary |
 | --- | --- | ---: | ---: | ---: |
@@ -153,6 +153,29 @@ Mean over these displayed metrics: FP 0.649, naive PTQ 0.355, QAT ternary
 `[+0.015, +0.175]`, recovering about 32% of the FP-vs-PTQ gap. QAT remains
 far below FP: QAT minus FP is `-0.199` macro mean with paired 95% CI
 `[-0.270, -0.127]`.
+
+### Full Ten-Task lm-eval Run
+
+The full core run was merged with uncapped BoolQ, COPA, OpenBookQA, SciQ, and
+TruthfulQA MC1 runs for the same three artifacts.
+
+| task | metric | FP | naive PTQ | QAT ternary |
+| --- | --- | ---: | ---: | ---: |
+| ARC-Challenge | acc_norm | 0.450 | 0.262 | 0.264 |
+| ARC-Easy | acc_norm | 0.720 | 0.244 | 0.478 |
+| HellaSwag | acc_norm | 0.678 | 0.264 | 0.362 |
+| PIQA | acc_norm | 0.758 | 0.508 | 0.622 |
+| WinoGrande | acc | 0.638 | 0.498 | 0.523 |
+| BoolQ | acc | 0.726 | 0.506 | 0.593 |
+| COPA | acc | 0.830 | 0.510 | 0.640 |
+| OpenBookQA | acc_norm | 0.404 | 0.276 | 0.312 |
+| SciQ | acc_norm | 0.934 | 0.199 | 0.613 |
+| TruthfulQA MC1 | acc | 0.305 | 0.220 | 0.241 |
+
+Mean over these displayed metrics: FP `0.644`, naive PTQ `0.349`, QAT ternary
+`0.465`. QAT improves over blind PTQ by `+0.116` macro mean with paired 95% CI
+`[+0.039, +0.194]`, recovering about 39% of the FP-vs-PTQ gap. QAT remains
+below FP by `-0.179` macro mean with paired 95% CI `[-0.235, -0.124]`.
 
 ### Packed GGUF CPU Runtime Snapshot
 

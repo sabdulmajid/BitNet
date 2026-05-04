@@ -17,7 +17,7 @@ these are quality and loader results, not final CPU product benchmarks.
 - WikiText eval: `wikitext-2-raw-v1`, test split, 64 blocks x 512 tokens
 - FineWeb heldout eval: `sample-10BT`, train stream after `--skip-rows 25000`, 32 blocks x 1024 tokens
 - Official task eval: EleutherAI `lm-eval` 0.4.11, 100-example ten-task
-  slices, 1000-example five-task core slices, and uncapped five-task core runs
+  slices, 1000-example five-task core slices, and uncapped ten-task merged runs
 - PyTorch runtime probe: Intel Xeon Silver 4116, PyTorch FP32, 12 Torch threads,
   512-token prompt, 32 generated tokens
 - Packed GGUF runtime probe: Intel Xeon Silver 4116, `llama-bench -p 512
@@ -195,8 +195,8 @@ noise, and it is not enough evidence for arbitrary lossless retrofit.
 ## Full Core lm-eval Accuracy
 
 The same five core tasks were then rerun with `LIMIT=0`, so lm-eval used the
-full task splits rather than the 1000-example cap. This is the strongest
-task-accuracy comparison in the current artifact set.
+full task splits rather than the 1000-example cap. This was the first
+uncapped task-accuracy comparison in the current artifact set.
 
 | task | metric | FP reference | naive PTQ ternary | QAT/distilled ternary |
 | --- | --- | ---: | ---: | ---: |
@@ -226,6 +226,49 @@ full five-task run. The recovery is real, but the absolute gap to FP remains
 large, especially on HellaSwag and ARC-Easy. The full run therefore confirms
 the same core verdict as the capped slice: training under ternary constraints
 is necessary and useful, but the current QAT recipe is not yet FP-quality.
+
+## Full Ten-Task lm-eval Accuracy
+
+The full five-task core run was merged with a second uncapped run over BoolQ,
+COPA, OpenBookQA, SciQ, and TruthfulQA MC1. The merge was done with
+`benchmarks/merge_lm_eval_results.py`, preserving logged samples for paired
+analysis.
+
+| task | metric | FP reference | naive PTQ ternary | QAT/distilled ternary |
+| --- | --- | ---: | ---: | ---: |
+| ARC-Challenge | acc_norm | 0.449659 | 0.261945 | 0.263652 |
+| ARC-Easy | acc_norm | 0.719697 | 0.244108 | 0.478114 |
+| HellaSwag | acc_norm | 0.677953 | 0.264190 | 0.362378 |
+| PIQA | acc_norm | 0.757889 | 0.507617 | 0.621872 |
+| WinoGrande | acc | 0.637727 | 0.498027 | 0.523283 |
+| BoolQ | acc | 0.725994 | 0.505505 | 0.592661 |
+| COPA | acc | 0.830000 | 0.510000 | 0.640000 |
+| OpenBookQA | acc_norm | 0.404000 | 0.276000 | 0.312000 |
+| SciQ | acc_norm | 0.934000 | 0.199000 | 0.613000 |
+| TruthfulQA MC1 | acc | 0.304774 | 0.220318 | 0.241126 |
+
+Mean displayed metric:
+
+| method | mean |
+| --- | ---: |
+| FP reference | 0.644169 |
+| naive PTQ ternary | 0.348671 |
+| QAT/distilled ternary | 0.464809 |
+
+Paired deltas on matched examples:
+
+| comparison | macro mean delta | paired 95% CI | example-weighted delta |
+| --- | ---: | ---: | ---: |
+| QAT minus naive PTQ | +0.116138 | [+0.038603, +0.193672] | +0.113171 |
+| QAT minus FP reference | -0.179361 | [-0.234751, -0.123971] | -0.233670 |
+| naive PTQ minus FP reference | -0.295498 | [-0.418827, -0.172169] | -0.346841 |
+
+This is the strongest task result in the current fork. QAT/distillation
+recovers about 39% of the FP-vs-naive-PTQ macro gap, with a positive paired
+confidence interval against naive PTQ. It still remains decisively below FP on
+the same examples. That supports a publication-quality negative result for
+blind retrofit and a partial-positive result for QAT/distillation, not a claim
+of acceptable FP-preserving conversion.
 
 ## Xeon PyTorch Runtime Probe
 
@@ -360,15 +403,20 @@ Interpretation:
    displayed task metric from 0.355 for naive PTQ to 0.450, while FP remains
    0.649. The paired QAT-minus-PTQ macro delta is +0.095 with 95% CI
    [+0.015, +0.175], so the recovery is measurable but incomplete.
-9. Row-wise ternary scales improve 0.5B heldout perplexity by about 2.4x versus
+9. On the full uncapped ten-task lm-eval merge, 1.5B QAT improves the mean
+   displayed task metric from 0.349 for naive PTQ to 0.465, while FP remains
+   0.644. The paired QAT-minus-PTQ macro delta is +0.116 with 95% CI
+   [+0.039, +0.194], while QAT-minus-FP is still -0.179 with 95% CI
+   [-0.235, -0.124].
+10. Row-wise ternary scales improve 0.5B heldout perplexity by about 2.4x versus
    tensor-scale QAT, but the small multiple-choice slices remain mixed.
-10. PyTorch ternary inference is slower than FP on the Xeon probe. The product
+11. PyTorch ternary inference is slower than FP on the Xeon probe. The product
    speed thesis depends on packed `bitnet.cpp` kernels, not on the PyTorch
    simulation path.
-11. Packed I2_S GGUF execution is fast on the Xeon for Qwen2.5-0.5B-shaped
+12. Packed I2_S GGUF execution is fast on the Xeon for Qwen2.5-0.5B-shaped
    and Qwen2.5-1.5B-shaped models, but naive I2_S conversion fails the smoke
    prompt and explodes WikiText excerpt perplexity.
-12. A deployable intermediate path exists through static ternary materialization
+13. A deployable intermediate path exists through static ternary materialization
    plus llama.cpp `TQ2_0` or single-thread-written `I2_S`: both preserve the QAT
    PPL and run much faster than F16 decode, but the path requires
    QAT/distillation.
@@ -376,8 +424,8 @@ Interpretation:
 ## What This Does Not Prove Yet
 
 1. It does not prove acceptable downstream task accuracy.
-2. It does not replace a broader full `lm-eval` leaderboard suite; only five
-   core tasks have been run uncapped so far.
+2. It does not replace a broader full `lm-eval` leaderboard suite; ten selected
+   tasks have been run uncapped so far.
 3. It does not prove bit-exact GGUF ingestion of `ternary_state_dict.pt`.
 4. It does not prove multi-threaded I2_S writer correctness; the safe artifact
    above was produced with `llama-quantize ... I2_S 1`.
@@ -398,7 +446,7 @@ The next benchmark gates are:
 3. Keep `TQ2_0` and single-thread `I2_S` as the current working packed ternary
    baselines and compare them against Q8_0 and Q4_K_M on quality, model size,
    RSS, prompt throughput, and decode throughput.
-4. Extend uncapped `lm-eval` beyond the five core tasks and run the same paired
-   analysis for the strongest exact static-ternary checkpoint.
+4. Extend uncapped `lm-eval` beyond the current ten selected tasks and keep the
+   same paired analysis for the strongest exact static-ternary checkpoint.
 5. Run ablations: longer QAT, KL-only, hidden-MSE weighting, group/row scales, and
    larger FineWeb samples.
