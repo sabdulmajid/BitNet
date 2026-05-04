@@ -90,6 +90,8 @@ python benchmarks/summarize_results.py \
   --mc-glob "$OUT_DIR/*.mc-do-not-match.json" \
   --lm-eval-glob "$OUT_DIR/*.json" \
   --runtime-glob "$OUT_DIR/*.runtime-do-not-match.json" \
+  --gguf-runtime-glob "$OUT_DIR/*.gguf-runtime-do-not-match.json" \
+  --gguf-ppl-glob "$OUT_DIR/*.gguf-ppl-do-not-match.log" \
   --generation-glob "$OUT_DIR/*.jsonl" \
   --output-md "$OUT_DIR/summary.md"
 
