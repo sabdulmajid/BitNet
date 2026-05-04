@@ -108,6 +108,8 @@ Install EleutherAI `lm-eval` in a controlled environment and run at least:
 - `winogrande`
 
 Report exact package version and task settings. If wrapping ternary PyTorch models for `lm-eval`, validate that the wrapper uses `StaticTernaryLinear`, not dense fallback.
+For the Slurm wrapper, set `LIMIT=0` to run full tasks instead of capped
+debug slices.
 
 ### Tier 4: CPU Runtime
 

@@ -55,7 +55,7 @@ def main() -> None:
     parser.add_argument("--ternary-state", default=None)
     parser.add_argument("--tokenizer", default=None)
     parser.add_argument("--tasks", default="piqa")
-    parser.add_argument("--limit", type=int, default=100)
+    parser.add_argument("--limit", type=int, default=100, help="Number of examples per task; use 0 for full tasks")
     parser.add_argument("--output-json", type=Path, required=True)
     parser.add_argument("--batch-size", default="1")
     parser.add_argument("--max-seq-len", type=int, default=1024)
@@ -86,11 +86,12 @@ def main() -> None:
         model = load_ternary_hflm(args)
         model_args = None
 
+    limit = None if args.limit <= 0 else args.limit
     results = evaluator.simple_evaluate(
         model=model,
         model_args=model_args,
         tasks=tasks,
-        limit=args.limit,
+        limit=limit,
         batch_size=args.batch_size,
         device=args.device,
         log_samples=True,
