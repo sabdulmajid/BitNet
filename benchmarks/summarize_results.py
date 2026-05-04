@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import glob
 import json
+import re
 from pathlib import Path
 
 
@@ -182,6 +183,31 @@ def summarize_gguf_runtime(pattern: str) -> str:
     )
 
 
+def summarize_gguf_perplexity(pattern: str) -> str:
+    rows = []
+    ppl_pattern = re.compile(r"Final estimate: PPL = ([^ ]+) \+/- ([^\n]+)")
+    speed_pattern = re.compile(
+        r"prompt eval time =\s+([0-9.]+) ms /\s+([0-9]+) tokens .*?([0-9.]+) tokens per second"
+    )
+    for item in sorted(glob.glob(pattern)):
+        path = Path(item)
+        text = path.read_text(encoding="utf-8", errors="replace")
+        ppl_match = ppl_pattern.search(text)
+        if not ppl_match:
+            continue
+        speed_match = speed_pattern.search(text)
+        rows.append([
+            path.stem,
+            ppl_match.group(1),
+            ppl_match.group(2).strip(),
+            speed_match.group(2) if speed_match else "",
+            speed_match.group(3) if speed_match else "",
+        ])
+    if not rows:
+        return "No GGUF perplexity logs found."
+    return md_table(["run", "ppl", "stderr", "tokens", "tok/s"], rows)
+
+
 def summarize_mc(pattern: str) -> str:
     rows = []
     for item in sorted(glob.glob(pattern)):
@@ -251,6 +277,7 @@ def main() -> None:
     parser.add_argument("--lm-eval-glob", default="benchmark_results/lm_eval/*.json")
     parser.add_argument("--runtime-glob", default="benchmark_results/runtime/*.json")
     parser.add_argument("--gguf-runtime-glob", default="benchmark_results/gguf-*-runtime/*.json")
+    parser.add_argument("--gguf-ppl-glob", default="benchmark_results/gguf-ppl/*.log")
     parser.add_argument("--output-md", type=Path, default=None)
     args = parser.parse_args()
 
@@ -266,6 +293,8 @@ def main() -> None:
         summarize_runtime(args.runtime_glob),
         "## GGUF Runtime",
         summarize_gguf_runtime(args.gguf_runtime_glob),
+        "## GGUF Perplexity",
+        summarize_gguf_perplexity(args.gguf_ppl_glob),
         "## Generation",
         summarize_generation(args.generation_glob),
     ])

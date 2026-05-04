@@ -95,12 +95,40 @@ created by converting dense HF checkpoints to F16 GGUF and then running
 | Qwen2.5-0.5B FP | I2_S | 230 MiB | 532.24 | 53.11 | degenerate punctuation |
 | Qwen2.5-0.5B QAT step-1000 | F16 | 1,208 MiB | 332.13 | 16.26 | degenerate text |
 | Qwen2.5-0.5B QAT step-1000 | I2_S | 490 MiB | 525.52 | 49.97 | degenerate punctuation |
+| Qwen2.5-1.5B FP | F16 | 2,950 MiB | 105.30 | 5.52 | sensible |
+| Qwen2.5-1.5B FP | Q8_0 | 1,570 MiB | 135.45 | 10.07 | sensible |
+| Qwen2.5-1.5B FP | Q4_K_M | 940 MiB | 95.17 | 15.72 | sensible |
+| Qwen2.5-1.5B FP | I2_S | 766 MiB | 205.66 | 18.41 | repeated-token collapse |
+| Qwen2.5-1.5B QAT step-5000 | F16 | 3,396 MiB | 105.21 | 5.52 | degenerate text |
+| Qwen2.5-1.5B QAT step-5000 | I2_S | 1,211 MiB | 203.59 | 17.97 | repeated-token collapse |
 
 Interpretation: the CPU backend can execute packed I2_S quickly on this 2017
 Xeon. The blocking problem is quality, not kernel availability. Standard Q8_0
 and Q4_K_M preserve the simple prompt, while I2_S does not. Q4_K_M should be
-read with care for this Qwen shape because many tensors require fallback
-quantization due column divisibility constraints.
+read with care for Qwen2.5-0.5B because many tensors require fallback
+quantization due column divisibility constraints; Qwen2.5-1.5B did not report
+that fallback warning.
+
+### Packed GGUF Perplexity Snapshot
+
+`llama-perplexity` was run on a fixed 16-chunk WikiText-2 test excerpt
+(8,192 tokens, `-c 512`, 12 threads) for Qwen2.5-1.5B GGUF artifacts.
+
+| source | GGUF type | WikiText excerpt PPL | prompt-eval tok/s |
+| --- | --- | ---: | ---: |
+| Qwen2.5-1.5B FP | F16 | 12.2806 | 84.11 |
+| Qwen2.5-1.5B FP | Q8_0 | 12.3207 | 104.28 |
+| Qwen2.5-1.5B FP | Q4_K_M | 12.8452 | 75.53 |
+| Qwen2.5-1.5B FP | I2_S | 1.206e51 | 140.03 |
+| Qwen2.5-1.5B QAT step-5000 dense GGUF | F16 | 2728.9322 | 83.79 |
+| Qwen2.5-1.5B QAT step-5000 dense GGUF | I2_S | 7.619e59 | 137.73 |
+
+This is the cleanest packed-runtime evidence so far: conventional Q8_0 and
+Q4_K_M retain the FP language-modeling likelihood, while blind I2_S
+ternarization destroys it. The dense GGUF exported from the QAT checkpoint is
+also not a valid proxy for the PyTorch static-ternary checkpoint; a bit-exact
+GGUF importer for `ternary_state_dict.pt` is required before claiming QAT
+quality through `bitnet.cpp`.
 
 ### Xeon PyTorch Runtime Probe
 

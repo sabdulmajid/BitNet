@@ -162,21 +162,57 @@ bit-exact loader for `ternary_state_dict.pt`.
 | Qwen2.5-0.5B FP | I2_S | 230 MiB | 532.24 | 53.11 | punctuation collapse |
 | Qwen2.5-0.5B QAT step-1000 | F16 | 1,208 MiB | 332.13 | 16.26 | degenerate text |
 | Qwen2.5-0.5B QAT step-1000 | I2_S | 490 MiB | 525.52 | 49.97 | punctuation collapse |
+| Qwen2.5-1.5B FP | F16 | 2,950 MiB | 105.30 | 5.52 | sensible completion |
+| Qwen2.5-1.5B FP | Q8_0 | 1,570 MiB | 135.45 | 10.07 | sensible completion |
+| Qwen2.5-1.5B FP | Q4_K_M | 940 MiB | 95.17 | 15.72 | sensible completion |
+| Qwen2.5-1.5B FP | I2_S | 766 MiB | 205.66 | 18.41 | repeated-token collapse |
+| Qwen2.5-1.5B QAT step-5000 | F16 | 3,396 MiB | 105.21 | 5.52 | degenerate text |
+| Qwen2.5-1.5B QAT step-5000 | I2_S | 1,211 MiB | 203.59 | 17.97 | repeated-token collapse |
 
 Smoke prompt: `The capital of France is`, greedy decoding, 24 generated tokens.
 The FP/Q8_0/Q4_K_M controls complete with `Paris` and related capital-city
-continuations. Both I2_S artifacts collapse to repeated exclamation marks.
+continuations. The 0.5B I2_S artifacts collapse to repeated exclamation marks;
+the 1.5B I2_S artifacts collapse to repeated `is` tokens.
 
 Important caveats:
 
 - I2_S is fast on this CPU, so the execution layer is not the bottleneck for a
   0.5B dense Qwen-shaped model.
 - Blind I2_S conversion is not quality-preserving.
-- Q4_K_M is not a pure Q4_K_M baseline for this model shape: 144 of 168 tensors
-  required fallback quantization in the original FP conversion.
+- Q4_K_M is not a pure Q4_K_M baseline for the Qwen2.5-0.5B shape: 144 of 168
+  tensors required fallback quantization in the original FP conversion. The
+  Qwen2.5-1.5B Q4_K_M conversions did not report fallback warnings.
 - The QAT 0.5B checkpoint is intrinsically weak, which matches its high
-  perplexity. The 1.5B QAT checkpoint is stronger but has not yet been converted
-  into GGUF/I2_S in this run.
+  perplexity. The 1.5B QAT checkpoint is stronger under the PyTorch
+  static-ternary path, but dense GGUF export from `model.safetensors` is not a
+  valid proxy for that static ternary artifact.
+
+## Packed GGUF Perplexity Probe
+
+`llama-perplexity` was run on a fixed WikiText-2 test excerpt generated from
+123 non-empty test rows: 16 chunks, 512-token context, 8,192 evaluated tokens,
+12 CPU threads, `-ngl 0`.
+
+| source | GGUF type | PPL | stderr | prompt-eval tok/s |
+| --- | --- | ---: | ---: | ---: |
+| Qwen2.5-1.5B FP | F16 | 12.2806 | 0.52969 | 84.11 |
+| Qwen2.5-1.5B FP | Q8_0 | 12.3207 | 0.53098 | 104.28 |
+| Qwen2.5-1.5B FP | Q4_K_M | 12.8452 | 0.55781 | 75.53 |
+| Qwen2.5-1.5B FP | I2_S | 1.206e51 | 5.898e50 | 140.03 |
+| Qwen2.5-1.5B QAT step-5000 dense GGUF | F16 | 2728.9322 | 262.72596 | 83.79 |
+| Qwen2.5-1.5B QAT step-5000 dense GGUF | I2_S | 7.619e59 | 4.502e59 | 137.73 |
+
+Interpretation:
+
+- Standard Q8_0 and Q4_K_M preserve the FP perplexity on this packed GGUF
+  excerpt.
+- Blind I2_S quantization mathematically destroys language-modeling likelihood
+  even though it improves CPU throughput.
+- Dense `model.safetensors` export from the QAT checkpoint is not the deployment
+  object we need. The PyTorch QAT result relies on static ternary weights and
+  scales from `ternary_state_dict.pt`; until GGUF ingests those exactly, the
+  GGUF QAT numbers above should be treated as a failed conversion path rather
+  than a final measure of the QAT recipe.
 
 ## What This Proves
 
@@ -198,15 +234,17 @@ Important caveats:
    speed thesis depends on packed `bitnet.cpp` kernels, not on the PyTorch
    simulation path.
 8. Packed I2_S GGUF execution is fast on the Xeon for Qwen2.5-0.5B-shaped
-   models, but naive I2_S conversion fails the smoke prompt.
+   and Qwen2.5-1.5B-shaped models, but naive I2_S conversion fails the smoke
+   prompt and explodes WikiText excerpt perplexity.
 
 ## What This Does Not Prove Yet
 
 1. It does not prove acceptable downstream task accuracy.
 2. It does not replace full, unsliced `lm-eval` task accuracy.
 3. It does not prove bit-exact GGUF ingestion of `ternary_state_dict.pt`.
-4. It does not prove real `bitnet.cpp` CPU speedups for the stronger Qwen2.5-1.5B
-   QAT checkpoint yet.
+4. It does not prove real `bitnet.cpp` quality for the stronger Qwen2.5-1.5B
+   QAT checkpoint yet because dense GGUF export is not bit-exact to
+   `ternary_state_dict.pt`.
 5. It does not prove the approach works for MoE models.
 6. It does not prove that the current training recipe is publishable as a final
    result.
@@ -215,12 +253,13 @@ Important caveats:
 
 The next benchmark gates are:
 
-1. Convert the stronger Qwen2.5-1.5B QAT checkpoint to GGUF/I2_S and repeat the
-   packed runtime smoke test.
-2. Build a bit-exact GGUF importer for `ternary_state_dict.pt` instead of
+1. Build a bit-exact GGUF importer for `ternary_state_dict.pt` instead of
    requantizing dense GGUF weights.
-3. Compare against llama.cpp Q8_0 and Q4_K_M on quality, model size, RSS, prompt
-   throughput, and decode throughput.
-4. Run full, unsliced `lm-eval` tasks for the strongest checkpoint.
+2. Re-run packed I2_S smoke, WikiText perplexity, and throughput on the exact
+   static-ternary GGUF artifact.
+3. Compare exact static-ternary GGUF against llama.cpp Q8_0 and Q4_K_M on
+   quality, model size, RSS, prompt throughput, and decode throughput.
+4. Run full, unsliced `lm-eval` tasks for the strongest exact static-ternary
+   checkpoint.
 5. Run ablations: longer QAT, row scale, KL-only, hidden-MSE weighting, and
    larger FineWeb samples.
