@@ -168,3 +168,9 @@ A credible claim needs all of:
 - actual packed CPU runtime numbers, not only PyTorch simulation,
 - ablations showing QAT/distillation beats naive PTQ,
 - reproducible scripts, logs, and checkpoint hashes.
+
+Useful ablation launch knobs in `slurm_distill.sh` include `SCALE_MODE=row`,
+`HIDDEN_MSE_WEIGHT=0`, `KL_WEIGHT`, `MAX_STEPS`, `MAX_PACKED_BLOCKS`, and
+`NPROC_PER_NODE`. Keep dataset, sequence length, optimizer, and evaluation
+settings fixed across an ablation table unless the changed variable is the
+thing being tested.
