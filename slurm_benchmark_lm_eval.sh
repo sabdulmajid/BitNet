@@ -89,6 +89,7 @@ python benchmarks/summarize_results.py \
   --perplexity-glob "$OUT_DIR/*.perplexity-do-not-match.json" \
   --mc-glob "$OUT_DIR/*.mc-do-not-match.json" \
   --lm-eval-glob "$OUT_DIR/*.json" \
+  --runtime-glob "$OUT_DIR/*.runtime-do-not-match.json" \
   --generation-glob "$OUT_DIR/*.jsonl" \
   --output-md "$OUT_DIR/summary.md"
 
