@@ -73,6 +73,34 @@ and FineWeb-heldout PPL to `108.366`. That suggests the hidden-state MSE term
 can overconstrain a short-budget ternary student, but it does not close the FP
 gap.
 
+## PTQ Math Audit
+
+The ternary export path used by `export_ternary.py` and the naive PTQ baseline
+uses absmean scaling:
+
+`alpha = mean(abs(W))`, `Q(W) = clamp(round(W / alpha), -1, 1) * alpha`.
+
+The QAT path in `train_distill.py` uses the same forward projection inside
+`TernaryWeightSTE`, but backpropagates through it with a straight-through
+estimator. That distinction matters: naive PTQ applies the projection once to
+a dense model that never learned under this constraint; QAT trains master
+weights while the forward path is already ternary.
+
+The empirical test in `experiments/math_viability_test.py` simulates a
+standard normally distributed FP16 projection matrix with shape `2048 x 2048`
+and a random activation batch. With seed 0:
+
+| projection | relative weight Frobenius error | relative output Frobenius error | output cosine | zero fraction |
+| --- | ---: | ---: | ---: | ---: |
+| absmean ternary repo formula | 0.512405 | 0.512541 | 0.887274 | 0.309841 |
+| sign/max TL-I2 generic path | 3.165178 | 3.167511 | 0.797521 | 0.000719 |
+
+For Gaussian weights, the theoretical relative Frobenius error of the absmean
+ternary projection is `0.513207`, matching the simulation. This proves the
+blind conversion is not functionally lossless even before model-level
+perplexity is measured: roughly half the matrix energy is displaced by the
+projection for an ordinary untrained FP weight distribution.
+
 ## Prompt-Suite Sanity Check
 
 The deterministic prompt suite loads the ternary checkpoints and confirms
