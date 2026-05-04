@@ -1,0 +1,42 @@
+[
+  {
+    "name": "qwen15b_fp_f16",
+    "kind": "fp_reference",
+    "path": "models/qwen2.5-1.5b-fp/qwen15b_fp_f16.gguf"
+  },
+  {
+    "name": "qwen15b_fp_q8_0",
+    "kind": "llama_q8",
+    "path": "models/qwen2.5-1.5b-fp/qwen15b_fp_q8_0.gguf"
+  },
+  {
+    "name": "qwen15b_fp_q4_k_m",
+    "kind": "llama_q4",
+    "path": "models/qwen2.5-1.5b-fp/qwen15b_fp_q4_k_m.gguf"
+  },
+  {
+    "name": "qwen15b_fp_tq2_0",
+    "kind": "blind_ternary_tq2",
+    "path": "models/qwen2.5-1.5b-fp/qwen15b_fp_tq2_0.gguf"
+  },
+  {
+    "name": "qwen15b_fp_i2_s",
+    "kind": "blind_bitnet_i2s",
+    "path": "models/qwen2.5-1.5b-fp/qwen15b_fp_i2_s.gguf"
+  },
+  {
+    "name": "qwen15b_static_ternary_f16",
+    "kind": "qat_static_ternary_materialized",
+    "path": "models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_f16.gguf"
+  },
+  {
+    "name": "qwen15b_static_ternary_tq2_0",
+    "kind": "qat_static_ternary_tq2",
+    "path": "models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_tq2_0.gguf"
+  },
+  {
+    "name": "qwen15b_static_ternary_i2_s",
+    "kind": "qat_static_ternary_i2s",
+    "path": "models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_i2_s.gguf"
+  }
+]

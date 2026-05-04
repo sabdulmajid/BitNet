@@ -120,6 +120,20 @@ After GGUF/TL2/I2_S conversion, compare against llama.cpp baselines:
 
 Measure prompt throughput, decode throughput, RSS, model file size, and perplexity on the same text blocks.
 
+The reusable GGUF suite runner consumes a manifest and writes raw logs plus
+machine-readable summaries:
+
+```bash
+python benchmarks/run_gguf_suite.py \
+  --models-json benchmarks/gguf_qwen15b_manifest.json \
+  --out-dir benchmark_results/gguf-qwen15b-suite \
+  --perplexity-file benchmark_results/gguf-ppl/wikitext2_test_excerpt.txt \
+  --threads 12 \
+  --prompt-tokens 512 \
+  --gen-tokens 128 \
+  --ppl-chunks 16
+```
+
 For QAT checkpoints, do not convert `model.safetensors` directly and treat it
 as the trained ternary artifact. The validated bridge is:
 
