@@ -51,6 +51,11 @@ conservative:
   artifacts. The multi-thread I2_S writer path is currently unsafe for this
   artifact and needs a correctness fix before it can be treated as production
   tooling.
+- **MoE remains unproven in this fork.** The vendored llama.cpp backend contains
+  generic expert routing and merged expert-tensor support, and the BitNet HF
+  converter has partial Qwen-style expert packing. This repo has not yet shown a
+  Kimi-compatible ternary converter, expert-router distillation, or an MoE
+  benchmark.
 
 Current evidence is tracked in
 [benchmarks/results/qwen_retrofit_2026-05-03.md](benchmarks/results/qwen_retrofit_2026-05-03.md).

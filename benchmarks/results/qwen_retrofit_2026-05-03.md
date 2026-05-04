@@ -429,6 +429,40 @@ Interpretation:
   slice. The earlier multi-thread I2_S artifact produced NaN PPL, which points
   to a writer/chunking bug rather than a fundamental runtime math failure.
 
+## MoE Status
+
+The codebase has partial infrastructure for MoE-shaped GGUF artifacts, but this
+fork has not proven a ternary MoE retrofit.
+
+What exists:
+
+- The vendored llama.cpp runtime stores expert metadata such as
+  `expert_count` and `expert_used_count`.
+- It has merged expert tensor names such as `ffn_gate_exps`, `ffn_down_exps`,
+  and `ffn_up_exps`.
+- Its MoE graph builder computes router logits, applies softmax and top-k
+  expert selection, uses `ggml_mul_mat_id` for selected expert matrices, and
+  aggregates the selected expert outputs.
+- `utils/convert-hf-to-gguf-bitnet.py` writes Qwen-style expert metadata from
+  `num_local_experts` and `num_experts_per_tok`, and packs
+  `block_sparse_moe.experts.*.{w1,w2,w3}.weight` tensors into merged 3D expert
+  tensors.
+
+What is missing:
+
+- No Kimi architecture mapping has been implemented or tested in this fork.
+- No MoE checkpoint has been trained with ternary expert forward constraints.
+- No expert-router distillation or load-balancing objective has been evaluated.
+- No native ternary-state GGUF writer has been proven for expert tensors.
+- No MoE quality, throughput, memory paging, or expert locality benchmark has
+  been run.
+
+Conclusion: MoE is not mathematically excluded. Static expert matrices can in
+principle use the same ternary projection and packed kernels as dense FFN
+matrices. The unproven part is the system: router quality under ternary expert
+constraints, expert tensor layout, dynamic expert selection overhead, and memory
+locality on CPU.
+
 ## What This Proves
 
 1. The pretrained Qwen dense architecture can be trained under BitNet-style
@@ -484,7 +518,9 @@ Interpretation:
    above was produced with `llama-quantize ... I2_S 1`.
 5. It does not prove the materialized dense-F16 bridge is storage-optimal; it
    is a validation bridge until a native ternary-state GGUF writer exists.
-6. It does not prove the approach works for MoE models.
+6. It does not prove the approach works for MoE models. The backend has generic
+   MoE infrastructure, but no Kimi-compatible ternary MoE path has been
+   benchmarked.
 7. It does not prove that the current training recipe is publishable as a final
    result.
 8. It does not prove that a dense tied `lm_head` is acceptable for every product
