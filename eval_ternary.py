@@ -33,13 +33,21 @@ class StaticTernaryLinear(nn.Module):
     same ternary-weight / int8-activation contract used by BitNet CPU kernels.
     """
 
-    def __init__(self, in_features: int, out_features: int, *, bias: bool, eps: float) -> None:
+    def __init__(
+        self,
+        in_features: int,
+        out_features: int,
+        *,
+        bias: bool,
+        eps: float,
+        scale_shape: torch.Size | tuple[int, ...] = (1,),
+    ) -> None:
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
         self.eps = eps
         self.register_buffer("ternary_weight", torch.empty(out_features, in_features, dtype=torch.int8))
-        self.register_buffer("weight_scale", torch.ones(1, dtype=torch.float32))
+        self.register_buffer("weight_scale", torch.ones(tuple(scale_shape), dtype=torch.float32))
         if bias:
             self.bias = nn.Parameter(torch.zeros(out_features, dtype=torch.float32), requires_grad=False)
         else:
@@ -88,11 +96,14 @@ def replace_ternary_linears(
         if not isinstance(original, nn.Linear):
             raise TypeError(f"expected {name} to be nn.Linear in the base model, got {type(original).__name__}")
         has_bias = f"{name}.bias" in ternary_state or original.bias is not None
+        scale = ternary_state.get(f"{name}.weight_scale")
+        scale_shape = scale.shape if scale is not None else (1,)
         ternary = StaticTernaryLinear(
             original.in_features,
             original.out_features,
             bias=has_bias,
             eps=eps,
+            scale_shape=scale_shape,
         )
         set_submodule(model, name, ternary)
         replaced += 1
