@@ -229,6 +229,46 @@ def audit_mc(specs: list[tuple[str, Path]]) -> str:
     return md_table(["label", "path", "status", "task", "kind", "acc", "acc_norm", "n"], rows)
 
 
+def audit_runtime(specs: list[tuple[str, Path]]) -> str:
+    if not specs:
+        return "No runtime specs supplied."
+    rows: list[list[str]] = []
+    required = {"model_kind", "device", "dtype", "torch_num_threads", "prompt_tokens", "max_new_tokens", "prefill", "generate"}
+    gib = 1024**3
+    for label, path in specs:
+        if not path.exists():
+            rows.append([label, str(path), "MISSING", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"])
+            continue
+        data = load_json(path)
+        missing = sorted(required - set(data))
+        prefill = data.get("prefill", {})
+        generate = data.get("generate", {})
+        rss = float(data.get("rss_after_move_bytes", 0.0)) / gib
+        model_size = float(data.get("model_storage_bytes", 0.0)) / gib
+        ternary_size = float(data.get("ternary_state_bytes", 0.0)) / gib
+        rows.append([
+            label,
+            str(path),
+            "PASS" if not missing else "FAIL",
+            str(data.get("model_kind", "")),
+            str(data.get("device", "")),
+            str(data.get("dtype", "")),
+            str(data.get("torch_num_threads", "")),
+            str(data.get("prompt_tokens", "")),
+            str(data.get("max_new_tokens", "")),
+            f"{float(prefill.get('tokens_per_second_median', 0.0)):.2f}",
+            f"{float(generate.get('new_tokens_per_second_median_including_prefill', 0.0)):.2f}",
+            f"{float(generate.get('decode_tokens_per_second_estimate', 0.0)):.2f}",
+            f"{rss:.3f}",
+            f"{model_size:.3f}",
+            f"{ternary_size:.3f}",
+        ])
+    return md_table(
+        ["label", "path", "status", "kind", "device", "dtype", "threads", "prompt", "new", "prefill tok/s", "gen tok/s", "decode tok/s", "RSS GiB", "model GiB", "ternary GiB"],
+        rows,
+    )
+
+
 def audit_math(specs: list[tuple[str, Path]]) -> str:
     if not specs:
         return "No math audit specs supplied."
@@ -262,6 +302,7 @@ def main() -> None:
     parser.add_argument("--lm-eval", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--perplexity", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--mc", action="append", default=[], help="LABEL=path.json")
+    parser.add_argument("--runtime", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--math", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--output-md", type=Path, default=None)
     args = parser.parse_args()
@@ -270,6 +311,7 @@ def main() -> None:
     lm_eval = [parse_label_path(spec) for spec in args.lm_eval]
     perplexity = [parse_label_path(spec) for spec in args.perplexity]
     mc_specs = [parse_label_path(spec) for spec in args.mc]
+    runtime = [parse_label_path(spec) for spec in args.runtime]
     math_specs = [parse_label_path(spec) for spec in args.math]
 
     report = "\n\n".join([
@@ -282,6 +324,8 @@ def main() -> None:
         audit_perplexity(perplexity),
         "## Multiple-Choice Artifacts",
         audit_mc(mc_specs),
+        "## Runtime Artifacts",
+        audit_runtime(runtime),
         "## PTQ Math Artifacts",
         audit_math(math_specs),
     ])
