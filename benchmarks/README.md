@@ -125,6 +125,21 @@ python benchmarks/compare_lm_eval.py \
   --metric winogrande=acc
 ```
 
+For paired deltas with 95% confidence intervals, use the logged samples from
+the same lm-eval runs:
+
+```bash
+python benchmarks/paired_lm_eval_delta.py \
+  --a naive_PTQ=benchmark_results/lm-eval-qwen15b-core5-full/qwen15b_naive_ptq.json \
+  --b QAT=benchmark_results/lm-eval-qwen15b-core5-full/qwen15b_qat_ternary.json \
+  --metric arc_challenge=acc_norm \
+  --metric arc_easy=acc_norm \
+  --metric hellaswag=acc_norm \
+  --metric piqa=acc_norm \
+  --metric winogrande=acc \
+  --output-md benchmark_results/lm-eval-qwen15b-core5-full/paired_qat_minus_ptq.md
+```
+
 ### Tier 4: CPU Runtime
 
 After GGUF/TL2/I2_S conversion, compare against llama.cpp baselines:

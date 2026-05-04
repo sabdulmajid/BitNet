@@ -102,6 +102,11 @@ core tasks below. This is still capped, but it is a stronger estimate than the
 Mean over these displayed metrics: FP 0.630, naive PTQ 0.359, QAT ternary
 0.456. QAT recovers clear signal over blind PTQ on the mean, but it recovers
 only about 36% of the FP-vs-PTQ gap and remains far below the FP reference.
+Paired sample-level deltas on the same capped examples give QAT minus naive PTQ
+`+0.097` macro mean with 95% CI `[+0.012, +0.182]`; QAT minus FP is `-0.174`
+with 95% CI `[-0.213, -0.135]`. This supports both conclusions at once:
+distillation is doing real work, and the current ternary checkpoint is still
+not an FP-quality replacement.
 
 ### Packed GGUF CPU Runtime Snapshot
 

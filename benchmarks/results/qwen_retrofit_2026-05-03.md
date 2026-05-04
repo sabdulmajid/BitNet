@@ -159,6 +159,17 @@ QAT/distillation improves the mean by 0.097 over naive PTQ and recovers about
 the FP reference, and ARC-Challenge is a small counterexample where QAT is
 slightly below naive PTQ on `acc_norm`.
 
+Because the lm-eval runs log per-example samples, the same five-task slice can
+be evaluated as paired deltas on exactly matched examples:
+
+| comparison | macro mean delta | paired 95% CI | interpretation |
+| --- | ---: | ---: | --- |
+| QAT minus naive PTQ | +0.097 | [+0.012, +0.182] | QAT/distillation is a real recovery signal on this capped slice |
+| QAT minus FP reference | -0.174 | [-0.213, -0.135] | QAT remains decisively below the dense teacher |
+
+The paired result strengthens the negative verdict: this is not random table
+noise, and it is not enough evidence for arbitrary lossless retrofit.
+
 ## Xeon PyTorch Runtime Probe
 
 These are CPU measurements on the Intel Xeon Silver 4116 host with PyTorch
