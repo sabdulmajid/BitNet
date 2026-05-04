@@ -28,8 +28,12 @@ conservative:
   training under ternary forward constraints recovers real signal.
 - **The current QAT checkpoints are not FP-quality yet.** The strongest
   Qwen2.5-1.5B static ternary checkpoint is usable enough for measurement, but
-  it remains significantly worse than the FP reference on perplexity and
-  capped task accuracy.
+  it remains significantly worse than the FP reference on perplexity and task
+  accuracy.
+- **Row-wise ternary scales help likelihood but do not solve accuracy.** A
+  Qwen2.5-0.5B row-scale ablation cut heldout perplexity by about 2.4x versus
+  the tensor-scale QAT checkpoint, but its 100-example multiple-choice slices
+  were mixed and mostly not better.
 - **PyTorch ternary simulation is not the speed path.** On the Xeon Silver 4116
   host, the exported ternary checkpoints are smaller in memory but slower than
   FP under PyTorch because the probe dequantizes into dense matmuls. Real
@@ -54,12 +58,35 @@ The benchmark harnesses are in [benchmarks/](benchmarks/).
 | Qwen2.5-0.5B | FP reference | 20.461 | 14.124 |
 | Qwen2.5-0.5B | naive PTQ ternary | 169,414.428 | 608,726.749 |
 | Qwen2.5-0.5B | QAT/distilled ternary | 1,079.167 | 373.775 |
+| Qwen2.5-0.5B | QAT/distilled ternary, row scale | 444.691 | 152.821 |
 | Qwen2.5-1.5B | FP reference | 13.901 | 10.269 |
 | Qwen2.5-1.5B | naive PTQ ternary | 3,813,121.803 | 9,582,923.269 |
 | Qwen2.5-1.5B | QAT/distilled ternary | 86.414 | 40.398 |
 
 These numbers are BF16/CUDA quality measurements using PyTorch simulation of
 W1.58A8 math. They are **not** `bitnet.cpp` CPU throughput claims.
+
+### Qwen2.5-0.5B Row-Scale Ablation
+
+The row-scale ablation kept the same 1000-step Qwen2.5-0.5B setup as the
+tensor-scale run, but exported one ternary scale per output row. Final training
+metrics were loss `15.3338`, KL `2.0530`, and hidden MSE `13.2808`.
+
+Compared with the tensor-scale QAT checkpoint, row scale improved WikiText PPL
+from `1,079.167` to `444.691` and FineWeb-heldout PPL from `373.775` to
+`152.821`. The fast 100-example multiple-choice slices did not show a matching
+task-accuracy gain:
+
+| task | tensor-scale acc_norm | row-scale acc_norm |
+| --- | ---: | ---: |
+| PIQA | 0.500 | 0.460 |
+| ARC-Easy | 0.270 | 0.260 |
+| ARC-Challenge | 0.300 | 0.240 |
+| HellaSwag | 0.260 | 0.240 |
+
+Interpretation: row scales reduce quantization error in the language-modeling
+objective, but this training budget still does not produce a competitive
+downstream checkpoint.
 
 ### Current Official lm-eval Snapshot
 
@@ -107,6 +134,25 @@ Paired sample-level deltas on the same capped examples give QAT minus naive PTQ
 with 95% CI `[-0.213, -0.135]`. This supports both conclusions at once:
 distillation is doing real work, and the current ternary checkpoint is still
 not an FP-quality replacement.
+
+### Full Core lm-eval Run
+
+The five core tasks above were also run without `lm-eval` example caps
+(`LIMIT=0`). This is the strongest task-accuracy evidence in this fork so far.
+
+| task | metric | FP | naive PTQ | QAT ternary |
+| --- | --- | ---: | ---: | ---: |
+| ARC-Challenge | acc_norm | 0.450 | 0.262 | 0.264 |
+| ARC-Easy | acc_norm | 0.720 | 0.244 | 0.478 |
+| HellaSwag | acc_norm | 0.678 | 0.264 | 0.362 |
+| PIQA | acc_norm | 0.758 | 0.508 | 0.622 |
+| WinoGrande | acc | 0.638 | 0.498 | 0.523 |
+
+Mean over these displayed metrics: FP 0.649, naive PTQ 0.355, QAT ternary
+0.450. QAT improves over blind PTQ by `+0.095` macro mean with paired 95% CI
+`[+0.015, +0.175]`, recovering about 32% of the FP-vs-PTQ gap. QAT remains
+far below FP: QAT minus FP is `-0.199` macro mean with paired 95% CI
+`[-0.270, -0.127]`.
 
 ### Packed GGUF CPU Runtime Snapshot
 
