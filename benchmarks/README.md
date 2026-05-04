@@ -175,8 +175,8 @@ python benchmarks/paired_lm_eval_delta.py \
 
 Before copying any result into a public report, run the artifact audit against
 the exact files being cited. It verifies checkpoint ternary key counts, scale
-layout, lm-eval task/sample presence, perplexity JSON structure, and PTQ math
-JSON outputs:
+layout, lm-eval task/sample presence, perplexity JSON structure, multiple-choice
+JSON structure, runtime probe JSON structure, and PTQ math JSON outputs:
 
 ```bash
 python experiments/math_viability_test.py \
@@ -184,13 +184,16 @@ python experiments/math_viability_test.py \
   --in-features 2048 \
   --batch 128 \
   --seed 0 \
-  --output-json benchmark_results/math_viability/qwen_dense_2048_seed0.json
+  --trials 10 \
+  --output-json benchmark_results/math_viability/qwen_dense_2048_trials10_seed0.json
 
 python benchmarks/audit_evidence.py \
   --checkpoint qwen15b=checkpoints/qwen2.5-1.5b-fineweb-edu/step-5000/ternary_state_dict.pt:197:197:scalar \
   --lm-eval qwen15b_qat=benchmark_results/lm-eval-qwen15b-full10/qwen15b_qat_ternary.json \
   --perplexity qwen15b_qat_wikitext=benchmark_results/quality-9735/qwen15b_ternary_wikitext.json \
-  --math dense_gaussian_2048=benchmark_results/math_viability/qwen_dense_2048_seed0.json \
+  --mc qwen05b_ternary_piqa=benchmark_results/mc-qwen05b-klonly-notiehead-1000/qwen05b_ternary_piqa.json \
+  --runtime qwen05b_runtime=benchmark_results/runtime-qwen05b-klonly-notiehead-512x32/qwen05b_klonly_notiehead.json \
+  --math dense_gaussian_2048=benchmark_results/math_viability/qwen_dense_2048_trials10_seed0.json \
   --output-md benchmark_results/evidence_audit/current.md
 ```
 
