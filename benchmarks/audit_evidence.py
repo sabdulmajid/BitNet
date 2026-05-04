@@ -36,6 +36,7 @@ class CheckpointSpec:
     expected_ternary: int | None
     expected_scales: int | None
     expected_scale_rank: int | None
+    expected_config_tie: bool | None
 
 
 def md_table(headers: list[str], rows: list[list[str]]) -> str:
@@ -65,7 +66,13 @@ def parse_checkpoint(spec: str) -> CheckpointSpec:
     if len(parts) > 3 and parts[3]:
         rank_aliases = {"scalar": 1, "row": 2, "none": None}
         expected_scale_rank = rank_aliases[parts[3]] if parts[3] in rank_aliases else int(parts[3])
-    return CheckpointSpec(label, path, expected_ternary, expected_scales, expected_scale_rank)
+    expected_config_tie = None
+    if len(parts) > 4 and parts[4]:
+        tie_aliases = {"tie_true": True, "tie_false": False, "true": True, "false": False, "tie_any": None, "none": None}
+        if parts[4] not in tie_aliases:
+            raise ValueError(f"unknown config tie expectation {parts[4]!r}")
+        expected_config_tie = tie_aliases[parts[4]]
+    return CheckpointSpec(label, path, expected_ternary, expected_scales, expected_scale_rank, expected_config_tie)
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -97,7 +104,9 @@ def audit_checkpoint(specs: list[CheckpointSpec]) -> str:
         first_scale_shape = ""
         first_ternary_values = ""
         config_tie = ""
-        metadata_note = "-"
+        config_tie_value: Any = None
+        metadata_notes: list[str] = []
+        metadata_warn = False
         if scale_keys:
             first_scale_shape = str(tuple(state[scale_keys[0]].shape))
         if ternary_keys:
@@ -109,7 +118,8 @@ def audit_checkpoint(specs: list[CheckpointSpec]) -> str:
             config_tie_value = config.get("tie_word_embeddings", "")
             config_tie = str(config_tie_value)
             if "lm_head.ternary_weight" in state and config_tie_value is True:
-                metadata_note = "lm_head ternary but config tie_word_embeddings=true"
+                metadata_warn = True
+                metadata_notes.append("lm_head ternary but config tie_word_embeddings=true")
 
         ok = True
         if spec.expected_ternary is not None:
@@ -118,10 +128,20 @@ def audit_checkpoint(specs: list[CheckpointSpec]) -> str:
             ok = ok and len(scale_keys) == spec.expected_scales
         if spec.expected_scale_rank is not None and scale_keys:
             ok = ok and len(tuple(state[scale_keys[0]].shape)) == spec.expected_scale_rank
+        if spec.expected_config_tie is not None:
+            if not config_path.exists():
+                ok = False
+                metadata_notes.append(f"missing config.json; expected tie_word_embeddings={spec.expected_config_tie}")
+            elif config_tie_value is not spec.expected_config_tie:
+                ok = False
+                metadata_notes.append(
+                    f"expected tie_word_embeddings={spec.expected_config_tie}, got {config_tie_value}"
+                )
         ok = ok and set(first_ternary_values.split(",")) <= {"-1", "0", "1"}
+        metadata_note = "; ".join(metadata_notes) if metadata_notes else "-"
         status = "FAIL"
         if ok:
-            status = "WARN" if metadata_note != "-" else "PASS"
+            status = "WARN" if metadata_warn else "PASS"
         rows.append([
             spec.label,
             str(spec.path),
@@ -298,7 +318,12 @@ def audit_math(specs: list[tuple[str, Path]]) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--checkpoint", action="append", default=[], help="LABEL=path[:expected_ternary[:expected_scales[:scalar|row]]]")
+    parser.add_argument(
+        "--checkpoint",
+        action="append",
+        default=[],
+        help="LABEL=path[:expected_ternary[:expected_scales[:scalar|row[:tie_true|tie_false]]]]",
+    )
     parser.add_argument("--lm-eval", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--perplexity", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--mc", action="append", default=[], help="LABEL=path.json")
