@@ -205,6 +205,30 @@ def audit_perplexity(specs: list[tuple[str, Path]]) -> str:
     return md_table(["label", "path", "status", "kind", "ppl", "nll", "tokens"], rows)
 
 
+def audit_mc(specs: list[tuple[str, Path]]) -> str:
+    if not specs:
+        return "No multiple-choice specs supplied."
+    rows: list[list[str]] = []
+    required = {"task", "accuracy", "accuracy_norm", "limit", "model_kind"}
+    for label, path in specs:
+        if not path.exists():
+            rows.append([label, str(path), "MISSING", "-", "-", "-", "-", "-"])
+            continue
+        data = load_json(path)
+        missing = sorted(required - set(data))
+        rows.append([
+            label,
+            str(path),
+            "PASS" if not missing else "FAIL",
+            str(data.get("task", "")),
+            str(data.get("model_kind", "")),
+            f"{float(data.get('accuracy', 0.0)):.4f}",
+            f"{float(data.get('accuracy_norm', 0.0)):.4f}",
+            str(int(float(data.get("limit", 0)))),
+        ])
+    return md_table(["label", "path", "status", "task", "kind", "acc", "acc_norm", "n"], rows)
+
+
 def audit_math(specs: list[tuple[str, Path]]) -> str:
     if not specs:
         return "No math audit specs supplied."
@@ -237,6 +261,7 @@ def main() -> None:
     parser.add_argument("--checkpoint", action="append", default=[], help="LABEL=path[:expected_ternary[:expected_scales[:scalar|row]]]")
     parser.add_argument("--lm-eval", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--perplexity", action="append", default=[], help="LABEL=path.json")
+    parser.add_argument("--mc", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--math", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--output-md", type=Path, default=None)
     args = parser.parse_args()
@@ -244,6 +269,7 @@ def main() -> None:
     checkpoints = [parse_checkpoint(spec) for spec in args.checkpoint]
     lm_eval = [parse_label_path(spec) for spec in args.lm_eval]
     perplexity = [parse_label_path(spec) for spec in args.perplexity]
+    mc_specs = [parse_label_path(spec) for spec in args.mc]
     math_specs = [parse_label_path(spec) for spec in args.math]
 
     report = "\n\n".join([
@@ -254,6 +280,8 @@ def main() -> None:
         audit_lm_eval(lm_eval),
         "## Perplexity Artifacts",
         audit_perplexity(perplexity),
+        "## Multiple-Choice Artifacts",
+        audit_mc(mc_specs),
         "## PTQ Math Artifacts",
         audit_math(math_specs),
     ])
