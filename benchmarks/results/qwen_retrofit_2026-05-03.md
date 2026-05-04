@@ -109,14 +109,18 @@ random activation batch. The current audit uses 10 trials from seed 0:
 
 | projection | relative weight Frobenius error | relative output Frobenius error | output cosine | zero fraction |
 | --- | ---: | ---: | ---: | ---: |
-| absmean ternary repo formula | 0.512679 +/- 0.000128 | 0.512542 +/- 0.000478 | 0.887496 +/- 0.000230 | 0.309943 +/- 0.000153 |
+| tensor absmean ternary repo formula | 0.512679 +/- 0.000128 | 0.512542 +/- 0.000478 | 0.887496 +/- 0.000230 | 0.309943 +/- 0.000153 |
+| row absmean ternary QAT formula | 0.512539 +/- 0.000129 | 0.512417 +/- 0.000484 | 0.887538 +/- 0.000222 | 0.309882 +/- 0.000152 |
 | sign/max TL-I2 generic path | 3.166747 +/- 0.000940 | 3.166292 +/- 0.004750 | 0.798595 +/- 0.000579 | 0.000740 +/- 0.000019 |
 
 For Gaussian weights, the theoretical relative Frobenius error of the absmean
 ternary projection is `0.513207`, matching the simulation. This proves the
 blind conversion is not functionally lossless even before model-level
 perplexity is measured: roughly half the matrix energy is displaced by the
-projection for an ordinary untrained FP weight distribution.
+projection for an ordinary untrained FP weight distribution. Row-wise absmean
+scales do not change that conclusion for ordinary dense weights; they mostly
+increase the number of possible dequantized values while leaving relative
+output error essentially unchanged in this audit.
 
 ## Prompt-Suite Sanity Check
 

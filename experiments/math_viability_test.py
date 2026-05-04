@@ -35,17 +35,29 @@ def _try_torch() -> Any | None:
     return torch
 
 
-def torch_mean_abs_ternary(torch: Any, weight: Any) -> Any:
+def torch_mean_abs_ternary(torch: Any, weight: Any, *, scale_mode: str) -> Any:
     """Exact PyTorch operation used by the repo's preprocessing scripts."""
     weight = weight.to(torch.float32)
-    s = 1.0 / weight.abs().mean().clamp_(min=1e-5)
+    if scale_mode == "tensor":
+        alpha = weight.abs().mean().clamp_(min=1e-5)
+    elif scale_mode == "row":
+        alpha = weight.abs().mean(dim=1, keepdim=True).clamp_(min=1e-5)
+    else:
+        raise ValueError(f"unknown scale_mode={scale_mode!r}")
+    s = 1.0 / alpha
     return (weight * s).round().clamp(-1, 1) / s
 
 
-def numpy_mean_abs_ternary(weight: np.ndarray) -> np.ndarray:
+def numpy_mean_abs_ternary(weight: np.ndarray, *, scale_mode: str) -> np.ndarray:
     """NumPy fallback for the same operation."""
     weight = weight.astype(np.float32)
-    scale = 1.0 / np.clip(np.mean(np.abs(weight)), 1e-5, None)
+    if scale_mode == "tensor":
+        alpha = np.clip(np.mean(np.abs(weight)), 1e-5, None)
+    elif scale_mode == "row":
+        alpha = np.clip(np.mean(np.abs(weight), axis=1, keepdims=True), 1e-5, None)
+    else:
+        raise ValueError(f"unknown scale_mode={scale_mode!r}")
+    scale = 1.0 / alpha
     return np.clip(np.round(weight * scale), -1, 1) / scale
 
 
@@ -100,28 +112,36 @@ def run_trial(args: argparse.Namespace, seed: int) -> dict[str, Any]:
         x_t = torch.randn(args.batch, args.in_features, dtype=torch.float16)
         w = w_t.float().cpu().numpy()
         x = x_t.float().cpu().numpy()
-        mean_abs_q = torch_mean_abs_ternary(torch, w_t).float().cpu().numpy()
+        mean_abs_q = torch_mean_abs_ternary(torch, w_t, scale_mode="tensor").float().cpu().numpy()
+        row_mean_abs_q = torch_mean_abs_ternary(torch, w_t, scale_mode="row").float().cpu().numpy()
         backend = f"torch {torch.__version__}"
     else:
         w = rng.standard_normal((args.out_features, args.in_features)).astype(np.float16).astype(np.float32)
         x = rng.standard_normal((args.batch, args.in_features)).astype(np.float16).astype(np.float32)
-        mean_abs_q = numpy_mean_abs_ternary(w)
+        mean_abs_q = numpy_mean_abs_ternary(w, scale_mode="tensor")
+        row_mean_abs_q = numpy_mean_abs_ternary(w, scale_mode="row")
         backend = "numpy fallback; torch is not installed"
 
     sign_max_q = numpy_sign_max_ternary(w)
     mean_abs_stats = summarize("mean_abs", w, mean_abs_q, x)
+    row_mean_abs_stats = summarize("row_mean_abs", w, row_mean_abs_q, x)
     sign_max_stats = summarize("sign_max", w, sign_max_q, x)
     return {
         "seed": seed,
         "backend": backend,
         "mean_abs_ternary_repo_formula": mean_abs_stats,
+        "row_mean_abs_ternary_qat_formula": row_mean_abs_stats,
         "sign_max_tl_i2_generic_path": sign_max_stats,
     }
 
 
 def aggregate_trials(trials: list[dict[str, Any]]) -> dict[str, dict[str, dict[str, float]]]:
     aggregate: dict[str, dict[str, dict[str, float]]] = {}
-    for method in ("mean_abs_ternary_repo_formula", "sign_max_tl_i2_generic_path"):
+    for method in (
+        "mean_abs_ternary_repo_formula",
+        "row_mean_abs_ternary_qat_formula",
+        "sign_max_tl_i2_generic_path",
+    ):
         keys = trials[0][method].keys()
         aggregate[method] = {}
         for key in keys:
@@ -156,7 +176,11 @@ def main() -> None:
     print(f"shape: W=({args.out_features}, {args.in_features}), X=({args.batch}, {args.in_features})")
     print(f"trials: {args.trials}")
     print(f"theoretical_mean_abs_relative_fro_error: {theory:.6f}")
-    for name in ("mean_abs_ternary_repo_formula", "sign_max_tl_i2_generic_path"):
+    for name in (
+        "mean_abs_ternary_repo_formula",
+        "row_mean_abs_ternary_qat_formula",
+        "sign_max_tl_i2_generic_path",
+    ):
         print(f"\n{name}")
         for key, stats in aggregate[name].items():
             value = stats["mean"]

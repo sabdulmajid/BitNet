@@ -300,6 +300,7 @@ def audit_math(specs: list[tuple[str, Path]]) -> str:
         data = load_json(path)
         aggregate = data.get("aggregate", {})
         mean_abs = aggregate.get("mean_abs_ternary_repo_formula", {})
+        row_mean_abs = aggregate.get("row_mean_abs_ternary_qat_formula", {})
         sign_max = aggregate.get("sign_max_tl_i2_generic_path", {})
         rows.append([
             label,
@@ -308,10 +309,24 @@ def audit_math(specs: list[tuple[str, Path]]) -> str:
             str(data.get("trials", "")),
             f"{float(data.get('theoretical_mean_abs_relative_fro_error', 0.0)):.6f}",
             f"{float(mean_abs.get('relative_output_fro_error', {}).get('mean', 0.0)):.6f}",
+            (
+                f"{float(row_mean_abs.get('relative_output_fro_error', {}).get('mean', 0.0)):.6f}"
+                if row_mean_abs
+                else "-"
+            ),
             f"{float(sign_max.get('relative_output_fro_error', {}).get('mean', 0.0)):.6f}",
         ])
     return md_table(
-        ["label", "path", "status", "trials", "theory rel Fro", "repo rel output", "sign/max rel output"],
+        [
+            "label",
+            "path",
+            "status",
+            "trials",
+            "theory rel Fro",
+            "repo tensor rel output",
+            "repo row rel output",
+            "sign/max rel output",
+        ],
         rows,
     )
 

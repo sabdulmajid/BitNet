@@ -23,7 +23,10 @@ conservative:
   QAT/distillation under ternary forward constraints, not blind conversion of
   existing FP16/BF16 checkpoints into 1.58-bit form with acceptable degradation.
 - **Blind post-training ternarization is not viable** for the tested Qwen
-  checkpoints. It causes catastrophic perplexity collapse.
+  checkpoints. It causes catastrophic perplexity collapse. On a 10-trial
+  Gaussian matrix audit, tensor absmean and row absmean ternarization both
+  displace about `51.2%` of the output Frobenius norm before any model-level
+  evaluation.
 - **QAT/distillation is materially better than naive PTQ**, which shows that
   training under ternary forward constraints recovers real signal.
 - **The current QAT checkpoints are not FP-quality yet.** The strongest
