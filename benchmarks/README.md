@@ -111,6 +111,20 @@ Report exact package version and task settings. If wrapping ternary PyTorch mode
 For the Slurm wrapper, set `LIMIT=0` to run full tasks instead of capped
 debug slices.
 
+To produce a selected-metric comparison table from lm-eval JSON outputs:
+
+```bash
+python benchmarks/compare_lm_eval.py \
+  --run FP=benchmark_results/lm-eval-qwen15b-core5-full/qwen15b_fp.json \
+  --run naive_PTQ=benchmark_results/lm-eval-qwen15b-core5-full/qwen15b_naive_ptq.json \
+  --run QAT=benchmark_results/lm-eval-qwen15b-core5-full/qwen15b_qat_ternary.json \
+  --metric arc_challenge=acc_norm \
+  --metric arc_easy=acc_norm \
+  --metric hellaswag=acc_norm \
+  --metric piqa=acc_norm \
+  --metric winogrande=acc
+```
+
 ### Tier 4: CPU Runtime
 
 After GGUF/TL2/I2_S conversion, compare against llama.cpp baselines:
