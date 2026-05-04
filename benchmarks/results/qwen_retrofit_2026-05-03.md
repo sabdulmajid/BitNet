@@ -165,6 +165,7 @@ bit-exact loader for `ternary_state_dict.pt`.
 | Qwen2.5-1.5B FP | F16 | 2,950 MiB | 105.30 | 5.52 | sensible completion |
 | Qwen2.5-1.5B FP | Q8_0 | 1,570 MiB | 135.45 | 10.07 | sensible completion |
 | Qwen2.5-1.5B FP | Q4_K_M | 940 MiB | 95.17 | 15.72 | sensible completion |
+| Qwen2.5-1.5B FP | TQ2_0 | 773 MiB | 160.96 | 18.37 | gibberish |
 | Qwen2.5-1.5B FP | I2_S | 766 MiB | 205.66 | 18.41 | repeated-token collapse |
 | Qwen2.5-1.5B QAT step-5000 | F16 | 3,396 MiB | 105.21 | 5.52 | degenerate text |
 | Qwen2.5-1.5B QAT step-5000 | I2_S | 1,211 MiB | 203.59 | 17.97 | repeated-token collapse |
@@ -204,6 +205,7 @@ Important caveats:
 | Qwen2.5-1.5B FP | F16 | 12.2806 | 0.52969 | 84.11 |
 | Qwen2.5-1.5B FP | Q8_0 | 12.3207 | 0.53098 | 104.28 |
 | Qwen2.5-1.5B FP | Q4_K_M | 12.8452 | 0.55781 | 75.53 |
+| Qwen2.5-1.5B FP | TQ2_0 | 18,041,439.0235 | 1,022,722.63659 | 116.28 |
 | Qwen2.5-1.5B FP | I2_S | 1.206e51 | 5.898e50 | 140.03 |
 | Qwen2.5-1.5B QAT step-5000 dense GGUF | F16 | 2728.9322 | 262.72596 | 83.79 |
 | Qwen2.5-1.5B QAT step-5000 dense GGUF | I2_S | 7.619e59 | 4.502e59 | 137.73 |
@@ -215,8 +217,9 @@ Interpretation:
 
 - Standard Q8_0 and Q4_K_M preserve the FP perplexity on this packed GGUF
   excerpt.
-- Blind I2_S quantization mathematically destroys language-modeling likelihood
-  even though it improves CPU throughput.
+- Blind ternary quantization mathematically destroys language-modeling
+  likelihood even though it improves CPU throughput. This is true for both
+  I2_S and generic `TQ2_0` on the original dense Qwen2.5-1.5B artifact.
 - Dense `model.safetensors` export from the QAT checkpoint is not the deployment
   object we need. The PyTorch QAT result relies on static ternary weights and
   scales from `ternary_state_dict.pt`; until GGUF ingests those exactly, the
@@ -226,7 +229,8 @@ Interpretation:
   exported static ternary checkpoint in GGUF F16 form: PPL 83.83, matching the
   earlier PyTorch-scale result.
 - Generic llama.cpp `TQ2_0` preserves that static-ternary PPL while giving a
-  2.06 bpw ternary file and about 18.38 decode tok/s on the Xeon.
+  2.06 bpw ternary file and about 18.38 decode tok/s on the Xeon. The same
+  `TQ2_0` format does not rescue a dense model without QAT/distillation.
 - Current I2_S quantization of the same materialized artifact produces NaN PPL,
   so I2_S needs a writer/kernel audit before being used for trained QAT Qwen.
 
@@ -254,7 +258,8 @@ Interpretation:
    prompt and explodes WikiText excerpt perplexity.
 9. A deployable intermediate path exists through static ternary materialization
    plus llama.cpp `TQ2_0`: it preserves the QAT PPL and runs much faster than
-   F16 decode, but it is not the optimized BitNet I2_S path.
+   F16 decode, but it requires QAT/distillation and is not the optimized BitNet
+   I2_S path.
 
 ## What This Does Not Prove Yet
 

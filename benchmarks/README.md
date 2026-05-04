@@ -137,9 +137,11 @@ python 3rdparty/llama.cpp/convert_hf_to_gguf.py \
 ```
 
 Current finding: this materialized static-ternary F16 GGUF recovers the QAT
-quality signal, and `TQ2_0` preserves it as a packed ternary GGUF. The I2_S path
-is faster but currently produces invalid perplexity for this trained sparse
-ternary artifact, so I2_S needs a writer/kernel audit before publication.
+quality signal, and `TQ2_0` preserves it as a packed ternary GGUF. Blind
+`TQ2_0` on the original dense Qwen checkpoint still fails, so this is not a
+post-training retrofit result. The I2_S path is faster but currently produces
+invalid perplexity for this trained sparse ternary artifact, so I2_S needs a
+writer/kernel audit before publication.
 
 ## Publishability Gate
 

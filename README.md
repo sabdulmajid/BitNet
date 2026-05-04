@@ -98,6 +98,7 @@ created by converting dense HF checkpoints to F16 GGUF and then running
 | Qwen2.5-1.5B FP | F16 | 2,950 MiB | 105.30 | 5.52 | sensible |
 | Qwen2.5-1.5B FP | Q8_0 | 1,570 MiB | 135.45 | 10.07 | sensible |
 | Qwen2.5-1.5B FP | Q4_K_M | 940 MiB | 95.17 | 15.72 | sensible |
+| Qwen2.5-1.5B FP | TQ2_0 | 773 MiB | 160.96 | 18.37 | gibberish |
 | Qwen2.5-1.5B FP | I2_S | 766 MiB | 205.66 | 18.41 | repeated-token collapse |
 | Qwen2.5-1.5B QAT step-5000 | F16 | 3,396 MiB | 105.21 | 5.52 | degenerate text |
 | Qwen2.5-1.5B QAT step-5000 | I2_S | 1,211 MiB | 203.59 | 17.97 | repeated-token collapse |
@@ -122,6 +123,7 @@ that fallback warning.
 | Qwen2.5-1.5B FP | F16 | 12.2806 | 84.11 |
 | Qwen2.5-1.5B FP | Q8_0 | 12.3207 | 104.28 |
 | Qwen2.5-1.5B FP | Q4_K_M | 12.8452 | 75.53 |
+| Qwen2.5-1.5B FP | TQ2_0 | 18,041,439.0235 | 116.28 |
 | Qwen2.5-1.5B FP | I2_S | 1.206e51 | 140.03 |
 | Qwen2.5-1.5B QAT step-5000 dense GGUF | F16 | 2728.9322 | 83.79 |
 | Qwen2.5-1.5B QAT step-5000 dense GGUF | I2_S | 7.619e59 | 137.73 |
@@ -130,8 +132,9 @@ that fallback warning.
 | Qwen2.5-1.5B static ternary | I2_S | NaN | 132.97 |
 
 This is the cleanest packed-runtime evidence so far: conventional Q8_0 and
-Q4_K_M retain the FP language-modeling likelihood, while blind I2_S
-ternarization destroys it. Materializing `ternary_state_dict.pt` as dense F16
+Q4_K_M retain the FP language-modeling likelihood, while blind ternarization
+destroys it, including generic `TQ2_0` when applied blindly to the original
+dense model. Materializing `ternary_state_dict.pt` as dense F16
 recovers the PyTorch static-ternary quality, and llama.cpp `TQ2_0` preserves
 that quality while giving a 2.06 bpw ternary GGUF artifact. The current I2_S
 quantization path is faster but numerically invalid for this trained sparse
