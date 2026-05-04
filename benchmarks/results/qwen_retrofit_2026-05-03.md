@@ -7,6 +7,7 @@ these are quality and loader results, not final CPU product benchmarks.
 ## Setup
 
 - Repository commit after benchmark tooling: `6501778`
+- Packed runtime binary: llama.cpp submodule commit `1f86f058`
 - Dataset for QAT/distillation: `HuggingFaceFW/fineweb-edu`, `sample-10BT`
 - QAT student forward math: ternary weights plus dynamic 8-bit activation quantization
 - QAT loss: teacher KL divergence plus last-hidden-state MSE
@@ -15,8 +16,10 @@ these are quality and loader results, not final CPU product benchmarks.
 - WikiText eval: `wikitext-2-raw-v1`, test split, 64 blocks x 512 tokens
 - FineWeb heldout eval: `sample-10BT`, train stream after `--skip-rows 25000`, 32 blocks x 1024 tokens
 - Official task eval: EleutherAI `lm-eval` 0.4.11, 100-example slices
-- Runtime probe: Intel Xeon Silver 4116, PyTorch FP32, 12 Torch threads,
+- PyTorch runtime probe: Intel Xeon Silver 4116, PyTorch FP32, 12 Torch threads,
   512-token prompt, 32 generated tokens
+- Packed GGUF runtime probe: Intel Xeon Silver 4116, `llama-bench -p 512
+  -n 128 -t 12 -ngl 0 -r 3`, no BLAS, AVX-512 available
 
 The FineWeb heldout skip is beyond the 1.5B training prefix. Job 9730 packed
 19,968 rows, so skipping 25,000 rows avoids direct train-prefix reuse for this
@@ -144,6 +147,37 @@ do not measure packed `bitnet.cpp` TL2/I2_S kernels.
 | Qwen2.5-1.5B | naive PTQ ternary | 79.93 | 0.48 | 4.748 | 2.090 | 1.655 |
 | Qwen2.5-1.5B | QAT/distilled ternary | 74.34 | 0.41 | 4.405 | 2.307 | 2.308 |
 
+## Packed GGUF CPU Runtime Probe
+
+These are actual `llama-bench` CPU measurements through the GGUF runtime. The
+Qwen2.5-0.5B QAT GGUF was created from the dense `model.safetensors` file in
+the QAT checkpoint and then quantized with `llama-quantize`; this is not yet a
+bit-exact loader for `ternary_state_dict.pt`.
+
+| source | GGUF type | file size | prefill tok/s | decode tok/s | smoke prompt behavior |
+| --- | --- | ---: | ---: | ---: | --- |
+| Qwen2.5-0.5B FP | F16 | 948 MiB | 331.82 | 16.39 | sensible completion |
+| Qwen2.5-0.5B FP | Q8_0 | 507 MiB | 391.40 | 28.84 | sensible completion |
+| Qwen2.5-0.5B FP | Q4_K_M | 379 MiB | 213.67 | 35.70 | sensible completion |
+| Qwen2.5-0.5B FP | I2_S | 230 MiB | 532.24 | 53.11 | punctuation collapse |
+| Qwen2.5-0.5B QAT step-1000 | F16 | 1,208 MiB | 332.13 | 16.26 | degenerate text |
+| Qwen2.5-0.5B QAT step-1000 | I2_S | 490 MiB | 525.52 | 49.97 | punctuation collapse |
+
+Smoke prompt: `The capital of France is`, greedy decoding, 24 generated tokens.
+The FP/Q8_0/Q4_K_M controls complete with `Paris` and related capital-city
+continuations. Both I2_S artifacts collapse to repeated exclamation marks.
+
+Important caveats:
+
+- I2_S is fast on this CPU, so the execution layer is not the bottleneck for a
+  0.5B dense Qwen-shaped model.
+- Blind I2_S conversion is not quality-preserving.
+- Q4_K_M is not a pure Q4_K_M baseline for this model shape: 144 of 168 tensors
+  required fallback quantization in the original FP conversion.
+- The QAT 0.5B checkpoint is intrinsically weak, which matches its high
+  perplexity. The 1.5B QAT checkpoint is stronger but has not yet been converted
+  into GGUF/I2_S in this run.
+
 ## What This Proves
 
 1. The pretrained Qwen dense architecture can be trained under BitNet-style
@@ -161,27 +195,32 @@ do not measure packed `bitnet.cpp` TL2/I2_S kernels.
 6. On ten lm-eval slices, 1.5B QAT improves the mean displayed task metric from
    0.351 for naive PTQ to 0.490, while FP remains 0.646.
 7. PyTorch ternary inference is slower than FP on the Xeon probe. The product
-   thesis still depends on packed `bitnet.cpp` kernels, not on the PyTorch
+   speed thesis depends on packed `bitnet.cpp` kernels, not on the PyTorch
    simulation path.
+8. Packed I2_S GGUF execution is fast on the Xeon for Qwen2.5-0.5B-shaped
+   models, but naive I2_S conversion fails the smoke prompt.
 
 ## What This Does Not Prove Yet
 
 1. It does not prove acceptable downstream task accuracy.
 2. It does not replace full, unsliced `lm-eval` task accuracy.
-3. It does not prove real `bitnet.cpp` CPU speedups; the current evaluation path
-   simulates W1.58A8 math in PyTorch and does not use packed TL2/I2_S kernels.
-4. It does not prove the approach works for MoE models.
-5. It does not prove that the current training recipe is publishable as a final
+3. It does not prove bit-exact GGUF ingestion of `ternary_state_dict.pt`.
+4. It does not prove real `bitnet.cpp` CPU speedups for the stronger Qwen2.5-1.5B
+   QAT checkpoint yet.
+5. It does not prove the approach works for MoE models.
+6. It does not prove that the current training recipe is publishable as a final
    result.
 
 ## Next Gates
 
 The next benchmark gates are:
 
-1. Convert repaired checkpoints to GGUF/TL2/I2_S and run actual `bitnet.cpp` CPU
-   inference.
-2. Compare against llama.cpp Q8_0 and Q4_K_M on quality, model size, RSS, prompt
+1. Convert the stronger Qwen2.5-1.5B QAT checkpoint to GGUF/I2_S and repeat the
+   packed runtime smoke test.
+2. Build a bit-exact GGUF importer for `ternary_state_dict.pt` instead of
+   requantizing dense GGUF weights.
+3. Compare against llama.cpp Q8_0 and Q4_K_M on quality, model size, RSS, prompt
    throughput, and decode throughput.
-3. Run full, unsliced `lm-eval` tasks for the strongest checkpoint.
-4. Run ablations: longer QAT, row scale, KL-only, hidden-MSE weighting, and
+4. Run full, unsliced `lm-eval` tasks for the strongest checkpoint.
+5. Run ablations: longer QAT, row scale, KL-only, hidden-MSE weighting, and
    larger FineWeb samples.

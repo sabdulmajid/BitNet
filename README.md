@@ -24,12 +24,17 @@ conservative:
 - **QAT/distillation is materially better than naive PTQ**, which shows that
   training under ternary forward constraints recovers real signal.
 - **The current QAT checkpoints are not deployment-quality yet.** They remain
-  significantly worse than the FP references and have not yet been converted to
-  packed `bitnet.cpp` CPU artifacts.
+  significantly worse than the FP references. A Qwen2.5-0.5B QAT checkpoint can
+  be converted to GGUF and packed as I2_S, but the resulting text is still
+  degenerate on a simple smoke prompt.
 - **PyTorch ternary simulation is not the speed path.** On the Xeon Silver 4116
   host, the exported ternary checkpoints are smaller in memory but slower than
   FP under PyTorch because the probe dequantizes into dense matmuls. Real
   product claims require GGUF/I2_S or TL2 execution through `bitnet.cpp`.
+- **Packed I2_S runtime is fast, but speed does not rescue blind
+  ternarization.** On the same Xeon, Qwen2.5-0.5B I2_S GGUF runs much faster
+  than F16/Q8 decode, but blind I2_S conversion collapses a basic generation
+  prompt to punctuation.
 
 Current evidence is tracked in
 [benchmarks/results/qwen_retrofit_2026-05-03.md](benchmarks/results/qwen_retrofit_2026-05-03.md).
@@ -47,9 +52,7 @@ The benchmark harnesses are in [benchmarks/](benchmarks/).
 | Qwen2.5-1.5B | QAT/distilled ternary | 86.414 | 40.398 |
 
 These numbers are BF16/CUDA quality measurements using PyTorch simulation of
-W1.58A8 math. They are **not** `bitnet.cpp` CPU throughput claims. The next
-required gates are GGUF/TL2/I2_S conversion and side-by-side CPU measurements
-against llama.cpp Q8_0/Q4_K_M baselines.
+W1.58A8 math. They are **not** `bitnet.cpp` CPU throughput claims.
 
 ### Current Official lm-eval Snapshot
 
@@ -74,6 +77,30 @@ Mean over these displayed metrics: FP 0.646, naive PTQ 0.351, QAT ternary
 0.490. This supports the narrow claim that QAT/distillation recovers substantial
 signal over blind ternarization. It does **not** support a claim that the
 current ternary model preserves FP quality.
+
+### Packed GGUF CPU Runtime Snapshot
+
+CPU runtime: Intel Xeon Silver 4116, 12 threads, `llama-bench -p 512 -n 128
+-ngl 0 -r 3`, no BLAS, AVX-512 available, llama.cpp submodule commit
+`1f86f058`. The I2_S path is a real packed GGUF CPU measurement. It is not yet
+an exact import of `ternary_state_dict.pt`; the tested GGUF artifacts were
+created by converting dense HF checkpoints to F16 GGUF and then running
+`llama-quantize`.
+
+| source | GGUF type | file size | prefill tok/s | decode tok/s | smoke prompt result |
+| --- | --- | ---: | ---: | ---: | --- |
+| Qwen2.5-0.5B FP | F16 | 948 MiB | 331.82 | 16.39 | sensible |
+| Qwen2.5-0.5B FP | Q8_0 | 507 MiB | 391.40 | 28.84 | sensible |
+| Qwen2.5-0.5B FP | Q4_K_M | 379 MiB | 213.67 | 35.70 | sensible |
+| Qwen2.5-0.5B FP | I2_S | 230 MiB | 532.24 | 53.11 | degenerate punctuation |
+| Qwen2.5-0.5B QAT step-1000 | F16 | 1,208 MiB | 332.13 | 16.26 | degenerate text |
+| Qwen2.5-0.5B QAT step-1000 | I2_S | 490 MiB | 525.52 | 49.97 | degenerate punctuation |
+
+Interpretation: the CPU backend can execute packed I2_S quickly on this 2017
+Xeon. The blocking problem is quality, not kernel availability. Standard Q8_0
+and Q4_K_M preserve the simple prompt, while I2_S does not. Q4_K_M should be
+read with care for this Qwen shape because many tensors require fallback
+quantization due column divisibility constraints.
 
 ### Xeon PyTorch Runtime Probe
 

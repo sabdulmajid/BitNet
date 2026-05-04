@@ -134,6 +134,54 @@ def summarize_runtime(pattern: str) -> str:
     )
 
 
+def summarize_gguf_runtime(pattern: str) -> str:
+    rows = []
+    for item in sorted(glob.glob(pattern)):
+        path = Path(item)
+        data = read_json(path)
+        if not isinstance(data, list):
+            continue
+        for record in data:
+            if not isinstance(record, dict) or "avg_ts" not in record:
+                continue
+            model_path = Path(str(record.get("model_filename", "")))
+            file_mib = ""
+            if model_path.exists():
+                file_mib = f"{model_path.stat().st_size / (1024 ** 2):.1f}"
+            mode = "prefill" if int(record.get("n_gen", 0)) == 0 else "decode"
+            rows.append([
+                f"{path.parent.name}/{path.stem}",
+                mode,
+                str(record.get("model_type", "")),
+                file_mib,
+                f"{float(record.get('model_size', 0.0)) / (1024 ** 2):.1f}",
+                str(record.get("n_threads", "")),
+                str(record.get("n_prompt", "")),
+                str(record.get("n_gen", "")),
+                f"{float(record.get('avg_ts', 0.0)):.2f}",
+                f"{float(record.get('stddev_ts', 0.0)):.2f}",
+                str(record.get("cpu_info", "")),
+            ])
+    if not rows:
+        return "No GGUF runtime results found."
+    return md_table(
+        [
+            "run",
+            "mode",
+            "model_type",
+            "file MiB",
+            "bench model MiB",
+            "threads",
+            "prompt",
+            "gen",
+            "tok/s",
+            "stddev",
+            "cpu",
+        ],
+        rows,
+    )
+
+
 def summarize_mc(pattern: str) -> str:
     rows = []
     for item in sorted(glob.glob(pattern)):
@@ -202,6 +250,7 @@ def main() -> None:
     parser.add_argument("--mc-glob", default="benchmark_results/mc/*.json")
     parser.add_argument("--lm-eval-glob", default="benchmark_results/lm_eval/*.json")
     parser.add_argument("--runtime-glob", default="benchmark_results/runtime/*.json")
+    parser.add_argument("--gguf-runtime-glob", default="benchmark_results/gguf-*-runtime/*.json")
     parser.add_argument("--output-md", type=Path, default=None)
     args = parser.parse_args()
 
@@ -215,6 +264,8 @@ def main() -> None:
         summarize_lm_eval(args.lm_eval_glob),
         "## Runtime",
         summarize_runtime(args.runtime_glob),
+        "## GGUF Runtime",
+        summarize_gguf_runtime(args.gguf_runtime_glob),
         "## Generation",
         summarize_generation(args.generation_glob),
     ])
