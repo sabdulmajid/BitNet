@@ -18,7 +18,10 @@ The formulas here mirror the conversion paths in this repository:
 from __future__ import annotations
 
 import argparse
+import json
 import math
+import statistics
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -87,19 +90,12 @@ def theoretical_mean_abs_mse() -> float:
     return 1.0 - 2.0 * alpha * tail_abs_moment + alpha * alpha * tail_prob
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--out-features", type=int, default=2048)
-    parser.add_argument("--in-features", type=int, default=2048)
-    parser.add_argument("--batch", type=int, default=128)
-    parser.add_argument("--seed", type=int, default=0)
-    args = parser.parse_args()
-
+def run_trial(args: argparse.Namespace, seed: int) -> dict[str, Any]:
     torch = _try_torch()
-    rng = np.random.default_rng(args.seed)
+    rng = np.random.default_rng(seed)
 
     if torch is not None:
-        torch.manual_seed(args.seed)
+        torch.manual_seed(seed)
         w_t = torch.randn(args.out_features, args.in_features, dtype=torch.float16)
         x_t = torch.randn(args.batch, args.in_features, dtype=torch.float16)
         w = w_t.float().cpu().numpy()
@@ -115,18 +111,75 @@ def main() -> None:
     sign_max_q = numpy_sign_max_ternary(w)
     mean_abs_stats = summarize("mean_abs", w, mean_abs_q, x)
     sign_max_stats = summarize("sign_max", w, sign_max_q, x)
+    return {
+        "seed": seed,
+        "backend": backend,
+        "mean_abs_ternary_repo_formula": mean_abs_stats,
+        "sign_max_tl_i2_generic_path": sign_max_stats,
+    }
 
-    print(f"backend: {backend}")
+
+def aggregate_trials(trials: list[dict[str, Any]]) -> dict[str, dict[str, dict[str, float]]]:
+    aggregate: dict[str, dict[str, dict[str, float]]] = {}
+    for method in ("mean_abs_ternary_repo_formula", "sign_max_tl_i2_generic_path"):
+        keys = trials[0][method].keys()
+        aggregate[method] = {}
+        for key in keys:
+            values = [float(trial[method][key]) for trial in trials]
+            aggregate[method][key] = {
+                "mean": float(sum(values) / len(values)),
+                "std": float(statistics.stdev(values)) if len(values) > 1 else 0.0,
+                "min": float(min(values)),
+                "max": float(max(values)),
+            }
+    return aggregate
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out-features", type=int, default=2048)
+    parser.add_argument("--in-features", type=int, default=2048)
+    parser.add_argument("--batch", type=int, default=128)
+    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--trials", type=int, default=1)
+    parser.add_argument("--output-json", type=Path, default=None)
+    args = parser.parse_args()
+
+    if args.trials < 1:
+        raise ValueError("--trials must be at least 1")
+
+    trials = [run_trial(args, args.seed + offset) for offset in range(args.trials)]
+    aggregate = aggregate_trials(trials)
+    theory = math.sqrt(theoretical_mean_abs_mse())
+
+    print(f"backend: {trials[0]['backend']}")
     print(f"shape: W=({args.out_features}, {args.in_features}), X=({args.batch}, {args.in_features})")
-    print(f"theoretical_mean_abs_relative_fro_error: {math.sqrt(theoretical_mean_abs_mse()):.6f}")
-    for name, stats in (("mean_abs_ternary_repo_formula", mean_abs_stats),
-                        ("sign_max_tl_i2_generic_path", sign_max_stats)):
+    print(f"trials: {args.trials}")
+    print(f"theoretical_mean_abs_relative_fro_error: {theory:.6f}")
+    for name in ("mean_abs_ternary_repo_formula", "sign_max_tl_i2_generic_path"):
         print(f"\n{name}")
-        for key, value in stats.items():
+        for key, stats in aggregate[name].items():
+            value = stats["mean"]
             if key == "unique_values":
                 print(f"  {key}: {int(value)}")
-            else:
+            elif args.trials == 1:
                 print(f"  {key}: {value:.6f}")
+            else:
+                print(f"  {key}: {value:.6f} +/- {stats['std']:.6f}")
+
+    if args.output_json is not None:
+        args.output_json.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "out_features": args.out_features,
+            "in_features": args.in_features,
+            "batch": args.batch,
+            "seed": args.seed,
+            "trials": args.trials,
+            "theoretical_mean_abs_relative_fro_error": theory,
+            "aggregate": aggregate,
+            "trial_results": trials,
+        }
+        args.output_json.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":
