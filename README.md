@@ -26,6 +26,10 @@ conservative:
 - **The current QAT checkpoints are not deployment-quality yet.** They remain
   significantly worse than the FP references and have not yet been converted to
   packed `bitnet.cpp` CPU artifacts.
+- **PyTorch ternary simulation is not the speed path.** On the Xeon Silver 4116
+  host, the exported ternary checkpoints are smaller in memory but slower than
+  FP under PyTorch because the probe dequantizes into dense matmuls. Real
+  product claims require GGUF/I2_S or TL2 execution through `bitnet.cpp`.
 
 Current evidence is tracked in
 [benchmarks/results/qwen_retrofit_2026-05-03.md](benchmarks/results/qwen_retrofit_2026-05-03.md).
@@ -44,15 +48,56 @@ The benchmark harnesses are in [benchmarks/](benchmarks/).
 
 These numbers are BF16/CUDA quality measurements using PyTorch simulation of
 W1.58A8 math. They are **not** `bitnet.cpp` CPU throughput claims. The next
-required gates are `lm-eval` task accuracy, GGUF/TL2/I2_S conversion, and
-side-by-side CPU measurements against llama.cpp Q8_0/Q4_K_M baselines.
+required gates are GGUF/TL2/I2_S conversion and side-by-side CPU measurements
+against llama.cpp Q8_0/Q4_K_M baselines.
+
+### Current Official lm-eval Snapshot
+
+EleutherAI `lm-eval` 0.4.11 was run on 100-example slices for ten tasks using
+Qwen2.5-1.5B FP, naive PTQ ternary, and QAT/distilled ternary. Where a task
+reports `acc_norm`, that metric is shown; otherwise raw `acc` is shown.
+
+| task | metric | FP | naive PTQ | QAT ternary |
+| --- | --- | ---: | ---: | ---: |
+| ARC-Challenge | acc_norm | 0.410 | 0.300 | 0.300 |
+| ARC-Easy | acc_norm | 0.760 | 0.220 | 0.510 |
+| BoolQ | acc | 0.690 | 0.400 | 0.700 |
+| COPA | acc | 0.830 | 0.510 | 0.640 |
+| HellaSwag | acc_norm | 0.660 | 0.290 | 0.460 |
+| OpenBookQA | acc_norm | 0.350 | 0.290 | 0.280 |
+| PIQA | acc_norm | 0.800 | 0.580 | 0.590 |
+| SciQ | acc_norm | 0.960 | 0.210 | 0.640 |
+| TruthfulQA MC1 | acc | 0.280 | 0.220 | 0.200 |
+| WinoGrande | acc | 0.720 | 0.490 | 0.580 |
+
+Mean over these displayed metrics: FP 0.646, naive PTQ 0.351, QAT ternary
+0.490. This supports the narrow claim that QAT/distillation recovers substantial
+signal over blind ternarization. It does **not** support a claim that the
+current ternary model preserves FP quality.
+
+### Xeon PyTorch Runtime Probe
+
+CPU probe: Intel Xeon Silver 4116, 12 physical cores / 24 threads, AVX-512,
+PyTorch FP32, 12 Torch threads, 512-token prompt, 32 generated tokens, median of
+three measured repeats. These are PyTorch loader numbers, not packed
+`bitnet.cpp` kernel numbers.
+
+| model | method | prefill tok/s | gen tok/s | RSS GiB | model GiB | ternary GiB |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Qwen2.5-0.5B | FP reference | 330.69 | 5.20 | 2.716 | 1.840 | - |
+| Qwen2.5-0.5B | naive PTQ ternary | 244.82 | 2.03 | 3.370 | 0.841 | 0.587 |
+| Qwen2.5-0.5B | QAT/distilled ternary | 219.71 | 1.41 | 2.173 | 0.967 | 0.968 |
+| Qwen2.5-1.5B | FP reference | 118.74 | 1.95 | 6.631 | 5.751 | - |
+| Qwen2.5-1.5B | naive PTQ ternary | 79.93 | 0.48 | 4.748 | 2.090 | 1.655 |
+| Qwen2.5-1.5B | QAT/distilled ternary | 74.34 | 0.41 | 4.405 | 2.307 | 2.308 |
 
 ### Current Task-Accuracy Snapshot
 
-The in-repo multiple-choice evaluator now covers 100-example validation slices
+The in-repo multiple-choice evaluator covers 100-example validation slices
 for PIQA, ARC-Easy, ARC-Challenge, and HellaSwag. This is a fast regression
-tool, not a replacement for full `lm-eval`. The strongest current ternary result
-is Qwen2.5-1.5B QAT/distilled:
+tool; the official `lm-eval` snapshot above is the stronger current evidence.
+The strongest current ternary result in this fast local harness is
+Qwen2.5-1.5B QAT/distilled:
 
 | task | FP Qwen2.5-1.5B acc | naive PTQ acc | QAT ternary acc |
 | --- | ---: | ---: | ---: |

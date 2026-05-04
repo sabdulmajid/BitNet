@@ -6,7 +6,7 @@ these are quality and loader results, not final CPU product benchmarks.
 
 ## Setup
 
-- Repository commit after benchmark tooling: `aaced64`
+- Repository commit after benchmark tooling: `6501778`
 - Dataset for QAT/distillation: `HuggingFaceFW/fineweb-edu`, `sample-10BT`
 - QAT student forward math: ternary weights plus dynamic 8-bit activation quantization
 - QAT loss: teacher KL divergence plus last-hidden-state MSE
@@ -14,6 +14,9 @@ these are quality and loader results, not final CPU product benchmarks.
 - Evaluation dtype/device for perplexity: BF16 on CUDA
 - WikiText eval: `wikitext-2-raw-v1`, test split, 64 blocks x 512 tokens
 - FineWeb heldout eval: `sample-10BT`, train stream after `--skip-rows 25000`, 32 blocks x 1024 tokens
+- Official task eval: EleutherAI `lm-eval` 0.4.11, 100-example slices
+- Runtime probe: Intel Xeon Silver 4116, PyTorch FP32, 12 Torch threads,
+  512-token prompt, 32 generated tokens
 
 The FineWeb heldout skip is beyond the 1.5B training prefix. Job 9730 packed
 19,968 rows, so skipping 25,000 rows avoids direct train-prefix reuse for this
@@ -97,6 +100,50 @@ change raw log-likelihood rankings.
 | HellaSwag | Qwen2.5-1.5B | naive PTQ ternary | 0.230 | 0.180 |
 | HellaSwag | Qwen2.5-1.5B | QAT/distilled ternary | 0.360 | 0.390 |
 
+## Official lm-eval Accuracy
+
+These are EleutherAI `lm-eval` 0.4.11 results for Qwen2.5-1.5B on ten
+100-example task slices. Where a task reports `acc_norm`, that metric is shown;
+otherwise raw `acc` is shown. This is still not a full official benchmark run,
+but it uses the standard lm-eval task implementations and result format.
+
+| task | metric | FP reference | naive PTQ ternary | QAT/distilled ternary |
+| --- | --- | ---: | ---: | ---: |
+| ARC-Challenge | acc_norm | 0.410 | 0.300 | 0.300 |
+| ARC-Easy | acc_norm | 0.760 | 0.220 | 0.510 |
+| BoolQ | acc | 0.690 | 0.400 | 0.700 |
+| COPA | acc | 0.830 | 0.510 | 0.640 |
+| HellaSwag | acc_norm | 0.660 | 0.290 | 0.460 |
+| OpenBookQA | acc_norm | 0.350 | 0.290 | 0.280 |
+| PIQA | acc_norm | 0.800 | 0.580 | 0.590 |
+| SciQ | acc_norm | 0.960 | 0.210 | 0.640 |
+| TruthfulQA MC1 | acc | 0.280 | 0.220 | 0.200 |
+| WinoGrande | acc | 0.720 | 0.490 | 0.580 |
+
+Mean displayed metric:
+
+| method | mean |
+| --- | ---: |
+| FP reference | 0.646 |
+| naive PTQ ternary | 0.351 |
+| QAT/distilled ternary | 0.490 |
+
+## Xeon PyTorch Runtime Probe
+
+These are CPU measurements on the Intel Xeon Silver 4116 host with PyTorch
+FP32 and 12 Torch threads. They are intentionally labeled as PyTorch probe
+numbers because the ternary path dequantizes into dense PyTorch matmuls. They
+do not measure packed `bitnet.cpp` TL2/I2_S kernels.
+
+| model | method | prefill tok/s | gen tok/s | RSS GiB | model GiB | ternary GiB |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Qwen2.5-0.5B | FP reference | 330.69 | 5.20 | 2.716 | 1.840 | - |
+| Qwen2.5-0.5B | naive PTQ ternary | 244.82 | 2.03 | 3.370 | 0.841 | 0.587 |
+| Qwen2.5-0.5B | QAT/distilled ternary | 219.71 | 1.41 | 2.173 | 0.967 | 0.968 |
+| Qwen2.5-1.5B | FP reference | 118.74 | 1.95 | 6.631 | 5.751 | - |
+| Qwen2.5-1.5B | naive PTQ ternary | 79.93 | 0.48 | 4.748 | 2.090 | 1.655 |
+| Qwen2.5-1.5B | QAT/distilled ternary | 74.34 | 0.41 | 4.405 | 2.307 | 2.308 |
+
 ## What This Proves
 
 1. The pretrained Qwen dense architecture can be trained under BitNet-style
@@ -111,11 +158,16 @@ change raw log-likelihood rankings.
    deployment claim.
 5. On fast multiple-choice slices, 1.5B QAT generally recovers meaningful
    accuracy relative to naive PTQ, but still trails FP.
+6. On ten lm-eval slices, 1.5B QAT improves the mean displayed task metric from
+   0.351 for naive PTQ to 0.490, while FP remains 0.646.
+7. PyTorch ternary inference is slower than FP on the Xeon probe. The product
+   thesis still depends on packed `bitnet.cpp` kernels, not on the PyTorch
+   simulation path.
 
 ## What This Does Not Prove Yet
 
 1. It does not prove acceptable downstream task accuracy.
-2. It does not replace full `lm-eval` task accuracy.
+2. It does not replace full, unsliced `lm-eval` task accuracy.
 3. It does not prove real `bitnet.cpp` CPU speedups; the current evaluation path
    simulates W1.58A8 math in PyTorch and does not use packed TL2/I2_S kernels.
 4. It does not prove the approach works for MoE models.
@@ -126,10 +178,10 @@ change raw log-likelihood rankings.
 
 The next benchmark gates are:
 
-1. Run `lm-eval` tasks: HellaSwag, PIQA, ARC-Easy, ARC-Challenge, and Winogrande.
-2. Convert repaired checkpoints to GGUF/TL2/I2_S and run actual `bitnet.cpp` CPU
+1. Convert repaired checkpoints to GGUF/TL2/I2_S and run actual `bitnet.cpp` CPU
    inference.
-3. Compare against llama.cpp Q8_0 and Q4_K_M on quality, model size, RSS, prompt
+2. Compare against llama.cpp Q8_0 and Q4_K_M on quality, model size, RSS, prompt
    throughput, and decode throughput.
+3. Run full, unsliced `lm-eval` tasks for the strongest checkpoint.
 4. Run ablations: longer QAT, row scale, KL-only, hidden-MSE weighting, and
    larger FineWeb samples.
