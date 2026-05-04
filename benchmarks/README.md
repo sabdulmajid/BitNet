@@ -192,16 +192,18 @@ post-training retrofit result. `I2_S` also preserves the static-ternary quality
 when quantized single-threaded:
 
 ```bash
-build/bin/llama-quantize \
-  models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_f16.gguf \
-  models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_i2_s_t1.gguf \
-  I2_S \
-  1
+python benchmarks/quantize_gguf_safe.py \
+  --input models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_f16.gguf \
+  --output models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_i2_s_t1.gguf \
+  --type I2_S \
+  --threads 12
 ```
 
 The multi-thread I2_S writer path produced a corrupted artifact for this layout,
-so the production gate is a writer/chunking fix plus a rerun without forcing
-`nthreads=1`.
+so `quantize_gguf_safe.py` forces I2_S to one writer thread unless
+`--allow-unsafe-i2s-multithread` is passed. This is a mitigation, not the final
+production fix; the production gate remains a writer/chunking fix plus a rerun
+without forcing `nthreads=1`.
 
 ## Publishability Gate
 
