@@ -377,13 +377,18 @@ bit-exact loader for `ternary_state_dict.pt`.
 | Qwen2.5-1.5B static ternary | F16 materialized | 3,396 MiB | 104.54 | 5.50 | sensible completion |
 | Qwen2.5-1.5B static ternary | TQ2_0 | 1,219 MiB | 160.94 | 18.39 | sensible completion |
 | Qwen2.5-1.5B static ternary | I2_S single-thread quant | 1,209 MiB | 206.15 | 18.58 | sensible completion |
+| Qwen2.5-1.5B KL-only static ternary | F16 materialized | 3,396 MiB | 105.34 | 5.50 | sensible completion |
+| Qwen2.5-1.5B KL-only static ternary | TQ2_0 | 1,219 MiB | 160.93 | 18.43 | sensible completion |
+| Qwen2.5-1.5B KL-only static ternary | I2_S single-thread quant | 1,209 MiB | 205.76 | 18.60 | sensible completion |
 
 Smoke prompt: `The capital of France is`, greedy decoding, 24 generated tokens.
 The FP/Q8_0/Q4_K_M controls complete with `Paris` and related capital-city
 continuations. The 0.5B I2_S artifacts collapse to repeated exclamation marks;
 the blind 1.5B I2_S artifact collapses to repeated `is` tokens. The
 single-thread-written static-ternary I2_S artifact produces a sensible
-Paris/French-government continuation.
+Paris/French-government continuation. The KL-only static-ternary artifacts
+produce sensible capital-city continuations and preserve the stronger KL-only
+quality signal.
 
 Important caveats:
 
@@ -403,6 +408,9 @@ Important caveats:
   generic `TQ2_0` preserves quality. I2_S also preserves quality when the GGUF
   is written with a single quantization thread; the earlier multi-thread I2_S
   artifact was corrupted.
+- Repeating the same static-ternary bridge for the stronger KL-only QAT
+  checkpoint improves fixed-excerpt I2_S PPL from `84.5277` to `54.7366` while
+  keeping decode throughput at `18.60` tok/s on the Xeon.
 
 ## Packed GGUF Perplexity Probe
 
@@ -422,6 +430,9 @@ Important caveats:
 | Qwen2.5-1.5B static ternary | F16 materialized | 83.8300 | 4.60205 | 77.11 |
 | Qwen2.5-1.5B static ternary | TQ2_0 | 84.0553 | 4.61363 | 116.64 |
 | Qwen2.5-1.5B static ternary | I2_S single-thread quant | 84.5277 | 4.63470 | 140.13 |
+| Qwen2.5-1.5B KL-only static ternary | F16 materialized | 55.0971 | 3.00700 | 82.65 |
+| Qwen2.5-1.5B KL-only static ternary | TQ2_0 | 55.1562 | 3.00939 | 116.16 |
+| Qwen2.5-1.5B KL-only static ternary | I2_S single-thread quant | 54.7366 | 2.98318 | 140.95 |
 
 Interpretation:
 
@@ -445,6 +456,10 @@ Interpretation:
   static-ternary PPL while giving the fastest prompt throughput in this GGUF
   slice. The earlier multi-thread I2_S artifact produced NaN PPL, which points
   to a writer/chunking bug rather than a fundamental runtime math failure.
+- The KL-only static-ternary bridge is the current best CPU-side result:
+  `I2_S` gives `54.7366` PPL on the fixed excerpt, `140.95` prompt-eval tok/s,
+  and `18.60` decode tok/s. It is much better than the hidden-MSE static
+  ternary bridge, but still far worse than FP/Q8/Q4 likelihood.
 
 ## MoE Status
 
@@ -523,7 +538,9 @@ locality on CPU.
 14. A deployable intermediate path exists through static ternary materialization
    plus llama.cpp `TQ2_0` or single-thread-written `I2_S`: both preserve the QAT
    PPL and run much faster than F16 decode, but the path requires
-   QAT/distillation.
+   QAT/distillation. The strongest CPU-side checkpoint so far is the KL-only
+   static ternary `I2_S` artifact: fixed-excerpt PPL 54.7366, prompt-eval
+   140.95 tok/s, and decode 18.60 tok/s on the Xeon.
 
 ## What This Does Not Prove Yet
 

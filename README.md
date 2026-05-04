@@ -37,6 +37,11 @@ conservative:
   it improves Qwen2.5-1.5B WikiText/FineWeb PPL from `86.414`/`40.398` to
   `50.595`/`26.599` versus the hidden-MSE QAT run, and improves uncapped
   ten-task lm-eval mean from `0.465` to `0.483`. FP remains `0.644`.
+- **The strongest packed CPU result is now KL-only static ternary I2_S.** On
+  the Xeon 4116 fixed GGUF excerpt, it reaches PPL `54.7366` at `140.95`
+  prompt-eval tok/s and `18.60` decode tok/s. This is a large improvement over
+  the earlier hidden-MSE static ternary I2_S PPL `84.5277`, but still far from
+  FP/Q8/Q4 likelihood.
 - **Row-wise ternary scales help likelihood but do not solve accuracy.** A
   Qwen2.5-0.5B row-scale ablation cut heldout perplexity by about 2.4x versus
   the tensor-scale QAT checkpoint, but its 100-example multiple-choice slices
@@ -251,11 +256,17 @@ created by converting dense HF checkpoints to F16 GGUF and then running
 | Qwen2.5-1.5B static ternary | F16 materialized | 3,396 MiB | 104.54 | 5.50 | sensible |
 | Qwen2.5-1.5B static ternary | TQ2_0 | 1,219 MiB | 160.94 | 18.39 | sensible |
 | Qwen2.5-1.5B static ternary | I2_S single-thread quant | 1,209 MiB | 206.15 | 18.58 | sensible |
+| Qwen2.5-1.5B KL-only static ternary | F16 materialized | 3,396 MiB | 105.34 | 5.50 | sensible |
+| Qwen2.5-1.5B KL-only static ternary | TQ2_0 | 1,219 MiB | 160.93 | 18.43 | sensible |
+| Qwen2.5-1.5B KL-only static ternary | I2_S single-thread quant | 1,209 MiB | 205.76 | 18.60 | sensible |
 
 Interpretation: the CPU backend can execute packed I2_S quickly on this 2017
 Xeon. The blocking problem is quality, not kernel availability. Blind I2_S
 does not preserve the dense FP checkpoint, but single-thread I2_S preserves the
-trained static-ternary artifact. Q4_K_M should be read with care for
+trained static-ternary artifact. The stronger KL-only static ternary checkpoint
+also survives GGUF materialization and packed ternary quantization, reducing
+the fixed-excerpt I2_S PPL from `84.5277` to `54.7366` while keeping decode
+throughput at about `18.6` tok/s. Q4_K_M should be read with care for
 Qwen2.5-0.5B because many tensors require fallback quantization due column
 divisibility constraints; Qwen2.5-1.5B did not report that fallback warning.
 
@@ -276,6 +287,9 @@ divisibility constraints; Qwen2.5-1.5B did not report that fallback warning.
 | Qwen2.5-1.5B static ternary | F16 materialized | 83.8300 | 77.11 |
 | Qwen2.5-1.5B static ternary | TQ2_0 | 84.0553 | 116.64 |
 | Qwen2.5-1.5B static ternary | I2_S single-thread quant | 84.5277 | 140.13 |
+| Qwen2.5-1.5B KL-only static ternary | F16 materialized | 55.0971 | 82.65 |
+| Qwen2.5-1.5B KL-only static ternary | TQ2_0 | 55.1562 | 116.16 |
+| Qwen2.5-1.5B KL-only static ternary | I2_S single-thread quant | 54.7366 | 140.95 |
 
 This is the cleanest packed-runtime evidence so far: conventional Q8_0 and
 Q4_K_M retain the FP language-modeling likelihood, while blind ternarization

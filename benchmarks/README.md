@@ -224,6 +224,10 @@ python benchmarks/run_gguf_suite.py \
   --ppl-chunks 16
 ```
 
+For the stronger Qwen2.5-1.5B KL-only static-ternary checkpoint, use
+`benchmarks/gguf_qwen15b_klonly_manifest.json` and write to a separate output
+directory, for example `benchmark_results/gguf-qwen15b-klonly-suite`.
+
 For QAT checkpoints, do not convert `model.safetensors` directly and treat it
 as the trained ternary artifact. The validated bridge is:
 

@@ -377,6 +377,25 @@ def audit_gguf_summary(specs: list[tuple[str, Path, int | None]]) -> str:
         if expected_rows is not None and len(rows) != expected_rows:
             failed.append(f"expected_rows={expected_rows},got={len(rows)}")
 
+        def select_name(*names: str, kind_tokens: tuple[str, ...] = ()) -> str:
+            for name in names:
+                if name in by_name:
+                    return name
+            if kind_tokens:
+                for candidate in rows:
+                    if not isinstance(candidate, dict):
+                        continue
+                    kind = str(candidate.get("kind", "")).lower()
+                    if all(token in kind for token in kind_tokens):
+                        return str(candidate.get("name", ""))
+            return names[0] if names else ""
+
+        qat_i2s_name = select_name(
+            "qwen15b_static_ternary_i2_s",
+            "qwen15b_klonly_static_ternary_i2_s",
+            kind_tokens=("qat", "i2s"),
+        )
+
         def ppl_for(name: str) -> str:
             value = by_name.get(name, {}).get("perplexity", {}).get("ppl")
             return f"{float(value):.4g}" if isinstance(value, (int, float)) and math.isfinite(float(value)) else "-"
@@ -395,8 +414,8 @@ def audit_gguf_summary(specs: list[tuple[str, Path, int | None]]) -> str:
             ",".join(nan_ppl) if nan_ppl else "-",
             ppl_for("qwen15b_fp_f16"),
             ppl_for("qwen15b_fp_i2_s"),
-            ppl_for("qwen15b_static_ternary_i2_s"),
-            decode_for("qwen15b_static_ternary_i2_s"),
+            ppl_for(qat_i2s_name),
+            decode_for(qat_i2s_name),
         ])
     return md_table(
         [
