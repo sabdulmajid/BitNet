@@ -84,6 +84,10 @@ QWEN15_PTQ=checkpoints/does-not-exist \
 sbatch slurm_benchmark_quality.sh
 ```
 
+For single-model ablation evaluation in `slurm_benchmark_quality.sh` or
+`slurm_benchmark_mc.sh`, use `RUN_QWEN05=false` or `RUN_QWEN15=false` rather
+than passing dummy checkpoint paths.
+
 ### Tier 2: Fixed Generation Suite
 
 ```bash

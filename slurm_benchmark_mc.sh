@@ -32,6 +32,8 @@ MAX_SEQ_LEN="${MAX_SEQ_LEN:-1024}"
 RUN_FP="${RUN_FP:-true}"
 RUN_QAT="${RUN_QAT:-true}"
 RUN_PTQ="${RUN_PTQ:-true}"
+RUN_QWEN05="${RUN_QWEN05:-true}"
+RUN_QWEN15="${RUN_QWEN15:-true}"
 
 QWEN05_FP="${QWEN05_FP:-Qwen/Qwen2.5-0.5B}"
 QWEN15_FP="${QWEN15_FP:-Qwen/Qwen2.5-1.5B}"
@@ -47,6 +49,7 @@ echo "OUT_DIR=$OUT_DIR"
 echo "DEVICE=$DEVICE DTYPE=$DTYPE LIMIT=$LIMIT MAX_SEQ_LEN=$MAX_SEQ_LEN"
 echo "TASKS=$TASKS"
 echo "RUN_FP=$RUN_FP RUN_QAT=$RUN_QAT RUN_PTQ=$RUN_PTQ"
+echo "RUN_QWEN05=$RUN_QWEN05 RUN_QWEN15=$RUN_QWEN15"
 
 run_task() {
   local task="$1"
@@ -66,26 +69,38 @@ run_task() {
 IFS=',' read -ra TASK_ARRAY <<< "$TASKS"
 for task in "${TASK_ARRAY[@]}"; do
   if [ "$RUN_FP" = "true" ]; then
-    run_task "$task" qwen05b_fp --model-kind hf --model "$QWEN05_FP"
-    run_task "$task" qwen15b_fp --model-kind hf --model "$QWEN15_FP"
+    if [ "$RUN_QWEN05" = "true" ]; then
+      run_task "$task" qwen05b_fp --model-kind hf --model "$QWEN05_FP"
+    fi
+    if [ "$RUN_QWEN15" = "true" ]; then
+      run_task "$task" qwen15b_fp --model-kind hf --model "$QWEN15_FP"
+    fi
   fi
 
   if [ "$RUN_PTQ" = "true" ]; then
-    if [ -d "$QWEN05_PTQ" ]; then
+    if [ "$RUN_QWEN05" = "true" ] && [ -d "$QWEN05_PTQ" ]; then
       run_task "$task" qwen05b_naive_ptq --model-kind ternary --checkpoint-dir "$QWEN05_PTQ"
-    else
+    elif [ "$RUN_QWEN05" = "true" ]; then
       echo "Skipping qwen05b_naive_ptq; directory not found: $QWEN05_PTQ"
     fi
-    if [ -d "$QWEN15_PTQ" ]; then
+    if [ "$RUN_QWEN15" = "true" ] && [ -d "$QWEN15_PTQ" ]; then
       run_task "$task" qwen15b_naive_ptq --model-kind ternary --checkpoint-dir "$QWEN15_PTQ"
-    else
+    elif [ "$RUN_QWEN15" = "true" ]; then
       echo "Skipping qwen15b_naive_ptq; directory not found: $QWEN15_PTQ"
     fi
   fi
 
   if [ "$RUN_QAT" = "true" ]; then
-    run_task "$task" qwen05b_ternary --model-kind ternary --checkpoint-dir "$QWEN05_TERNARY"
-    run_task "$task" qwen15b_ternary --model-kind ternary --checkpoint-dir "$QWEN15_TERNARY"
+    if [ "$RUN_QWEN05" = "true" ] && [ -d "$QWEN05_TERNARY" ]; then
+      run_task "$task" qwen05b_ternary --model-kind ternary --checkpoint-dir "$QWEN05_TERNARY"
+    elif [ "$RUN_QWEN05" = "true" ]; then
+      echo "Skipping qwen05b_ternary; directory not found: $QWEN05_TERNARY"
+    fi
+    if [ "$RUN_QWEN15" = "true" ] && [ -d "$QWEN15_TERNARY" ]; then
+      run_task "$task" qwen15b_ternary --model-kind ternary --checkpoint-dir "$QWEN15_TERNARY"
+    elif [ "$RUN_QWEN15" = "true" ]; then
+      echo "Skipping qwen15b_ternary; directory not found: $QWEN15_TERNARY"
+    fi
   fi
 done
 
