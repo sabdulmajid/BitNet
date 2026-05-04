@@ -190,27 +190,30 @@ bit-exact loader for `ternary_state_dict.pt`.
 | Qwen2.5-0.5B FP | I2_S | 230 MiB | 532.24 | 53.11 | punctuation collapse |
 | Qwen2.5-0.5B QAT step-1000 | F16 | 1,208 MiB | 332.13 | 16.26 | degenerate text |
 | Qwen2.5-0.5B QAT step-1000 | I2_S | 490 MiB | 525.52 | 49.97 | punctuation collapse |
-| Qwen2.5-1.5B FP | F16 | 2,950 MiB | 105.30 | 5.52 | sensible completion |
-| Qwen2.5-1.5B FP | Q8_0 | 1,570 MiB | 135.45 | 10.07 | sensible completion |
-| Qwen2.5-1.5B FP | Q4_K_M | 940 MiB | 95.17 | 15.72 | sensible completion |
-| Qwen2.5-1.5B FP | TQ2_0 | 773 MiB | 160.96 | 18.37 | gibberish |
-| Qwen2.5-1.5B FP | I2_S | 766 MiB | 205.66 | 18.41 | repeated-token collapse |
+| Qwen2.5-1.5B FP | F16 | 2,950 MiB | 105.43 | 5.46 | sensible completion |
+| Qwen2.5-1.5B FP | Q8_0 | 1,570 MiB | 132.58 | 10.09 | sensible completion |
+| Qwen2.5-1.5B FP | Q4_K_M | 940 MiB | 94.96 | 15.73 | sensible completion |
+| Qwen2.5-1.5B FP | TQ2_0 | 773 MiB | 160.84 | 18.38 | gibberish |
+| Qwen2.5-1.5B FP | I2_S | 766 MiB | 205.17 | 18.45 | repeated-token collapse |
 | Qwen2.5-1.5B QAT step-5000 | F16 | 3,396 MiB | 105.21 | 5.52 | degenerate text |
 | Qwen2.5-1.5B QAT step-5000 | I2_S | 1,211 MiB | 203.59 | 17.97 | repeated-token collapse |
-| Qwen2.5-1.5B static ternary | F16 materialized | 3,396 MiB | 105.28 | 5.51 | sensible completion |
-| Qwen2.5-1.5B static ternary | TQ2_0 | 1,219 MiB | 158.52 | 18.38 | sensible completion |
-| Qwen2.5-1.5B static ternary | I2_S | 1,211 MiB | 190.79 | 18.61 | punctuation collapse |
+| Qwen2.5-1.5B static ternary | F16 materialized | 3,396 MiB | 104.54 | 5.50 | sensible completion |
+| Qwen2.5-1.5B static ternary | TQ2_0 | 1,219 MiB | 160.94 | 18.39 | sensible completion |
+| Qwen2.5-1.5B static ternary | I2_S single-thread quant | 1,209 MiB | 206.15 | 18.58 | sensible completion |
 
 Smoke prompt: `The capital of France is`, greedy decoding, 24 generated tokens.
 The FP/Q8_0/Q4_K_M controls complete with `Paris` and related capital-city
 continuations. The 0.5B I2_S artifacts collapse to repeated exclamation marks;
-the 1.5B I2_S artifacts collapse to repeated `is` tokens.
+the blind 1.5B I2_S artifact collapses to repeated `is` tokens. The
+single-thread-written static-ternary I2_S artifact produces a sensible
+Paris/French-government continuation.
 
 Important caveats:
 
 - I2_S is fast on this CPU, so the execution layer is not the bottleneck for a
-  0.5B dense Qwen-shaped model.
-- Blind I2_S conversion is not quality-preserving.
+  Qwen-shaped model.
+- Blind I2_S conversion is not quality-preserving, but I2_S can preserve a
+  trained static-ternary artifact when the GGUF is written correctly.
 - Q4_K_M is not a pure Q4_K_M baseline for the Qwen2.5-0.5B shape: 144 of 168
   tensors required fallback quantization in the original FP conversion. The
   Qwen2.5-1.5B Q4_K_M conversions did not report fallback warnings.
@@ -220,7 +223,9 @@ Important caveats:
   valid proxy for that static ternary artifact.
 - Materializing `ternary_state_dict.pt` back into dense F16 recovers the
   expected static-ternary behavior. Quantizing that materialized artifact to
-  generic `TQ2_0` preserves quality, while quantizing it to I2_S does not.
+  generic `TQ2_0` preserves quality. I2_S also preserves quality when the GGUF
+  is written with a single quantization thread; the earlier multi-thread I2_S
+  artifact was corrupted.
 
 ## Packed GGUF Perplexity Probe
 
@@ -230,16 +235,16 @@ Important caveats:
 
 | source | GGUF type | PPL | stderr | prompt-eval tok/s |
 | --- | --- | ---: | ---: | ---: |
-| Qwen2.5-1.5B FP | F16 | 12.2806 | 0.52969 | 84.11 |
-| Qwen2.5-1.5B FP | Q8_0 | 12.3207 | 0.53098 | 104.28 |
-| Qwen2.5-1.5B FP | Q4_K_M | 12.8452 | 0.55781 | 75.53 |
-| Qwen2.5-1.5B FP | TQ2_0 | 18,041,439.0235 | 1,022,722.63659 | 116.28 |
-| Qwen2.5-1.5B FP | I2_S | 1.206e51 | 5.898e50 | 140.03 |
+| Qwen2.5-1.5B FP | F16 | 12.2806 | 0.52969 | 84.13 |
+| Qwen2.5-1.5B FP | Q8_0 | 12.3207 | 0.53098 | 104.77 |
+| Qwen2.5-1.5B FP | Q4_K_M | 12.8452 | 0.55781 | 75.66 |
+| Qwen2.5-1.5B FP | TQ2_0 | 18,041,439.0235 | 1,022,722.63659 | 113.43 |
+| Qwen2.5-1.5B FP | I2_S | 1.206e51 | 5.898e50 | 139.16 |
 | Qwen2.5-1.5B QAT step-5000 dense GGUF | F16 | 2728.9322 | 262.72596 | 83.79 |
 | Qwen2.5-1.5B QAT step-5000 dense GGUF | I2_S | 7.619e59 | 4.502e59 | 137.73 |
-| Qwen2.5-1.5B static ternary | F16 materialized | 83.8300 | 4.60205 | 83.27 |
-| Qwen2.5-1.5B static ternary | TQ2_0 | 84.0553 | 4.61363 | 113.75 |
-| Qwen2.5-1.5B static ternary | I2_S | NaN | NaN | 132.97 |
+| Qwen2.5-1.5B static ternary | F16 materialized | 83.8300 | 4.60205 | 77.11 |
+| Qwen2.5-1.5B static ternary | TQ2_0 | 84.0553 | 4.61363 | 116.64 |
+| Qwen2.5-1.5B static ternary | I2_S single-thread quant | 84.5277 | 4.63470 | 140.13 |
 
 Interpretation:
 
@@ -259,8 +264,10 @@ Interpretation:
 - Generic llama.cpp `TQ2_0` preserves that static-ternary PPL while giving a
   2.06 bpw ternary file and about 18.38 decode tok/s on the Xeon. The same
   `TQ2_0` format does not rescue a dense model without QAT/distillation.
-- Current I2_S quantization of the same materialized artifact produces NaN PPL,
-  so I2_S needs a writer/kernel audit before being used for trained QAT Qwen.
+- Single-thread llama.cpp `I2_S` quantization also preserves that
+  static-ternary PPL while giving the fastest prompt throughput in this GGUF
+  slice. The earlier multi-thread I2_S artifact produced NaN PPL, which points
+  to a writer/chunking bug rather than a fundamental runtime math failure.
 
 ## What This Proves
 
@@ -288,20 +295,19 @@ Interpretation:
    and Qwen2.5-1.5B-shaped models, but naive I2_S conversion fails the smoke
    prompt and explodes WikiText excerpt perplexity.
 10. A deployable intermediate path exists through static ternary materialization
-   plus llama.cpp `TQ2_0`: it preserves the QAT PPL and runs much faster than
-   F16 decode, but it requires QAT/distillation and is not the optimized BitNet
-   I2_S path.
+   plus llama.cpp `TQ2_0` or single-thread-written `I2_S`: both preserve the QAT
+   PPL and run much faster than F16 decode, but the path requires
+   QAT/distillation.
 
 ## What This Does Not Prove Yet
 
 1. It does not prove acceptable downstream task accuracy.
 2. It does not replace full, unsliced `lm-eval` task accuracy.
 3. It does not prove bit-exact GGUF ingestion of `ternary_state_dict.pt`.
-4. It does not prove optimized BitNet I2_S deployment quality for the stronger
-   Qwen2.5-1.5B QAT checkpoint; the working packed baseline is currently
-   generic llama.cpp `TQ2_0`.
-5. It does not prove I2_S correctness for trained sparse ternary Qwen; the
-   materialized static-ternary I2_S artifact produced NaN perplexity.
+4. It does not prove multi-threaded I2_S writer correctness; the safe artifact
+   above was produced with `llama-quantize ... I2_S 1`.
+5. It does not prove the materialized dense-F16 bridge is storage-optimal; it
+   is a validation bridge until a native ternary-state GGUF writer exists.
 6. It does not prove the approach works for MoE models.
 7. It does not prove that the current training recipe is publishable as a final
    result.
@@ -310,13 +316,13 @@ Interpretation:
 
 The next benchmark gates are:
 
-1. Audit and fix I2_S quantization/runtime for materialized sparse ternary Qwen
-   weights.
+1. Fix the multi-thread I2_S quantization writer/chunking path, then rerun the
+   corrected suite without forcing `nthreads=1`.
 2. Build a native GGUF writer for `ternary_state_dict.pt` so I2_S can ingest
    trained ternary codes and scales directly.
-3. Keep `TQ2_0` as the current working packed ternary baseline and compare it
-   against Q8_0 and Q4_K_M on quality, model size, RSS, prompt throughput, and
-   decode throughput.
+3. Keep `TQ2_0` and single-thread `I2_S` as the current working packed ternary
+   baselines and compare them against Q8_0 and Q4_K_M on quality, model size,
+   RSS, prompt throughput, and decode throughput.
 4. Run full, unsliced `lm-eval` tasks for the strongest exact static-ternary
    checkpoint.
 5. Run ablations: longer QAT, row scale, KL-only, hidden-MSE weighting, and

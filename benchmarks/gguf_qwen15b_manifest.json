@@ -36,7 +36,7 @@
   },
   {
     "name": "qwen15b_static_ternary_i2_s",
-    "kind": "qat_static_ternary_i2s",
-    "path": "models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_i2_s.gguf"
+    "kind": "qat_static_ternary_i2s_single_thread_quant",
+    "path": "models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_i2_s_t1.gguf"
   }
 ]

@@ -37,10 +37,11 @@ conservative:
 - **Packed ternary runtime is fast, but speed does not rescue blind
   ternarization.** On the same Xeon, blind I2_S/TQ2_0 conversion runs faster
   than F16 but destroys quality. Materializing the trained
-  `ternary_state_dict.pt` and packing it as llama.cpp `TQ2_0` preserves the QAT
-  perplexity while giving a CPU-native 2.06 bpw artifact. The optimized I2_S
-  path still needs a writer/kernel correctness audit for trained sparse ternary
-  Qwen weights.
+  `ternary_state_dict.pt` and packing it as llama.cpp `TQ2_0` or single-thread
+  `I2_S` preserves the QAT perplexity while giving CPU-native ternary
+  artifacts. The multi-thread I2_S writer path is currently unsafe for this
+  artifact and needs a correctness fix before it can be treated as production
+  tooling.
 
 Current evidence is tracked in
 [benchmarks/results/qwen_retrofit_2026-05-03.md](benchmarks/results/qwen_retrofit_2026-05-03.md).
@@ -119,23 +120,23 @@ created by converting dense HF checkpoints to F16 GGUF and then running
 | Qwen2.5-0.5B FP | I2_S | 230 MiB | 532.24 | 53.11 | degenerate punctuation |
 | Qwen2.5-0.5B QAT step-1000 | F16 | 1,208 MiB | 332.13 | 16.26 | degenerate text |
 | Qwen2.5-0.5B QAT step-1000 | I2_S | 490 MiB | 525.52 | 49.97 | degenerate punctuation |
-| Qwen2.5-1.5B FP | F16 | 2,950 MiB | 105.30 | 5.52 | sensible |
-| Qwen2.5-1.5B FP | Q8_0 | 1,570 MiB | 135.45 | 10.07 | sensible |
-| Qwen2.5-1.5B FP | Q4_K_M | 940 MiB | 95.17 | 15.72 | sensible |
-| Qwen2.5-1.5B FP | TQ2_0 | 773 MiB | 160.96 | 18.37 | gibberish |
-| Qwen2.5-1.5B FP | I2_S | 766 MiB | 205.66 | 18.41 | repeated-token collapse |
+| Qwen2.5-1.5B FP | F16 | 2,950 MiB | 105.43 | 5.46 | sensible |
+| Qwen2.5-1.5B FP | Q8_0 | 1,570 MiB | 132.58 | 10.09 | sensible |
+| Qwen2.5-1.5B FP | Q4_K_M | 940 MiB | 94.96 | 15.73 | sensible |
+| Qwen2.5-1.5B FP | TQ2_0 | 773 MiB | 160.84 | 18.38 | gibberish |
+| Qwen2.5-1.5B FP | I2_S | 766 MiB | 205.17 | 18.45 | repeated-token collapse |
 | Qwen2.5-1.5B QAT step-5000 | F16 | 3,396 MiB | 105.21 | 5.52 | degenerate text |
 | Qwen2.5-1.5B QAT step-5000 | I2_S | 1,211 MiB | 203.59 | 17.97 | repeated-token collapse |
-| Qwen2.5-1.5B static ternary | F16 materialized | 3,396 MiB | 105.28 | 5.51 | sensible |
-| Qwen2.5-1.5B static ternary | TQ2_0 | 1,219 MiB | 158.52 | 18.38 | sensible |
-| Qwen2.5-1.5B static ternary | I2_S | 1,211 MiB | 190.79 | 18.61 | degenerate punctuation |
+| Qwen2.5-1.5B static ternary | F16 materialized | 3,396 MiB | 104.54 | 5.50 | sensible |
+| Qwen2.5-1.5B static ternary | TQ2_0 | 1,219 MiB | 160.94 | 18.39 | sensible |
+| Qwen2.5-1.5B static ternary | I2_S single-thread quant | 1,209 MiB | 206.15 | 18.58 | sensible |
 
 Interpretation: the CPU backend can execute packed I2_S quickly on this 2017
-Xeon. The blocking problem is quality, not kernel availability. Standard Q8_0
-and Q4_K_M preserve the simple prompt, while I2_S does not. Q4_K_M should be
-read with care for Qwen2.5-0.5B because many tensors require fallback
-quantization due column divisibility constraints; Qwen2.5-1.5B did not report
-that fallback warning.
+Xeon. The blocking problem is quality, not kernel availability. Blind I2_S
+does not preserve the dense FP checkpoint, but single-thread I2_S preserves the
+trained static-ternary artifact. Q4_K_M should be read with care for
+Qwen2.5-0.5B because many tensors require fallback quantization due column
+divisibility constraints; Qwen2.5-1.5B did not report that fallback warning.
 
 ### Packed GGUF Perplexity Snapshot
 
@@ -144,26 +145,27 @@ that fallback warning.
 
 | source | GGUF type | WikiText excerpt PPL | prompt-eval tok/s |
 | --- | --- | ---: | ---: |
-| Qwen2.5-1.5B FP | F16 | 12.2806 | 84.11 |
-| Qwen2.5-1.5B FP | Q8_0 | 12.3207 | 104.28 |
-| Qwen2.5-1.5B FP | Q4_K_M | 12.8452 | 75.53 |
-| Qwen2.5-1.5B FP | TQ2_0 | 18,041,439.0235 | 116.28 |
-| Qwen2.5-1.5B FP | I2_S | 1.206e51 | 140.03 |
+| Qwen2.5-1.5B FP | F16 | 12.2806 | 84.13 |
+| Qwen2.5-1.5B FP | Q8_0 | 12.3207 | 104.77 |
+| Qwen2.5-1.5B FP | Q4_K_M | 12.8452 | 75.66 |
+| Qwen2.5-1.5B FP | TQ2_0 | 18,041,439.0235 | 113.43 |
+| Qwen2.5-1.5B FP | I2_S | 1.206e51 | 139.16 |
 | Qwen2.5-1.5B QAT step-5000 dense GGUF | F16 | 2728.9322 | 83.79 |
 | Qwen2.5-1.5B QAT step-5000 dense GGUF | I2_S | 7.619e59 | 137.73 |
-| Qwen2.5-1.5B static ternary | F16 materialized | 83.8300 | 83.27 |
-| Qwen2.5-1.5B static ternary | TQ2_0 | 84.0553 | 113.75 |
-| Qwen2.5-1.5B static ternary | I2_S | NaN | 132.97 |
+| Qwen2.5-1.5B static ternary | F16 materialized | 83.8300 | 77.11 |
+| Qwen2.5-1.5B static ternary | TQ2_0 | 84.0553 | 116.64 |
+| Qwen2.5-1.5B static ternary | I2_S single-thread quant | 84.5277 | 140.13 |
 
 This is the cleanest packed-runtime evidence so far: conventional Q8_0 and
 Q4_K_M retain the FP language-modeling likelihood, while blind ternarization
 destroys it, including generic `TQ2_0` when applied blindly to the original
 dense model. Materializing `ternary_state_dict.pt` as dense F16
 recovers the PyTorch static-ternary quality, and llama.cpp `TQ2_0` preserves
-that quality while giving a 2.06 bpw ternary GGUF artifact. The current I2_S
-quantization path is faster but numerically invalid for this trained sparse
-ternary artifact, so a native I2_S writer/kernel audit remains required before
-claiming BitNet I2_S deployment quality.
+that quality while giving a 2.06 bpw ternary GGUF artifact. Single-thread
+`I2_S` quantization also preserves the static-ternary quality and gives the
+fastest prompt throughput in this table. The multi-thread I2_S quantizer can
+write a corrupted artifact for this layout, so the writer must be fixed or run
+single-threaded before claiming robust BitNet I2_S deployment tooling.
 
 ### Xeon PyTorch Runtime Probe
 

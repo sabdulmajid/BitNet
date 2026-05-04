@@ -155,9 +155,20 @@ python 3rdparty/llama.cpp/convert_hf_to_gguf.py \
 Current finding: this materialized static-ternary F16 GGUF recovers the QAT
 quality signal, and `TQ2_0` preserves it as a packed ternary GGUF. Blind
 `TQ2_0` on the original dense Qwen checkpoint still fails, so this is not a
-post-training retrofit result. The I2_S path is faster but currently produces
-invalid perplexity for this trained sparse ternary artifact, so I2_S needs a
-writer/kernel audit before publication.
+post-training retrofit result. `I2_S` also preserves the static-ternary quality
+when quantized single-threaded:
+
+```bash
+build/bin/llama-quantize \
+  models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_f16.gguf \
+  models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_i2_s_t1.gguf \
+  I2_S \
+  1
+```
+
+The multi-thread I2_S writer path produced a corrupted artifact for this layout,
+so the production gate is a writer/chunking fix plus a rerun without forcing
+`nthreads=1`.
 
 ## Publishability Gate
 
