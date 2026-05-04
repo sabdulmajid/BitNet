@@ -30,6 +30,10 @@ conservative:
   Qwen2.5-1.5B static ternary checkpoint is usable enough for measurement, but
   it remains significantly worse than the FP reference on perplexity and task
   accuracy.
+- **KL-only distillation is the strongest 1.5B recipe so far.** At 5000 steps,
+  it improves Qwen2.5-1.5B WikiText/FineWeb PPL from `86.414`/`40.398` to
+  `50.595`/`26.599` versus the hidden-MSE QAT run, and improves uncapped
+  ten-task lm-eval mean from `0.465` to `0.483`. FP remains `0.644`.
 - **Row-wise ternary scales help likelihood but do not solve accuracy.** A
   Qwen2.5-0.5B row-scale ablation cut heldout perplexity by about 2.4x versus
   the tensor-scale QAT checkpoint, but its 100-example multiple-choice slices
@@ -74,6 +78,7 @@ The benchmark harnesses are in [benchmarks/](benchmarks/).
 | Qwen2.5-1.5B | FP reference | 13.901 | 10.269 |
 | Qwen2.5-1.5B | naive PTQ ternary | 3,813,121.803 | 9,582,923.269 |
 | Qwen2.5-1.5B | QAT/distilled ternary | 86.414 | 40.398 |
+| Qwen2.5-1.5B | QAT/distilled ternary, KL only | 50.595 | 26.599 |
 
 These numbers are BF16/CUDA quality measurements using PyTorch simulation of
 W1.58A8 math. They are **not** `bitnet.cpp` CPU throughput claims.
@@ -196,23 +201,25 @@ far below FP: QAT minus FP is `-0.199` macro mean with paired 95% CI
 The full core run was merged with uncapped BoolQ, COPA, OpenBookQA, SciQ, and
 TruthfulQA MC1 runs for the same three artifacts.
 
-| task | metric | FP | naive PTQ | QAT ternary |
-| --- | --- | ---: | ---: | ---: |
-| ARC-Challenge | acc_norm | 0.450 | 0.262 | 0.264 |
-| ARC-Easy | acc_norm | 0.720 | 0.244 | 0.478 |
-| HellaSwag | acc_norm | 0.678 | 0.264 | 0.362 |
-| PIQA | acc_norm | 0.758 | 0.508 | 0.622 |
-| WinoGrande | acc | 0.638 | 0.498 | 0.523 |
-| BoolQ | acc | 0.726 | 0.506 | 0.593 |
-| COPA | acc | 0.830 | 0.510 | 0.640 |
-| OpenBookQA | acc_norm | 0.404 | 0.276 | 0.312 |
-| SciQ | acc_norm | 0.934 | 0.199 | 0.613 |
-| TruthfulQA MC1 | acc | 0.305 | 0.220 | 0.241 |
+| task | metric | FP | naive PTQ | QAT hidden-MSE | QAT KL-only |
+| --- | --- | ---: | ---: | ---: | ---: |
+| ARC-Challenge | acc_norm | 0.450 | 0.262 | 0.264 | 0.271 |
+| ARC-Easy | acc_norm | 0.720 | 0.244 | 0.478 | 0.483 |
+| HellaSwag | acc_norm | 0.678 | 0.264 | 0.362 | 0.378 |
+| PIQA | acc_norm | 0.758 | 0.508 | 0.622 | 0.637 |
+| WinoGrande | acc | 0.638 | 0.498 | 0.523 | 0.521 |
+| BoolQ | acc | 0.726 | 0.506 | 0.593 | 0.596 |
+| COPA | acc | 0.830 | 0.510 | 0.640 | 0.700 |
+| OpenBookQA | acc_norm | 0.404 | 0.276 | 0.312 | 0.312 |
+| SciQ | acc_norm | 0.934 | 0.199 | 0.613 | 0.695 |
+| TruthfulQA MC1 | acc | 0.305 | 0.220 | 0.241 | 0.241 |
 
-Mean over these displayed metrics: FP `0.644`, naive PTQ `0.349`, QAT ternary
-`0.465`. QAT improves over blind PTQ by `+0.116` macro mean with paired 95% CI
-`[+0.039, +0.194]`, recovering about 39% of the FP-vs-PTQ gap. QAT remains
-below FP by `-0.179` macro mean with paired 95% CI `[-0.235, -0.124]`.
+Mean over these displayed metrics: FP `0.644`, naive PTQ `0.349`,
+QAT hidden-MSE `0.465`, and QAT KL-only `0.483`. KL-only improves over
+hidden-MSE by `+0.0186` macro mean with paired 95% CI `[+0.0008, +0.0364]`.
+It improves over blind PTQ by `+0.1348` with paired 95% CI
+`[+0.0429, +0.2267]`, but remains below FP by `-0.1607` with paired 95% CI
+`[-0.2075, -0.1140]`.
 
 ### Packed GGUF CPU Runtime Snapshot
 

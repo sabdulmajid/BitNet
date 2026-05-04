@@ -11,7 +11,7 @@ these are quality and loader results, not final CPU product benchmarks.
 - Dataset for QAT/distillation: `HuggingFaceFW/fineweb-edu`, `sample-10BT`
 - QAT student forward math: ternary weights plus dynamic 8-bit activation quantization
 - Main QAT loss: teacher KL divergence plus last-hidden-state MSE
-- Additional ablation: teacher KL only for Qwen2.5-0.5B
+- Additional ablation: teacher KL only for Qwen2.5-0.5B and Qwen2.5-1.5B
 - Additional ablation: teacher KL only with tied dense `lm_head` preserved for
   Qwen2.5-0.5B
 - Main scale mode: per-tensor absmean scale
@@ -39,6 +39,7 @@ smoke-scale heldout test.
 | 9747 | Qwen2.5-0.5B QAT student, row scale | 1000 | 4,000 x 512 | 15.3338 | 2.0530 | 13.2808 | complete |
 | 9748 | Qwen2.5-0.5B QAT student, KL only | 1000 | 4,000 x 512 | 1.6375 | 1.6375 | 0.0000 | complete |
 | 9764 | Qwen2.5-0.5B QAT student, KL only, dense tied `lm_head` | 1000 | 4,000 x 512 | 1.6821 | 1.6821 | 0.0000 | complete |
+| 9758 | Qwen2.5-1.5B QAT student, KL only | 5000 | 20,000 x 1024 | 1.5172 | 1.5172 | 0.0000 | complete |
 
 ## Export Status
 
@@ -49,6 +50,7 @@ smoke-scale heldout test.
 | `qwen2.5-0.5b-fineweb-edu-klonly-1000/step-1000` | 169 | 169 | KL-only QAT ternary export; tensor scale |
 | `qwen2.5-0.5b-fineweb-edu-klonly-notiehead-1000/step-1000` | 168 | 168 | KL-only export with tied dense `lm_head` preserved; config keeps `tie_word_embeddings=true` |
 | `qwen2.5-1.5b-fineweb-edu/step-5000` | 197 | 197 | repaired after FSDP name-mapping bug |
+| `qwen2.5-1.5b-fineweb-edu-klonly-5000/step-5000` | 197 | 197 | KL-only QAT ternary export; `lm_head` is ternary so config is patched to `tie_word_embeddings=false` |
 | `qwen2.5-0.5b-naive-ptq-tensor` | 168 | 168 | original HF checkpoint has tied `lm_head` |
 | `qwen2.5-1.5b-naive-ptq-tensor` | 196 | 196 | original HF checkpoint has tied `lm_head` |
 
@@ -67,6 +69,7 @@ Lower is better.
 | Qwen2.5-1.5B | FP reference | 13.901 | 10.269 | baseline quality |
 | Qwen2.5-1.5B | naive PTQ ternary | 3,813,121.803 | 9,582,923.269 | blind ternarization destroys quality |
 | Qwen2.5-1.5B | QAT/distilled ternary | 86.414 | 40.398 | QAT is orders better than PTQ, but still far from FP |
+| Qwen2.5-1.5B | QAT/distilled ternary, KL only | 50.595 | 26.599 | best 1.5B tensor-scale QAT result so far, still far from FP |
 
 The row-scale ablation is meaningful but not decisive. It reduces 0.5B
 WikiText PPL from `1,079.167` to `444.691` and FineWeb-heldout PPL from
@@ -80,6 +83,12 @@ FineWeb-heldout PPL. That suggests the hidden-state MSE term can overconstrain
 a short-budget ternary student, and that tied output-head policy matters. The
 dense-`lm_head` result does not close the FP gap and is not an all-linear W1.58
 checkpoint.
+
+The same KL-only loss at Qwen2.5-1.5B scale also improves over the earlier
+hidden-MSE QAT run: WikiText PPL drops from `86.414` to `50.595`, and
+FineWeb-heldout PPL drops from `40.398` to `26.599`. This is the strongest
+1.5B tensor-scale QAT result so far, but it still remains far from FP PPL
+(`13.901` and `10.269`).
 
 ## PTQ Math Audit
 
@@ -282,18 +291,18 @@ COPA, OpenBookQA, SciQ, and TruthfulQA MC1. The merge was done with
 `benchmarks/merge_lm_eval_results.py`, preserving logged samples for paired
 analysis.
 
-| task | metric | FP reference | naive PTQ ternary | QAT/distilled ternary |
-| --- | --- | ---: | ---: | ---: |
-| ARC-Challenge | acc_norm | 0.449659 | 0.261945 | 0.263652 |
-| ARC-Easy | acc_norm | 0.719697 | 0.244108 | 0.478114 |
-| HellaSwag | acc_norm | 0.677953 | 0.264190 | 0.362378 |
-| PIQA | acc_norm | 0.757889 | 0.507617 | 0.621872 |
-| WinoGrande | acc | 0.637727 | 0.498027 | 0.523283 |
-| BoolQ | acc | 0.725994 | 0.505505 | 0.592661 |
-| COPA | acc | 0.830000 | 0.510000 | 0.640000 |
-| OpenBookQA | acc_norm | 0.404000 | 0.276000 | 0.312000 |
-| SciQ | acc_norm | 0.934000 | 0.199000 | 0.613000 |
-| TruthfulQA MC1 | acc | 0.304774 | 0.220318 | 0.241126 |
+| task | metric | FP reference | naive PTQ ternary | QAT hidden-MSE | QAT KL-only |
+| --- | --- | ---: | ---: | ---: | ---: |
+| ARC-Challenge | acc_norm | 0.449659 | 0.261945 | 0.263652 | 0.271331 |
+| ARC-Easy | acc_norm | 0.719697 | 0.244108 | 0.478114 | 0.483165 |
+| HellaSwag | acc_norm | 0.677953 | 0.264190 | 0.362378 | 0.377714 |
+| PIQA | acc_norm | 0.757889 | 0.507617 | 0.621872 | 0.637106 |
+| WinoGrande | acc | 0.637727 | 0.498027 | 0.523283 | 0.520916 |
+| BoolQ | acc | 0.725994 | 0.505505 | 0.592661 | 0.596024 |
+| COPA | acc | 0.830000 | 0.510000 | 0.640000 | 0.700000 |
+| OpenBookQA | acc_norm | 0.404000 | 0.276000 | 0.312000 | 0.312000 |
+| SciQ | acc_norm | 0.934000 | 0.199000 | 0.613000 | 0.695000 |
+| TruthfulQA MC1 | acc | 0.304774 | 0.220318 | 0.241126 | 0.241126 |
 
 Mean displayed metric:
 
@@ -301,22 +310,26 @@ Mean displayed metric:
 | --- | ---: |
 | FP reference | 0.644169 |
 | naive PTQ ternary | 0.348671 |
-| QAT/distilled ternary | 0.464809 |
+| QAT hidden-MSE | 0.464809 |
+| QAT KL-only | 0.483438 |
 
 Paired deltas on matched examples:
 
 | comparison | macro mean delta | paired 95% CI | example-weighted delta |
 | --- | ---: | ---: | ---: |
-| QAT minus naive PTQ | +0.116138 | [+0.038603, +0.193672] | +0.113171 |
-| QAT minus FP reference | -0.179361 | [-0.234751, -0.123971] | -0.233670 |
+| QAT hidden-MSE minus naive PTQ | +0.116138 | [+0.038603, +0.193672] | +0.113171 |
+| QAT hidden-MSE minus FP reference | -0.179361 | [-0.234751, -0.123971] | -0.233670 |
 | naive PTQ minus FP reference | -0.295498 | [-0.418827, -0.172169] | -0.346841 |
+| QAT KL-only minus QAT hidden-MSE | +0.018630 | [+0.000830, +0.036429] | +0.013359 |
+| QAT KL-only minus naive PTQ | +0.134767 | [+0.042874, +0.226660] | +0.126530 |
+| QAT KL-only minus FP reference | -0.160731 | [-0.207484, -0.113978] | -0.220311 |
 
-This is the strongest task result in the current fork. QAT/distillation
-recovers about 39% of the FP-vs-naive-PTQ macro gap, with a positive paired
-confidence interval against naive PTQ. It still remains decisively below FP on
-the same examples. That supports a publication-quality negative result for
-blind retrofit and a partial-positive result for QAT/distillation, not a claim
-of acceptable FP-preserving conversion.
+This is the strongest task result in the current fork. KL-only QAT/distillation
+recovers about 46% of the FP-vs-naive-PTQ macro gap, with a positive paired
+confidence interval against both naive PTQ and the earlier hidden-MSE QAT run.
+It still remains decisively below FP on the same examples. That supports a
+publication-quality negative result for blind retrofit and a partial-positive
+result for QAT/distillation, not a claim of acceptable FP-preserving conversion.
 
 ## Xeon PyTorch Runtime Probe
 
@@ -487,10 +500,10 @@ locality on CPU.
    0.649. The paired QAT-minus-PTQ macro delta is +0.095 with 95% CI
    [+0.015, +0.175], so the recovery is measurable but incomplete.
 9. On the full uncapped ten-task lm-eval merge, 1.5B QAT improves the mean
-   displayed task metric from 0.349 for naive PTQ to 0.465, while FP remains
-   0.644. The paired QAT-minus-PTQ macro delta is +0.116 with 95% CI
-   [+0.039, +0.194], while QAT-minus-FP is still -0.179 with 95% CI
-   [-0.235, -0.124].
+   displayed task metric from 0.349 for naive PTQ to 0.465 with hidden-MSE and
+   0.483 with KL-only, while FP remains 0.644. KL-only beats hidden-MSE by
+   +0.0186 macro mean with paired 95% CI [+0.0008, +0.0364], but KL-only minus
+   FP is still -0.1607 with 95% CI [-0.2075, -0.1140].
 10. Row-wise ternary scales improve 0.5B heldout perplexity by about 2.4x versus
    tensor-scale QAT, but the small multiple-choice slices remain mixed.
 11. KL-only 0.5B distillation improves heldout perplexity further. Keeping
