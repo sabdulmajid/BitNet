@@ -1,0 +1,23 @@
+[
+  {
+    "name": "qwen05b_fp_f16",
+    "kind": "fp16 dense",
+    "path": "models/qwen2.5-0.5b-fp/qwen05b_fp_f16.gguf"
+  },
+  {
+    "name": "qwen05b_fp_q4_k_m",
+    "kind": "fp16 baseline quantized",
+    "path": "models/qwen2.5-0.5b-fp/qwen05b_fp_q4_k_m.gguf"
+  },
+  {
+    "name": "qwen05b_qat_i2_s",
+    "kind": "distilled ternary I2_S",
+    "path": "models/qwen2.5-0.5b-qatsby/qwen05b_qat_i2_s.gguf"
+  },
+  {
+    "name": "qwen05b_qat_tl2",
+    "kind": "distilled ternary TL2 probe",
+    "path": "benchmark_results/tl2_probe/qwen05b-bitnet-tl2.gguf",
+    "notes": "Converted with Qwen-specific TL2 kernel_config.ini; current runtime build is not TL2-LUT optimized."
+  }
+]

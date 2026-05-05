@@ -32,8 +32,8 @@ Current evidence still supports the negative retrofit verdict:
 | Add llama.cpp Q4_K_M and Q8_0 baselines | complete for Qwen2.5-1.5B | `benchmark_results/gguf-qwen15b-klonly-suite/summary.json` includes F16, Q8_0, Q4_K_M, blind TQ2_0, blind I2_S, and trained static-ternary artifacts |
 | Add QAT with and without hidden MSE | complete | hidden-MSE run `checkpoints/qwen2.5-1.5b-fineweb-edu/step-5000`; KL-only run `checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-5000/step-5000`; full ten-task comparison in `benchmark_results/lm-eval-qwen15b-klonly-full10/selected_metrics_with_baselines.md` |
 | Add row-scale versus tensor-scale | complete for Qwen2.5-1.5B dense-head ablation | Qwen2.5-1.5B row-scale dense-head job `9771` completed 5000 steps; checkpoints step 1000/2000/3000/4000/5000 all passed audit at 196 ternary keys / 196 row-scale tensors; final PPL, MC200, full ten-task lm-eval, paired deltas, and row GGUF suite completed under `benchmark_results/quality-qwen15b-klonly-row-notiehead-5000`, `benchmark_results/mc-qwen15b-klonly-row-notiehead-5000-200`, `benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10`, and `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite` |
-| Convert repaired checkpoints into GGUF/TL2/I2_S | partial | static-ternary materialization to GGUF and packed `TQ2_0`/`I2_S` complete for tensor-scale checkpoints; row-scale materialization and `TQ2_0` preserve quality; default row-scale `I2_S` fails audit; per-row-scale `I2_S` prototype patch preserves quality but is not yet the default format; native direct `ternary_state_dict.pt` GGUF writer and Qwen TL2 path are not yet complete |
-| Run actual bitnet.cpp / llama.cpp CPU inference | complete for packed GGUF probes | `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`, `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json`, dense-head suite `benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json`, and row-scale dense-head suite `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json` |
+| Convert repaired checkpoints into GGUF/TL2/I2_S | partial | static-ternary materialization to GGUF and packed `TQ2_0`/`I2_S` complete for tensor-scale checkpoints; row-scale materialization and `TQ2_0` preserve quality; default row-scale `I2_S` fails audit; per-row-scale `I2_S` prototype patch preserves quality but is not yet the default format; dense Qwen2.5-0.5B TL2 export works only with model-specific codegen and fails quality; native direct `ternary_state_dict.pt` GGUF writer is not complete |
+| Run actual bitnet.cpp / llama.cpp CPU inference | complete for packed GGUF probes | `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`, `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json`, dense-head suite `benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json`, row-scale dense-head suite `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json`, and Qwen0.5B TL2 probe `benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json` |
 | Measure CPU tokens/sec, prompt throughput, RSS, model size, quality loss | complete for current baselines | PyTorch RSS/runtime in `benchmark_results/runtime-qwen-xeon4116-512x32/summary.md`; Xeon packed GGUF throughput/file size/PPL in `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`; AMD dense-head packed GGUF in `benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json`; AMD row-scale dense-head packed GGUF in `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json`; patched I2_S confirmation in `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json`; RSS context scaling in `benchmark_results/gguf-rss-qwen15b-context-scaling-2026-05-05/summary.json` |
 
 ## Mechanical Audit Evidence
@@ -105,10 +105,19 @@ and zero return-code failures.
 The conversion support audit is tracked at
 `benchmarks/results/conversion_support_audit_2026-05-05.md`. It mechanically
 checks converter registrations, converter outtypes, and `llama-quantize` help
-output. The result confirms the current split: TL2 is exposed by the
-BitNet-specific converter but Qwen2/Qwen2MoE are not registered there; Qwen2 and
-Qwen2MoE are registered by the vendored llama.cpp converter, but that converter
-does not expose TL2 or I2_S as HF-conversion outtypes.
+output. The BitNet-specific converter now exposes TL2, registers dense
+`Qwen2ForCausalLM`, and accepts an explicit `--kernel-config`, while Qwen2MoE
+is still not registered there. The vendored llama.cpp converter registers Qwen2
+and Qwen2MoE, but does not expose TL2 or I2_S as HF-conversion outtypes.
+
+The TL2 shape support audit is tracked at
+`benchmarks/results/tl2_shape_support_audit_2026-05-05.md`. Bundled TL2
+configs cover 0/168 eligible Qwen2.5-0.5B tensors and only 56/196 eligible
+Qwen2.5-1.5B tensors; exact model-specific TL2 code generation is required.
+The Qwen2.5-0.5B TL2 probe is tracked at
+`benchmarks/results/qwen05b_tl2_probe_2026-05-05.md`. It produced a loadable
+TL2 GGUF and a matching `BITNET_X86_TL2=ON` AVX-512 build, but the measured TL2
+artifact has NaN PPL and nonsensical smoke text.
 
 The MoE support audit is tracked at
 `benchmarks/results/moe_support_audit_2026-05-05.md`. It confirms generic GGUF
@@ -170,6 +179,10 @@ Key audited values:
 | Qwen2.5-1.5B FP Q4_K_M GGUF max RSS at `-c 32768` | 1.850 GiB |
 | Qwen2.5-1.5B row-scale dense-head TQ2_0 max RSS at `-c 32768` | 2.121 GiB |
 | Qwen2.5-1.5B row-scale dense-head I2_S max RSS at `-c 32768` | 2.114 GiB |
+| Qwen2.5-0.5B QAT TL2 GGUF file size | 599.5 MiB |
+| Qwen2.5-0.5B QAT TL2 prompt tok/s on TL2 AVX-512 build | 229.52 |
+| Qwen2.5-0.5B QAT TL2 decode tok/s on TL2 AVX-512 build | 22.95 |
+| Qwen2.5-0.5B QAT TL2 PPL on TL2 AVX-512 build | NaN |
 | Gaussian absmean ternary relative output Frobenius error | 0.512542 |
 
 ## Current Open Gaps
@@ -183,14 +196,12 @@ Key audited values:
    Static-ternary materialization is a validated bridge, not the final storage
    path. `benchmarks/build_static_ternary_gguf_bridge.py` now makes that bridge
    reproducible and auditable.
-3. Qwen TL2 is not complete. The current `llama-quantize` CLI does not expose
-   TL2 and its generic quantize switch has no TL2 quantization case. The
-   BitNet-specific HF converter exposes `--outtype tl2`, but it only registers
-   LLaMA/Mistral/Mixtral-style and BitNet model classes, not `Qwen2ForCausalLM`.
-   Custom TL2 code generation now supports arbitrary shapes, but a Qwen-aware
-   TL2 GGUF writer/loader path still needs implementation and validation. The
-   conversion support audit records this split in
-   `benchmarks/results/conversion_support_audit_2026-05-05.md`.
+3. Qwen TL2 is not complete. Dense Qwen2.5-0.5B TL2 export now works after
+   exact shape codegen and a matching TL2 build, but the tested checkpoint has
+   NaN PPL. `llama-quantize` still does not expose TL2, Qwen2MoE/Kimi are not
+   registered in the BitNet TL2 converter, and the strong Qwen2.5-1.5B
+   row-scale checkpoint has not been validated through a row-scale-aware TL2
+   format.
 4. The validated threaded `I2_S` writer fix exists as
    `patches/llama-i2s-threaded-quantization.patch`, but the llama.cpp submodule
    has not been advanced to a commit containing that fix.

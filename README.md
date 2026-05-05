@@ -88,6 +88,15 @@ conservative:
   fork also includes a validated patch file for that threaded packing/scaling
   bug, while the safe wrapper remains single-threaded until the submodule is
   advanced.
+- **TL2 is now a partial dense-Qwen engineering probe, not a product claim.**
+  This fork can generate a Qwen2.5-0.5B TL2 GGUF only after exact
+  model-specific TL2 code generation and a matching `BITNET_X86_TL2=ON`
+  runtime rebuild. The Qwen2.5-0.5B TL2 artifact is `599.5 MiB` and runs on an
+  AVX-512-enabled TL2 build, but quality fails: PPL is `NaN` and smoke text is
+  nonsensical. The generic AVX2 build can benchmark the artifact but standard
+  smoke/perplexity segfault. The strong Qwen2.5-1.5B row-scale checkpoint has
+  not been validated through TL2, and the current TL1/TL2 converter uses one
+  tensor scale rather than row scales.
 - **MoE remains unproven in this fork.** The vendored llama.cpp backend contains
   generic expert routing and merged expert-tensor support, and the BitNet HF
   converter has partial Qwen-style expert packing. This repo has not yet shown a
@@ -114,6 +123,10 @@ The GGUF context-scaling RSS note is
 [benchmarks/results/gguf_context_scaling_2026-05-05.md](benchmarks/results/gguf_context_scaling_2026-05-05.md).
 The conversion support audit is
 [benchmarks/results/conversion_support_audit_2026-05-05.md](benchmarks/results/conversion_support_audit_2026-05-05.md).
+The TL2 shape support audit is
+[benchmarks/results/tl2_shape_support_audit_2026-05-05.md](benchmarks/results/tl2_shape_support_audit_2026-05-05.md).
+The Qwen2.5-0.5B TL2 probe is
+[benchmarks/results/qwen05b_tl2_probe_2026-05-05.md](benchmarks/results/qwen05b_tl2_probe_2026-05-05.md).
 The MoE support audit is
 [benchmarks/results/moe_support_audit_2026-05-05.md](benchmarks/results/moe_support_audit_2026-05-05.md).
 The reusable static-ternary GGUF bridge note is
@@ -199,10 +212,13 @@ retrofit pipeline with measured guarantees:
 - publish a benchmark card with FP/Q8/Q4/blind-ternary/QAT comparisons.
 
 The current MVP should target dense Qwen-style models first. MoE models such as
-Kimi, native TL2 export for Qwen, direct GGUF ingestion of ternary state dicts,
-and quality guarantees for arbitrary architectures remain research tasks.
-The current toolchain split is mechanical: the BitNet HF converter exposes
-`tl2` but does not register Qwen2/Qwen2MoE, while the vendored llama.cpp HF
+Kimi, production TL2 export for strong row-scale Qwen checkpoints, direct GGUF
+ingestion of ternary state dicts, and quality guarantees for arbitrary
+architectures remain research tasks.
+The current toolchain split is mechanical: the BitNet HF converter now exposes
+`tl2`, registers dense `Qwen2ForCausalLM`, and accepts `--kernel-config` for
+model-specific TL2 shape tables, but it still does not register Qwen2MoE/Kimi
+and TL2 still needs a matching generated LUT runtime. The vendored llama.cpp HF
 converter registers Qwen2/Qwen2MoE but exposes only
 `f32/f16/bf16/q8_0/tq1_0/tq2_0/auto`.
 `llama-quantize` exposes `I2_S`, but it requires an existing GGUF input.

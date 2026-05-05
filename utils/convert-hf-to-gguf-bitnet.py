@@ -346,6 +346,9 @@ class Model(ABC):
         if chkhsh == "9c2227e4dd922002fb81bde4fc02b0483ca4f12911410dee2255e4987644e3f8":
             # ref: https://huggingface.co/CohereForAI/c4ai-command-r-v01
             res = "command-r"
+        if chkhsh == "e636dc30a262dcc0d8c323492e32ae2b70728f4df7dfe9737d9f920a282b8aea":
+            # ref: https://huggingface.co/Qwen/Qwen1.5-7B
+            res = "qwen2"
         if chkhsh == "9d032fcbd5501f4a38150912590928bfb36091efb5df11b8e2124b0390e3fb1e":
             res = "falcon3"
 
@@ -468,6 +471,27 @@ class Model(ABC):
 
 # TL1
 
+def kernel_config_path() -> Path:
+    if "args" in globals() and getattr(args, "kernel_config", None) is not None:
+        return Path(args.kernel_config)
+    if "BITNET_KERNEL_CONFIG" in os.environ:
+        return Path(os.environ["BITNET_KERNEL_CONFIG"])
+    return Path("include/kernel_config.ini")
+
+
+def missing_kernel_config_error(kind: str, config_path: Path, M: int, K: int, read_files: list[str]) -> NotImplementedError:
+    if not read_files:
+        return NotImplementedError(
+            f"{kind} kernel config not found at {config_path}. Generate a matching "
+            "kernel_config.ini with utils/codegen_tl1.py or utils/codegen_tl2.py, "
+            "then pass --kernel-config or set BITNET_KERNEL_CONFIG."
+        )
+    return NotImplementedError(
+        f"{kind} kernel config {config_path} has no entry for tensor shape "
+        f"M={M}, K={K}. Generate kernels for this exact output,input shape and "
+        "rebuild the runtime with the matching LUT header before benchmarking."
+    )
+
 def process_tl1(weight, BM, BY, bm, by, M, K):
     weight = weight.reshape((M, K // 2)).astype(np.uint8)
     weight = weight.reshape((M // BM, BM, K // 2)).transpose(0, 2, 1)
@@ -496,7 +520,8 @@ def preprocess_weights_tl1(
     weight = np.sign(weight)
     weight_num = np.prod(weight.shape)
 
-    config.read('include/kernel_config.ini')
+    config_path = kernel_config_path()
+    read_files = config.read(config_path)
     BM = -1
     BY = -1
     bm = -1
@@ -510,7 +535,7 @@ def preprocess_weights_tl1(
             break
 
     if BM == -1:
-        raise NotImplementedError
+        raise missing_kernel_config_error("TL1", config_path, M, K, read_files)
 
     weight = np.reshape(weight, (weight_num // 2, 2))
     hi_weight = np.multiply(np.split(weight, 2, axis=1)[0], 3)
@@ -614,7 +639,8 @@ def preprocess_weights_tl2(
     weight = np.sign(weight)
     weight_num = np.prod(weight.shape)
 
-    config.read('include/kernel_config.ini')
+    config_path = kernel_config_path()
+    read_files = config.read(config_path)
     BM = -1
     BY = -1
     bm = -1
@@ -628,7 +654,7 @@ def preprocess_weights_tl2(
             break
 
     if BM == -1:
-        raise NotImplementedError
+        raise missing_kernel_config_error("TL2", config_path, M, K, read_files)
 
     if (weight.shape[1] % BY != 0):
         slice_k_idx = weight.shape[1] - weight.shape[1] % BY
@@ -958,6 +984,21 @@ class LlamaModel(Model):
                 raise ValueError(f"Unprocessed experts: {experts}")
 
 
+@Model.register("Qwen2ForCausalLM")
+class Qwen2Model(LlamaModel):
+    model_arch = gguf.MODEL_ARCH.QWEN2
+
+    def set_vocab(self):
+        try:
+            self._set_vocab_sentencepiece()
+        except FileNotFoundError:
+            self._set_vocab_gpt2()
+
+    def modify_tensors(self, data_torch: Tensor, name: str, bid: int | None) -> Iterable[tuple[str, Tensor]]:
+        del bid
+        return [(self.map_tensor_name(name), data_torch)]
+
+
 @Model.register("BitnetForCausalLM")
 class BitnetModel(Model):
     model_arch = gguf.MODEL_ARCH.BITNET
@@ -1125,6 +1166,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model-name", type=str, default=None, help="name of the model")
     parser.add_argument("--verbose", action="store_true", help="increase output verbosity")
     parser.add_argument("--quant-embd", action="store_true", help="quantize the embedding layer")
+    parser.add_argument(
+        "--kernel-config",
+        type=Path,
+        default=None,
+        help="TL1/TL2 kernel_config.ini generated for this model's exact matrix shapes",
+    )
 
     return parser.parse_args()
 

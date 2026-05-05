@@ -18,6 +18,7 @@ claim below is scoped to the cited artifact family.
 | A local row-scale-aware `I2_S` prototype fixes that specific packed-format failure | supported as prototype | `patches/llama-i2s-row-scale.patch`; `benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json`; `benchmark_results/evidence_audit/qwen15b_row_i2s_heapfix.md` | local replacement layout; not a stable upstream GGUF type |
 | Row-scale `I2_S` prefill scales with threads while decode saturates early | supported | `benchmarks/results/i2s_thread_scaling_2026-05-05.md`; `benchmark_results/evidence_audit/qwen15b_row_i2s_thread_scaling.md` | Xeon Silver 4116, portable AVX2 build, patched row-scale `I2_S` artifact |
 | Row-scale `I2_S` keeps a memory advantage over FP16 at long context but not over Q4_K_M | supported | `benchmarks/results/gguf_context_scaling_2026-05-05.md`; `benchmark_results/evidence_audit/qwen15b_context_scaling_rss.md` | Qwen2.5-1.5B row-scale dense-`lm_head`, contexts 512/2048/8192/32768 |
+| Dense Qwen TL2 export is possible only with model-specific code generation, and the tested 0.5B TL2 checkpoint fails quality | supported | `benchmarks/results/tl2_shape_support_audit_2026-05-05.md`; `benchmarks/results/qwen05b_tl2_probe_2026-05-05.md`; `benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json` | Qwen2.5-0.5B dense checkpoint; generated TL2 shapes plus a `BITNET_X86_TL2=ON` AVX-512 build; PPL is NaN |
 | Generic MoE infrastructure exists, but Kimi support is unproven | supported | `benchmarks/results/moe_support_audit_2026-05-05.md`; `benchmarks/results/conversion_support_audit_2026-05-05.md` | generic Qwen2MoE/runtime path exists; no Kimi-specific converter/runtime benchmark |
 
 ## Unsupported Or Not-Yet Claims
@@ -29,7 +30,7 @@ claim below is scoped to the cited artifact family.
 | Row-scale `I2_S` is production-ready | unsupported | the prototype changes the `I2_S` binary layout instead of introducing a compatibility-safe stable type |
 | Native AVX-512 speeds up the row-scale `I2_S` path | unsupported | native `GGML_NATIVE=ON`/`AVX512 = 1` run preserved quality but was slightly slower than portable AVX2 for the tested artifact |
 | Direct `ternary_state_dict.pt` to GGUF writing is complete | unsupported | current path uses dense HF materialization through `benchmarks/build_static_ternary_gguf_bridge.py` |
-| Qwen TL2 deployment is complete | unsupported | BitNet converter exposes TL2 but lacks Qwen2/Qwen2MoE registration; llama.cpp converter supports Qwen2/Qwen2MoE but lacks TL2 outtype |
+| Qwen TL2 deployment is complete | unsupported | Qwen2 dense TL2 export now works only after model-specific codegen and a matching TL2 build; tested Qwen2.5-0.5B TL2 has NaN PPL; Qwen2MoE/Kimi and the strong Qwen2.5-1.5B row-scale TL2 path remain unvalidated |
 | Kimi or other MoE models have been successfully ternary-retrofitted | unsupported | no Kimi-specific converter, router distillation, expert-locality benchmark, or quality run exists in this fork |
 
 ## Product Implication

@@ -683,8 +683,9 @@ What exists:
   tensors.
 - The conversion support audit at
   `benchmarks/results/conversion_support_audit_2026-05-05.md` confirms the
-  vendored llama.cpp HF converter registers `Qwen2MoeForCausalLM`, but the
-  TL2-capable BitNet HF converter does not.
+  vendored llama.cpp HF converter registers `Qwen2MoeForCausalLM`. The
+  TL2-capable BitNet HF converter now registers dense `Qwen2ForCausalLM`, but
+  still does not register `Qwen2MoeForCausalLM`.
 
 What is missing:
 
@@ -797,8 +798,11 @@ Kimi benchmark artifact.
 2. It does not replace a broader full `lm-eval` leaderboard suite; ten selected
    tasks have been run uncapped so far.
 3. It does not prove bit-exact GGUF ingestion of `ternary_state_dict.pt`.
-   The current conversion support audit confirms there is still no single
-   direct Qwen2 plus TL2/I2_S HF-conversion path.
+   The current conversion support audit confirms there is still no direct
+   ternary-state GGUF writer. Dense Qwen2.5-0.5B TL2 export now works only with
+   model-specific shape codegen and a matching TL2 build, and that TL2 probe
+   quality-fails with NaN PPL; the strong Qwen2.5-1.5B row-scale TL2 path is
+   still unvalidated.
 4. It does not prove that the multi-threaded I2_S writer fix is upstreamed in
    the llama.cpp submodule yet; the fix is included as
    `patches/llama-i2s-threaded-quantization.patch` and validated locally.

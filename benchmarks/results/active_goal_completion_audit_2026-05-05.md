@@ -34,7 +34,7 @@ requirements are still partial or unproven.
 | QAT with and without hidden MSE | complete | hidden-MSE, KL-only, dense-head, and row-scale checkpoints/evals summarized in side-by-side report | longer training remains research, not a completed proof |
 | Row-scale versus tensor-scale | complete for Qwen2.5-1.5B dense-head | row-scale full ten-task mean `0.499459`; paired CI `[+0.009028, +0.021134]` vs tensor-scale dense-head | still below FP |
 | GGUF conversion and packed CPU inference | partial | static-ternary materialization, reusable bridge runner `benchmarks/build_static_ternary_gguf_bridge.py`, TQ2_0, tensor-scale I2_S, row-scale I2_S prototype; `patches/llama-i2s-row-scale.patch` | direct `ternary_state_dict.pt` GGUF writer is not complete |
-| TL2 conversion and CPU inference | partial | code-generation exploration plus `benchmarks/results/conversion_support_audit_2026-05-05.md` | Qwen-aware TL2 writer/loader path not complete |
+| TL2 conversion and CPU inference | partial | `benchmarks/results/conversion_support_audit_2026-05-05.md`; `benchmarks/results/tl2_shape_support_audit_2026-05-05.md`; Qwen0.5B TL2 probe `benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json` | dense Qwen0.5B TL2 is model-specific and quality-failed; strong Qwen1.5B row-scale TL2, Qwen2MoE, and Kimi remain unvalidated |
 | Row-scale I2_S quality preservation | complete as prototype | heap-fix confirmation `benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json`; audit `benchmark_results/evidence_audit/qwen15b_row_i2s_heapfix.md` | not an upstream/default stable GGUF format |
 | Row-scale I2_S thread scaling | complete as prototype | `benchmarks/results/i2s_thread_scaling_2026-05-05.md`; audit `benchmark_results/evidence_audit/qwen15b_row_i2s_thread_scaling.md` | decode remains around `18-20 tok/s` after 4 threads |
 | Native AVX-512 check | complete | `benchmark_results/gguf-qwen15b-row-i2s-prototype-native-suite/summary.json`; audit `benchmark_results/evidence_audit/qwen15b_row_i2s_native.md` | no AVX-512 speedup shown |
@@ -56,8 +56,8 @@ measured recovery path:
   commodity CPU.
 
 The active goal is not complete because the repo still lacks a production
-row-scale GGUF type, direct ternary-state GGUF ingestion, Qwen TL2 execution,
-and MoE/Kimi proof.
+row-scale GGUF type, direct ternary-state GGUF ingestion, a quality-preserving
+Qwen TL2 path, and MoE/Kimi proof.
 
 ## Next Required Gates
 
@@ -65,8 +65,9 @@ and MoE/Kimi proof.
    format rather than replacing the existing `I2_S` layout.
 2. Build direct GGUF ingestion for `ternary_state_dict.pt` so materialized F16
    bridge export is no longer required.
-3. Implement and benchmark a Qwen-aware TL2 writer/loader path, or explicitly
-   remove TL2 from the supported product claim.
+3. Implement and benchmark a row-scale-aware Qwen2.5-1.5B TL2 path, or keep
+   TL2 out of the supported product claim. The current Qwen0.5B TL2 probe is a
+   model-specific engineering result with NaN PPL.
 4. Extend quality evaluation only if the product/paper scope requires a broader
    leaderboard; the current ten-task set is sufficient for the negative
    retrofit verdict but not a full model card.

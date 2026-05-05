@@ -126,15 +126,28 @@ def build_report(data: dict[str, Any]) -> str:
             ", ".join(data["llama_quantize"]["types"]),
         ],
     ]
-    verdict = (
-        "The current toolchain does not provide a single direct path that is both "
-        "Qwen2-aware and TL2-capable. The BitNet HF converter exposes `tl2`, but "
-        "does not register `Qwen2ForCausalLM` or `Qwen2MoeForCausalLM`. The "
-        "vendored llama.cpp converter registers those Qwen architectures, but "
-        "its `--outtype` choices stop at `tq2_0` and do not include `tl2` or "
-        "`i2_s`. `llama-quantize` can produce `I2_S`, but it operates from an "
-        "existing GGUF and is not a direct `ternary_state_dict.pt` writer."
-    )
+    if data["bitnet_converter"]["supports_qwen2"] and data["bitnet_converter"]["supports_tl2_outtype"]:
+        verdict = (
+            "The BitNet HF converter now has a Qwen2 plus TL2 conversion entry "
+            "point, and its help path is runnable in this clone. This is "
+            "converter-level support only: Qwen2MoE is still not registered in "
+            "that converter, TL2 still requires exact model-specific kernel "
+            "config/codegen, and `llama-quantize` still cannot create TL2 from "
+            "an existing GGUF. The Qwen2.5-0.5B TL2 probe is a quality-failed "
+            "small-model artifact, not a production Qwen TL2 deployment. "
+            "`llama-quantize` can produce `I2_S`, but it operates from an existing "
+            "GGUF and is not a direct `ternary_state_dict.pt` writer."
+        )
+    else:
+        verdict = (
+            "The current toolchain does not provide a single direct path that is both "
+            "Qwen2-aware and TL2-capable. The BitNet HF converter exposes `tl2`, but "
+            "does not register `Qwen2ForCausalLM` or `Qwen2MoeForCausalLM`. The "
+            "vendored llama.cpp converter registers those Qwen architectures, but "
+            "its `--outtype` choices stop at `tq2_0` and do not include `tl2` or "
+            "`i2_s`. `llama-quantize` can produce `I2_S`, but it operates from an "
+            "existing GGUF and is not a direct `ternary_state_dict.pt` writer."
+        )
     return "\n\n".join(
         [
             "# Conversion Support Audit, 2026-05-05",
