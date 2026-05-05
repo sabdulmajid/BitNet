@@ -699,7 +699,10 @@ Conclusion: MoE is not mathematically excluded. Static expert matrices can in
 principle use the same ternary projection and packed kernels as dense FFN
 matrices. The unproven part is the system: router quality under ternary expert
 constraints, expert tensor layout, dynamic expert selection overhead, and memory
-locality on CPU.
+locality on CPU. The mechanical audit at
+`benchmarks/results/moe_support_audit_2026-05-05.md` confirms generic MoE
+infrastructure but finds no Kimi-specific converter/runtime mapping and no local
+Kimi benchmark artifact.
 
 ## What This Proves
 

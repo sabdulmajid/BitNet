@@ -91,8 +91,10 @@ conservative:
 - **MoE remains unproven in this fork.** The vendored llama.cpp backend contains
   generic expert routing and merged expert-tensor support, and the BitNet HF
   converter has partial Qwen-style expert packing. This repo has not yet shown a
-  Kimi-compatible ternary converter, expert-router distillation, or an MoE
-  benchmark.
+  Kimi-compatible ternary converter, expert-router distillation, or a Kimi/MoE
+  benchmark. The mechanical MoE audit confirms generic Qwen2MoE infrastructure
+  exists, but no Kimi-specific converter/runtime mapping or benchmark artifact
+  is present.
 
 Current evidence is tracked in
 [benchmarks/results/qwen_retrofit_2026-05-03.md](benchmarks/results/qwen_retrofit_2026-05-03.md).
@@ -112,6 +114,8 @@ The GGUF context-scaling RSS note is
 [benchmarks/results/gguf_context_scaling_2026-05-05.md](benchmarks/results/gguf_context_scaling_2026-05-05.md).
 The conversion support audit is
 [benchmarks/results/conversion_support_audit_2026-05-05.md](benchmarks/results/conversion_support_audit_2026-05-05.md).
+The MoE support audit is
+[benchmarks/results/moe_support_audit_2026-05-05.md](benchmarks/results/moe_support_audit_2026-05-05.md).
 The benchmark harnesses are in [benchmarks/](benchmarks/).
 
 ### Current Perplexity Snapshot

@@ -110,6 +110,13 @@ BitNet-specific converter but Qwen2/Qwen2MoE are not registered there; Qwen2 and
 Qwen2MoE are registered by the vendored llama.cpp converter, but that converter
 does not expose TL2 or I2_S as HF-conversion outtypes.
 
+The MoE support audit is tracked at
+`benchmarks/results/moe_support_audit_2026-05-05.md`. It confirms generic GGUF
+expert metadata, Qwen2MoE tensor schema, Qwen2MoE converter registration,
+merged expert packing, and runtime top-k sparse expert matmuls. It also
+confirms no Kimi-specific converter/runtime mapping and no local Kimi benchmark
+artifact.
+
 Key audited values:
 
 | artifact | audited value |
@@ -175,7 +182,9 @@ Key audited values:
    has not been advanced to a commit containing that fix.
 5. MoE/Kimi remains unproven. The backend has generic MoE execution support,
    but this fork has not implemented a Kimi-compatible ternary converter,
-   router distillation, expert-locality benchmark, or MoE quality run.
+   router distillation, expert-locality benchmark, or MoE quality run. The MoE
+   support audit records the generic support and Kimi-specific absence in
+   `benchmarks/results/moe_support_audit_2026-05-05.md`.
 6. The current result is not a publishable "arbitrary model retrofit works"
    claim. The publishable angle, if any, is the negative result plus a measured
    recovery path: PTQ fails mathematically and empirically; QAT/distillation
