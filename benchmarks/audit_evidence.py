@@ -48,6 +48,13 @@ class GGUFSummarySpec:
     max_i2s_reference_ratio: float
 
 
+@dataclass(frozen=True)
+class ThreadScalingSpec:
+    label: str
+    path: Path
+    expected_threads: tuple[int, ...]
+
+
 def md_table(headers: list[str], rows: list[list[str]]) -> str:
     lines = ["| " + " | ".join(headers) + " |"]
     lines.append("| " + " | ".join(["---"] * len(headers)) + " |")
@@ -72,6 +79,16 @@ def parse_label_path_count(spec: str) -> GGUFSummarySpec:
     expected_count = int(parts[1]) if len(parts) > 1 and parts[1] else None
     max_i2s_reference_ratio = float(parts[2]) if len(parts) > 2 and parts[2] else 10.0
     return GGUFSummarySpec(label, path, expected_count, max_i2s_reference_ratio)
+
+
+def parse_thread_scaling(spec: str) -> ThreadScalingSpec:
+    label, raw_path = parse_label_path(spec)
+    parts = str(raw_path).split(":")
+    path = Path(parts[0])
+    expected_threads = ()
+    if len(parts) > 1 and parts[1]:
+        expected_threads = tuple(int(value) for value in parts[1].split(",") if value)
+    return ThreadScalingSpec(label, path, expected_threads)
 
 
 def parse_checkpoint(spec: str) -> CheckpointSpec:
@@ -497,6 +514,91 @@ def audit_gguf_summary(specs: list[GGUFSummarySpec]) -> str:
     )
 
 
+def audit_thread_scaling(specs: list[ThreadScalingSpec]) -> str:
+    if not specs:
+        return "No thread-scaling specs supplied."
+    rows_out: list[list[str]] = []
+    for spec in specs:
+        if not spec.path.exists():
+            rows_out.append([spec.label, str(spec.path), "MISSING", "-", "-", "-", "-", "-", "-", "-"])
+            continue
+        data = load_json(spec.path)
+        rows = data.get("rows", [])
+        if not isinstance(rows, list):
+            rows_out.append([spec.label, str(spec.path), "FAIL", "0", "-", "rows is not a list", "-", "-", "-", "-"])
+            continue
+
+        failures: list[str] = []
+        by_thread: dict[int, dict[str, Any]] = {}
+        for row in rows:
+            if not isinstance(row, dict):
+                failures.append("non-object-row")
+                continue
+            thread = int(row.get("threads", -1))
+            by_thread[thread] = row
+            if int(row.get("returncode", 1)) != 0:
+                failures.append(f"t{thread}:returncode={row.get('returncode')}")
+            for key in ("prefill_tok_s", "decode_tok_s"):
+                value = row.get(key)
+                if not isinstance(value, (int, float)) or not math.isfinite(float(value)) or float(value) <= 0.0:
+                    failures.append(f"t{thread}:{key}")
+
+        observed_threads = tuple(sorted(by_thread))
+        if spec.expected_threads and observed_threads != spec.expected_threads:
+            failures.append(f"threads={','.join(str(v) for v in observed_threads)}")
+
+        prefill_values = {
+            thread: float(row["prefill_tok_s"])
+            for thread, row in by_thread.items()
+            if isinstance(row.get("prefill_tok_s"), (int, float))
+        }
+        decode_values = {
+            thread: float(row["decode_tok_s"])
+            for thread, row in by_thread.items()
+            if isinstance(row.get("decode_tok_s"), (int, float))
+        }
+        max_prefill_thread = max(prefill_values, key=lambda thread: prefill_values[thread]) if prefill_values else None
+        max_decode_thread = max(decode_values, key=lambda thread: decode_values[thread]) if decode_values else None
+        prefill_speedup = None
+        if 1 in prefill_values and max_prefill_thread is not None:
+            prefill_speedup = prefill_values[max_prefill_thread] / prefill_values[1]
+
+        def fmt(value: float | None, digits: int = 2) -> str:
+            return f"{value:.{digits}f}" if value is not None and math.isfinite(value) else "-"
+
+        rows_out.append([
+            spec.label,
+            str(spec.path),
+            "PASS" if not failures else "FAIL",
+            str(len(rows)),
+            ",".join(str(thread) for thread in observed_threads),
+            fmt(prefill_values.get(1)),
+            fmt(prefill_values.get(max_prefill_thread) if max_prefill_thread is not None else None),
+            str(max_prefill_thread) if max_prefill_thread is not None else "-",
+            fmt(prefill_speedup),
+            fmt(decode_values.get(max_decode_thread) if max_decode_thread is not None else None),
+            str(max_decode_thread) if max_decode_thread is not None else "-",
+            ",".join(failures) if failures else "-",
+        ])
+    return md_table(
+        [
+            "label",
+            "path",
+            "status",
+            "rows",
+            "threads",
+            "prefill t1",
+            "max prefill",
+            "max prefill thread",
+            "prefill speedup",
+            "max decode",
+            "max decode thread",
+            "failures",
+        ],
+        rows_out,
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -515,6 +617,12 @@ def main() -> None:
         default=[],
         help="LABEL=summary.json[:expected_rows[:max_i2s_reference_ratio]]",
     )
+    parser.add_argument(
+        "--thread-scaling",
+        action="append",
+        default=[],
+        help="LABEL=summary.json[:expected_threads_csv]",
+    )
     parser.add_argument("--math", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--output-md", type=Path, default=None)
     args = parser.parse_args()
@@ -525,6 +633,7 @@ def main() -> None:
     mc_specs = [parse_label_path(spec) for spec in args.mc]
     runtime = [parse_label_path(spec) for spec in args.runtime]
     gguf_summary = [parse_label_path_count(spec) for spec in args.gguf_summary]
+    thread_scaling = [parse_thread_scaling(spec) for spec in args.thread_scaling]
     math_specs = [parse_label_path(spec) for spec in args.math]
 
     report = "\n\n".join([
@@ -541,6 +650,8 @@ def main() -> None:
         audit_runtime(runtime),
         "## GGUF Summary Artifacts",
         audit_gguf_summary(gguf_summary),
+        "## Thread-Scaling Artifacts",
+        audit_thread_scaling(thread_scaling),
         "## PTQ Math Artifacts",
         audit_math(math_specs),
     ])

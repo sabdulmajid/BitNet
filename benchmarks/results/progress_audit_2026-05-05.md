@@ -82,7 +82,9 @@ the Xeon 4116.
 The row-scale `I2_S` thread-scaling probe is tracked at
 `benchmarks/results/i2s_thread_scaling_2026-05-05.md`. The row-scale patch now
 uses heap temporary buffers in the I2_S prompt GEMM/GEMV path; after that fix,
-`llama-bench` passes at 1/2/4/8/12/16/24 threads.
+`llama-bench` passes at 1/2/4/8/12/16/24 threads. Its mechanical audit is
+`benchmark_results/evidence_audit/qwen15b_row_i2s_thread_scaling.md`, which
+passes all seven expected thread rows with no failed return codes.
 
 Key audited values:
 
