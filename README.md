@@ -55,9 +55,9 @@ conservative:
   default `I2_S` path does **not** preserve it: row-scale `I2_S` explodes to
   PPL `1.197e6` and produces a failed smoke completion. A local prototype patch
   that stores one scale per output row fixes this layout issue: row-scale
-  `I2_S` reaches PPL `38.8832 +/- 1.97093`, `215.00` prompt tok/s, and
-  `18.83` decode tok/s on the Xeon 4116. That patch is not yet an upstreamed
-  default.
+  `I2_S` reaches PPL `38.8832 +/- 1.97093`, `216.03` prompt tok/s, and
+  `18.83` decode tok/s on the Xeon 4116 portable-AVX2 run. That patch is not
+  yet an upstreamed default.
 - **Row-wise ternary scales help likelihood but are not enough alone.** A
   Qwen2.5-0.5B row-scale ablation cut heldout perplexity by about 2.4x versus
   the tensor-scale QAT checkpoint, and the final 1.5B row-scale run improved
@@ -96,6 +96,8 @@ The current prompt-to-artifact progress audit is
 [benchmarks/results/progress_audit_2026-05-05.md](benchmarks/results/progress_audit_2026-05-05.md).
 The artifact-generated side-by-side Qwen summary is
 [benchmarks/results/qwen_side_by_side_2026-05-05.md](benchmarks/results/qwen_side_by_side_2026-05-05.md).
+The row-scale `I2_S` prototype note is
+[benchmarks/results/i2s_row_scale_prototype_2026-05-05.md](benchmarks/results/i2s_row_scale_prototype_2026-05-05.md).
 The benchmark harnesses are in [benchmarks/](benchmarks/).
 
 ### Current Perplexity Snapshot
@@ -126,12 +128,14 @@ same CPU family shown in the table.
 
 | CPU | artifact | file MiB | PPL | prompt tok/s | decode tok/s |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Intel Xeon Silver 4116 | FP F16 | 2,950.4 | 12.2806 | 104.23 | 5.47 |
-| Intel Xeon Silver 4116 | FP Q8_0 | 1,570.3 | 12.3207 | 134.48 | 10.03 |
-| Intel Xeon Silver 4116 | FP Q4_K_M | 940.4 | 12.8452 | 94.03 | 15.73 |
+| Intel Xeon Silver 4116 | FP F16 | 2,950.4 | 12.2808 | 114.47 | 5.56 |
+| Intel Xeon Silver 4116 | FP Q8_0 | 1,570.3 | 12.3056 | 124.86 | 10.13 |
+| Intel Xeon Silver 4116 | FP Q4_K_M | 940.4 | 12.8112 | 92.08 | 16.01 |
 | Intel Xeon Silver 4116 | blind FP-to-I2_S | 766.1 | 1.206e51 | 204.57 | 18.34 |
 | Intel Xeon Silver 4116 | KL-only static ternary I2_S, all-linear | 1,208.9 | 54.7366 | 205.76 | 18.60 |
-| Intel Xeon Silver 4116 | KL-only row-scale static ternary I2_S prototype, dense tied `lm_head` | 1,205.6 | 38.8832 | 215.00 | 18.83 |
+| Intel Xeon Silver 4116 | KL-only row-scale static ternary F16, dense tied `lm_head` | 3,395.5 | 38.8651 | 114.75 | 5.49 |
+| Intel Xeon Silver 4116 | KL-only row-scale static ternary TQ2_0, dense tied `lm_head` | 1,218.6 | 38.8224 | 169.46 | 18.68 |
+| Intel Xeon Silver 4116 | KL-only row-scale static ternary I2_S prototype, dense tied `lm_head` | 1,211.3 | 38.8832 | 216.03 | 18.83 |
 | AMD Ryzen Threadripper PRO 5945WX | KL-only static ternary I2_S, dense tied `lm_head` | 1,208.9 | 47.3435 | 464.19 | 45.50 |
 | AMD Ryzen Threadripper PRO 5945WX | KL-only row-scale static ternary TQ2_0, dense tied `lm_head` | 1,218.6 | 38.8224 | 345.32 | 44.85 |
 | AMD Ryzen Threadripper PRO 5945WX | KL-only row-scale static ternary I2_S, dense tied `lm_head` | 1,208.9 | 1.197e6 | 465.34 | 46.13 |
@@ -392,7 +396,10 @@ llama.cpp `TQ2_0` preserves both tensor-scale and row-scale static ternary
 artifacts. Tensor-scale `I2_S` also preserves static-ternary quality, but the
 current row-scale-to-`I2_S` bridge fails; row-scale deployment needs a
 row-scale-aware packed ternary writer and kernel rather than the current
-I2_S path. The included `patches/llama-i2s-threaded-quantization.patch` fixes
+I2_S path. The included `patches/llama-i2s-row-scale.patch` proves the local
+format fix by recovering row-scale `I2_S` PPL `38.8832` with `216.03` prompt
+tok/s and `18.83` decode tok/s on the Xeon portable-AVX2 suite. The included
+`patches/llama-i2s-threaded-quantization.patch` fixes
 the tensor-scale threaded I2_S packing path locally: a 12-thread quantized
 artifact matches the single-thread PPL (`54.7366`) and reaches `208.10` prompt
 tok/s / `18.63` decode tok/s. The safe wrapper remains conservative until the

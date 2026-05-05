@@ -25,7 +25,8 @@ these are quality and loader results, not final CPU product benchmarks.
 - PyTorch runtime probe: Intel Xeon Silver 4116, PyTorch FP32, 12 Torch threads,
   512-token prompt, 32 generated tokens
 - Packed GGUF runtime probe: Intel Xeon Silver 4116, `llama-bench -p 512
-  -n 128 -t 12 -ngl 0 -r 3`, no BLAS, AVX-512 available
+  -n 128 -t 12 -ngl 0 -r 3`, no BLAS; the row-scale `I2_S` prototype used the
+  portable AVX2 build even though the host CPU supports AVX-512
 - Additional packed GGUF dense-head and row-scale probes: AMD Ryzen
   Threadripper PRO 5945WX via portable AVX2 llama.cpp build
 
@@ -534,7 +535,19 @@ patch is recorded at `patches/llama-i2s-row-scale.patch`.
 
 | source | GGUF type | CPU | PPL | prompt-eval tok/s | decode tok/s | smoke prompt |
 | --- | --- | --- | ---: | ---: | ---: | --- |
-| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | I2_S per-row-scale prototype | Xeon 4116 | 38.8832 +/- 1.97093 | 215.00 | 18.83 | sensible |
+| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | I2_S per-row-scale prototype | Xeon 4116 | 38.8832 +/- 1.97093 | 216.03 | 18.83 | sensible |
+
+The same patched build was also run as a six-model same-hardware suite on the
+Xeon Silver 4116:
+
+| source | GGUF type | CPU | file MiB | PPL | prompt-eval tok/s | decode tok/s | smoke prompt |
+| --- | --- | --- | ---: | ---: | ---: | ---: | --- |
+| Qwen2.5-1.5B FP | F16 | Xeon 4116 | 2,950.4 | 12.2808 | 114.47 | 5.56 | sensible |
+| Qwen2.5-1.5B FP | Q8_0 | Xeon 4116 | 1,570.3 | 12.3056 | 124.86 | 10.13 | sensible |
+| Qwen2.5-1.5B FP | Q4_K_M | Xeon 4116 | 940.4 | 12.8112 | 92.08 | 16.01 | sensible |
+| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | F16 materialized | Xeon 4116 | 3,395.5 | 38.8651 | 114.75 | 5.49 | sensible |
+| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | TQ2_0 | Xeon 4116 | 1,218.6 | 38.8224 | 169.46 | 18.68 | sensible |
+| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | I2_S per-row-scale prototype | Xeon 4116 | 1,211.3 | 38.8832 | 216.03 | 18.83 | sensible |
 
 Interpretation:
 
@@ -576,9 +589,11 @@ Interpretation:
   `I2_S` deployment.
 - The per-row-scale `I2_S` prototype fixes that specific failure: PPL returns
   to `38.8832 +/- 1.97093`, matching row-scale `TQ2_0` within measurement
-  noise, and the smoke prompt is coherent. This is a promising engineering
-  result, but it changes the `I2_S` binary layout, so existing `I2_S` GGUF
-  files must be regenerated and the format needs a compatibility policy.
+  noise, and the smoke prompt is coherent. On the same Xeon suite it gives
+  `216.03` prompt tok/s and `18.83` decode tok/s, versus row-scale `TQ2_0` at
+  `169.46` and `18.68`. This is a promising engineering result, but it changes
+  the `I2_S` binary layout, so existing `I2_S` GGUF files must be regenerated
+  and the format needs a compatibility policy.
 
 ## MoE Status
 
@@ -679,7 +694,7 @@ locality on CPU.
     problem.
 18. A per-row-scale `I2_S` prototype fixes that row-scale quality failure on
     the Xeon 4116: fixed-excerpt PPL is `38.8832 +/- 1.97093`, prompt
-    throughput is `215.00` tok/s, decode throughput is `18.83` tok/s, and the
+    throughput is `216.03` tok/s, decode throughput is `18.83` tok/s, and the
     smoke prompt is coherent.
 19. The original tensor-scale multi-thread I2_S writer corruption is fixable.
     A local llama.cpp patch that packs I2_S chunks at compressed offsets and

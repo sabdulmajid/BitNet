@@ -63,3 +63,9 @@ Generated from benchmark JSON artifacts. Missing rows are intentionally shown as
 | KL-only row dense lm_head static ternary suite | AMD Ryzen Threadripper PRO 5945WX 12-Cores | qwen15b_klonly_row_notie_static_ternary_f16 | static_ternary_materialized | 3395.5 | 221.64 | 12.49 | 38.8651 |
 | KL-only row dense lm_head static ternary suite | AMD Ryzen Threadripper PRO 5945WX 12-Cores | qwen15b_klonly_row_notie_static_ternary_tq2_0 | static_ternary_tq2 | 1218.6 | 345.32 | 44.85 | 38.8224 |
 | KL-only row dense lm_head static ternary suite | AMD Ryzen Threadripper PRO 5945WX 12-Cores | qwen15b_klonly_row_notie_static_ternary_i2_s | static_ternary_i2s_single_thread_quant | 1208.9 | 465.34 | 46.13 | 1197135.5848 |
+| KL-only row dense lm_head I2_S row-scale prototype suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_fp_f16 | fp_reference | 2950.4 | 114.47 | 5.56 | 12.2808 |
+| KL-only row dense lm_head I2_S row-scale prototype suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_fp_q8_0 | llama_q8 | 1570.3 | 124.86 | 10.13 | 12.3056 |
+| KL-only row dense lm_head I2_S row-scale prototype suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_fp_q4_k_m | llama_q4 | 940.4 | 92.08 | 16.01 | 12.8112 |
+| KL-only row dense lm_head I2_S row-scale prototype suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_klonly_row_notie_static_ternary_f16 | static_ternary_materialized | 3395.5 | 114.75 | 5.49 | 38.8651 |
+| KL-only row dense lm_head I2_S row-scale prototype suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_klonly_row_notie_static_ternary_tq2_0 | static_ternary_tq2 | 1218.6 | 169.46 | 18.68 | 38.8224 |
+| KL-only row dense lm_head I2_S row-scale prototype suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale | static_ternary_i2s_row_scale_prototype | 1211.3 | 216.03 | 18.83 | 38.8832 |

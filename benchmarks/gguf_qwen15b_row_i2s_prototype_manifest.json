@@ -1,0 +1,32 @@
+[
+  {
+    "name": "qwen15b_fp_f16",
+    "kind": "fp_reference",
+    "path": "models/qwen2.5-1.5b-fp/qwen15b_fp_f16.gguf"
+  },
+  {
+    "name": "qwen15b_fp_q8_0",
+    "kind": "llama_q8",
+    "path": "models/qwen2.5-1.5b-fp/qwen15b_fp_q8_0.gguf"
+  },
+  {
+    "name": "qwen15b_fp_q4_k_m",
+    "kind": "llama_q4",
+    "path": "models/qwen2.5-1.5b-fp/qwen15b_fp_q4_k_m.gguf"
+  },
+  {
+    "name": "qwen15b_klonly_row_notie_static_ternary_f16",
+    "kind": "static_ternary_materialized",
+    "path": "models/qwen2.5-1.5b-klonly-row-notie-static-ternary-dense/qwen15b_klonly_row_notie_static_ternary_f16.gguf"
+  },
+  {
+    "name": "qwen15b_klonly_row_notie_static_ternary_tq2_0",
+    "kind": "static_ternary_tq2",
+    "path": "models/qwen2.5-1.5b-klonly-row-notie-static-ternary-dense/qwen15b_klonly_row_notie_static_ternary_tq2_0.gguf"
+  },
+  {
+    "name": "qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale",
+    "kind": "static_ternary_i2s_row_scale_prototype",
+    "path": "models/qwen2.5-1.5b-klonly-row-notie-static-ternary-dense/qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale.gguf"
+  }
+]

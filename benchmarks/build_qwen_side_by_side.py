@@ -46,6 +46,7 @@ GGUF_SUMMARIES = [
     ("KL-only all-linear static ternary suite", "benchmark_results/gguf-qwen15b-klonly-suite/summary.json"),
     ("KL-only dense lm_head static ternary suite", "benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json"),
     ("KL-only row dense lm_head static ternary suite", "benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json"),
+    ("KL-only row dense lm_head I2_S row-scale prototype suite", "benchmark_results/gguf-qwen15b-row-i2s-prototype-suite/summary.json"),
 ]
 
 
@@ -147,7 +148,7 @@ def build_gguf_table() -> str:
             continue
         for row in summary.get("rows", []):
             name = str(row.get("name", ""))
-            if not name.endswith(("f16", "q8_0", "q4_k_m", "tq2_0", "i2_s")):
+            if not name.endswith(("f16", "q8_0", "q4_k_m", "tq2_0", "i2_s", "i2_s_rowscale")):
                 continue
             ppl = row.get("perplexity", {}).get("ppl")
             bench = row.get("bench", {})
