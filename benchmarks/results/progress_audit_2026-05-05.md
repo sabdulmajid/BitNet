@@ -68,7 +68,8 @@ The generated six-model suite is under
 tracked manifest is `benchmarks/gguf_qwen15b_row_i2s_prototype_manifest.json`.
 The mechanical suite audit is
 `benchmark_results/evidence_audit/qwen15b_row_i2s_prototype.md`, which passes
-with six rows and no failed/NaN entries.
+with six rows, no failed/NaN entries, and an `I2_S`/row-scale-reference PPL
+ratio of `1.00157` under a strict `1.01` max-ratio threshold.
 
 Key audited values:
 

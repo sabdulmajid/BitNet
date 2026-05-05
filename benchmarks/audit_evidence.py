@@ -40,6 +40,14 @@ class CheckpointSpec:
     expected_config_tie: bool | None
 
 
+@dataclass(frozen=True)
+class GGUFSummarySpec:
+    label: str
+    path: Path
+    expected_rows: int | None
+    max_i2s_reference_ratio: float
+
+
 def md_table(headers: list[str], rows: list[list[str]]) -> str:
     lines = ["| " + " | ".join(headers) + " |"]
     lines.append("| " + " | ".join(["---"] * len(headers)) + " |")
@@ -57,12 +65,13 @@ def parse_label_path(spec: str) -> tuple[str, Path]:
     return label, Path(path)
 
 
-def parse_label_path_count(spec: str) -> tuple[str, Path, int | None]:
+def parse_label_path_count(spec: str) -> GGUFSummarySpec:
     label, raw_path = parse_label_path(spec)
     parts = str(raw_path).split(":")
     path = Path(parts[0])
     expected_count = int(parts[1]) if len(parts) > 1 and parts[1] else None
-    return label, path, expected_count
+    max_i2s_reference_ratio = float(parts[2]) if len(parts) > 2 and parts[2] else 10.0
+    return GGUFSummarySpec(label, path, expected_count, max_i2s_reference_ratio)
 
 
 def parse_checkpoint(spec: str) -> CheckpointSpec:
@@ -340,18 +349,20 @@ def audit_math(specs: list[tuple[str, Path]]) -> str:
     )
 
 
-def audit_gguf_summary(specs: list[tuple[str, Path, int | None]]) -> str:
+def audit_gguf_summary(specs: list[GGUFSummarySpec]) -> str:
     if not specs:
         return "No GGUF summary specs supplied."
     rows_out: list[list[str]] = []
-    for label, path, expected_rows in specs:
+    for spec in specs:
+        label = spec.label
+        path = spec.path
         if not path.exists():
-            rows_out.append([label, str(path), "MISSING", "-", "-", "-", "-", "-", "-", "-", "-"])
+            rows_out.append([label, str(path), "MISSING", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"])
             continue
         data = load_json(path)
         rows = data.get("rows", [])
         if not isinstance(rows, list):
-            rows_out.append([label, str(path), "FAIL", "0", "-", "rows is not a list", "-", "-", "-", "-", "-"])
+            rows_out.append([label, str(path), "FAIL", "0", "-", "rows is not a list", "-", "-", "-", "-", "-", "-", "-"])
             continue
 
         failed: list[str] = []
@@ -374,8 +385,8 @@ def audit_gguf_summary(specs: list[tuple[str, Path, int | None]]) -> str:
             if not cpu:
                 cpu = str(row.get("bench", {}).get("prefill", {}).get("cpu", ""))
 
-        if expected_rows is not None and len(rows) != expected_rows:
-            failed.append(f"expected_rows={expected_rows},got={len(rows)}")
+        if spec.expected_rows is not None and len(rows) != spec.expected_rows:
+            failed.append(f"expected_rows={spec.expected_rows},got={len(rows)}")
 
         def select_name(*names: str, kind_tokens: tuple[str, ...] = ()) -> str:
             for name in names:
@@ -424,6 +435,8 @@ def audit_gguf_summary(specs: list[tuple[str, Path, int | None]]) -> str:
             return f"{float(value):.2f}" if isinstance(value, (int, float)) else "-"
 
         qat_i2s_ppl = numeric_ppl(qat_i2s_name)
+        reference_ppl: float | None = None
+        i2s_reference_ratio: float | None = None
         reference_ppls: list[float] = []
         for candidate in rows:
             if not isinstance(candidate, dict):
@@ -440,8 +453,12 @@ def audit_gguf_summary(specs: list[tuple[str, Path, int | None]]) -> str:
                 reference_ppls.append(value)
         if qat_i2s_ppl is not None and reference_ppls:
             reference_ppl = min(reference_ppls)
-            if qat_i2s_ppl > reference_ppl * 10.0:
-                failed.append(f"{qat_i2s_name}:ppl_ratio={qat_i2s_ppl / reference_ppl:.1f}x")
+            i2s_reference_ratio = qat_i2s_ppl / reference_ppl
+            if i2s_reference_ratio > spec.max_i2s_reference_ratio:
+                failed.append(f"{qat_i2s_name}:ppl_ratio={i2s_reference_ratio:.3g}x")
+
+        def fmt_number(value: float | None, digits: int = 4) -> str:
+            return f"{value:.{digits}g}" if value is not None and math.isfinite(value) else "-"
 
         rows_out.append([
             label,
@@ -454,6 +471,9 @@ def audit_gguf_summary(specs: list[tuple[str, Path, int | None]]) -> str:
             ppl_for("qwen15b_fp_f16"),
             ppl_for("qwen15b_fp_i2_s"),
             ppl_for(qat_i2s_name),
+            fmt_number(reference_ppl),
+            fmt_number(i2s_reference_ratio, 6),
+            f"{spec.max_i2s_reference_ratio:.6g}",
             decode_for(qat_i2s_name),
         ])
     return md_table(
@@ -468,6 +488,9 @@ def audit_gguf_summary(specs: list[tuple[str, Path, int | None]]) -> str:
             "FP F16 PPL",
             "blind I2_S PPL",
             "QAT I2_S PPL",
+            "static ternary ref PPL",
+            "I2_S/ref ratio",
+            "max ratio",
             "QAT I2_S decode tok/s",
         ],
         rows_out,
@@ -486,7 +509,12 @@ def main() -> None:
     parser.add_argument("--perplexity", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--mc", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--runtime", action="append", default=[], help="LABEL=path.json")
-    parser.add_argument("--gguf-summary", action="append", default=[], help="LABEL=summary.json[:expected_rows]")
+    parser.add_argument(
+        "--gguf-summary",
+        action="append",
+        default=[],
+        help="LABEL=summary.json[:expected_rows[:max_i2s_reference_ratio]]",
+    )
     parser.add_argument("--math", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--output-md", type=Path, default=None)
     args = parser.parse_args()
