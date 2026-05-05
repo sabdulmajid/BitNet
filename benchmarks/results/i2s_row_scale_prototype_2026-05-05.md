@@ -59,13 +59,13 @@ Thread scaling with the portable AVX2 build:
 
 | threads | status | prompt tok/s | decode tok/s |
 | ---: | --- | ---: | ---: |
-| 1 | `llama-bench` segfault | - | - |
-| 2 | `llama-bench` segfault | - | - |
-| 4 | pass | 83.17 | 19.63 |
-| 8 | pass | 154.42 | 19.35 |
-| 12 | pass | 211.63 | 18.82 |
-| 16 | pass | 197.88 | 19.32 |
-| 24 | pass | 247.75 | 17.81 |
+| 1 | pass | 22.02 | 8.57 |
+| 2 | pass | 43.42 | 14.74 |
+| 4 | pass | 84.41 | 19.49 |
+| 8 | pass | 154.94 | 19.38 |
+| 12 | pass | 217.60 | 18.95 |
+| 16 | pass | 197.98 | 19.19 |
+| 24 | pass | 245.31 | 18.34 |
 
 The thread-scaling detail is tracked separately in
 `benchmarks/results/i2s_thread_scaling_2026-05-05.md`.
@@ -88,4 +88,5 @@ This patch changes the binary layout of `I2_S` tensors. Existing tensor-scale
 `I2_S` GGUF files should be regenerated with the patched writer before use.
 The current kernel should not be marketed as AVX-512 accelerated until an
 AVX-512-specific speedup is measured.
-The low-thread `llama-bench` segfaults are also a prototype stability gap.
+The row-scale patch also moves large I2_S prompt temporary buffers from stack
+to heap, fixing the earlier low-thread `llama-bench` crash.

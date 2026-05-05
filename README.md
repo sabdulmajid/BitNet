@@ -152,10 +152,10 @@ The same patched row-scale `I2_S` artifact also passed a native AVX-512-enabled
 Xeon run at PPL `38.8853`, `207.35` prompt tok/s, and `18.37` decode tok/s;
 quality is preserved, but throughput did not beat the portable AVX2 build.
 Thread scaling on the portable AVX2 row-scale `I2_S` artifact shows prefill
-scaling from `83.17` tok/s at 4 threads to `247.75` tok/s at 24 threads, while
-decode stays near `18-20` tok/s. `llama-bench` currently segfaults at 1 and 2
-threads for this patched row-scale `I2_S` artifact, although `llama-cli -t 1`
-works and a Q4_K_M `llama-bench -t 1` control works.
+scaling from `22.02` tok/s at 1 thread to `245.31` tok/s at 24 threads, while
+decode improves through 4 threads and then stays near `18-20` tok/s. The
+current row-scale patch includes a heap-buffer fix for the earlier low-thread
+`llama-bench` crash.
 
 ### Practical Product Direction
 
@@ -416,9 +416,10 @@ tok/s and `18.83` decode tok/s on the Xeon portable-AVX2 suite. The included
 native AVX-512-enabled run preserves quality but is slightly slower for this
 kernel (`207.35` prompt tok/s / `18.37` decode tok/s), so CPU-feature-based
 speed claims still need kernel-specific measurement. Thread scaling shows
-prompt ingestion scaling to `247.75` tok/s at 24 threads, but decode stays near
-`18-20` tok/s and the patched `llama-bench` path currently crashes at 1 and 2
-threads. The included
+prompt ingestion scaling to `245.31` tok/s at 24 threads, but decode stays near
+`18-20` tok/s after 4 threads. The row-scale patch also fixes the earlier
+low-thread `llama-bench` crash by moving large I2_S prompt temporary buffers
+from stack to heap. The included
 `patches/llama-i2s-threaded-quantization.patch` fixes
 the tensor-scale threaded I2_S packing path locally: a 12-thread quantized
 artifact matches the single-thread PPL (`54.7366`) and reaches `208.10` prompt

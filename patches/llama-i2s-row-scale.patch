@@ -158,7 +158,7 @@ index 4ba9d65..7c9ba94 100644
 \ No newline at end of file
 +}
 diff --git a/3rdparty/llama.cpp/ggml/src/ggml.c b/3rdparty/llama.cpp/ggml/src/ggml.c
-index 121f72da..17818bc7 100644
+index 121f72da..24fc7200 100644
 --- a/3rdparty/llama.cpp/ggml/src/ggml.c
 +++ b/3rdparty/llama.cpp/ggml/src/ggml.c
 @@ -3482,7 +3482,10 @@ size_t ggml_nbytes(const struct ggml_tensor * tensor) {
@@ -203,42 +203,66 @@ index 121f72da..17818bc7 100644
                          } else {
                              vec_dot(ne00, &tmp[ir0 - iir0], (num_rows_per_vec_dot > 1 ? 16 : 0), src0_row + ir0 * nb01, (num_rows_per_vec_dot > 1 ? nb01 : 0), src1_col, (num_rows_per_vec_dot > 1 ? src1_col_stride : 0), num_rows_per_vec_dot);
                          }
-@@ -13259,14 +13264,14 @@ UseGgmlGemm2:;
+@@ -13258,18 +13263,22 @@ UseGgmlGemm2:;
+         // If there are more than three rows in src1, use gemm; otherwise, use gemv.
          if (gemm && (ne11 > 3)) {
              if (src0->type == GGML_TYPE_I2_S) {
-                 float tmp[(src0_end - src0_start)*(ne11 - ne11 % 4)];
+-                float tmp[(src0_end - src0_start)*(ne11 - ne11 % 4)];
 -                const float * scale      = (float * )((uint8_t*) (src0->data) + (ne00 * ne01 / 4));
++                const int64_t n_rows = src0_end - src0_start;
++                const int64_t n_cols = ne11 - ne11 % 4;
++                float * tmp = (float *) malloc((size_t) n_rows * n_cols * sizeof(float));
++                GGML_ASSERT(tmp != NULL);
 +                const float * scale      = (float * )((uint8_t*) (src0->data) + (ggml_nelements(src0) / 4));
                  const float * act_scales = (const float*) ((const char *) src1_wdata + (ne11 * ne10));
                  const int32_t * act_sums   = (const int32_t*) ((const char *) act_scales + (ne11) * sizeof(float));
-                 gemm(ne00, &tmp[0], src0_end - src0_start, (const char *) src0->data + src0_start * nb01 / 4,
-                     (const char *) src1_wdata, ne11 - ne11 % 4, src0_end - src0_start);
-                 for (int col = 0; col < ne11 - ne11 % 4; col++) {
-                     for (int row = 0; row < src0_end - src0_start; row++) {
+-                gemm(ne00, &tmp[0], src0_end - src0_start, (const char *) src0->data + src0_start * nb01 / 4,
+-                    (const char *) src1_wdata, ne11 - ne11 % 4, src0_end - src0_start);
+-                for (int col = 0; col < ne11 - ne11 % 4; col++) {
+-                    for (int row = 0; row < src0_end - src0_start; row++) {
 -                        tmp[col * (src0_end - src0_start) + row] = (tmp[col * (src0_end - src0_start) + row] - act_sums[col]) / (act_scales[col]) * (*scale);
-+                        tmp[col * (src0_end - src0_start) + row] = (tmp[col * (src0_end - src0_start) + row] - act_sums[col]) / (act_scales[col]) * scale[src0_start + row];
++                gemm(ne00, &tmp[0], n_rows, (const char *) src0->data + src0_start * nb01 / 4,
++                    (const char *) src1_wdata, n_cols, n_rows);
++                for (int col = 0; col < n_cols; col++) {
++                    for (int row = 0; row < n_rows; row++) {
++                        tmp[col * n_rows + row] = (tmp[col * n_rows + row] - act_sums[col]) / (act_scales[col]) * scale[src0_start + row];
                      }
-                     memcpy((float *)((char *) dst->data + (col * nb1)) + src0_start, tmp + col * (src0_end - src0_start), (src0_end - src0_start) * sizeof(float));
+-                    memcpy((float *)((char *) dst->data + (col * nb1)) + src0_start, tmp + col * (src0_end - src0_start), (src0_end - src0_start) * sizeof(float));
++                    memcpy((float *)((char *) dst->data + (col * nb1)) + src0_start, tmp + col * n_rows, n_rows * sizeof(float));
                  }
-@@ -13279,7 +13284,7 @@ UseGgmlGemm2:;
++                free(tmp);
+             }
+             else {
+                 gemm(ne00, (float *)((char *) dst->data) + src0_start, ne01, (const char *) src0->data + src0_start * nb01,
+@@ -13278,18 +13287,21 @@ UseGgmlGemm2:;
+         }
          for (int iter = gemm ? ne11 - ne11 % 4 : 0; iter < ne11; iter++) {
              if (src0->type == GGML_TYPE_I2_S) {
-                 float tmp[src0_end - src0_start];
+-                float tmp[src0_end - src0_start];
 -                const float * scale      = (float * )((uint8_t*) (src0->data) + (ne00 * ne01 / 4));
++                const int64_t n_rows = src0_end - src0_start;
++                float * tmp = (float *) malloc((size_t) n_rows * sizeof(float));
++                GGML_ASSERT(tmp != NULL);
 +                const float * scale      = (float * )((uint8_t*) (src0->data) + (ggml_nelements(src0) / 4));
                  const float * act_scales = (const float*) ((const char *) src1_wdata + (ne11 * ne10));
                  const int32_t * act_sums   = (const int32_t*) ((const char *) act_scales + (ne11) * sizeof(float));
                  gemv(ne00, &tmp[0], ne01,
-@@ -13287,7 +13292,7 @@ UseGgmlGemm2:;
+                     (const char *) src0->data + src0_start * nb01 / 4,
                      (const char *) src1_wdata + (src1_col_stride * iter),
-                     1, src0_end - src0_start);
-                 for (int row = 0; row < src0_end - src0_start; row++) {
+-                    1, src0_end - src0_start);
+-                for (int row = 0; row < src0_end - src0_start; row++) {
 -                    tmp[row] = (tmp[row] - act_sums[iter]) / (act_scales[iter]) * (*scale);
++                    1, n_rows);
++                for (int row = 0; row < n_rows; row++) {
 +                    tmp[row] = (tmp[row] - act_sums[iter]) / (act_scales[iter]) * scale[src0_start + row];
                  }
-                 memcpy((float *)((char *) dst->data + (iter * nb1)) + src0_start, tmp, (src0_end - src0_start) * sizeof(float));
+-                memcpy((float *)((char *) dst->data + (iter * nb1)) + src0_start, tmp, (src0_end - src0_start) * sizeof(float));
++                memcpy((float *)((char *) dst->data + (iter * nb1)) + src0_start, tmp, n_rows * sizeof(float));
++                free(tmp);
              }
-@@ -14100,7 +14105,7 @@ static void ggml_compute_forward_get_rows_i2_s(
+             else {
+                 gemv(ne00, (float *)((char *) dst->data + (iter * nb1)) + src0_start, ne01,
+@@ -14100,7 +14112,7 @@ static void ggml_compute_forward_get_rows_i2_s(
  
      const uint8_t * base = (const uint8_t *) src0->data;
      const size_t packed_bytes_total = (size_t) (ggml_nelements(src0) / 4);
@@ -247,7 +271,7 @@ index 121f72da..17818bc7 100644
  
      for (int64_t i = ir0; i < ir1; ++i) {
          const int64_t i12 = i/(ne11*ne10);
-@@ -14110,9 +14115,11 @@ static void ggml_compute_forward_get_rows_i2_s(
+@@ -14110,9 +14122,11 @@ static void ggml_compute_forward_get_rows_i2_s(
  
          GGML_ASSERT(i01 >= 0 && i01 < ne01);
  
@@ -260,7 +284,7 @@ index 121f72da..17818bc7 100644
      }
  }
  
-@@ -22690,7 +22697,7 @@ size_t ggml_quantize_chunk(
+@@ -22690,7 +22704,7 @@ size_t ggml_quantize_chunk(
      }
  
      if (type == GGML_TYPE_I2_S) {

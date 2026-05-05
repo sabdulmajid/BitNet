@@ -80,10 +80,9 @@ AVX-512 preserved quality but did not improve row-scale `I2_S` throughput on
 the Xeon 4116.
 
 The row-scale `I2_S` thread-scaling probe is tracked at
-`benchmarks/results/i2s_thread_scaling_2026-05-05.md`. It shows passing
-`llama-bench` rows at 4/8/12/16/24 threads, low-thread `llama-bench` segfaults
-at 1/2 threads, a successful `llama-cli -t 1` smoke check, and a successful
-Q4_K_M `llama-bench -t 1` control.
+`benchmarks/results/i2s_thread_scaling_2026-05-05.md`. The row-scale patch now
+uses heap temporary buffers in the I2_S prompt GEMM/GEMV path; after that fix,
+`llama-bench` passes at 1/2/4/8/12/16/24 threads.
 
 Key audited values:
 
@@ -115,9 +114,9 @@ Key audited values:
 | Qwen2.5-1.5B row-scale dense-head native AVX-512 I2_S prototype PPL on Xeon 4116 | 38.8853 |
 | Qwen2.5-1.5B row-scale dense-head native AVX-512 I2_S prototype prompt tok/s on Xeon 4116 | 207.35 |
 | Qwen2.5-1.5B row-scale dense-head native AVX-512 I2_S prototype decode tok/s on Xeon 4116 | 18.37 |
-| Row-scale dense-head I2_S portable AVX2 prompt tok/s at 4 threads | 83.17 |
-| Row-scale dense-head I2_S portable AVX2 prompt tok/s at 24 threads | 247.75 |
-| Row-scale dense-head I2_S portable AVX2 decode tok/s range, passing rows | 17.81-19.63 |
+| Row-scale dense-head I2_S portable AVX2 prompt tok/s at 1 thread | 22.02 |
+| Row-scale dense-head I2_S portable AVX2 prompt tok/s at 24 threads | 245.31 |
+| Row-scale dense-head I2_S portable AVX2 decode tok/s range, all thread rows | 8.57-19.49 |
 | Gaussian absmean ternary relative output Frobenius error | 0.512542 |
 
 ## Current Open Gaps
@@ -126,8 +125,7 @@ Key audited values:
    `I2_S` packing path loses row-scale magnitudes and fails the GGUF audit with
    PPL `1.197e6`; the prototype patch stores one scale per output row and
    recovers PPL `38.8832`, but the format change still needs integration,
-   compatibility policy, low-thread `llama-bench` stability work, and
-   regeneration of affected artifacts.
+   compatibility policy, and regeneration of affected artifacts.
 2. Native direct GGUF writing from `ternary_state_dict.pt` is not complete.
    Static-ternary materialization is a validated bridge, not the final storage
    path.
