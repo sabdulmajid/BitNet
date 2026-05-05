@@ -802,7 +802,9 @@ Kimi benchmark artifact.
    ternary-state GGUF writer. Dense Qwen2.5-0.5B TL2 export now works only with
    model-specific shape codegen and a matching TL2 build, and that TL2 probe
    quality-fails with NaN PPL; the strong Qwen2.5-1.5B row-scale TL2 path is
-   still unvalidated.
+   still unvalidated. A separate TL2 scale-semantics audit shows that naive
+   one-scale TL2 export of the row-scale checkpoint would induce relative
+   Frobenius/output-RMS error `1.904230`.
 4. It does not prove that the multi-threaded I2_S writer fix is upstreamed in
    the llama.cpp submodule yet; the fix is included as
    `patches/llama-i2s-threaded-quantization.patch` and validated locally.

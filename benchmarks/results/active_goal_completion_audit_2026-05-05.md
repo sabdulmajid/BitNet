@@ -34,7 +34,7 @@ requirements are still partial or unproven.
 | QAT with and without hidden MSE | complete | hidden-MSE, KL-only, dense-head, and row-scale checkpoints/evals summarized in side-by-side report | longer training remains research, not a completed proof |
 | Row-scale versus tensor-scale | complete for Qwen2.5-1.5B dense-head | row-scale full ten-task mean `0.499459`; paired CI `[+0.009028, +0.021134]` vs tensor-scale dense-head | still below FP |
 | GGUF conversion and packed CPU inference | partial | static-ternary materialization, reusable bridge runner `benchmarks/build_static_ternary_gguf_bridge.py`, TQ2_0, tensor-scale I2_S, row-scale I2_S prototype; `patches/llama-i2s-row-scale.patch` | direct `ternary_state_dict.pt` GGUF writer is not complete |
-| TL2 conversion and CPU inference | partial | `benchmarks/results/conversion_support_audit_2026-05-05.md`; `benchmarks/results/tl2_shape_support_audit_2026-05-05.md`; Qwen0.5B TL2 probe `benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json` | dense Qwen0.5B TL2 is model-specific and quality-failed; strong Qwen1.5B row-scale TL2, Qwen2MoE, and Kimi remain unvalidated |
+| TL2 conversion and CPU inference | partial | `benchmarks/results/conversion_support_audit_2026-05-05.md`; `benchmarks/results/tl2_shape_support_audit_2026-05-05.md`; `benchmarks/results/tl2_scale_semantics_2026-05-05.md`; Qwen0.5B TL2 probe `benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json` | dense Qwen0.5B TL2 is model-specific and quality-failed; current TL2 one-scale semantics are mathematically invalid for the strong row-scale Qwen1.5B checkpoint; Qwen2MoE and Kimi remain unvalidated |
 | Row-scale I2_S quality preservation | complete as prototype | heap-fix confirmation `benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json`; audit `benchmark_results/evidence_audit/qwen15b_row_i2s_heapfix.md` | not an upstream/default stable GGUF format |
 | Row-scale I2_S thread scaling | complete as prototype | `benchmarks/results/i2s_thread_scaling_2026-05-05.md`; audit `benchmark_results/evidence_audit/qwen15b_row_i2s_thread_scaling.md` | decode remains around `18-20 tok/s` after 4 threads |
 | Native AVX-512 check | complete | `benchmark_results/gguf-qwen15b-row-i2s-prototype-native-suite/summary.json`; audit `benchmark_results/evidence_audit/qwen15b_row_i2s_native.md` | no AVX-512 speedup shown |
@@ -67,7 +67,9 @@ Qwen TL2 path, and MoE/Kimi proof.
    bridge export is no longer required.
 3. Implement and benchmark a row-scale-aware Qwen2.5-1.5B TL2 path, or keep
    TL2 out of the supported product claim. The current Qwen0.5B TL2 probe is a
-   model-specific engineering result with NaN PPL.
+   model-specific engineering result with NaN PPL, and the current TL2
+   one-scale convention induces `1.904230` relative error on the strong
+   row-scale checkpoint.
 4. Extend quality evaluation only if the product/paper scope requires a broader
    leaderboard; the current ten-task set is sufficient for the negative
    retrofit verdict but not a full model card.

@@ -81,7 +81,9 @@ The only TL2 result worth pursuing next is a strong checkpoint:
 1. Generate TL2 kernels for the Qwen2.5-1.5B row-scale dense-head shapes.
 2. Decide how TL2 should represent row scales; the current TL1/TL2 converter
    uses one tensor scale from `max(abs(W))`, which will not preserve row-scale
-   QAT behavior.
+   QAT behavior. The scale-semantics audit at
+   `benchmarks/results/tl2_scale_semantics_2026-05-05.md` measures the induced
+   row-scale 1.5B error at `1.904230` relative Frobenius/output RMS.
 3. Convert and benchmark only after the scale semantics are fixed; otherwise a
    TL2 run on the strong row-scale checkpoint would likely reproduce the same
    row-scale-loss failure seen in default I2_S.

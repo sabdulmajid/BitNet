@@ -96,7 +96,10 @@ conservative:
   nonsensical. The generic AVX2 build can benchmark the artifact but standard
   smoke/perplexity segfault. The strong Qwen2.5-1.5B row-scale checkpoint has
   not been validated through TL2, and the current TL1/TL2 converter uses one
-  tensor scale rather than row scales.
+  tensor scale rather than row scales. The scale-semantics audit shows why a
+  naive row-scale TL2 export is invalid: replacing row-wise scales with one TL2
+  tensor scale would introduce relative Frobenius/output-RMS error `1.904230`
+  on the best row-scale 1.5B checkpoint; the scalar-scale control is `0.0`.
 - **MoE remains unproven in this fork.** The vendored llama.cpp backend contains
   generic expert routing and merged expert-tensor support, and the BitNet HF
   converter has partial Qwen-style expert packing. This repo has not yet shown a
@@ -127,6 +130,8 @@ The TL2 shape support audit is
 [benchmarks/results/tl2_shape_support_audit_2026-05-05.md](benchmarks/results/tl2_shape_support_audit_2026-05-05.md).
 The Qwen2.5-0.5B TL2 probe is
 [benchmarks/results/qwen05b_tl2_probe_2026-05-05.md](benchmarks/results/qwen05b_tl2_probe_2026-05-05.md).
+The TL2 scale-semantics audit is
+[benchmarks/results/tl2_scale_semantics_2026-05-05.md](benchmarks/results/tl2_scale_semantics_2026-05-05.md).
 The MoE support audit is
 [benchmarks/results/moe_support_audit_2026-05-05.md](benchmarks/results/moe_support_audit_2026-05-05.md).
 The reusable static-ternary GGUF bridge note is

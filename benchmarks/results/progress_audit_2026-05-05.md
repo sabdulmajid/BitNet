@@ -121,6 +121,14 @@ artifact has NaN PPL and nonsensical smoke text. Its mechanical evidence audit
 is `benchmark_results/evidence_audit/qwen05b_tl2_probe.md`, which passes only
 because it expects this scoped negative result.
 
+The TL2 scale-semantics audit is tracked at
+`benchmarks/results/tl2_scale_semantics_2026-05-05.md`. It compares the current
+TL1/TL2 one-scale convention against the actual Qwen2.5-1.5B ternary states:
+the tensor-scale checkpoint has zero induced error, while replacing row-wise
+scales with one TL2 tensor scale on the best row-scale checkpoint gives total
+relative Frobenius/output-RMS error `1.904230`, with worst tensor error
+`8.196455`. This makes naive row-scale TL2 export mathematically invalid.
+
 The MoE support audit is tracked at
 `benchmarks/results/moe_support_audit_2026-05-05.md`. It confirms generic GGUF
 expert metadata, Qwen2MoE tensor schema, Qwen2MoE converter registration,
@@ -185,6 +193,9 @@ Key audited values:
 | Qwen2.5-0.5B QAT TL2 prompt tok/s on TL2 AVX-512 build | 229.52 |
 | Qwen2.5-0.5B QAT TL2 decode tok/s on TL2 AVX-512 build | 22.95 |
 | Qwen2.5-0.5B QAT TL2 PPL on TL2 AVX-512 build | NaN |
+| Qwen2.5-1.5B tensor-scale checkpoint TL2 one-scale induced error | 0.000000 |
+| Qwen2.5-1.5B row-scale checkpoint TL2 one-scale induced error | 1.904230 |
+| Qwen2.5-1.5B row-scale checkpoint worst tensor TL2 one-scale induced error | 8.196455 |
 | Gaussian absmean ternary relative output Frobenius error | 0.512542 |
 
 ## Current Open Gaps
@@ -202,8 +213,9 @@ Key audited values:
    exact shape codegen and a matching TL2 build, but the tested checkpoint has
    NaN PPL. `llama-quantize` still does not expose TL2, Qwen2MoE/Kimi are not
    registered in the BitNet TL2 converter, and the strong Qwen2.5-1.5B
-   row-scale checkpoint has not been validated through a row-scale-aware TL2
-   format.
+   row-scale checkpoint cannot be naively exported through the current TL2
+   one-scale convention without a measured `1.904230` relative weight/output
+   error.
 4. The validated threaded `I2_S` writer fix exists as
    `patches/llama-i2s-threaded-quantization.patch`, but the llama.cpp submodule
    has not been advanced to a commit containing that fix.
