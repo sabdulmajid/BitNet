@@ -681,6 +681,10 @@ What exists:
   `num_local_experts` and `num_experts_per_tok`, and packs
   `block_sparse_moe.experts.*.{w1,w2,w3}.weight` tensors into merged 3D expert
   tensors.
+- The conversion support audit at
+  `benchmarks/results/conversion_support_audit_2026-05-05.md` confirms the
+  vendored llama.cpp HF converter registers `Qwen2MoeForCausalLM`, but the
+  TL2-capable BitNet HF converter does not.
 
 What is missing:
 
@@ -790,6 +794,8 @@ locality on CPU.
 2. It does not replace a broader full `lm-eval` leaderboard suite; ten selected
    tasks have been run uncapped so far.
 3. It does not prove bit-exact GGUF ingestion of `ternary_state_dict.pt`.
+   The current conversion support audit confirms there is still no single
+   direct Qwen2 plus TL2/I2_S HF-conversion path.
 4. It does not prove that the multi-threaded I2_S writer fix is upstreamed in
    the llama.cpp submodule yet; the fix is included as
    `patches/llama-i2s-threaded-quantization.patch` and validated locally.

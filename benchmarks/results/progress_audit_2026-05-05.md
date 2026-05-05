@@ -102,6 +102,14 @@ The GGUF RSS context-scaling probe is tracked at
 all 24 expected rows across contexts `512,2048,8192,32768` with positive RSS
 and zero return-code failures.
 
+The conversion support audit is tracked at
+`benchmarks/results/conversion_support_audit_2026-05-05.md`. It mechanically
+checks converter registrations, converter outtypes, and `llama-quantize` help
+output. The result confirms the current split: TL2 is exposed by the
+BitNet-specific converter but Qwen2/Qwen2MoE are not registered there; Qwen2 and
+Qwen2MoE are registered by the vendored llama.cpp converter, but that converter
+does not expose TL2 or I2_S as HF-conversion outtypes.
+
 Key audited values:
 
 | artifact | audited value |
@@ -159,7 +167,9 @@ Key audited values:
    BitNet-specific HF converter exposes `--outtype tl2`, but it only registers
    LLaMA/Mistral/Mixtral-style and BitNet model classes, not `Qwen2ForCausalLM`.
    Custom TL2 code generation now supports arbitrary shapes, but a Qwen-aware
-   TL2 GGUF writer/loader path still needs implementation and validation.
+   TL2 GGUF writer/loader path still needs implementation and validation. The
+   conversion support audit records this split in
+   `benchmarks/results/conversion_support_audit_2026-05-05.md`.
 4. The validated threaded `I2_S` writer fix exists as
    `patches/llama-i2s-threaded-quantization.patch`, but the llama.cpp submodule
    has not been advanced to a commit containing that fix.

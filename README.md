@@ -110,6 +110,8 @@ The GGUF RSS note is
 [benchmarks/results/gguf_memory_2026-05-05.md](benchmarks/results/gguf_memory_2026-05-05.md).
 The GGUF context-scaling RSS note is
 [benchmarks/results/gguf_context_scaling_2026-05-05.md](benchmarks/results/gguf_context_scaling_2026-05-05.md).
+The conversion support audit is
+[benchmarks/results/conversion_support_audit_2026-05-05.md](benchmarks/results/conversion_support_audit_2026-05-05.md).
 The benchmark harnesses are in [benchmarks/](benchmarks/).
 
 ### Current Perplexity Snapshot
@@ -189,6 +191,11 @@ retrofit pipeline with measured guarantees:
 The current MVP should target dense Qwen-style models first. MoE models such as
 Kimi, native TL2 export for Qwen, direct GGUF ingestion of ternary state dicts,
 and quality guarantees for arbitrary architectures remain research tasks.
+The current toolchain split is mechanical: the BitNet HF converter exposes
+`tl2` but does not register Qwen2/Qwen2MoE, while the vendored llama.cpp HF
+converter registers Qwen2/Qwen2MoE but exposes only
+`f32/f16/bf16/q8_0/tq1_0/tq2_0/auto`.
+`llama-quantize` exposes `I2_S`, but it requires an existing GGUF input.
 
 ### Qwen2.5-0.5B Row-Scale Ablation
 
