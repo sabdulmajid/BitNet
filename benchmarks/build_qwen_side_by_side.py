@@ -50,6 +50,10 @@ GGUF_SUMMARIES = [
     ("KL-only row dense lm_head I2_S row-scale prototype native suite", "benchmark_results/gguf-qwen15b-row-i2s-prototype-native-suite/summary.json"),
 ]
 
+GGUF_MEMORY_SUMMARIES = [
+    ("Qwen2.5-1.5B row-scale I2_S RSS probe", "benchmark_results/gguf-rss-qwen15b-row-i2s-fixed-2026-05-05/summary.json"),
+]
+
 
 def read_json(path: Path) -> dict[str, Any] | None:
     if not path.exists():
@@ -167,6 +171,25 @@ def build_gguf_table() -> str:
     return md_table(["suite", "CPU", "artifact", "kind", "file MiB", "prefill tok/s", "decode tok/s", "PPL"], rows)
 
 
+def build_gguf_memory_table() -> str:
+    rows: list[list[str]] = []
+    for suite_label, path in GGUF_MEMORY_SUMMARIES:
+        summary = read_json(Path(path))
+        if summary is None:
+            rows.append([suite_label, "-", "-", "-", "-", "-", "missing"])
+            continue
+        for row in summary.get("rows", []):
+            rows.append([
+                suite_label,
+                str(row.get("name", "")),
+                str(row.get("kind", "")),
+                fmt(row.get("file_mib"), 1),
+                fmt(row.get("max_rss_gib"), 3),
+                str(row.get("returncode", "")),
+            ])
+    return md_table(["suite", "artifact", "kind", "file MiB", "max RSS GiB", "return code"], rows)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-md", type=Path, required=True)
@@ -183,6 +206,8 @@ def main() -> None:
         build_lm_eval_detail_table(),
         "## Packed GGUF CPU",
         build_gguf_table(),
+        "## Packed GGUF RSS",
+        build_gguf_memory_table(),
     ])
     args.output_md.parent.mkdir(parents=True, exist_ok=True)
     args.output_md.write_text(report + "\n", encoding="utf-8")
