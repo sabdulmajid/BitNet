@@ -13,6 +13,7 @@ a native I2_S writer for `ternary_state_dict.pt`.
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import json
 import shutil
 from pathlib import Path
@@ -60,14 +61,25 @@ def copy_sidecars(source_dir: Path, output_dir: Path, dtype_name: str, *, untie_
         config_path.write_text(json.dumps(config, indent=2, sort_keys=False) + "\n", encoding="utf-8")
 
 
-def materialize(input_path: Path, output_dir: Path, dtype: torch.dtype) -> dict[str, int | str]:
-    state = torch.load(input_path, map_location="cpu")
+def validate_ternary_codes(key: str, tensor: torch.Tensor) -> None:
+    values = torch.unique(tensor.cpu())
+    allowed = torch.tensor([-1, 0, 1], dtype=values.dtype)
+    invalid = values[~torch.isin(values, allowed)]
+    if invalid.numel() > 0:
+        raise ValueError(f"{key} contains non-ternary codes: {invalid.tolist()}")
+
+
+def materialize(input_path: Path, output_dir: Path, dtype: torch.dtype, *, validate_codes: bool) -> dict[str, object]:
+    state = torch.load(input_path, map_location="cpu", weights_only=True)
     if not isinstance(state, dict):
         raise TypeError(f"expected a flat state dict in {input_path}")
 
     output: dict[str, torch.Tensor] = {}
     ternary_count = 0
     copied_count = 0
+    scale_rank_histogram: Counter[str] = Counter()
+    ternary_dtype_histogram: Counter[str] = Counter()
+    scale_shape_examples: list[dict[str, object]] = []
 
     for key, tensor in state.items():
         if key.endswith(".weight_scale"):
@@ -78,6 +90,12 @@ def materialize(input_path: Path, output_dir: Path, dtype: torch.dtype) -> dict[
             if scale_key not in state:
                 raise KeyError(f"missing scale tensor for {key}: {scale_key}")
             scale = state[scale_key].to(dtype=dtype)
+            if validate_codes:
+                validate_ternary_codes(key, tensor)
+            scale_rank_histogram[str(scale.ndim)] += 1
+            ternary_dtype_histogram[str(tensor.dtype).replace("torch.", "")] += 1
+            if len(scale_shape_examples) < 8:
+                scale_shape_examples.append({"key": scale_key, "shape": list(scale.shape)})
             output[f"{prefix}.weight"] = tensor.to(dtype=dtype).mul(scale)
             ternary_count += 1
         else:
@@ -96,6 +114,9 @@ def materialize(input_path: Path, output_dir: Path, dtype: torch.dtype) -> dict[
         "copied_tensors": copied_count,
         "output_tensors": len(output),
         "materialized_lm_head": int("lm_head.weight" in output),
+        "scale_rank_histogram": dict(sorted(scale_rank_histogram.items())),
+        "ternary_dtype_histogram": dict(sorted(ternary_dtype_histogram.items())),
+        "scale_shape_examples": scale_shape_examples,
     }
 
 
@@ -106,13 +127,14 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--dtype", default="float16", choices=["fp16", "float16", "bf16", "bfloat16", "fp32", "float32"])
     parser.add_argument("--expect-ternary-keys", type=int, default=None)
+    parser.add_argument("--validate-codes", action="store_true", help="Verify every ternary tensor contains only -1, 0, 1")
     args = parser.parse_args()
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     ternary_path = args.ternary_state or args.checkpoint_dir / "ternary_state_dict.pt"
     dtype = dtype_from_name(args.dtype)
 
-    manifest = materialize(ternary_path, args.output_dir, dtype)
+    manifest = materialize(ternary_path, args.output_dir, dtype, validate_codes=args.validate_codes)
     copy_sidecars(
         args.checkpoint_dir,
         args.output_dir,
