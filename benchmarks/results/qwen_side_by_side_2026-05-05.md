@@ -75,6 +75,7 @@ Generated from benchmark JSON artifacts. Missing rows are intentionally shown as
 | KL-only row dense lm_head I2_S row-scale prototype native suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_klonly_row_notie_static_ternary_f16 | static_ternary_materialized | 3395.5 | 104.72 | 5.49 | 38.8652 |
 | KL-only row dense lm_head I2_S row-scale prototype native suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_klonly_row_notie_static_ternary_tq2_0 | static_ternary_tq2 | 1218.6 | 161.67 | 18.14 | 38.8357 |
 | KL-only row dense lm_head I2_S row-scale prototype native suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale | static_ternary_i2s_row_scale_prototype | 1211.3 | 207.35 | 18.37 | 38.8853 |
+| KL-only row dense lm_head I2_S heap-fix confirmation | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale | static_ternary_i2s_row_scale_prototype_heap_tmp_fix | 1211.3 | 218.17 | 18.97 | 38.8832 |
 
 ## Packed GGUF RSS
 

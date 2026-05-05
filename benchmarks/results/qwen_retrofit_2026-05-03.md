@@ -535,7 +535,7 @@ patch is recorded at `patches/llama-i2s-row-scale.patch`.
 
 | source | GGUF type | CPU | PPL | prompt-eval tok/s | decode tok/s | smoke prompt |
 | --- | --- | --- | ---: | ---: | ---: | --- |
-| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | I2_S per-row-scale prototype | Xeon 4116 | 38.8832 +/- 1.97093 | 216.03 | 18.83 | sensible |
+| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | I2_S per-row-scale prototype, heap fix | Xeon 4116 | 38.8832 | 218.17 | 18.97 | sensible |
 
 The same patched build was also run as a six-model same-hardware suite on the
 Xeon Silver 4116:
@@ -548,6 +548,7 @@ Xeon Silver 4116:
 | Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | F16 materialized | Xeon 4116 | 3,395.5 | 38.8651 | 114.75 | 5.49 | sensible |
 | Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | TQ2_0 | Xeon 4116 | 1,218.6 | 38.8224 | 169.46 | 18.68 | sensible |
 | Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | I2_S per-row-scale prototype | Xeon 4116 | 1,211.3 | 38.8832 | 216.03 | 18.83 | sensible |
+| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | I2_S per-row-scale prototype, heap fix confirmation | Xeon 4116 | 1,211.3 | 38.8832 | 218.17 | 18.97 | sensible |
 
 A native `GGML_NATIVE=ON` build was then run on the same Xeon. Runtime
 `system_info` reported `AVX512 = 1`, but the row-scale `I2_S` prototype was
@@ -624,9 +625,11 @@ Interpretation:
   to `38.8832 +/- 1.97093`, matching row-scale `TQ2_0` within measurement
   noise, and the smoke prompt is coherent. On the same Xeon suite it gives
   `216.03` prompt tok/s and `18.83` decode tok/s, versus row-scale `TQ2_0` at
-  `169.46` and `18.68`. This is a promising engineering result, but it changes
-  the `I2_S` binary layout, so existing `I2_S` GGUF files must be regenerated
-  and the format needs a compatibility policy.
+  `169.46` and `18.68`. The post-heap-fix confirmation gives `218.17` prompt
+  tok/s and `18.97` decode tok/s with the same PPL. This is a promising
+  engineering result, but it changes the `I2_S` binary layout, so existing
+  `I2_S` GGUF files must be regenerated and the format needs a compatibility
+  policy.
 - Enabling AVX-512 through the native build does not currently improve the
   row-scale `I2_S` prototype on the Xeon 4116. The native run preserves quality
   at PPL `38.8853`, but prompt/decode throughput falls to `207.35`/`18.37`
@@ -743,8 +746,8 @@ locality on CPU.
     problem.
 18. A per-row-scale `I2_S` prototype fixes that row-scale quality failure on
     the Xeon 4116: fixed-excerpt PPL is `38.8832 +/- 1.97093`, prompt
-    throughput is `216.03` tok/s, decode throughput is `18.83` tok/s, and the
-    smoke prompt is coherent.
+    throughput is `218.17` tok/s after the heap-buffer fix, decode throughput
+    is `18.97` tok/s, and the smoke prompt is coherent.
 19. A native AVX-512-enabled build preserves the same row-scale `I2_S` quality
     but does not improve throughput on the Xeon 4116: fixed-excerpt PPL is
     38.8853, prompt throughput is 207.35 tok/s, and decode throughput is 18.37

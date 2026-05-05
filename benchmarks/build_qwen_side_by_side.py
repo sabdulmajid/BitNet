@@ -48,6 +48,7 @@ GGUF_SUMMARIES = [
     ("KL-only row dense lm_head static ternary suite", "benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json"),
     ("KL-only row dense lm_head I2_S row-scale prototype suite", "benchmark_results/gguf-qwen15b-row-i2s-prototype-suite/summary.json"),
     ("KL-only row dense lm_head I2_S row-scale prototype native suite", "benchmark_results/gguf-qwen15b-row-i2s-prototype-native-suite/summary.json"),
+    ("KL-only row dense lm_head I2_S heap-fix confirmation", "benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json"),
 ]
 
 GGUF_MEMORY_SUMMARIES = [

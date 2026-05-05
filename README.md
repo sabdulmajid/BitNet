@@ -55,9 +55,10 @@ conservative:
   default `I2_S` path does **not** preserve it: row-scale `I2_S` explodes to
   PPL `1.197e6` and produces a failed smoke completion. A local prototype patch
   that stores one scale per output row fixes this layout issue: row-scale
-  `I2_S` reaches PPL `38.8832 +/- 1.97093`, `216.03` prompt tok/s, and
-  `18.83` decode tok/s on the Xeon 4116 portable-AVX2 run. That patch is not
-  yet an upstreamed default. A native `GGML_NATIVE=ON` build reported
+  `I2_S` reaches PPL `38.8832`, `218.17` prompt tok/s, and
+  `18.97` decode tok/s on the Xeon 4116 portable-AVX2 heap-fix confirmation
+  run. That patch is not yet an upstreamed default. A native
+  `GGML_NATIVE=ON` build reported
   `AVX512 = 1` but was slightly slower for this row-scale `I2_S` prototype
   (`207.35` prompt tok/s, `18.37` decode tok/s), so there is no current
   AVX-512 speedup claim.
@@ -142,7 +143,7 @@ same CPU family shown in the table.
 | Intel Xeon Silver 4116 | KL-only static ternary I2_S, all-linear | 1,208.9 | 54.7366 | 205.76 | 18.60 |
 | Intel Xeon Silver 4116 | KL-only row-scale static ternary F16, dense tied `lm_head` | 3,395.5 | 38.8651 | 114.75 | 5.49 |
 | Intel Xeon Silver 4116 | KL-only row-scale static ternary TQ2_0, dense tied `lm_head` | 1,218.6 | 38.8224 | 169.46 | 18.68 |
-| Intel Xeon Silver 4116 | KL-only row-scale static ternary I2_S prototype, dense tied `lm_head` | 1,211.3 | 38.8832 | 216.03 | 18.83 |
+| Intel Xeon Silver 4116 | KL-only row-scale static ternary I2_S prototype, dense tied `lm_head` | 1,211.3 | 38.8832 | 218.17 | 18.97 |
 | AMD Ryzen Threadripper PRO 5945WX | KL-only static ternary I2_S, dense tied `lm_head` | 1,208.9 | 47.3435 | 464.19 | 45.50 |
 | AMD Ryzen Threadripper PRO 5945WX | KL-only row-scale static ternary TQ2_0, dense tied `lm_head` | 1,218.6 | 38.8224 | 345.32 | 44.85 |
 | AMD Ryzen Threadripper PRO 5945WX | KL-only row-scale static ternary I2_S, dense tied `lm_head` | 1,208.9 | 1.197e6 | 465.34 | 46.13 |
@@ -416,8 +417,9 @@ artifacts. Tensor-scale `I2_S` also preserves static-ternary quality, but the
 current row-scale-to-`I2_S` bridge fails; row-scale deployment needs a
 row-scale-aware packed ternary writer and kernel rather than the current
 I2_S path. The included `patches/llama-i2s-row-scale.patch` proves the local
-format fix by recovering row-scale `I2_S` PPL `38.8832` with `216.03` prompt
-tok/s and `18.83` decode tok/s on the Xeon portable-AVX2 suite. The included
+format fix by recovering row-scale `I2_S` PPL `38.8832` with `218.17` prompt
+tok/s and `18.97` decode tok/s on the Xeon portable-AVX2 heap-fix
+confirmation. The included
 native AVX-512-enabled run preserves quality but is slightly slower for this
 kernel (`207.35` prompt tok/s / `18.37` decode tok/s), so CPU-feature-based
 speed claims still need kernel-specific measurement. Thread scaling shows

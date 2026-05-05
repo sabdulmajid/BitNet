@@ -86,6 +86,11 @@ uses heap temporary buffers in the I2_S prompt GEMM/GEMV path; after that fix,
 `benchmark_results/evidence_audit/qwen15b_row_i2s_thread_scaling.md`, which
 passes all seven expected thread rows with no failed return codes.
 
+The post-heap-fix row-scale `I2_S` quality confirmation is under
+`benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json`. Its
+mechanical audit is `benchmark_results/evidence_audit/qwen15b_row_i2s_heapfix.md`,
+which passes with one row, PPL `38.8832`, and no failed return codes.
+
 The packed GGUF RSS probe is tracked at
 `benchmarks/results/gguf_memory_2026-05-05.md`. Its mechanical audit is
 `benchmark_results/evidence_audit/qwen15b_row_i2s_rss.md`, which passes all six
@@ -115,8 +120,8 @@ Key audited values:
 | Qwen2.5-1.5B KL-only row-scale dense-head static-ternary TQ2_0 decode tok/s on AMD 5945WX | 44.85 |
 | Qwen2.5-1.5B KL-only row-scale dense-head static-ternary I2_S PPL on AMD 5945WX | 1.197e6 |
 | Qwen2.5-1.5B row-scale dense-head I2_S prototype PPL on Xeon 4116 | 38.8832 |
-| Qwen2.5-1.5B row-scale dense-head I2_S prototype prompt tok/s on Xeon 4116 | 216.03 |
-| Qwen2.5-1.5B row-scale dense-head I2_S prototype decode tok/s on Xeon 4116 | 18.83 |
+| Qwen2.5-1.5B row-scale dense-head I2_S prototype prompt tok/s on Xeon 4116 | 218.17 |
+| Qwen2.5-1.5B row-scale dense-head I2_S prototype decode tok/s on Xeon 4116 | 18.97 |
 | Qwen2.5-1.5B row-scale dense-head I2_S prototype GGUF file size | 1,211.3 MiB |
 | Qwen2.5-1.5B row-scale dense-head native AVX-512 I2_S prototype PPL on Xeon 4116 | 38.8853 |
 | Qwen2.5-1.5B row-scale dense-head native AVX-512 I2_S prototype prompt tok/s on Xeon 4116 | 207.35 |

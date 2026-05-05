@@ -27,9 +27,10 @@ Artifact:
 | metric | value |
 | --- | ---: |
 | fixed WikiText excerpt PPL | `38.8832 +/- 1.97093` |
-| PPL prompt-eval throughput | `151.89 tok/s` |
-| prompt throughput, `llama-bench -p 512` | `216.03 tok/s` |
-| decode throughput, `llama-bench -n 128` | `18.83 tok/s` |
+| post-fix fixed WikiText excerpt PPL | `38.8832` |
+| post-fix PPL prompt-eval throughput | `153.52 tok/s` |
+| post-fix prompt throughput, `llama-bench -p 512` | `218.17 tok/s` |
+| post-fix decode throughput, `llama-bench -n 128` | `18.97 tok/s` |
 | GGUF file size | `1,211.3 MiB` |
 | llama-bench model payload size | `1,264,210,048 bytes` |
 
@@ -54,6 +55,13 @@ Native `GGML_NATIVE=ON` AVX-512 check on the same Xeon:
 The native run reported `AVX512 = 1` in `system_info` and passed the strict
 `I2_S`/reference PPL-ratio audit at `1.00128` under a `1.01` max-ratio
 threshold. It did not improve throughput for this prototype on Skylake-SP.
+
+After the heap-buffer fix, the same portable AVX2 row-scale `I2_S` artifact was
+rerun as a single-artifact confirmation:
+
+| artifact | fixed PPL | prompt tok/s | decode tok/s | PPL tok/s |
+| --- | ---: | ---: | ---: | ---: |
+| row-scale static ternary I2_S prototype, heap fix | 38.8832 | 218.17 | 18.97 | 153.52 |
 
 Thread scaling with the portable AVX2 build:
 
