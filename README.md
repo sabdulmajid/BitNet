@@ -101,6 +101,8 @@ The artifact-generated side-by-side Qwen summary is
 [benchmarks/results/qwen_side_by_side_2026-05-05.md](benchmarks/results/qwen_side_by_side_2026-05-05.md).
 The row-scale `I2_S` prototype note is
 [benchmarks/results/i2s_row_scale_prototype_2026-05-05.md](benchmarks/results/i2s_row_scale_prototype_2026-05-05.md).
+The row-scale `I2_S` thread-scaling note is
+[benchmarks/results/i2s_thread_scaling_2026-05-05.md](benchmarks/results/i2s_thread_scaling_2026-05-05.md).
 The benchmark harnesses are in [benchmarks/](benchmarks/).
 
 ### Current Perplexity Snapshot
@@ -149,6 +151,11 @@ changes the packed tensor layout to store one scale per output row.
 The same patched row-scale `I2_S` artifact also passed a native AVX-512-enabled
 Xeon run at PPL `38.8853`, `207.35` prompt tok/s, and `18.37` decode tok/s;
 quality is preserved, but throughput did not beat the portable AVX2 build.
+Thread scaling on the portable AVX2 row-scale `I2_S` artifact shows prefill
+scaling from `83.17` tok/s at 4 threads to `247.75` tok/s at 24 threads, while
+decode stays near `18-20` tok/s. `llama-bench` currently segfaults at 1 and 2
+threads for this patched row-scale `I2_S` artifact, although `llama-cli -t 1`
+works and a Q4_K_M `llama-bench -t 1` control works.
 
 ### Practical Product Direction
 
@@ -408,7 +415,10 @@ format fix by recovering row-scale `I2_S` PPL `38.8832` with `216.03` prompt
 tok/s and `18.83` decode tok/s on the Xeon portable-AVX2 suite. The included
 native AVX-512-enabled run preserves quality but is slightly slower for this
 kernel (`207.35` prompt tok/s / `18.37` decode tok/s), so CPU-feature-based
-speed claims still need kernel-specific measurement. The included
+speed claims still need kernel-specific measurement. Thread scaling shows
+prompt ingestion scaling to `247.75` tok/s at 24 threads, but decode stays near
+`18-20` tok/s and the patched `llama-bench` path currently crashes at 1 and 2
+threads. The included
 `patches/llama-i2s-threaded-quantization.patch` fixes
 the tensor-scale threaded I2_S packing path locally: a 12-thread quantized
 artifact matches the single-thread PPL (`54.7366`) and reaches `208.10` prompt

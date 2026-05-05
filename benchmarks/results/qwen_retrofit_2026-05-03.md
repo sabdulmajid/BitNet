@@ -558,6 +558,18 @@ slightly slower than the portable AVX2 build:
 | Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary I2_S prototype | portable AVX2 | Xeon 4116 | 38.8832 | 216.03 | 18.83 | 151.89 |
 | Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary I2_S prototype | native AVX-512 enabled | Xeon 4116 | 38.8853 | 207.35 | 18.37 | 139.71 |
 
+Portable AVX2 thread scaling for the same row-scale `I2_S` artifact:
+
+| threads | status | prompt-eval tok/s | decode tok/s |
+| ---: | --- | ---: | ---: |
+| 1 | `llama-bench` segfault | - | - |
+| 2 | `llama-bench` segfault | - | - |
+| 4 | pass | 83.17 | 19.63 |
+| 8 | pass | 154.42 | 19.35 |
+| 12 | pass | 211.63 | 18.82 |
+| 16 | pass | 197.88 | 19.32 |
+| 24 | pass | 247.75 | 17.81 |
+
 Interpretation:
 
 - Standard Q8_0 and Q4_K_M preserve the FP perplexity on this packed GGUF
@@ -608,6 +620,12 @@ Interpretation:
   at PPL `38.8853`, but prompt/decode throughput falls to `207.35`/`18.37`
   tok/s. The likely product implication is that I2_S needs kernel-specific
   AVX-512 work; hardware feature flags alone are not a speed proof.
+- Thread scaling confirms that prefill benefits from more CPU threads, while
+  autoregressive decode does not. The portable AVX2 row-scale `I2_S` prototype
+  reaches `247.75` prompt tok/s at 24 threads, but decode remains in the
+  `17.81-19.63` tok/s range across passing rows. `llama-bench` also segfaults
+  at 1 and 2 threads for this patched artifact, while `llama-cli -t 1` works;
+  that is a prototype stability gap.
 
 ## MoE Status
 
@@ -714,7 +732,11 @@ locality on CPU.
     but does not improve throughput on the Xeon 4116: fixed-excerpt PPL is
     38.8853, prompt throughput is 207.35 tok/s, and decode throughput is 18.37
     tok/s.
-20. The original tensor-scale multi-thread I2_S writer corruption is fixable.
+20. Row-scale `I2_S` prefill scales with CPU threads, but decode does not:
+    portable AVX2 prompt throughput rises from 83.17 tok/s at 4 threads to
+    247.75 tok/s at 24 threads, while decode stays near 18-20 tok/s across
+    passing rows.
+21. The original tensor-scale multi-thread I2_S writer corruption is fixable.
     A local llama.cpp patch that packs I2_S chunks at compressed offsets and
     writes one tensor-level scale preserves fixed-excerpt PPL 54.7366 with 12
     quantization threads.
@@ -744,6 +766,8 @@ locality on CPU.
 10. It does not prove AVX-512 acceleration for the current `I2_S` kernel; the
     native AVX-512-enabled run was slightly slower than the portable AVX2 run
     on this Xeon.
+11. It does not prove row-scale `I2_S` production stability; `llama-bench`
+    currently segfaults at 1 and 2 threads for the patched artifact.
 
 ## Next Gates
 
@@ -751,7 +775,8 @@ The next benchmark gates are:
 
 1. Promote `patches/llama-i2s-row-scale.patch` into a stable row-scale-aware
    packed ternary format or new GGUF quantization type, then regenerate row
-   artifacts and rerun the full GGUF suite.
+   artifacts and rerun the full GGUF suite, including low-thread
+   `llama-bench` stability checks.
 2. Advance or fork the llama.cpp submodule to include the validated
    tensor-scale multi-thread I2_S writer patch, then keep
    `quantize_gguf_safe.py` from forcing `nthreads=1`.

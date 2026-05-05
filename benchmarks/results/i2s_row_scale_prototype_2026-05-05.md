@@ -55,6 +55,21 @@ The native run reported `AVX512 = 1` in `system_info` and passed the strict
 `I2_S`/reference PPL-ratio audit at `1.00128` under a `1.01` max-ratio
 threshold. It did not improve throughput for this prototype on Skylake-SP.
 
+Thread scaling with the portable AVX2 build:
+
+| threads | status | prompt tok/s | decode tok/s |
+| ---: | --- | ---: | ---: |
+| 1 | `llama-bench` segfault | - | - |
+| 2 | `llama-bench` segfault | - | - |
+| 4 | pass | 83.17 | 19.63 |
+| 8 | pass | 154.42 | 19.35 |
+| 12 | pass | 211.63 | 18.82 |
+| 16 | pass | 197.88 | 19.32 |
+| 24 | pass | 247.75 | 17.81 |
+
+The thread-scaling detail is tracked separately in
+`benchmarks/results/i2s_thread_scaling_2026-05-05.md`.
+
 Smoke prompt `The capital of France is` completed coherently:
 
 ```text
@@ -73,3 +88,4 @@ This patch changes the binary layout of `I2_S` tensors. Existing tensor-scale
 `I2_S` GGUF files should be regenerated with the patched writer before use.
 The current kernel should not be marketed as AVX-512 accelerated until an
 AVX-512-specific speedup is measured.
+The low-thread `llama-bench` segfaults are also a prototype stability gap.
