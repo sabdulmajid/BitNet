@@ -262,11 +262,21 @@ python benchmarks/quantize_gguf_safe.py \
   --threads 12
 ```
 
-The multi-thread I2_S writer path produced a corrupted artifact for this layout,
-so `quantize_gguf_safe.py` forces I2_S to one writer thread unless
-`--allow-unsafe-i2s-multithread` is passed. This is a mitigation, not the final
-production fix; the production gate remains a writer/chunking fix plus a rerun
-without forcing `nthreads=1`.
+The original multi-thread I2_S writer path produced a corrupted artifact for
+this layout, so `quantize_gguf_safe.py` still forces I2_S to one writer thread
+unless `--allow-unsafe-i2s-multithread` is passed. A validated submodule patch
+is included at `patches/llama-i2s-threaded-quantization.patch`; apply it with:
+
+```bash
+git -C 3rdparty/llama.cpp apply ../../patches/llama-i2s-threaded-quantization.patch
+cmake --build build --target llama-quantize -j 4
+```
+
+After applying that patch locally, 12-thread I2_S quantization of the
+Qwen2.5-1.5B KL-only static-ternary GGUF matched the single-thread PPL
+(`54.7366`) and produced a sensible smoke completion. Keep the safe wrapper's
+single-thread default until the llama.cpp submodule itself is advanced to a
+commit containing the fix.
 
 ## Publishability Gate
 

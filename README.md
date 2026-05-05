@@ -65,9 +65,10 @@ conservative:
   than F16 but destroys quality. Materializing the trained
   `ternary_state_dict.pt` and packing it as llama.cpp `TQ2_0` or single-thread
   `I2_S` preserves the QAT perplexity while giving CPU-native ternary
-  artifacts. The multi-thread I2_S writer path is currently unsafe for this
-  artifact and needs a correctness fix before it can be treated as production
-  tooling.
+  artifacts. The original multi-thread I2_S writer path was unsafe for this
+  artifact; this fork now includes a validated llama.cpp patch file that fixes
+  the threaded packing/scaling bug, while the safe wrapper remains
+  single-threaded until the submodule is advanced.
 - **MoE remains unproven in this fork.** The vendored llama.cpp backend contains
   generic expert routing and merged expert-tensor support, and the BitNet HF
   converter has partial Qwen-style expert packing. This repo has not yet shown a
@@ -280,6 +281,7 @@ created by converting dense HF checkpoints to F16 GGUF and then running
 | Qwen2.5-1.5B KL-only static ternary | F16 materialized | 3,396 MiB | 105.34 | 5.50 | sensible |
 | Qwen2.5-1.5B KL-only static ternary | TQ2_0 | 1,219 MiB | 160.93 | 18.43 | sensible |
 | Qwen2.5-1.5B KL-only static ternary | I2_S single-thread quant | 1,209 MiB | 205.76 | 18.60 | sensible |
+| Qwen2.5-1.5B KL-only static ternary | I2_S patched 12-thread quant | 1,209 MiB | 208.10 | 18.63 | sensible |
 
 Interpretation: the CPU backend can execute packed I2_S quickly on this 2017
 Xeon. The blocking problem is quality, not kernel availability. Blind I2_S
@@ -311,6 +313,7 @@ divisibility constraints; Qwen2.5-1.5B did not report that fallback warning.
 | Qwen2.5-1.5B KL-only static ternary | F16 materialized | 55.0971 | 82.65 |
 | Qwen2.5-1.5B KL-only static ternary | TQ2_0 | 55.1562 | 116.16 |
 | Qwen2.5-1.5B KL-only static ternary | I2_S single-thread quant | 54.7366 | 140.95 |
+| Qwen2.5-1.5B KL-only static ternary | I2_S patched 12-thread quant | 54.7366 | 141.14 |
 
 This is the cleanest packed-runtime evidence so far: conventional Q8_0 and
 Q4_K_M retain the FP language-modeling likelihood, while blind ternarization
@@ -318,10 +321,12 @@ destroys it, including generic `TQ2_0` when applied blindly to the original
 dense model. Materializing `ternary_state_dict.pt` as dense F16
 recovers the PyTorch static-ternary quality, and llama.cpp `TQ2_0` preserves
 that quality while giving a 2.06 bpw ternary GGUF artifact. Single-thread
-`I2_S` quantization also preserves the static-ternary quality and gives the
-fastest prompt throughput in this table. The multi-thread I2_S quantizer can
-write a corrupted artifact for this layout, so the writer must be fixed or run
-single-threaded before claiming robust BitNet I2_S deployment tooling.
+`I2_S` quantization also preserves the static-ternary quality. The included
+`patches/llama-i2s-threaded-quantization.patch` fixes the threaded I2_S packing
+path locally: a 12-thread quantized artifact matches the single-thread PPL
+(`54.7366`) and reaches `208.10` prompt tok/s / `18.63` decode tok/s. The safe
+wrapper remains conservative until the submodule is advanced to a commit with
+that fix.
 
 ### Xeon PyTorch Runtime Probe
 

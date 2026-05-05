@@ -1,0 +1,81 @@
+diff --git a/src/llama.cpp b/src/llama.cpp
+index 666fcc4d..5d2d1afe 100644
+--- a/src/llama.cpp
++++ b/src/llama.cpp
+@@ -18656,6 +18656,76 @@ static size_t llama_tensor_quantize_internal(enum ggml_type new_type, const floa
+         return new_size;
+     }
+ 
++    if (new_type == GGML_TYPE_I2_S) {
++        GGML_ASSERT(n_per_row % 4 == 0);
++
++        const size_t row_size = ggml_row_size(new_type, n_per_row);
++        const size_t packed_size = (size_t) nrows * row_size / 4;
++        const size_t new_size = packed_size + 32;
++
++        double max_abs = 0.0;
++        for (int64_t i = 0; i < nrows * n_per_row; ++i) {
++            max_abs = std::max(max_abs, (double) std::fabs(f32_data[i]));
++        }
++
++        std::memset(new_data, 0, new_size);
++
++        std::mutex mutex;
++        int64_t counter = 0;
++        bool valid = true;
++
++        auto compute = [&mutex, &counter, &valid, f32_data, new_data, chunk_size, nrows, n_per_row, row_size, imatrix]() {
++            const int64_t nrows_per_chunk = std::max<int64_t>(1, chunk_size / n_per_row);
++            const size_t local_size = (size_t) nrows_per_chunk * row_size / 4 + 32;
++            std::vector<uint8_t> local(local_size);
++
++            while (true) {
++                std::unique_lock<std::mutex> lock(mutex);
++                int64_t first_row = counter;
++                counter += nrows_per_chunk;
++                if (first_row >= nrows) {
++                    break;
++                }
++                lock.unlock();
++
++                const int64_t this_nrow = std::min(nrows - first_row, nrows_per_chunk);
++                const size_t this_packed = (size_t) this_nrow * row_size / 4;
++
++                const float * chunk_imatrix = imatrix ? imatrix : nullptr;
++                const size_t this_size = ggml_quantize_chunk(
++                        GGML_TYPE_I2_S,
++                        f32_data + first_row * n_per_row,
++                        local.data(),
++                        0,
++                        this_nrow,
++                        n_per_row,
++                        chunk_imatrix);
++
++                if (this_size < this_packed) {
++                    std::unique_lock<std::mutex> lock_valid(mutex);
++                    valid = false;
++                    break;
++                }
++
++                std::memcpy((char *) new_data + (size_t) first_row * row_size / 4, local.data(), this_packed);
++            }
++        };
++
++        for (int it = 0; it < nthread - 1; ++it) {
++            workers.emplace_back(compute);
++        }
++        compute();
++        for (auto & w : workers) { w.join(); }
++        workers.clear();
++        if (!valid) {
++            throw std::runtime_error("I2_S quantized data validation failed");
++        }
++
++        float * scale = (float *) ((char *) new_data + packed_size);
++        scale[0] = (float) max_abs;
++        return new_size;
++    }
++
+     std::mutex mutex;
+     int64_t counter = 0;
+     size_t new_size = 0;

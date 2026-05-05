@@ -18,7 +18,10 @@ def main() -> None:
     parser.add_argument(
         "--allow-unsafe-i2s-multithread",
         action="store_true",
-        help="Do not force I2_S to one writer thread. Use only for debugging the writer bug.",
+        help=(
+            "Do not force I2_S to one writer thread. Use only after applying and "
+            "validating patches/llama-i2s-threaded-quantization.patch, or for debugging."
+        ),
     )
     args = parser.parse_args()
 

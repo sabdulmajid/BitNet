@@ -411,6 +411,7 @@ bit-exact loader for `ternary_state_dict.pt`.
 | Qwen2.5-1.5B KL-only static ternary | F16 materialized | 3,396 MiB | 105.34 | 5.50 | sensible completion |
 | Qwen2.5-1.5B KL-only static ternary | TQ2_0 | 1,219 MiB | 160.93 | 18.43 | sensible completion |
 | Qwen2.5-1.5B KL-only static ternary | I2_S single-thread quant | 1,209 MiB | 205.76 | 18.60 | sensible completion |
+| Qwen2.5-1.5B KL-only static ternary | I2_S patched 12-thread quant | 1,209 MiB | 208.10 | 18.63 | sensible completion |
 
 Smoke prompt: `The capital of France is`, greedy decoding, 24 generated tokens.
 The FP/Q8_0/Q4_K_M controls complete with `Paris` and related capital-city
@@ -437,11 +438,17 @@ Important caveats:
 - Materializing `ternary_state_dict.pt` back into dense F16 recovers the
   expected static-ternary behavior. Quantizing that materialized artifact to
   generic `TQ2_0` preserves quality. I2_S also preserves quality when the GGUF
-  is written with a single quantization thread; the earlier multi-thread I2_S
-  artifact was corrupted.
+  is written with a single quantization thread. The earlier multi-thread I2_S
+  artifact was corrupted because the generic chunked writer did not respect the
+  I2_S packed-byte layout or its tensor-level scale.
 - Repeating the same static-ternary bridge for the stronger KL-only QAT
   checkpoint improves fixed-excerpt I2_S PPL from `84.5277` to `54.7366` while
   keeping decode throughput at `18.60` tok/s on the Xeon.
+- Applying `patches/llama-i2s-threaded-quantization.patch` to the llama.cpp
+  submodule fixes the threaded I2_S writer locally. A 12-thread quantized
+  KL-only static-ternary artifact preserves PPL `54.7366`, reaches `208.10`
+  prompt tok/s and `18.63` decode tok/s, and produces a sensible smoke
+  completion.
 
 ## Packed GGUF Perplexity Probe
 
@@ -464,6 +471,7 @@ Important caveats:
 | Qwen2.5-1.5B KL-only static ternary | F16 materialized | 55.0971 | 3.00700 | 82.65 |
 | Qwen2.5-1.5B KL-only static ternary | TQ2_0 | 55.1562 | 3.00939 | 116.16 |
 | Qwen2.5-1.5B KL-only static ternary | I2_S single-thread quant | 54.7366 | 2.98318 | 140.95 |
+| Qwen2.5-1.5B KL-only static ternary | I2_S patched 12-thread quant | 54.7366 | 2.98318 | 141.14 |
 
 Interpretation:
 
@@ -484,13 +492,14 @@ Interpretation:
   2.06 bpw ternary file and about 18.38 decode tok/s on the Xeon. The same
   `TQ2_0` format does not rescue a dense model without QAT/distillation.
 - Single-thread llama.cpp `I2_S` quantization also preserves that
-  static-ternary PPL while giving the fastest prompt throughput in this GGUF
-  slice. The earlier multi-thread I2_S artifact produced NaN PPL, which points
-  to a writer/chunking bug rather than a fundamental runtime math failure.
+  static-ternary PPL. The included threaded-writer patch preserves the same PPL
+  with 12 quantization threads, which confirms the earlier NaN PPL was a
+  writer/chunking bug rather than a fundamental runtime math failure.
 - The KL-only static-ternary bridge is the current best CPU-side result:
-  `I2_S` gives `54.7366` PPL on the fixed excerpt, `140.95` prompt-eval tok/s,
-  and `18.60` decode tok/s. It is much better than the hidden-MSE static
-  ternary bridge, but still far worse than FP/Q8/Q4 likelihood.
+  patched 12-thread `I2_S` gives `54.7366` PPL on the fixed excerpt, `141.14`
+  prompt-eval tok/s, and `18.63` decode tok/s. It is much better than the
+  hidden-MSE static ternary bridge, but still far worse than FP/Q8/Q4
+  likelihood.
 
 ## MoE Status
 
@@ -576,6 +585,10 @@ locality on CPU.
    QAT/distillation. The strongest CPU-side checkpoint so far is the KL-only
    static ternary `I2_S` artifact: fixed-excerpt PPL 54.7366, prompt-eval
    140.95 tok/s, and decode 18.60 tok/s on the Xeon.
+16. The original multi-thread I2_S writer corruption is fixable. A local
+    llama.cpp patch that packs I2_S chunks at compressed offsets and writes one
+    tensor-level scale preserves fixed-excerpt PPL 54.7366 with 12 quantization
+    threads.
 
 ## What This Does Not Prove Yet
 
@@ -583,8 +596,9 @@ locality on CPU.
 2. It does not replace a broader full `lm-eval` leaderboard suite; ten selected
    tasks have been run uncapped so far.
 3. It does not prove bit-exact GGUF ingestion of `ternary_state_dict.pt`.
-4. It does not prove multi-threaded I2_S writer correctness; the safe artifact
-   above was produced with `llama-quantize ... I2_S 1`.
+4. It does not prove that the multi-threaded I2_S writer fix is upstreamed in
+   the llama.cpp submodule yet; the fix is included as
+   `patches/llama-i2s-threaded-quantization.patch` and validated locally.
 5. It does not prove the materialized dense-F16 bridge is storage-optimal; it
    is a validation bridge until a native ternary-state GGUF writer exists.
 6. It does not prove the approach works for MoE models. The backend has generic
@@ -601,8 +615,9 @@ locality on CPU.
 
 The next benchmark gates are:
 
-1. Fix the multi-thread I2_S quantization writer/chunking path, then rerun the
-   corrected suite without forcing `nthreads=1`.
+1. Advance or fork the llama.cpp submodule to include the validated
+   multi-thread I2_S writer patch, then keep `quantize_gguf_safe.py` from
+   forcing `nthreads=1`.
 2. Build a native GGUF writer for `ternary_state_dict.pt` so I2_S can ingest
    trained ternary codes and scales directly.
 3. Keep `TQ2_0` and single-thread `I2_S` as the current working packed ternary
