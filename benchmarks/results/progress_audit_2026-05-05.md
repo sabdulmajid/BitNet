@@ -125,6 +125,11 @@ and optional evidence audit commands. This improves reproducibility but remains
 a dense-materialization bridge, not direct GGUF ingestion of
 `ternary_state_dict.pt`.
 
+The publishable-claims ledger is tracked at
+`benchmarks/results/publishable_claims_2026-05-05.md`. It separates supported
+claims from unsupported or not-yet claims and should be the first artifact used
+when deciding what can be stated publicly.
+
 Key audited values:
 
 | artifact | audited value |
