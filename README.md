@@ -255,10 +255,11 @@ check, not a replacement for the uncapped `lm-eval` table above.
 
 CPU runtime: Intel Xeon Silver 4116, 12 threads, `llama-bench -p 512 -n 128
 -ngl 0 -r 3`, no BLAS, AVX-512 available, llama.cpp submodule commit
-`1f86f058`. The I2_S path is a real packed GGUF CPU measurement. It is not yet
-an exact import of `ternary_state_dict.pt`; the tested GGUF artifacts were
-created by converting dense HF checkpoints to F16 GGUF and then running
-`llama-quantize`.
+`1f86f058`. The I2_S path is a real packed GGUF CPU measurement. Dense-control
+rows were created by converting HF checkpoints to F16 GGUF and then running
+`llama-quantize`; static-ternary rows were created by materializing
+`ternary_state_dict.pt` back into an HF-shaped checkpoint before GGUF
+conversion and packing.
 
 | source | GGUF type | file size | prefill tok/s | decode tok/s | smoke prompt result |
 | --- | --- | ---: | ---: | ---: | --- |

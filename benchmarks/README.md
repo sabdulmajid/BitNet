@@ -92,6 +92,11 @@ For `slurm_benchmark_mc.sh`, prefer `MC_LIMIT=200` over the legacy `LIMIT=200`
 environment variable. `LIMIT` is still accepted for older commands, but it is
 generic enough to be accidentally inherited by Slurm submissions.
 
+When submitting Slurm jobs with comma-valued variables such as `TASKS`, set the
+variable in the `sbatch` process environment and use `--export=ALL`. Do not put
+`TASKS=a,b,c` inside Slurm's comma-separated `--export=ALL,...` argument unless
+your Slurm version has been explicitly tested with escaped commas.
+
 ### Tier 2: Fixed Generation Suite
 
 ```bash

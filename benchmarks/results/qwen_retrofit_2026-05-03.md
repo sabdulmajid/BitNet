@@ -6,7 +6,7 @@ these are quality and loader results, not final CPU product benchmarks.
 
 ## Setup
 
-- Latest pushed tooling commit before this report update: `2d6a712`
+- Latest pushed tooling commit before this report update: `272e24e`
 - Packed runtime binary: llama.cpp submodule commit `1f86f058`
 - Dataset for QAT/distillation: `HuggingFaceFW/fineweb-edu`, `sample-10BT`
 - QAT student forward math: ternary weights plus dynamic 8-bit activation quantization
