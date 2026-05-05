@@ -695,16 +695,27 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='gen impl')
     parser.add_argument('--model',default="input", type=str, dest="model", 
-                        help="choose from bitnet_b1_58-large/bitnet_b1_58-3B/Llama3-8B-1.58-100B-tokens.")
+                        help="choose from bitnet_b1_58-large/bitnet_b1_58-3B/Llama3-8B-1.58-100B-tokens, or pass --shape for a custom model.")
+    parser.add_argument('--shape', action='append', default=[],
+                        help="custom output,input shape as M,K; repeat once per unique Linear shape.")
     parser.add_argument('--BM',default="input", type=str,
                         help="block length when cutting one weight (M, K) into M / BM weights (BM, K).")
     parser.add_argument('--BK',default="input", type=str,
                         help="block length when cutting one weight (M, K) into K / BK weights (M, BK).")
     parser.add_argument('--bm',default="input", type=str,
                         help="using simd instructions to compute (bm, 192 / bm) in one block")
+    parser.add_argument('--output-dir', default=None,
+                        help="directory for bitnet-lut-kernels.h and kernel_config.ini; defaults to repo include/")
     args = parser.parse_args()
 
-    kernel_shapes = ModelShapeDict[args.model]
+    if args.shape:
+        kernel_shapes = []
+        for item in args.shape:
+            parts = [int(part.strip()) for part in item.split(',')]
+            assert len(parts) == 2, "--shape entries must be M,K"
+            kernel_shapes.append(parts)
+    else:
+        kernel_shapes = ModelShapeDict[args.model]
 
     BM_list = [int(item) for item in args.BM.split(',')]
     BK_list = [int(item) for item in args.BK.split(',')]
@@ -732,7 +743,8 @@ if __name__ == "__main__":
     api_code = gen_top_api(kernel_shapes, k_list)
     trans_code = gen_transform_code(kernel_shapes)
 
-    output_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "include")
+    output_dir = args.output_dir or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "include")
+    os.makedirs(output_dir, exist_ok=True)
 
     with open(''.join([output_dir, "/bitnet-lut-kernels.h"]), 'w') as f:
         f.write(''.join("#if defined(GGML_BITNET_X86_TL2)"))
