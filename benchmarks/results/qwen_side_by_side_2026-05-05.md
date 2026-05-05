@@ -11,7 +11,7 @@ Generated from benchmark JSON artifacts. Missing rows are intentionally shown as
 | QAT hidden-MSE | 86.414 | 40.398 | 32704 | 32736 | present |
 | QAT KL-only | 50.595 | 26.599 | 32704 | 32736 | present |
 | QAT KL-only dense lm_head | 43.372 | 22.759 | 32704 | 32736 | present |
-| QAT KL-only row dense lm_head | - | - | - | - | missing |
+| QAT KL-only row dense lm_head | 38.580 | 21.333 | 32704 | 32736 | present |
 
 ## Full Ten-Task lm-eval
 
@@ -22,22 +22,22 @@ Generated from benchmark JSON artifacts. Missing rows are intentionally shown as
 | QAT hidden-MSE | 0.464809 | 10 | 22382 | present |
 | QAT KL-only | 0.483438 | 10 | 22382 | present |
 | QAT KL-only dense lm_head | 0.484378 | 10 | 22382 | present |
-| QAT KL-only row dense lm_head | - | 0 | 0 | missing |
+| QAT KL-only row dense lm_head | 0.499459 | 10 | 22382 | present |
 
 ## Full Ten-Task Detail
 
 | task | metric | FP | naive PTQ | QAT hidden-MSE | QAT KL-only | QAT KL-only dense lm_head | QAT KL-only row dense lm_head |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| arc_challenge | acc_norm | 0.450 | 0.262 | 0.264 | 0.271 | 0.264 | - |
-| arc_easy | acc_norm | 0.720 | 0.244 | 0.478 | 0.483 | 0.501 | - |
-| hellaswag | acc_norm | 0.678 | 0.264 | 0.362 | 0.378 | 0.391 | - |
-| piqa | acc_norm | 0.758 | 0.508 | 0.622 | 0.637 | 0.647 | - |
-| winogrande | acc | 0.638 | 0.498 | 0.523 | 0.521 | 0.523 | - |
-| boolq | acc | 0.726 | 0.506 | 0.593 | 0.596 | 0.597 | - |
-| copa | acc | 0.830 | 0.510 | 0.640 | 0.700 | 0.680 | - |
-| openbookqa | acc_norm | 0.404 | 0.276 | 0.312 | 0.312 | 0.308 | - |
-| sciq | acc_norm | 0.934 | 0.199 | 0.613 | 0.695 | 0.700 | - |
-| truthfulqa_mc1 | acc | 0.305 | 0.220 | 0.241 | 0.241 | 0.233 | - |
+| arc_challenge | acc_norm | 0.450 | 0.262 | 0.264 | 0.271 | 0.264 | 0.272 |
+| arc_easy | acc_norm | 0.720 | 0.244 | 0.478 | 0.483 | 0.501 | 0.518 |
+| hellaswag | acc_norm | 0.678 | 0.264 | 0.362 | 0.378 | 0.391 | 0.412 |
+| piqa | acc_norm | 0.758 | 0.508 | 0.622 | 0.637 | 0.647 | 0.650 |
+| winogrande | acc | 0.638 | 0.498 | 0.523 | 0.521 | 0.523 | 0.537 |
+| boolq | acc | 0.726 | 0.506 | 0.593 | 0.596 | 0.597 | 0.605 |
+| copa | acc | 0.830 | 0.510 | 0.640 | 0.700 | 0.680 | 0.690 |
+| openbookqa | acc_norm | 0.404 | 0.276 | 0.312 | 0.312 | 0.308 | 0.316 |
+| sciq | acc_norm | 0.934 | 0.199 | 0.613 | 0.695 | 0.700 | 0.733 |
+| truthfulqa_mc1 | acc | 0.305 | 0.220 | 0.241 | 0.241 | 0.233 | 0.261 |
 
 ## Packed GGUF CPU
 
@@ -57,4 +57,9 @@ Generated from benchmark JSON artifacts. Missing rows are intentionally shown as
 | KL-only dense lm_head static ternary suite | AMD Ryzen Threadripper PRO 5945WX 12-Cores | qwen15b_klonly_notie_static_ternary_f16 | static_ternary_materialized | 3395.5 | 222.07 | 12.48 | 47.2994 |
 | KL-only dense lm_head static ternary suite | AMD Ryzen Threadripper PRO 5945WX 12-Cores | qwen15b_klonly_notie_static_ternary_tq2_0 | static_ternary_tq2 | 1218.6 | 348.88 | 44.03 | 47.2823 |
 | KL-only dense lm_head static ternary suite | AMD Ryzen Threadripper PRO 5945WX 12-Cores | qwen15b_klonly_notie_static_ternary_i2_s | static_ternary_i2s_single_thread_quant | 1208.9 | 464.19 | 45.50 | 47.3435 |
-| KL-only row dense lm_head static ternary suite | - | - | - | - | - | missing |
+| KL-only row dense lm_head static ternary suite | AMD Ryzen Threadripper PRO 5945WX 12-Cores | qwen15b_fp_f16 | fp_reference | 2950.4 | 219.27 | 11.99 | 12.2808 |
+| KL-only row dense lm_head static ternary suite | AMD Ryzen Threadripper PRO 5945WX 12-Cores | qwen15b_fp_q8_0 | llama_q8 | 1570.3 | 214.69 | 22.51 | 12.3056 |
+| KL-only row dense lm_head static ternary suite | AMD Ryzen Threadripper PRO 5945WX 12-Cores | qwen15b_fp_q4_k_m | llama_q4 | 940.4 | 172.37 | 36.82 | 12.8112 |
+| KL-only row dense lm_head static ternary suite | AMD Ryzen Threadripper PRO 5945WX 12-Cores | qwen15b_klonly_row_notie_static_ternary_f16 | static_ternary_materialized | 3395.5 | 221.64 | 12.49 | 38.8651 |
+| KL-only row dense lm_head static ternary suite | AMD Ryzen Threadripper PRO 5945WX 12-Cores | qwen15b_klonly_row_notie_static_ternary_tq2_0 | static_ternary_tq2 | 1218.6 | 345.32 | 44.85 | 38.8224 |
+| KL-only row dense lm_head static ternary suite | AMD Ryzen Threadripper PRO 5945WX 12-Cores | qwen15b_klonly_row_notie_static_ternary_i2_s | static_ternary_i2s_single_thread_quant | 1208.9 | 465.34 | 46.13 | 1197135.5848 |

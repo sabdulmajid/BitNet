@@ -1,4 +1,4 @@
-# Qwen W1.58A8 Retrofit Results, 2026-05-03
+# Qwen W1.58A8 Retrofit Results, 2026-05-03, Updated 2026-05-05
 
 This note records the current evidence for retrofitting pretrained Qwen dense
 models into BitNet-style W1.58A8 checkpoints. It is intentionally conservative:
@@ -15,7 +15,8 @@ these are quality and loader results, not final CPU product benchmarks.
 - Additional ablation: teacher KL only with tied dense `lm_head` preserved for
   Qwen2.5-0.5B and Qwen2.5-1.5B
 - Main scale mode: per-tensor absmean scale
-- Additional ablation: per-output-row absmean scale for Qwen2.5-0.5B
+- Additional ablation: per-output-row absmean scale for Qwen2.5-0.5B and
+  Qwen2.5-1.5B KL-only dense tied-`lm_head`
 - Evaluation dtype/device for perplexity: BF16 on CUDA
 - WikiText eval: `wikitext-2-raw-v1`, test split, 64 blocks x 512 tokens
 - FineWeb heldout eval: `sample-10BT`, train stream after `--skip-rows 25000`, 32 blocks x 1024 tokens
@@ -25,6 +26,8 @@ these are quality and loader results, not final CPU product benchmarks.
   512-token prompt, 32 generated tokens
 - Packed GGUF runtime probe: Intel Xeon Silver 4116, `llama-bench -p 512
   -n 128 -t 12 -ngl 0 -r 3`, no BLAS, AVX-512 available
+- Additional packed GGUF dense-head and row-scale probes: AMD Ryzen
+  Threadripper PRO 5945WX via portable AVX2 llama.cpp build
 
 The FineWeb heldout skip is beyond the 1.5B training prefix. Job 9730 packed
 19,968 rows, so skipping 25,000 rows avoids direct train-prefix reuse for this
@@ -41,6 +44,7 @@ smoke-scale heldout test.
 | 9764 | Qwen2.5-0.5B QAT student, KL only, dense tied `lm_head` | 1000 | 4,000 x 512 | 1.6821 | 1.6821 | 0.0000 | complete |
 | 9758 | Qwen2.5-1.5B QAT student, KL only | 5000 | 20,000 x 1024 | 1.5172 | 1.5172 | 0.0000 | complete |
 | 9767 | Qwen2.5-1.5B QAT student, KL only, dense tied `lm_head` | 5000 | 20,000 x 1024 | 1.3353 | 1.3353 | 0.0000 | complete |
+| 9771 | Qwen2.5-1.5B QAT student, KL only, row scale, dense tied `lm_head` | 5000 | 20,000 x 1024 | 1.2569 | 1.2569 | 0.0000 | complete |
 
 ## Export Status
 
@@ -53,6 +57,7 @@ smoke-scale heldout test.
 | `qwen2.5-1.5b-fineweb-edu/step-5000` | 197 | 197 | repaired after FSDP name-mapping bug |
 | `qwen2.5-1.5b-fineweb-edu-klonly-5000/step-5000` | 197 | 197 | KL-only QAT ternary export; `lm_head` is ternary so config is patched to `tie_word_embeddings=false` |
 | `qwen2.5-1.5b-fineweb-edu-klonly-notiehead-5000/step-5000` | 196 | 196 | KL-only export with tied dense `lm_head` preserved; config keeps `tie_word_embeddings=true` |
+| `qwen2.5-1.5b-fineweb-edu-klonly-row-notiehead-5000/step-5000` | 196 | 196 | KL-only export with tied dense `lm_head` preserved and one scale per output row |
 | `qwen2.5-0.5b-naive-ptq-tensor` | 168 | 168 | original HF checkpoint has tied `lm_head` |
 | `qwen2.5-1.5b-naive-ptq-tensor` | 196 | 196 | original HF checkpoint has tied `lm_head` |
 
@@ -72,12 +77,13 @@ Lower is better.
 | Qwen2.5-1.5B | naive PTQ ternary | 3,813,121.803 | 9,582,923.269 | blind ternarization destroys quality |
 | Qwen2.5-1.5B | QAT/distilled ternary | 86.414 | 40.398 | QAT is orders better than PTQ, but still far from FP |
 | Qwen2.5-1.5B | QAT/distilled ternary, KL only | 50.595 | 26.599 | best 1.5B tensor-scale QAT result so far, still far from FP |
-| Qwen2.5-1.5B | QAT/distilled ternary, KL only, dense tied `lm_head` | 43.372 | 22.759 | best 1.5B likelihood result so far, but output head remains dense/tied |
+| Qwen2.5-1.5B | QAT/distilled ternary, KL only, dense tied `lm_head` | 43.372 | 22.759 | strong 1.5B tensor-scale likelihood result, but output head remains dense/tied |
+| Qwen2.5-1.5B | QAT/distilled ternary, KL only, row scale, dense tied `lm_head` | 38.580 | 21.333 | best 1.5B PyTorch likelihood result so far, still far from FP |
 
-The row-scale ablation is meaningful but not decisive. It reduces 0.5B
+The 0.5B row-scale ablation is meaningful but not decisive. It reduces
 WikiText PPL from `1,079.167` to `444.691` and FineWeb-heldout PPL from
 `373.775` to `152.821`, but it remains far from the FP reference and does not
-yet establish downstream quality.
+establish downstream quality by itself.
 
 The KL-only ablation is stronger. It reduces 0.5B WikiText PPL to `296.602`
 and FineWeb-heldout PPL to `108.366`. Preserving Qwen's tied `lm_head` as dense
@@ -96,6 +102,12 @@ same 1.5B KL-only setup improves likelihood again to `43.372` WikiText PPL and
 `22.759` FineWeb-heldout PPL. That tied-head checkpoint is not an all-linear
 W1.58 model, and its full ten-task accuracy gain over the all-ternary KL-only
 checkpoint is not statistically decisive.
+
+Adding per-output-row scales to the same KL-only dense-head 1.5B setup improves
+likelihood further to `38.580` WikiText PPL and `21.333` FineWeb-heldout PPL.
+It is the best PyTorch-quality ablation in this report, but it still remains
+far from the FP PPL baseline and, as shown below, current `I2_S` packing does
+not preserve it.
 
 ## PTQ Math Audit
 
@@ -302,18 +314,18 @@ COPA, OpenBookQA, SciQ, and TruthfulQA MC1. The merge was done with
 `benchmarks/merge_lm_eval_results.py`, preserving logged samples for paired
 analysis.
 
-| task | metric | FP reference | naive PTQ ternary | QAT hidden-MSE | QAT KL-only | QAT KL-only dense `lm_head` |
-| --- | --- | ---: | ---: | ---: | ---: | ---: |
-| ARC-Challenge | acc_norm | 0.449659 | 0.261945 | 0.263652 | 0.271331 | 0.263652 |
-| ARC-Easy | acc_norm | 0.719697 | 0.244108 | 0.478114 | 0.483165 | 0.500842 |
-| HellaSwag | acc_norm | 0.677953 | 0.264190 | 0.362378 | 0.377714 | 0.390759 |
-| PIQA | acc_norm | 0.757889 | 0.507617 | 0.621872 | 0.637106 | 0.647443 |
-| WinoGrande | acc | 0.637727 | 0.498027 | 0.523283 | 0.520916 | 0.523283 |
-| BoolQ | acc | 0.725994 | 0.505505 | 0.592661 | 0.596024 | 0.597248 |
-| COPA | acc | 0.830000 | 0.510000 | 0.640000 | 0.700000 | 0.680000 |
-| OpenBookQA | acc_norm | 0.404000 | 0.276000 | 0.312000 | 0.312000 | 0.308000 |
-| SciQ | acc_norm | 0.934000 | 0.199000 | 0.613000 | 0.695000 | 0.700000 |
-| TruthfulQA MC1 | acc | 0.304774 | 0.220318 | 0.241126 | 0.241126 | 0.232558 |
+| task | metric | FP reference | naive PTQ ternary | QAT hidden-MSE | QAT KL-only | QAT KL-only dense `lm_head` | QAT KL-only row-scale dense `lm_head` |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| ARC-Challenge | acc_norm | 0.449659 | 0.261945 | 0.263652 | 0.271331 | 0.263652 | 0.272184 |
+| ARC-Easy | acc_norm | 0.719697 | 0.244108 | 0.478114 | 0.483165 | 0.500842 | 0.517677 |
+| HellaSwag | acc_norm | 0.677953 | 0.264190 | 0.362378 | 0.377714 | 0.390759 | 0.412169 |
+| PIQA | acc_norm | 0.757889 | 0.507617 | 0.621872 | 0.637106 | 0.647443 | 0.650163 |
+| WinoGrande | acc | 0.637727 | 0.498027 | 0.523283 | 0.520916 | 0.523283 | 0.537490 |
+| BoolQ | acc | 0.725994 | 0.505505 | 0.592661 | 0.596024 | 0.597248 | 0.605199 |
+| COPA | acc | 0.830000 | 0.510000 | 0.640000 | 0.700000 | 0.680000 | 0.690000 |
+| OpenBookQA | acc_norm | 0.404000 | 0.276000 | 0.312000 | 0.312000 | 0.308000 | 0.316000 |
+| SciQ | acc_norm | 0.934000 | 0.199000 | 0.613000 | 0.695000 | 0.700000 | 0.733000 |
+| TruthfulQA MC1 | acc | 0.304774 | 0.220318 | 0.241126 | 0.241126 | 0.232558 | 0.260710 |
 
 Mean displayed metric:
 
@@ -324,6 +336,7 @@ Mean displayed metric:
 | QAT hidden-MSE | 0.464809 |
 | QAT KL-only | 0.483438 |
 | QAT KL-only dense `lm_head` | 0.484378 |
+| QAT KL-only row-scale dense `lm_head` | 0.499459 |
 
 Paired deltas on matched examples:
 
@@ -339,17 +352,18 @@ Paired deltas on matched examples:
 | QAT KL-only dense `lm_head` minus QAT hidden-MSE | +0.019570 | [+0.001767, +0.037373] | +0.021580 |
 | QAT KL-only dense `lm_head` minus naive PTQ | +0.135707 | [+0.041607, +0.229808] | +0.134751 |
 | QAT KL-only dense `lm_head` minus FP reference | -0.159791 | [-0.202734, -0.116847] | -0.212090 |
+| QAT KL-only row-scale dense `lm_head` minus QAT KL-only dense `lm_head` | +0.015081 | [+0.009028, +0.021134] | +0.016755 |
+| QAT KL-only row-scale dense `lm_head` minus QAT KL-only | +0.016021 | [+0.006145, +0.025897] | +0.024975 |
 
-This is the strongest task result in the current fork, but only by a very small
-margin. The dense tied-head run has the highest selected mean (`0.484378`) and
-recovers about 46% of the FP-vs-naive-PTQ macro gap, but its macro improvement
-over the all-ternary KL-only run is only `+0.000940` with a paired confidence
-interval crossing zero. The tied-head policy is therefore justified by
-perplexity and by architecture, not by a decisive ten-task accuracy win. The
-QAT/distilled checkpoints still remain decisively below FP on the same
-examples. That supports a publication-quality negative result for blind
-retrofit and a partial-positive result for QAT/distillation, not a claim of
-acceptable FP-preserving conversion.
+The row-scale dense tied-head run is the strongest task result in the current
+fork. It reaches selected mean `0.499459`, improves over the tensor-scale
+dense-head run by `+0.015081` macro mean with paired 95% CI
+`[+0.009028, +0.021134]`, and improves over the all-ternary KL-only run by
+`+0.016021` with paired 95% CI `[+0.006145, +0.025897]`. It still remains far
+below FP on the same tasks: FP mean is `0.644169`, so the remaining macro gap
+is about `0.14471`. That supports a publication-quality negative result for
+blind retrofit and a partial-positive result for QAT/distillation with better
+scaling policy, not a claim of acceptable FP-preserving conversion.
 
 ## Fast Dense-Head MC200 Check
 
@@ -365,6 +379,21 @@ the uncapped `lm-eval` table above is stronger evidence for task quality.
 | ARC-Easy | 0.5850 | 0.4500 | 200 |
 | ARC-Challenge | 0.2250 | 0.2550 | 200 |
 | HellaSwag | 0.3800 | 0.4100 | 200 |
+
+The same MC200 probe was rerun for the final row-scale dense tied-`lm_head`
+checkpoint:
+
+| task | acc | acc_norm | n |
+| --- | ---: | ---: | ---: |
+| PIQA | 0.6450 | 0.6850 | 200 |
+| ARC-Easy | 0.6100 | 0.5100 | 200 |
+| ARC-Challenge | 0.2550 | 0.2900 | 200 |
+| HellaSwag | 0.3700 | 0.3950 | 200 |
+
+This quick probe is consistent with the uncapped lm-eval result on PIQA,
+ARC-Easy, and ARC-Challenge, while HellaSwag is slightly lower than the
+tensor-scale dense-head MC200 slice. The uncapped ten-task table above remains
+the stronger evidence.
 
 ## Xeon PyTorch Runtime Probe
 
@@ -487,6 +516,18 @@ against the Xeon rows as a same-hardware speedup.
 | Qwen2.5-1.5B KL-only dense-`lm_head` static ternary | TQ2_0 | AMD 5945WX | 47.2823 | 348.88 | 44.03 |
 | Qwen2.5-1.5B KL-only dense-`lm_head` static ternary | I2_S single-thread quant | AMD 5945WX | 47.3435 | 464.19 | 45.50 |
 
+The final row-scale dense-head suite was run on the same AMD node and fixed
+WikiText excerpt:
+
+| source | GGUF type | CPU | PPL | prompt-eval tok/s | decode tok/s | smoke prompt |
+| --- | --- | --- | ---: | ---: | ---: | --- |
+| Qwen2.5-1.5B FP | F16 | AMD 5945WX | 12.2808 | 219.27 | 11.99 | sensible |
+| Qwen2.5-1.5B FP | Q8_0 | AMD 5945WX | 12.3056 | 214.69 | 22.51 | sensible |
+| Qwen2.5-1.5B FP | Q4_K_M | AMD 5945WX | 12.8112 | 172.37 | 36.82 | sensible |
+| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | F16 materialized | AMD 5945WX | 38.8651 | 221.64 | 12.49 | sensible |
+| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | TQ2_0 | AMD 5945WX | 38.8224 | 345.32 | 44.85 | sensible |
+| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | I2_S single-thread quant | AMD 5945WX | 1,197,135.5848 | 465.34 | 46.13 | failed |
+
 Interpretation:
 
 - Standard Q8_0 and Q4_K_M preserve the FP perplexity on this packed GGUF
@@ -517,6 +558,14 @@ Interpretation:
   5945WX, so it is quality evidence and a separate hardware throughput data
   point, not a same-machine Xeon speed comparison. Both trained ternary bridges
   are still far worse than FP/Q8/Q4 likelihood.
+- The row-scale dense-`lm_head` bridge improves fixed-excerpt PPL further to
+  `38.8651` as materialized F16 and `38.8224` as `TQ2_0`, so row scales do
+  survive the dense bridge and generic ternary packing.
+- The current row-scale `I2_S` bridge fails despite high throughput: PPL rises
+  to `1,197,135.5848` and the smoke prompt is incoherent. This is a concrete
+  format/kernel limitation, not a training-quality result. A row-scale-aware
+  packed ternary writer and kernel are required before claiming row-scale
+  `I2_S` deployment.
 
 ## MoE Status
 
@@ -576,10 +625,10 @@ locality on CPU.
    0.649. The paired QAT-minus-PTQ macro delta is +0.095 with 95% CI
    [+0.015, +0.175], so the recovery is measurable but incomplete.
 9. On the full uncapped ten-task lm-eval merge, 1.5B QAT improves the mean
-   displayed task metric from 0.349 for naive PTQ to 0.465 with hidden-MSE and
-   0.483 with KL-only, while FP remains 0.644. The dense tied-head KL-only
-   variant reaches 0.484. It still trails FP by -0.1598 macro mean with paired
-   95% CI [-0.2027, -0.1168].
+   displayed task metric from 0.349 for naive PTQ to 0.465 with hidden-MSE,
+   0.483 with KL-only, 0.484 with KL-only dense `lm_head`, and 0.499 with
+   KL-only row-scale dense `lm_head`, while FP remains 0.644. The best ternary
+   student still trails FP by about 0.14471 macro mean.
 10. Row-wise ternary scales improve 0.5B heldout perplexity by about 2.4x versus
    tensor-scale QAT, but the small multiple-choice slices remain mixed.
 11. KL-only 0.5B distillation improves heldout perplexity further. Keeping
@@ -590,25 +639,35 @@ locality on CPU.
     from 50.595/26.599 to 43.372/22.759 versus the all-ternary KL-only run, but
     its ten-task macro gain over that all-ternary KL-only run is only +0.00094
     with a paired 95% CI crossing zero.
-13. PyTorch ternary inference is slower than FP on the Xeon probe. The product
+13. Combining row-wise scales with KL-only distillation and a dense tied
+    `lm_head` improves Qwen2.5-1.5B WikiText/FineWeb PPL further to
+    38.580/21.333 and improves ten-task macro mean over the tensor-scale
+    dense-head run by +0.015081 with paired 95% CI [+0.009028, +0.021134].
+14. PyTorch ternary inference is slower than FP on the Xeon probe. The product
    speed thesis depends on packed `bitnet.cpp` kernels, not on the PyTorch
    simulation path.
-14. Packed I2_S GGUF execution is fast on the Xeon for Qwen2.5-0.5B-shaped
+15. Packed I2_S GGUF execution is fast on the Xeon for Qwen2.5-0.5B-shaped
    and Qwen2.5-1.5B-shaped models, but naive I2_S conversion fails the smoke
    prompt and explodes WikiText excerpt perplexity.
-15. A deployable intermediate path exists through static ternary materialization
+16. A deployable intermediate path exists through static ternary materialization
    plus llama.cpp `TQ2_0` or single-thread-written `I2_S`: both preserve the QAT
    PPL and run much faster than F16 decode, but the path requires
    QAT/distillation. The strongest same-hardware Xeon all-linear checkpoint is
    the KL-only static ternary `I2_S` artifact: fixed-excerpt PPL 54.7366,
    prompt-eval 140.95 tok/s, and decode 18.60 tok/s. The strongest packed
-   quality result so far is the dense-`lm_head` KL-only static ternary `I2_S`
+   `I2_S` quality result so far is the dense-`lm_head` KL-only static ternary
    artifact: fixed-excerpt PPL 47.3435, measured on AMD 5945WX at 464.19
-   prompt-eval tok/s and 45.50 decode tok/s.
-16. The original multi-thread I2_S writer corruption is fixable. A local
-    llama.cpp patch that packs I2_S chunks at compressed offsets and writes one
-    tensor-level scale preserves fixed-excerpt PPL 54.7366 with 12 quantization
-    threads.
+   prompt-eval tok/s and 45.50 decode tok/s. The strongest packed row-scale
+   quality result is `TQ2_0`, not `I2_S`: fixed-excerpt PPL 38.8224 on AMD
+   5945WX at 345.32 prompt-eval tok/s and 44.85 decode tok/s.
+17. The current row-scale `I2_S` path fails. It reaches high throughput but
+    explodes to fixed-excerpt PPL 1,197,135.5848 and fails the smoke prompt.
+    This identifies a packed-format/kernel problem rather than a training
+    problem.
+18. The original tensor-scale multi-thread I2_S writer corruption is fixable.
+    A local llama.cpp patch that packs I2_S chunks at compressed offsets and
+    writes one tensor-level scale preserves fixed-excerpt PPL 54.7366 with 12
+    quantization threads.
 
 ## What This Does Not Prove Yet
 
@@ -628,25 +687,27 @@ locality on CPU.
    result.
 8. It does not prove that a dense tied `lm_head` is acceptable for every product
    constraint; it improves likelihood at 0.5B and 1.5B scale but gives up full
-   output-head ternarization and does not materially change the 1.5B ten-task
-   verdict.
+   output-head ternarization.
+9. It does not prove row-scale `I2_S` deployment. The current row-scale
+   materialized and `TQ2_0` artifacts work; the current row-scale `I2_S`
+   artifact fails quality audit.
 
 ## Next Gates
 
 The next benchmark gates are:
 
-1. Advance or fork the llama.cpp submodule to include the validated
-   multi-thread I2_S writer patch, then keep `quantize_gguf_safe.py` from
-   forcing `nthreads=1`.
-2. Build a native GGUF writer for `ternary_state_dict.pt` so I2_S can ingest
-   trained ternary codes and scales directly.
-3. Keep `TQ2_0` and single-thread `I2_S` as the current working packed ternary
-   baselines and compare them against Q8_0 and Q4_K_M on quality, model size,
-   RSS, prompt throughput, and decode throughput.
-4. Extend uncapped `lm-eval` beyond the current ten selected tasks and keep the
+1. Build a row-scale-aware packed ternary writer and kernel path. The current
+   highest-quality row-scale checkpoint works as materialized F16 and `TQ2_0`
+   but fails as `I2_S`.
+2. Advance or fork the llama.cpp submodule to include the validated
+   tensor-scale multi-thread I2_S writer patch, then keep
+   `quantize_gguf_safe.py` from forcing `nthreads=1`.
+3. Build a native GGUF writer for `ternary_state_dict.pt` so packed formats can
+   ingest trained ternary codes and per-tensor or per-row scales directly.
+4. Keep `TQ2_0` and tensor-scale single-thread `I2_S` as the current working
+   packed ternary baselines and compare them against Q8_0 and Q4_K_M on
+   quality, model size, RSS, prompt throughput, and decode throughput.
+5. Extend uncapped `lm-eval` beyond the current ten selected tasks and keep the
    same paired analysis for the strongest exact static-ternary checkpoint.
-5. Run ablations: longer QAT, hidden-MSE weighting, group/row scales, and
+6. Run ablations: longer QAT, hidden-MSE weighting, group/row scales, and
    larger FineWeb samples.
-6. Finish the queued Qwen2.5-1.5B row-scale plus dense tied-`lm_head` ablation,
-   then compare it against the tensor-scale dense-head run on perplexity,
-   full ten-task lm-eval, and packed GGUF perplexity.

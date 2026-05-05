@@ -33,32 +33,39 @@ conservative:
   Qwen2.5-1.5B static ternary checkpoint is usable enough for measurement, but
   it remains significantly worse than the FP reference on perplexity and task
   accuracy.
-- **KL-only distillation is the strongest 1.5B recipe so far.** At 5000 steps,
-  it improves Qwen2.5-1.5B WikiText/FineWeb PPL from `86.414`/`40.398` to
-  `50.595`/`26.599` versus the hidden-MSE QAT run, and improves uncapped
-  ten-task lm-eval mean from `0.465` to `0.483`. FP remains `0.644`.
+- **KL-only distillation is stronger than the original hidden-MSE recipe.** At
+  5000 steps, it improves Qwen2.5-1.5B WikiText/FineWeb PPL from
+  `86.414`/`40.398` to `50.595`/`26.599` versus the hidden-MSE QAT run, and
+  improves uncapped ten-task lm-eval mean from `0.465` to `0.483`. FP remains
+  `0.644`.
 - **Keeping Qwen's tied output head dense improves 1.5B likelihood, not the
   task verdict.** The dense-`lm_head` KL-only 1.5B ablation improves
   WikiText/FineWeb PPL again to `43.372`/`22.759`, but its uncapped ten-task
   mean is only `0.484`; the paired macro delta versus the all-ternary KL-only
   run is `+0.00094` with 95% CI crossing zero.
-- **The strongest packed CPU quality result is now KL-only dense-`lm_head`
-  static ternary I2_S.** On the fixed GGUF WikiText excerpt it reaches PPL
-  `47.3435` after preserving Qwen's tied output head as dense. That latest
-  run was measured on `ece-nebula12` with an AMD Ryzen Threadripper PRO 5945WX,
-  so its throughput is not directly comparable to the older Xeon 4116 run. On
-  the Xeon 4116, the all-linear KL-only static ternary I2_S artifact remains
-  the audited same-hardware result: PPL `54.7366`, `140.95` prompt-eval tok/s,
-  and `18.60` decode tok/s.
-- **Row-wise ternary scales help likelihood but do not solve accuracy.** A
+- **Row-wise ternary scales are the strongest PyTorch quality ablation so
+  far.** Qwen2.5-1.5B KL-only row-scale training with a dense tied `lm_head`
+  reaches WikiText/FineWeb PPL `38.580`/`21.333` and an uncapped ten-task mean
+  of `0.499459`. It improves over the tensor-scale dense-head run by
+  `+0.015081` macro mean with paired 95% CI `[+0.009028, +0.021134]`, but it
+  still trails FP by about `0.145` macro mean.
+- **Packed row-scale deployment is format-limited.** Row-scale static ternary
+  materialization and generic `TQ2_0` preserve the row-scale quality on the
+  fixed GGUF WikiText excerpt: PPL `38.8651` and `38.8224`, respectively. The
+  current `I2_S` path does **not** preserve it: row-scale `I2_S` explodes to
+  PPL `1.197e6` and produces a failed smoke completion. The strongest working
+  packed `I2_S` quality result remains the tensor-scale dense-`lm_head`
+  checkpoint at PPL `47.3435` on AMD 5945WX.
+- **Row-wise ternary scales help likelihood but are not enough alone.** A
   Qwen2.5-0.5B row-scale ablation cut heldout perplexity by about 2.4x versus
-  the tensor-scale QAT checkpoint, but its 100-example multiple-choice slices
-  were mixed and mostly not better.
-- **KL-only distillation with a dense tied `lm_head` is the best likelihood
-  ablation so far.** Removing the hidden-state MSE term improved quality, and
-  leaving Qwen's tied output head dense improved it again at both 0.5B and
-  1.5B scale. That checkpoint family is not an all-linear W1.58 model, but it
-  is the more architecturally honest Qwen retrofit policy tested so far.
+  the tensor-scale QAT checkpoint, and the final 1.5B row-scale run improved
+  ten-task accuracy. Neither result reaches FP quality.
+- **KL-only distillation plus a dense tied `lm_head` is the current base recipe.**
+  Removing the hidden-state MSE term improved quality, leaving Qwen's tied
+  output head dense improved it again at both 0.5B and 1.5B scale, and row-wise
+  scales improved the 1.5B recipe further. This checkpoint family is not an
+  all-linear W1.58 model, but it is the more architecturally honest Qwen
+  retrofit policy tested so far.
 - **PyTorch ternary simulation is not the speed path.** On the Xeon Silver 4116
   host, the exported ternary checkpoints are smaller in memory but slower than
   FP under PyTorch because the probe dequantizes into dense matmuls. Real
@@ -66,9 +73,10 @@ conservative:
 - **Packed ternary runtime is fast, but speed does not rescue blind
   ternarization.** On the same Xeon, blind I2_S/TQ2_0 conversion runs faster
   than F16 but destroys quality. Materializing the trained
-  `ternary_state_dict.pt` and packing it as llama.cpp `TQ2_0` or single-thread
-  `I2_S` preserves the QAT perplexity while giving CPU-native ternary
-  artifacts. The original multi-thread I2_S writer path was unsafe for this
+  `ternary_state_dict.pt` and packing it as llama.cpp `TQ2_0` preserves both
+  tensor-scale and row-scale QAT perplexity; tensor-scale single-thread `I2_S`
+  also preserves quality. The row-scale `I2_S` bridge currently fails. The
+  original tensor-scale multi-thread I2_S writer path was unsafe for this
   artifact; this fork now includes a validated llama.cpp patch file that fixes
   the threaded packing/scaling bug, while the safe wrapper remains
   single-threaded until the submodule is advanced.
@@ -101,6 +109,7 @@ The benchmark harnesses are in [benchmarks/](benchmarks/).
 | Qwen2.5-1.5B | QAT/distilled ternary | 86.414 | 40.398 |
 | Qwen2.5-1.5B | QAT/distilled ternary, KL only | 50.595 | 26.599 |
 | Qwen2.5-1.5B | QAT/distilled ternary, KL only, dense tied `lm_head` | 43.372 | 22.759 |
+| Qwen2.5-1.5B | QAT/distilled ternary, KL only, row scale, dense tied `lm_head` | 38.580 | 21.333 |
 
 These numbers are BF16/CUDA quality measurements using PyTorch simulation of
 W1.58A8 math. They are **not** `bitnet.cpp` CPU throughput claims.
@@ -119,6 +128,11 @@ same CPU family shown in the table.
 | Intel Xeon Silver 4116 | blind FP-to-I2_S | 766.1 | 1.206e51 | 204.57 | 18.34 |
 | Intel Xeon Silver 4116 | KL-only static ternary I2_S, all-linear | 1,208.9 | 54.7366 | 205.76 | 18.60 |
 | AMD Ryzen Threadripper PRO 5945WX | KL-only static ternary I2_S, dense tied `lm_head` | 1,208.9 | 47.3435 | 464.19 | 45.50 |
+| AMD Ryzen Threadripper PRO 5945WX | KL-only row-scale static ternary TQ2_0, dense tied `lm_head` | 1,218.6 | 38.8224 | 345.32 | 44.85 |
+| AMD Ryzen Threadripper PRO 5945WX | KL-only row-scale static ternary I2_S, dense tied `lm_head` | 1,208.9 | 1.197e6 | 465.34 | 46.13 |
+
+The row-scale `I2_S` row is a failed quality result, included to make the
+format limitation explicit.
 
 ### Practical Product Direction
 
@@ -131,6 +145,8 @@ retrofit pipeline with measured guarantees:
 - distill against the FP teacher under the exact ternary constraint,
 - export `ternary_state_dict.pt` plus a static-ternary GGUF bridge,
 - pack `TQ2_0` and `I2_S` artifacts for commodity CPU inference,
+- build a row-scale-aware packed ternary format/kernel before claiming row-scale
+  `I2_S` deployment,
 - publish a benchmark card with FP/Q8/Q4/blind-ternary/QAT comparisons.
 
 The current MVP should target dense Qwen-style models first. MoE models such as
@@ -255,27 +271,26 @@ far below FP: QAT minus FP is `-0.199` macro mean with paired 95% CI
 The full core run was merged with uncapped BoolQ, COPA, OpenBookQA, SciQ, and
 TruthfulQA MC1 runs for the same artifacts.
 
-| task | metric | FP | naive PTQ | QAT hidden-MSE | QAT KL-only | QAT KL-only dense `lm_head` |
-| --- | --- | ---: | ---: | ---: | ---: | ---: |
-| ARC-Challenge | acc_norm | 0.450 | 0.262 | 0.264 | 0.271 | 0.264 |
-| ARC-Easy | acc_norm | 0.720 | 0.244 | 0.478 | 0.483 | 0.501 |
-| HellaSwag | acc_norm | 0.678 | 0.264 | 0.362 | 0.378 | 0.391 |
-| PIQA | acc_norm | 0.758 | 0.508 | 0.622 | 0.637 | 0.647 |
-| WinoGrande | acc | 0.638 | 0.498 | 0.523 | 0.521 | 0.523 |
-| BoolQ | acc | 0.726 | 0.506 | 0.593 | 0.596 | 0.597 |
-| COPA | acc | 0.830 | 0.510 | 0.640 | 0.700 | 0.680 |
-| OpenBookQA | acc_norm | 0.404 | 0.276 | 0.312 | 0.312 | 0.308 |
-| SciQ | acc_norm | 0.934 | 0.199 | 0.613 | 0.695 | 0.700 |
-| TruthfulQA MC1 | acc | 0.305 | 0.220 | 0.241 | 0.241 | 0.233 |
+| task | metric | FP | naive PTQ | QAT hidden-MSE | QAT KL-only | QAT KL-only dense `lm_head` | QAT KL-only row scale dense `lm_head` |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| ARC-Challenge | acc_norm | 0.450 | 0.262 | 0.264 | 0.271 | 0.264 | 0.272 |
+| ARC-Easy | acc_norm | 0.720 | 0.244 | 0.478 | 0.483 | 0.501 | 0.518 |
+| HellaSwag | acc_norm | 0.678 | 0.264 | 0.362 | 0.378 | 0.391 | 0.412 |
+| PIQA | acc_norm | 0.758 | 0.508 | 0.622 | 0.637 | 0.647 | 0.650 |
+| WinoGrande | acc | 0.638 | 0.498 | 0.523 | 0.521 | 0.523 | 0.537 |
+| BoolQ | acc | 0.726 | 0.506 | 0.593 | 0.596 | 0.597 | 0.605 |
+| COPA | acc | 0.830 | 0.510 | 0.640 | 0.700 | 0.680 | 0.690 |
+| OpenBookQA | acc_norm | 0.404 | 0.276 | 0.312 | 0.312 | 0.308 | 0.316 |
+| SciQ | acc_norm | 0.934 | 0.199 | 0.613 | 0.695 | 0.700 | 0.733 |
+| TruthfulQA MC1 | acc | 0.305 | 0.220 | 0.241 | 0.241 | 0.233 | 0.261 |
 
 Mean over these displayed metrics: FP `0.644`, naive PTQ `0.349`,
-QAT hidden-MSE `0.465`, QAT KL-only `0.483`, and QAT KL-only dense `lm_head`
-`0.484`. The dense-head run improves over hidden-MSE by `+0.0196` macro mean
-with paired 95% CI `[+0.0018, +0.0374]`, but it is not distinguishable from
-the all-ternary KL-only run on macro mean (`+0.00094`, CI
-`[-0.0061, +0.0080]`). It improves over blind PTQ by `+0.1357` with paired
-95% CI `[+0.0416, +0.2298]`, but remains below FP by `-0.1598` with paired
-95% CI `[-0.2027, -0.1168]`.
+QAT hidden-MSE `0.465`, QAT KL-only `0.483`, QAT KL-only dense `lm_head`
+`0.484`, and QAT KL-only row scale with dense `lm_head` `0.499`. The row-scale
+dense-head run improves over tensor-scale dense-head by `+0.015081` macro mean
+with paired 95% CI `[+0.009028, +0.021134]`; it improves over all-ternary
+KL-only by `+0.016021` with 95% CI `[+0.006145, +0.025897]`. It remains far
+below FP by about `-0.14471` macro mean.
 
 ### Fast MC200 Dense-Head Check
 
@@ -355,18 +370,27 @@ divisibility constraints; Qwen2.5-1.5B did not report that fallback warning.
 | Qwen2.5-1.5B KL-only static ternary | I2_S single-thread quant | 54.7366 | 140.95 |
 | Qwen2.5-1.5B KL-only static ternary | I2_S patched 12-thread quant | 54.7366 | 141.14 |
 
-This is the cleanest packed-runtime evidence so far: conventional Q8_0 and
-Q4_K_M retain the FP language-modeling likelihood, while blind ternarization
-destroys it, including generic `TQ2_0` when applied blindly to the original
-dense model. Materializing `ternary_state_dict.pt` as dense F16
-recovers the PyTorch static-ternary quality, and llama.cpp `TQ2_0` preserves
-that quality while giving a 2.06 bpw ternary GGUF artifact. Single-thread
-`I2_S` quantization also preserves the static-ternary quality. The included
-`patches/llama-i2s-threaded-quantization.patch` fixes the threaded I2_S packing
-path locally: a 12-thread quantized artifact matches the single-thread PPL
-(`54.7366`) and reaches `208.10` prompt tok/s / `18.63` decode tok/s. The safe
-wrapper remains conservative until the submodule is advanced to a commit with
-that fix.
+A later AMD 5945WX portable-AVX2 suite tested the stronger dense-head and
+row-scale dense-head bridges on the same fixed WikiText excerpt:
+
+| source | GGUF type | WikiText excerpt PPL | prompt-eval tok/s | decode tok/s |
+| --- | --- | ---: | ---: | ---: |
+| Qwen2.5-1.5B KL-only dense-`lm_head` static ternary | I2_S single-thread quant | 47.3435 | 464.19 | 45.50 |
+| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | TQ2_0 | 38.8224 | 345.32 | 44.85 |
+| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | I2_S single-thread quant | 1.197e6 | 465.34 | 46.13 |
+
+The packed-runtime conclusion is now narrower: conventional Q8_0 and Q4_K_M
+retain the FP likelihood, while blind ternarization destroys it. Materializing
+`ternary_state_dict.pt` as dense F16 recovers the static-ternary quality, and
+llama.cpp `TQ2_0` preserves both tensor-scale and row-scale static ternary
+artifacts. Tensor-scale `I2_S` also preserves static-ternary quality, but the
+current row-scale-to-`I2_S` bridge fails; row-scale deployment needs a
+row-scale-aware packed ternary writer and kernel rather than the current
+I2_S path. The included `patches/llama-i2s-threaded-quantization.patch` fixes
+the tensor-scale threaded I2_S packing path locally: a 12-thread quantized
+artifact matches the single-thread PPL (`54.7366`) and reaches `208.10` prompt
+tok/s / `18.63` decode tok/s. The safe wrapper remains conservative until the
+submodule is advanced to a commit with that fix.
 
 ### Xeon PyTorch Runtime Probe
 

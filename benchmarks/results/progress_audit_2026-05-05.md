@@ -10,13 +10,12 @@ Current evidence still supports the negative retrofit verdict:
 
 - Blind FP/BF16 to ternary PTQ is not viable for the tested Qwen checkpoints.
 - QAT/distillation recovers substantial signal over blind PTQ.
-- The strongest current Qwen2.5-1.5B ternary path is KL-only distillation with
-  a dense tied `lm_head`, followed by static-ternary materialization and packed
-  GGUF `I2_S` or `TQ2_0`.
+- The strongest current Qwen2.5-1.5B PyTorch-quality path is KL-only
+  row-scale distillation with a dense tied `lm_head`.
+- The strongest packed row-scale path that preserves quality is currently GGUF
+  `TQ2_0`, not `I2_S`. The row-scale `I2_S` artifact fails quality audit.
 - The strongest current CPU-side checkpoint is still far below FP/Q8/Q4
   language-modeling quality.
-- The Qwen2.5-1.5B row-scale dense-head ablation is still running and must not
-  be cited until its checkpoint and dependent evals pass audit.
 
 ## Requirement Checklist
 
@@ -31,10 +30,10 @@ Current evidence still supports the negative retrofit verdict:
 | Add naive PTQ BitNet baseline | complete | `checkpoints/qwen2.5-0.5b-naive-ptq-tensor`, `checkpoints/qwen2.5-1.5b-naive-ptq-tensor`, PPL files under `benchmark_results/quality-ptq-*`, ten-task PTQ in `benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json` |
 | Add llama.cpp Q4_K_M and Q8_0 baselines | complete for Qwen2.5-1.5B | `benchmark_results/gguf-qwen15b-klonly-suite/summary.json` includes F16, Q8_0, Q4_K_M, blind TQ2_0, blind I2_S, and trained static-ternary artifacts |
 | Add QAT with and without hidden MSE | complete | hidden-MSE run `checkpoints/qwen2.5-1.5b-fineweb-edu/step-5000`; KL-only run `checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-5000/step-5000`; full ten-task comparison in `benchmark_results/lm-eval-qwen15b-klonly-full10/selected_metrics_with_baselines.md` |
-| Add row-scale versus tensor-scale | partial | Qwen2.5-0.5B row-scale evidence complete; Qwen2.5-1.5B row-scale dense-head job `9771` reached steps 1000, 2000, 3000, and 4000, and all four checkpoints passed audit at 196 ternary keys / 196 row-scale tensors with first scale shape `(1536, 1)`; early step-1000 PPL probe is WikiText `88.634` and FineWeb `45.680`, not a final result; final step 5000 quality jobs `9776`, `9779`, `9780`, postprocess `9781`, and row GGUF job `9794` are still pending |
-| Convert repaired checkpoints into GGUF/TL2/I2_S | partial | static-ternary materialization to GGUF and packed `TQ2_0`/`I2_S` complete; native direct `ternary_state_dict.pt` GGUF writer and Qwen TL2 path are not yet complete |
-| Run actual bitnet.cpp / llama.cpp CPU inference | complete for packed GGUF probes | `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`, `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json`, and dense-head suite `benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json` |
-| Measure CPU tokens/sec, prompt throughput, RSS, model size, quality loss | complete for current baselines | PyTorch RSS/runtime in `benchmark_results/runtime-qwen-xeon4116-512x32/summary.md`; Xeon packed GGUF throughput/file size/PPL in `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`; AMD dense-head packed GGUF in `benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json`; patched I2_S confirmation in `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json` |
+| Add row-scale versus tensor-scale | complete for Qwen2.5-1.5B dense-head ablation | Qwen2.5-1.5B row-scale dense-head job `9771` completed 5000 steps; checkpoints step 1000/2000/3000/4000/5000 all passed audit at 196 ternary keys / 196 row-scale tensors; final PPL, MC200, full ten-task lm-eval, paired deltas, and row GGUF suite completed under `benchmark_results/quality-qwen15b-klonly-row-notiehead-5000`, `benchmark_results/mc-qwen15b-klonly-row-notiehead-5000-200`, `benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10`, and `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite` |
+| Convert repaired checkpoints into GGUF/TL2/I2_S | partial | static-ternary materialization to GGUF and packed `TQ2_0`/`I2_S` complete for tensor-scale checkpoints; row-scale materialization and `TQ2_0` preserve quality, but row-scale `I2_S` fails audit; native direct `ternary_state_dict.pt` GGUF writer and Qwen TL2 path are not yet complete |
+| Run actual bitnet.cpp / llama.cpp CPU inference | complete for packed GGUF probes | `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`, `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json`, dense-head suite `benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json`, and row-scale dense-head suite `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json` |
+| Measure CPU tokens/sec, prompt throughput, RSS, model size, quality loss | complete for current baselines | PyTorch RSS/runtime in `benchmark_results/runtime-qwen-xeon4116-512x32/summary.md`; Xeon packed GGUF throughput/file size/PPL in `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`; AMD dense-head packed GGUF in `benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json`; AMD row-scale dense-head packed GGUF in `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json`; patched I2_S confirmation in `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json` |
 
 ## Mechanical Audit Evidence
 
@@ -46,6 +45,16 @@ It passed the cited checkpoint counts, full ten-task lm-eval sample counts,
 dense-head PPL files, MC200 files, patched I2_S GGUF summary, and Gaussian PTQ
 math artifact.
 
+The row-scale evidence audit was generated at:
+
+`benchmark_results/evidence_audit/qwen15b_row_notie_5000.md`
+
+It passed the row-scale checkpoint counts, full ten-task lm-eval sample counts,
+PPL files, MC200 files, and paired-delta artifacts. The row GGUF audit at
+`benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/audit.md` correctly
+fails the current row-scale `I2_S` artifact because its PPL is more than
+30,000x worse than row-scale `TQ2_0`.
+
 Key audited values:
 
 | artifact | audited value |
@@ -55,21 +64,27 @@ Key audited values:
 | Qwen2.5-1.5B hidden-MSE QAT ten-task mean | 0.464809 |
 | Qwen2.5-1.5B KL-only QAT ten-task mean | 0.483438 |
 | Qwen2.5-1.5B KL-only dense-head ten-task mean | 0.484378 |
+| Qwen2.5-1.5B KL-only row-scale dense-head ten-task mean | 0.499459 |
 | Qwen2.5-1.5B KL-only dense-head WikiText PPL | 43.372 |
 | Qwen2.5-1.5B KL-only dense-head FineWeb-heldout PPL | 22.759 |
+| Qwen2.5-1.5B KL-only row-scale dense-head WikiText PPL | 38.580 |
+| Qwen2.5-1.5B KL-only row-scale dense-head FineWeb-heldout PPL | 21.333 |
+| Row-scale dense-head minus tensor-scale dense-head ten-task macro delta | +0.015081 |
+| Row-scale dense-head minus tensor-scale dense-head paired 95% CI | [+0.009028, +0.021134] |
 | Qwen2.5-1.5B KL-only static-ternary patched I2_S PPL | 54.7366 |
 | Qwen2.5-1.5B KL-only static-ternary patched I2_S decode tok/s | 18.63 |
 | Qwen2.5-1.5B KL-only dense-head static-ternary I2_S PPL | 47.3435 |
 | Qwen2.5-1.5B KL-only dense-head static-ternary I2_S decode tok/s on AMD 5945WX | 45.50 |
+| Qwen2.5-1.5B KL-only row-scale dense-head static-ternary TQ2_0 PPL on AMD 5945WX | 38.8224 |
+| Qwen2.5-1.5B KL-only row-scale dense-head static-ternary TQ2_0 decode tok/s on AMD 5945WX | 44.85 |
+| Qwen2.5-1.5B KL-only row-scale dense-head static-ternary I2_S PPL on AMD 5945WX | 1.197e6 |
 | Gaussian absmean ternary relative output Frobenius error | 0.512542 |
 
 ## Current Open Gaps
 
-1. The Qwen2.5-1.5B row-scale dense-head ablation has not completed. Its
-   step-1000 checkpoint proves the row-scale export path mechanically, but its
-   final results are queued for automatic quality, MC200, full ten-task
-   lm-eval, GGUF packing, and postprocess auditing. No row-scale 1.5B quality
-   claim should be made yet.
+1. Row-scale `I2_S` is not working. Row-scale materialization and `TQ2_0`
+   preserve the best PyTorch-quality checkpoint, but the current `I2_S` packing
+   path loses row-scale magnitudes and fails the GGUF audit with PPL `1.197e6`.
 2. Native direct GGUF writing from `ternary_state_dict.pt` is not complete.
    Static-ternary materialization is a validated bridge, not the final storage
    path.
