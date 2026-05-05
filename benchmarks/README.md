@@ -249,6 +249,14 @@ python benchmarks/run_gguf_suite.py \
   --ppl-chunks 16
 ```
 
+For Slurm jobs that may move across CPU families, do not assume the repo-root
+`build/bin` binaries are portable. A build configured with `GGML_NATIVE=ON` on
+an AVX-512 Intel node can fail with `SIGILL` on an AVX2-only AMD node. The
+`slurm_gguf_static_ternary_suite.sh` wrapper therefore defaults to
+`build-portable-avx2/bin` and configures it with `GGML_NATIVE=OFF`,
+`GGML_AVX2=ON`, `GGML_FMA=ON`, and `GGML_F16C=ON` before running
+`llama-quantize`, `llama-cli`, `llama-bench`, and `llama-perplexity`.
+
 For the stronger Qwen2.5-1.5B KL-only static-ternary checkpoint, use
 `benchmarks/gguf_qwen15b_klonly_manifest.json` and write to a separate output
 directory, for example `benchmark_results/gguf-qwen15b-klonly-suite`.
