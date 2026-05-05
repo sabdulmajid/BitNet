@@ -246,6 +246,20 @@ For the stronger Qwen2.5-1.5B KL-only static-ternary checkpoint, use
 `benchmarks/gguf_qwen15b_klonly_manifest.json` and write to a separate output
 directory, for example `benchmark_results/gguf-qwen15b-klonly-suite`.
 
+For one-off static-ternary checkpoint families, the Slurm wrapper below
+materializes `ternary_state_dict.pt`, converts the materialized checkpoint to
+F16 GGUF, packs TQ2_0 and safe single-thread-written I2_S artifacts, runs the
+standard GGUF suite against FP/Q8/Q4 controls, and audits the resulting summary:
+
+```bash
+CHECKPOINT_DIR=checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-notiehead-5000/step-5000 \
+EXPECT_TERNARY_KEYS=196 \
+RUN_LABEL=qwen15b_klonly_notie_static_ternary \
+OUT_MODEL_DIR=models/qwen2.5-1.5b-klonly-notie-static-ternary-dense \
+RESULTS_DIR=benchmark_results/gguf-qwen15b-klonly-notiehead-suite \
+sbatch --export=ALL slurm_gguf_static_ternary_suite.sh
+```
+
 For QAT checkpoints, do not convert `model.safetensors` directly and treat it
 as the trained ternary artifact. The validated bridge is:
 
