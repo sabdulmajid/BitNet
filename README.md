@@ -103,6 +103,8 @@ The row-scale `I2_S` prototype note is
 [benchmarks/results/i2s_row_scale_prototype_2026-05-05.md](benchmarks/results/i2s_row_scale_prototype_2026-05-05.md).
 The row-scale `I2_S` thread-scaling note is
 [benchmarks/results/i2s_thread_scaling_2026-05-05.md](benchmarks/results/i2s_thread_scaling_2026-05-05.md).
+The GGUF RSS note is
+[benchmarks/results/gguf_memory_2026-05-05.md](benchmarks/results/gguf_memory_2026-05-05.md).
 The benchmark harnesses are in [benchmarks/](benchmarks/).
 
 ### Current Perplexity Snapshot
@@ -156,6 +158,9 @@ scaling from `22.02` tok/s at 1 thread to `245.31` tok/s at 24 threads, while
 decode improves through 4 threads and then stays near `18-20` tok/s. The
 current row-scale patch includes a heap-buffer fix for the earlier low-thread
 `llama-bench` crash.
+At `-c 512`, `/usr/bin/time -v` reports peak RSS `1.250 GiB` for row-scale
+`I2_S`, `1.257 GiB` for row-scale `TQ2_0`, `2.948 GiB` for FP F16, and
+`0.985 GiB` for FP Q4_K_M.
 
 ### Practical Product Direction
 

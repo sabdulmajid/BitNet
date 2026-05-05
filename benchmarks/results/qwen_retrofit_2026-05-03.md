@@ -570,6 +570,18 @@ Portable AVX2 thread scaling for the same row-scale `I2_S` artifact:
 | 16 | pass | 197.98 | 19.19 |
 | 24 | pass | 245.31 | 18.34 |
 
+Packed GGUF RSS at `-c 512`, measured with `/usr/bin/time -v` around
+`llama-cli`:
+
+| source | GGUF type | file MiB | max RSS GiB |
+| --- | --- | ---: | ---: |
+| Qwen2.5-1.5B FP | F16 | 2,950.4 | 2.948 |
+| Qwen2.5-1.5B FP | Q8_0 | 1,570.3 | 1.601 |
+| Qwen2.5-1.5B FP | Q4_K_M | 940.4 | 0.985 |
+| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | F16 materialized | 3,395.5 | 3.383 |
+| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | TQ2_0 | 1,218.6 | 1.257 |
+| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | I2_S per-row-scale prototype | 1,211.3 | 1.250 |
+
 Interpretation:
 
 - Standard Q8_0 and Q4_K_M preserve the FP perplexity on this packed GGUF
@@ -626,6 +638,11 @@ Interpretation:
   to 4 threads and then remains near `18-20` tok/s. The row-scale patch now
   uses heap temporary buffers in the I2_S prompt path, which fixes the earlier
   low-thread `llama-bench` segfault.
+- The packed RSS probe confirms the corrected row-scale `I2_S` artifact is
+  memory-competitive with row-scale `TQ2_0` at `-c 512`: `1.250 GiB` versus
+  `1.257 GiB`. It is still larger than FP `Q4_K_M` (`0.985 GiB`) because the
+  current best row-scale checkpoint keeps Qwen's tied `lm_head` dense and the
+  prototype layout is not a final compact GGUF type.
 
 ## MoE Status
 
@@ -736,7 +753,10 @@ locality on CPU.
     portable AVX2 prompt throughput rises from 22.02 tok/s at 1 thread to
     245.31 tok/s at 24 threads, while decode improves mainly up to 4 threads
     and then stays near 18-20 tok/s.
-21. The original tensor-scale multi-thread I2_S writer corruption is fixable.
+21. Row-scale `I2_S` peak RSS at `-c 512` is `1.250 GiB`, essentially equal to
+    row-scale `TQ2_0` at `1.257 GiB`, below FP F16 at `2.948 GiB`, and above
+    FP Q4_K_M at `0.985 GiB`.
+22. The original tensor-scale multi-thread I2_S writer corruption is fixable.
     A local llama.cpp patch that packs I2_S chunks at compressed offsets and
     writes one tensor-level scale preserves fixed-excerpt PPL 54.7366 with 12
     quantization threads.

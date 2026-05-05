@@ -55,6 +55,13 @@ class ThreadScalingSpec:
     expected_threads: tuple[int, ...]
 
 
+@dataclass(frozen=True)
+class GGUFMemorySpec:
+    label: str
+    path: Path
+    expected_rows: int | None
+
+
 def md_table(headers: list[str], rows: list[list[str]]) -> str:
     lines = ["| " + " | ".join(headers) + " |"]
     lines.append("| " + " | ".join(["---"] * len(headers)) + " |")
@@ -89,6 +96,14 @@ def parse_thread_scaling(spec: str) -> ThreadScalingSpec:
     if len(parts) > 1 and parts[1]:
         expected_threads = tuple(int(value) for value in parts[1].split(",") if value)
     return ThreadScalingSpec(label, path, expected_threads)
+
+
+def parse_gguf_memory(spec: str) -> GGUFMemorySpec:
+    label, raw_path = parse_label_path(spec)
+    parts = str(raw_path).split(":")
+    path = Path(parts[0])
+    expected_rows = int(parts[1]) if len(parts) > 1 and parts[1] else None
+    return GGUFMemorySpec(label, path, expected_rows)
 
 
 def parse_checkpoint(spec: str) -> CheckpointSpec:
@@ -599,6 +614,85 @@ def audit_thread_scaling(specs: list[ThreadScalingSpec]) -> str:
     )
 
 
+def audit_gguf_memory(specs: list[GGUFMemorySpec]) -> str:
+    if not specs:
+        return "No GGUF memory specs supplied."
+    rows_out: list[list[str]] = []
+    for spec in specs:
+        if not spec.path.exists():
+            rows_out.append([spec.label, str(spec.path), "MISSING", "-", "-", "-", "-", "-", "-"])
+            continue
+        data = load_json(spec.path)
+        rows = data.get("rows", [])
+        if not isinstance(rows, list):
+            rows_out.append([spec.label, str(spec.path), "FAIL", "0", "rows is not a list", "-", "-", "-", "-"])
+            continue
+
+        failures: list[str] = []
+        by_name: dict[str, dict[str, Any]] = {}
+        for row in rows:
+            if not isinstance(row, dict):
+                failures.append("non-object-row")
+                continue
+            name = str(row.get("name", ""))
+            by_name[name] = row
+            if not row.get("exists", False):
+                failures.append(f"{name}:missing")
+            if int(row.get("returncode", 1)) != 0:
+                failures.append(f"{name}:returncode={row.get('returncode')}")
+            rss = row.get("max_rss_gib")
+            if not isinstance(rss, (int, float)) or not math.isfinite(float(rss)) or float(rss) <= 0.0:
+                failures.append(f"{name}:max_rss_gib")
+        if spec.expected_rows is not None and len(rows) != spec.expected_rows:
+            failures.append(f"expected_rows={spec.expected_rows},got={len(rows)}")
+
+        def rss_for(name: str) -> float | None:
+            value = by_name.get(name, {}).get("max_rss_gib")
+            if isinstance(value, (int, float)) and math.isfinite(float(value)):
+                return float(value)
+            return None
+
+        fp_f16 = rss_for("qwen15b_fp_f16")
+        fp_q4 = rss_for("qwen15b_fp_q4_k_m")
+        row_tq2 = rss_for("qwen15b_klonly_row_notie_static_ternary_tq2_0")
+        row_i2s = rss_for("qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale")
+        i2s_vs_f16 = row_i2s / fp_f16 if row_i2s is not None and fp_f16 else None
+        i2s_vs_q4 = row_i2s / fp_q4 if row_i2s is not None and fp_q4 else None
+
+        def fmt(value: float | None, digits: int = 3) -> str:
+            return f"{value:.{digits}f}" if value is not None and math.isfinite(value) else "-"
+
+        rows_out.append([
+            spec.label,
+            str(spec.path),
+            "PASS" if not failures else "FAIL",
+            str(len(rows)),
+            fmt(fp_f16),
+            fmt(fp_q4),
+            fmt(row_tq2),
+            fmt(row_i2s),
+            fmt(i2s_vs_f16),
+            fmt(i2s_vs_q4),
+            ",".join(failures) if failures else "-",
+        ])
+    return md_table(
+        [
+            "label",
+            "path",
+            "status",
+            "rows",
+            "FP F16 RSS GiB",
+            "FP Q4 RSS GiB",
+            "row TQ2 RSS GiB",
+            "row I2_S RSS GiB",
+            "I2_S/F16 RSS",
+            "I2_S/Q4 RSS",
+            "failures",
+        ],
+        rows_out,
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -623,6 +717,7 @@ def main() -> None:
         default=[],
         help="LABEL=summary.json[:expected_threads_csv]",
     )
+    parser.add_argument("--gguf-memory", action="append", default=[], help="LABEL=summary.json[:expected_rows]")
     parser.add_argument("--math", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--output-md", type=Path, default=None)
     args = parser.parse_args()
@@ -634,6 +729,7 @@ def main() -> None:
     runtime = [parse_label_path(spec) for spec in args.runtime]
     gguf_summary = [parse_label_path_count(spec) for spec in args.gguf_summary]
     thread_scaling = [parse_thread_scaling(spec) for spec in args.thread_scaling]
+    gguf_memory = [parse_gguf_memory(spec) for spec in args.gguf_memory]
     math_specs = [parse_label_path(spec) for spec in args.math]
 
     report = "\n\n".join([
@@ -652,6 +748,8 @@ def main() -> None:
         audit_gguf_summary(gguf_summary),
         "## Thread-Scaling Artifacts",
         audit_thread_scaling(thread_scaling),
+        "## GGUF Memory Artifacts",
+        audit_gguf_memory(gguf_memory),
         "## PTQ Math Artifacts",
         audit_math(math_specs),
     ])

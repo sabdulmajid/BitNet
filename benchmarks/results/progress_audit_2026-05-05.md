@@ -86,6 +86,11 @@ uses heap temporary buffers in the I2_S prompt GEMM/GEMV path; after that fix,
 `benchmark_results/evidence_audit/qwen15b_row_i2s_thread_scaling.md`, which
 passes all seven expected thread rows with no failed return codes.
 
+The packed GGUF RSS probe is tracked at
+`benchmarks/results/gguf_memory_2026-05-05.md`. Its mechanical audit is
+`benchmark_results/evidence_audit/qwen15b_row_i2s_rss.md`, which passes all six
+expected rows with positive RSS and zero return-code failures.
+
 Key audited values:
 
 | artifact | audited value |
@@ -119,6 +124,9 @@ Key audited values:
 | Row-scale dense-head I2_S portable AVX2 prompt tok/s at 1 thread | 22.02 |
 | Row-scale dense-head I2_S portable AVX2 prompt tok/s at 24 threads | 245.31 |
 | Row-scale dense-head I2_S portable AVX2 decode tok/s range, all thread rows | 8.57-19.49 |
+| Qwen2.5-1.5B FP F16 GGUF max RSS at `-c 512` | 2.948 GiB |
+| Qwen2.5-1.5B FP Q4_K_M GGUF max RSS at `-c 512` | 0.985 GiB |
+| Qwen2.5-1.5B row-scale dense-head I2_S max RSS at `-c 512` | 1.250 GiB |
 | Gaussian absmean ternary relative output Frobenius error | 0.512542 |
 
 ## Current Open Gaps
