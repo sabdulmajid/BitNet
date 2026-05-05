@@ -549,6 +549,15 @@ Xeon Silver 4116:
 | Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | TQ2_0 | Xeon 4116 | 1,218.6 | 38.8224 | 169.46 | 18.68 | sensible |
 | Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | I2_S per-row-scale prototype | Xeon 4116 | 1,211.3 | 38.8832 | 216.03 | 18.83 | sensible |
 
+A native `GGML_NATIVE=ON` build was then run on the same Xeon. Runtime
+`system_info` reported `AVX512 = 1`, but the row-scale `I2_S` prototype was
+slightly slower than the portable AVX2 build:
+
+| source | build | CPU | PPL | prompt-eval tok/s | decode tok/s | PPL tok/s |
+| --- | --- | --- | ---: | ---: | ---: | ---: |
+| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary I2_S prototype | portable AVX2 | Xeon 4116 | 38.8832 | 216.03 | 18.83 | 151.89 |
+| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary I2_S prototype | native AVX-512 enabled | Xeon 4116 | 38.8853 | 207.35 | 18.37 | 139.71 |
+
 Interpretation:
 
 - Standard Q8_0 and Q4_K_M preserve the FP perplexity on this packed GGUF
@@ -594,6 +603,11 @@ Interpretation:
   `169.46` and `18.68`. This is a promising engineering result, but it changes
   the `I2_S` binary layout, so existing `I2_S` GGUF files must be regenerated
   and the format needs a compatibility policy.
+- Enabling AVX-512 through the native build does not currently improve the
+  row-scale `I2_S` prototype on the Xeon 4116. The native run preserves quality
+  at PPL `38.8853`, but prompt/decode throughput falls to `207.35`/`18.37`
+  tok/s. The likely product implication is that I2_S needs kernel-specific
+  AVX-512 work; hardware feature flags alone are not a speed proof.
 
 ## MoE Status
 
@@ -696,7 +710,11 @@ locality on CPU.
     the Xeon 4116: fixed-excerpt PPL is `38.8832 +/- 1.97093`, prompt
     throughput is `216.03` tok/s, decode throughput is `18.83` tok/s, and the
     smoke prompt is coherent.
-19. The original tensor-scale multi-thread I2_S writer corruption is fixable.
+19. A native AVX-512-enabled build preserves the same row-scale `I2_S` quality
+    but does not improve throughput on the Xeon 4116: fixed-excerpt PPL is
+    38.8853, prompt throughput is 207.35 tok/s, and decode throughput is 18.37
+    tok/s.
+20. The original tensor-scale multi-thread I2_S writer corruption is fixable.
     A local llama.cpp patch that packs I2_S chunks at compressed offsets and
     writes one tensor-level scale preserves fixed-excerpt PPL 54.7366 with 12
     quantization threads.
@@ -723,6 +741,9 @@ locality on CPU.
 9. It does not prove production-ready row-scale `I2_S` deployment. The
    per-row-scale prototype works, but it changes the `I2_S` binary layout and
    needs integration, compatibility policy, and artifact regeneration.
+10. It does not prove AVX-512 acceleration for the current `I2_S` kernel; the
+    native AVX-512-enabled run was slightly slower than the portable AVX2 run
+    on this Xeon.
 
 ## Next Gates
 

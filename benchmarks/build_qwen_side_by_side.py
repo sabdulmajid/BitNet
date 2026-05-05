@@ -47,6 +47,7 @@ GGUF_SUMMARIES = [
     ("KL-only dense lm_head static ternary suite", "benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json"),
     ("KL-only row dense lm_head static ternary suite", "benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json"),
     ("KL-only row dense lm_head I2_S row-scale prototype suite", "benchmark_results/gguf-qwen15b-row-i2s-prototype-suite/summary.json"),
+    ("KL-only row dense lm_head I2_S row-scale prototype native suite", "benchmark_results/gguf-qwen15b-row-i2s-prototype-native-suite/summary.json"),
 ]
 
 

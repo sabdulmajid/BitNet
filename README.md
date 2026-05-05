@@ -57,7 +57,10 @@ conservative:
   that stores one scale per output row fixes this layout issue: row-scale
   `I2_S` reaches PPL `38.8832 +/- 1.97093`, `216.03` prompt tok/s, and
   `18.83` decode tok/s on the Xeon 4116 portable-AVX2 run. That patch is not
-  yet an upstreamed default.
+  yet an upstreamed default. A native `GGML_NATIVE=ON` build reported
+  `AVX512 = 1` but was slightly slower for this row-scale `I2_S` prototype
+  (`207.35` prompt tok/s, `18.37` decode tok/s), so there is no current
+  AVX-512 speedup claim.
 - **Row-wise ternary scales help likelihood but are not enough alone.** A
   Qwen2.5-0.5B row-scale ablation cut heldout perplexity by about 2.4x versus
   the tensor-scale QAT checkpoint, and the final 1.5B row-scale run improved
@@ -143,6 +146,9 @@ same CPU family shown in the table.
 The AMD row-scale `I2_S` row is the failed default layout result. The Xeon
 row-scale `I2_S` prototype row uses `patches/llama-i2s-row-scale.patch`, which
 changes the packed tensor layout to store one scale per output row.
+The same patched row-scale `I2_S` artifact also passed a native AVX-512-enabled
+Xeon run at PPL `38.8853`, `207.35` prompt tok/s, and `18.37` decode tok/s;
+quality is preserved, but throughput did not beat the portable AVX2 build.
 
 ### Practical Product Direction
 
@@ -318,12 +324,13 @@ check, not a replacement for the uncapped `lm-eval` table above.
 ### Packed GGUF CPU Runtime Snapshot
 
 CPU runtime: Intel Xeon Silver 4116, 12 threads, `llama-bench -p 512 -n 128
--ngl 0 -r 3`, no BLAS, AVX-512 available, llama.cpp submodule commit
-`1f86f058`. The I2_S path is a real packed GGUF CPU measurement. Dense-control
-rows were created by converting HF checkpoints to F16 GGUF and then running
-`llama-quantize`; static-ternary rows were created by materializing
-`ternary_state_dict.pt` back into an HF-shaped checkpoint before GGUF
-conversion and packing.
+-ngl 0 -r 3`, no BLAS, llama.cpp submodule commit `1f86f058`. The host CPU
+supports AVX-512; build-specific AVX usage is stated for the row-scale
+prototype suites. The I2_S path is a real packed GGUF CPU measurement.
+Dense-control rows were created by converting HF checkpoints to F16 GGUF and
+then running `llama-quantize`; static-ternary rows were created by
+materializing `ternary_state_dict.pt` back into an HF-shaped checkpoint before
+GGUF conversion and packing.
 
 | source | GGUF type | file size | prefill tok/s | decode tok/s | smoke prompt result |
 | --- | --- | ---: | ---: | ---: | --- |
@@ -399,6 +406,9 @@ row-scale-aware packed ternary writer and kernel rather than the current
 I2_S path. The included `patches/llama-i2s-row-scale.patch` proves the local
 format fix by recovering row-scale `I2_S` PPL `38.8832` with `216.03` prompt
 tok/s and `18.83` decode tok/s on the Xeon portable-AVX2 suite. The included
+native AVX-512-enabled run preserves quality but is slightly slower for this
+kernel (`207.35` prompt tok/s / `18.37` decode tok/s), so CPU-feature-based
+speed claims still need kernel-specific measurement. The included
 `patches/llama-i2s-threaded-quantization.patch` fixes
 the tensor-scale threaded I2_S packing path locally: a 12-thread quantized
 artifact matches the single-thread PPL (`54.7366`) and reaches `208.10` prompt

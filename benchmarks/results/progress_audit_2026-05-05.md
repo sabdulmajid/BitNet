@@ -71,6 +71,14 @@ The mechanical suite audit is
 with six rows, no failed/NaN entries, and an `I2_S`/row-scale-reference PPL
 ratio of `1.00157` under a strict `1.01` max-ratio threshold.
 
+The native `GGML_NATIVE=ON` AVX-512-enabled suite is under
+`benchmark_results/gguf-qwen15b-row-i2s-prototype-native-suite/summary.json`.
+Its mechanical audit is
+`benchmark_results/evidence_audit/qwen15b_row_i2s_native.md`, which passes with
+six rows and an `I2_S`/row-scale-reference PPL ratio of `1.00128`. Native
+AVX-512 preserved quality but did not improve row-scale `I2_S` throughput on
+the Xeon 4116.
+
 Key audited values:
 
 | artifact | audited value |
@@ -98,6 +106,9 @@ Key audited values:
 | Qwen2.5-1.5B row-scale dense-head I2_S prototype prompt tok/s on Xeon 4116 | 216.03 |
 | Qwen2.5-1.5B row-scale dense-head I2_S prototype decode tok/s on Xeon 4116 | 18.83 |
 | Qwen2.5-1.5B row-scale dense-head I2_S prototype GGUF file size | 1,211.3 MiB |
+| Qwen2.5-1.5B row-scale dense-head native AVX-512 I2_S prototype PPL on Xeon 4116 | 38.8853 |
+| Qwen2.5-1.5B row-scale dense-head native AVX-512 I2_S prototype prompt tok/s on Xeon 4116 | 207.35 |
+| Qwen2.5-1.5B row-scale dense-head native AVX-512 I2_S prototype decode tok/s on Xeon 4116 | 18.37 |
 | Gaussian absmean ternary relative output Frobenius error | 0.512542 |
 
 ## Current Open Gaps

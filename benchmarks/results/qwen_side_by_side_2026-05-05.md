@@ -69,3 +69,9 @@ Generated from benchmark JSON artifacts. Missing rows are intentionally shown as
 | KL-only row dense lm_head I2_S row-scale prototype suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_klonly_row_notie_static_ternary_f16 | static_ternary_materialized | 3395.5 | 114.75 | 5.49 | 38.8651 |
 | KL-only row dense lm_head I2_S row-scale prototype suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_klonly_row_notie_static_ternary_tq2_0 | static_ternary_tq2 | 1218.6 | 169.46 | 18.68 | 38.8224 |
 | KL-only row dense lm_head I2_S row-scale prototype suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale | static_ternary_i2s_row_scale_prototype | 1211.3 | 216.03 | 18.83 | 38.8832 |
+| KL-only row dense lm_head I2_S row-scale prototype native suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_fp_f16 | fp_reference | 2950.4 | 102.46 | 5.49 | 12.2806 |
+| KL-only row dense lm_head I2_S row-scale prototype native suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_fp_q8_0 | llama_q8 | 1570.3 | 136.02 | 10.05 | 12.3207 |
+| KL-only row dense lm_head I2_S row-scale prototype native suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_fp_q4_k_m | llama_q4 | 940.4 | 92.46 | 15.67 | 12.8452 |
+| KL-only row dense lm_head I2_S row-scale prototype native suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_klonly_row_notie_static_ternary_f16 | static_ternary_materialized | 3395.5 | 104.72 | 5.49 | 38.8652 |
+| KL-only row dense lm_head I2_S row-scale prototype native suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_klonly_row_notie_static_ternary_tq2_0 | static_ternary_tq2 | 1218.6 | 161.67 | 18.14 | 38.8357 |
+| KL-only row dense lm_head I2_S row-scale prototype native suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale | static_ternary_i2s_row_scale_prototype | 1211.3 | 207.35 | 18.37 | 38.8853 |
