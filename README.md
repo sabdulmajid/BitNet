@@ -77,6 +77,8 @@ conservative:
 
 Current evidence is tracked in
 [benchmarks/results/qwen_retrofit_2026-05-03.md](benchmarks/results/qwen_retrofit_2026-05-03.md).
+The current prompt-to-artifact progress audit is
+[benchmarks/results/progress_audit_2026-05-05.md](benchmarks/results/progress_audit_2026-05-05.md).
 The benchmark harnesses are in [benchmarks/](benchmarks/).
 
 ### Current Perplexity Snapshot
