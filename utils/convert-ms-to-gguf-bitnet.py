@@ -29,7 +29,13 @@ import numpy as np
 from sentencepiece import SentencePieceProcessor
 
 if 'NO_LOCAL_GGUF' not in os.environ:
-    sys.path.insert(1, str(Path(__file__).parent / 'gguf-py'))
+    for gguf_dir in (
+        Path(__file__).parent / 'gguf-py',
+        Path(__file__).resolve().parents[1] / '3rdparty' / 'llama.cpp' / 'gguf-py',
+    ):
+        if gguf_dir.exists():
+            sys.path.insert(1, str(gguf_dir))
+            break
 import gguf
 
 if TYPE_CHECKING:

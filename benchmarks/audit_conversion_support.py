@@ -71,6 +71,17 @@ def llama_quantize_types(path: Path) -> list[str]:
     return sorted(names)
 
 
+def python_help_ok(path: Path) -> bool:
+    completed = subprocess.run(
+        ["python", str(path), "--help"],
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+    return completed.returncode == 0 and "usage:" in completed.stdout
+
+
 def yes(value: bool) -> str:
     return "yes" if value else "no"
 
@@ -91,6 +102,7 @@ def build_report(data: dict[str, Any]) -> str:
             yes(data["bitnet_converter"]["supports_qwen2_moe"]),
             yes(data["bitnet_converter"]["supports_tl2_outtype"]),
             yes(data["bitnet_converter"]["supports_i2s_outtype"]),
+            yes(data["bitnet_converter"]["help_ok"]),
             ", ".join(data["bitnet_converter"]["outtypes"]),
         ],
         [
@@ -100,6 +112,7 @@ def build_report(data: dict[str, Any]) -> str:
             yes(data["llama_converter"]["supports_qwen2_moe"]),
             yes(data["llama_converter"]["supports_tl2_outtype"]),
             yes(data["llama_converter"]["supports_i2s_outtype"]),
+            yes(data["llama_converter"]["help_ok"]),
             ", ".join(data["llama_converter"]["outtypes"]),
         ],
         [
@@ -109,6 +122,7 @@ def build_report(data: dict[str, Any]) -> str:
             "n/a",
             yes(data["llama_quantize"]["supports_tl2_type"]),
             yes(data["llama_quantize"]["supports_i2s_type"]),
+            yes(data["llama_quantize"]["help_ok"]),
             ", ".join(data["llama_quantize"]["types"]),
         ],
     ]
@@ -132,6 +146,7 @@ def build_report(data: dict[str, Any]) -> str:
                     "Qwen2 MoE",
                     "TL2 out/type",
                     "I2_S out/type",
+                    "help ok",
                     "advertised output/types",
                 ],
                 rows,
@@ -166,6 +181,7 @@ def main() -> None:
             "supports_qwen2_moe": "Qwen2MoeForCausalLM" in bitnet_arches,
             "supports_tl2_outtype": "tl2" in bitnet_outtypes,
             "supports_i2s_outtype": "i2_s" in bitnet_outtypes or "I2_S" in bitnet_outtypes,
+            "help_ok": python_help_ok(args.bitnet_converter),
         },
         "llama_converter": {
             "path": str(args.llama_converter),
@@ -175,6 +191,7 @@ def main() -> None:
             "supports_qwen2_moe": "Qwen2MoeForCausalLM" in llama_arches,
             "supports_tl2_outtype": "tl2" in llama_outtypes,
             "supports_i2s_outtype": "i2_s" in llama_outtypes or "I2_S" in llama_outtypes,
+            "help_ok": python_help_ok(args.llama_converter),
         },
         "llama_quantize": {
             "path": str(args.llama_quantize),
@@ -182,6 +199,7 @@ def main() -> None:
             "supports_tl2_type": "TL2" in quantize_types,
             "supports_i2s_type": "I2_S" in quantize_types,
             "supports_tq2_type": "TQ2_0" in quantize_types,
+            "help_ok": bool(quantize_types),
         },
     }
 
