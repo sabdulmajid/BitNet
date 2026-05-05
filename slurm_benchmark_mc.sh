@@ -26,7 +26,15 @@ DTYPE="${DTYPE:-bf16}"
 RUN_ID="${SLURM_JOB_ID:-local}"
 OUT_DIR="${OUT_DIR:-benchmark_results/mc-${RUN_ID}}"
 TASKS="${TASKS:-piqa,arc_easy,arc_challenge,hellaswag}"
-LIMIT="${LIMIT:-200}"
+if [ -n "${MC_LIMIT:-}" ]; then
+  LIMIT="$MC_LIMIT"
+  LIMIT_SOURCE="MC_LIMIT"
+elif [ -n "${LIMIT:-}" ]; then
+  LIMIT_SOURCE="LIMIT (legacy)"
+else
+  LIMIT="200"
+  LIMIT_SOURCE="default"
+fi
 MAX_SEQ_LEN="${MAX_SEQ_LEN:-1024}"
 
 RUN_FP="${RUN_FP:-true}"
@@ -46,7 +54,10 @@ mkdir -p "$OUT_DIR"
 
 echo "SLURM_JOB_ID=${SLURM_JOB_ID:-local}"
 echo "OUT_DIR=$OUT_DIR"
-echo "DEVICE=$DEVICE DTYPE=$DTYPE LIMIT=$LIMIT MAX_SEQ_LEN=$MAX_SEQ_LEN"
+echo "DEVICE=$DEVICE DTYPE=$DTYPE LIMIT=$LIMIT LIMIT_SOURCE=$LIMIT_SOURCE MAX_SEQ_LEN=$MAX_SEQ_LEN"
+if [ "$LIMIT_SOURCE" = "LIMIT (legacy)" ]; then
+  echo "WARNING: LIMIT is a generic environment variable; prefer MC_LIMIT for reproducible MC submissions."
+fi
 echo "TASKS=$TASKS"
 echo "RUN_FP=$RUN_FP RUN_QAT=$RUN_QAT RUN_PTQ=$RUN_PTQ"
 echo "RUN_QWEN05=$RUN_QWEN05 RUN_QWEN15=$RUN_QWEN15"

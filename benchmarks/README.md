@@ -88,6 +88,10 @@ For single-model ablation evaluation in `slurm_benchmark_quality.sh` or
 `slurm_benchmark_mc.sh`, use `RUN_QWEN05=false` or `RUN_QWEN15=false` rather
 than passing dummy checkpoint paths.
 
+For `slurm_benchmark_mc.sh`, prefer `MC_LIMIT=200` over the legacy `LIMIT=200`
+environment variable. `LIMIT` is still accepted for older commands, but it is
+generic enough to be accidentally inherited by Slurm submissions.
+
 ### Tier 2: Fixed Generation Suite
 
 ```bash
