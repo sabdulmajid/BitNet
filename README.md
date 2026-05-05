@@ -52,10 +52,12 @@ conservative:
 - **Packed row-scale deployment is format-limited.** Row-scale static ternary
   materialization and generic `TQ2_0` preserve the row-scale quality on the
   fixed GGUF WikiText excerpt: PPL `38.8651` and `38.8224`, respectively. The
-  current `I2_S` path does **not** preserve it: row-scale `I2_S` explodes to
-  PPL `1.197e6` and produces a failed smoke completion. The strongest working
-  packed `I2_S` quality result remains the tensor-scale dense-`lm_head`
-  checkpoint at PPL `47.3435` on AMD 5945WX.
+  default `I2_S` path does **not** preserve it: row-scale `I2_S` explodes to
+  PPL `1.197e6` and produces a failed smoke completion. A local prototype patch
+  that stores one scale per output row fixes this layout issue: row-scale
+  `I2_S` reaches PPL `38.8832 +/- 1.97093`, `215.00` prompt tok/s, and
+  `18.83` decode tok/s on the Xeon 4116. That patch is not yet an upstreamed
+  default.
 - **Row-wise ternary scales help likelihood but are not enough alone.** A
   Qwen2.5-0.5B row-scale ablation cut heldout perplexity by about 2.4x versus
   the tensor-scale QAT checkpoint, and the final 1.5B row-scale run improved
@@ -75,11 +77,13 @@ conservative:
   than F16 but destroys quality. Materializing the trained
   `ternary_state_dict.pt` and packing it as llama.cpp `TQ2_0` preserves both
   tensor-scale and row-scale QAT perplexity; tensor-scale single-thread `I2_S`
-  also preserves quality. The row-scale `I2_S` bridge currently fails. The
-  original tensor-scale multi-thread I2_S writer path was unsafe for this
-  artifact; this fork now includes a validated llama.cpp patch file that fixes
-  the threaded packing/scaling bug, while the safe wrapper remains
-  single-threaded until the submodule is advanced.
+  also preserves quality. The default row-scale `I2_S` bridge fails because it
+  stores only one tensor scale; `patches/llama-i2s-row-scale.patch` prototypes a
+  per-row-scale layout that fixes the row-scale quality failure. The original
+  tensor-scale multi-thread I2_S writer path was unsafe for this artifact; this
+  fork also includes a validated patch file for that threaded packing/scaling
+  bug, while the safe wrapper remains single-threaded until the submodule is
+  advanced.
 - **MoE remains unproven in this fork.** The vendored llama.cpp backend contains
   generic expert routing and merged expert-tensor support, and the BitNet HF
   converter has partial Qwen-style expert packing. This repo has not yet shown a
@@ -127,12 +131,14 @@ same CPU family shown in the table.
 | Intel Xeon Silver 4116 | FP Q4_K_M | 940.4 | 12.8452 | 94.03 | 15.73 |
 | Intel Xeon Silver 4116 | blind FP-to-I2_S | 766.1 | 1.206e51 | 204.57 | 18.34 |
 | Intel Xeon Silver 4116 | KL-only static ternary I2_S, all-linear | 1,208.9 | 54.7366 | 205.76 | 18.60 |
+| Intel Xeon Silver 4116 | KL-only row-scale static ternary I2_S prototype, dense tied `lm_head` | 1,205.6 | 38.8832 | 215.00 | 18.83 |
 | AMD Ryzen Threadripper PRO 5945WX | KL-only static ternary I2_S, dense tied `lm_head` | 1,208.9 | 47.3435 | 464.19 | 45.50 |
 | AMD Ryzen Threadripper PRO 5945WX | KL-only row-scale static ternary TQ2_0, dense tied `lm_head` | 1,218.6 | 38.8224 | 345.32 | 44.85 |
 | AMD Ryzen Threadripper PRO 5945WX | KL-only row-scale static ternary I2_S, dense tied `lm_head` | 1,208.9 | 1.197e6 | 465.34 | 46.13 |
 
-The row-scale `I2_S` row is a failed quality result, included to make the
-format limitation explicit.
+The AMD row-scale `I2_S` row is the failed default layout result. The Xeon
+row-scale `I2_S` prototype row uses `patches/llama-i2s-row-scale.patch`, which
+changes the packed tensor layout to store one scale per output row.
 
 ### Practical Product Direction
 
@@ -145,8 +151,8 @@ retrofit pipeline with measured guarantees:
 - distill against the FP teacher under the exact ternary constraint,
 - export `ternary_state_dict.pt` plus a static-ternary GGUF bridge,
 - pack `TQ2_0` and `I2_S` artifacts for commodity CPU inference,
-- build a row-scale-aware packed ternary format/kernel before claiming row-scale
-  `I2_S` deployment,
+- promote the row-scale-aware `I2_S` prototype into a stable packed format or
+  new GGUF quantization type before claiming row-scale `I2_S` deployment,
 - publish a benchmark card with FP/Q8/Q4/blind-ternary/QAT comparisons.
 
 The current MVP should target dense Qwen-style models first. MoE models such as

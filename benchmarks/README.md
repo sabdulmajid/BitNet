@@ -321,6 +321,21 @@ Qwen2.5-1.5B KL-only static-ternary GGUF matched the single-thread PPL
 single-thread default until the llama.cpp submodule itself is advanced to a
 commit containing the fix.
 
+Row-scale checkpoints need a separate layout fix. Default `I2_S` stores one
+tensor-level scale and therefore cannot preserve per-output-row ternary scales.
+The prototype patch at `patches/llama-i2s-row-scale.patch` stores one scale per
+output row and updates the CPU matmul/get_rows paths:
+
+```bash
+git apply patches/llama-i2s-row-scale.patch
+cmake --build build-portable-avx2 --target llama-quantize llama-cli llama-perplexity -j 12
+```
+
+With that patch, the Qwen2.5-1.5B KL-only row-scale dense-`lm_head` artifact
+recovered fixed-excerpt PPL `38.8832 +/- 1.97093` as `I2_S`, compared with
+`1,197,135.5848` for the default `I2_S` layout. This patch changes the binary
+layout of `I2_S`; regenerate existing `I2_S` GGUF files before comparing.
+
 ## Publishability Gate
 
 A credible claim needs all of:

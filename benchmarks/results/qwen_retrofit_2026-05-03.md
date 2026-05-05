@@ -528,6 +528,14 @@ WikiText excerpt:
 | Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | TQ2_0 | AMD 5945WX | 38.8224 | 345.32 | 44.85 | sensible |
 | Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | I2_S single-thread quant | AMD 5945WX | 1,197,135.5848 | 465.34 | 46.13 | failed |
 
+After identifying that default `I2_S` stores only one tensor-level scale, a
+local per-row-scale `I2_S` prototype was tested on the Xeon Silver 4116. The
+patch is recorded at `patches/llama-i2s-row-scale.patch`.
+
+| source | GGUF type | CPU | PPL | prompt-eval tok/s | decode tok/s | smoke prompt |
+| --- | --- | --- | ---: | ---: | ---: | --- |
+| Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | I2_S per-row-scale prototype | Xeon 4116 | 38.8832 +/- 1.97093 | 215.00 | 18.83 | sensible |
+
 Interpretation:
 
 - Standard Q8_0 and Q4_K_M preserve the FP perplexity on this packed GGUF
@@ -566,6 +574,11 @@ Interpretation:
   format/kernel limitation, not a training-quality result. A row-scale-aware
   packed ternary writer and kernel are required before claiming row-scale
   `I2_S` deployment.
+- The per-row-scale `I2_S` prototype fixes that specific failure: PPL returns
+  to `38.8832 +/- 1.97093`, matching row-scale `TQ2_0` within measurement
+  noise, and the smoke prompt is coherent. This is a promising engineering
+  result, but it changes the `I2_S` binary layout, so existing `I2_S` GGUF
+  files must be regenerated and the format needs a compatibility policy.
 
 ## MoE Status
 
@@ -660,11 +673,15 @@ locality on CPU.
    prompt-eval tok/s and 45.50 decode tok/s. The strongest packed row-scale
    quality result is `TQ2_0`, not `I2_S`: fixed-excerpt PPL 38.8224 on AMD
    5945WX at 345.32 prompt-eval tok/s and 44.85 decode tok/s.
-17. The current row-scale `I2_S` path fails. It reaches high throughput but
+17. The default row-scale `I2_S` path fails. It reaches high throughput but
     explodes to fixed-excerpt PPL 1,197,135.5848 and fails the smoke prompt.
     This identifies a packed-format/kernel problem rather than a training
     problem.
-18. The original tensor-scale multi-thread I2_S writer corruption is fixable.
+18. A per-row-scale `I2_S` prototype fixes that row-scale quality failure on
+    the Xeon 4116: fixed-excerpt PPL is `38.8832 +/- 1.97093`, prompt
+    throughput is `215.00` tok/s, decode throughput is `18.83` tok/s, and the
+    smoke prompt is coherent.
+19. The original tensor-scale multi-thread I2_S writer corruption is fixable.
     A local llama.cpp patch that packs I2_S chunks at compressed offsets and
     writes one tensor-level scale preserves fixed-excerpt PPL 54.7366 with 12
     quantization threads.
@@ -688,17 +705,17 @@ locality on CPU.
 8. It does not prove that a dense tied `lm_head` is acceptable for every product
    constraint; it improves likelihood at 0.5B and 1.5B scale but gives up full
    output-head ternarization.
-9. It does not prove row-scale `I2_S` deployment. The current row-scale
-   materialized and `TQ2_0` artifacts work; the current row-scale `I2_S`
-   artifact fails quality audit.
+9. It does not prove production-ready row-scale `I2_S` deployment. The
+   per-row-scale prototype works, but it changes the `I2_S` binary layout and
+   needs integration, compatibility policy, and artifact regeneration.
 
 ## Next Gates
 
 The next benchmark gates are:
 
-1. Build a row-scale-aware packed ternary writer and kernel path. The current
-   highest-quality row-scale checkpoint works as materialized F16 and `TQ2_0`
-   but fails as `I2_S`.
+1. Promote `patches/llama-i2s-row-scale.patch` into a stable row-scale-aware
+   packed ternary format or new GGUF quantization type, then regenerate row
+   artifacts and rerun the full GGUF suite.
 2. Advance or fork the llama.cpp submodule to include the validated
    tensor-scale multi-thread I2_S writer patch, then keep
    `quantize_gguf_safe.py` from forcing `nthreads=1`.
