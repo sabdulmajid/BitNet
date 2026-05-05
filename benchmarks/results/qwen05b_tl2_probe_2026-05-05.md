@@ -19,6 +19,8 @@ Inputs:
 
 The generated GGUF is `599.5 MiB`; llama.cpp reports `168` TL2 tensors,
 `122` F32 tensors, `593.78 MiB` model size, and `10.08 BPW`.
+The mechanical evidence audit is
+`benchmark_results/evidence_audit/qwen05b_tl2_probe.md`.
 
 ## Engineering Result
 

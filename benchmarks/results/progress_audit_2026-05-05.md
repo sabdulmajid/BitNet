@@ -117,7 +117,9 @@ Qwen2.5-1.5B tensors; exact model-specific TL2 code generation is required.
 The Qwen2.5-0.5B TL2 probe is tracked at
 `benchmarks/results/qwen05b_tl2_probe_2026-05-05.md`. It produced a loadable
 TL2 GGUF and a matching `BITNET_X86_TL2=ON` AVX-512 build, but the measured TL2
-artifact has NaN PPL and nonsensical smoke text.
+artifact has NaN PPL and nonsensical smoke text. Its mechanical evidence audit
+is `benchmark_results/evidence_audit/qwen05b_tl2_probe.md`, which passes only
+because it expects this scoped negative result.
 
 The MoE support audit is tracked at
 `benchmarks/results/moe_support_audit_2026-05-05.md`. It confirms generic GGUF
