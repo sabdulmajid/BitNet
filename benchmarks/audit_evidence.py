@@ -395,6 +395,19 @@ def audit_gguf_summary(specs: list[tuple[str, Path, int | None]]) -> str:
             "qwen15b_klonly_static_ternary_i2_s",
             kind_tokens=("qat", "i2s"),
         )
+        if qat_i2s_name not in by_name:
+            for candidate in rows:
+                if not isinstance(candidate, dict):
+                    continue
+                name = str(candidate.get("name", ""))
+                kind = str(candidate.get("kind", "")).lower()
+                normalized_name = name.lower()
+                if (
+                    ("static_ternary" in kind and "i2s" in kind)
+                    or ("static_ternary" in normalized_name and "i2_s" in normalized_name)
+                ):
+                    qat_i2s_name = name
+                    break
 
         def ppl_for(name: str) -> str:
             value = by_name.get(name, {}).get("perplexity", {}).get("ppl")
