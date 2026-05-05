@@ -42,11 +42,14 @@ conservative:
   WikiText/FineWeb PPL again to `43.372`/`22.759`, but its uncapped ten-task
   mean is only `0.484`; the paired macro delta versus the all-ternary KL-only
   run is `+0.00094` with 95% CI crossing zero.
-- **The strongest packed CPU result is now KL-only static ternary I2_S.** On
-  the Xeon 4116 fixed GGUF excerpt, it reaches PPL `54.7366` at `140.95`
-  prompt-eval tok/s and `18.60` decode tok/s. This is a large improvement over
-  the earlier hidden-MSE static ternary I2_S PPL `84.5277`, but still far from
-  FP/Q8/Q4 likelihood.
+- **The strongest packed CPU quality result is now KL-only dense-`lm_head`
+  static ternary I2_S.** On the fixed GGUF WikiText excerpt it reaches PPL
+  `47.3435` after preserving Qwen's tied output head as dense. That latest
+  run was measured on `ece-nebula12` with an AMD Ryzen Threadripper PRO 5945WX,
+  so its throughput is not directly comparable to the older Xeon 4116 run. On
+  the Xeon 4116, the all-linear KL-only static ternary I2_S artifact remains
+  the audited same-hardware result: PPL `54.7366`, `140.95` prompt-eval tok/s,
+  and `18.60` decode tok/s.
 - **Row-wise ternary scales help likelihood but do not solve accuracy.** A
   Qwen2.5-0.5B row-scale ablation cut heldout perplexity by about 2.4x versus
   the tensor-scale QAT checkpoint, but its 100-example multiple-choice slices
@@ -101,6 +104,21 @@ The benchmark harnesses are in [benchmarks/](benchmarks/).
 
 These numbers are BF16/CUDA quality measurements using PyTorch simulation of
 W1.58A8 math. They are **not** `bitnet.cpp` CPU throughput claims.
+
+### Current Packed GGUF CPU Snapshot
+
+Packed GGUF results below are fixed-excerpt `llama.cpp` CPU measurements. The
+PPL values are comparable across rows; throughput is only comparable within the
+same CPU family shown in the table.
+
+| CPU | artifact | file MiB | PPL | prompt tok/s | decode tok/s |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Intel Xeon Silver 4116 | FP F16 | 2,950.4 | 12.2806 | 104.23 | 5.47 |
+| Intel Xeon Silver 4116 | FP Q8_0 | 1,570.3 | 12.3207 | 134.48 | 10.03 |
+| Intel Xeon Silver 4116 | FP Q4_K_M | 940.4 | 12.8452 | 94.03 | 15.73 |
+| Intel Xeon Silver 4116 | blind FP-to-I2_S | 766.1 | 1.206e51 | 204.57 | 18.34 |
+| Intel Xeon Silver 4116 | KL-only static ternary I2_S, all-linear | 1,208.9 | 54.7366 | 205.76 | 18.60 |
+| AMD Ryzen Threadripper PRO 5945WX | KL-only static ternary I2_S, dense tied `lm_head` | 1,208.9 | 47.3435 | 464.19 | 45.50 |
 
 ### Qwen2.5-0.5B Row-Scale Ablation
 

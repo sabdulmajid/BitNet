@@ -33,8 +33,8 @@ Current evidence still supports the negative retrofit verdict:
 | Add QAT with and without hidden MSE | complete | hidden-MSE run `checkpoints/qwen2.5-1.5b-fineweb-edu/step-5000`; KL-only run `checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-5000/step-5000`; full ten-task comparison in `benchmark_results/lm-eval-qwen15b-klonly-full10/selected_metrics_with_baselines.md` |
 | Add row-scale versus tensor-scale | partial | Qwen2.5-0.5B row-scale evidence complete; Qwen2.5-1.5B row-scale dense-head job `9771` is still running with dependent jobs `9776`, `9779`, `9780`, and postprocess `9781` pending |
 | Convert repaired checkpoints into GGUF/TL2/I2_S | partial | static-ternary materialization to GGUF and packed `TQ2_0`/`I2_S` complete; native direct `ternary_state_dict.pt` GGUF writer and Qwen TL2 path are not yet complete |
-| Run actual bitnet.cpp / llama.cpp CPU inference | complete for packed GGUF probes | `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`, `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json` |
-| Measure Xeon tokens/sec, prompt throughput, RSS, model size, quality loss | complete for current baselines | PyTorch RSS/runtime in `benchmark_results/runtime-qwen-xeon4116-512x32/summary.md`; packed GGUF throughput/file size/PPL in `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`; patched I2_S confirmation in `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json` |
+| Run actual bitnet.cpp / llama.cpp CPU inference | complete for packed GGUF probes | `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`, `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json`, and dense-head suite `benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json` |
+| Measure CPU tokens/sec, prompt throughput, RSS, model size, quality loss | complete for current baselines | PyTorch RSS/runtime in `benchmark_results/runtime-qwen-xeon4116-512x32/summary.md`; Xeon packed GGUF throughput/file size/PPL in `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`; AMD dense-head packed GGUF in `benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json`; patched I2_S confirmation in `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json` |
 
 ## Mechanical Audit Evidence
 
@@ -59,6 +59,8 @@ Key audited values:
 | Qwen2.5-1.5B KL-only dense-head FineWeb-heldout PPL | 22.759 |
 | Qwen2.5-1.5B KL-only static-ternary patched I2_S PPL | 54.7366 |
 | Qwen2.5-1.5B KL-only static-ternary patched I2_S decode tok/s | 18.63 |
+| Qwen2.5-1.5B KL-only dense-head static-ternary I2_S PPL | 47.3435 |
+| Qwen2.5-1.5B KL-only dense-head static-ternary I2_S decode tok/s on AMD 5945WX | 45.50 |
 | Gaussian absmean ternary relative output Frobenius error | 0.512542 |
 
 ## Current Open Gaps

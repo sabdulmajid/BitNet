@@ -473,6 +473,20 @@ Important caveats:
 | Qwen2.5-1.5B KL-only static ternary | I2_S single-thread quant | 54.7366 | 2.98318 | 140.95 |
 | Qwen2.5-1.5B KL-only static ternary | I2_S patched 12-thread quant | 54.7366 | 2.98318 | 141.14 |
 
+A later dense-`lm_head` static-ternary GGUF suite was run on the same fixed
+WikiText excerpt but on `ece-nebula12`, an AMD Ryzen Threadripper PRO 5945WX
+node. Its PPL values are directly useful; its throughput should not be compared
+against the Xeon rows as a same-hardware speedup.
+
+| source | GGUF type | CPU | PPL | prompt-eval tok/s | decode tok/s |
+| --- | --- | --- | ---: | ---: | ---: |
+| Qwen2.5-1.5B FP | F16 | AMD 5945WX | 12.2808 | 218.46 | 12.46 |
+| Qwen2.5-1.5B FP | Q8_0 | AMD 5945WX | 12.3056 | 215.00 | 23.14 |
+| Qwen2.5-1.5B FP | Q4_K_M | AMD 5945WX | 12.8112 | 172.14 | 36.50 |
+| Qwen2.5-1.5B KL-only dense-`lm_head` static ternary | F16 materialized | AMD 5945WX | 47.2994 | 222.07 | 12.48 |
+| Qwen2.5-1.5B KL-only dense-`lm_head` static ternary | TQ2_0 | AMD 5945WX | 47.2823 | 348.88 | 44.03 |
+| Qwen2.5-1.5B KL-only dense-`lm_head` static ternary | I2_S single-thread quant | AMD 5945WX | 47.3435 | 464.19 | 45.50 |
+
 Interpretation:
 
 - Standard Q8_0 and Q4_K_M preserve the FP perplexity on this packed GGUF
@@ -495,11 +509,14 @@ Interpretation:
   static-ternary PPL. The included threaded-writer patch preserves the same PPL
   with 12 quantization threads, which confirms the earlier NaN PPL was a
   writer/chunking bug rather than a fundamental runtime math failure.
-- The KL-only static-ternary bridge is the current best CPU-side result:
-  patched 12-thread `I2_S` gives `54.7366` PPL on the fixed excerpt, `141.14`
-  prompt-eval tok/s, and `18.63` decode tok/s. It is much better than the
-  hidden-MSE static ternary bridge, but still far worse than FP/Q8/Q4
-  likelihood.
+- The all-linear KL-only static-ternary bridge is the best same-hardware Xeon
+  result: patched 12-thread `I2_S` gives `54.7366` PPL on the fixed excerpt,
+  `141.14` prompt-eval tok/s, and `18.63` decode tok/s.
+- The dense-`lm_head` KL-only static-ternary bridge improves the fixed-excerpt
+  PPL to `47.3435` when packed as `I2_S`. That run was measured on AMD
+  5945WX, so it is quality evidence and a separate hardware throughput data
+  point, not a same-machine Xeon speed comparison. Both trained ternary bridges
+  are still far worse than FP/Q8/Q4 likelihood.
 
 ## MoE Status
 
@@ -582,9 +599,12 @@ locality on CPU.
 15. A deployable intermediate path exists through static ternary materialization
    plus llama.cpp `TQ2_0` or single-thread-written `I2_S`: both preserve the QAT
    PPL and run much faster than F16 decode, but the path requires
-   QAT/distillation. The strongest CPU-side checkpoint so far is the KL-only
-   static ternary `I2_S` artifact: fixed-excerpt PPL 54.7366, prompt-eval
-   140.95 tok/s, and decode 18.60 tok/s on the Xeon.
+   QAT/distillation. The strongest same-hardware Xeon all-linear checkpoint is
+   the KL-only static ternary `I2_S` artifact: fixed-excerpt PPL 54.7366,
+   prompt-eval 140.95 tok/s, and decode 18.60 tok/s. The strongest packed
+   quality result so far is the dense-`lm_head` KL-only static ternary `I2_S`
+   artifact: fixed-excerpt PPL 47.3435, measured on AMD 5945WX at 464.19
+   prompt-eval tok/s and 45.50 decode tok/s.
 16. The original multi-thread I2_S writer corruption is fixable. A local
     llama.cpp patch that packs I2_S chunks at compressed offsets and writes one
     tensor-level scale preserves fixed-excerpt PPL 54.7366 with 12 quantization

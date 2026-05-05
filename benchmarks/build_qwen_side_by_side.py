@@ -132,8 +132,10 @@ def build_gguf_table() -> str:
                 continue
             ppl = row.get("perplexity", {}).get("ppl")
             bench = row.get("bench", {})
+            cpu = bench.get("prefill", {}).get("cpu") or bench.get("decode", {}).get("cpu") or "-"
             rows.append([
                 suite_label,
+                str(cpu),
                 name,
                 str(row.get("kind", "")),
                 fmt(row.get("file_mib"), 1),
@@ -141,7 +143,7 @@ def build_gguf_table() -> str:
                 fmt(bench.get("decode", {}).get("tok_s"), 2),
                 fmt(ppl, 4),
             ])
-    return md_table(["suite", "artifact", "kind", "file MiB", "prefill tok/s", "decode tok/s", "PPL"], rows)
+    return md_table(["suite", "CPU", "artifact", "kind", "file MiB", "prefill tok/s", "decode tok/s", "PPL"], rows)
 
 
 def main() -> None:
