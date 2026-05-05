@@ -208,6 +208,15 @@ python benchmarks/audit_evidence.py \
   --output-md benchmark_results/evidence_audit/current.md
 ```
 
+For the Qwen2.5-1.5B row-scale dense-head ablation, the postprocess wrapper
+audits the final checkpoint/eval artifacts and writes paired lm-eval comparison
+tables after the quality, MC, and full ten-task jobs complete:
+
+```bash
+sbatch --dependency=afterok:<quality_job>:<mc_job>:<lm_eval_job> \
+  slurm_postprocess_row_densehead.sh
+```
+
 ### Tier 4: CPU Runtime
 
 After GGUF/TL2/I2_S conversion, compare against llama.cpp baselines:
