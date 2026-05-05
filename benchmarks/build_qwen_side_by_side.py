@@ -119,6 +119,25 @@ def build_lm_eval_table() -> str:
     return md_table(["run", "selected mean", "tasks", "samples", "status"], rows)
 
 
+def build_lm_eval_detail_table() -> str:
+    loaded = [(label, read_json(Path(path))) for label, path in LM_EVAL_RUNS]
+    rows: list[list[str]] = []
+    for task, metric in SELECTED_LM_EVAL_METRICS.items():
+        row = [task, metric]
+        for _, data in loaded:
+            value = None
+            if data is not None:
+                task_results = data.get("results", {}).get(task)
+                if isinstance(task_results, dict):
+                    try:
+                        value = metric_value(task_results, metric)
+                    except KeyError:
+                        value = None
+            row.append(fmt(value, 3))
+        rows.append(row)
+    return md_table(["task", "metric", *[label for label, _ in loaded]], rows)
+
+
 def build_gguf_table() -> str:
     rows: list[list[str]] = []
     for suite_label, path in GGUF_SUMMARIES:
@@ -158,6 +177,8 @@ def main() -> None:
         build_ppl_table(),
         "## Full Ten-Task lm-eval",
         build_lm_eval_table(),
+        "## Full Ten-Task Detail",
+        build_lm_eval_detail_table(),
         "## Packed GGUF CPU",
         build_gguf_table(),
     ])

@@ -24,6 +24,21 @@ Generated from benchmark JSON artifacts. Missing rows are intentionally shown as
 | QAT KL-only dense lm_head | 0.484378 | 10 | 22382 | present |
 | QAT KL-only row dense lm_head | - | 0 | 0 | missing |
 
+## Full Ten-Task Detail
+
+| task | metric | FP | naive PTQ | QAT hidden-MSE | QAT KL-only | QAT KL-only dense lm_head | QAT KL-only row dense lm_head |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| arc_challenge | acc_norm | 0.450 | 0.262 | 0.264 | 0.271 | 0.264 | - |
+| arc_easy | acc_norm | 0.720 | 0.244 | 0.478 | 0.483 | 0.501 | - |
+| hellaswag | acc_norm | 0.678 | 0.264 | 0.362 | 0.378 | 0.391 | - |
+| piqa | acc_norm | 0.758 | 0.508 | 0.622 | 0.637 | 0.647 | - |
+| winogrande | acc | 0.638 | 0.498 | 0.523 | 0.521 | 0.523 | - |
+| boolq | acc | 0.726 | 0.506 | 0.593 | 0.596 | 0.597 | - |
+| copa | acc | 0.830 | 0.510 | 0.640 | 0.700 | 0.680 | - |
+| openbookqa | acc_norm | 0.404 | 0.276 | 0.312 | 0.312 | 0.308 | - |
+| sciq | acc_norm | 0.934 | 0.199 | 0.613 | 0.695 | 0.700 | - |
+| truthfulqa_mc1 | acc | 0.305 | 0.220 | 0.241 | 0.241 | 0.233 | - |
+
 ## Packed GGUF CPU
 
 | suite | CPU | artifact | kind | file MiB | prefill tok/s | decode tok/s | PPL |
