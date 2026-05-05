@@ -37,6 +37,11 @@ conservative:
   it improves Qwen2.5-1.5B WikiText/FineWeb PPL from `86.414`/`40.398` to
   `50.595`/`26.599` versus the hidden-MSE QAT run, and improves uncapped
   ten-task lm-eval mean from `0.465` to `0.483`. FP remains `0.644`.
+- **Keeping Qwen's tied output head dense improves 1.5B likelihood, not the
+  task verdict.** The dense-`lm_head` KL-only 1.5B ablation improves
+  WikiText/FineWeb PPL again to `43.372`/`22.759`, but its uncapped ten-task
+  mean is only `0.484`; the paired macro delta versus the all-ternary KL-only
+  run is `+0.00094` with 95% CI crossing zero.
 - **The strongest packed CPU result is now KL-only static ternary I2_S.** On
   the Xeon 4116 fixed GGUF excerpt, it reaches PPL `54.7366` at `140.95`
   prompt-eval tok/s and `18.60` decode tok/s. This is a large improvement over
@@ -46,11 +51,11 @@ conservative:
   Qwen2.5-0.5B row-scale ablation cut heldout perplexity by about 2.4x versus
   the tensor-scale QAT checkpoint, but its 100-example multiple-choice slices
   were mixed and mostly not better.
-- **KL-only distillation with a dense tied `lm_head` is the best 0.5B
+- **KL-only distillation with a dense tied `lm_head` is the best likelihood
   ablation so far.** Removing the hidden-state MSE term improved quality, and
-  leaving Qwen's tied output head dense improved it again. That checkpoint is
-  not an all-linear W1.58 model, but it is the more architecturally honest
-  Qwen retrofit policy tested so far.
+  leaving Qwen's tied output head dense improved it again at both 0.5B and
+  1.5B scale. That checkpoint family is not an all-linear W1.58 model, but it
+  is the more architecturally honest Qwen retrofit policy tested so far.
 - **PyTorch ternary simulation is not the speed path.** On the Xeon Silver 4116
   host, the exported ternary checkpoints are smaller in memory but slower than
   FP under PyTorch because the probe dequantizes into dense matmuls. Real
@@ -87,6 +92,7 @@ The benchmark harnesses are in [benchmarks/](benchmarks/).
 | Qwen2.5-1.5B | naive PTQ ternary | 3,813,121.803 | 9,582,923.269 |
 | Qwen2.5-1.5B | QAT/distilled ternary | 86.414 | 40.398 |
 | Qwen2.5-1.5B | QAT/distilled ternary, KL only | 50.595 | 26.599 |
+| Qwen2.5-1.5B | QAT/distilled ternary, KL only, dense tied `lm_head` | 43.372 | 22.759 |
 
 These numbers are BF16/CUDA quality measurements using PyTorch simulation of
 W1.58A8 math. They are **not** `bitnet.cpp` CPU throughput claims.
@@ -207,27 +213,42 @@ far below FP: QAT minus FP is `-0.199` macro mean with paired 95% CI
 ### Full Ten-Task lm-eval Run
 
 The full core run was merged with uncapped BoolQ, COPA, OpenBookQA, SciQ, and
-TruthfulQA MC1 runs for the same three artifacts.
+TruthfulQA MC1 runs for the same artifacts.
 
-| task | metric | FP | naive PTQ | QAT hidden-MSE | QAT KL-only |
-| --- | --- | ---: | ---: | ---: | ---: |
-| ARC-Challenge | acc_norm | 0.450 | 0.262 | 0.264 | 0.271 |
-| ARC-Easy | acc_norm | 0.720 | 0.244 | 0.478 | 0.483 |
-| HellaSwag | acc_norm | 0.678 | 0.264 | 0.362 | 0.378 |
-| PIQA | acc_norm | 0.758 | 0.508 | 0.622 | 0.637 |
-| WinoGrande | acc | 0.638 | 0.498 | 0.523 | 0.521 |
-| BoolQ | acc | 0.726 | 0.506 | 0.593 | 0.596 |
-| COPA | acc | 0.830 | 0.510 | 0.640 | 0.700 |
-| OpenBookQA | acc_norm | 0.404 | 0.276 | 0.312 | 0.312 |
-| SciQ | acc_norm | 0.934 | 0.199 | 0.613 | 0.695 |
-| TruthfulQA MC1 | acc | 0.305 | 0.220 | 0.241 | 0.241 |
+| task | metric | FP | naive PTQ | QAT hidden-MSE | QAT KL-only | QAT KL-only dense `lm_head` |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| ARC-Challenge | acc_norm | 0.450 | 0.262 | 0.264 | 0.271 | 0.264 |
+| ARC-Easy | acc_norm | 0.720 | 0.244 | 0.478 | 0.483 | 0.501 |
+| HellaSwag | acc_norm | 0.678 | 0.264 | 0.362 | 0.378 | 0.391 |
+| PIQA | acc_norm | 0.758 | 0.508 | 0.622 | 0.637 | 0.647 |
+| WinoGrande | acc | 0.638 | 0.498 | 0.523 | 0.521 | 0.523 |
+| BoolQ | acc | 0.726 | 0.506 | 0.593 | 0.596 | 0.597 |
+| COPA | acc | 0.830 | 0.510 | 0.640 | 0.700 | 0.680 |
+| OpenBookQA | acc_norm | 0.404 | 0.276 | 0.312 | 0.312 | 0.308 |
+| SciQ | acc_norm | 0.934 | 0.199 | 0.613 | 0.695 | 0.700 |
+| TruthfulQA MC1 | acc | 0.305 | 0.220 | 0.241 | 0.241 | 0.233 |
 
 Mean over these displayed metrics: FP `0.644`, naive PTQ `0.349`,
-QAT hidden-MSE `0.465`, and QAT KL-only `0.483`. KL-only improves over
-hidden-MSE by `+0.0186` macro mean with paired 95% CI `[+0.0008, +0.0364]`.
-It improves over blind PTQ by `+0.1348` with paired 95% CI
-`[+0.0429, +0.2267]`, but remains below FP by `-0.1607` with paired 95% CI
-`[-0.2075, -0.1140]`.
+QAT hidden-MSE `0.465`, QAT KL-only `0.483`, and QAT KL-only dense `lm_head`
+`0.484`. The dense-head run improves over hidden-MSE by `+0.0196` macro mean
+with paired 95% CI `[+0.0018, +0.0374]`, but it is not distinguishable from
+the all-ternary KL-only run on macro mean (`+0.00094`, CI
+`[-0.0061, +0.0080]`). It improves over blind PTQ by `+0.1357` with paired
+95% CI `[+0.0416, +0.2298]`, but remains below FP by `-0.1598` with paired
+95% CI `[-0.2027, -0.1168]`.
+
+### Fast MC200 Dense-Head Check
+
+The in-repo multiple-choice harness was rerun on 200-example validation slices
+for the Qwen2.5-1.5B KL-only dense-`lm_head` checkpoint. This is a regression
+check, not a replacement for the uncapped `lm-eval` table above.
+
+| task | acc | acc_norm | n |
+| --- | ---: | ---: | ---: |
+| PIQA | 0.640 | 0.655 | 200 |
+| ARC-Easy | 0.585 | 0.450 | 200 |
+| ARC-Challenge | 0.225 | 0.255 | 200 |
+| HellaSwag | 0.380 | 0.410 | 200 |
 
 ### Packed GGUF CPU Runtime Snapshot
 
@@ -324,8 +345,8 @@ three measured repeats. These are PyTorch loader numbers, not packed
 The in-repo multiple-choice evaluator covers 100-example validation slices
 for PIQA, ARC-Easy, ARC-Challenge, and HellaSwag. This is a fast regression
 tool; the official `lm-eval` snapshot above is the stronger current evidence.
-The strongest current ternary result in this fast local harness is
-Qwen2.5-1.5B QAT/distilled:
+This older 100-example table is kept for historical comparison with the first
+Qwen2.5-1.5B hidden-MSE QAT checkpoint:
 
 | task | FP Qwen2.5-1.5B acc | naive PTQ acc | QAT ternary acc |
 | --- | ---: | ---: | ---: |

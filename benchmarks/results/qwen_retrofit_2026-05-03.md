@@ -6,14 +6,14 @@ these are quality and loader results, not final CPU product benchmarks.
 
 ## Setup
 
-- Benchmark tooling commit before this report update: `333cc54`
+- Latest pushed tooling commit before this report update: `2d6a712`
 - Packed runtime binary: llama.cpp submodule commit `1f86f058`
 - Dataset for QAT/distillation: `HuggingFaceFW/fineweb-edu`, `sample-10BT`
 - QAT student forward math: ternary weights plus dynamic 8-bit activation quantization
 - Main QAT loss: teacher KL divergence plus last-hidden-state MSE
 - Additional ablation: teacher KL only for Qwen2.5-0.5B and Qwen2.5-1.5B
 - Additional ablation: teacher KL only with tied dense `lm_head` preserved for
-  Qwen2.5-0.5B
+  Qwen2.5-0.5B and Qwen2.5-1.5B
 - Main scale mode: per-tensor absmean scale
 - Additional ablation: per-output-row absmean scale for Qwen2.5-0.5B
 - Evaluation dtype/device for perplexity: BF16 on CUDA
@@ -40,6 +40,7 @@ smoke-scale heldout test.
 | 9748 | Qwen2.5-0.5B QAT student, KL only | 1000 | 4,000 x 512 | 1.6375 | 1.6375 | 0.0000 | complete |
 | 9764 | Qwen2.5-0.5B QAT student, KL only, dense tied `lm_head` | 1000 | 4,000 x 512 | 1.6821 | 1.6821 | 0.0000 | complete |
 | 9758 | Qwen2.5-1.5B QAT student, KL only | 5000 | 20,000 x 1024 | 1.5172 | 1.5172 | 0.0000 | complete |
+| 9767 | Qwen2.5-1.5B QAT student, KL only, dense tied `lm_head` | 5000 | 20,000 x 1024 | 1.3353 | 1.3353 | 0.0000 | complete |
 
 ## Export Status
 
@@ -51,6 +52,7 @@ smoke-scale heldout test.
 | `qwen2.5-0.5b-fineweb-edu-klonly-notiehead-1000/step-1000` | 168 | 168 | KL-only export with tied dense `lm_head` preserved; config keeps `tie_word_embeddings=true` |
 | `qwen2.5-1.5b-fineweb-edu/step-5000` | 197 | 197 | repaired after FSDP name-mapping bug |
 | `qwen2.5-1.5b-fineweb-edu-klonly-5000/step-5000` | 197 | 197 | KL-only QAT ternary export; `lm_head` is ternary so config is patched to `tie_word_embeddings=false` |
+| `qwen2.5-1.5b-fineweb-edu-klonly-notiehead-5000/step-5000` | 196 | 196 | KL-only export with tied dense `lm_head` preserved; config keeps `tie_word_embeddings=true` |
 | `qwen2.5-0.5b-naive-ptq-tensor` | 168 | 168 | original HF checkpoint has tied `lm_head` |
 | `qwen2.5-1.5b-naive-ptq-tensor` | 196 | 196 | original HF checkpoint has tied `lm_head` |
 
@@ -70,6 +72,7 @@ Lower is better.
 | Qwen2.5-1.5B | naive PTQ ternary | 3,813,121.803 | 9,582,923.269 | blind ternarization destroys quality |
 | Qwen2.5-1.5B | QAT/distilled ternary | 86.414 | 40.398 | QAT is orders better than PTQ, but still far from FP |
 | Qwen2.5-1.5B | QAT/distilled ternary, KL only | 50.595 | 26.599 | best 1.5B tensor-scale QAT result so far, still far from FP |
+| Qwen2.5-1.5B | QAT/distilled ternary, KL only, dense tied `lm_head` | 43.372 | 22.759 | best 1.5B likelihood result so far, but output head remains dense/tied |
 
 The row-scale ablation is meaningful but not decisive. It reduces 0.5B
 WikiText PPL from `1,079.167` to `444.691` and FineWeb-heldout PPL from
@@ -87,8 +90,12 @@ checkpoint.
 The same KL-only loss at Qwen2.5-1.5B scale also improves over the earlier
 hidden-MSE QAT run: WikiText PPL drops from `86.414` to `50.595`, and
 FineWeb-heldout PPL drops from `40.398` to `26.599`. This is the strongest
-1.5B tensor-scale QAT result so far, but it still remains far from FP PPL
-(`13.901` and `10.269`).
+1.5B all-linear ternary QAT result so far, but it still remains far from FP
+PPL (`13.901` and `10.269`). Preserving the tied output head as dense in the
+same 1.5B KL-only setup improves likelihood again to `43.372` WikiText PPL and
+`22.759` FineWeb-heldout PPL. That tied-head checkpoint is not an all-linear
+W1.58 model, and its full ten-task accuracy gain over the all-ternary KL-only
+checkpoint is not statistically decisive.
 
 ## PTQ Math Audit
 
@@ -295,18 +302,18 @@ COPA, OpenBookQA, SciQ, and TruthfulQA MC1. The merge was done with
 `benchmarks/merge_lm_eval_results.py`, preserving logged samples for paired
 analysis.
 
-| task | metric | FP reference | naive PTQ ternary | QAT hidden-MSE | QAT KL-only |
-| --- | --- | ---: | ---: | ---: | ---: |
-| ARC-Challenge | acc_norm | 0.449659 | 0.261945 | 0.263652 | 0.271331 |
-| ARC-Easy | acc_norm | 0.719697 | 0.244108 | 0.478114 | 0.483165 |
-| HellaSwag | acc_norm | 0.677953 | 0.264190 | 0.362378 | 0.377714 |
-| PIQA | acc_norm | 0.757889 | 0.507617 | 0.621872 | 0.637106 |
-| WinoGrande | acc | 0.637727 | 0.498027 | 0.523283 | 0.520916 |
-| BoolQ | acc | 0.725994 | 0.505505 | 0.592661 | 0.596024 |
-| COPA | acc | 0.830000 | 0.510000 | 0.640000 | 0.700000 |
-| OpenBookQA | acc_norm | 0.404000 | 0.276000 | 0.312000 | 0.312000 |
-| SciQ | acc_norm | 0.934000 | 0.199000 | 0.613000 | 0.695000 |
-| TruthfulQA MC1 | acc | 0.304774 | 0.220318 | 0.241126 | 0.241126 |
+| task | metric | FP reference | naive PTQ ternary | QAT hidden-MSE | QAT KL-only | QAT KL-only dense `lm_head` |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| ARC-Challenge | acc_norm | 0.449659 | 0.261945 | 0.263652 | 0.271331 | 0.263652 |
+| ARC-Easy | acc_norm | 0.719697 | 0.244108 | 0.478114 | 0.483165 | 0.500842 |
+| HellaSwag | acc_norm | 0.677953 | 0.264190 | 0.362378 | 0.377714 | 0.390759 |
+| PIQA | acc_norm | 0.757889 | 0.507617 | 0.621872 | 0.637106 | 0.647443 |
+| WinoGrande | acc | 0.637727 | 0.498027 | 0.523283 | 0.520916 | 0.523283 |
+| BoolQ | acc | 0.725994 | 0.505505 | 0.592661 | 0.596024 | 0.597248 |
+| COPA | acc | 0.830000 | 0.510000 | 0.640000 | 0.700000 | 0.680000 |
+| OpenBookQA | acc_norm | 0.404000 | 0.276000 | 0.312000 | 0.312000 | 0.308000 |
+| SciQ | acc_norm | 0.934000 | 0.199000 | 0.613000 | 0.695000 | 0.700000 |
+| TruthfulQA MC1 | acc | 0.304774 | 0.220318 | 0.241126 | 0.241126 | 0.232558 |
 
 Mean displayed metric:
 
@@ -316,6 +323,7 @@ Mean displayed metric:
 | naive PTQ ternary | 0.348671 |
 | QAT hidden-MSE | 0.464809 |
 | QAT KL-only | 0.483438 |
+| QAT KL-only dense `lm_head` | 0.484378 |
 
 Paired deltas on matched examples:
 
@@ -327,13 +335,36 @@ Paired deltas on matched examples:
 | QAT KL-only minus QAT hidden-MSE | +0.018630 | [+0.000830, +0.036429] | +0.013359 |
 | QAT KL-only minus naive PTQ | +0.134767 | [+0.042874, +0.226660] | +0.126530 |
 | QAT KL-only minus FP reference | -0.160731 | [-0.207484, -0.113978] | -0.220311 |
+| QAT KL-only dense `lm_head` minus QAT KL-only | +0.000940 | [-0.006100, +0.007980] | +0.008221 |
+| QAT KL-only dense `lm_head` minus QAT hidden-MSE | +0.019570 | [+0.001767, +0.037373] | +0.021580 |
+| QAT KL-only dense `lm_head` minus naive PTQ | +0.135707 | [+0.041607, +0.229808] | +0.134751 |
+| QAT KL-only dense `lm_head` minus FP reference | -0.159791 | [-0.202734, -0.116847] | -0.212090 |
 
-This is the strongest task result in the current fork. KL-only QAT/distillation
-recovers about 46% of the FP-vs-naive-PTQ macro gap, with a positive paired
-confidence interval against both naive PTQ and the earlier hidden-MSE QAT run.
-It still remains decisively below FP on the same examples. That supports a
-publication-quality negative result for blind retrofit and a partial-positive
-result for QAT/distillation, not a claim of acceptable FP-preserving conversion.
+This is the strongest task result in the current fork, but only by a very small
+margin. The dense tied-head run has the highest selected mean (`0.484378`) and
+recovers about 46% of the FP-vs-naive-PTQ macro gap, but its macro improvement
+over the all-ternary KL-only run is only `+0.000940` with a paired confidence
+interval crossing zero. The tied-head policy is therefore justified by
+perplexity and by architecture, not by a decisive ten-task accuracy win. The
+QAT/distilled checkpoints still remain decisively below FP on the same
+examples. That supports a publication-quality negative result for blind
+retrofit and a partial-positive result for QAT/distillation, not a claim of
+acceptable FP-preserving conversion.
+
+## Fast Dense-Head MC200 Check
+
+The in-repo multiple-choice evaluator was rerun on 200-example validation
+slices for the Qwen2.5-1.5B KL-only dense tied-`lm_head` checkpoint. This
+corrects an earlier 100-example smoke run that inherited a stale `LIMIT`
+environment variable. These MC200 numbers are useful for regression tracking;
+the uncapped `lm-eval` table above is stronger evidence for task quality.
+
+| task | acc | acc_norm | n |
+| --- | ---: | ---: | ---: |
+| PIQA | 0.6400 | 0.6550 | 200 |
+| ARC-Easy | 0.5850 | 0.4500 | 200 |
+| ARC-Challenge | 0.2250 | 0.2550 | 200 |
+| HellaSwag | 0.3800 | 0.4100 | 200 |
 
 ## Xeon PyTorch Runtime Probe
 
@@ -520,22 +551,26 @@ locality on CPU.
    [+0.015, +0.175], so the recovery is measurable but incomplete.
 9. On the full uncapped ten-task lm-eval merge, 1.5B QAT improves the mean
    displayed task metric from 0.349 for naive PTQ to 0.465 with hidden-MSE and
-   0.483 with KL-only, while FP remains 0.644. KL-only beats hidden-MSE by
-   +0.0186 macro mean with paired 95% CI [+0.0008, +0.0364], but KL-only minus
-   FP is still -0.1607 with 95% CI [-0.2075, -0.1140].
+   0.483 with KL-only, while FP remains 0.644. The dense tied-head KL-only
+   variant reaches 0.484. It still trails FP by -0.1598 macro mean with paired
+   95% CI [-0.2027, -0.1168].
 10. Row-wise ternary scales improve 0.5B heldout perplexity by about 2.4x versus
    tensor-scale QAT, but the small multiple-choice slices remain mixed.
 11. KL-only 0.5B distillation improves heldout perplexity further. Keeping
    Qwen's tied `lm_head` dense improves it again and is the best short-budget
    0.5B ablation so far, but it remains far from FP quality and is not a fully
    ternary linear stack.
-12. PyTorch ternary inference is slower than FP on the Xeon probe. The product
+12. Keeping Qwen2.5-1.5B's tied `lm_head` dense improves WikiText/FineWeb PPL
+    from 50.595/26.599 to 43.372/22.759 versus the all-ternary KL-only run, but
+    its ten-task macro gain over that all-ternary KL-only run is only +0.00094
+    with a paired 95% CI crossing zero.
+13. PyTorch ternary inference is slower than FP on the Xeon probe. The product
    speed thesis depends on packed `bitnet.cpp` kernels, not on the PyTorch
    simulation path.
-13. Packed I2_S GGUF execution is fast on the Xeon for Qwen2.5-0.5B-shaped
+14. Packed I2_S GGUF execution is fast on the Xeon for Qwen2.5-0.5B-shaped
    and Qwen2.5-1.5B-shaped models, but naive I2_S conversion fails the smoke
    prompt and explodes WikiText excerpt perplexity.
-14. A deployable intermediate path exists through static ternary materialization
+15. A deployable intermediate path exists through static ternary materialization
    plus llama.cpp `TQ2_0` or single-thread-written `I2_S`: both preserve the QAT
    PPL and run much faster than F16 decode, but the path requires
    QAT/distillation. The strongest CPU-side checkpoint so far is the KL-only
@@ -558,8 +593,9 @@ locality on CPU.
 7. It does not prove that the current training recipe is publishable as a final
    result.
 8. It does not prove that a dense tied `lm_head` is acceptable for every product
-   constraint; it improves quality in the 0.5B ablation but gives up full
-   output-head ternarization.
+   constraint; it improves likelihood at 0.5B and 1.5B scale but gives up full
+   output-head ternarization and does not materially change the 1.5B ten-task
+   verdict.
 
 ## Next Gates
 
@@ -576,6 +612,6 @@ The next benchmark gates are:
    same paired analysis for the strongest exact static-ternary checkpoint.
 5. Run ablations: longer QAT, hidden-MSE weighting, group/row scales, and
    larger FineWeb samples.
-6. Repeat the dense tied-`lm_head` policy at Qwen2.5-1.5B scale, then compare it
-   against the fully ternarized `lm_head` checkpoint on full ten-task lm-eval and
-   packed GGUF perplexity.
+6. Finish the queued Qwen2.5-1.5B row-scale plus dense tied-`lm_head` ablation,
+   then compare it against the tensor-scale dense-head run on perplexity,
+   full ten-task lm-eval, and packed GGUF perplexity.
