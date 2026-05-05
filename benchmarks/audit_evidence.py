@@ -413,9 +413,35 @@ def audit_gguf_summary(specs: list[tuple[str, Path, int | None]]) -> str:
             value = by_name.get(name, {}).get("perplexity", {}).get("ppl")
             return f"{float(value):.4g}" if isinstance(value, (int, float)) and math.isfinite(float(value)) else "-"
 
+        def numeric_ppl(name: str) -> float | None:
+            value = by_name.get(name, {}).get("perplexity", {}).get("ppl")
+            if isinstance(value, (int, float)) and math.isfinite(float(value)):
+                return float(value)
+            return None
+
         def decode_for(name: str) -> str:
             value = by_name.get(name, {}).get("bench", {}).get("decode", {}).get("tok_s")
             return f"{float(value):.2f}" if isinstance(value, (int, float)) else "-"
+
+        qat_i2s_ppl = numeric_ppl(qat_i2s_name)
+        reference_ppls: list[float] = []
+        for candidate in rows:
+            if not isinstance(candidate, dict):
+                continue
+            name = str(candidate.get("name", ""))
+            kind = str(candidate.get("kind", "")).lower()
+            normalized_name = name.lower()
+            if "static_ternary" not in kind and "static_ternary" not in normalized_name:
+                continue
+            if "i2s" in kind or "i2_s" in normalized_name:
+                continue
+            value = numeric_ppl(name)
+            if value is not None:
+                reference_ppls.append(value)
+        if qat_i2s_ppl is not None and reference_ppls:
+            reference_ppl = min(reference_ppls)
+            if qat_i2s_ppl > reference_ppl * 10.0:
+                failed.append(f"{qat_i2s_name}:ppl_ratio={qat_i2s_ppl / reference_ppl:.1f}x")
 
         rows_out.append([
             label,
