@@ -53,6 +53,7 @@ GGUF_SUMMARIES = [
 
 GGUF_MEMORY_SUMMARIES = [
     ("Qwen2.5-1.5B row-scale I2_S RSS probe", "benchmark_results/gguf-rss-qwen15b-row-i2s-fixed-2026-05-05/summary.json"),
+    ("Qwen2.5-1.5B row-scale I2_S RSS context scaling", "benchmark_results/gguf-rss-qwen15b-context-scaling-2026-05-05/summary.json"),
 ]
 
 
@@ -184,11 +185,12 @@ def build_gguf_memory_table() -> str:
                 suite_label,
                 str(row.get("name", "")),
                 str(row.get("kind", "")),
+                str(row.get("ctx_size", "-")),
                 fmt(row.get("file_mib"), 1),
                 fmt(row.get("max_rss_gib"), 3),
                 str(row.get("returncode", "")),
             ])
-    return md_table(["suite", "artifact", "kind", "file MiB", "max RSS GiB", "return code"], rows)
+    return md_table(["suite", "artifact", "kind", "ctx", "file MiB", "max RSS GiB", "return code"], rows)
 
 
 def main() -> None:

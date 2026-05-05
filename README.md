@@ -108,6 +108,8 @@ The row-scale `I2_S` thread-scaling note is
 [benchmarks/results/i2s_thread_scaling_2026-05-05.md](benchmarks/results/i2s_thread_scaling_2026-05-05.md).
 The GGUF RSS note is
 [benchmarks/results/gguf_memory_2026-05-05.md](benchmarks/results/gguf_memory_2026-05-05.md).
+The GGUF context-scaling RSS note is
+[benchmarks/results/gguf_context_scaling_2026-05-05.md](benchmarks/results/gguf_context_scaling_2026-05-05.md).
 The benchmark harnesses are in [benchmarks/](benchmarks/).
 
 ### Current Perplexity Snapshot
@@ -163,7 +165,11 @@ current row-scale patch includes a heap-buffer fix for the earlier low-thread
 `llama-bench` crash.
 At `-c 512`, `/usr/bin/time -v` reports peak RSS `1.250 GiB` for row-scale
 `I2_S`, `1.257 GiB` for row-scale `TQ2_0`, `2.948 GiB` for FP F16, and
-`0.985 GiB` for FP Q4_K_M.
+`0.985 GiB` for FP Q4_K_M. The same probe at `-c 32768` reports `2.114 GiB`
+for row-scale `I2_S`, `2.121 GiB` for row-scale `TQ2_0`, `3.812 GiB` for FP
+F16, and `1.850 GiB` for FP Q4_K_M. This preserves the ternary-vs-FP16 memory
+advantage at long context, but it still does not beat the dense `Q4_K_M`
+baseline on RSS.
 
 ### Practical Product Direction
 

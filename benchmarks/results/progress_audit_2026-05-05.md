@@ -34,7 +34,7 @@ Current evidence still supports the negative retrofit verdict:
 | Add row-scale versus tensor-scale | complete for Qwen2.5-1.5B dense-head ablation | Qwen2.5-1.5B row-scale dense-head job `9771` completed 5000 steps; checkpoints step 1000/2000/3000/4000/5000 all passed audit at 196 ternary keys / 196 row-scale tensors; final PPL, MC200, full ten-task lm-eval, paired deltas, and row GGUF suite completed under `benchmark_results/quality-qwen15b-klonly-row-notiehead-5000`, `benchmark_results/mc-qwen15b-klonly-row-notiehead-5000-200`, `benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10`, and `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite` |
 | Convert repaired checkpoints into GGUF/TL2/I2_S | partial | static-ternary materialization to GGUF and packed `TQ2_0`/`I2_S` complete for tensor-scale checkpoints; row-scale materialization and `TQ2_0` preserve quality; default row-scale `I2_S` fails audit; per-row-scale `I2_S` prototype patch preserves quality but is not yet the default format; native direct `ternary_state_dict.pt` GGUF writer and Qwen TL2 path are not yet complete |
 | Run actual bitnet.cpp / llama.cpp CPU inference | complete for packed GGUF probes | `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`, `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json`, dense-head suite `benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json`, and row-scale dense-head suite `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json` |
-| Measure CPU tokens/sec, prompt throughput, RSS, model size, quality loss | complete for current baselines | PyTorch RSS/runtime in `benchmark_results/runtime-qwen-xeon4116-512x32/summary.md`; Xeon packed GGUF throughput/file size/PPL in `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`; AMD dense-head packed GGUF in `benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json`; AMD row-scale dense-head packed GGUF in `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json`; patched I2_S confirmation in `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json` |
+| Measure CPU tokens/sec, prompt throughput, RSS, model size, quality loss | complete for current baselines | PyTorch RSS/runtime in `benchmark_results/runtime-qwen-xeon4116-512x32/summary.md`; Xeon packed GGUF throughput/file size/PPL in `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`; AMD dense-head packed GGUF in `benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json`; AMD row-scale dense-head packed GGUF in `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json`; patched I2_S confirmation in `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json`; RSS context scaling in `benchmark_results/gguf-rss-qwen15b-context-scaling-2026-05-05/summary.json` |
 
 ## Mechanical Audit Evidence
 
@@ -96,6 +96,12 @@ The packed GGUF RSS probe is tracked at
 `benchmark_results/evidence_audit/qwen15b_row_i2s_rss.md`, which passes all six
 expected rows with positive RSS and zero return-code failures.
 
+The GGUF RSS context-scaling probe is tracked at
+`benchmarks/results/gguf_context_scaling_2026-05-05.md`. Its mechanical audit is
+`benchmark_results/evidence_audit/qwen15b_context_scaling_rss.md`, which passes
+all 24 expected rows across contexts `512,2048,8192,32768` with positive RSS
+and zero return-code failures.
+
 Key audited values:
 
 | artifact | audited value |
@@ -132,6 +138,10 @@ Key audited values:
 | Qwen2.5-1.5B FP F16 GGUF max RSS at `-c 512` | 2.948 GiB |
 | Qwen2.5-1.5B FP Q4_K_M GGUF max RSS at `-c 512` | 0.985 GiB |
 | Qwen2.5-1.5B row-scale dense-head I2_S max RSS at `-c 512` | 1.250 GiB |
+| Qwen2.5-1.5B FP F16 GGUF max RSS at `-c 32768` | 3.812 GiB |
+| Qwen2.5-1.5B FP Q4_K_M GGUF max RSS at `-c 32768` | 1.850 GiB |
+| Qwen2.5-1.5B row-scale dense-head TQ2_0 max RSS at `-c 32768` | 2.121 GiB |
+| Qwen2.5-1.5B row-scale dense-head I2_S max RSS at `-c 32768` | 2.114 GiB |
 | Gaussian absmean ternary relative output Frobenius error | 0.512542 |
 
 ## Current Open Gaps

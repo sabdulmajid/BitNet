@@ -30,6 +30,9 @@ The reported metric is peak resident set size from `/usr/bin/time`.
 Mechanical audit:
 `benchmark_results/evidence_audit/qwen15b_row_i2s_rss.md`
 
+The matching context-scaling probe is documented in
+`benchmarks/results/gguf_context_scaling_2026-05-05.md`.
+
 ## Interpretation
 
 The corrected row-scale `I2_S` artifact has nearly the same RSS as row-scale

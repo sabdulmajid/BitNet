@@ -41,8 +41,8 @@ def fmt(value: Any, digits: int = 2) -> str:
 
 def markdown_table(rows: list[dict[str, Any]]) -> str:
     lines = [
-        "| name | kind | file MiB | max RSS GiB | return code |",
-        "| --- | --- | ---: | ---: | ---: |",
+        "| name | kind | ctx | file MiB | max RSS GiB | return code |",
+        "| --- | --- | ---: | ---: | ---: | ---: |",
     ]
     for row in rows:
         lines.append(
@@ -51,6 +51,7 @@ def markdown_table(rows: list[dict[str, Any]]) -> str:
                 [
                     str(row.get("name", "")),
                     str(row.get("kind", "")),
+                    str(row.get("ctx_size", "")),
                     fmt(row.get("file_mib"), 1),
                     fmt(row.get("max_rss_gib"), 3),
                     str(row.get("returncode", "")),
@@ -68,6 +69,7 @@ def main() -> None:
     parser.add_argument("--llama-bin-dir", type=Path, default=Path("build/bin"))
     parser.add_argument("--threads", type=int, default=12)
     parser.add_argument("--ctx-size", type=int, default=512)
+    parser.add_argument("--ctx-sizes", type=int, nargs="+", default=None)
     parser.add_argument("--tokens", type=int, default=1)
     parser.add_argument("--prompt", default="The capital of France is")
     args = parser.parse_args()
@@ -75,52 +77,55 @@ def main() -> None:
     args.out_dir.mkdir(parents=True, exist_ok=True)
     llama_cli = args.llama_bin_dir / "llama-cli"
     rows: list[dict[str, Any]] = []
+    ctx_sizes = args.ctx_sizes if args.ctx_sizes is not None else [args.ctx_size]
 
-    for item in read_manifest(args.models_json):
-        name = str(item["name"])
-        model_path = Path(str(item["path"]))
-        stem = re.sub(r"[^A-Za-z0-9_.-]+", "_", name)
-        stdout_path = args.out_dir / f"{stem}.stdout"
-        stderr_path = args.out_dir / f"{stem}.stderr"
-        command = [
-            "/usr/bin/time",
-            "-v",
-            str(llama_cli),
-            "-m",
-            str(model_path),
-            "-p",
-            args.prompt,
-            "-n",
-            str(args.tokens),
-            "-c",
-            str(args.ctx_size),
-            "-t",
-            str(args.threads),
-            "-ngl",
-            "0",
-            "--temp",
-            "0",
-            "--no-display-prompt",
-        ]
+    for ctx_size in ctx_sizes:
+        for item in read_manifest(args.models_json):
+            name = str(item["name"])
+            model_path = Path(str(item["path"]))
+            stem = re.sub(r"[^A-Za-z0-9_.-]+", "_", name)
+            stdout_path = args.out_dir / f"{stem}.ctx{ctx_size}.stdout"
+            stderr_path = args.out_dir / f"{stem}.ctx{ctx_size}.stderr"
+            command = [
+                "/usr/bin/time",
+                "-v",
+                str(llama_cli),
+                "-m",
+                str(model_path),
+                "-p",
+                args.prompt,
+                "-n",
+                str(args.tokens),
+                "-c",
+                str(ctx_size),
+                "-t",
+                str(args.threads),
+                "-ngl",
+                "0",
+                "--temp",
+                "0",
+                "--no-display-prompt",
+            ]
 
-        row: dict[str, Any] = {
-            "name": name,
-            "kind": str(item.get("kind", "")),
-            "path": str(model_path),
-            "exists": model_path.exists(),
-            "file_mib": model_path.stat().st_size / (1024**2) if model_path.exists() else None,
-        }
-        if not model_path.exists():
-            row["returncode"] = None
-            row["error"] = "missing model"
+            row: dict[str, Any] = {
+                "name": name,
+                "kind": str(item.get("kind", "")),
+                "path": str(model_path),
+                "ctx_size": ctx_size,
+                "exists": model_path.exists(),
+                "file_mib": model_path.stat().st_size / (1024**2) if model_path.exists() else None,
+            }
+            if not model_path.exists():
+                row["returncode"] = None
+                row["error"] = "missing model"
+                rows.append(row)
+                continue
+
+            with stdout_path.open("w", encoding="utf-8") as stdout, stderr_path.open("w", encoding="utf-8") as stderr:
+                completed = subprocess.run(command, stdout=stdout, stderr=stderr, check=False)
+            row["returncode"] = completed.returncode
+            row.update(parse_time_stderr(stderr_path.read_text(encoding="utf-8", errors="replace")))
             rows.append(row)
-            continue
-
-        with stdout_path.open("w", encoding="utf-8") as stdout, stderr_path.open("w", encoding="utf-8") as stderr:
-            completed = subprocess.run(command, stdout=stdout, stderr=stderr, check=False)
-        row["returncode"] = completed.returncode
-        row.update(parse_time_stderr(stderr_path.read_text(encoding="utf-8", errors="replace")))
-        rows.append(row)
 
     summary = {
         "models_json": str(args.models_json),
@@ -128,6 +133,7 @@ def main() -> None:
         "llama_bin_dir": str(args.llama_bin_dir),
         "threads": args.threads,
         "ctx_size": args.ctx_size,
+        "ctx_sizes": ctx_sizes,
         "tokens": args.tokens,
         "prompt": args.prompt,
         "rows": rows,

@@ -79,11 +79,35 @@ Generated from benchmark JSON artifacts. Missing rows are intentionally shown as
 
 ## Packed GGUF RSS
 
-| suite | artifact | kind | file MiB | max RSS GiB | return code |
-| --- | --- | --- | --- | --- | --- |
-| Qwen2.5-1.5B row-scale I2_S RSS probe | qwen15b_fp_f16 | fp_reference | 2950.4 | 2.948 | 0 |
-| Qwen2.5-1.5B row-scale I2_S RSS probe | qwen15b_fp_q8_0 | llama_q8 | 1570.3 | 1.601 | 0 |
-| Qwen2.5-1.5B row-scale I2_S RSS probe | qwen15b_fp_q4_k_m | llama_q4 | 940.4 | 0.985 | 0 |
-| Qwen2.5-1.5B row-scale I2_S RSS probe | qwen15b_klonly_row_notie_static_ternary_f16 | static_ternary_materialized | 3395.5 | 3.383 | 0 |
-| Qwen2.5-1.5B row-scale I2_S RSS probe | qwen15b_klonly_row_notie_static_ternary_tq2_0 | static_ternary_tq2 | 1218.6 | 1.257 | 0 |
-| Qwen2.5-1.5B row-scale I2_S RSS probe | qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale | static_ternary_i2s_row_scale_prototype | 1211.3 | 1.250 | 0 |
+| suite | artifact | kind | ctx | file MiB | max RSS GiB | return code |
+| --- | --- | --- | --- | --- | --- | --- |
+| Qwen2.5-1.5B row-scale I2_S RSS probe | qwen15b_fp_f16 | fp_reference | - | 2950.4 | 2.948 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS probe | qwen15b_fp_q8_0 | llama_q8 | - | 1570.3 | 1.601 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS probe | qwen15b_fp_q4_k_m | llama_q4 | - | 940.4 | 0.985 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS probe | qwen15b_klonly_row_notie_static_ternary_f16 | static_ternary_materialized | - | 3395.5 | 3.383 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS probe | qwen15b_klonly_row_notie_static_ternary_tq2_0 | static_ternary_tq2 | - | 1218.6 | 1.257 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS probe | qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale | static_ternary_i2s_row_scale_prototype | - | 1211.3 | 1.250 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_fp_f16 | fp_reference | 512 | 2950.4 | 2.948 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_fp_q8_0 | llama_q8 | 512 | 1570.3 | 1.601 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_fp_q4_k_m | llama_q4 | 512 | 940.4 | 0.985 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_klonly_row_notie_static_ternary_f16 | static_ternary_materialized | 512 | 3395.5 | 3.383 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_klonly_row_notie_static_ternary_tq2_0 | static_ternary_tq2 | 512 | 1218.6 | 1.257 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale | static_ternary_i2s_row_scale_prototype | 512 | 1211.3 | 1.250 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_fp_f16 | fp_reference | 2048 | 2950.4 | 2.989 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_fp_q8_0 | llama_q8 | 2048 | 1570.3 | 1.642 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_fp_q4_k_m | llama_q4 | 2048 | 940.4 | 1.027 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_klonly_row_notie_static_ternary_f16 | static_ternary_materialized | 2048 | 3395.5 | 3.424 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_klonly_row_notie_static_ternary_tq2_0 | static_ternary_tq2 | 2048 | 1218.6 | 1.298 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale | static_ternary_i2s_row_scale_prototype | 2048 | 1211.3 | 1.291 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_fp_f16 | fp_reference | 8192 | 2950.4 | 3.153 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_fp_q8_0 | llama_q8 | 8192 | 1570.3 | 1.806 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_fp_q4_k_m | llama_q4 | 8192 | 940.4 | 1.191 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_klonly_row_notie_static_ternary_f16 | static_ternary_materialized | 8192 | 3395.5 | 3.588 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_klonly_row_notie_static_ternary_tq2_0 | static_ternary_tq2 | 8192 | 1218.6 | 1.462 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale | static_ternary_i2s_row_scale_prototype | 8192 | 1211.3 | 1.455 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_fp_f16 | fp_reference | 32768 | 2950.4 | 3.812 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_fp_q8_0 | llama_q8 | 32768 | 1570.3 | 2.465 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_fp_q4_k_m | llama_q4 | 32768 | 940.4 | 1.850 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_klonly_row_notie_static_ternary_f16 | static_ternary_materialized | 32768 | 3395.5 | 4.247 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_klonly_row_notie_static_ternary_tq2_0 | static_ternary_tq2 | 32768 | 1218.6 | 2.121 | 0 |
+| Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale | static_ternary_i2s_row_scale_prototype | 32768 | 1211.3 | 2.114 | 0 |

@@ -60,6 +60,7 @@ class GGUFMemorySpec:
     label: str
     path: Path
     expected_rows: int | None
+    expected_contexts: tuple[int, ...]
 
 
 def md_table(headers: list[str], rows: list[list[str]]) -> str:
@@ -103,7 +104,10 @@ def parse_gguf_memory(spec: str) -> GGUFMemorySpec:
     parts = str(raw_path).split(":")
     path = Path(parts[0])
     expected_rows = int(parts[1]) if len(parts) > 1 and parts[1] else None
-    return GGUFMemorySpec(label, path, expected_rows)
+    expected_contexts: tuple[int, ...] = ()
+    if len(parts) > 2 and parts[2]:
+        expected_contexts = tuple(int(value) for value in parts[2].split(",") if value)
+    return GGUFMemorySpec(label, path, expected_rows, expected_contexts)
 
 
 def parse_checkpoint(spec: str) -> CheckpointSpec:
@@ -620,42 +624,71 @@ def audit_gguf_memory(specs: list[GGUFMemorySpec]) -> str:
     rows_out: list[list[str]] = []
     for spec in specs:
         if not spec.path.exists():
-            rows_out.append([spec.label, str(spec.path), "MISSING", "-", "-", "-", "-", "-", "-"])
+            rows_out.append([spec.label, str(spec.path), "MISSING", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"])
             continue
         data = load_json(spec.path)
         rows = data.get("rows", [])
         if not isinstance(rows, list):
-            rows_out.append([spec.label, str(spec.path), "FAIL", "0", "rows is not a list", "-", "-", "-", "-"])
+            rows_out.append([spec.label, str(spec.path), "FAIL", "0", "-", "-", "-", "-", "-", "-", "-", "-", "rows is not a list"])
             continue
 
         failures: list[str] = []
-        by_name: dict[str, dict[str, Any]] = {}
+        by_name_ctx: dict[tuple[str, int | None], dict[str, Any]] = {}
+        observed_contexts_set: set[int] = set()
         for row in rows:
             if not isinstance(row, dict):
                 failures.append("non-object-row")
                 continue
             name = str(row.get("name", ""))
-            by_name[name] = row
+            raw_ctx = row.get("ctx_size")
+            ctx = int(raw_ctx) if isinstance(raw_ctx, (int, float)) else None
+            if ctx is not None:
+                observed_contexts_set.add(ctx)
+            key = (name, ctx)
+            if key in by_name_ctx:
+                failures.append(f"{name}@{ctx}:duplicate")
+            by_name_ctx[key] = row
             if not row.get("exists", False):
-                failures.append(f"{name}:missing")
+                failures.append(f"{name}@{ctx}:missing")
             if int(row.get("returncode", 1)) != 0:
-                failures.append(f"{name}:returncode={row.get('returncode')}")
+                failures.append(f"{name}@{ctx}:returncode={row.get('returncode')}")
             rss = row.get("max_rss_gib")
             if not isinstance(rss, (int, float)) or not math.isfinite(float(rss)) or float(rss) <= 0.0:
-                failures.append(f"{name}:max_rss_gib")
+                failures.append(f"{name}@{ctx}:max_rss_gib")
         if spec.expected_rows is not None and len(rows) != spec.expected_rows:
             failures.append(f"expected_rows={spec.expected_rows},got={len(rows)}")
+        observed_contexts = tuple(sorted(observed_contexts_set))
+        if spec.expected_contexts:
+            if observed_contexts != spec.expected_contexts:
+                failures.append(
+                    "ctx="
+                    + ",".join(str(value) for value in observed_contexts)
+                    + f";expected={','.join(str(value) for value in spec.expected_contexts)}"
+                )
+            names = sorted({name for name, _ in by_name_ctx})
+            for name in names:
+                missing = [ctx for ctx in spec.expected_contexts if (name, ctx) not in by_name_ctx]
+                if missing:
+                    failures.append(f"{name}:missing_ctx={','.join(str(value) for value in missing)}")
 
-        def rss_for(name: str) -> float | None:
-            value = by_name.get(name, {}).get("max_rss_gib")
+        reported_ctx = max(observed_contexts) if observed_contexts else None
+
+        def rss_for(name: str, ctx: int | None) -> float | None:
+            row = by_name_ctx.get((name, ctx))
+            if row is None and ctx is None:
+                matches = [candidate for (candidate_name, _), candidate in by_name_ctx.items() if candidate_name == name]
+                row = matches[-1] if matches else None
+            if row is None:
+                return None
+            value = row.get("max_rss_gib")
             if isinstance(value, (int, float)) and math.isfinite(float(value)):
                 return float(value)
             return None
 
-        fp_f16 = rss_for("qwen15b_fp_f16")
-        fp_q4 = rss_for("qwen15b_fp_q4_k_m")
-        row_tq2 = rss_for("qwen15b_klonly_row_notie_static_ternary_tq2_0")
-        row_i2s = rss_for("qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale")
+        fp_f16 = rss_for("qwen15b_fp_f16", reported_ctx)
+        fp_q4 = rss_for("qwen15b_fp_q4_k_m", reported_ctx)
+        row_tq2 = rss_for("qwen15b_klonly_row_notie_static_ternary_tq2_0", reported_ctx)
+        row_i2s = rss_for("qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale", reported_ctx)
         i2s_vs_f16 = row_i2s / fp_f16 if row_i2s is not None and fp_f16 else None
         i2s_vs_q4 = row_i2s / fp_q4 if row_i2s is not None and fp_q4 else None
 
@@ -667,6 +700,8 @@ def audit_gguf_memory(specs: list[GGUFMemorySpec]) -> str:
             str(spec.path),
             "PASS" if not failures else "FAIL",
             str(len(rows)),
+            ",".join(str(value) for value in observed_contexts) if observed_contexts else "-",
+            str(reported_ctx) if reported_ctx is not None else "-",
             fmt(fp_f16),
             fmt(fp_q4),
             fmt(row_tq2),
@@ -681,6 +716,8 @@ def audit_gguf_memory(specs: list[GGUFMemorySpec]) -> str:
             "path",
             "status",
             "rows",
+            "contexts",
+            "reported ctx",
             "FP F16 RSS GiB",
             "FP Q4 RSS GiB",
             "row TQ2 RSS GiB",
@@ -717,7 +754,12 @@ def main() -> None:
         default=[],
         help="LABEL=summary.json[:expected_threads_csv]",
     )
-    parser.add_argument("--gguf-memory", action="append", default=[], help="LABEL=summary.json[:expected_rows]")
+    parser.add_argument(
+        "--gguf-memory",
+        action="append",
+        default=[],
+        help="LABEL=summary.json[:expected_rows[:expected_contexts_csv]]",
+    )
     parser.add_argument("--math", action="append", default=[], help="LABEL=path.json")
     parser.add_argument("--output-md", type=Path, default=None)
     args = parser.parse_args()

@@ -583,6 +583,17 @@ Packed GGUF RSS at `-c 512`, measured with `/usr/bin/time -v` around
 | Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | TQ2_0 | 1,218.6 | 1.257 |
 | Qwen2.5-1.5B KL-only row-scale dense-`lm_head` static ternary | I2_S per-row-scale prototype | 1,211.3 | 1.250 |
 
+Packed GGUF RSS context scaling, measured with the same probe:
+
+| artifact | ctx 512 RSS GiB | ctx 2048 RSS GiB | ctx 8192 RSS GiB | ctx 32768 RSS GiB |
+| --- | ---: | ---: | ---: | ---: |
+| FP F16 | 2.948 | 2.989 | 3.153 | 3.812 |
+| FP Q8_0 | 1.601 | 1.642 | 1.806 | 2.465 |
+| FP Q4_K_M | 0.985 | 1.027 | 1.191 | 1.850 |
+| row-scale static ternary F16 | 3.383 | 3.424 | 3.588 | 4.247 |
+| row-scale static ternary TQ2_0 | 1.257 | 1.298 | 1.462 | 2.121 |
+| row-scale static ternary I2_S prototype | 1.250 | 1.291 | 1.455 | 2.114 |
+
 Interpretation:
 
 - Standard Q8_0 and Q4_K_M preserve the FP perplexity on this packed GGUF
@@ -646,6 +657,11 @@ Interpretation:
   `1.257 GiB`. It is still larger than FP `Q4_K_M` (`0.985 GiB`) because the
   current best row-scale checkpoint keeps Qwen's tied `lm_head` dense and the
   prototype layout is not a final compact GGUF type.
+- Context scaling preserves that relationship through `-c 32768`: row-scale
+  `I2_S` reaches `2.114 GiB`, row-scale `TQ2_0` reaches `2.121 GiB`, FP F16
+  reaches `3.812 GiB`, and FP `Q4_K_M` reaches `1.850 GiB`. This supports a
+  ternary-vs-FP16 memory claim at long context, but not a ternary-vs-Q4 memory
+  win for the current artifact.
 
 ## MoE Status
 
@@ -759,7 +775,11 @@ locality on CPU.
 21. Row-scale `I2_S` peak RSS at `-c 512` is `1.250 GiB`, essentially equal to
     row-scale `TQ2_0` at `1.257 GiB`, below FP F16 at `2.948 GiB`, and above
     FP Q4_K_M at `0.985 GiB`.
-22. The original tensor-scale multi-thread I2_S writer corruption is fixable.
+22. Row-scale `I2_S` keeps the same memory relationship at long context:
+    at `-c 32768`, peak RSS is `2.114 GiB` for row-scale `I2_S`, `2.121 GiB`
+    for row-scale `TQ2_0`, `3.812 GiB` for FP F16, and `1.850 GiB` for
+    FP Q4_K_M.
+23. The original tensor-scale multi-thread I2_S writer corruption is fixable.
     A local llama.cpp patch that packs I2_S chunks at compressed offsets and
     writes one tensor-level scale preserves fixed-excerpt PPL 54.7366 with 12
     quantization threads.
