@@ -117,6 +117,14 @@ merged expert packing, and runtime top-k sparse expert matmuls. It also
 confirms no Kimi-specific converter/runtime mapping and no local Kimi benchmark
 artifact.
 
+The reusable static-ternary GGUF bridge is tracked at
+`benchmarks/results/static_ternary_gguf_bridge_2026-05-05.md`. The new
+`benchmarks/build_static_ternary_gguf_bridge.py` runner records materialization,
+F16 GGUF conversion, `TQ2_0`/`I2_S` quantization, optional GGUF suite execution,
+and optional evidence audit commands. This improves reproducibility but remains
+a dense-materialization bridge, not direct GGUF ingestion of
+`ternary_state_dict.pt`.
+
 Key audited values:
 
 | artifact | audited value |
@@ -168,7 +176,8 @@ Key audited values:
    compatibility policy, and regeneration of affected artifacts.
 2. Native direct GGUF writing from `ternary_state_dict.pt` is not complete.
    Static-ternary materialization is a validated bridge, not the final storage
-   path.
+   path. `benchmarks/build_static_ternary_gguf_bridge.py` now makes that bridge
+   reproducible and auditable.
 3. Qwen TL2 is not complete. The current `llama-quantize` CLI does not expose
    TL2 and its generic quantize switch has no TL2 quantization case. The
    BitNet-specific HF converter exposes `--outtype tl2`, but it only registers

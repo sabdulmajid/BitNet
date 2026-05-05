@@ -116,6 +116,8 @@ The conversion support audit is
 [benchmarks/results/conversion_support_audit_2026-05-05.md](benchmarks/results/conversion_support_audit_2026-05-05.md).
 The MoE support audit is
 [benchmarks/results/moe_support_audit_2026-05-05.md](benchmarks/results/moe_support_audit_2026-05-05.md).
+The reusable static-ternary GGUF bridge note is
+[benchmarks/results/static_ternary_gguf_bridge_2026-05-05.md](benchmarks/results/static_ternary_gguf_bridge_2026-05-05.md).
 The benchmark harnesses are in [benchmarks/](benchmarks/).
 
 ### Current Perplexity Snapshot
@@ -188,6 +190,8 @@ retrofit pipeline with measured guarantees:
 - distill against the FP teacher under the exact ternary constraint,
 - export `ternary_state_dict.pt` plus a static-ternary GGUF bridge,
 - pack `TQ2_0` and `I2_S` artifacts for commodity CPU inference,
+- use `benchmarks/build_static_ternary_gguf_bridge.py` as the current
+  reproducible bridge runner while direct GGUF export is still unfinished,
 - promote the row-scale-aware `I2_S` prototype into a stable packed format or
   new GGUF quantization type before claiming row-scale `I2_S` deployment,
 - publish a benchmark card with FP/Q8/Q4/blind-ternary/QAT comparisons.

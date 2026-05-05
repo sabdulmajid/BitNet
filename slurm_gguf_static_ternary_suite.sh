@@ -26,12 +26,6 @@ GEN_TOKENS="${GEN_TOKENS:-128}"
 LLAMA_BUILD_DIR="${LLAMA_BUILD_DIR:-build-portable-avx2}"
 LLAMA_BIN_DIR="${LLAMA_BIN_DIR:-$LLAMA_BUILD_DIR/bin}"
 
-HF_DENSE_DIR="$OUT_MODEL_DIR/hf_f16"
-F16_GGUF="$OUT_MODEL_DIR/${RUN_LABEL}_f16.gguf"
-TQ2_GGUF="$OUT_MODEL_DIR/${RUN_LABEL}_tq2_0.gguf"
-I2S_GGUF="$OUT_MODEL_DIR/${RUN_LABEL}_i2_s_t1.gguf"
-MANIFEST="$OUT_MODEL_DIR/${RUN_LABEL}_manifest.json"
-
 mkdir -p "$OUT_MODEL_DIR" "$RESULTS_DIR"
 
 echo "CHECKPOINT_DIR=$CHECKPOINT_DIR"
@@ -58,85 +52,18 @@ if [[ ! -x "$LLAMA_BIN_DIR/llama-quantize" || ! -x "$LLAMA_BIN_DIR/llama-cli" ||
   cmake --build "$LLAMA_BUILD_DIR" --target llama-quantize llama-cli llama-bench llama-perplexity -j "$THREADS"
 fi
 
-python benchmarks/materialize_static_ternary_hf.py \
+python benchmarks/build_static_ternary_gguf_bridge.py \
   --checkpoint-dir "$CHECKPOINT_DIR" \
-  --output-dir "$HF_DENSE_DIR" \
-  --dtype float16 \
-  --expect-ternary-keys "$EXPECT_TERNARY_KEYS"
-
-python 3rdparty/llama.cpp/convert_hf_to_gguf.py \
-  "$HF_DENSE_DIR" \
-  --outfile "$F16_GGUF" \
-  --outtype f16
-
-python benchmarks/quantize_gguf_safe.py \
-  --llama-quantize "$LLAMA_BIN_DIR/llama-quantize" \
-  --input "$F16_GGUF" \
-  --output "$TQ2_GGUF" \
-  --type TQ2_0 \
-  --threads "$THREADS"
-
-python benchmarks/quantize_gguf_safe.py \
-  --llama-quantize "$LLAMA_BIN_DIR/llama-quantize" \
-  --input "$F16_GGUF" \
-  --output "$I2S_GGUF" \
-  --type I2_S \
-  --threads "$THREADS"
-
-python - <<PY
-import json
-from pathlib import Path
-
-manifest = [
-    {
-        "name": "qwen15b_fp_f16",
-        "kind": "fp_reference",
-        "path": "models/qwen2.5-1.5b-fp/qwen15b_fp_f16.gguf",
-    },
-    {
-        "name": "qwen15b_fp_q8_0",
-        "kind": "llama_q8",
-        "path": "models/qwen2.5-1.5b-fp/qwen15b_fp_q8_0.gguf",
-    },
-    {
-        "name": "qwen15b_fp_q4_k_m",
-        "kind": "llama_q4",
-        "path": "models/qwen2.5-1.5b-fp/qwen15b_fp_q4_k_m.gguf",
-    },
-    {
-        "name": "${RUN_LABEL}_f16",
-        "kind": "static_ternary_materialized",
-        "path": "${F16_GGUF}",
-    },
-    {
-        "name": "${RUN_LABEL}_tq2_0",
-        "kind": "static_ternary_tq2",
-        "path": "${TQ2_GGUF}",
-    },
-    {
-        "name": "${RUN_LABEL}_i2_s",
-        "kind": "static_ternary_i2s_single_thread_quant",
-        "path": "${I2S_GGUF}",
-    },
-]
-path = Path("${MANIFEST}")
-path.write_text(json.dumps(manifest, indent=2) + "\\n", encoding="utf-8")
-print(path)
-PY
-
-python benchmarks/run_gguf_suite.py \
-  --models-json "$MANIFEST" \
-  --out-dir "$RESULTS_DIR" \
+  --expect-ternary-keys "$EXPECT_TERNARY_KEYS" \
+  --run-label "$RUN_LABEL" \
+  --out-model-dir "$OUT_MODEL_DIR" \
+  --results-dir "$RESULTS_DIR" \
   --llama-bin-dir "$LLAMA_BIN_DIR" \
-  --perplexity-file benchmark_results/gguf-ppl/wikitext2_test_excerpt.txt \
   --threads "$THREADS" \
   --prompt-tokens "$PROMPT_TOKENS" \
   --gen-tokens "$GEN_TOKENS" \
-  --ppl-chunks "$PPL_CHUNKS"
-
-python benchmarks/audit_evidence.py \
-  --gguf-summary "${RUN_LABEL}=$RESULTS_DIR/summary.json:6" \
-  --output-md "$RESULTS_DIR/audit.md"
+  --ppl-chunks "$PPL_CHUNKS" \
+  --run-suite
 
 echo "wrote $RESULTS_DIR/summary.json"
 echo "wrote $RESULTS_DIR/audit.md"
