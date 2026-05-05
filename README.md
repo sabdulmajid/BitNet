@@ -120,6 +120,23 @@ same CPU family shown in the table.
 | Intel Xeon Silver 4116 | KL-only static ternary I2_S, all-linear | 1,208.9 | 54.7366 | 205.76 | 18.60 |
 | AMD Ryzen Threadripper PRO 5945WX | KL-only static ternary I2_S, dense tied `lm_head` | 1,208.9 | 47.3435 | 464.19 | 45.50 |
 
+### Practical Product Direction
+
+This fork does **not** support a credible one-click, lossless ternarizer for
+arbitrary Hugging Face models. A realistic product direction is a CPU-first
+retrofit pipeline with measured guarantees:
+
+- ingest a supported dense decoder checkpoint,
+- replace eligible projections with BitLinear-style ternary-forward modules,
+- distill against the FP teacher under the exact ternary constraint,
+- export `ternary_state_dict.pt` plus a static-ternary GGUF bridge,
+- pack `TQ2_0` and `I2_S` artifacts for commodity CPU inference,
+- publish a benchmark card with FP/Q8/Q4/blind-ternary/QAT comparisons.
+
+The current MVP should target dense Qwen-style models first. MoE models such as
+Kimi, native TL2 export for Qwen, direct GGUF ingestion of ternary state dicts,
+and quality guarantees for arbitrary architectures remain research tasks.
+
 ### Qwen2.5-0.5B Row-Scale Ablation
 
 The row-scale ablation kept the same 1000-step Qwen2.5-0.5B setup as the
