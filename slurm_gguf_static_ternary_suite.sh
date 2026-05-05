@@ -23,6 +23,8 @@ THREADS="${THREADS:-12}"
 PPL_CHUNKS="${PPL_CHUNKS:-16}"
 PROMPT_TOKENS="${PROMPT_TOKENS:-512}"
 GEN_TOKENS="${GEN_TOKENS:-128}"
+LLAMA_BUILD_DIR="${LLAMA_BUILD_DIR:-build-portable-avx2}"
+LLAMA_BIN_DIR="${LLAMA_BIN_DIR:-$LLAMA_BUILD_DIR/bin}"
 
 HF_DENSE_DIR="$OUT_MODEL_DIR/hf_f16"
 F16_GGUF="$OUT_MODEL_DIR/${RUN_LABEL}_f16.gguf"
@@ -38,6 +40,23 @@ echo "RUN_LABEL=$RUN_LABEL"
 echo "OUT_MODEL_DIR=$OUT_MODEL_DIR"
 echo "RESULTS_DIR=$RESULTS_DIR"
 echo "THREADS=$THREADS PPL_CHUNKS=$PPL_CHUNKS PROMPT_TOKENS=$PROMPT_TOKENS GEN_TOKENS=$GEN_TOKENS"
+echo "LLAMA_BUILD_DIR=$LLAMA_BUILD_DIR"
+echo "LLAMA_BIN_DIR=$LLAMA_BIN_DIR"
+
+if [[ ! -x "$LLAMA_BIN_DIR/llama-quantize" || ! -x "$LLAMA_BIN_DIR/llama-cli" || ! -x "$LLAMA_BIN_DIR/llama-bench" || ! -x "$LLAMA_BIN_DIR/llama-perplexity" ]]; then
+  cmake -S . -B "$LLAMA_BUILD_DIR" \
+    -DGGML_NATIVE=OFF \
+    -DGGML_AVX=ON \
+    -DGGML_AVX2=ON \
+    -DGGML_FMA=ON \
+    -DGGML_F16C=ON \
+    -DGGML_AVX512=OFF \
+    -DGGML_AVX512_VBMI=OFF \
+    -DGGML_AVX512_VNNI=OFF \
+    -DGGML_AVX512_BF16=OFF \
+    -DBITNET_X86_TL2=OFF
+  cmake --build "$LLAMA_BUILD_DIR" --target llama-quantize llama-cli llama-bench llama-perplexity -j "$THREADS"
+fi
 
 python benchmarks/materialize_static_ternary_hf.py \
   --checkpoint-dir "$CHECKPOINT_DIR" \
@@ -51,12 +70,14 @@ python 3rdparty/llama.cpp/convert_hf_to_gguf.py \
   --outtype f16
 
 python benchmarks/quantize_gguf_safe.py \
+  --llama-quantize "$LLAMA_BIN_DIR/llama-quantize" \
   --input "$F16_GGUF" \
   --output "$TQ2_GGUF" \
   --type TQ2_0 \
   --threads "$THREADS"
 
 python benchmarks/quantize_gguf_safe.py \
+  --llama-quantize "$LLAMA_BIN_DIR/llama-quantize" \
   --input "$F16_GGUF" \
   --output "$I2S_GGUF" \
   --type I2_S \
@@ -106,6 +127,7 @@ PY
 python benchmarks/run_gguf_suite.py \
   --models-json "$MANIFEST" \
   --out-dir "$RESULTS_DIR" \
+  --llama-bin-dir "$LLAMA_BIN_DIR" \
   --perplexity-file benchmark_results/gguf-ppl/wikitext2_test_excerpt.txt \
   --threads "$THREADS" \
   --prompt-tokens "$PROMPT_TOKENS" \

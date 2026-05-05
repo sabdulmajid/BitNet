@@ -46,5 +46,6 @@ __pycache__/
 poetry.toml
 
 build/
+build-portable-avx2/
 logs/
 benchmark_results/
