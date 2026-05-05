@@ -32,7 +32,7 @@ Current evidence still supports the negative retrofit verdict:
 | Add llama.cpp Q4_K_M and Q8_0 baselines | complete for Qwen2.5-1.5B | `benchmark_results/gguf-qwen15b-klonly-suite/summary.json` includes F16, Q8_0, Q4_K_M, blind TQ2_0, blind I2_S, and trained static-ternary artifacts |
 | Add QAT with and without hidden MSE | complete | hidden-MSE run `checkpoints/qwen2.5-1.5b-fineweb-edu/step-5000`; KL-only run `checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-5000/step-5000`; full ten-task comparison in `benchmark_results/lm-eval-qwen15b-klonly-full10/selected_metrics_with_baselines.md` |
 | Add row-scale versus tensor-scale | partial | Qwen2.5-0.5B row-scale evidence complete; Qwen2.5-1.5B row-scale dense-head job `9771` is still running with dependent jobs `9776`, `9779`, `9780`, and postprocess `9781` pending |
-| Convert repaired checkpoints into GGUF/TL2/I2_S | partial | static-ternary materialization to GGUF and packed `TQ2_0`/`I2_S` complete; native direct `ternary_state_dict.pt` GGUF writer and TL2 path are not yet complete |
+| Convert repaired checkpoints into GGUF/TL2/I2_S | partial | static-ternary materialization to GGUF and packed `TQ2_0`/`I2_S` complete; native direct `ternary_state_dict.pt` GGUF writer and Qwen TL2 path are not yet complete |
 | Run actual bitnet.cpp / llama.cpp CPU inference | complete for packed GGUF probes | `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`, `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json` |
 | Measure Xeon tokens/sec, prompt throughput, RSS, model size, quality loss | complete for current baselines | PyTorch RSS/runtime in `benchmark_results/runtime-qwen-xeon4116-512x32/summary.md`; packed GGUF throughput/file size/PPL in `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`; patched I2_S confirmation in `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json` |
 
@@ -69,13 +69,19 @@ Key audited values:
 2. Native direct GGUF writing from `ternary_state_dict.pt` is not complete.
    Static-ternary materialization is a validated bridge, not the final storage
    path.
-3. The validated threaded `I2_S` writer fix exists as
+3. Qwen TL2 is not complete. The current `llama-quantize` CLI does not expose
+   TL2 and its generic quantize switch has no TL2 quantization case. The
+   BitNet-specific HF converter exposes `--outtype tl2`, but it only registers
+   LLaMA/Mistral/Mixtral-style and BitNet model classes, not `Qwen2ForCausalLM`.
+   Custom TL2 code generation now supports arbitrary shapes, but a Qwen-aware
+   TL2 GGUF writer/loader path still needs implementation and validation.
+4. The validated threaded `I2_S` writer fix exists as
    `patches/llama-i2s-threaded-quantization.patch`, but the llama.cpp submodule
    has not been advanced to a commit containing that fix.
-4. MoE/Kimi remains unproven. The backend has generic MoE execution support,
+5. MoE/Kimi remains unproven. The backend has generic MoE execution support,
    but this fork has not implemented a Kimi-compatible ternary converter,
    router distillation, expert-locality benchmark, or MoE quality run.
-5. The current result is not a publishable "arbitrary model retrofit works"
+6. The current result is not a publishable "arbitrary model retrofit works"
    claim. The publishable angle, if any, is the negative result plus a measured
    recovery path: PTQ fails mathematically and empirically; QAT/distillation
    plus static ternary packing partially recovers quality and yields real CPU

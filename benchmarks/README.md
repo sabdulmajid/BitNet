@@ -228,6 +228,13 @@ After GGUF/TL2/I2_S conversion, compare against llama.cpp baselines:
 
 Measure prompt throughput, decode throughput, RSS, model file size, and perplexity on the same text blocks.
 
+Current Qwen status: I2_S and TQ2_0 are benchmarked through the static-ternary
+materialization bridge. TL2 is not yet a validated Qwen path. `llama-quantize`
+does not expose TL2 as an allowed output type, and the BitNet-specific
+`utils/convert-hf-to-gguf-bitnet.py --outtype tl2` converter does not register
+`Qwen2ForCausalLM`. Treat TL2 as pending until there is a Qwen-aware TL2 GGUF
+writer and a TL2-enabled build has passed smoke, PPL, and throughput audits.
+
 The reusable GGUF suite runner consumes a manifest and writes raw logs plus
 machine-readable summaries:
 
