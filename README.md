@@ -98,6 +98,8 @@ Current evidence is tracked in
 [benchmarks/results/qwen_retrofit_2026-05-03.md](benchmarks/results/qwen_retrofit_2026-05-03.md).
 The current prompt-to-artifact progress audit is
 [benchmarks/results/progress_audit_2026-05-05.md](benchmarks/results/progress_audit_2026-05-05.md).
+The active-goal completion audit is
+[benchmarks/results/active_goal_completion_audit_2026-05-05.md](benchmarks/results/active_goal_completion_audit_2026-05-05.md).
 The artifact-generated side-by-side Qwen summary is
 [benchmarks/results/qwen_side_by_side_2026-05-05.md](benchmarks/results/qwen_side_by_side_2026-05-05.md).
 The row-scale `I2_S` prototype note is
