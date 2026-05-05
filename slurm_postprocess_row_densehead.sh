@@ -19,11 +19,13 @@ ROW_CKPT="${ROW_CKPT:-checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-row-notiehead-
 ROW_QUALITY="${ROW_QUALITY:-benchmark_results/quality-qwen15b-klonly-row-notiehead-5000}"
 ROW_MC="${ROW_MC:-benchmark_results/mc-qwen15b-klonly-row-notiehead-5000-200}"
 ROW_LMEVAL="${ROW_LMEVAL:-benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10}"
+ROW_GGUF="${ROW_GGUF:-benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite}"
 
 echo "ROW_CKPT=$ROW_CKPT"
 echo "ROW_QUALITY=$ROW_QUALITY"
 echo "ROW_MC=$ROW_MC"
 echo "ROW_LMEVAL=$ROW_LMEVAL"
+echo "ROW_GGUF=$ROW_GGUF"
 
 python benchmarks/audit_evidence.py \
   --checkpoint qwen15b_row_notie_step5000="$ROW_CKPT/ternary_state_dict.pt:196:196:row:tie_true" \
@@ -34,6 +36,7 @@ python benchmarks/audit_evidence.py \
   --mc qwen15b_row_notie_arc_easy="$ROW_MC/qwen15b_ternary_arc_easy.json" \
   --mc qwen15b_row_notie_arc_challenge="$ROW_MC/qwen15b_ternary_arc_challenge.json" \
   --mc qwen15b_row_notie_hellaswag="$ROW_MC/qwen15b_ternary_hellaswag.json" \
+  --gguf-summary qwen15b_row_notie_gguf="$ROW_GGUF/summary.json:6" \
   --output-md benchmark_results/evidence_audit/qwen15b_row_notie_5000.md
 
 python benchmarks/compare_lm_eval.py \
