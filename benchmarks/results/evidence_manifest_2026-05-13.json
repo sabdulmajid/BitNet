@@ -1,5 +1,5 @@
 {
-  "artifact_count": 84,
+  "artifact_count": 86,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "70327e2debf45ee7a2791b5d53d573dbe5006bb6c9d02718e91eed1472109a71",
-      "size_bytes": 49548
+      "sha256": "9357a430f81afa6bfe4018c212fea53f5b3afb0104380d8fe3f9c71552e279f7",
+      "size_bytes": 49682
     },
     {
       "exists": true,
@@ -70,8 +70,17 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-13.md",
-      "sha256": "560cfebee3548a0b2c3059da0dc8e17b52677b40b0546e653a999daaa2bfe19a",
+      "sha256": "276e47b35d9b4a099a3052f228ed8f86a8eb00e7d5cbb00e9b7bce5bd50698a0",
       "size_bytes": 4607
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "product_scope_gate",
+      "metrics": {},
+      "path": "benchmarks/results/product_scope_gate_2026-05-13.md",
+      "sha256": "3c7f37313807fbc628a589ea1a4f163db48580d87fd51e917be95435251d07b6",
+      "size_bytes": 2812
     },
     {
       "exists": true,
@@ -79,7 +88,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-13.md",
-      "sha256": "5b8eec834b62559acef2afb7bdfcde0af556380a24f021e1bc525036d7435a02",
+      "sha256": "eb5d7c226cdfdd03f2dc7d18a8fb2e31f54c3698c9a9f83c0de879e0e40cc3b0",
       "size_bytes": 2865
     },
     {
@@ -1543,7 +1552,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-13.json",
-      "sha256": "b88bfc582a242f52622f544169afe67f116b65c68b52d9303c69dbc3a4643bb0",
+      "sha256": "b39f894321a087268e6378242dcd9379cd7c64c23ccce4bb7e2f5b11126e62cb",
       "size_bytes": 5392
     },
     {
@@ -1561,8 +1570,22 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-13.json",
-      "sha256": "2cb1c8deb29b2910e49317f066debe99b919f2d09aa6b6d4ba45f439647c45ca",
+      "sha256": "2d3f1c5c5cb160380d3a146a4351639209ccbc2cc76925d4e55331d8cf27402d",
       "size_bytes": 14327
+    },
+    {
+      "exists": true,
+      "kind": "product_scope_gate_json",
+      "label": "product_scope_gate_json",
+      "metrics": {
+        "publishable_angle": "negative arbitrary-retrofit result plus dense-Qwen row-scale recovery path",
+        "scope_status": "research_mvp_only",
+        "supported_claim_count": 2,
+        "unsupported_claim_count": 5
+      },
+      "path": "benchmark_results/product_scope_gate_2026-05-13.json",
+      "sha256": "baa7c6e01235d9182d7af039b2014f140c6b2ffc9bc592bc9bbbc39d156fd383",
+      "size_bytes": 3471
     },
     {
       "exists": true,

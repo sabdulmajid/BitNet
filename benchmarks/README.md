@@ -221,6 +221,17 @@ to report `Objective achieved: False` until row-scale `I2_SR` is an active
 runtime contract or explicitly scoped as downstream, and until TL2/MoE claims
 are either benchmarked or removed from the product scope.
 
+To classify the current publication/product scope from artifacts:
+
+```bash
+python benchmarks/audit_product_scope.py
+```
+
+The current scope gate is
+`benchmarks/results/product_scope_gate_2026-05-13.md`. It separates the
+supported dense-Qwen negative result plus row-scale recovery path from
+unsupported one-click, TL2, default-runtime, and MoE/Kimi claims.
+
 Large checkpoints, model conversions, and CPU benchmark byproducts are ignored
 by Git. To make pruning reproducible, generate the dry-run artifact plan before
 deleting anything:

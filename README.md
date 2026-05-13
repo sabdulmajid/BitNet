@@ -150,6 +150,8 @@ The current prompt-to-artifact progress audit is
 [benchmarks/results/progress_audit_2026-05-05.md](benchmarks/results/progress_audit_2026-05-05.md).
 The active-goal completion audit is
 [benchmarks/results/objective_completion_audit_2026-05-13.md](benchmarks/results/objective_completion_audit_2026-05-13.md).
+The product-scope gate is
+[benchmarks/results/product_scope_gate_2026-05-13.md](benchmarks/results/product_scope_gate_2026-05-13.md).
 The artifact-generated side-by-side Qwen summary is
 [benchmarks/results/qwen_side_by_side_2026-05-05.md](benchmarks/results/qwen_side_by_side_2026-05-05.md).
 The row-scale `I2_S` prototype note is
