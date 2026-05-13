@@ -11,7 +11,7 @@ Artifacts: `104`. Missing: `0`.
 | active_goal_audit | tracked_report | yes | 10765 | 255dacfeae0a |  |
 | objective_completion_audit | tracked_report | yes | 5101 | 3ee167dfea1e |  |
 | product_scope_gate | tracked_report | yes | 3226 | 7c97b38f6d45 |  |
-| i2sr_submodule_promotion_audit | tracked_report | yes | 2913 | 014d7a43f05f |  |
+| i2sr_submodule_promotion_audit | tracked_report | yes | 3097 | 3fb7dcf980ce |  |
 | benchmark_coverage_gate_report | tracked_report | yes | 2866 | 1d9aa0605ab4 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2174 | d6e0c6ec52ec |  |
@@ -98,7 +98,7 @@ Artifacts: `104`. Missing: `0`.
 | benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5393 | 69194a94c6c1 | passed=True, checks=33, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 14839 | 820d0a389481 | achieved=False, status=not_complete, complete=7/9, open=2 |
 | product_scope_gate_json | product_scope_gate_json | yes | 3885 | 1352532bc5cc | scope=research_mvp_only, supported=2, unsupported=5 |
-| i2sr_submodule_promotion_audit_json | i2sr_submodule_promotion_audit_json | yes | 3201 | 8bf5a4845054 | ready=False, active=False, patch_applies=True, submodule=1f86f058, blockers=4 |
+| i2sr_submodule_promotion_audit_json | i2sr_submodule_promotion_audit_json | yes | 3583 | c7e94523c8fb | ready=False, active=False, patch_applies=True, submodule=1f86f058, blockers=4 |
 | moe_support_json | moe_support_json | yes | 10013 | f650b04a567a | present=5/5, gates=6, failed=3, kimi_artifacts=0 |
 | moe_packing_contract_json | moe_packing_contract_json | yes | 2966 | 538939fcb10b | ready=False, tl2_3d=False, i2sr_3d=True, control_2d=True, layout=4/4, blockers=1 |
 | moe_tl2_runtime_contract_json | moe_tl2_runtime_contract_json | yes | 2985 | e5b03c961bf5 | ready=False, checks=5, failed=3, underreport=69632, ratio=3.99312, blockers=3 |

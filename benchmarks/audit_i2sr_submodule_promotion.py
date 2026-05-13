@@ -15,6 +15,7 @@ SUBMODULE_PATH = Path("3rdparty/llama.cpp")
 PATCH_PATH = Path("patches/llama-i2sr-row-scale-qtype.patch")
 ROOT_SPLIT_PATCH = Path("patches/bitnet-i2sr-root-runtime.patch")
 SUBMODULE_SPLIT_PATCH = Path("patches/llama-i2sr-row-scale-qtype.submodule.patch")
+HANDOFF_JSON = Path("benchmark_results/i2sr_promotion_handoff_2026-05-13.json")
 
 
 def run(command: list[str], *, cwd: Path, check: bool = False) -> subprocess.CompletedProcess[str]:
@@ -23,6 +24,12 @@ def run(command: list[str], *, cwd: Path, check: bool = False) -> subprocess.Com
 
 def git_output(command: list[str], *, cwd: Path) -> str:
     return run(command, cwd=cwd, check=True).stdout.strip()
+
+
+def read_json(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def file_contains(path: Path, needles: list[str]) -> bool:
@@ -91,6 +98,15 @@ def build_audit(
     remote_contains = git_output(["git", "branch", "--remotes", "--contains", "HEAD"], cwd=submodule).splitlines()
     remote_write = remote_write_probe(submodule, remote_probe_branch) if check_remote_write else None
     candidate_fork = remote_read_probe(candidate_fork_url) if candidate_fork_url else None
+    handoff = read_json(root / HANDOFF_JSON)
+    handoff_result = handoff.get("worktree_result") if isinstance(handoff.get("worktree_result"), dict) else {}
+    local_handoff = {
+        "prepared": bool(handoff_result.get("prepared")),
+        "pushed": bool(handoff_result.get("pushed")),
+        "commit_sha": handoff_result.get("commit_sha") or "",
+        "worktree_dir": handoff_result.get("worktree_dir") or "",
+        "branch": handoff_result.get("branch") or remote_probe_branch,
+    }
 
     patch_applies = run(["git", "apply", "--check", str(patch)], cwd=root).returncode == 0
     patch_already_applied = run(["git", "apply", "--reverse", "--check", str(patch)], cwd=root).returncode == 0
@@ -133,6 +149,23 @@ def build_audit(
     if any(line.startswith(" M ") or line.startswith("?? ") for line in submodule_status.splitlines()):
         blockers.append("Submodule working tree is dirty.")
 
+    next_steps = [
+        "Create or choose a writable llama.cpp fork/branch for the I2_SR runtime changes.",
+    ]
+    if local_handoff["prepared"]:
+        next_steps.append(
+            f"Push prepared local branch `{local_handoff['branch']}` from `{local_handoff['worktree_dir']}` at `{local_handoff['commit_sha']}`."
+        )
+    else:
+        next_steps.append(f"Apply `{SUBMODULE_SPLIT_PATCH}` inside that branch and commit it.")
+    next_steps.extend(
+        [
+            f"Apply `{ROOT_SPLIT_PATCH}` in this superproject or split it into an equivalent top-level commit.",
+            "Push the submodule branch, update .gitmodules if the URL changes, then update the superproject submodule pointer.",
+            "Run benchmarks/run_i2sr_active_patch_gate.py or the equivalent active-source productization gate after the pointer update.",
+        ]
+    )
+
     return {
         "schema": "bitnet-i2sr-submodule-promotion-audit-v1",
         "date": DATE,
@@ -155,18 +188,13 @@ def build_audit(
         "remote_branches_containing_head": [line.strip() for line in remote_contains],
         "remote_write_probe": remote_write,
         "candidate_fork_probe": candidate_fork,
+        "local_handoff": local_handoff,
         "superproject_status": superproject_status,
         "submodule_status": submodule_status,
         "active_checks": active_checks,
         "patch_files": patch_files,
         "blockers": blockers,
-        "next_steps": [
-            "Create or choose a writable llama.cpp fork/branch for the I2_SR runtime changes.",
-            f"Apply `{SUBMODULE_SPLIT_PATCH}` inside that branch and commit it.",
-            f"Apply `{ROOT_SPLIT_PATCH}` in this superproject or split it into an equivalent top-level commit.",
-            "Push the submodule branch, update .gitmodules if the URL changes, then update the superproject submodule pointer.",
-            "Run benchmarks/run_i2sr_active_patch_gate.py or the equivalent active-source productization gate after the pointer update.",
-        ],
+        "next_steps": next_steps,
     }
 
 
@@ -192,6 +220,7 @@ def render_markdown(result: dict[str, Any]) -> str:
     next_rows = [[step] for step in result["next_steps"]]
     remote_write = result.get("remote_write_probe")
     candidate_fork = result.get("candidate_fork_probe")
+    local_handoff = result.get("local_handoff") or {}
     remote_write_lines = []
     if remote_write:
         stderr = remote_write.get("stderr", "").replace("\n", " ")
@@ -234,6 +263,10 @@ def render_markdown(result: dict[str, Any]) -> str:
             f"Patch applies cleanly: {md_bool(result['patch_applies_cleanly'])}.",
             f"Submodule: `{result['configured_submodule_url']}` branch `{result['configured_submodule_branch']}` at `{result['submodule_short']}`.",
             f"Remote branches containing HEAD: `{', '.join(result['remote_branches_containing_head'])}`.",
+            (
+                f"Prepared local handoff: {md_bool(bool(local_handoff.get('prepared')))} "
+                f"commit `{local_handoff.get('commit_sha', '')}`."
+            ),
             "## Active Source Checks",
             md_table(["check", "present"], active_rows),
             "## Blockers",

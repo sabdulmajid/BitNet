@@ -12,6 +12,8 @@ Submodule: `https://github.com/Eddie-Wang1120/llama.cpp.git` branch `merge-dev` 
 
 Remote branches containing HEAD: `origin/merge-dev`.
 
+Prepared local handoff: `true` commit `cb38942486a05e3a1212e6eba1462e178478f459`.
+
 ## Active Source Checks
 
 | check | present |
@@ -76,7 +78,7 @@ Remote branches containing HEAD: `origin/merge-dev`.
 | step |
 | --- |
 | Create or choose a writable llama.cpp fork/branch for the I2_SR runtime changes. |
-| Apply `patches/llama-i2sr-row-scale-qtype.submodule.patch` inside that branch and commit it. |
+| Push prepared local branch `i2sr-row-scale-runtime` from `/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/i2sr-promotion-llama-worktree` at `cb38942486a05e3a1212e6eba1462e178478f459`. |
 | Apply `patches/bitnet-i2sr-root-runtime.patch` in this superproject or split it into an equivalent top-level commit. |
 | Push the submodule branch, update .gitmodules if the URL changes, then update the superproject submodule pointer. |
 | Run benchmarks/run_i2sr_active_patch_gate.py or the equivalent active-source productization gate after the pointer update. |
