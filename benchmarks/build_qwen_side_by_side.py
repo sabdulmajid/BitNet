@@ -72,6 +72,10 @@ HEADLINE_CPU_ROWS = [
 ]
 
 PRODUCTIZATION_GATE = "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json"
+OBJECTIVE_AUDIT = "benchmark_results/objective_completion_audit_2026-05-13.json"
+PRODUCT_SCOPE_GATE = "benchmark_results/product_scope_gate_2026-05-13.json"
+I2SR_PROMOTION_AUDIT = "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json"
+MOE_PACKING_CONTRACT = "benchmark_results/moe_packing_contract_2026-05-13.json"
 
 PAIRED_DELTA_REPORTS = [
     ("QAT row-scale minus FP", "benchmarks/results/paired_row_densehead_minus_fp_2026-05-13.md"),
@@ -251,6 +255,51 @@ def build_headline_table() -> str:
     )
 
 
+def build_reviewer_gate_table() -> str:
+    objective = read_json(Path(OBJECTIVE_AUDIT)) or {}
+    scope = read_json(Path(PRODUCT_SCOPE_GATE)) or {}
+    i2sr = read_json(Path(I2SR_PROMOTION_AUDIT)) or {}
+    moe = read_json(Path(MOE_PACKING_CONTRACT)) or {}
+    moe_verdict = moe.get("verdict", {}) if isinstance(moe.get("verdict"), dict) else {}
+    rows = [
+        [
+            "benchmark coverage",
+            "pass",
+            "full ten-task, paired deltas, CPU quality/speed/RSS, manifest",
+            "This confirms artifact coverage, not product completion.",
+        ],
+        [
+            "objective completion",
+            str(objective.get("completion_status", "missing")),
+            f"{objective.get('complete_count', '-')}/{objective.get('check_count', '-')} complete",
+            "Open items are default row-scale runtime promotion and MoE/Kimi evidence.",
+        ],
+        [
+            "product scope",
+            str(scope.get("scope_status", "missing")),
+            str(scope.get("publishable_angle", "-")),
+            "Do not claim arbitrary lossless retrofit or MoE/Kimi support.",
+        ],
+        [
+            "I2_SR active submodule",
+            "ready" if i2sr.get("promotion_ready") else "blocked",
+            f"active={i2sr.get('active_runtime_support')}; patch_applies={i2sr.get('patch_applies_cleanly')}; blockers={len(i2sr.get('blockers', []))}",
+            "Quality-valid CPU path exists only with the downstream patch until a writable llama.cpp fork/branch is provided.",
+        ],
+        [
+            "MoE/Kimi packing",
+            "ready" if moe_verdict.get("moe_packing_ready") else "blocked",
+            (
+                f"tl2_3d={moe_verdict.get('merged_3d_tl2_supported')}; "
+                f"i2sr_3d={moe_verdict.get('merged_3d_i2s_i2sr_supported')}; "
+                f"2d_control={moe_verdict.get('dense_2d_i2s_control_supported')}"
+            ),
+            "Synthetic contract test rejects merged expert tensors; no Kimi artifact exists.",
+        ],
+    ]
+    return md_table(["gate", "status", "evidence", "reviewer implication"], rows)
+
+
 def build_cpu_headline_table() -> str:
     rows: list[list[str]] = []
     for label, path, name in HEADLINE_CPU_ROWS:
@@ -362,6 +411,8 @@ def main() -> None:
         ),
         "## Headline Verdict",
         build_headline_table(),
+        "## Reviewer Gate Summary",
+        build_reviewer_gate_table(),
         "## Perplexity",
         build_ppl_table(),
         "## Full Ten-Task lm-eval",
