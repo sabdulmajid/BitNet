@@ -1,18 +1,18 @@
 {
   "evidence_manifest": "benchmarks/results/evidence_manifest_2026-05-13.json",
-  "generated_utc": "2026-05-13T03:55:58+00:00",
-  "git_head": "2b92e84a5560",
+  "generated_utc": "2026-05-13T04:11:59+00:00",
+  "git_head": "c5e4584d0959",
   "groups": {
     "keep_by_default_model_artifacts": [
       {
         "path": "models/eval-ternary-tiny-direct",
         "reason": "Generated model/GGUF directory; useful for reruns and protected if referenced by a benchmark manifest.",
-        "size_bytes": 25361184
+        "size_bytes": 76039968
       },
       {
         "path": "models/qwen2.5-0.5b-direct-static-ternary",
         "reason": "Generated model/GGUF directory; useful for reruns and protected if referenced by a benchmark manifest.",
-        "size_bytes": 1266427136
+        "size_bytes": 1906659072
       },
       {
         "path": "models/qwen2.5-0.5b-fp",
@@ -229,13 +229,17 @@
   },
   "protected_counts": {
     "benchmark_manifest_paths": 27,
-    "evidence_manifest_files": 49,
+    "evidence_manifest_files": 55,
     "protected_checkpoint_dirs": 12
   },
   "protected_paths": [
     "README.md",
     "benchmark_results/direct-gguf-qwen05b-klonly-notie-2026-05-13/summary.json",
     "benchmark_results/direct-gguf-tiny-2026-05-13/summary.json",
+    "benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/conversion_summary.json",
+    "benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/summary.json",
+    "benchmark_results/direct-i2s-tiny-2026-05-13/selfcontained_summary.json",
+    "benchmark_results/direct_packed_gguf_support_2026-05-13.json",
     "benchmark_results/evidence_audit/latest_nonrow.md",
     "benchmark_results/evidence_audit/qwen05b_tl2_probe.md",
     "benchmark_results/evidence_audit/qwen15b_context_scaling_rss.md",
@@ -274,6 +278,8 @@
     "benchmark_results/tl2_scale_semantics_2026-05-05.json",
     "benchmark_results/tl2_shape_support_audit_2026-05-05.json",
     "benchmarks/results/active_goal_completion_audit_2026-05-05.md",
+    "benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md",
+    "benchmarks/results/direct_packed_gguf_support_2026-05-13.md",
     "benchmarks/results/direct_static_ternary_gguf_2026-05-13.md",
     "benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md",
     "benchmarks/results/moe_support_audit_2026-05-05.md",
@@ -315,7 +321,7 @@
   ],
   "schema": "bitnet-artifact-prune-plan-v1",
   "totals": {
-    "keep_by_default_model_artifacts": 58217733340,
+    "keep_by_default_model_artifacts": 58908644060,
     "prune_intermediate_checkpoints": 217345585819,
     "remove_local_caches": 4386032852,
     "remove_rebuildable_build_dirs": 86093832

@@ -1,5 +1,5 @@
 {
-  "artifact_count": 51,
+  "artifact_count": 55,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "7f99e9166d208cbcf03e4eb13b4ca3fc554f0bbf2a25684933939713e39a5ec8",
-      "size_bytes": 45347
+      "sha256": "75166bcd08ec92738015f5380ad3c87295a12c585d59edc2796660ec8683f204",
+      "size_bytes": 46252
     },
     {
       "exists": true,
@@ -25,8 +25,8 @@
       "label": "publishable_claims",
       "metrics": {},
       "path": "benchmarks/results/publishable_claims_2026-05-05.md",
-      "sha256": "d4b80f3ef31d7d25f2cae844883a198de92aa617d17d62d41e5b18303293c30d",
-      "size_bytes": 7863
+      "sha256": "91966011ad7c492dbe7f46514ef5438fc3770bbf7d138ccc6149535eab3d9d0f",
+      "size_bytes": 8403
     },
     {
       "exists": true,
@@ -34,8 +34,8 @@
       "label": "progress_audit",
       "metrics": {},
       "path": "benchmarks/results/progress_audit_2026-05-05.md",
-      "sha256": "5d69561cfef841758b8a59448057dd5db19d67984fa3cc8e1635df32c66ac6d1",
-      "size_bytes": 18867
+      "sha256": "20fd1e06767edbcace0ea44c52e4691f4846554556d7b27df47ff05907c070e9",
+      "size_bytes": 19707
     },
     {
       "exists": true,
@@ -43,8 +43,8 @@
       "label": "active_goal_audit",
       "metrics": {},
       "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md",
-      "sha256": "64e3d97ff2e1d86db5aed3d71fcfe5796adf7e343f615649b2d3bf9f2317de01",
-      "size_bytes": 8608
+      "sha256": "356501a5e22b642988d24582ebd5f72b37977bdf580549528c90b31662c2eea4",
+      "size_bytes": 8585
     },
     {
       "exists": true,
@@ -63,6 +63,15 @@
       "path": "benchmarks/results/direct_packed_gguf_support_2026-05-13.md",
       "sha256": "8b12a3dc950e1aa4fa5e84fdf9c5345e41b2d102c1370c6fd76fd8a64a19c6bf",
       "size_bytes": 2063
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "direct_i2s_scalar_gguf_report",
+      "metrics": {},
+      "path": "benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md",
+      "sha256": "58997cd5dbe70f1bbb206991f84aca84b3be56ca7107c70499e2173f84df93e8",
+      "size_bytes": 5389
     },
     {
       "exists": true,
@@ -791,6 +800,75 @@
       "path": "benchmark_results/direct-gguf-qwen05b-klonly-notie-2026-05-13/summary.json",
       "sha256": "fb82f94beb5754b9e385d1bc1fadcc2755924887c8b40584eeace8d9b9f44998",
       "size_bytes": 2546
+    },
+    {
+      "exists": true,
+      "kind": "direct_i2s_json",
+      "label": "direct_i2s_tiny",
+      "metrics": {
+        "architecture": "LlamaForCausalLM",
+        "copied_tensors": 4,
+        "has_native_gguf_python_constants": false,
+        "outfile_size_bytes": 25339392,
+        "output_f16_tensors": 1,
+        "output_tensors": 12,
+        "row_scale_rejected": 0,
+        "ternary_i2s_packed": 7
+      },
+      "path": "benchmark_results/direct-i2s-tiny-2026-05-13/selfcontained_summary.json",
+      "sha256": "d4fa8a211c215fe28ea69537a4f0fc03cbec24fcecdd26f53919c17a17bff2c5",
+      "size_bytes": 841
+    },
+    {
+      "exists": true,
+      "kind": "direct_i2s_json",
+      "label": "direct_i2s_qwen05b_conversion",
+      "metrics": {
+        "architecture": "Qwen2ForCausalLM",
+        "copied_tensors": 122,
+        "has_native_gguf_python_constants": false,
+        "outfile_size_bytes": 640231936,
+        "output_f16_tensors": 1,
+        "output_tensors": 291,
+        "row_scale_rejected": 0,
+        "ternary_i2s_packed": 168
+      },
+      "path": "benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/conversion_summary.json",
+      "sha256": "bc3e80077c9b425ac5b9c6466a5b1336a0d037ab3ca0de12e085caa32129b94c",
+      "size_bytes": 900
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "direct_i2s_qwen05b_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 16.30706,
+            "file_mib": 948.098876953125,
+            "kind": "fp16-baseline",
+            "name": "qwen05b_fp_f16",
+            "ppl": 18.0984,
+            "prefill_tok_s": 328.210498
+          },
+          {
+            "decode_tok_s": 37.408742,
+            "file_mib": 610.57275390625,
+            "kind": "direct-scalar-i2s",
+            "name": "qwen05b_klonly_direct_i2_s",
+            "ppl": "NaN",
+            "prefill_tok_s": 502.310892
+          }
+        ],
+        "failed": [],
+        "nan_ppl": [
+          "qwen05b_klonly_direct_i2_s"
+        ],
+        "rows": 2
+      },
+      "path": "benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/summary.json",
+      "sha256": "a82fe992c60773b945493c1b824f6b695c900d57b3714f4223c261ec9f948b74",
+      "size_bytes": 2558
     },
     {
       "exists": true,

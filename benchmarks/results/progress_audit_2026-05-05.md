@@ -32,7 +32,7 @@ Current evidence still supports the negative retrofit verdict:
 | Add llama.cpp Q4_K_M and Q8_0 baselines | complete for Qwen2.5-1.5B | `benchmark_results/gguf-qwen15b-klonly-suite/summary.json` includes F16, Q8_0, Q4_K_M, blind TQ2_0, blind I2_S, and trained static-ternary artifacts |
 | Add QAT with and without hidden MSE | complete | hidden-MSE run `checkpoints/qwen2.5-1.5b-fineweb-edu/step-5000`; KL-only run `checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-5000/step-5000`; full ten-task comparison in `benchmark_results/lm-eval-qwen15b-klonly-full10/selected_metrics_with_baselines.md` |
 | Add row-scale versus tensor-scale | complete for Qwen2.5-1.5B dense-head ablation | Qwen2.5-1.5B row-scale dense-head job `9771` completed 5000 steps; checkpoints step 1000/2000/3000/4000/5000 all passed audit at 196 ternary keys / 196 row-scale tensors; final PPL, MC200, full ten-task lm-eval, paired deltas, and row GGUF suite completed under `benchmark_results/quality-qwen15b-klonly-row-notiehead-5000`, `benchmark_results/mc-qwen15b-klonly-row-notiehead-5000-200`, `benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10`, and `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite` |
-| Convert repaired checkpoints into GGUF/TL2/I2_S | partial | static-ternary materialization to GGUF and packed `TQ2_0`/`I2_S` complete for tensor-scale checkpoints; row-scale materialization and `TQ2_0` preserve quality; default row-scale `I2_S` fails audit; per-row-scale `I2_S` prototype patch preserves quality but is not yet the default format; dense Qwen2.5-0.5B TL2 export works only with model-specific codegen and fails quality; native direct `ternary_state_dict.pt` GGUF writer is not complete |
+| Convert repaired checkpoints into GGUF/TL2/I2_S | partial | static-ternary materialization to GGUF and packed `TQ2_0`/`I2_S` complete for tensor-scale checkpoints; direct dense GGUF export works; direct scalar `I2_S` export now loads/runs without submodule edits but Qwen2.5-0.5B quality fails as NaN PPL; row-scale materialization and `TQ2_0` preserve quality; default row-scale `I2_S` fails audit; per-row-scale `I2_S` prototype patch preserves quality but is not yet the default format; dense Qwen2.5-0.5B TL2 export works only with model-specific codegen and fails quality |
 | Run actual bitnet.cpp / llama.cpp CPU inference | complete for packed GGUF probes | `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`, `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json`, dense-head suite `benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json`, row-scale dense-head suite `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json`, and Qwen0.5B TL2 probe `benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json` |
 | Measure CPU tokens/sec, prompt throughput, RSS, model size, quality loss | complete for current baselines | PyTorch RSS/runtime in `benchmark_results/runtime-qwen-xeon4116-512x32/summary.md`; Xeon packed GGUF throughput/file size/PPL in `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`; AMD dense-head packed GGUF in `benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json`; AMD row-scale dense-head packed GGUF in `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json`; patched I2_S confirmation in `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json`; RSS context scaling in `benchmark_results/gguf-rss-qwen15b-context-scaling-2026-05-05/summary.json` |
 
@@ -159,6 +159,14 @@ writer stack used for direct `ternary_state_dict.pt` export lacks `I2_S`
 quantization constants, file-type metadata, quant-size metadata, and special
 layout handling.
 
+The direct scalar `I2_S` GGUF export note is tracked at
+`benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md`. It adds a
+self-contained scalar `I2_S` writer using the C++ runtime's existing type IDs
+without modifying the llama.cpp submodule. The Qwen2.5-0.5B scalar artifact
+loads and runs as `168` `i2_s` tensors, but quality fails with NaN PPL and
+punctuation-only deterministic smoke output. Row-scale checkpoints are rejected
+by design.
+
 The publishable-claims ledger is tracked at
 `benchmarks/results/publishable_claims_2026-05-05.md`. It separates supported
 claims from unsupported or not-yet claims and should be the first artifact used
@@ -211,6 +219,10 @@ Key audited values:
 | Direct Qwen2.5-0.5B static-ternary F16 GGUF smoke return code | 0 |
 | Direct packed I2_S support in Python GGUF writer | false |
 | Product-safe row-scale packed GGUF support | false |
+| Direct Qwen2.5-0.5B scalar `I2_S` packed tensors | 168 |
+| Direct Qwen2.5-0.5B scalar `I2_S` file size | 610.6 MiB |
+| Direct Qwen2.5-0.5B scalar `I2_S` fixed-excerpt PPL | NaN |
+| Direct Qwen2.5-0.5B scalar `I2_S` prompt/decode tok/s | 502.31 / 37.41 |
 | Qwen2.5-1.5B FP F16 GGUF max RSS at `-c 512` | 2.948 GiB |
 | Qwen2.5-1.5B FP Q4_K_M GGUF max RSS at `-c 512` | 0.985 GiB |
 | Qwen2.5-1.5B row-scale dense-head I2_S max RSS at `-c 512` | 1.250 GiB |
@@ -236,10 +248,11 @@ Key audited values:
    compatibility policy, and regeneration of affected artifacts. The
    row-scale format audit shows the prototype currently overloads the existing
    `I2_S` type instead of defining a compatibility-safe row-scale qtype.
-2. Native direct packed GGUF writing from `ternary_state_dict.pt` is not
-   complete. Static-ternary dense GGUF export now has two validated bridges:
-   the older HF-materialization bridge and the newer in-memory direct dense
-   bridge. Neither is the final row-scale-aware packed `I2_S` writer.
+2. Native quality-preserving direct packed GGUF writing from
+   `ternary_state_dict.pt` is not complete. Static-ternary dense GGUF export
+   now has two validated bridges, and scalar direct `I2_S` export is loadable,
+   but the scalar Qwen2.5-0.5B artifact has NaN PPL. The final row-scale-aware
+   packed `I2_S` writer still needs a stable row-scale layout.
 3. Qwen TL2 is not complete. Dense Qwen2.5-0.5B TL2 export now works after
    exact shape codegen and a matching TL2 build, but the tested checkpoint has
    NaN PPL. `llama-quantize` still does not expose TL2, Qwen2MoE/Kimi are not

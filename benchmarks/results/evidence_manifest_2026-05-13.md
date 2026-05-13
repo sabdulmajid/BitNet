@@ -1,14 +1,15 @@
 # Evidence Manifest, 2026-05-13
-Artifacts: `51`. Missing: `0`.
+Artifacts: `55`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 45347 | 7f99e9166d20 |  |
+| README | tracked_report | yes | 46252 | 75166bcd08ec |  |
 | side_by_side_report | tracked_report | yes | 12585 | 570856967359 |  |
-| publishable_claims | tracked_report | yes | 7863 | d4b80f3ef31d |  |
-| progress_audit | tracked_report | yes | 18867 | 5d69561cfef8 |  |
-| active_goal_audit | tracked_report | yes | 8608 | 64e3d97ff2e1 |  |
+| publishable_claims | tracked_report | yes | 8403 | 91966011ad7c |  |
+| progress_audit | tracked_report | yes | 19707 | 20fd1e06767e |  |
+| active_goal_audit | tracked_report | yes | 8585 | 356501a5e22b |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2063 | 8b12a3dc950e |  |
+| direct_i2s_scalar_gguf_report | tracked_report | yes | 5389 | 58997cd5dbe7 |  |
 | tl2_shape_report | tracked_report | yes | 2817 | 8dddd65315e0 |  |
 | tl2_probe_report | tracked_report | yes | 3608 | dd7e4fa29cc1 |  |
 | tl2_scale_report | tracked_report | yes | 2321 | 30bbfbd22559 |  |
@@ -46,6 +47,9 @@ Artifacts: `51`. Missing: `0`.
 | gguf_context_rss | gguf_memory_json | yes | 9911 | fd135b202cfd | rows=24, contexts=[512, 2048, 8192, 32768] |
 | direct_gguf_tiny | direct_gguf_json | yes | 1972 | a01c51bbb398 | arch=LlamaForCausalLM, outtype=f16, ternary=8, tensors=12, reader_rc=0, smoke_rc=None |
 | direct_gguf_qwen05b | direct_gguf_json | yes | 2546 | fb82f94beb57 | arch=Qwen2ForCausalLM, outtype=f16, ternary=168, tensors=291, reader_rc=0, smoke_rc=0 |
+| direct_i2s_tiny | direct_i2s_json | yes | 841 | d4fa8a211c21 | arch=LlamaForCausalLM, packed=7, out_f16=1, tensors=12, native_py_consts=False |
+| direct_i2s_qwen05b_conversion | direct_i2s_json | yes | 900 | bc3e80077c9b | arch=Qwen2ForCausalLM, packed=168, out_f16=1, tensors=291, native_py_consts=False |
+| direct_i2s_qwen05b_suite | gguf_summary_json | yes | 2558 | a82fe992c607 | rows=2, failed=0, nan=1 |
 | direct_packed_gguf_support_json | direct_packed_support_json | yes | 2040 | 175fc0758125 | dense=True, packed_i2s=False, row_safe=False |
 | tl2_shape_json | tl2_shape_json | yes | 12054 | a99430f0f4b0 |  |
 | tl2_scale_json | tl2_scale_json | yes | 14344 | bf2d36674b72 | qwen15b_tensor_scale err=0; qwen15b_row_scale err=1.90423 |

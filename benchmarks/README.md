@@ -308,6 +308,26 @@ Use `benchmarks/audit_direct_packed_gguf_support.py` to check the current
 direct packed-writer gates; the current audit reports dense direct GGUF support
 as present and direct packed row-scale support as absent.
 
+For scalar-scale static ternary checkpoints, `convert_static_ternary_to_i2s_gguf.py`
+can pack `ternary_state_dict.pt` directly into the existing tensor-scale
+`I2_S` GGUF layout without modifying the vendored `llama.cpp` Python constants:
+
+```bash
+python benchmarks/convert_static_ternary_to_i2s_gguf.py \
+  --checkpoint-dir checkpoints/qwen2.5-0.5b-fineweb-edu-klonly-1000/step-1000 \
+  --outfile models/qwen2.5-0.5b-direct-static-ternary/qwen05b_klonly_direct_i2_s.gguf \
+  --expect-ternary-keys 169 \
+  --validate-codes \
+  --summary-json benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/conversion_summary.json
+```
+
+This path intentionally rejects row-scale checkpoints. On the Qwen2.5-0.5B
+KL-only scalar checkpoint it produced a loadable `I2_S` GGUF with `168` packed
+projection tensors, but the fixed-excerpt CPU benchmark failed quality
+(`NaN` PPL, punctuation-only smoke). Treat it as a scalar-format/runtime probe,
+not as the row-scale product path. See
+`benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md`.
+
 For QAT checkpoints, do not convert `model.safetensors` directly and treat it
 as the trained ternary artifact. The validated bridge is:
 

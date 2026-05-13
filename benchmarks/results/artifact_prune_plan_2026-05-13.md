@@ -1,14 +1,14 @@
 # Artifact Prune Plan
 
-Generated UTC: `2026-05-13T03:55:58+00:00`
-Git HEAD: `2b92e84a5560`
+Generated UTC: `2026-05-13T04:11:59+00:00`
+Git HEAD: `c5e4584d0959`
 
 This is a dry-run plan. No files were deleted by the generator.
 
 ## Guardrails
 
 - Evidence manifest: `benchmarks/results/evidence_manifest_2026-05-13.json`
-- Protected evidence files: `49`
+- Protected evidence files: `55`
 - Protected benchmark-manifest paths: `27`
 - Protected checkpoint directories: `12`
 
@@ -16,7 +16,7 @@ This is a dry-run plan. No files were deleted by the generator.
 
 | class | action | items | total |
 | --- | --- | ---: | ---: |
-| `keep_by_default_model_artifacts` | keep by default | 10 | 54.22 GiB |
+| `keep_by_default_model_artifacts` | keep by default | 10 | 54.86 GiB |
 | `prune_intermediate_checkpoints` | safe after review | 29 | 202.42 GiB |
 | `remove_local_caches` | safe after review | 1 | 4.08 GiB |
 | `remove_rebuildable_build_dirs` | safe after review | 3 | 82.11 MiB |
@@ -83,8 +83,8 @@ rm -rf '.hf_cache'
 
 ## Model Artifacts Kept By Default
 
-- `models/eval-ternary-tiny-direct`: 24.19 MiB
-- `models/qwen2.5-0.5b-direct-static-ternary`: 1.18 GiB
+- `models/eval-ternary-tiny-direct`: 72.52 MiB
+- `models/qwen2.5-0.5b-direct-static-ternary`: 1.78 GiB
 - `models/qwen2.5-0.5b-fp`: 2.02 GiB
 - `models/qwen2.5-0.5b-qatsby`: 2.74 GiB
 - `models/qwen2.5-1.5b-fp`: 6.84 GiB

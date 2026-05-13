@@ -88,6 +88,15 @@ conservative:
   fork also includes a validated patch file for that threaded packing/scaling
   bug, while the safe wrapper remains single-threaded until the submodule is
   advanced.
+- **Direct scalar `I2_S` export is mechanically solved but not a quality
+  result.** This fork can now pack a scalar-scale `ternary_state_dict.pt`
+  directly into GGUF `I2_S` without editing the vendored `llama.cpp` submodule.
+  The Qwen2.5-0.5B KL-only scalar checkpoint loads and runs on CPU as `168`
+  `i2_s` tensors, shrinking file size from `948.1` MiB FP16 to `610.6` MiB and
+  improving fixed-excerpt prefill/decode throughput from `328.21`/`16.31` tok/s
+  to `502.31`/`37.41` tok/s. Quality fails: PPL is `NaN` and deterministic
+  smoke output is punctuation spam. This is a runtime-format milestone, not a
+  publishable model-quality claim.
 - **TL2 is now a partial dense-Qwen engineering probe, not a product claim.**
   This fork can generate a Qwen2.5-0.5B TL2 GGUF only after exact
   model-specific TL2 code generation and a matching `BITNET_X86_TL2=ON`
@@ -142,6 +151,8 @@ The direct static-ternary GGUF bridge note is
 [benchmarks/results/direct_static_ternary_gguf_2026-05-13.md](benchmarks/results/direct_static_ternary_gguf_2026-05-13.md).
 The direct packed GGUF support audit is
 [benchmarks/results/direct_packed_gguf_support_2026-05-13.md](benchmarks/results/direct_packed_gguf_support_2026-05-13.md).
+The direct scalar `I2_S` GGUF export note is
+[benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md](benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md).
 The publishable-claims ledger is
 [benchmarks/results/publishable_claims_2026-05-05.md](benchmarks/results/publishable_claims_2026-05-05.md).
 The compact evidence manifest with hashes and parsed metrics is
@@ -218,15 +229,17 @@ retrofit pipeline with measured guarantees:
 - distill against the FP teacher under the exact ternary constraint,
 - export `ternary_state_dict.pt` plus a static-ternary GGUF bridge,
 - pack `TQ2_0` and `I2_S` artifacts for commodity CPU inference,
-- use `benchmarks/build_static_ternary_gguf_bridge.py` as the current
-  reproducible bridge runner while direct GGUF export is still unfinished,
+- use direct dense GGUF export for inspection and direct scalar `I2_S` export
+  only for scalar-scale experiments; use the materialization/static bridge for
+  row-scale quality-preserving exports until a stable row-scale packed format
+  exists,
 - promote the row-scale-aware `I2_S` prototype into a stable packed format or
   new GGUF quantization type before claiming row-scale `I2_S` deployment,
 - publish a benchmark card with FP/Q8/Q4/blind-ternary/QAT comparisons.
 
 The current MVP should target dense Qwen-style models first. MoE models such as
-Kimi, production TL2 export for strong row-scale Qwen checkpoints, direct GGUF
-ingestion of ternary state dicts, and quality guarantees for arbitrary
+Kimi, production TL2 export for strong row-scale Qwen checkpoints, stable
+row-scale packed GGUF ingestion, and quality guarantees for arbitrary
 architectures remain research tasks.
 The current toolchain split is mechanical: the BitNet HF converter now exposes
 `tl2`, registers dense `Qwen2ForCausalLM`, and accepts `--kernel-config` for
