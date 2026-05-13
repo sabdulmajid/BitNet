@@ -59,7 +59,7 @@ Branch: `i2sr-row-scale-runtime`.
 
 | field | value |
 | --- | --- |
-| prepared | `n/a` |
-| pushed | `n/a` |
-| commit | `` |
-| worktree | `` |
+| prepared | `true` |
+| pushed | `false` |
+| commit | `cb38942486a05e3a1212e6eba1462e178478f459` |
+| worktree | `/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/i2sr-promotion-llama-worktree` |
