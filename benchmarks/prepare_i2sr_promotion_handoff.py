@@ -179,27 +179,42 @@ def build_handoff(
         fork = remote_probe(fork_url, cwd=root)
 
     blockers = []
+    prepare_blockers = []
     if not root_clean:
-        blockers.append("Root worktree is dirty; commit or stash unrelated changes before promotion.")
+        message = "Root worktree is dirty; commit or stash unrelated changes before promotion."
+        blockers.append(message)
+        prepare_blockers.append(message)
     if not submodule_clean:
-        blockers.append("llama.cpp submodule worktree is dirty; promotion must start from the audited clean state.")
+        message = "llama.cpp submodule worktree is dirty; promotion must start from the audited clean state."
+        blockers.append(message)
+        prepare_blockers.append(message)
     if not root_patch_check["applies"]:
-        blockers.append("Root I2_SR patch does not apply cleanly.")
+        message = "Root I2_SR patch does not apply cleanly."
+        blockers.append(message)
+        prepare_blockers.append(message)
     if not submodule_patch_check["applies"]:
-        blockers.append("Submodule I2_SR patch does not apply cleanly.")
+        message = "Submodule I2_SR patch does not apply cleanly."
+        blockers.append(message)
+        prepare_blockers.append(message)
     if not skip_remote_check and not fork.get("reachable"):
         blockers.append("Candidate llama.cpp fork URL is not reachable.")
     if push and not prepare:
-        blockers.append("--push requires --prepare-worktree.")
+        message = "--push requires --prepare-worktree."
+        blockers.append(message)
+        prepare_blockers.append(message)
     if push and skip_remote_check:
-        blockers.append("--push requires a real remote reachability check.")
+        message = "--push requires a real remote reachability check."
+        blockers.append(message)
+        prepare_blockers.append(message)
+    if push and not fork.get("reachable"):
+        prepare_blockers.append("Cannot push because the candidate llama.cpp fork URL is not reachable.")
 
     commands = build_commands(root, fork_url, branch, worktree_dir)
     worktree_result = None
     can_prepare = root_clean and submodule_clean and root_patch_check["applies"] and submodule_patch_check["applies"]
     if prepare:
-        if blockers:
-            raise SystemExit("cannot prepare worktree while blockers remain: " + "; ".join(blockers))
+        if prepare_blockers:
+            raise SystemExit("cannot prepare worktree while blockers remain: " + "; ".join(prepare_blockers))
         if not can_prepare:
             raise SystemExit("cannot prepare worktree; preflight failed")
         worktree_result = prepare_worktree(root, worktree_dir, branch, fork_url, push=push)
@@ -219,6 +234,7 @@ def build_handoff(
         "candidate_fork_probe": fork,
         "prepare_requested": prepare,
         "push_requested": push,
+        "prepare_blockers": prepare_blockers,
         "worktree_result": worktree_result,
         "ready_for_handoff": can_prepare and (skip_remote_check or bool(fork.get("reachable"))),
         "blockers": blockers,
