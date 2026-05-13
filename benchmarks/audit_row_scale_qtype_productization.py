@@ -166,6 +166,16 @@ def build_report(result: dict[str, Any]) -> str:
         for gate in result["gates"]
     ]
     obs = result["observations"]
+    writer_clause = (
+        "the direct writer now has an `I2_SR` emission mode"
+        if obs["direct_writer_emits_stable_qtype"]
+        else "the direct writer does not emit one"
+    )
+    benchmark_clause = (
+        "a stable-qtype benchmark is present"
+        if obs["stable_benchmark_present"]
+        else "the manifest has no stable-qtype benchmark"
+    )
     lines = [
         "# Row-Scale Qtype Productization Gate, 2026-05-13",
         "",
@@ -189,7 +199,9 @@ def build_report(result: dict[str, Any]) -> str:
         "",
         "## Interpretation",
         "",
-        "The feasibility claim is positive: the patched prototype preserves row-scale quality. The productization claim is negative: the source tree does not yet define a separate row-scale qtype, the direct writer does not emit one, and the manifest has no stable-qtype benchmark. This keeps row-scale packed deployment in research/prototype status.",
+        "The feasibility claim is positive: the patched prototype preserves row-scale quality. "
+        f"The productization claim is negative: the source tree does not yet define a separate row-scale qtype, {writer_clause}, and {benchmark_clause}. "
+        "This keeps row-scale packed deployment in research/prototype status.",
     ]
     return "\n".join(lines)
 

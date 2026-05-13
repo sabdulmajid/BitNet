@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Directly pack static ternary checkpoints as I2_S GGUF.
+"""Directly pack static ternary checkpoints as I2_S/I2_SR GGUF.
 
 This writer handles the scalar/tensor-scale case by default. Row-scale
 checkpoints need a compatibility-safe GGUF type or versioned layout and are
-therefore rejected unless --row-scale-prototype is passed.
+therefore rejected unless --row-scale-prototype or --row-scale-qtype=i2_sr is
+passed. The i2_sr mode emits the candidate stable row-scale type IDs used by
+patches/llama-i2sr-row-scale-qtype.patch.
 """
 
 from __future__ import annotations
@@ -119,11 +121,23 @@ def pack_i2_s_row_prototype(codes: torch.Tensor, scale: torch.Tensor) -> np.ndar
     return output
 
 
-def get_gguf_i2s_types(gguf: Any) -> tuple[Any, Any, bool]:
-    has_native_constants = hasattr(gguf.GGMLQuantizationType, "I2_S") and hasattr(gguf.LlamaFileType, "MOSTLY_I2_S")
+def get_gguf_i2s_types(gguf: Any, *, row_scale_qtype: str | None) -> tuple[Any, Any, Any, Any, bool, bool]:
+    has_native_i2s_constants = hasattr(gguf.GGMLQuantizationType, "I2_S") and hasattr(gguf.LlamaFileType, "MOSTLY_I2_S")
+    has_native_i2sr_constants = hasattr(gguf.GGMLQuantizationType, "I2_SR") and hasattr(gguf.LlamaFileType, "MOSTLY_I2_SR")
     i2_s_dtype = getattr(gguf.GGMLQuantizationType, "I2_S", NamedInt(36, "I2_S"))
     mostly_i2_s_ftype = getattr(gguf.LlamaFileType, "MOSTLY_I2_S", NamedInt(40, "MOSTLY_I2_S"))
-    return i2_s_dtype, mostly_i2_s_ftype, has_native_constants
+    i2_sr_dtype = getattr(gguf.GGMLQuantizationType, "I2_SR", NamedInt(40, "I2_SR"))
+    mostly_i2_sr_ftype = getattr(gguf.LlamaFileType, "MOSTLY_I2_SR", NamedInt(41, "MOSTLY_I2_SR"))
+    if row_scale_qtype not in {None, "i2_sr"}:
+        raise ValueError(f"unsupported row_scale_qtype={row_scale_qtype!r}")
+    return (
+        i2_s_dtype,
+        mostly_i2_s_ftype,
+        i2_sr_dtype,
+        mostly_i2_sr_ftype,
+        has_native_i2s_constants,
+        has_native_i2sr_constants,
+    )
 
 
 def make_i2s_model_class(
@@ -133,6 +147,7 @@ def make_i2s_model_class(
     args: argparse.Namespace,
     summary: dict[str, Any],
     i2_s_dtype: Any,
+    i2_sr_dtype: Any,
 ) -> type:
     gguf = converter.gguf
 
@@ -161,11 +176,12 @@ def make_i2s_model_class(
                     new_name = self.map_tensor_name(f"{prefix}.weight")
                     scale = state[scale_key]
                     is_output = args.keep_output_f16 and new_name == self.format_tensor_name(gguf.MODEL_TENSOR.OUTPUT)
-                    if scale.numel() != 1 and not args.row_scale_prototype:
+                    if scale.numel() != 1 and not (args.row_scale_prototype or args.row_scale_qtype == "i2_sr"):
                         row_scale_rejected += 1
                         raise ValueError(
                             f"{scale_key} has row or non-scalar scale shape {tuple(scale.shape)}; "
-                            "direct I2_S writer supports row scales only with --row-scale-prototype"
+                            "direct packed writer supports row scales only with --row-scale-prototype "
+                            "or --row-scale-qtype=i2_sr"
                         )
                     if is_output:
                         dense = tensor.to(dtype=torch.float16).mul(scale.to(dtype=torch.float16)).squeeze().numpy()
@@ -174,14 +190,16 @@ def make_i2s_model_class(
                     else:
                         if scale.numel() == 1:
                             packed = pack_i2_s_scalar(tensor, scale)
+                            raw_dtype = i2_s_dtype
                         else:
                             packed = pack_i2_s_row_prototype(tensor, scale)
                             row_scale_packed += 1
+                            raw_dtype = i2_sr_dtype if args.row_scale_qtype == "i2_sr" else i2_s_dtype
                         self.gguf_writer.add_tensor(
                             new_name,
                             packed,
                             raw_shape=tuple(tensor.shape),
-                            raw_dtype=i2_s_dtype,
+                            raw_dtype=raw_dtype,
                         )
                         ternary_packed += 1
                         packed_bytes += int(packed.nbytes)
@@ -232,11 +250,29 @@ def main() -> None:
         action="store_true",
         help="Allow row-scale checkpoints using the experimental per-output-row I2_S layout.",
     )
+    parser.add_argument(
+        "--row-scale-qtype",
+        choices=["i2_sr"],
+        default=None,
+        help=(
+            "Emit a candidate stable row-scale qtype instead of overloading I2_S. "
+            "Requires a runtime with patches/llama-i2sr-row-scale-qtype.patch applied."
+        ),
+    )
     args = parser.parse_args()
+    if args.row_scale_prototype and args.row_scale_qtype is not None:
+        raise SystemExit("--row-scale-prototype and --row-scale-qtype are mutually exclusive")
 
     ternary_state = args.ternary_state or args.checkpoint_dir / "ternary_state_dict.pt"
     converter = load_converter(args.converter)
-    i2_s_dtype, mostly_i2_s_ftype, has_native_gguf_constants = get_gguf_i2s_types(converter.gguf)
+    (
+        i2_s_dtype,
+        mostly_i2_s_ftype,
+        i2_sr_dtype,
+        mostly_i2_sr_ftype,
+        has_native_i2s_constants,
+        has_native_i2sr_constants,
+    ) = get_gguf_i2s_types(converter.gguf, row_scale_qtype=args.row_scale_qtype)
     architecture = load_architecture(args.checkpoint_dir)
     base_cls = converter.Model.from_model_architecture(architecture)
     state = torch.load(ternary_state, map_location="cpu", weights_only=True)
@@ -249,25 +285,31 @@ def main() -> None:
         "architecture": architecture,
         "outfile": str(args.outfile),
         "converter": str(args.converter),
-        "format_scope": "scalar-scale I2_S by default; row-scale only with --row-scale-prototype",
+        "format_scope": "scalar-scale I2_S by default; row-scale only with --row-scale-prototype or --row-scale-qtype=i2_sr",
         "i2_s_dtype": int(i2_s_dtype),
+        "i2_sr_dtype": int(i2_sr_dtype),
         "mostly_i2_s_file_type": int(mostly_i2_s_ftype),
-        "has_native_gguf_python_constants": has_native_gguf_constants,
+        "mostly_i2_sr_file_type": int(mostly_i2_sr_ftype),
+        "has_native_i2s_gguf_python_constants": has_native_i2s_constants,
+        "has_native_i2sr_gguf_python_constants": has_native_i2sr_constants,
         "limitations": [
-            "Rejects row-scale checkpoints unless --row-scale-prototype is passed.",
+            "Rejects row-scale checkpoints unless --row-scale-prototype or --row-scale-qtype=i2_sr is passed.",
             "Scalar mode uses the existing tensor-scale I2_S layout.",
-            "Row-scale prototype mode requires a matching experimental runtime layout.",
+            "Row-scale prototype mode requires a matching experimental runtime layout and overloads I2_S.",
+            "Row-scale i2_sr mode requires a runtime with a stable I2_SR qtype.",
             "Keeps output.weight in F16 by default to match llama-quantize policy.",
         ],
         "row_scale_prototype": bool(args.row_scale_prototype),
+        "row_scale_qtype": args.row_scale_qtype,
     }
 
-    model_cls = make_i2s_model_class(base_cls, state, converter, args, summary, i2_s_dtype)
+    model_cls = make_i2s_model_class(base_cls, state, converter, args, summary, i2_s_dtype, i2_sr_dtype)
+    output_ftype = mostly_i2_sr_ftype if args.row_scale_qtype == "i2_sr" else mostly_i2_s_ftype
     args.outfile.parent.mkdir(parents=True, exist_ok=True)
     with torch.inference_mode():
         model = model_cls(
             dir_model=args.checkpoint_dir,
-            ftype=mostly_i2_s_ftype,
+            ftype=output_ftype,
             fname_out=args.outfile,
             eager=True,
         )

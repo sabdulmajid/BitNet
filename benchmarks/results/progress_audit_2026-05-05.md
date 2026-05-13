@@ -4,8 +4,9 @@ This audit maps the original six-item benchmark plan to concrete artifacts in
 this fork. It is intentionally conservative: a requirement is marked complete
 only when there is a file, log, or mechanical audit supporting it.
 
-Last refreshed on 2026-05-13 after adding the direct scalar `I2_S` and direct
-row-scale `I2_S` Qwen2.5-0.5B controls.
+Last refreshed on 2026-05-13 after adding the direct scalar `I2_S`, direct
+row-scale `I2_S` Qwen2.5-0.5B controls, and the build-checked candidate
+`I2_SR` row-scale qtype patch.
 
 ## Verdict State
 
@@ -17,7 +18,8 @@ Current evidence still supports the negative retrofit verdict:
   row-scale distillation with a dense tied `lm_head`.
 - The strongest default packed row-scale path that preserves quality is
   currently GGUF `TQ2_0`. The default row-scale `I2_S` artifact fails quality
-  audit, but a local per-row-scale `I2_S` prototype patch fixes the failure.
+  audit, a local per-row-scale `I2_S` prototype patch fixes the failure, and a
+  cleaner `I2_SR` qtype patch is now build-checked but not quality-benchmarked.
 - The strongest current CPU-side checkpoint is still far below FP/Q8/Q4
   language-modeling quality.
 
@@ -35,7 +37,7 @@ Current evidence still supports the negative retrofit verdict:
 | Add llama.cpp Q4_K_M and Q8_0 baselines | complete for Qwen2.5-1.5B | `benchmark_results/gguf-qwen15b-klonly-suite/summary.json` includes F16, Q8_0, Q4_K_M, blind TQ2_0, blind I2_S, and trained static-ternary artifacts |
 | Add QAT with and without hidden MSE | complete | hidden-MSE run `checkpoints/qwen2.5-1.5b-fineweb-edu/step-5000`; KL-only run `checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-5000/step-5000`; full ten-task comparison in `benchmark_results/lm-eval-qwen15b-klonly-full10/selected_metrics_with_baselines.md` |
 | Add row-scale versus tensor-scale | complete for Qwen2.5-1.5B dense-head ablation | Qwen2.5-1.5B row-scale dense-head job `9771` completed 5000 steps; checkpoints step 1000/2000/3000/4000/5000 all passed audit at 196 ternary keys / 196 row-scale tensors; final PPL, MC200, full ten-task lm-eval, paired deltas, and row GGUF suite completed under `benchmark_results/quality-qwen15b-klonly-row-notiehead-5000`, `benchmark_results/mc-qwen15b-klonly-row-notiehead-5000-200`, `benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10`, and `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite` |
-| Convert repaired checkpoints into GGUF/TL2/I2_S | partial | static-ternary materialization to GGUF and packed `TQ2_0`/`I2_S` complete for tensor-scale checkpoints; direct dense GGUF export works; direct scalar `I2_S` export now loads/runs without submodule edits but Qwen2.5-0.5B quality fails as NaN PPL; direct row-scale `I2_S` prototype writes per-row scales but the Qwen2.5-0.5B control is catastrophic; row-scale materialization and `TQ2_0` preserve quality for the stronger 1.5B row checkpoint; default row-scale `I2_S` fails audit; per-row-scale `I2_S` prototype patch preserves quality but is not yet the default format; dense Qwen2.5-0.5B TL2 export works only with model-specific codegen and fails quality |
+| Convert repaired checkpoints into GGUF/TL2/I2_S | partial | static-ternary materialization to GGUF and packed `TQ2_0`/`I2_S` complete for tensor-scale checkpoints; direct dense GGUF export works; direct scalar `I2_S` export now loads/runs without submodule edits but Qwen2.5-0.5B quality fails as NaN PPL; direct row-scale `I2_S` prototype writes per-row scales but the Qwen2.5-0.5B control is catastrophic; row-scale materialization and `TQ2_0` preserve quality for the stronger 1.5B row checkpoint; default row-scale `I2_S` fails audit; per-row-scale `I2_S` prototype patch preserves quality but is not yet the default format; `patches/llama-i2sr-row-scale-qtype.patch` plus `--row-scale-qtype i2_sr` adds a cleaner candidate stable qtype path that applies/builds and writer-smokes, but it has no full quality/throughput suite yet; dense Qwen2.5-0.5B TL2 export works only with model-specific codegen and fails quality |
 | Run actual bitnet.cpp / llama.cpp CPU inference | complete for packed GGUF probes | `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`, `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json`, dense-head suite `benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json`, row-scale dense-head suite `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json`, and Qwen0.5B TL2 probe `benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json` |
 | Measure CPU tokens/sec, prompt throughput, RSS, model size, quality loss | complete for current baselines | PyTorch RSS/runtime in `benchmark_results/runtime-qwen-xeon4116-512x32/summary.md`; Xeon packed GGUF throughput/file size/PPL in `benchmark_results/gguf-qwen15b-klonly-suite/summary.json`; AMD dense-head packed GGUF in `benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json`; AMD row-scale dense-head packed GGUF in `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json`; patched I2_S confirmation in `benchmark_results/gguf-qwen15b-klonly-i2s-mt-fixed/summary.json`; RSS context scaling in `benchmark_results/gguf-rss-qwen15b-context-scaling-2026-05-05/summary.json` |
 
@@ -98,8 +100,18 @@ The row-scale qtype productization gate is tracked at
 `benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md`. It
 passes the feasibility gates (`1.001566` prototype/TQ2_0 PPL ratio and
 `30836.21` default/TQ2_0 failure ratio) but fails productization because the
-source tree has no separate row-scale GGML qtype, no separate llama file type,
-no stable-qtype direct writer, and no stable-qtype benchmark artifact.
+source tree has no active separate row-scale GGML qtype, no active separate
+llama file type, and no stable-qtype benchmark artifact. The direct writer now
+has an explicit `--row-scale-qtype i2_sr` mode, but the matching runtime is
+still a candidate patch rather than the active vendored source.
+
+The candidate stable qtype patch is tracked at
+`benchmarks/results/i2sr_candidate_patch_2026-05-13.md`. It defines
+`GGML_TYPE_I2_SR=40` and `LLAMA_FTYPE_MOSTLY_I2_SR=41`, preserves scalar
+`I2_S` compatibility, applies cleanly, builds under `build-portable-avx2`, and
+smoke-wrote the Qwen2.5-0.5B row checkpoint with `168` row-scale tensors plus
+one dense F16 output tensor. It still needs a full applied-runtime benchmark on
+the strong Qwen2.5-1.5B row-scale checkpoint.
 
 The packed GGUF RSS probe is tracked at
 `benchmarks/results/gguf_memory_2026-05-05.md`. Its mechanical audit is
@@ -159,15 +171,17 @@ The direct dense GGUF bridge is tracked at
 `ternary_state_dict.pt` directly as the source and skips the intermediate dense
 HF `model.safetensors` directory. It validated a tiny Llama-style checkpoint
 and Qwen2.5-0.5B dense-head F16 GGUF load/smoke, but direct packed `TQ2_0`
-through the Python converter fell back to F16 for Qwen shapes; packed `I2_S`
-still needs the stable row-scale writer/type.
+through the Python converter fell back to F16 for Qwen shapes. Scalar direct
+`I2_S` now uses a separate self-contained writer; row-scale still needs the
+stable `I2_SR` runtime benchmark.
 
 The direct packed GGUF support audit is tracked at
 `benchmarks/results/direct_packed_gguf_support_2026-05-13.md`. It confirms the
-C++ runtime and `llama-quantize` path expose `I2_S`, while the Python GGUF
-writer stack used for direct `ternary_state_dict.pt` export lacks `I2_S`
-quantization constants, file-type metadata, quant-size metadata, and special
-layout handling.
+C++ runtime and `llama-quantize` path expose `I2_S`, the native Python GGUF
+stack still lacks first-class `I2_S` constants/layout metadata, and the
+self-contained direct writer now covers scalar `I2_S` plus candidate `I2_SR`
+emission. Product-safe row-scale remains false until the `I2_SR` runtime path
+has a full benchmark suite.
 
 The direct scalar `I2_S` GGUF export note is tracked at
 `benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md`. It adds a
@@ -227,6 +241,7 @@ Key audited values:
 | Default row-scale I2_S / TQ2_0 PPL ratio | 30836.21 |
 | Patched row-scale I2_S / TQ2_0 PPL ratio | 1.0016 |
 | Row-scale I2_S patch defines a new stable qtype | false |
+| Candidate I2_SR patch applies and builds | true |
 | Qwen2.5-1.5B row-scale dense-head native AVX-512 I2_S prototype PPL on Xeon 4116 | 38.8853 |
 | Qwen2.5-1.5B row-scale dense-head native AVX-512 I2_S prototype prompt tok/s on Xeon 4116 | 207.35 |
 | Qwen2.5-1.5B row-scale dense-head native AVX-512 I2_S prototype decode tok/s on Xeon 4116 | 18.37 |
@@ -236,7 +251,8 @@ Key audited values:
 | Direct tiny static-ternary GGUF tensors | 12 |
 | Direct Qwen2.5-0.5B static-ternary F16 GGUF tensors | 291 |
 | Direct Qwen2.5-0.5B static-ternary F16 GGUF smoke return code | 0 |
-| Direct packed I2_S support in Python GGUF writer | false |
+| Direct packed scalar I2_S support in self-contained writer | true |
+| Candidate row-scale I2_SR writer support | true |
 | Product-safe row-scale packed GGUF support | false |
 | Direct Qwen2.5-0.5B scalar `I2_S` packed tensors | 168 |
 | Direct Qwen2.5-0.5B scalar `I2_S` file size | 610.6 MiB |
@@ -246,6 +262,8 @@ Key audited values:
 | Direct Qwen2.5-0.5B row-scale `I2_S` prototype file size | 611.7 MiB |
 | Direct Qwen2.5-0.5B row-scale `I2_S` prototype fixed-excerpt PPL | 59401.5449 |
 | Direct Qwen2.5-0.5B row-scale `I2_S` prototype prompt/decode tok/s | 544.87 / 39.56 |
+| Candidate Qwen2.5-0.5B row-scale `I2_SR` writer-smoke packed tensors | 168 |
+| Candidate Qwen2.5-0.5B row-scale `I2_SR` writer-smoke file size | 611.7 MiB |
 | Qwen2.5-1.5B FP F16 GGUF max RSS at `-c 512` | 2.948 GiB |
 | Qwen2.5-1.5B FP Q4_K_M GGUF max RSS at `-c 512` | 0.985 GiB |
 | Qwen2.5-1.5B row-scale dense-head I2_S max RSS at `-c 512` | 1.250 GiB |
@@ -270,9 +288,9 @@ Key audited values:
    recovers PPL `38.8832`, but the format change still needs integration,
    compatibility policy, and regeneration of affected artifacts. The
    row-scale format audit shows the prototype currently overloads the existing
-   `I2_S` type instead of defining a compatibility-safe row-scale qtype.
-   The productization gate now machine-checks this and fails until a stable
-   row-scale qtype, writer, and benchmark suite exist.
+   `I2_S` type. The candidate `I2_SR` patch and writer mode close the first
+   engineering gap, but the productization gate still fails until the stable
+   qtype is active in the runtime and has a benchmark suite.
 2. Native quality-preserving direct packed GGUF writing from
    `ternary_state_dict.pt` is not complete. Static-ternary dense GGUF export
    now has two validated bridges, scalar direct `I2_S` export is loadable but

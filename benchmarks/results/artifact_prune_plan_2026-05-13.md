@@ -1,14 +1,14 @@
 # Artifact Prune Plan
 
-Generated UTC: `2026-05-13T04:50:57+00:00`
-Git HEAD: `1f47ec07c846`
+Generated UTC: `2026-05-13T05:13:56+00:00`
+Git HEAD: `023e1ba66fbc`
 
 This is a dry-run plan. No files were deleted by the generator.
 
 ## Guardrails
 
 - Evidence manifest: `benchmarks/results/evidence_manifest_2026-05-13.json`
-- Protected evidence files: `63`
+- Protected evidence files: `64`
 - Protected benchmark-manifest paths: `27`
 - Protected checkpoint directories: `12`
 
@@ -19,7 +19,7 @@ This is a dry-run plan. No files were deleted by the generator.
 | `keep_by_default_model_artifacts` | keep by default | 11 | 59.18 GiB |
 | `prune_intermediate_checkpoints` | safe after review | 29 | 202.42 GiB |
 | `remove_local_caches` | safe after review | 1 | 4.08 GiB |
-| `remove_rebuildable_build_dirs` | safe after review | 3 | 82.11 MiB |
+| `remove_rebuildable_build_dirs` | safe after review | 3 | 111.58 MiB |
 
 ## Recommended Sequence
 

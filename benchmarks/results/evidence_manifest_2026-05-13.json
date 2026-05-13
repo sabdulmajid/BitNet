@@ -1,5 +1,5 @@
 {
-  "artifact_count": 63,
+  "artifact_count": 64,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "5f392b29b868744741b48be992496a919d68a18e2cc99f58df2bda6a29c2dfc8",
-      "size_bytes": 47265
+      "sha256": "af3109405c34b006b1c68bfd87b698b4cd6775d2e2027d36e38594b52b3248f1",
+      "size_bytes": 48050
     },
     {
       "exists": true,
@@ -25,8 +25,8 @@
       "label": "publishable_claims",
       "metrics": {},
       "path": "benchmarks/results/publishable_claims_2026-05-05.md",
-      "sha256": "4f511348da26660687a16a918196ecfaac93c714f8ce56ddc5d4e5cb9212d5fb",
-      "size_bytes": 9162
+      "sha256": "9a01e43a68560b5bf627f19d794466625aeec8e6ecfc0edea3ac71948fb4cd29",
+      "size_bytes": 9726
     },
     {
       "exists": true,
@@ -34,8 +34,8 @@
       "label": "progress_audit",
       "metrics": {},
       "path": "benchmarks/results/progress_audit_2026-05-05.md",
-      "sha256": "b5598326ec9052bc87b5d96083ab59a7a40ad9ac97a041691e96f64307a422ed",
-      "size_bytes": 21514
+      "sha256": "d5d5679e3fc30e82e9489ab574c803e51144f467bc9ee8ddc203952fcae870a0",
+      "size_bytes": 22913
     },
     {
       "exists": true,
@@ -43,8 +43,8 @@
       "label": "active_goal_audit",
       "metrics": {},
       "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md",
-      "sha256": "ad83dd0dd2edcc8047aa6a6e6a1540f1636f0ee66535dbf840efe21d4df01e5d",
-      "size_bytes": 9236
+      "sha256": "cbe862d8b2104afccbb4405daeaa6e6205bbc303e924957412cb37f25def07c1",
+      "size_bytes": 9724
     },
     {
       "exists": true,
@@ -61,8 +61,8 @@
       "label": "direct_packed_gguf_support_report",
       "metrics": {},
       "path": "benchmarks/results/direct_packed_gguf_support_2026-05-13.md",
-      "sha256": "8b12a3dc950e1aa4fa5e84fdf9c5345e41b2d102c1370c6fd76fd8a64a19c6bf",
-      "size_bytes": 2063
+      "sha256": "86a566cf3fad3ee68baac4e9f39cda56adc3ae0c5d2ab2d68d7170df01b79f86",
+      "size_bytes": 2053
     },
     {
       "exists": true,
@@ -124,8 +124,8 @@
       "label": "row_scale_qtype_productization_gate_report",
       "metrics": {},
       "path": "benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md",
-      "sha256": "03bfdb019e9520502d1ad823b27dad0c7a6471d5eeee7f5a65ed32caeeda3ad6",
-      "size_bytes": 2158
+      "sha256": "9562e31211113aa5d2725a8f01b61e7c6b1a171630216c58932aa13eeb885e8b",
+      "size_bytes": 2099
     },
     {
       "exists": true,
@@ -844,11 +844,16 @@
         "architecture": "LlamaForCausalLM",
         "copied_tensors": 4,
         "has_native_gguf_python_constants": false,
+        "has_native_i2s_gguf_python_constants": null,
+        "has_native_i2sr_gguf_python_constants": null,
+        "i2_sr_dtype": null,
+        "mostly_i2_sr_file_type": null,
         "outfile_size_bytes": 25339392,
         "output_f16_tensors": 1,
         "output_tensors": 12,
         "row_scale_i2s_packed": 0,
         "row_scale_prototype": false,
+        "row_scale_qtype": null,
         "row_scale_rejected": 0,
         "ternary_i2s_packed": 7
       },
@@ -864,11 +869,16 @@
         "architecture": "Qwen2ForCausalLM",
         "copied_tensors": 122,
         "has_native_gguf_python_constants": false,
+        "has_native_i2s_gguf_python_constants": null,
+        "has_native_i2sr_gguf_python_constants": null,
+        "i2_sr_dtype": null,
+        "mostly_i2_sr_file_type": null,
         "outfile_size_bytes": 640231936,
         "output_f16_tensors": 1,
         "output_tensors": 291,
         "row_scale_i2s_packed": 0,
         "row_scale_prototype": false,
+        "row_scale_qtype": null,
         "row_scale_rejected": 0,
         "ternary_i2s_packed": 168
       },
@@ -920,17 +930,47 @@
         "architecture": "Qwen2ForCausalLM",
         "copied_tensors": 122,
         "has_native_gguf_python_constants": false,
+        "has_native_i2s_gguf_python_constants": null,
+        "has_native_i2sr_gguf_python_constants": null,
+        "i2_sr_dtype": null,
+        "mostly_i2_sr_file_type": null,
         "outfile_size_bytes": 641448448,
         "output_f16_tensors": 1,
         "output_tensors": 291,
         "row_scale_i2s_packed": 168,
         "row_scale_prototype": true,
+        "row_scale_qtype": null,
         "row_scale_rejected": 0,
         "ternary_i2s_packed": 168
       },
       "path": "benchmark_results/direct-row-i2s-qwen05b-2026-05-13/conversion_summary.json",
       "sha256": "a7ee2b556bc3867a31381b3a83f2057f884ba3ab7eb830374b4850506df0ba0c",
       "size_bytes": 1157
+    },
+    {
+      "exists": true,
+      "kind": "direct_i2s_json",
+      "label": "i2sr_writer_smoke_qwen05b",
+      "metrics": {
+        "architecture": "Qwen2ForCausalLM",
+        "copied_tensors": 122,
+        "has_native_gguf_python_constants": null,
+        "has_native_i2s_gguf_python_constants": false,
+        "has_native_i2sr_gguf_python_constants": false,
+        "i2_sr_dtype": 40,
+        "mostly_i2_sr_file_type": 41,
+        "outfile_size_bytes": 641448448,
+        "output_f16_tensors": 1,
+        "output_tensors": 291,
+        "row_scale_i2s_packed": 168,
+        "row_scale_prototype": false,
+        "row_scale_qtype": "i2_sr",
+        "row_scale_rejected": 0,
+        "ternary_i2s_packed": 168
+      },
+      "path": "benchmark_results/i2sr-writer-smoke-2026-05-13/summary.json",
+      "sha256": "42f8bed864e76f5594d3fdc10426a507a1f813f15ac127f41814d91ae6f3516a",
+      "size_bytes": 1421
     },
     {
       "exists": true,
@@ -1080,14 +1120,14 @@
       "label": "direct_packed_gguf_support_json",
       "metrics": {
         "direct_dense_gguf_supported": true,
-        "direct_packed_i2s_supported": false,
+        "direct_packed_i2s_supported": true,
         "product_safe_row_scale_packed_supported": false,
         "py_gguf_has_i2s_quant_type": false,
         "requires_stable_row_scale_type_or_version": true
       },
       "path": "benchmark_results/direct_packed_gguf_support_2026-05-13.json",
-      "sha256": "175fc0758125780cbe09f5b196765e509c7acc92667f57a80db3c227beb8150e",
-      "size_bytes": 2040
+      "sha256": "4636ac5e9c529e31e905e28f5f28d90fbadae4948e007244e6040f164ed61e18",
+      "size_bytes": 2426
     },
     {
       "exists": true,
@@ -1175,12 +1215,11 @@
       "label": "row_scale_qtype_productization_gate_json",
       "metrics": {
         "default_ratio": 30836.207570886912,
-        "direct_writer_emits_stable_qtype": false,
+        "direct_writer_emits_stable_qtype": true,
         "failed": [
           "stable GGML row-scale qtype is defined",
           "stable llama file type is defined",
           "runtime routes stable qtype without changing I2_S",
-          "direct writer emits stable row-scale qtype",
           "stable qtype benchmark evidence exists"
         ],
         "gates": 7,
@@ -1191,8 +1230,8 @@
         "stable_benchmark_present": false
       },
       "path": "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json",
-      "sha256": "1c9145ee3859639c9762e9c146c4ac694dd56049810162dba051f224eb4b10a5",
-      "size_bytes": 2729
+      "sha256": "cc961131c059a23d8cc6955379227f5a44e1c211ce11c09bea946761c2de5d74",
+      "size_bytes": 2654
     },
     {
       "exists": true,

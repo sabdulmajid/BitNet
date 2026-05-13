@@ -1,6 +1,6 @@
 # Direct Packed GGUF Support Audit, 2026-05-13
 
-This audit distinguishes direct dense GGUF export from direct packed CPU-native GGUF export. The former is now validated; the latter still needs writer and format work.
+This audit distinguishes direct dense GGUF export, scalar direct packed `I2_S` export, and product-safe row-scale packed export.
 
 ## Checks
 
@@ -15,6 +15,9 @@ This audit distinguishes direct dense GGUF export from direct packed CPU-native 
 | py_gguf_has_i2s_quant_size | False |
 | py_quants_has_i2s_trait | False |
 | py_writer_has_i2s_special_layout | False |
+| direct_i2s_writer_has_1x4_layout | True |
+| direct_i2s_writer_has_i2s_fallback | True |
+| direct_i2s_writer_has_i2sr_mode | True |
 | direct_converter_blocks_quantized_by_default | True |
 | row_scale_patch_reuses_i2s_type | True |
 | row_scale_patch_changes_i2s_nbytes | True |
@@ -24,7 +27,9 @@ This audit distinguishes direct dense GGUF export from direct packed CPU-native 
 | claim | value |
 | --- | --- |
 | direct_dense_gguf_supported | True |
-| direct_packed_i2s_supported | False |
+| direct_packed_i2s_supported | True |
+| direct_packed_i2s_supported_via_native_py_stack | False |
+| candidate_i2sr_writer_supported | True |
 | product_safe_row_scale_packed_supported | False |
 | requires_python_gguf_i2s_support | True |
 | requires_stable_row_scale_type_or_version | True |
@@ -32,12 +37,11 @@ This audit distinguishes direct dense GGUF export from direct packed CPU-native 
 
 ## Required Gates
 
-1. Add Python GGUF constants for the packed ternary type being written.
-2. Add file-type metadata for packed I2_S or a new row-scale ternary type.
-3. Teach the Python writer/reader the special packed layout instead of assuming a fixed block type size is enough.
-4. Define a compatibility-safe row-scale layout instead of overloading existing tensor-scale I2_S.
-5. Write direct packed tensors from ternary codes plus scales, then load with llama-cli and run PPL/throughput/RSS audits.
+1. Keep the scalar direct I2_S writer covered by load/run quality-failure evidence.
+2. Promote the candidate I2_SR patch into the active runtime or carry it as an explicit downstream patch.
+3. Run a full I2_SR PPL/throughput/RSS suite on the strong Qwen2.5-1.5B row-scale checkpoint.
+4. Only then claim product-safe direct packed row-scale GGUF support.
 
 ## Interpretation
 
-The C++ runtime and `llama-quantize` path know about `I2_S`, but the Python GGUF writer stack used for direct `ternary_state_dict.pt` export does not expose a compatible `I2_S` writer contract. More importantly, row-scale deployment needs a compatibility-safe row-scale layout or new qtype; the current prototype patch changes the existing `I2_S` payload. Therefore direct dense GGUF export is a real improvement, but direct packed row-scale GGUF export is not complete.
+Scalar direct packed `I2_S` export is now mechanically supported by the self-contained writer and covered by a Qwen0.5B load/run quality-failure artifact. Row-scale remains not product-complete: the older quality-preserving prototype overloads `I2_S`, while the cleaner `I2_SR` path is currently an apply-check/build-checked candidate patch plus writer smoke, not a full runtime benchmark suite.

@@ -32,6 +32,7 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
     py_constants = read(args.py_constants)
     py_quants = read(args.py_quants)
     py_writer = read(args.py_writer)
+    direct_i2s_writer = read(args.direct_i2s_writer)
     direct_converter = read(args.direct_converter)
     row_patch = read(args.row_scale_patch)
 
@@ -45,6 +46,9 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
         "py_gguf_has_i2s_quant_size": has(r"GGMLQuantizationType\.I2_S\s*:", py_constants),
         "py_quants_has_i2s_trait": has(r"class\s+I2_S\b", py_quants),
         "py_writer_has_i2s_special_layout": has(r"GGMLQuantizationType\.I2_S", py_writer),
+        "direct_i2s_writer_has_1x4_layout": "pack_i2_s_codes_1x4" in direct_i2s_writer,
+        "direct_i2s_writer_has_i2s_fallback": 'NamedInt(36, "I2_S")' in direct_i2s_writer,
+        "direct_i2s_writer_has_i2sr_mode": "--row-scale-qtype" in direct_i2s_writer and "I2_SR" in direct_i2s_writer,
         "direct_converter_blocks_quantized_by_default": "--allow-converter-quantized-outtype" in direct_converter,
         "row_scale_patch_reuses_i2s_type": (
             "GGML_TYPE_I2_S" in row_patch
@@ -55,7 +59,7 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
     }
 
     dense_direct_supported = Path(args.direct_qwen_summary).exists()
-    direct_packed_i2s_supported = all(
+    direct_packed_i2s_supported_via_native_py_stack = all(
         checks[name]
         for name in (
             "cxx_has_i2s_ggml_type",
@@ -67,7 +71,15 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
             "py_writer_has_i2s_special_layout",
         )
     )
-    product_safe_row_scale_packed_supported = direct_packed_i2s_supported and not checks["row_scale_patch_reuses_i2s_type"]
+    direct_packed_scalar_i2s_supported = (
+        Path(args.direct_i2s_qwen_summary).exists()
+        and checks["cxx_has_i2s_ggml_type"]
+        and checks["cxx_has_i2s_llama_ftype"]
+        and checks["direct_i2s_writer_has_1x4_layout"]
+        and checks["direct_i2s_writer_has_i2s_fallback"]
+    )
+    candidate_i2sr_writer_supported = checks["direct_i2s_writer_has_i2sr_mode"] and Path(args.i2sr_writer_smoke_summary).exists()
+    product_safe_row_scale_packed_supported = False
 
     return {
         "schema": "bitnet-direct-packed-gguf-support-audit-v1",
@@ -78,25 +90,29 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
             "py_constants": str(args.py_constants),
             "py_quants": str(args.py_quants),
             "py_writer": str(args.py_writer),
+            "direct_i2s_writer": str(args.direct_i2s_writer),
             "direct_converter": str(args.direct_converter),
             "row_scale_patch": str(args.row_scale_patch),
             "direct_qwen_summary": str(args.direct_qwen_summary),
+            "direct_i2s_qwen_summary": str(args.direct_i2s_qwen_summary),
+            "i2sr_writer_smoke_summary": str(args.i2sr_writer_smoke_summary),
         },
         "checks": checks,
         "verdict": {
             "direct_dense_gguf_supported": dense_direct_supported,
-            "direct_packed_i2s_supported": direct_packed_i2s_supported,
+            "direct_packed_i2s_supported": direct_packed_scalar_i2s_supported,
+            "direct_packed_i2s_supported_via_native_py_stack": direct_packed_i2s_supported_via_native_py_stack,
+            "candidate_i2sr_writer_supported": candidate_i2sr_writer_supported,
             "product_safe_row_scale_packed_supported": product_safe_row_scale_packed_supported,
             "requires_python_gguf_i2s_support": not checks["py_gguf_has_i2s_quant_type"],
             "requires_stable_row_scale_type_or_version": checks["row_scale_patch_reuses_i2s_type"],
             "requires_special_row_scale_nbytes": checks["row_scale_patch_changes_i2s_nbytes"],
         },
         "required_gates": [
-            "Add Python GGUF constants for the packed ternary type being written.",
-            "Add file-type metadata for packed I2_S or a new row-scale ternary type.",
-            "Teach the Python writer/reader the special packed layout instead of assuming a fixed block type size is enough.",
-            "Define a compatibility-safe row-scale layout instead of overloading existing tensor-scale I2_S.",
-            "Write direct packed tensors from ternary codes plus scales, then load with llama-cli and run PPL/throughput/RSS audits.",
+            "Keep the scalar direct I2_S writer covered by load/run quality-failure evidence.",
+            "Promote the candidate I2_SR patch into the active runtime or carry it as an explicit downstream patch.",
+            "Run a full I2_SR PPL/throughput/RSS suite on the strong Qwen2.5-1.5B row-scale checkpoint.",
+            "Only then claim product-safe direct packed row-scale GGUF support.",
         ],
     }
 
@@ -110,7 +126,7 @@ def build_report(result: dict[str, Any]) -> str:
     return "\n\n".join(
         [
             "# Direct Packed GGUF Support Audit, 2026-05-13",
-            "This audit distinguishes direct dense GGUF export from direct packed CPU-native GGUF export. The former is now validated; the latter still needs writer and format work.",
+            "This audit distinguishes direct dense GGUF export, scalar direct packed `I2_S` export, and product-safe row-scale packed export.",
             "## Checks",
             md_table(["check", "value"], check_rows),
             "## Verdict",
@@ -118,7 +134,7 @@ def build_report(result: dict[str, Any]) -> str:
             "## Required Gates",
             gates,
             "## Interpretation",
-            "The C++ runtime and `llama-quantize` path know about `I2_S`, but the Python GGUF writer stack used for direct `ternary_state_dict.pt` export does not expose a compatible `I2_S` writer contract. More importantly, row-scale deployment needs a compatibility-safe row-scale layout or new qtype; the current prototype patch changes the existing `I2_S` payload. Therefore direct dense GGUF export is a real improvement, but direct packed row-scale GGUF export is not complete.",
+            "Scalar direct packed `I2_S` export is now mechanically supported by the self-contained writer and covered by a Qwen0.5B load/run quality-failure artifact. Row-scale remains not product-complete: the older quality-preserving prototype overloads `I2_S`, while the cleaner `I2_SR` path is currently an apply-check/build-checked candidate patch plus writer smoke, not a full runtime benchmark suite.",
         ]
     )
 
@@ -132,9 +148,12 @@ def main() -> None:
     parser.add_argument("--py-constants", type=Path, default=Path("3rdparty/llama.cpp/gguf-py/gguf/constants.py"))
     parser.add_argument("--py-quants", type=Path, default=Path("3rdparty/llama.cpp/gguf-py/gguf/quants.py"))
     parser.add_argument("--py-writer", type=Path, default=Path("3rdparty/llama.cpp/gguf-py/gguf/gguf_writer.py"))
+    parser.add_argument("--direct-i2s-writer", type=Path, default=Path("benchmarks/convert_static_ternary_to_i2s_gguf.py"))
     parser.add_argument("--direct-converter", type=Path, default=Path("benchmarks/convert_static_ternary_to_gguf.py"))
     parser.add_argument("--row-scale-patch", type=Path, default=Path("patches/llama-i2s-row-scale.patch"))
     parser.add_argument("--direct-qwen-summary", type=Path, default=Path("benchmark_results/direct-gguf-qwen05b-klonly-notie-2026-05-13/summary.json"))
+    parser.add_argument("--direct-i2s-qwen-summary", type=Path, default=Path("benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/summary.json"))
+    parser.add_argument("--i2sr-writer-smoke-summary", type=Path, default=Path("benchmark_results/i2sr-writer-smoke-2026-05-13/summary.json"))
     parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/direct_packed_gguf_support_2026-05-13.json"))
     parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/direct_packed_gguf_support_2026-05-13.md"))
     args = parser.parse_args()

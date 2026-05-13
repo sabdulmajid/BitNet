@@ -106,6 +106,15 @@ conservative:
   materialized-then-`I2_S` was `NaN`, and materialized-then-`TQ2_0` was
   `5118527.5782`. The quality-preserving packed row-scale evidence remains the
   separate 1.5B patched-runtime prototype, not default `I2_S`.
+- **A candidate stable `I2_SR` path now exists, but it is not benchmark-proven
+  yet.** `patches/llama-i2sr-row-scale-qtype.patch` introduces a separate
+  row-scale qtype/file type instead of changing the existing `I2_S` contract.
+  The patch applies cleanly and built in `build-portable-avx2`; the direct
+  writer can emit `--row-scale-qtype i2_sr` and smoke-wrote the Qwen2.5-0.5B
+  row checkpoint as `168` row-scale tensors plus a dense F16 output tensor.
+  This is writer/runtime plumbing, not a quality claim; the next required
+  evidence is a full applied-patch `I2_SR` GGUF suite on the strong 1.5B
+  row-scale checkpoint.
 - **TL2 is now a partial dense-Qwen engineering probe, not a product claim.**
   This fork can generate a Qwen2.5-0.5B TL2 GGUF only after exact
   model-specific TL2 code generation and a matching `BITNET_X86_TL2=ON`
@@ -166,6 +175,8 @@ The direct scalar `I2_S` GGUF export note is
 [benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md](benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md).
 The direct row-scale `I2_S` Qwen0.5B control is
 [benchmarks/results/direct_row_i2s_qwen05b_2026-05-13.md](benchmarks/results/direct_row_i2s_qwen05b_2026-05-13.md).
+The candidate stable `I2_SR` patch note is
+[benchmarks/results/i2sr_candidate_patch_2026-05-13.md](benchmarks/results/i2sr_candidate_patch_2026-05-13.md).
 The publishable-claims ledger is
 [benchmarks/results/publishable_claims_2026-05-05.md](benchmarks/results/publishable_claims_2026-05-05.md).
 The compact evidence manifest with hashes and parsed metrics is

@@ -85,6 +85,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "direct_i2s_qwen05b_conversion", "kind": "direct_i2s_json", "path": "benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/conversion_summary.json"},
     {"label": "direct_i2s_qwen05b_suite", "kind": "gguf_summary_json", "path": "benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/summary.json"},
     {"label": "direct_row_i2s_qwen05b_conversion", "kind": "direct_i2s_json", "path": "benchmark_results/direct-row-i2s-qwen05b-2026-05-13/conversion_summary.json"},
+    {"label": "i2sr_writer_smoke_qwen05b", "kind": "direct_i2s_json", "path": "benchmark_results/i2sr-writer-smoke-2026-05-13/summary.json"},
     {"label": "direct_row_i2s_qwen05b_suite", "kind": "gguf_summary_json", "path": "benchmark_results/direct-row-i2s-qwen05b-portable-2026-05-13/summary.json"},
     {"label": "row_f16_qwen05b_suite", "kind": "gguf_summary_json", "path": "benchmark_results/row-f16-qwen05b-2026-05-13/summary.json"},
     {"label": "row_i2s_quantized_qwen05b_suite", "kind": "gguf_summary_json", "path": "benchmark_results/quantized-row-i2s-qwen05b-2026-05-13/summary.json"},
@@ -261,6 +262,8 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
         return {
             "architecture": data.get("architecture"),
             "has_native_gguf_python_constants": data.get("has_native_gguf_python_constants"),
+            "has_native_i2s_gguf_python_constants": data.get("has_native_i2s_gguf_python_constants"),
+            "has_native_i2sr_gguf_python_constants": data.get("has_native_i2sr_gguf_python_constants"),
             "ternary_i2s_packed": data.get("ternary_i2s_packed"),
             "row_scale_i2s_packed": data.get("row_scale_i2s_packed"),
             "output_f16_tensors": data.get("output_f16_tensors"),
@@ -269,6 +272,9 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "outfile_size_bytes": data.get("outfile_size_bytes"),
             "row_scale_rejected": data.get("row_scale_rejected"),
             "row_scale_prototype": data.get("row_scale_prototype"),
+            "row_scale_qtype": data.get("row_scale_qtype"),
+            "i2_sr_dtype": data.get("i2_sr_dtype"),
+            "mostly_i2_sr_file_type": data.get("mostly_i2_sr_file_type"),
         }
     if kind == "direct_packed_support_json":
         verdict = data.get("verdict", {})
@@ -410,11 +416,18 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"row_safe={metrics.get('product_safe_row_scale_packed_supported', '-')}"
             )
         elif entry["kind"] == "direct_i2s_json":
+            native_consts = metrics.get("has_native_gguf_python_constants")
+            if native_consts is None:
+                native_consts = {
+                    "i2s": metrics.get("has_native_i2s_gguf_python_constants"),
+                    "i2sr": metrics.get("has_native_i2sr_gguf_python_constants"),
+                }
             summary = (
                 f"arch={metrics.get('architecture', '-')}, packed={metrics.get('ternary_i2s_packed', '-')}, "
                 f"row_packed={metrics.get('row_scale_i2s_packed', '-')}, "
                 f"out_f16={metrics.get('output_f16_tensors', '-')}, tensors={metrics.get('output_tensors', '-')}, "
-                f"native_py_consts={metrics.get('has_native_gguf_python_constants', '-')}"
+                f"row_qtype={metrics.get('row_scale_qtype', '-')}, "
+                f"native_py_consts={native_consts}"
             )
         elif entry["kind"] == "tl2_scale_json":
             values = metrics.get("results", [])
