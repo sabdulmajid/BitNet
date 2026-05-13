@@ -1,0 +1,152 @@
+diff --git a/src/ggml-bitnet-mad.cpp b/src/ggml-bitnet-mad.cpp
+index 4ba9d65..384b4c7 100644
+--- a/src/ggml-bitnet-mad.cpp
++++ b/src/ggml-bitnet-mad.cpp
+@@ -195,6 +195,140 @@ size_t quantize_i2_s(const float * src, void * dst, int64_t nrow, int64_t n_per_
+ #endif
+ }
+ 
++size_t quantize_i2_sr(const float * src, void * dst, int64_t nrow, int64_t n_per_row, const float * quant_weights) {
++#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512F__) || defined(__SSSE3__)
++#if defined(ACT_PARALLEL)
++    size_t row_size = ggml_row_size(GGML_TYPE_I2_SR, n_per_row);
++    int64_t n = nrow * n_per_row;
++
++    uint8_t* q8 = (uint8_t*)malloc(n * sizeof(uint8_t));
++    float* scale_ptr = (float*)((char*)dst + n / 4);
++    for (int64_t row = 0; row < nrow; row++) {
++        double row_max = 0;
++        for (int64_t col = 0; col < n_per_row; col++) {
++            row_max = fmax(row_max, (double)fabs((double)src[row * n_per_row + col]));
++        }
++        scale_ptr[row] = (float)row_max;
++        for (int64_t col = 0; col < n_per_row; col++) {
++            const int64_t i = row * n_per_row + col;
++            if (fabs((double)(src[i])) < 1e-6) {
++                q8[i] = 1;
++                continue;
++            }
++            q8[i] = src[i] > 0 ? 2 : 0;
++        }
++    }
++
++    memset(dst, 0, n * sizeof(uint8_t) / 4);
++
++    uint8_t* i2_weight = (uint8_t*)dst;
++    for (int64_t i = 0; i < n / QK_I2_S; i++) {
++        for (int64_t j = 0; j < QK_I2_S; j++) {
++            int64_t group_idx = j / 32;
++            int64_t group_pos = j % 32;
++            uint8_t temp = (q8[i * QK_I2_S + j] << (6 - 2 * group_idx));
++            i2_weight[i * 32 + group_pos] |= temp;
++        }
++    }
++
++    free(q8);
++    return nrow * row_size / 4 + nrow * sizeof(float) + 32;
++#else
++    assert((nrow % 4) == 0 && "quantize_i2_sr_1x4 requires nrow % 4 == 0");
++
++    size_t row_size = ggml_row_size(GGML_TYPE_I2_SR, n_per_row);
++    int64_t n = nrow * n_per_row;
++
++    uint8_t* q8 = (uint8_t*)malloc(n * sizeof(uint8_t));
++    float* scale_ptr = (float*)((char*)dst + n / 4);
++    for (int64_t row = 0; row < nrow; row++) {
++        double row_max = 0;
++        for (int64_t col = 0; col < n_per_row; col++) {
++            row_max = fmax(row_max, (double)fabs((double)src[row * n_per_row + col]));
++        }
++        scale_ptr[row] = (float)row_max;
++        for (int64_t col = 0; col < n_per_row; col++) {
++            const int64_t i = row * n_per_row + col;
++            if (fabs((double)(src[i])) < 1e-6) {
++                q8[i] = 1;
++                continue;
++            }
++            q8[i] = src[i] > 0 ? 2 : 0;
++        }
++    }
++
++    uint8_t* out = (uint8_t*)dst;
++    memset(out, 0, (size_t)(n / 4));
++
++    int64_t nrow4 = nrow / 4;
++    for (int64_t rg = 0; rg < nrow4; rg++) {
++        int64_t r0 = rg * 4 + 0;
++        int64_t r1 = rg * 4 + 1;
++        int64_t r2 = rg * 4 + 2;
++        int64_t r3 = rg * 4 + 3;
++
++        int64_t base = rg * n_per_row;
++
++        for (int64_t col = 0; col < n_per_row; col++) {
++            uint8_t q0 = q8[r0 * n_per_row + col];
++            uint8_t q1 = q8[r1 * n_per_row + col];
++            uint8_t q2 = q8[r2 * n_per_row + col];
++            uint8_t q3 = q8[r3 * n_per_row + col];
++
++            uint8_t packed = (uint8_t)((q0 << 6) | (q1 << 4) | (q2 << 2) | (q3 << 0));
++            out[base + col] = packed;
++        }
++    }
++
++    free(q8);
++    return nrow * row_size / 4 + nrow * sizeof(float) + 32;
++#endif
++#elif defined(__ARM_NEON)
++    size_t row_size = ggml_row_size(GGML_TYPE_I2_SR, n_per_row);
++    int64_t n = nrow * n_per_row;
++
++    uint8_t* q8 = (uint8_t*)malloc(n * sizeof(uint8_t));
++    float* scale_ptr = (float*)((char*)dst + n / 4);
++    for (int64_t row = 0; row < nrow; row++) {
++        double row_max = 0;
++        for (int64_t col = 0; col < n_per_row; col++) {
++            row_max = fmax(row_max, (double)fabs((double)src[row * n_per_row + col]));
++        }
++        scale_ptr[row] = (float)row_max;
++        for (int64_t col = 0; col < n_per_row; col++) {
++            const int64_t i = row * n_per_row + col;
++            if (fabs((double)(src[i])) < 1e-6) {
++                q8[i] = 1;
++                continue;
++            }
++            q8[i] = src[i] > 0 ? 2 : 0;
++        }
++    }
++
++    memset(dst, 0, n * sizeof(uint8_t) / 4);
++
++    uint8_t* i2_weight = (uint8_t*)dst;
++    for (int64_t i = 0; i < n / QK_I2_S; i++) {
++        for (int64_t j = 0; j < QK_I2_S; j++) {
++            int64_t group_idx = j / 16;
++            int64_t group_pos = j % 16;
++            uint8_t temp = (q8[i * QK_I2_S + j] << (6 - 2 * group_idx));
++            i2_weight[i * 16 + group_pos] |= temp;
++        }
++    }
++
++    free(q8);
++    return nrow * row_size / 4 + nrow * sizeof(float) + 32;
++#else
++    GGML_UNUSED(src);
++    GGML_UNUSED(dst);
++    GGML_UNUSED(nrow);
++    GGML_UNUSED(n_per_row);
++    GGML_UNUSED(quant_weights);
++    GGML_ABORT("quantize_i2_sr requires an I2_S-enabled CPU backend");
++#endif
++}
++
+ void ggml_vec_dot_i2_i8_s_1x1(int n, float * s, size_t bs, const void * vx, size_t bx, const void * vy, size_t by, int nrc) {
+ #if defined(__AVX2__)
+     const uint8_t *    x = (uint8_t *)vx;
+@@ -1053,4 +1187,4 @@ void ggml_vec_dot_i2_i8_s(int n, float * s, size_t bs, const void * vx, size_t b
+     {
+         ggml_vec_dot_i2_i8_s_1x1(n, s, bs, vx, bx, vy, by, nrc);
+     }
+-}
+\ No newline at end of file
++}

@@ -1,5 +1,5 @@
 {
-  "artifact_count": 88,
+  "artifact_count": 91,
   "entries": [
     {
       "exists": true,
@@ -70,7 +70,7 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-13.md",
-      "sha256": "6d179a960388872d7ffac97a4198dd6c9cb95e7728451b15badd8e802dc2fc7c",
+      "sha256": "286d35c5f243048aab222cd480edab024d0cc550609773ce664d833963cef959",
       "size_bytes": 4607
     },
     {
@@ -88,8 +88,8 @@
       "label": "i2sr_submodule_promotion_audit",
       "metrics": {},
       "path": "benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md",
-      "sha256": "7de7d284f7c9ee2a01850022c51e992542c14c1c9cd116ccd43bcdf2c069a439",
-      "size_bytes": 1819
+      "sha256": "3bf77dd62e65eb58d521a65396bbf14c539007856c25b869512d52adee9b2681",
+      "size_bytes": 2494
     },
     {
       "exists": true,
@@ -97,7 +97,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-13.md",
-      "sha256": "93c3f4872e46845f8a30ef0aa315d9bace1b6fbc17638c6e2526b383e68657d7",
+      "sha256": "f77ef3139ff6a170861747ff2480f812ee191dca76a7779caa5eccfd2f4274ad",
       "size_bytes": 2865
     },
     {
@@ -234,6 +234,33 @@
       "path": "benchmarks/results/moe_support_audit_2026-05-05.md",
       "sha256": "342ac496a28dca8392f277284e831ef38d2e2a906c3aa51677645ee14775956a",
       "size_bytes": 1882
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2sr_combined_patch",
+      "metrics": {},
+      "path": "patches/llama-i2sr-row-scale-qtype.patch",
+      "sha256": "d02e20bd9e00c5703521749a49af9d3c433fa01d8b7257d31aae8f050a325643",
+      "size_bytes": 26764
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2sr_root_runtime_patch",
+      "metrics": {},
+      "path": "patches/bitnet-i2sr-root-runtime.patch",
+      "sha256": "c4c30c8e2053fac2c098db0f7a45b70d4966468707988c2a42b2a3690b59ec2b",
+      "size_bytes": 5408
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2sr_submodule_patch",
+      "metrics": {},
+      "path": "patches/llama-i2sr-row-scale-qtype.submodule.patch",
+      "sha256": "aa68da60931a7047c7a459db503210dd87c5baa6dcecfcbfebe86fa8880a9b9a",
+      "size_bytes": 20824
     },
     {
       "exists": true,
@@ -1561,7 +1588,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-13.json",
-      "sha256": "3d87ce099da4b7f60800912a90c974a470ab50f6b959cb859bb66bb0e6944cc9",
+      "sha256": "2007da2c6dab172d0a3791bad6add141550aeb54a696b1858b9d00f6833b0bf6",
       "size_bytes": 5392
     },
     {
@@ -1579,7 +1606,7 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-13.json",
-      "sha256": "9d09a6370e998823da2c328d227d492b1537d9c68b83e54d021d48d4d0188c19",
+      "sha256": "e1107e3f5c5e12007d3d9ba7406cdec18954e60eee4f7312115e00c7c6826c87",
       "size_bytes": 14327
     },
     {
@@ -1604,15 +1631,16 @@
         "active_runtime_support": false,
         "blockers": [
           "I2_SR qtype/file-type/runtime support is not present in the active submodule/root runtime files.",
-          "The I2_SR support still exists as an unapplied patch rather than active committed code."
+          "The I2_SR support still exists as an unapplied patch rather than active committed code.",
+          "Configured llama.cpp submodule remote is not writable from this environment; use a fork or writable branch."
         ],
         "patch_applies_cleanly": true,
         "promotion_ready": false,
         "submodule_short": "1f86f058"
       },
       "path": "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json",
-      "sha256": "f82b6b897b5ce0cae258284a74915fbb7ab8312438f813cae2bc1d571d695940",
-      "size_bytes": 2227
+      "sha256": "ad03cebb11b5e00bd0accbc24751becdee1290335a524acacf96e60b73be228f",
+      "size_bytes": 3066
     },
     {
       "exists": true,

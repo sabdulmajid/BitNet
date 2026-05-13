@@ -28,6 +28,24 @@ Remote branches containing HEAD: `origin/merge-dev`.
 | --- |
 | I2_SR qtype/file-type/runtime support is not present in the active submodule/root runtime files. |
 | The I2_SR support still exists as an unapplied patch rather than active committed code. |
+| Configured llama.cpp submodule remote is not writable from this environment; use a fork or writable branch. |
+
+## Remote Write Probe
+
+| field | value |
+| --- | --- |
+| branch | `i2sr-row-scale-runtime` |
+| returncode | `128` |
+| writable | `false` |
+| permission_denied | `true` |
+| stderr | `remote: Permission to Eddie-Wang1120/llama.cpp.git denied to sabdulmajid. fatal: unable to access 'https://github.com/Eddie-Wang1120/llama.cpp.git/': The requested URL returned error: 403` |
+
+## Split Promotion Patches
+
+| path | applies cleanly |
+| --- | --- |
+| patches/bitnet-i2sr-root-runtime.patch | `true` |
+| patches/llama-i2sr-row-scale-qtype.submodule.patch | `true` |
 
 ## Patch Touches
 
@@ -47,7 +65,7 @@ Remote branches containing HEAD: `origin/merge-dev`.
 | step |
 | --- |
 | Create or choose a writable llama.cpp fork/branch for the I2_SR runtime changes. |
-| Apply the submodule portion of patches/llama-i2sr-row-scale-qtype.patch inside that branch and commit it. |
-| Apply the root runtime portion in this superproject or split it into an equivalent top-level commit. |
+| Apply `patches/llama-i2sr-row-scale-qtype.submodule.patch` inside that branch and commit it. |
+| Apply `patches/bitnet-i2sr-root-runtime.patch` in this superproject or split it into an equivalent top-level commit. |
 | Push the submodule branch, update .gitmodules if the URL changes, then update the superproject submodule pointer. |
 | Run benchmarks/run_i2sr_active_patch_gate.py or the equivalent active-source productization gate after the pointer update. |

@@ -244,6 +244,18 @@ The current report is
 expected to fail until the submodule points at a pushed branch containing the
 row-scale qtype/runtime changes.
 
+The monolithic candidate patch can be split into promotion-ready pieces with:
+
+```bash
+python benchmarks/split_i2sr_patch.py
+git apply --check patches/bitnet-i2sr-root-runtime.patch
+git -C 3rdparty/llama.cpp apply --check ../../patches/llama-i2sr-row-scale-qtype.submodule.patch
+```
+
+The generated split patches are tracked as
+`patches/bitnet-i2sr-root-runtime.patch` and
+`patches/llama-i2sr-row-scale-qtype.submodule.patch`.
+
 Large checkpoints, model conversions, and CPU benchmark byproducts are ignored
 by Git. To make pruning reproducible, generate the dry-run artifact plan before
 deleting anything:

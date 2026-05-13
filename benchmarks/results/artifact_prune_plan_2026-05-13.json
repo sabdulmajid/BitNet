@@ -1,7 +1,7 @@
 {
   "evidence_manifest": "benchmarks/results/evidence_manifest_2026-05-13.json",
-  "generated_utc": "2026-05-13T08:09:24+00:00",
-  "git_head": "30574c5d6c69",
+  "generated_utc": "2026-05-13T08:25:17+00:00",
+  "git_head": "8c50fc8d76f9",
   "groups": {
     "keep_by_default_model_artifacts": [
       {
@@ -234,7 +234,7 @@
   },
   "protected_counts": {
     "benchmark_manifest_paths": 31,
-    "evidence_manifest_files": 88,
+    "evidence_manifest_files": 91,
     "protected_checkpoint_dirs": 12
   },
   "protected_paths": [
@@ -358,7 +358,10 @@
     "models/qwen2.5-1.5b-klonly-static-ternary-dense/qwen15b_klonly_static_ternary_dense_tq2_0.gguf",
     "models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_f16.gguf",
     "models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_i2_s_t1.gguf",
-    "models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_tq2_0.gguf"
+    "models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_tq2_0.gguf",
+    "patches/bitnet-i2sr-root-runtime.patch",
+    "patches/llama-i2sr-row-scale-qtype.patch",
+    "patches/llama-i2sr-row-scale-qtype.submodule.patch"
   ],
   "schema": "bitnet-artifact-prune-plan-v1",
   "totals": {
