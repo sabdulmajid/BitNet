@@ -315,27 +315,34 @@ can pack `ternary_state_dict.pt` directly into the existing tensor-scale
 ```bash
 python benchmarks/convert_static_ternary_to_i2s_gguf.py \
   --checkpoint-dir checkpoints/qwen2.5-0.5b-fineweb-edu-klonly-1000/step-1000 \
-  --outfile models/qwen2.5-0.5b-direct-static-ternary/qwen05b_klonly_direct_i2_s.gguf \
+  --outfile models/qwen2.5-0.5b-direct-static-ternary/qwen05b_klonly_direct_i2_s_x86act.gguf \
   --expect-ternary-keys 169 \
   --validate-codes \
-  --summary-json benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/conversion_summary.json
+  --summary-json benchmark_results/direct-i2s-qwen05b-klonly-x86act-2026-05-13/conversion_summary.json
 ```
 
 By default this path intentionally rejects row-scale checkpoints. On the
 Qwen2.5-0.5B KL-only scalar checkpoint it produced a loadable `I2_S` GGUF with
-`168` packed projection tensors, but the fixed-excerpt CPU benchmark failed
-quality (`NaN` PPL, punctuation-only smoke). Treat it as a scalar-format/runtime
-probe, not as the row-scale product path. See
+`168` packed projection tensors. The fixed x86 `ACT_PARALLEL` artifact is
+finite but weak on the fixed-excerpt CPU benchmark: PPL `423.4528`,
+`540.97` prompt tok/s, and `40.04` decode tok/s versus FP16 PPL `18.0986`.
+Treat it as a scalar-format/runtime probe, not as the row-scale product path. See
 `benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md`.
 
 For debugging only, `--row-scale-prototype` writes one float32 scale per output
-row after the packed 1x4 `I2_S` codes. This requires a matching experimental
-runtime layout and is not a stable GGUF contract. The Qwen2.5-0.5B row-scale
-control failed quality even after correcting the packing layout:
+row after the packed active x86 `I2_S` codes. This requires a matching
+experimental runtime layout and is not a stable GGUF contract. The
+Qwen2.5-0.5B row-scale control is a historical negative control from before the
+x86 `ACT_PARALLEL` packing fix and failed quality badly:
 materialized-F16 PPL `578.4833`, direct row-scale `I2_S` PPL `59401.5449`,
 materialized-then-`I2_S` PPL `NaN`, and materialized-then-`TQ2_0` PPL
 `5118527.5782`. See
 `benchmarks/results/direct_row_i2s_qwen05b_2026-05-13.md`.
+
+The quality-valid direct row-scale packed evidence is the fixed candidate
+`I2_SR` path on Qwen2.5-1.5B: PPL `38.8477`, `211.67` prompt tok/s, and
+`19.07` decode tok/s with `patches/llama-i2sr-row-scale-qtype.patch` applied.
+That qtype is still downstream, not active by default.
 
 For QAT checkpoints, do not convert `model.safetensors` directly and treat it
 as the trained ternary artifact. The validated bridge is:

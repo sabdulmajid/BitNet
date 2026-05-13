@@ -22,7 +22,7 @@ changing the existing `I2_S` binary contract:
 | --- | ---: |
 | `GGML_TYPE_I2_SR` | `40` |
 | `LLAMA_FTYPE_MOSTLY_I2_SR` | `41` |
-| packed codes | same BitNet 1x4 row-interleaved 2-bit codes |
+| packed codes | same active x86 `I2_S` `ACT_PARALLEL` 128-code layout |
 | scales | one FP32 scale per output row |
 | scalar `I2_S` compatibility | preserved |
 
@@ -69,16 +69,23 @@ converted with `--row-scale-qtype i2_sr`.
 | prompt throughput | `212.10` tok/s |
 | decode throughput | `19.01` tok/s |
 
-The artifact loads and runs, but quality is catastrophic. The known-good
+The first artifact loaded and ran, but quality was catastrophic. The known-good
 row-scale packed prototype on the same checkpoint reaches PPL `38.8832`, so
-this result points to a remaining semantic/layout mismatch in the direct
-`I2_SR` path. The detailed negative result is recorded in
+that result pointed to a semantic/layout mismatch in the direct `I2_SR` path.
+The detailed negative result is recorded in
 `benchmarks/results/i2sr_qwen15b_candidate_2026-05-13.md`.
+
+The mismatch was then traced to the direct writer's row-group-of-four pack
+order. This fork's x86 runtime defines `ACT_PARALLEL`, so the active layout is
+the chunked 128-code layout emitted by `quantize_i2_s`. After changing the
+direct writer to that layout, the fixed `I2_SR` artifact reached PPL `38.8477`,
+prompt throughput `211.67` tok/s, and decode throughput `19.07` tok/s. The fix
+is recorded in `benchmarks/results/i2sr_x86act_fix_2026-05-13.md`.
 
 ## Current Status
 
-This is a real engineering step, but it is not a publishable quality claim.
-The productization gate still fails because the stable qtype is a candidate
-patch rather than the active vendored runtime, and the first full applied
-`I2_SR` artifact quality-fails. Required next work is layout-equivalence
-debugging against the known-good patched `llama-quantize` row-scale path.
+This is now a quality-preserving engineering step, but it is still not a
+product-ready upstream claim. The productization gate fails because the stable
+qtype is a candidate patch rather than the active vendored runtime. Required
+next work is promoting the qtype/runtime contract and adding regression tests
+for both scalar `I2_S` and row-scale `I2_SR` packing.

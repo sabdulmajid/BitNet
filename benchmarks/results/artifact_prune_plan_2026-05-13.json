@@ -1,7 +1,7 @@
 {
   "evidence_manifest": "benchmarks/results/evidence_manifest_2026-05-13.json",
-  "generated_utc": "2026-05-13T05:29:17+00:00",
-  "git_head": "0844cb568eef",
+  "generated_utc": "2026-05-13T06:06:56+00:00",
+  "git_head": "82284d67d78c",
   "groups": {
     "keep_by_default_model_artifacts": [
       {
@@ -12,7 +12,7 @@
       {
         "path": "models/qwen2.5-0.5b-direct-static-ternary",
         "reason": "Generated model/GGUF directory; useful for reruns and protected if referenced by a benchmark manifest.",
-        "size_bytes": 2548107520
+        "size_bytes": 3188339456
       },
       {
         "path": "models/qwen2.5-0.5b-fp",
@@ -42,7 +42,7 @@
       {
         "path": "models/qwen2.5-1.5b-klonly-row-notie-static-ternary-dense",
         "reason": "Generated model/GGUF directory; useful for reruns and protected if referenced by a benchmark manifest.",
-        "size_bytes": 12211764164
+        "size_bytes": 13481922052
       },
       {
         "path": "models/qwen2.5-1.5b-klonly-static-ternary-dense",
@@ -223,7 +223,7 @@
       {
         "path": "build-portable-avx2",
         "reason": "CMake/runtime build output; can be regenerated.",
-        "size_bytes": 50443158
+        "size_bytes": 50439470
       },
       {
         "path": "build-qwen05b-tl2",
@@ -233,8 +233,8 @@
     ]
   },
   "protected_counts": {
-    "benchmark_manifest_paths": 28,
-    "evidence_manifest_files": 67,
+    "benchmark_manifest_paths": 31,
+    "evidence_manifest_files": 72,
     "protected_checkpoint_dirs": 12
   },
   "protected_paths": [
@@ -243,6 +243,8 @@
     "benchmark_results/direct-gguf-tiny-2026-05-13/summary.json",
     "benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/conversion_summary.json",
     "benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/summary.json",
+    "benchmark_results/direct-i2s-qwen05b-klonly-x86act-2026-05-13/conversion_summary.json",
+    "benchmark_results/direct-i2s-qwen05b-klonly-x86act-2026-05-13/summary.json",
     "benchmark_results/direct-i2s-tiny-2026-05-13/selfcontained_summary.json",
     "benchmark_results/direct-row-i2s-qwen05b-2026-05-13/conversion_summary.json",
     "benchmark_results/direct-row-i2s-qwen05b-portable-2026-05-13/summary.json",
@@ -264,6 +266,8 @@
     "benchmark_results/i2s_row_scale_format_audit_2026-05-13.json",
     "benchmark_results/i2sr-row-scale-qwen15b-convert-2026-05-13/summary.json",
     "benchmark_results/i2sr-row-scale-qwen15b-suite-2026-05-13/summary.json",
+    "benchmark_results/i2sr-row-scale-qwen15b-x86act-convert-2026-05-13/summary.json",
+    "benchmark_results/i2sr-row-scale-qwen15b-x86act-suite-2026-05-13/summary.json",
     "benchmark_results/i2sr-writer-smoke-2026-05-13/summary.json",
     "benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json",
     "benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json",
@@ -298,6 +302,7 @@
     "benchmarks/results/direct_static_ternary_gguf_2026-05-13.md",
     "benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md",
     "benchmarks/results/i2sr_qwen15b_candidate_2026-05-13.md",
+    "benchmarks/results/i2sr_x86act_fix_2026-05-13.md",
     "benchmarks/results/moe_support_audit_2026-05-05.md",
     "benchmarks/results/progress_audit_2026-05-05.md",
     "benchmarks/results/publishable_claims_2026-05-05.md",
@@ -318,6 +323,7 @@
     "checkpoints/qwen2.5-1.5b-fineweb-edu/step-5000",
     "checkpoints/qwen2.5-1.5b-fineweb-edu/step-5000-static-ternary-dense-f16",
     "checkpoints/qwen2.5-1.5b-naive-ptq-tensor",
+    "models/qwen2.5-0.5b-direct-static-ternary/qwen05b_klonly_direct_i2_s_x86act.gguf",
     "models/qwen2.5-0.5b-fp/qwen05b_fp_f16.gguf",
     "models/qwen2.5-0.5b-fp/qwen05b_fp_q4_k_m.gguf",
     "models/qwen2.5-0.5b-qatsby/qwen05b_qat_i2_s.gguf",
@@ -329,6 +335,7 @@
     "models/qwen2.5-1.5b-klonly-row-notie-static-ternary-dense/qwen15b_klonly_row_notie_static_ternary_f16.gguf",
     "models/qwen2.5-1.5b-klonly-row-notie-static-ternary-dense/qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale.gguf",
     "models/qwen2.5-1.5b-klonly-row-notie-static-ternary-dense/qwen15b_klonly_row_notie_static_ternary_i2_sr.gguf",
+    "models/qwen2.5-1.5b-klonly-row-notie-static-ternary-dense/qwen15b_klonly_row_notie_static_ternary_i2_sr_x86act.gguf",
     "models/qwen2.5-1.5b-klonly-row-notie-static-ternary-dense/qwen15b_klonly_row_notie_static_ternary_tq2_0.gguf",
     "models/qwen2.5-1.5b-klonly-static-ternary-dense/qwen15b_klonly_static_ternary_dense_f16.gguf",
     "models/qwen2.5-1.5b-klonly-static-ternary-dense/qwen15b_klonly_static_ternary_dense_i2_s_t1.gguf",
@@ -339,9 +346,9 @@
   ],
   "schema": "bitnet-artifact-prune-plan-v1",
   "totals": {
-    "keep_by_default_model_artifacts": 64812323415,
+    "keep_by_default_model_artifacts": 66722713239,
     "prune_intermediate_checkpoints": 217345585819,
     "remove_local_caches": 4386032852,
-    "remove_rebuildable_build_dirs": 118077233
+    "remove_rebuildable_build_dirs": 118073545
   }
 }

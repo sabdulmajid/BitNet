@@ -1,0 +1,13 @@
+[
+  {
+    "name": "qwen05b_fp_f16",
+    "kind": "fp16_baseline",
+    "path": "models/qwen2.5-0.5b-fp/qwen05b_fp_f16.gguf"
+  },
+  {
+    "name": "qwen05b_klonly_direct_i2_s_x86act",
+    "kind": "direct_scalar_i2s_x86_act_pack",
+    "path": "models/qwen2.5-0.5b-direct-static-ternary/qwen05b_klonly_direct_i2_s_x86act.gguf",
+    "notes": "Direct scalar-scale static ternary checkpoint packed with the active x86 ACT_PARALLEL I2_S layout; output head kept F16."
+  }
+]

@@ -50,15 +50,13 @@ The candidate qtype is mechanically real: the patched runtime loads the file,
 routes `196` tensors as `i2_sr`, and runs at roughly the same speed and file
 size as the older row-scale packed prototype.
 
-It is not semantically correct yet. The fixed-excerpt PPL is catastrophic
-(`20,074,699.9423`) while the earlier quality-preserving row-scale prototype
-on the same strong checkpoint reaches PPL `38.8832`. This does not disprove
-row-scale ternary execution; it disproves the current direct `I2_SR` writer /
-runtime combination as a quality-valid deployment path.
+This first artifact was not semantically correct. The fixed-excerpt PPL was
+catastrophic (`20,074,699.9423`) while the earlier quality-preserving row-scale
+prototype on the same strong checkpoint reached PPL `38.8832`. This did not
+disprove row-scale ternary execution; it exposed a direct-writer packing bug.
 
-The most likely next debugging target is layout equivalence with the known-good
-patched `llama-quantize` path. The direct writer packs `ternary_state_dict.pt`
-directly, whereas the known-good prototype was produced through a materialized
-GGUF plus patched quantizer path. Until those layouts are byte- or
-matmul-equivalent, `I2_SR` must remain an engineering candidate, not a product
-claim.
+The follow-up fix changed the direct writer to use the active x86
+`ACT_PARALLEL` chunk-128 packing layout. The fixed artifact reaches PPL
+`38.8477`, prompt throughput `211.67` tok/s, and decode throughput `19.07`
+tok/s. Details are recorded in
+`benchmarks/results/i2sr_x86act_fix_2026-05-13.md`.

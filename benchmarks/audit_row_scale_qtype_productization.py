@@ -282,7 +282,7 @@ def main() -> None:
     parser.add_argument("--llama-cpp", type=Path, default=Path("3rdparty/llama.cpp/src/llama.cpp"))
     parser.add_argument("--direct-writer", type=Path, default=Path("benchmarks/convert_static_ternary_to_i2s_gguf.py"))
     parser.add_argument("--row-patch", type=Path, default=Path("patches/llama-i2s-row-scale.patch"))
-    parser.add_argument("--stable-qtype-summary-json", type=Path, default=Path("benchmark_results/i2sr-row-scale-qwen15b-suite-2026-05-13/summary.json"))
+    parser.add_argument("--stable-qtype-summary-json", type=Path, default=Path("benchmark_results/i2sr-row-scale-qwen15b-x86act-suite-2026-05-13/summary.json"))
     parser.add_argument("--prototype-max-ppl-ratio", type=float, default=1.01)
     parser.add_argument("--default-failure-min-ratio", type=float, default=10.0)
     parser.add_argument("--catastrophic-ppl-threshold", type=float, default=1.0e4)

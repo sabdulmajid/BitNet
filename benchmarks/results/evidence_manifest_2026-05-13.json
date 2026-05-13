@@ -1,5 +1,5 @@
 {
-  "artifact_count": 67,
+  "artifact_count": 72,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "b9a753265ecaec66f9a26ce8718b03f8565157586835f60712c7d7b3b40ba333",
-      "size_bytes": 48495
+      "sha256": "a5e247698cca415c254043abc4fd0232f9662921d123f43824010f8fd3752c5d",
+      "size_bytes": 48822
     },
     {
       "exists": true,
@@ -25,8 +25,8 @@
       "label": "publishable_claims",
       "metrics": {},
       "path": "benchmarks/results/publishable_claims_2026-05-05.md",
-      "sha256": "96c4ec0e5a211158245ff2a92640dde7f6b7144fc78b8cd2cc9ab3f4c8455193",
-      "size_bytes": 9997
+      "sha256": "612e61a0deb2e06ca1b82541d471c2730e417eb7ae2a1a1a29d22fe0d9d9a209",
+      "size_bytes": 9964
     },
     {
       "exists": true,
@@ -34,8 +34,8 @@
       "label": "progress_audit",
       "metrics": {},
       "path": "benchmarks/results/progress_audit_2026-05-05.md",
-      "sha256": "d5d5679e3fc30e82e9489ab574c803e51144f467bc9ee8ddc203952fcae870a0",
-      "size_bytes": 22913
+      "sha256": "0fd781748e8e218db76c46b1653f90cd5714961f0d5a1acf73a6f0ef811e4143",
+      "size_bytes": 23484
     },
     {
       "exists": true,
@@ -43,8 +43,8 @@
       "label": "active_goal_audit",
       "metrics": {},
       "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md",
-      "sha256": "cbe862d8b2104afccbb4405daeaa6e6205bbc303e924957412cb37f25def07c1",
-      "size_bytes": 9724
+      "sha256": "e6b8733c3c906014c21c312ca99506a7b5a97e0b0f1c3d2314aedab0a6bbb15d",
+      "size_bytes": 9666
     },
     {
       "exists": true,
@@ -61,8 +61,8 @@
       "label": "direct_packed_gguf_support_report",
       "metrics": {},
       "path": "benchmarks/results/direct_packed_gguf_support_2026-05-13.md",
-      "sha256": "86a566cf3fad3ee68baac4e9f39cda56adc3ae0c5d2ab2d68d7170df01b79f86",
-      "size_bytes": 2053
+      "sha256": "0339aa3955da5154f2354d173844d2647fd24d496e6935ca441497b5fa004344",
+      "size_bytes": 2060
     },
     {
       "exists": true,
@@ -70,8 +70,8 @@
       "label": "direct_i2s_scalar_gguf_report",
       "metrics": {},
       "path": "benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md",
-      "sha256": "2c5a76508f7a7894ba50a0795441c4f5953bc8db0420f3cde74ddcfc32a2cd6c",
-      "size_bytes": 5514
+      "sha256": "b4ea3c5c6f686408fdac9538729e9c22ae90fa38da049c091e945e925a43108e",
+      "size_bytes": 6338
     },
     {
       "exists": true,
@@ -79,8 +79,8 @@
       "label": "direct_row_i2s_qwen05b_report",
       "metrics": {},
       "path": "benchmarks/results/direct_row_i2s_qwen05b_2026-05-13.md",
-      "sha256": "7986c373ad38af92c8dd590e5875648e32018ef0d41c37f7e8c05630586fe1a1",
-      "size_bytes": 3648
+      "sha256": "f5f6d912626b928e4e4f3a91c49b145a475316e3ab5a7e470a1c475e4658ca39",
+      "size_bytes": 3967
     },
     {
       "exists": true,
@@ -124,8 +124,8 @@
       "label": "row_scale_qtype_productization_gate_report",
       "metrics": {},
       "path": "benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md",
-      "sha256": "4d9ec58650d5d55401bb046157cc1c5e1b08525e7644df6704b085c76ab035d1",
-      "size_bytes": 2383
+      "sha256": "f90176f61c4b331ecdab3ea85eb972f8565069f8cafe9e231cd99ebfc7cde01a",
+      "size_bytes": 2301
     },
     {
       "exists": true,
@@ -133,8 +133,17 @@
       "label": "i2sr_qwen15b_candidate_report",
       "metrics": {},
       "path": "benchmarks/results/i2sr_qwen15b_candidate_2026-05-13.md",
-      "sha256": "84768020bf76563ae0d2949cc10fcbf8537f4cbb0d5daea7106102c7f3dad6b4",
-      "size_bytes": 2476
+      "sha256": "0e61281598cebd54838900316cb722c5b8b1ee514e6ec394701afd6ea02811a4",
+      "size_bytes": 2330
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2sr_x86act_fix_report",
+      "metrics": {},
+      "path": "benchmarks/results/i2sr_x86act_fix_2026-05-13.md",
+      "sha256": "828c0baaa784b20ce156b48acc2e7e3ecaf96502d6c6a6ee6d91c8d30566f426",
+      "size_bytes": 2113
     },
     {
       "exists": true,
@@ -873,7 +882,7 @@
     {
       "exists": true,
       "kind": "direct_i2s_json",
-      "label": "direct_i2s_qwen05b_conversion",
+      "label": "direct_i2s_qwen05b_rowgroup_conversion",
       "metrics": {
         "architecture": "Qwen2ForCausalLM",
         "copied_tensors": 122,
@@ -898,7 +907,7 @@
     {
       "exists": true,
       "kind": "gguf_summary_json",
-      "label": "direct_i2s_qwen05b_suite",
+      "label": "direct_i2s_qwen05b_rowgroup_suite",
       "metrics": {
         "artifacts": [
           {
@@ -930,6 +939,65 @@
       "path": "benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/summary.json",
       "sha256": "d6451c122755b39b3f80b49d1252a915ba4dd4dfd2305a7a931ccb6f1d852950",
       "size_bytes": 2559
+    },
+    {
+      "exists": true,
+      "kind": "direct_i2s_json",
+      "label": "direct_i2s_qwen05b_x86act_conversion",
+      "metrics": {
+        "architecture": "Qwen2ForCausalLM",
+        "copied_tensors": 122,
+        "has_native_gguf_python_constants": null,
+        "has_native_i2s_gguf_python_constants": false,
+        "has_native_i2sr_gguf_python_constants": false,
+        "i2_sr_dtype": 40,
+        "mostly_i2_sr_file_type": 41,
+        "outfile_size_bytes": 640231936,
+        "output_f16_tensors": 1,
+        "output_tensors": 291,
+        "row_scale_i2s_packed": 0,
+        "row_scale_prototype": false,
+        "row_scale_qtype": null,
+        "row_scale_rejected": 0,
+        "ternary_i2s_packed": 168
+      },
+      "path": "benchmark_results/direct-i2s-qwen05b-klonly-x86act-2026-05-13/conversion_summary.json",
+      "sha256": "d465fe463870cd3400a01f5494685c874034d1ddf2628a355af282c37e22000f",
+      "size_bytes": 1434
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "direct_i2s_qwen05b_x86act_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 16.677618,
+            "file_mib": 948.098876953125,
+            "kind": "fp16_baseline",
+            "name": "qwen05b_fp_f16",
+            "ppl": 18.0986,
+            "prefill_tok_s": 367.954946
+          },
+          {
+            "decode_tok_s": 40.04494,
+            "file_mib": 610.57275390625,
+            "kind": "direct_scalar_i2s_x86_act_pack",
+            "name": "qwen05b_klonly_direct_i2_s_x86act",
+            "ppl": 423.4528,
+            "prefill_tok_s": 540.972199
+          }
+        ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
+        "failed": [],
+        "max_finite_ppl": 423.4528,
+        "nan_ppl": [],
+        "rows": 2
+      },
+      "path": "benchmark_results/direct-i2s-qwen05b-klonly-x86act-2026-05-13/summary.json",
+      "sha256": "bb63cf2ca6d6422d2bacea6255f19944a667aaac0a99a880ab9eb0396df77f3b",
+      "size_bytes": 2688
     },
     {
       "exists": true,
@@ -1033,6 +1101,57 @@
       "path": "benchmark_results/i2sr-row-scale-qwen15b-suite-2026-05-13/summary.json",
       "sha256": "d31d7de92fa12494e7c5afe513347bd9f5bca92a5dc4620f9e3ca223bc2311b6",
       "size_bytes": 1670
+    },
+    {
+      "exists": true,
+      "kind": "direct_i2s_json",
+      "label": "i2sr_x86act_qwen15b_conversion",
+      "metrics": {
+        "architecture": "Qwen2ForCausalLM",
+        "copied_tensors": 143,
+        "has_native_gguf_python_constants": null,
+        "has_native_i2s_gguf_python_constants": true,
+        "has_native_i2sr_gguf_python_constants": true,
+        "i2_sr_dtype": 40,
+        "mostly_i2_sr_file_type": 41,
+        "outfile_size_bytes": 1270157888,
+        "output_f16_tensors": 0,
+        "output_tensors": 339,
+        "row_scale_i2s_packed": 196,
+        "row_scale_prototype": false,
+        "row_scale_qtype": "i2_sr",
+        "row_scale_rejected": 0,
+        "ternary_i2s_packed": 196
+      },
+      "path": "benchmark_results/i2sr-row-scale-qwen15b-x86act-convert-2026-05-13/summary.json",
+      "sha256": "81195fb04a42dbbb22daf8b12d9f84ef84ce534f379bd6b78b1bf016a0e8908b",
+      "size_bytes": 1502
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "i2sr_x86act_qwen15b_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 19.065496,
+            "file_mib": 1211.3169555664062,
+            "kind": "static_ternary_i2sr_row_scale_candidate_x86_act_pack",
+            "name": "qwen15b_klonly_row_notie_static_ternary_i2_sr_x86act",
+            "ppl": 38.8477,
+            "prefill_tok_s": 211.668328
+          }
+        ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
+        "failed": [],
+        "max_finite_ppl": 38.8477,
+        "nan_ppl": [],
+        "rows": 1
+      },
+      "path": "benchmark_results/i2sr-row-scale-qwen15b-x86act-suite-2026-05-13/summary.json",
+      "sha256": "a12b1ca591a860cc632a97ec8a43af9d0bcb0c48e0cc964586f1963d8f73d69e",
+      "size_bytes": 1688
     },
     {
       "exists": true,
@@ -1188,8 +1307,8 @@
         "requires_stable_row_scale_type_or_version": true
       },
       "path": "benchmark_results/direct_packed_gguf_support_2026-05-13.json",
-      "sha256": "4636ac5e9c529e31e905e28f5f28d90fbadae4948e007244e6040f164ed61e18",
-      "size_bytes": 2426
+      "sha256": "95e3680e8067cbfe49f1c3b3bdbbfa520be57e21de4021466313ca733c43e4e6",
+      "size_bytes": 2601
     },
     {
       "exists": true,
@@ -1281,21 +1400,20 @@
         "failed": [
           "stable GGML row-scale qtype is defined",
           "stable llama file type is defined",
-          "runtime routes stable qtype without changing I2_S",
-          "stable qtype benchmark preserves quality"
+          "runtime routes stable qtype without changing I2_S"
         ],
         "gates": 8,
         "has_ggml_stable_qtype": false,
         "has_llama_stable_ftype": false,
         "passed": false,
         "prototype_ratio": 1.0015661061655128,
-        "stable_benchmark_max_ppl": 20074699.9423,
+        "stable_benchmark_max_ppl": 38.8477,
         "stable_benchmark_present": true,
-        "stable_benchmark_quality_ok": false
+        "stable_benchmark_quality_ok": true
       },
       "path": "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json",
-      "sha256": "35d29a51a6d17dae36e6bd9e01e6d58b479b8ae96d092d3308dcba2b6d88632d",
-      "size_bytes": 3181
+      "sha256": "7cd6bdc00fc220adda299f3f2e83bdb670f170228f39799e6ea205689dccf4d3",
+      "size_bytes": 3112
     },
     {
       "exists": true,

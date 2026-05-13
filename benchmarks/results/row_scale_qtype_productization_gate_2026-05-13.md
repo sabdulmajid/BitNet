@@ -15,7 +15,7 @@ Overall status: `fail`.
 | runtime routes stable qtype without changing I2_S | fail | ggml.c/llama.cpp source scan plus row-scale patch scan | Runtime evidence still indicates an overloaded I2_S patch rather than a separate row-scale qtype path. |
 | direct writer emits stable row-scale qtype | pass | benchmarks/convert_static_ternary_to_i2s_gguf.py |  |
 | stable qtype benchmark evidence exists | pass | benchmarks/results/evidence_manifest_2026-05-13.json |  |
-| stable qtype benchmark preserves quality | fail | benchmark_results/i2sr-row-scale-qwen15b-suite-2026-05-13/summary.json | Stable qtype benchmark is missing or has catastrophic/invalid PPL >= 10000. |
+| stable qtype benchmark preserves quality | pass | benchmark_results/i2sr-row-scale-qwen15b-x86act-suite-2026-05-13/summary.json |  |
 
 ## Observations
 
@@ -26,9 +26,9 @@ Overall status: `fail`.
 - Stable llama file type present: `False`.
 - Direct writer emits stable row-scale qtype: `True`.
 - Stable qtype benchmark present in manifest: `True`.
-- Stable qtype benchmark quality acceptable: `False`.
-- Stable qtype benchmark max finite PPL: `20074699.9423`.
+- Stable qtype benchmark quality acceptable: `True`.
+- Stable qtype benchmark max finite PPL: `38.8477`.
 
 ## Interpretation
 
-The feasibility claim is positive: the patched prototype preserves row-scale quality. The productization claim is negative: the source tree does not yet define a separate row-scale qtype, the direct writer now has an `I2_SR` emission mode, and a stable-qtype benchmark is present but it does not pass the catastrophic-PPL gate. This keeps row-scale packed deployment in research/prototype status.
+The feasibility claim is positive: the patched prototype preserves row-scale quality. The productization claim is negative: the source tree does not yet define a separate row-scale qtype, the direct writer now has an `I2_SR` emission mode, and a stable-qtype benchmark is present and it passes the catastrophic-PPL gate. This keeps row-scale packed deployment in research/prototype status.

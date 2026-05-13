@@ -64,28 +64,30 @@ def validate_ternary_codes(key: str, tensor: torch.Tensor) -> None:
         raise ValueError(f"{key} contains non-ternary codes: {invalid.tolist()}")
 
 
-def pack_i2_s_codes_1x4(codes: torch.Tensor) -> np.ndarray:
-    """Pack BitNet's CPU I2_S 1x4 layout.
+def pack_i2_s_codes_x86_act(codes: torch.Tensor) -> np.ndarray:
+    """Pack BitNet's active x86 I2_S layout.
 
-    The current x86 non-ACT_PARALLEL path stores four output rows for the same
-    input column in one byte, not four consecutive row-major values.
+    `include/gemm-config.h` defines ACT_PARALLEL in this fork, so the x86
+    runtime packs each flat row-major group of 128 ternary codes into 32 bytes.
+    This is the layout produced by `quantize_i2_s` and consumed by the current
+    `ggml_vec_dot_i2_i8_s` kernels.
     """
     if codes.ndim != 2:
         raise ValueError(f"I2_S packing expects a 2D weight matrix, got shape {tuple(codes.shape)}")
-    rows, cols = map(int, codes.shape)
-    if rows % 4 != 0:
-        raise ValueError(f"I2_S 1x4 packing expects row count divisible by 4, got {rows}")
 
     q8 = (codes.to(torch.int16).cpu().numpy() + 1).astype(np.uint8, copy=False)
-    packed = np.empty((rows // 4, cols), dtype=np.uint8)
-    for group in range(rows // 4):
-        quad = q8[group * 4 : group * 4 + 4, :]
-        packed[group, :] = (
-            (quad[0, :] << np.uint8(6))
-            | (quad[1, :] << np.uint8(4))
-            | (quad[2, :] << np.uint8(2))
-            | quad[3, :]
-        ).astype(np.uint8, copy=False)
+    flat = q8.reshape(-1)
+    qk_i2_s = 128
+    if flat.size % qk_i2_s != 0:
+        raise ValueError(f"I2_S x86 ACT_PARALLEL packing expects element count divisible by {qk_i2_s}, got {flat.size}")
+
+    groups = flat.reshape(-1, qk_i2_s)
+    packed = (
+        (groups[:, 0:32] << np.uint8(6))
+        | (groups[:, 32:64] << np.uint8(4))
+        | (groups[:, 64:96] << np.uint8(2))
+        | groups[:, 96:128]
+    ).astype(np.uint8, copy=False)
     return packed.reshape(-1)
 
 
@@ -93,7 +95,7 @@ def pack_i2_s_scalar(codes: torch.Tensor, scale: torch.Tensor) -> np.ndarray:
     if scale.numel() != 1:
         raise ValueError(f"scalar I2_S packing expects one scale, got shape {tuple(scale.shape)}")
 
-    packed = pack_i2_s_codes_1x4(codes)
+    packed = pack_i2_s_codes_x86_act(codes)
 
     output = np.zeros(packed.size + 32, dtype=np.uint8)
     output[: packed.size] = packed
@@ -110,7 +112,7 @@ def pack_i2_s_row_prototype(codes: torch.Tensor, scale: torch.Tensor) -> np.ndar
     if row_scales.numel() != rows:
         raise ValueError(f"row-scale I2_S packing expects {rows} scales, got shape {tuple(scale.shape)}")
 
-    packed = pack_i2_s_codes_1x4(codes)
+    packed = pack_i2_s_codes_x86_act(codes)
     if packed.size % 4 != 0:
         raise ValueError(f"row-scale I2_S scale offset must be 4-byte aligned, got {packed.size}")
 

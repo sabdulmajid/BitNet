@@ -1,25 +1,25 @@
 # Artifact Prune Plan
 
-Generated UTC: `2026-05-13T05:29:17+00:00`
-Git HEAD: `0844cb568eef`
+Generated UTC: `2026-05-13T06:06:56+00:00`
+Git HEAD: `82284d67d78c`
 
 This is a dry-run plan. No files were deleted by the generator.
 
 ## Guardrails
 
 - Evidence manifest: `benchmarks/results/evidence_manifest_2026-05-13.json`
-- Protected evidence files: `67`
-- Protected benchmark-manifest paths: `28`
+- Protected evidence files: `72`
+- Protected benchmark-manifest paths: `31`
 - Protected checkpoint directories: `12`
 
 ## Candidate Storage
 
 | class | action | items | total |
 | --- | --- | ---: | ---: |
-| `keep_by_default_model_artifacts` | keep by default | 11 | 60.36 GiB |
+| `keep_by_default_model_artifacts` | keep by default | 11 | 62.14 GiB |
 | `prune_intermediate_checkpoints` | safe after review | 29 | 202.42 GiB |
 | `remove_local_caches` | safe after review | 1 | 4.08 GiB |
-| `remove_rebuildable_build_dirs` | safe after review | 3 | 112.61 MiB |
+| `remove_rebuildable_build_dirs` | safe after review | 3 | 112.60 MiB |
 
 ## Recommended Sequence
 
@@ -84,13 +84,13 @@ rm -rf '.hf_cache'
 ## Model Artifacts Kept By Default
 
 - `models/eval-ternary-tiny-direct`: 72.52 MiB
-- `models/qwen2.5-0.5b-direct-static-ternary`: 2.37 GiB
+- `models/qwen2.5-0.5b-direct-static-ternary`: 2.97 GiB
 - `models/qwen2.5-0.5b-fp`: 2.02 GiB
 - `models/qwen2.5-0.5b-qatsby`: 2.74 GiB
 - `models/qwen2.5-0.5b-row-static-ternary-dense`: 3.72 GiB
 - `models/qwen2.5-1.5b-fp`: 6.84 GiB
 - `models/qwen2.5-1.5b-klonly-notie-static-ternary-dense`: 9.01 GiB
-- `models/qwen2.5-1.5b-klonly-row-notie-static-ternary-dense`: 11.37 GiB
+- `models/qwen2.5-1.5b-klonly-row-notie-static-ternary-dense`: 12.56 GiB
 - `models/qwen2.5-1.5b-klonly-static-ternary-dense`: 6.87 GiB
 - `models/qwen2.5-1.5b-qatsby`: 7.30 GiB
 - `models/qwen2.5-1.5b-static-ternary-dense`: 8.05 GiB

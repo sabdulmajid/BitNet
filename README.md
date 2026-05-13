@@ -91,31 +91,34 @@ conservative:
 - **Direct scalar `I2_S` export is mechanically solved but not a quality
   result.** This fork can now pack a scalar-scale `ternary_state_dict.pt`
   directly into GGUF `I2_S` without editing the vendored `llama.cpp` submodule.
-  The Qwen2.5-0.5B KL-only scalar checkpoint loads and runs on CPU as `168`
-  `i2_s` tensors, shrinking file size from `948.1` MiB FP16 to `610.6` MiB and
-  improving fixed-excerpt prefill/decode throughput from `331.42`/`16.30` tok/s
-  to `523.69`/`37.30` tok/s. Quality fails: PPL is `NaN` and deterministic
-  smoke output is punctuation spam. This is a runtime-format milestone, not a
-  publishable model-quality claim.
-- **Direct row-scale `I2_S` export remains experimental and failed on the
-  Qwen2.5-0.5B row checkpoint.** The direct writer now matches BitNet's 1x4
-  row-interleaved `I2_S` packing layout. Its `--row-scale-prototype` mode can
-  write one scale per output row, but this is not a stable GGUF contract and it
-  did not rescue the weak 0.5B row checkpoint: materialized F16 PPL was
+  The current x86 `ACT_PARALLEL` writer fixes the earlier row-group packing
+  mistake: the Qwen2.5-0.5B KL-only scalar checkpoint loads and runs on CPU as
+  `168` `i2_s` tensors, shrinking file size from `948.1` MiB FP16 to
+  `610.6` MiB and improving fixed-excerpt prefill/decode throughput from
+  `367.95`/`16.68` tok/s to `540.97`/`40.04` tok/s. Quality is finite but
+  still weak: PPL is `423.4528` versus FP16 `18.0986`. This is a
+  runtime-format milestone, not a publishable model-quality claim.
+- **Direct row-scale `I2_S` export remains a historical negative control on the
+  Qwen2.5-0.5B row checkpoint.** The tested artifact used a row-group packing
+  layout that was later superseded by the x86 `ACT_PARALLEL` fix. Its
+  `--row-scale-prototype` mode wrote one scale per output row, but this was not
+  a stable GGUF contract and it did not rescue the weak 0.5B row checkpoint:
+  materialized F16 PPL was
   `578.4833`, direct row-scale `I2_S` prototype PPL was `59401.5449`,
   materialized-then-`I2_S` was `NaN`, and materialized-then-`TQ2_0` was
   `5118527.5782`. The quality-preserving packed row-scale evidence remains the
   separate 1.5B patched-runtime prototype, not default `I2_S`.
-- **A candidate stable `I2_SR` path now exists, but its first full benchmark
-  failed quality.** `patches/llama-i2sr-row-scale-qtype.patch` introduces a
+- **A candidate stable `I2_SR` path now preserves row-scale quality after a
+  packing fix.** `patches/llama-i2sr-row-scale-qtype.patch` introduces a
   separate row-scale qtype/file type instead of changing the existing `I2_S`
-  contract. The patch applies, builds, and the direct writer emits
-  `--row-scale-qtype i2_sr`. The strong Qwen2.5-1.5B row-scale checkpoint
-  loads and runs as `196` `i2_sr` tensors at `212.10` prompt tok/s and
-  `19.01` decode tok/s on the Xeon 4116, but fixed-excerpt PPL is
-  `20,074,699.9423`. That is a semantic/layout failure, not a publishable
-  quality result. The known-good row-scale packed result remains the older
-  patched `I2_S` prototype at PPL `38.8832`.
+  contract. The first full artifact loaded and ran but failed quality because
+  the direct writer used a row-group-of-four layout while this fork's active
+  x86 runtime defines `ACT_PARALLEL` and expects the chunked 128-code BitNet
+  layout. After fixing the writer, the strong Qwen2.5-1.5B row-scale checkpoint
+  loads and runs as `196` `i2_sr` tensors at PPL `38.8477`, `211.67` prompt
+  tok/s, and `19.07` decode tok/s on the Xeon 4116. This is quality-equivalent
+  to the older patched row-scale `I2_S` prototype at PPL `38.8832`, but it is
+  still a downstream candidate patch, not an upstream/default runtime contract.
 - **TL2 is now a partial dense-Qwen engineering probe, not a product claim.**
   This fork can generate a Qwen2.5-0.5B TL2 GGUF only after exact
   model-specific TL2 code generation and a matching `BITNET_X86_TL2=ON`
@@ -220,7 +223,8 @@ same CPU family shown in the table.
 | Intel Xeon Silver 4116 | KL-only row-scale static ternary F16, dense tied `lm_head` | 3,395.5 | 38.8651 | 114.75 | 5.49 |
 | Intel Xeon Silver 4116 | KL-only row-scale static ternary TQ2_0, dense tied `lm_head` | 1,218.6 | 38.8224 | 169.46 | 18.68 |
 | Intel Xeon Silver 4116 | KL-only row-scale static ternary I2_S prototype, dense tied `lm_head` | 1,211.3 | 38.8832 | 218.17 | 18.97 |
-| Intel Xeon Silver 4116 | KL-only row-scale static ternary I2_SR candidate, dense tied `lm_head` | 1,211.3 | 2.007e7 | 212.10 | 19.01 |
+| Intel Xeon Silver 4116 | KL-only row-scale static ternary I2_SR candidate, old row-group direct pack | 1,211.3 | 2.007e7 | 212.10 | 19.01 |
+| Intel Xeon Silver 4116 | KL-only row-scale static ternary I2_SR candidate, fixed x86 ACT pack | 1,211.3 | 38.8477 | 211.67 | 19.07 |
 | AMD Ryzen Threadripper PRO 5945WX | KL-only static ternary I2_S, dense tied `lm_head` | 1,208.9 | 47.3435 | 464.19 | 45.50 |
 | AMD Ryzen Threadripper PRO 5945WX | KL-only row-scale static ternary TQ2_0, dense tied `lm_head` | 1,218.6 | 38.8224 | 345.32 | 44.85 |
 | AMD Ryzen Threadripper PRO 5945WX | KL-only row-scale static ternary I2_S, dense tied `lm_head` | 1,208.9 | 1.197e6 | 465.34 | 46.13 |
@@ -228,9 +232,9 @@ same CPU family shown in the table.
 The AMD row-scale `I2_S` row is the failed default layout result. The Xeon
 row-scale `I2_S` prototype row uses `patches/llama-i2s-row-scale.patch`, which
 changes the packed tensor layout to store one scale per output row.
-The Xeon `I2_SR` candidate row uses the separate-qtype patch, loads and runs,
-but fails quality badly; it should be treated as a direct-writer/runtime layout
-debug target rather than evidence that stable row-scale deployment is solved.
+The old Xeon `I2_SR` candidate row is preserved as the failure case that exposed
+the direct-writer packing bug. The fixed `I2_SR` row uses the separate-qtype
+patch plus the active x86 `ACT_PARALLEL` packing layout.
 The same patched row-scale `I2_S` artifact also passed a native AVX-512-enabled
 Xeon run at PPL `38.8853`, `207.35` prompt tok/s, and `18.37` decode tok/s;
 quality is preserved, but throughput did not beat the portable AVX2 build.
@@ -259,11 +263,10 @@ retrofit pipeline with measured guarantees:
 - export `ternary_state_dict.pt` plus a static-ternary GGUF bridge,
 - pack `TQ2_0` and `I2_S` artifacts for commodity CPU inference,
 - use direct dense GGUF export for inspection and direct scalar `I2_S` export
-  only for scalar-scale experiments; use the materialization/static bridge for
-  row-scale quality-preserving exports until a stable row-scale packed format
-  exists,
-- promote the row-scale-aware `I2_S` prototype into a stable packed format or
-  new GGUF quantization type before claiming row-scale `I2_S` deployment,
+  only for scalar-scale experiments; use `TQ2_0` or the downstream fixed
+  `I2_SR` candidate for row-scale quality-preserving packed experiments,
+- promote the row-scale-aware `I2_SR` qtype into a stable packed format before
+  claiming row-scale ternary deployment,
 - publish a benchmark card with FP/Q8/Q4/blind-ternary/QAT comparisons.
 
 The current MVP should target dense Qwen-style models first. MoE models such as
