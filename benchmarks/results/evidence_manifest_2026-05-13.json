@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "9424eb4b58444c8608ed29bb1032e9a389497f9b8131d28c08aaec7d8a87df2d",
-      "size_bytes": 44668
+      "sha256": "e060f079ee88f23cd854b5647b9acc2babf91c15afab46ea39f5afccf7dc748d",
+      "size_bytes": 44838
     },
     {
       "exists": true,
@@ -25,8 +25,8 @@
       "label": "publishable_claims",
       "metrics": {},
       "path": "benchmarks/results/publishable_claims_2026-05-05.md",
-      "sha256": "480624db3c74c1c9987e65fc1ec70ba481893e93e81d43c748b190109910dc91",
-      "size_bytes": 6871
+      "sha256": "372b8aeed38a7e4c464007ffb8d4655aef53e67c977f8cbc2a995cad73870d88",
+      "size_bytes": 7055
     },
     {
       "exists": true,
@@ -34,8 +34,8 @@
       "label": "progress_audit",
       "metrics": {},
       "path": "benchmarks/results/progress_audit_2026-05-05.md",
-      "sha256": "6e06fba2ad02197815d7549ccd4f047678378d30eab67f3b235263c4091ce3f2",
-      "size_bytes": 17059
+      "sha256": "0a1546330dcf39b859d8fa06945a6543fb35d9527b0773a41656a3eeca6c2f5b",
+      "size_bytes": 17370
     },
     {
       "exists": true,

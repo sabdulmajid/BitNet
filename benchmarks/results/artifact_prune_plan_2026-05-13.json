@@ -1,0 +1,308 @@
+{
+  "evidence_manifest": "benchmarks/results/evidence_manifest_2026-05-13.json",
+  "generated_utc": "2026-05-13T03:32:45+00:00",
+  "git_head": "c8b99d71af69",
+  "groups": {
+    "keep_by_default_model_artifacts": [
+      {
+        "path": "models/qwen2.5-0.5b-fp",
+        "reason": "Generated model/GGUF directory; useful for reruns and protected if referenced by a benchmark manifest.",
+        "size_bytes": 2164008448
+      },
+      {
+        "path": "models/qwen2.5-0.5b-qatsby",
+        "reason": "Generated model/GGUF directory; useful for reruns and protected if referenced by a benchmark manifest.",
+        "size_bytes": 2946782720
+      },
+      {
+        "path": "models/qwen2.5-1.5b-fp",
+        "reason": "Generated model/GGUF directory; useful for reruns and protected if referenced by a benchmark manifest.",
+        "size_bytes": 7340611520
+      },
+      {
+        "path": "models/qwen2.5-1.5b-klonly-notie-static-ternary-dense",
+        "reason": "Generated model/GGUF directory; useful for reruns and protected if referenced by a benchmark manifest.",
+        "size_bytes": 9671448408
+      },
+      {
+        "path": "models/qwen2.5-1.5b-klonly-row-notie-static-ternary-dense",
+        "reason": "Generated model/GGUF directory; useful for reruns and protected if referenced by a benchmark manifest.",
+        "size_bytes": 10941606276
+      },
+      {
+        "path": "models/qwen2.5-1.5b-klonly-static-ternary-dense",
+        "reason": "Generated model/GGUF directory; useful for reruns and protected if referenced by a benchmark manifest.",
+        "size_bytes": 7373379456
+      },
+      {
+        "path": "models/qwen2.5-1.5b-qatsby",
+        "reason": "Generated model/GGUF directory; useful for reruns and protected if referenced by a benchmark manifest.",
+        "size_bytes": 7842278912
+      },
+      {
+        "path": "models/qwen2.5-1.5b-static-ternary-dense",
+        "reason": "Generated model/GGUF directory; useful for reruns and protected if referenced by a benchmark manifest.",
+        "size_bytes": 8645829280
+      }
+    ],
+    "prune_intermediate_checkpoints": [
+      {
+        "path": "checkpoints/audit-save/step-7",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 6077
+      },
+      {
+        "path": "checkpoints/qwen2.5-0.5b-fineweb-edu-12/step-250",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 3571070953
+      },
+      {
+        "path": "checkpoints/qwen2.5-0.5b-fineweb-edu-12/step-500",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 3571070953
+      },
+      {
+        "path": "checkpoints/qwen2.5-0.5b-fineweb-edu-12/step-750",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 3571070953
+      },
+      {
+        "path": "checkpoints/qwen2.5-0.5b-fineweb-edu-klonly-1000/step-250",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 3571070953
+      },
+      {
+        "path": "checkpoints/qwen2.5-0.5b-fineweb-edu-klonly-1000/step-500",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 3571070953
+      },
+      {
+        "path": "checkpoints/qwen2.5-0.5b-fineweb-edu-klonly-1000/step-750",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 3571070953
+      },
+      {
+        "path": "checkpoints/qwen2.5-0.5b-fineweb-edu-klonly-notiehead-1000/step-250",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 3434935695
+      },
+      {
+        "path": "checkpoints/qwen2.5-0.5b-fineweb-edu-klonly-notiehead-1000/step-500",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 3434935695
+      },
+      {
+        "path": "checkpoints/qwen2.5-0.5b-fineweb-edu-klonly-notiehead-1000/step-750",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 3434935695
+      },
+      {
+        "path": "checkpoints/qwen2.5-0.5b-fineweb-edu-row-1000/step-250",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 3572896105
+      },
+      {
+        "path": "checkpoints/qwen2.5-0.5b-fineweb-edu-row-1000/step-500",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 3572896105
+      },
+      {
+        "path": "checkpoints/qwen2.5-0.5b-fineweb-edu-row-1000/step-750",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 3572896105
+      },
+      {
+        "path": "checkpoints/qwen2.5-1.5b-fineweb-edu/step-1000",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 13528165247
+      },
+      {
+        "path": "checkpoints/qwen2.5-1.5b-fineweb-edu/step-2000",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 13528165247
+      },
+      {
+        "path": "checkpoints/qwen2.5-1.5b-fineweb-edu/step-3000",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 13528165247
+      },
+      {
+        "path": "checkpoints/qwen2.5-1.5b-fineweb-edu/step-4000",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 13528165247
+      },
+      {
+        "path": "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-5000/step-1000",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 9597642087
+      },
+      {
+        "path": "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-5000/step-2000",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 9597642087
+      },
+      {
+        "path": "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-5000/step-3000",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 9597642087
+      },
+      {
+        "path": "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-5000/step-4000",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 9597642087
+      },
+      {
+        "path": "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-notiehead-5000/step-1000",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 10297762845
+      },
+      {
+        "path": "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-notiehead-5000/step-2000",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 10297762845
+      },
+      {
+        "path": "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-notiehead-5000/step-3000",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 10297762845
+      },
+      {
+        "path": "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-notiehead-5000/step-4000",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 10297762845
+      },
+      {
+        "path": "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-row-notiehead-5000/step-1000",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 10300344477
+      },
+      {
+        "path": "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-row-notiehead-5000/step-2000",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 10300344477
+      },
+      {
+        "path": "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-row-notiehead-5000/step-3000",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 10300344477
+      },
+      {
+        "path": "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-row-notiehead-5000/step-4000",
+        "reason": "Intermediate training checkpoint; final/evidence checkpoints are protected.",
+        "size_bytes": 10300344477
+      }
+    ],
+    "remove_local_caches": [
+      {
+        "path": ".hf_cache",
+        "reason": "Download/cache directory; can be repopulated.",
+        "size_bytes": 4386032852
+      }
+    ],
+    "remove_rebuildable_build_dirs": [
+      {
+        "path": "build",
+        "reason": "CMake/runtime build output; can be regenerated.",
+        "size_bytes": 49410493
+      },
+      {
+        "path": "build-portable-avx2",
+        "reason": "CMake/runtime build output; can be regenerated.",
+        "size_bytes": 18459757
+      },
+      {
+        "path": "build-qwen05b-tl2",
+        "reason": "CMake/runtime build output; can be regenerated.",
+        "size_bytes": 18223582
+      }
+    ]
+  },
+  "protected_counts": {
+    "benchmark_manifest_paths": 27,
+    "evidence_manifest_files": 44,
+    "protected_checkpoint_dirs": 12
+  },
+  "protected_paths": [
+    "README.md",
+    "benchmark_results/evidence_audit/latest_nonrow.md",
+    "benchmark_results/evidence_audit/qwen05b_tl2_probe.md",
+    "benchmark_results/evidence_audit/qwen15b_context_scaling_rss.md",
+    "benchmark_results/evidence_audit/qwen15b_row_i2s_heapfix.md",
+    "benchmark_results/evidence_audit/qwen15b_row_i2s_thread_scaling.md",
+    "benchmark_results/evidence_audit/qwen15b_row_notie_5000.md",
+    "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json",
+    "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json",
+    "benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json",
+    "benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json",
+    "benchmark_results/gguf-qwen15b-klonly-suite/summary.json",
+    "benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json",
+    "benchmark_results/gguf-rss-qwen15b-context-scaling-2026-05-05/summary.json",
+    "benchmark_results/i2s-row-scale-thread-scaling-fixed-2026-05-05/summary.json",
+    "benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json",
+    "benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json",
+    "benchmark_results/lm-eval-qwen15b-full10/qwen15b_qat_ternary.json",
+    "benchmark_results/lm-eval-qwen15b-klonly-full10/qwen15b_qat_ternary.json",
+    "benchmark_results/lm-eval-qwen15b-klonly-notiehead-full10/qwen15b_qat_ternary.json",
+    "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/qwen15b_qat_ternary.json",
+    "benchmark_results/math_viability_gaussian_10trial_2026-05-05.json",
+    "benchmark_results/quality-9735/qwen15b_fp_fineweb_heldout.json",
+    "benchmark_results/quality-9735/qwen15b_fp_wikitext.json",
+    "benchmark_results/quality-9735/qwen15b_ternary_fineweb_heldout.json",
+    "benchmark_results/quality-9735/qwen15b_ternary_wikitext.json",
+    "benchmark_results/quality-ptq-qwen15b/qwen15b_naive_ptq_fineweb_heldout.json",
+    "benchmark_results/quality-ptq-qwen15b/qwen15b_naive_ptq_wikitext.json",
+    "benchmark_results/quality-qwen15b-klonly-5000/qwen15b_ternary_fineweb_heldout.json",
+    "benchmark_results/quality-qwen15b-klonly-5000/qwen15b_ternary_wikitext.json",
+    "benchmark_results/quality-qwen15b-klonly-notiehead-5000/qwen15b_ternary_fineweb_heldout.json",
+    "benchmark_results/quality-qwen15b-klonly-notiehead-5000/qwen15b_ternary_wikitext.json",
+    "benchmark_results/quality-qwen15b-klonly-row-notiehead-5000/qwen15b_ternary_fineweb_heldout.json",
+    "benchmark_results/quality-qwen15b-klonly-row-notiehead-5000/qwen15b_ternary_wikitext.json",
+    "benchmark_results/tl2_probe/qwen05b-bitnet-tl2.gguf",
+    "benchmark_results/tl2_scale_semantics_2026-05-05.json",
+    "benchmark_results/tl2_shape_support_audit_2026-05-05.json",
+    "benchmarks/results/active_goal_completion_audit_2026-05-05.md",
+    "benchmarks/results/moe_support_audit_2026-05-05.md",
+    "benchmarks/results/progress_audit_2026-05-05.md",
+    "benchmarks/results/publishable_claims_2026-05-05.md",
+    "benchmarks/results/qwen05b_tl2_probe_2026-05-05.md",
+    "benchmarks/results/qwen_side_by_side_2026-05-05.md",
+    "benchmarks/results/tl2_scale_semantics_2026-05-05.md",
+    "benchmarks/results/tl2_shape_support_audit_2026-05-05.md",
+    "checkpoints/qwen2.5-0.5b-fineweb-edu-12/step-1000",
+    "checkpoints/qwen2.5-0.5b-fineweb-edu-klonly-1000/step-1000",
+    "checkpoints/qwen2.5-0.5b-fineweb-edu-klonly-notiehead-1000/step-1000",
+    "checkpoints/qwen2.5-0.5b-fineweb-edu-row-1000/step-1000",
+    "checkpoints/qwen2.5-0.5b-naive-ptq-tensor",
+    "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-5000/step-5000",
+    "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-5000/step-5000-static-ternary-dense-f16",
+    "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-notiehead-5000/step-5000",
+    "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-row-notiehead-5000/step-5000",
+    "checkpoints/qwen2.5-1.5b-fineweb-edu/step-5000",
+    "checkpoints/qwen2.5-1.5b-fineweb-edu/step-5000-static-ternary-dense-f16",
+    "checkpoints/qwen2.5-1.5b-naive-ptq-tensor",
+    "models/qwen2.5-0.5b-fp/qwen05b_fp_f16.gguf",
+    "models/qwen2.5-0.5b-fp/qwen05b_fp_q4_k_m.gguf",
+    "models/qwen2.5-0.5b-qatsby/qwen05b_qat_i2_s.gguf",
+    "models/qwen2.5-1.5b-fp/qwen15b_fp_f16.gguf",
+    "models/qwen2.5-1.5b-fp/qwen15b_fp_i2_s.gguf",
+    "models/qwen2.5-1.5b-fp/qwen15b_fp_q4_k_m.gguf",
+    "models/qwen2.5-1.5b-fp/qwen15b_fp_q8_0.gguf",
+    "models/qwen2.5-1.5b-fp/qwen15b_fp_tq2_0.gguf",
+    "models/qwen2.5-1.5b-klonly-row-notie-static-ternary-dense/qwen15b_klonly_row_notie_static_ternary_f16.gguf",
+    "models/qwen2.5-1.5b-klonly-row-notie-static-ternary-dense/qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale.gguf",
+    "models/qwen2.5-1.5b-klonly-row-notie-static-ternary-dense/qwen15b_klonly_row_notie_static_ternary_tq2_0.gguf",
+    "models/qwen2.5-1.5b-klonly-static-ternary-dense/qwen15b_klonly_static_ternary_dense_f16.gguf",
+    "models/qwen2.5-1.5b-klonly-static-ternary-dense/qwen15b_klonly_static_ternary_dense_i2_s_t1.gguf",
+    "models/qwen2.5-1.5b-klonly-static-ternary-dense/qwen15b_klonly_static_ternary_dense_tq2_0.gguf",
+    "models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_f16.gguf",
+    "models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_i2_s_t1.gguf",
+    "models/qwen2.5-1.5b-static-ternary-dense/qwen15b_static_ternary_dense_tq2_0.gguf"
+  ],
+  "schema": "bitnet-artifact-prune-plan-v1",
+  "totals": {
+    "keep_by_default_model_artifacts": 56925945020,
+    "prune_intermediate_checkpoints": 217345585819,
+    "remove_local_caches": 4386032852,
+    "remove_rebuildable_build_dirs": 86093832
+  }
+}

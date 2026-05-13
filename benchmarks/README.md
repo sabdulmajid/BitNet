@@ -208,6 +208,20 @@ python benchmarks/audit_evidence.py \
   --output-md benchmark_results/evidence_audit/current.md
 ```
 
+Large checkpoints, model conversions, and CPU benchmark byproducts are ignored
+by Git. To make pruning reproducible, generate the dry-run artifact plan before
+deleting anything:
+
+```bash
+TMPDIR=/mnt/slurm_nfs/a6abdulm/tmp python benchmarks/plan_artifact_pruning.py
+```
+
+The current plan is
+`benchmarks/results/artifact_prune_plan_2026-05-13.md`. It protects the hashed
+evidence manifest files, benchmark-manifest model paths, and final checkpoints,
+then separates intermediate checkpoint cleanup from rebuildable caches and model
+artifacts.
+
 For the Qwen2.5-1.5B row-scale dense-head ablation, the postprocess wrapper
 audits the final checkpoint/eval artifacts and writes paired lm-eval comparison
 tables after the quality, MC, and full ten-task jobs complete:

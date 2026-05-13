@@ -2,10 +2,10 @@
 Artifacts: `44`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 44668 | 9424eb4b5844 |  |
+| README | tracked_report | yes | 44838 | e060f079ee88 |  |
 | side_by_side_report | tracked_report | yes | 12585 | 570856967359 |  |
-| publishable_claims | tracked_report | yes | 6871 | 480624db3c74 |  |
-| progress_audit | tracked_report | yes | 17059 | 6e06fba2ad02 |  |
+| publishable_claims | tracked_report | yes | 7055 | 372b8aeed38a |  |
+| progress_audit | tracked_report | yes | 17370 | 0a1546330dcf |  |
 | active_goal_audit | tracked_report | yes | 7542 | ad6b497a44c3 |  |
 | tl2_shape_report | tracked_report | yes | 2817 | 8dddd65315e0 |  |
 | tl2_probe_report | tracked_report | yes | 3608 | dd7e4fa29cc1 |  |
