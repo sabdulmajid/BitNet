@@ -1,7 +1,7 @@
 {
   "evidence_manifest": "benchmarks/results/evidence_manifest_2026-05-13.json",
-  "generated_utc": "2026-05-13T07:11:21+00:00",
-  "git_head": "568a6037f2f5",
+  "generated_utc": "2026-05-13T07:30:02+00:00",
+  "git_head": "8284dc2c9301",
   "groups": {
     "keep_by_default_model_artifacts": [
       {

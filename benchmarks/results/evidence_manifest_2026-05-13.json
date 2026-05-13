@@ -160,8 +160,8 @@
       "label": "row_scale_qtype_i2sr_active_patch_gate_report",
       "metrics": {},
       "path": "benchmarks/results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.md",
-      "sha256": "8c7b7393771ee0dfc7447a206ce76131165fc0bbbc9d75bba0603bc7fb250349",
-      "size_bytes": 2392
+      "sha256": "42acb39176cb4f5fc9a3b6b54b8ba3ab90b4c01df7f96811b9725904204c3bca",
+      "size_bytes": 2390
     },
     {
       "exists": true,
@@ -1508,8 +1508,8 @@
         "stable_benchmark_quality_ok": true
       },
       "path": "benchmark_results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.json",
-      "sha256": "3f239a45212e783710d331a539b813766ddcbdb634eb053f74e3433f9725633f",
-      "size_bytes": 3618
+      "sha256": "cb42720567a11cde149d930264220bd9f90de58acbed8a7037b163c9adb51928",
+      "size_bytes": 3616
     },
     {
       "exists": true,

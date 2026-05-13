@@ -344,6 +344,20 @@ The quality-valid direct row-scale packed evidence is the fixed candidate
 `19.07` decode tok/s with `patches/llama-i2sr-row-scale-qtype.patch` applied.
 That qtype is still downstream, not active by default.
 
+To reproduce the active-patch productization gate without leaving the source
+tree patched:
+
+```bash
+python benchmarks/run_i2sr_active_patch_gate.py --restore-build
+```
+
+The harness checks that the patch applies cleanly, applies it, rebuilds
+`llama-cli`, `llama-bench`, `llama-perplexity`, and `llama-quantize`, runs
+`benchmarks/audit_row_scale_qtype_productization.py` in the patched-source
+scenario, reverses the patch, and optionally rebuilds the default binaries.
+The current generated proof is
+`benchmarks/results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.md`.
+
 For QAT checkpoints, do not convert `model.safetensors` directly and treat it
 as the trained ternary artifact. The validated bridge is:
 
