@@ -136,13 +136,21 @@ conservative:
   naive row-scale TL2 export is invalid: replacing row-wise scales with one TL2
   tensor scale would introduce relative Frobenius/output-RMS error `1.904230`
   on the best row-scale 1.5B checkpoint; the scalar-scale control is `0.0`.
+  A follow-up design audit shows this is a runtime/kernel indexing problem, not
+  a storage problem: the best one-scale approximation still has error
+  `0.161173`, group-32 fp16 scales have error `0.142844`, group-2 fp16 scales
+  have error `0.098692`, and exact fp16 row scales reduce error to `0.000197`
+  while adding only `1.230 MiB` of scale metadata.
 - **MoE remains unproven in this fork.** The vendored llama.cpp backend contains
   generic expert routing and merged expert-tensor support, and the BitNet HF
   converter has partial Qwen-style expert packing. This repo has not yet shown a
   Kimi-compatible ternary converter, expert-router distillation, or a Kimi/MoE
   benchmark. The mechanical MoE audit confirms generic Qwen2MoE infrastructure
-  exists, but no Kimi-specific converter/runtime mapping or benchmark artifact
-  is present.
+  exists, but five of six MoE productization gates fail: the TL2-capable BitNet
+  converter does not explicitly register Qwen2MoE/Kimi, the TL2 path unpacks
+  weights as 2D matrices, the direct `I2_SR` writer rejects non-2D ternary
+  tensors, no local Kimi artifacts exist, and no quality/throughput/RSS or
+  expert-locality benchmarks exist.
 
 Current evidence is tracked in
 [benchmarks/results/qwen_retrofit_2026-05-03.md](benchmarks/results/qwen_retrofit_2026-05-03.md).
@@ -172,12 +180,16 @@ The Qwen2.5-0.5B TL2 probe is
 [benchmarks/results/qwen05b_tl2_probe_2026-05-05.md](benchmarks/results/qwen05b_tl2_probe_2026-05-05.md).
 The TL2 scale-semantics audit is
 [benchmarks/results/tl2_scale_semantics_2026-05-05.md](benchmarks/results/tl2_scale_semantics_2026-05-05.md).
+The TL2 row-scale design audit is
+[benchmarks/results/tl2_row_scale_design_2026-05-13.md](benchmarks/results/tl2_row_scale_design_2026-05-13.md).
 The row-scale `I2_S` format compatibility audit is
 [benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md](benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md).
 The row-scale qtype productization gate is
 [benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md](benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md).
 The candidate active-patch productization proof is
 [benchmarks/results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.md](benchmarks/results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.md).
+The split-patch I2_SR promotion rehearsal is
+[benchmarks/results/row_scale_qtype_productization_gate_i2sr_promotion_rehearsal_2026-05-13.md](benchmarks/results/row_scale_qtype_productization_gate_i2sr_promotion_rehearsal_2026-05-13.md).
 The MoE support audit is
 [benchmarks/results/moe_support_audit_2026-05-05.md](benchmarks/results/moe_support_audit_2026-05-05.md).
 The reusable static-ternary GGUF bridge note is
@@ -282,10 +294,16 @@ retrofit pipeline with measured guarantees:
   claiming row-scale ternary deployment,
 - publish a benchmark card with FP/Q8/Q4/blind-ternary/QAT comparisons.
 
-The current MVP should target dense Qwen-style models first. MoE models such as
-Kimi, production TL2 export for strong row-scale Qwen checkpoints, stable
-row-scale packed GGUF ingestion, and quality guarantees for arbitrary
-architectures remain research tasks.
+The current MVP should target dense Qwen-style models first. The strongest
+near-term runtime path is to promote the downstream `I2_SR` patch, because it
+already preserves the best row-scale checkpoint's quality and passes the
+promotion rehearsal. Production TL2 export for strong row-scale Qwen checkpoints
+needs row/group-scale metadata plus generated kernels that index those scales;
+it is not blocked by scale-storage size. MoE models such as Kimi need explicit
+converter registration, router/shared-expert tensor mapping, 3D expert packing
+tests for TL2/`I2_SR`, router/expert distillation, and quality, throughput, RSS,
+and expert-locality benchmarks. Quality guarantees for arbitrary architectures
+remain research tasks.
 The current toolchain split is mechanical: the BitNet HF converter now exposes
 `tl2`, registers dense `Qwen2ForCausalLM`, and accepts `--kernel-config` for
 model-specific TL2 shape tables, but it still does not register Qwen2MoE/Kimi
