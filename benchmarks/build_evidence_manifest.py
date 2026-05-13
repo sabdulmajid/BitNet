@@ -53,6 +53,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "row_scale_qtype_productization_gate_report", "kind": "tracked_report", "path": "benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md"},
     {"label": "row_scale_qtype_i2sr_active_patch_gate_report", "kind": "tracked_report", "path": "benchmarks/results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.md"},
     {"label": "row_scale_qtype_i2sr_promotion_rehearsal_report", "kind": "tracked_report", "path": "benchmarks/results/row_scale_qtype_productization_gate_i2sr_promotion_rehearsal_2026-05-13.md"},
+    {"label": "i2sr_promotion_handoff_report", "kind": "tracked_report", "path": "benchmarks/results/i2sr_promotion_handoff_2026-05-13.md"},
     {"label": "i2sr_qwen15b_candidate_report", "kind": "tracked_report", "path": "benchmarks/results/i2sr_qwen15b_candidate_2026-05-13.md"},
     {"label": "i2sr_x86act_fix_report", "kind": "tracked_report", "path": "benchmarks/results/i2sr_x86act_fix_2026-05-13.md"},
     {"label": "i2s_packing_layout_verify_report", "kind": "tracked_report", "path": "benchmarks/results/i2s_packing_layout_verify_2026-05-13.md"},
@@ -123,6 +124,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "row_scale_qtype_productization_gate_json", "kind": "row_scale_qtype_gate_json", "path": "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json"},
     {"label": "row_scale_qtype_i2sr_active_patch_gate_json", "kind": "row_scale_qtype_gate_json", "path": "benchmark_results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.json"},
     {"label": "row_scale_qtype_i2sr_promotion_rehearsal_json", "kind": "row_scale_qtype_gate_json", "path": "benchmark_results/row_scale_qtype_productization_gate_i2sr_promotion_rehearsal_2026-05-13.json"},
+    {"label": "i2sr_promotion_handoff_json", "kind": "i2sr_promotion_handoff_json", "path": "benchmark_results/i2sr_promotion_handoff_2026-05-13.json"},
     {"label": "i2s_packing_layout_verify_json", "kind": "packing_verify_json", "path": "benchmark_results/i2s-packing-layout-verify-2026-05-13/summary.json"},
     {"label": "benchmark_coverage_gate_json", "kind": "benchmark_coverage_gate_json", "path": "benchmark_results/benchmark_coverage_gate_2026-05-13.json"},
     {"label": "objective_completion_audit_json", "kind": "objective_completion_audit_json", "path": "benchmark_results/objective_completion_audit_2026-05-13.json"},
@@ -441,6 +443,17 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "patch_applies_cleanly": data.get("patch_applies_cleanly"),
             "submodule_short": data.get("submodule_short"),
             "blockers": data.get("blockers"),
+        }
+    if kind == "i2sr_promotion_handoff_json":
+        fork = data.get("candidate_fork_probe", {})
+        return {
+            "ready_for_handoff": data.get("ready_for_handoff"),
+            "root_clean": data.get("root_clean"),
+            "submodule_clean": data.get("submodule_clean"),
+            "root_patch_applies": data.get("root_patch_check", {}).get("applies"),
+            "submodule_patch_applies": data.get("submodule_patch_check", {}).get("applies"),
+            "candidate_fork_reachable": fork.get("reachable") if isinstance(fork, dict) else None,
+            "blockers": data.get("blockers", []),
         }
     if kind == "moe_support_json":
         gates = data.get("productization_gates", [])

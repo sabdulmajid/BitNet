@@ -289,6 +289,21 @@ The generated split patches are tracked as
 `patches/bitnet-i2sr-root-runtime.patch` and
 `patches/llama-i2sr-row-scale-qtype.submodule.patch`.
 
+To make the remaining Git handoff reproducible before a writable fork exists,
+generate the non-mutating promotion handoff report:
+
+```bash
+python benchmarks/prepare_i2sr_promotion_handoff.py \
+  --fork-url https://github.com/sabdulmajid/llama.cpp.git
+```
+
+The report is
+`benchmarks/results/i2sr_promotion_handoff_2026-05-13.md`. It records local
+patch applicability, the fork reachability probe, exact commands for creating
+and pushing the submodule branch, the superproject pointer-update commands, and
+the post-promotion gates. After the fork exists, rerun it with
+`--prepare-worktree`; add `--push` only when the fork URL is confirmed writable.
+
 To rehearse promotion with those split patches, including patched build,
 productization gate, patch reversal, and optional unpatched rebuild:
 

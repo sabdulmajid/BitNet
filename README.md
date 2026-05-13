@@ -191,6 +191,8 @@ The candidate active-patch productization proof is
 [benchmarks/results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.md](benchmarks/results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.md).
 The split-patch I2_SR promotion rehearsal is
 [benchmarks/results/row_scale_qtype_productization_gate_i2sr_promotion_rehearsal_2026-05-13.md](benchmarks/results/row_scale_qtype_productization_gate_i2sr_promotion_rehearsal_2026-05-13.md).
+The non-mutating I2_SR Git handoff preflight is
+[benchmarks/results/i2sr_promotion_handoff_2026-05-13.md](benchmarks/results/i2sr_promotion_handoff_2026-05-13.md).
 The MoE support audit is
 [benchmarks/results/moe_support_audit_2026-05-05.md](benchmarks/results/moe_support_audit_2026-05-05.md).
 The synthetic MoE packing contract audit is
