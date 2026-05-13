@@ -2,10 +2,10 @@
 Artifacts: `76`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 49072 | a21e17f7db8d |  |
+| README | tracked_report | yes | 49110 | 37e45f88c9de |  |
 | side_by_side_report | tracked_report | yes | 12803 | 1729d20a5d2a |  |
-| publishable_claims | tracked_report | yes | 10257 | 1dc76bd4d7da |  |
-| progress_audit | tracked_report | yes | 24169 | 34d41a3e1fc0 |  |
+| publishable_claims | tracked_report | yes | 10262 | 351f254f8573 |  |
+| progress_audit | tracked_report | yes | 24310 | 0c92c45d4949 |  |
 | active_goal_audit | tracked_report | yes | 9843 | 8a4a13da9ebf |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2174 | d6e0c6ec52ec |  |
@@ -19,7 +19,7 @@ Artifacts: `76`. Missing: `0`.
 | i2sr_qwen15b_candidate_report | tracked_report | yes | 2330 | 0e61281598ce |  |
 | i2sr_x86act_fix_report | tracked_report | yes | 2113 | 828c0baaa784 |  |
 | i2s_packing_layout_verify_report | tracked_report | yes | 1075 | c11acd561e3c |  |
-| i2sr_rss_report | tracked_report | yes | 1318 | 35a2a4b8c40b |  |
+| i2sr_rss_report | tracked_report | yes | 1698 | cd21d1ee3435 |  |
 | moe_report | tracked_report | yes | 1882 | 342ac496a28d |  |
 | latest_nonrow_audit | evidence_audit_md | yes | 4396 | 6d8c31e958f1 |  |
 | row_notie_5000_audit | evidence_audit_md | yes | 2569 | 4615a642257d |  |
@@ -51,7 +51,7 @@ Artifacts: `76`. Missing: `0`.
 | gguf_row_i2s_heapfix | gguf_summary_json | yes | 1647 | 734fa7c103f1 | rows=1, failed=0, nan=0, catastrophic=0, max_ppl=38.8832 |
 | gguf_row_i2s_thread_scaling | thread_scaling_json | yes | 2296 | 0396f5c951bd | rows=7, max_prefill=245.314, max_decode=19.4941 |
 | gguf_context_rss | gguf_memory_json | yes | 9911 | fd135b202cfd | rows=24, contexts=[512, 2048, 8192, 32768] |
-| i2sr_x86act_rss | gguf_memory_json | yes | 817 | 2c32abec22da | rows=1, contexts=[512] |
+| i2sr_x86act_rss | gguf_memory_json | yes | 2331 | 0ff7563901fb | rows=4, contexts=[512, 2048, 8192, 32768] |
 | direct_gguf_tiny | direct_gguf_json | yes | 1972 | a01c51bbb398 | arch=LlamaForCausalLM, outtype=f16, ternary=8, tensors=12, reader_rc=0, smoke_rc=None |
 | direct_gguf_qwen05b | direct_gguf_json | yes | 2546 | fb82f94beb57 | arch=Qwen2ForCausalLM, outtype=f16, ternary=168, tensors=291, reader_rc=0, smoke_rc=0 |
 | direct_i2s_tiny | direct_i2s_json | yes | 1087 | 496c4a2bac8d | arch=LlamaForCausalLM, packed=7, row_packed=0, out_f16=1, tensors=12, row_qtype=None, native_py_consts=False |

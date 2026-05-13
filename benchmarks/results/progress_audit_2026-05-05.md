@@ -127,8 +127,9 @@ The packed GGUF RSS probe is tracked at
 `benchmark_results/evidence_audit/qwen15b_row_i2s_rss.md`, which passes all six
 expected rows with positive RSS and zero return-code failures.
 The fixed direct `I2_SR` RSS probe is tracked at
-`benchmarks/results/i2sr_rss_2026-05-13.md`; it reports `1.250 GiB` at
-`-c 512` with the downstream qtype patch applied.
+`benchmarks/results/i2sr_rss_2026-05-13.md`; it reports `1.250`, `1.291`,
+`1.455`, and `2.114 GiB` at contexts `512`, `2048`, `8192`, and `32768` with
+the downstream qtype patch applied.
 
 The GGUF RSS context-scaling probe is tracked at
 `benchmarks/results/gguf_context_scaling_2026-05-05.md`. Its mechanical audit is
@@ -283,6 +284,7 @@ Key audited values:
 | Fixed Qwen2.5-1.5B row-scale `I2_SR` prompt tok/s on Xeon 4116 | 211.67 |
 | Fixed Qwen2.5-1.5B row-scale `I2_SR` decode tok/s on Xeon 4116 | 19.07 |
 | Fixed Qwen2.5-1.5B row-scale `I2_SR` max RSS at `-c 512` | 1.250 GiB |
+| Fixed Qwen2.5-1.5B row-scale `I2_SR` max RSS at `-c 32768` | 2.114 GiB |
 | Fixed `I2_SR` code-payload byte-layout verification | 5/5 tensors pass |
 | Qwen2.5-1.5B FP F16 GGUF max RSS at `-c 512` | 2.948 GiB |
 | Qwen2.5-1.5B FP Q4_K_M GGUF max RSS at `-c 512` | 0.985 GiB |

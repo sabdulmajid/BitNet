@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "a21e17f7db8dcc06b5a9638b372302789fb85d4c39fe24817278038cfc9316a4",
-      "size_bytes": 49072
+      "sha256": "37e45f88c9def32aed5ad5ec41efb9fd5b10913b650a53019a9cd6b369000b8f",
+      "size_bytes": 49110
     },
     {
       "exists": true,
@@ -25,8 +25,8 @@
       "label": "publishable_claims",
       "metrics": {},
       "path": "benchmarks/results/publishable_claims_2026-05-05.md",
-      "sha256": "1dc76bd4d7daee273acb0414836afb610c7b0cc2ce0ebc70489c0a411a7e773c",
-      "size_bytes": 10257
+      "sha256": "351f254f857318cacbfa3cdc1105c0841d3d820e38f7fec788080e97f602397e",
+      "size_bytes": 10262
     },
     {
       "exists": true,
@@ -34,8 +34,8 @@
       "label": "progress_audit",
       "metrics": {},
       "path": "benchmarks/results/progress_audit_2026-05-05.md",
-      "sha256": "34d41a3e1fc0cf21cd53bb32907d48fe89b2955eccd3082354aa1aeb9e0ed4e5",
-      "size_bytes": 24169
+      "sha256": "0c92c45d49491f929a566398543bebae5d2c9be9ecc2811e68b15f326441f923",
+      "size_bytes": 24310
     },
     {
       "exists": true,
@@ -160,8 +160,8 @@
       "label": "i2sr_rss_report",
       "metrics": {},
       "path": "benchmarks/results/i2sr_rss_2026-05-13.md",
-      "sha256": "35a2a4b8c40b4f22f1e093e8ddee4ffda3060d50e6a4c90e997219c347e8abf7",
-      "size_bytes": 1318
+      "sha256": "cd21d1ee3435e4d0f287d235397cce29973e6e0ff76f07cf73c1a6dad644b209",
+      "size_bytes": 1698
     },
     {
       "exists": true,
@@ -840,13 +840,16 @@
       "label": "i2sr_x86act_rss",
       "metrics": {
         "contexts": [
-          512
+          512,
+          2048,
+          8192,
+          32768
         ],
-        "rows": 1
+        "rows": 4
       },
-      "path": "benchmark_results/gguf-rss-qwen15b-i2sr-x86act-2026-05-13/summary.json",
-      "sha256": "2c32abec22da68fc2dde9afbf10ab74e9e11fa8315deea652d262072df8a8e1b",
-      "size_bytes": 817
+      "path": "benchmark_results/gguf-rss-qwen15b-i2sr-x86act-context-2026-05-13/summary.json",
+      "sha256": "0ff7563901fb8b9e0568d322bec965bf256b8223397a786c4bacfc67cd7f25b9",
+      "size_bytes": 2331
     },
     {
       "exists": true,
