@@ -59,6 +59,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "i2sr_rss_report", "kind": "tracked_report", "path": "benchmarks/results/i2sr_rss_2026-05-13.md"},
     {"label": "moe_report", "kind": "tracked_report", "path": "benchmarks/results/moe_support_audit_2026-05-05.md"},
     {"label": "moe_packing_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_packing_contract_2026-05-13.md"},
+    {"label": "unblock_requirements_report", "kind": "tracked_report", "path": "benchmarks/results/unblock_requirements_2026-05-13.md"},
     {"label": "i2sr_combined_patch", "kind": "tracked_report", "path": "patches/llama-i2sr-row-scale-qtype.patch"},
     {"label": "i2sr_root_runtime_patch", "kind": "tracked_report", "path": "patches/bitnet-i2sr-root-runtime.patch"},
     {"label": "i2sr_submodule_patch", "kind": "tracked_report", "path": "patches/llama-i2sr-row-scale-qtype.submodule.patch"},
@@ -129,6 +130,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "i2sr_submodule_promotion_audit_json", "kind": "i2sr_submodule_promotion_audit_json", "path": "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json"},
     {"label": "moe_support_json", "kind": "moe_support_json", "path": "benchmark_results/moe_support_audit_2026-05-05.json"},
     {"label": "moe_packing_contract_json", "kind": "moe_packing_contract_json", "path": "benchmark_results/moe_packing_contract_2026-05-13.json"},
+    {"label": "unblock_requirements_json", "kind": "unblock_requirements_json", "path": "benchmark_results/unblock_requirements_2026-05-13.json"},
     {"label": "tl2_generic_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json"},
     {"label": "tl2_avx512_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json"},
     {"label": "ptq_math", "kind": "math_json", "path": "benchmark_results/math_viability_gaussian_10trial_2026-05-05.json"},
@@ -463,6 +465,18 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "dense_2d_control": verdict.get("dense_2d_i2s_control_supported"),
             "blockers": data.get("blockers", []),
         }
+    if kind == "unblock_requirements_json":
+        requirements = data.get("requirements", [])
+        missing = [item for item in requirements if isinstance(item, dict) and item.get("status") == "missing"]
+        fork = data.get("candidate_fork_probe", {})
+        return {
+            "missing_count": data.get("missing_count"),
+            "requirements": len(requirements) if isinstance(requirements, list) else None,
+            "can_continue_productively_without_input": data.get("can_continue_productively_without_input"),
+            "objective_status": data.get("objective_status"),
+            "candidate_fork_reachable": fork.get("reachable") if isinstance(fork, dict) else None,
+            "missing": [item.get("name") for item in missing],
+        }
     if kind == "math_json":
         aggregate = data.get("aggregate", {})
         mean_abs = aggregate.get("mean_abs_ternary_repo_formula", {})
@@ -630,6 +644,12 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"i2sr_3d={metrics.get('i2sr_3d', '-')}, "
                 f"control_2d={metrics.get('dense_2d_control', '-')}, "
                 f"blockers={len(metrics.get('blockers', []))}"
+            )
+        elif entry["kind"] == "unblock_requirements_json":
+            summary = (
+                f"missing={metrics.get('missing_count', '-')}/{metrics.get('requirements', '-')}, "
+                f"can_continue={metrics.get('can_continue_productively_without_input', '-')}, "
+                f"fork_reachable={metrics.get('candidate_fork_reachable', '-')}"
             )
         elif entry["kind"] == "math_json":
             summary = f"trials={metrics.get('trials', '-')}, rel_error={fmt_metric(metrics.get('relative_output_fro_error_mean'))}"

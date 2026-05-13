@@ -232,6 +232,17 @@ The current scope gate is
 supported dense-Qwen negative result plus row-scale recovery path from
 unsupported one-click, TL2, default-runtime, and MoE/Kimi claims.
 
+To consolidate the inputs required before the remaining open claims can advance:
+
+```bash
+python benchmarks/audit_unblock_requirements.py
+```
+
+The current report is `benchmarks/results/unblock_requirements_2026-05-13.md`.
+It checks the writable `llama.cpp` fork requirement, local Kimi/Qwen2MoE
+artifacts, MoE packing readiness, and whether more local benchmarking can
+continue productively without new input.
+
 To verify the current MoE packing blocker with synthetic merged expert tensors:
 
 ```bash

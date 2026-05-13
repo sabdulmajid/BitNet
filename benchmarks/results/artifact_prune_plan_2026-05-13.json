@@ -1,7 +1,7 @@
 {
   "evidence_manifest": "benchmarks/results/evidence_manifest_2026-05-13.json",
-  "generated_utc": "2026-05-13T09:55:05+00:00",
-  "git_head": "04e3450d941e",
+  "generated_utc": "2026-05-13T09:59:38+00:00",
+  "git_head": "cd3c3034c315",
   "groups": {
     "keep_by_default_model_artifacts": [
       {
@@ -234,7 +234,7 @@
   },
   "protected_counts": {
     "benchmark_manifest_paths": 31,
-    "evidence_manifest_files": 98,
+    "evidence_manifest_files": 100,
     "protected_checkpoint_dirs": 12
   },
   "protected_paths": [
@@ -306,6 +306,7 @@
     "benchmark_results/tl2_row_scale_design_2026-05-13.json",
     "benchmark_results/tl2_scale_semantics_2026-05-05.json",
     "benchmark_results/tl2_shape_support_audit_2026-05-05.json",
+    "benchmark_results/unblock_requirements_2026-05-13.json",
     "benchmarks/results/active_goal_completion_audit_2026-05-05.md",
     "benchmarks/results/benchmark_coverage_gate_2026-05-13.md",
     "benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md",
@@ -334,6 +335,7 @@
     "benchmarks/results/tl2_row_scale_design_2026-05-13.md",
     "benchmarks/results/tl2_scale_semantics_2026-05-05.md",
     "benchmarks/results/tl2_shape_support_audit_2026-05-05.md",
+    "benchmarks/results/unblock_requirements_2026-05-13.md",
     "checkpoints/qwen2.5-0.5b-fineweb-edu-12/step-1000",
     "checkpoints/qwen2.5-0.5b-fineweb-edu-klonly-1000/step-1000",
     "checkpoints/qwen2.5-0.5b-fineweb-edu-klonly-notiehead-1000/step-1000",

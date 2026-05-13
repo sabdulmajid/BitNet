@@ -1,5 +1,5 @@
 {
-  "artifact_count": 98,
+  "artifact_count": 100,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "08a9e50003493196c01fd394d59c9dad45b99c673b9ad0c6b7d5398956930358",
-      "size_bytes": 51467
+      "sha256": "d392b8618cad97006b5d88a6ffb5c16d0451c45418762f216d31fef9b3e18767",
+      "size_bytes": 51626
     },
     {
       "exists": true,
@@ -70,8 +70,8 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-13.md",
-      "sha256": "e5ace2efd97d9cbbe54e02d2cafdf460675f841fa4ece7b2953081e5ed028d27",
-      "size_bytes": 4836
+      "sha256": "213c744a8bfdc26f428d7cc04478055decd42073c4d85659e614f265628ce1ef",
+      "size_bytes": 4837
     },
     {
       "exists": true,
@@ -97,8 +97,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-13.md",
-      "sha256": "1f927dd96365cd2db366d8c9f9aa8e66bbd7780589b34adf0b30bb0eaed6e6e2",
-      "size_bytes": 2865
+      "sha256": "f67f46e9d6378cc4963ab9877936530337386dd2f6a5c32426ae5a8d1b98a2e6",
+      "size_bytes": 2866
     },
     {
       "exists": true,
@@ -261,6 +261,15 @@
       "path": "benchmarks/results/moe_packing_contract_2026-05-13.md",
       "sha256": "41f1773d62d903796fb86fa6eb15fdbb3dc77236953495ffca08a65e5a2ebc3c",
       "size_bytes": 1310
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "unblock_requirements_report",
+      "metrics": {},
+      "path": "benchmarks/results/unblock_requirements_2026-05-13.md",
+      "sha256": "aba00d8146660a46404f267c4db9192db9956e5ddae3f6e25220076f3144e418",
+      "size_bytes": 1829
     },
     {
       "exists": true,
@@ -1668,8 +1677,8 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-13.json",
-      "sha256": "ad9f61fd268dfbcec73b33de7544020f38d8dfe227b7aec8ab61738b4c68539c",
-      "size_bytes": 5392
+      "sha256": "e8c6cf145330177fe1d6f9e7d7811378c2da37defa5291a2f625f19574e29e64",
+      "size_bytes": 5393
     },
     {
       "exists": true,
@@ -1686,8 +1695,8 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-13.json",
-      "sha256": "747a1c8a68bd06bf356b1ccf420af796669d8229cb599bd9ec7d4ace8face45d",
-      "size_bytes": 14705
+      "sha256": "bb18a8f23b5c4b7ae7b714bc4da67b249932523928a55d1be223d7c143688276",
+      "size_bytes": 14707
     },
     {
       "exists": true,
@@ -1763,6 +1772,28 @@
       "path": "benchmark_results/moe_packing_contract_2026-05-13.json",
       "sha256": "1abe9027c4b80325cd840be405edee340de9495c800f48da26220e89d387f0c5",
       "size_bytes": 1514
+    },
+    {
+      "exists": true,
+      "kind": "unblock_requirements_json",
+      "label": "unblock_requirements_json",
+      "metrics": {
+        "can_continue_productively_without_input": false,
+        "candidate_fork_reachable": false,
+        "missing": [
+          "Writable llama.cpp fork or branch",
+          "GitHub automation credential",
+          "Local Kimi/Qwen2MoE model artifact",
+          "MoE 3D expert tensor packing support",
+          "MoE quality/locality benchmark artifacts"
+        ],
+        "missing_count": 5,
+        "objective_status": "not_complete",
+        "requirements": 5
+      },
+      "path": "benchmark_results/unblock_requirements_2026-05-13.json",
+      "sha256": "65d12be0467985730bafaa5cf68a1888c66c3129e6ff46c8d6308bafa4aa380c",
+      "size_bytes": 2174
     },
     {
       "exists": true,
