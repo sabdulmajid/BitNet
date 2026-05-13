@@ -1,23 +1,24 @@
 # Evidence Manifest, 2026-05-13
-Artifacts: `72`. Missing: `0`.
+Artifacts: `74`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 48822 | a5e247698cca |  |
+| README | tracked_report | yes | 48943 | c5cc278e76ef |  |
 | side_by_side_report | tracked_report | yes | 12803 | 1729d20a5d2a |  |
-| publishable_claims | tracked_report | yes | 9964 | 612e61a0deb2 |  |
-| progress_audit | tracked_report | yes | 23484 | 0fd781748e8e |  |
-| active_goal_audit | tracked_report | yes | 9666 | e6b8733c3c90 |  |
+| publishable_claims | tracked_report | yes | 10078 | b3df90102b6e |  |
+| progress_audit | tracked_report | yes | 23926 | 8bea0052af61 |  |
+| active_goal_audit | tracked_report | yes | 9775 | 65c06a16a35c |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
-| direct_packed_gguf_support_report | tracked_report | yes | 2060 | 0339aa3955da |  |
+| direct_packed_gguf_support_report | tracked_report | yes | 2174 | d6e0c6ec52ec |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
 | direct_row_i2s_qwen05b_report | tracked_report | yes | 3967 | f5f6d912626b |  |
 | tl2_shape_report | tracked_report | yes | 2817 | 8dddd65315e0 |  |
 | tl2_probe_report | tracked_report | yes | 3608 | dd7e4fa29cc1 |  |
 | tl2_scale_report | tracked_report | yes | 2321 | 30bbfbd22559 |  |
 | i2s_row_scale_format_report | tracked_report | yes | 1759 | 256abf73581c |  |
-| row_scale_qtype_productization_gate_report | tracked_report | yes | 2301 | f90176f61c4b |  |
+| row_scale_qtype_productization_gate_report | tracked_report | yes | 2516 | a91218189066 |  |
 | i2sr_qwen15b_candidate_report | tracked_report | yes | 2330 | 0e61281598ce |  |
 | i2sr_x86act_fix_report | tracked_report | yes | 2113 | 828c0baaa784 |  |
+| i2s_packing_layout_verify_report | tracked_report | yes | 1075 | c11acd561e3c |  |
 | moe_report | tracked_report | yes | 1882 | 342ac496a28d |  |
 | latest_nonrow_audit | evidence_audit_md | yes | 4396 | 6d8c31e958f1 |  |
 | row_notie_5000_audit | evidence_audit_md | yes | 2569 | 4615a642257d |  |
@@ -66,11 +67,12 @@ Artifacts: `72`. Missing: `0`.
 | row_f16_qwen05b_suite | gguf_summary_json | yes | 2575 | cc4583593042 | rows=2, failed=0, nan=0, catastrophic=0, max_ppl=578.483 |
 | row_i2s_quantized_qwen05b_suite | gguf_summary_json | yes | 2645 | 23b71114cdae | rows=2, failed=0, nan=1, catastrophic=0, max_ppl=18.0986 |
 | row_tq2_qwen05b_suite | gguf_summary_json | yes | 2667 | d3005c427d44 | rows=2, failed=0, nan=0, catastrophic=1, max_ppl=5.11853e+06 |
-| direct_packed_gguf_support_json | direct_packed_support_json | yes | 2601 | 95e3680e8067 | dense=True, packed_i2s=True, row_safe=False |
+| direct_packed_gguf_support_json | direct_packed_support_json | yes | 2798 | 4130b3f67c9e | dense=True, packed_i2s=True, row_safe=False |
 | tl2_shape_json | tl2_shape_json | yes | 12054 | a99430f0f4b0 |  |
 | tl2_scale_json | tl2_scale_json | yes | 14344 | bf2d36674b72 | qwen15b_tensor_scale err=0; qwen15b_row_scale err=1.90423 |
 | i2s_row_scale_format_json | i2s_format_json | yes | 1528 | e17297539b9d | default_ratio=30836.2, prototype_ratio=1.00157, stable_format_required=True |
-| row_scale_qtype_productization_gate_json | row_scale_qtype_gate_json | yes | 3112 | 7cd6bdc00fc2 | passed=False, gates=8, failed=3, stable_qtype=False, writer=True, stable_quality=True, stable_max_ppl=38.8477 |
+| row_scale_qtype_productization_gate_json | row_scale_qtype_gate_json | yes | 3604 | 223df0d152f9 | passed=False, gates=9, failed=3, stable_qtype=False, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
+| i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
 | tl2_generic_summary | gguf_summary_json | yes | 4494 | 306a682203b2 | rows=4, failed=2, nan=1, catastrophic=0, max_ppl=18.8044 |
 | tl2_avx512_summary | gguf_summary_json | yes | 4573 | 6ec820472f37 | rows=4, failed=0, nan=2, catastrophic=0, max_ppl=18.8239 |
 | ptq_math | math_json | yes | 14010 | 8cedd88658e0 | trials=10, rel_error=0.512542 |

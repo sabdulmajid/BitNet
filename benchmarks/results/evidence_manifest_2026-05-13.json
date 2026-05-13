@@ -1,5 +1,5 @@
 {
-  "artifact_count": 72,
+  "artifact_count": 74,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "a5e247698cca415c254043abc4fd0232f9662921d123f43824010f8fd3752c5d",
-      "size_bytes": 48822
+      "sha256": "c5cc278e76ef16039c20e164439b333424f11e046947e0a392391ded681f062b",
+      "size_bytes": 48943
     },
     {
       "exists": true,
@@ -25,8 +25,8 @@
       "label": "publishable_claims",
       "metrics": {},
       "path": "benchmarks/results/publishable_claims_2026-05-05.md",
-      "sha256": "612e61a0deb2e06ca1b82541d471c2730e417eb7ae2a1a1a29d22fe0d9d9a209",
-      "size_bytes": 9964
+      "sha256": "b3df90102b6e8c1fc131eac044f9777eaa0a94b0a9132e9da6bd42d85b3dda1c",
+      "size_bytes": 10078
     },
     {
       "exists": true,
@@ -34,8 +34,8 @@
       "label": "progress_audit",
       "metrics": {},
       "path": "benchmarks/results/progress_audit_2026-05-05.md",
-      "sha256": "0fd781748e8e218db76c46b1653f90cd5714961f0d5a1acf73a6f0ef811e4143",
-      "size_bytes": 23484
+      "sha256": "8bea0052af6121fbaf58f724160dfa818916424e6623097f4dfeb936ba381d25",
+      "size_bytes": 23926
     },
     {
       "exists": true,
@@ -43,8 +43,8 @@
       "label": "active_goal_audit",
       "metrics": {},
       "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md",
-      "sha256": "e6b8733c3c906014c21c312ca99506a7b5a97e0b0f1c3d2314aedab0a6bbb15d",
-      "size_bytes": 9666
+      "sha256": "65c06a16a35c05852de04fa3760df0566426b2c05c1fad676d05ff217c7a683f",
+      "size_bytes": 9775
     },
     {
       "exists": true,
@@ -61,8 +61,8 @@
       "label": "direct_packed_gguf_support_report",
       "metrics": {},
       "path": "benchmarks/results/direct_packed_gguf_support_2026-05-13.md",
-      "sha256": "0339aa3955da5154f2354d173844d2647fd24d496e6935ca441497b5fa004344",
-      "size_bytes": 2060
+      "sha256": "d6e0c6ec52ecf68cd1371c78120c3fda965695433a164d81d32d49ee0b30ed32",
+      "size_bytes": 2174
     },
     {
       "exists": true,
@@ -124,8 +124,8 @@
       "label": "row_scale_qtype_productization_gate_report",
       "metrics": {},
       "path": "benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md",
-      "sha256": "f90176f61c4b331ecdab3ea85eb972f8565069f8cafe9e231cd99ebfc7cde01a",
-      "size_bytes": 2301
+      "sha256": "a912181890668473a4adff38fced90ae87cd1b2411973de429e7caa61c15a41a",
+      "size_bytes": 2516
     },
     {
       "exists": true,
@@ -144,6 +144,15 @@
       "path": "benchmarks/results/i2sr_x86act_fix_2026-05-13.md",
       "sha256": "828c0baaa784b20ce156b48acc2e7e3ecaf96502d6c6a6ee6d91c8d30566f426",
       "size_bytes": 2113
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2s_packing_layout_verify_report",
+      "metrics": {},
+      "path": "benchmarks/results/i2s_packing_layout_verify_2026-05-13.md",
+      "sha256": "c11acd561e3c069ab3595231a42fcdb48974b2a3fc06727531d6e18412f9cb4c",
+      "size_bytes": 1075
     },
     {
       "exists": true,
@@ -1307,8 +1316,8 @@
         "requires_stable_row_scale_type_or_version": true
       },
       "path": "benchmark_results/direct_packed_gguf_support_2026-05-13.json",
-      "sha256": "95e3680e8067cbfe49f1c3b3bdbbfa520be57e21de4021466313ca733c43e4e6",
-      "size_bytes": 2601
+      "sha256": "4130b3f67c9ee943cdf4d3bece395d7214e30070cbb96e935d150889a331bcb4",
+      "size_bytes": 2798
     },
     {
       "exists": true,
@@ -1402,9 +1411,11 @@
           "stable llama file type is defined",
           "runtime routes stable qtype without changing I2_S"
         ],
-        "gates": 8,
+        "gates": 9,
         "has_ggml_stable_qtype": false,
         "has_llama_stable_ftype": false,
+        "packing_verification_checked_tensors": 5,
+        "packing_verification_passed": true,
         "passed": false,
         "prototype_ratio": 1.0015661061655128,
         "stable_benchmark_max_ppl": 38.8477,
@@ -1412,8 +1423,21 @@
         "stable_benchmark_quality_ok": true
       },
       "path": "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json",
-      "sha256": "7cd6bdc00fc220adda299f3f2e83bdb670f170228f39799e6ea205689dccf4d3",
-      "size_bytes": 3112
+      "sha256": "223df0d152f9ab166c7c8dfd445eb753585996c0ed974bf4a3858f2017412f9b",
+      "size_bytes": 3604
+    },
+    {
+      "exists": true,
+      "kind": "packing_verify_json",
+      "label": "i2s_packing_layout_verify_json",
+      "metrics": {
+        "checked_tensors": 5,
+        "passed": true,
+        "passed_tensors": 5
+      },
+      "path": "benchmark_results/i2s-packing-layout-verify-2026-05-13/summary.json",
+      "sha256": "88fee552ba2ebc123fc8063f3b1ab94f67acbeadc29b90df5c7d0abe23bcc7c3",
+      "size_bytes": 3409
     },
     {
       "exists": true,

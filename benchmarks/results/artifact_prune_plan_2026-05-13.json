@@ -1,7 +1,7 @@
 {
   "evidence_manifest": "benchmarks/results/evidence_manifest_2026-05-13.json",
-  "generated_utc": "2026-05-13T06:06:56+00:00",
-  "git_head": "82284d67d78c",
+  "generated_utc": "2026-05-13T06:14:53+00:00",
+  "git_head": "3eba3acd9e51",
   "groups": {
     "keep_by_default_model_artifacts": [
       {
@@ -234,7 +234,7 @@
   },
   "protected_counts": {
     "benchmark_manifest_paths": 31,
-    "evidence_manifest_files": 72,
+    "evidence_manifest_files": 74,
     "protected_checkpoint_dirs": 12
   },
   "protected_paths": [
@@ -262,6 +262,7 @@
     "benchmark_results/gguf-qwen15b-klonly-suite/summary.json",
     "benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json",
     "benchmark_results/gguf-rss-qwen15b-context-scaling-2026-05-05/summary.json",
+    "benchmark_results/i2s-packing-layout-verify-2026-05-13/summary.json",
     "benchmark_results/i2s-row-scale-thread-scaling-fixed-2026-05-05/summary.json",
     "benchmark_results/i2s_row_scale_format_audit_2026-05-13.json",
     "benchmark_results/i2sr-row-scale-qwen15b-convert-2026-05-13/summary.json",
@@ -300,6 +301,7 @@
     "benchmarks/results/direct_packed_gguf_support_2026-05-13.md",
     "benchmarks/results/direct_row_i2s_qwen05b_2026-05-13.md",
     "benchmarks/results/direct_static_ternary_gguf_2026-05-13.md",
+    "benchmarks/results/i2s_packing_layout_verify_2026-05-13.md",
     "benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md",
     "benchmarks/results/i2sr_qwen15b_candidate_2026-05-13.md",
     "benchmarks/results/i2sr_x86act_fix_2026-05-13.md",

@@ -85,6 +85,18 @@ def summarize_stable_qtype_benchmark(path: Path, catastrophic_ppl_threshold: flo
     }
 
 
+def summarize_packing_verification(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {"exists": False, "passed": False, "checked_tensors": 0, "passed_tensors": 0}
+    data = read_json(path)
+    return {
+        "exists": True,
+        "passed": bool(data.get("passed")),
+        "checked_tensors": data.get("checked_tensors", 0),
+        "passed_tensors": data.get("passed_tensors", 0),
+    }
+
+
 def audit(args: argparse.Namespace) -> dict[str, Any]:
     format_audit = read_json(args.format_audit_json)
     evidence_manifest = read_json(args.evidence_manifest_json)
@@ -120,6 +132,7 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
     prototype_quality_ok = isinstance(prototype_ratio, (int, float)) and float(prototype_ratio) <= args.prototype_max_ppl_ratio
     default_failure_proven = isinstance(default_ratio, (int, float)) and float(default_ratio) >= args.default_failure_min_ratio
     stable_benchmark = summarize_stable_qtype_benchmark(args.stable_qtype_summary_json, args.catastrophic_ppl_threshold)
+    packing_verification = summarize_packing_verification(args.packing_verification_json)
     stable_benchmark_present = (
         "i2sr_row_scale_qwen15b_suite" in labels
         or "i2rs_row_scale_qwen15b_suite" in labels
@@ -176,6 +189,12 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
             str(args.stable_qtype_summary_json),
             f"Stable qtype benchmark is missing or has catastrophic/invalid PPL >= {args.catastrophic_ppl_threshold:g}.",
         ),
+        make_gate(
+            "direct I2_SR packing matches known-good x86 layout",
+            bool(packing_verification["passed"]),
+            str(args.packing_verification_json),
+            "No passing byte-layout regression comparing direct I2_SR codes to the known-good quantizer layout.",
+        ),
     ]
 
     return {
@@ -190,6 +209,7 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
             "direct_writer": str(args.direct_writer),
             "row_patch": str(args.row_patch),
             "stable_qtype_summary_json": str(args.stable_qtype_summary_json),
+            "packing_verification_json": str(args.packing_verification_json),
         },
         "thresholds": {
             "prototype_max_ppl_ratio": args.prototype_max_ppl_ratio,
@@ -208,6 +228,10 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
             "stable_benchmark_rows": stable_benchmark["rows"],
             "stable_benchmark_max_ppl": stable_benchmark["max_ppl"],
             "stable_benchmark_failed_returncodes": stable_benchmark["failed_returncodes"],
+            "packing_verification_present": packing_verification["exists"],
+            "packing_verification_passed": packing_verification["passed"],
+            "packing_verification_checked_tensors": packing_verification["checked_tensors"],
+            "packing_verification_passed_tensors": packing_verification["passed_tensors"],
         },
         "gates": gates,
         "passed": all(gate["passed"] for gate in gates),
@@ -262,6 +286,8 @@ def build_report(result: dict[str, Any]) -> str:
         f"- Stable qtype benchmark present in manifest: `{obs['stable_benchmark_present']}`.",
         f"- Stable qtype benchmark quality acceptable: `{obs['stable_benchmark_quality_ok']}`.",
         f"- Stable qtype benchmark max finite PPL: `{fmt(obs['stable_benchmark_max_ppl'], 4)}`.",
+        f"- Direct `I2_SR` packing byte-layout verification passed: `{obs['packing_verification_passed']}` "
+        f"({obs['packing_verification_passed_tensors']}/{obs['packing_verification_checked_tensors']} tensors).",
         "",
         "## Interpretation",
         "",
@@ -283,6 +309,7 @@ def main() -> None:
     parser.add_argument("--direct-writer", type=Path, default=Path("benchmarks/convert_static_ternary_to_i2s_gguf.py"))
     parser.add_argument("--row-patch", type=Path, default=Path("patches/llama-i2s-row-scale.patch"))
     parser.add_argument("--stable-qtype-summary-json", type=Path, default=Path("benchmark_results/i2sr-row-scale-qwen15b-x86act-suite-2026-05-13/summary.json"))
+    parser.add_argument("--packing-verification-json", type=Path, default=Path("benchmark_results/i2s-packing-layout-verify-2026-05-13/summary.json"))
     parser.add_argument("--prototype-max-ppl-ratio", type=float, default=1.01)
     parser.add_argument("--default-failure-min-ratio", type=float, default=10.0)
     parser.add_argument("--catastrophic-ppl-threshold", type=float, default=1.0e4)

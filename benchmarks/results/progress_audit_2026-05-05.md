@@ -116,6 +116,12 @@ one dense F16 output tensor. The first Qwen2.5-1.5B artifact failed at PPL
 prompt tok/s, and `19.07` decode tok/s. The fix note is
 `benchmarks/results/i2sr_x86act_fix_2026-05-13.md`.
 
+The direct I2-style byte-layout verifier is tracked at
+`benchmarks/results/i2s_packing_layout_verify_2026-05-13.md`. It compares the
+fixed direct `I2_SR` code payload against the known-good row-scale `I2_S`
+prototype for five tensors and passes `5/5`, including `blk.0.attn_q.weight`
+with SHA-256 prefix `efe477cf31e2`.
+
 The packed GGUF RSS probe is tracked at
 `benchmarks/results/gguf_memory_2026-05-05.md`. Its mechanical audit is
 `benchmark_results/evidence_audit/qwen15b_row_i2s_rss.md`, which passes all six
@@ -273,6 +279,7 @@ Key audited values:
 | Fixed Qwen2.5-1.5B row-scale `I2_SR` PPL on Xeon 4116 | 38.8477 |
 | Fixed Qwen2.5-1.5B row-scale `I2_SR` prompt tok/s on Xeon 4116 | 211.67 |
 | Fixed Qwen2.5-1.5B row-scale `I2_SR` decode tok/s on Xeon 4116 | 19.07 |
+| Fixed `I2_SR` code-payload byte-layout verification | 5/5 tensors pass |
 | Qwen2.5-1.5B FP F16 GGUF max RSS at `-c 512` | 2.948 GiB |
 | Qwen2.5-1.5B FP Q4_K_M GGUF max RSS at `-c 512` | 0.985 GiB |
 | Qwen2.5-1.5B row-scale dense-head I2_S max RSS at `-c 512` | 1.250 GiB |
@@ -298,16 +305,16 @@ Key audited values:
    compatibility policy, and regeneration of affected artifacts. The
    row-scale format audit shows the prototype currently overloads the existing
    `I2_S` type. The fixed candidate `I2_SR` patch and writer mode now preserve
-   quality, but the productization gate still fails until the stable qtype is
-   active in the runtime and covered by regression tests.
+   quality and has byte-layout regression coverage, but the productization gate
+   still fails until the stable qtype is active in the runtime.
 2. Native quality-preserving direct packed GGUF writing from
    `ternary_state_dict.pt` is not complete. Static-ternary dense GGUF export
    now has two validated bridges, scalar direct `I2_S` export is loadable with
    finite but weak Qwen2.5-0.5B PPL `423.4528`, and direct row-scale prototype
    export is mechanically possible but catastrophic on the Qwen2.5-0.5B row
    control. The fixed direct `I2_SR` path validates the stronger 1.5B row
-   checkpoint, but it still needs an active stable qtype/runtime contract and
-   regression tests.
+   checkpoint and byte-validates against the known-good quantizer layout, but
+   it still needs an active stable qtype/runtime contract.
 3. Qwen TL2 is not complete. Dense Qwen2.5-0.5B TL2 export now works after
    exact shape codegen and a matching TL2 build, but the tested checkpoint has
    NaN PPL. `llama-quantize` still does not expose TL2, Qwen2MoE/Kimi are not

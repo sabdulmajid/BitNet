@@ -19,6 +19,7 @@ This audit distinguishes direct dense GGUF export, scalar direct packed `I2_S` e
 | direct_i2s_writer_has_i2s_fallback | True |
 | direct_i2s_writer_has_i2sr_mode | True |
 | direct_converter_blocks_quantized_by_default | True |
+| direct_i2sr_packing_byte_verified | True |
 | row_scale_patch_reuses_i2s_type | True |
 | row_scale_patch_changes_i2s_nbytes | True |
 
@@ -31,6 +32,7 @@ This audit distinguishes direct dense GGUF export, scalar direct packed `I2_S` e
 | direct_packed_i2s_supported_via_native_py_stack | False |
 | candidate_i2sr_writer_supported | True |
 | candidate_i2sr_quality_valid | True |
+| candidate_i2sr_layout_verified | True |
 | product_safe_row_scale_packed_supported | False |
 | requires_python_gguf_i2s_support | True |
 | requires_stable_row_scale_type_or_version | True |
@@ -40,9 +42,9 @@ This audit distinguishes direct dense GGUF export, scalar direct packed `I2_S` e
 
 1. Keep scalar direct I2_S covered by load/run evidence after the x86 ACT packing fix.
 2. Promote the candidate I2_SR patch into the active runtime or carry it as an explicit downstream patch.
-3. Add regression tests that byte-compare direct I2_SR packing against the known-good quantizer layout.
+3. Keep byte-layout regression coverage for direct I2_SR packing against the known-good quantizer layout.
 4. Only then claim product-safe direct packed row-scale GGUF support.
 
 ## Interpretation
 
-Scalar direct packed `I2_S` export is mechanically supported by the self-contained writer. Row-scale direct export is now quality-valid through the fixed x86 ACT `I2_SR` candidate path on Qwen2.5-1.5B, but it remains not product-complete because the cleaner row-scale qtype is still a downstream patch rather than active/default runtime support.
+Scalar direct packed `I2_S` export is mechanically supported by the self-contained writer. Row-scale direct export is now quality-valid and byte-layout-verified through the fixed x86 ACT `I2_SR` candidate path on Qwen2.5-1.5B, but it remains not product-complete because the cleaner row-scale qtype is still a downstream patch rather than active/default runtime support.

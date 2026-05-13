@@ -16,6 +16,7 @@ Overall status: `fail`.
 | direct writer emits stable row-scale qtype | pass | benchmarks/convert_static_ternary_to_i2s_gguf.py |  |
 | stable qtype benchmark evidence exists | pass | benchmarks/results/evidence_manifest_2026-05-13.json |  |
 | stable qtype benchmark preserves quality | pass | benchmark_results/i2sr-row-scale-qwen15b-x86act-suite-2026-05-13/summary.json |  |
+| direct I2_SR packing matches known-good x86 layout | pass | benchmark_results/i2s-packing-layout-verify-2026-05-13/summary.json |  |
 
 ## Observations
 
@@ -28,6 +29,7 @@ Overall status: `fail`.
 - Stable qtype benchmark present in manifest: `True`.
 - Stable qtype benchmark quality acceptable: `True`.
 - Stable qtype benchmark max finite PPL: `38.8477`.
+- Direct `I2_SR` packing byte-layout verification passed: `True` (5/5 tensors).
 
 ## Interpretation
 

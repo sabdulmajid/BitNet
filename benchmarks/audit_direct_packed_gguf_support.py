@@ -14,6 +14,10 @@ def read(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="replace")
 
 
+def read_json(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+
+
 def has(pattern: str, text: str) -> bool:
     return re.search(pattern, text, flags=re.MULTILINE | re.DOTALL) is not None
 
@@ -35,6 +39,7 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
     direct_i2s_writer = read(args.direct_i2s_writer)
     direct_converter = read(args.direct_converter)
     row_patch = read(args.row_scale_patch)
+    packing_verification = read_json(args.packing_verification_json)
 
     checks = {
         "cxx_has_i2s_ggml_type": has(r"GGML_TYPE_I2_S\s*=\s*36", ggml_h),
@@ -50,6 +55,7 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
         "direct_i2s_writer_has_i2s_fallback": 'NamedInt(36, "I2_S")' in direct_i2s_writer,
         "direct_i2s_writer_has_i2sr_mode": "--row-scale-qtype" in direct_i2s_writer and "I2_SR" in direct_i2s_writer,
         "direct_converter_blocks_quantized_by_default": "--allow-converter-quantized-outtype" in direct_converter,
+        "direct_i2sr_packing_byte_verified": bool(packing_verification.get("passed")),
         "row_scale_patch_reuses_i2s_type": (
             "GGML_TYPE_I2_S" in row_patch
             and "GGML_TYPE_I2_RS" not in row_patch
@@ -80,6 +86,7 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
     )
     candidate_i2sr_writer_supported = checks["direct_i2s_writer_has_i2sr_mode"] and Path(args.i2sr_writer_smoke_summary).exists()
     candidate_i2sr_quality_valid = Path(args.i2sr_qwen15b_summary).exists()
+    candidate_i2sr_layout_verified = checks["direct_i2sr_packing_byte_verified"]
     product_safe_row_scale_packed_supported = False
 
     return {
@@ -98,6 +105,7 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
             "direct_i2s_qwen_summary": str(args.direct_i2s_qwen_summary),
             "i2sr_writer_smoke_summary": str(args.i2sr_writer_smoke_summary),
             "i2sr_qwen15b_summary": str(args.i2sr_qwen15b_summary),
+            "packing_verification_json": str(args.packing_verification_json),
         },
         "checks": checks,
         "verdict": {
@@ -106,6 +114,7 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
             "direct_packed_i2s_supported_via_native_py_stack": direct_packed_i2s_supported_via_native_py_stack,
             "candidate_i2sr_writer_supported": candidate_i2sr_writer_supported,
             "candidate_i2sr_quality_valid": candidate_i2sr_quality_valid,
+            "candidate_i2sr_layout_verified": candidate_i2sr_layout_verified,
             "product_safe_row_scale_packed_supported": product_safe_row_scale_packed_supported,
             "requires_python_gguf_i2s_support": not checks["py_gguf_has_i2s_quant_type"],
             "requires_stable_row_scale_type_or_version": checks["row_scale_patch_reuses_i2s_type"],
@@ -114,7 +123,7 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
         "required_gates": [
             "Keep scalar direct I2_S covered by load/run evidence after the x86 ACT packing fix.",
             "Promote the candidate I2_SR patch into the active runtime or carry it as an explicit downstream patch.",
-            "Add regression tests that byte-compare direct I2_SR packing against the known-good quantizer layout.",
+            "Keep byte-layout regression coverage for direct I2_SR packing against the known-good quantizer layout.",
             "Only then claim product-safe direct packed row-scale GGUF support.",
         ],
     }
@@ -137,7 +146,7 @@ def build_report(result: dict[str, Any]) -> str:
             "## Required Gates",
             gates,
             "## Interpretation",
-            "Scalar direct packed `I2_S` export is mechanically supported by the self-contained writer. Row-scale direct export is now quality-valid through the fixed x86 ACT `I2_SR` candidate path on Qwen2.5-1.5B, but it remains not product-complete because the cleaner row-scale qtype is still a downstream patch rather than active/default runtime support.",
+            "Scalar direct packed `I2_S` export is mechanically supported by the self-contained writer. Row-scale direct export is now quality-valid and byte-layout-verified through the fixed x86 ACT `I2_SR` candidate path on Qwen2.5-1.5B, but it remains not product-complete because the cleaner row-scale qtype is still a downstream patch rather than active/default runtime support.",
         ]
     )
 
@@ -158,6 +167,7 @@ def main() -> None:
     parser.add_argument("--direct-i2s-qwen-summary", type=Path, default=Path("benchmark_results/direct-i2s-qwen05b-klonly-x86act-2026-05-13/summary.json"))
     parser.add_argument("--i2sr-writer-smoke-summary", type=Path, default=Path("benchmark_results/i2sr-writer-smoke-2026-05-13/summary.json"))
     parser.add_argument("--i2sr-qwen15b-summary", type=Path, default=Path("benchmark_results/i2sr-row-scale-qwen15b-x86act-suite-2026-05-13/summary.json"))
+    parser.add_argument("--packing-verification-json", type=Path, default=Path("benchmark_results/i2s-packing-layout-verify-2026-05-13/summary.json"))
     parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/direct_packed_gguf_support_2026-05-13.json"))
     parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/direct_packed_gguf_support_2026-05-13.md"))
     args = parser.parse_args()

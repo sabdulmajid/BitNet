@@ -117,8 +117,10 @@ conservative:
   layout. After fixing the writer, the strong Qwen2.5-1.5B row-scale checkpoint
   loads and runs as `196` `i2_sr` tensors at PPL `38.8477`, `211.67` prompt
   tok/s, and `19.07` decode tok/s on the Xeon 4116. This is quality-equivalent
-  to the older patched row-scale `I2_S` prototype at PPL `38.8832`, but it is
-  still a downstream candidate patch, not an upstream/default runtime contract.
+  to the older patched row-scale `I2_S` prototype at PPL `38.8832`. A
+  byte-layout verifier now compares five representative tensors against the
+  known-good prototype and passes `5/5`; the path is still a downstream
+  candidate patch, not an upstream/default runtime contract.
 - **TL2 is now a partial dense-Qwen engineering probe, not a product claim.**
   This fork can generate a Qwen2.5-0.5B TL2 GGUF only after exact
   model-specific TL2 code generation and a matching `BITNET_X86_TL2=ON`

@@ -46,6 +46,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "row_scale_qtype_productization_gate_report", "kind": "tracked_report", "path": "benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md"},
     {"label": "i2sr_qwen15b_candidate_report", "kind": "tracked_report", "path": "benchmarks/results/i2sr_qwen15b_candidate_2026-05-13.md"},
     {"label": "i2sr_x86act_fix_report", "kind": "tracked_report", "path": "benchmarks/results/i2sr_x86act_fix_2026-05-13.md"},
+    {"label": "i2s_packing_layout_verify_report", "kind": "tracked_report", "path": "benchmarks/results/i2s_packing_layout_verify_2026-05-13.md"},
     {"label": "moe_report", "kind": "tracked_report", "path": "benchmarks/results/moe_support_audit_2026-05-05.md"},
     # Mechanical audits.
     {"label": "latest_nonrow_audit", "kind": "evidence_audit_md", "path": "benchmark_results/evidence_audit/latest_nonrow.md"},
@@ -103,6 +104,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "tl2_scale_json", "kind": "tl2_scale_json", "path": "benchmark_results/tl2_scale_semantics_2026-05-05.json"},
     {"label": "i2s_row_scale_format_json", "kind": "i2s_format_json", "path": "benchmark_results/i2s_row_scale_format_audit_2026-05-13.json"},
     {"label": "row_scale_qtype_productization_gate_json", "kind": "row_scale_qtype_gate_json", "path": "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json"},
+    {"label": "i2s_packing_layout_verify_json", "kind": "packing_verify_json", "path": "benchmark_results/i2s-packing-layout-verify-2026-05-13/summary.json"},
     {"label": "tl2_generic_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json"},
     {"label": "tl2_avx512_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json"},
     {"label": "ptq_math", "kind": "math_json", "path": "benchmark_results/math_viability_gaussian_10trial_2026-05-05.json"},
@@ -351,6 +353,14 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "stable_benchmark_present": observations.get("stable_benchmark_present"),
             "stable_benchmark_quality_ok": observations.get("stable_benchmark_quality_ok"),
             "stable_benchmark_max_ppl": observations.get("stable_benchmark_max_ppl"),
+            "packing_verification_passed": observations.get("packing_verification_passed"),
+            "packing_verification_checked_tensors": observations.get("packing_verification_checked_tensors"),
+        }
+    if kind == "packing_verify_json":
+        return {
+            "passed": data.get("passed"),
+            "checked_tensors": data.get("checked_tensors"),
+            "passed_tensors": data.get("passed_tensors"),
         }
     if kind == "math_json":
         aggregate = data.get("aggregate", {})
@@ -459,7 +469,14 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"stable_qtype={metrics.get('has_ggml_stable_qtype', '-')}, "
                 f"writer={metrics.get('direct_writer_emits_stable_qtype', '-')}, "
                 f"stable_quality={metrics.get('stable_benchmark_quality_ok', '-')}, "
-                f"stable_max_ppl={fmt_metric(metrics.get('stable_benchmark_max_ppl'))}"
+                f"stable_max_ppl={fmt_metric(metrics.get('stable_benchmark_max_ppl'))}, "
+                f"layout_verified={metrics.get('packing_verification_passed', '-')}"
+            )
+        elif entry["kind"] == "packing_verify_json":
+            summary = (
+                f"passed={metrics.get('passed', '-')}, "
+                f"checked={metrics.get('checked_tensors', '-')}, "
+                f"passed_tensors={metrics.get('passed_tensors', '-')}"
             )
         elif entry["kind"] == "math_json":
             summary = f"trials={metrics.get('trials', '-')}, rel_error={fmt_metric(metrics.get('relative_output_fro_error_mean'))}"

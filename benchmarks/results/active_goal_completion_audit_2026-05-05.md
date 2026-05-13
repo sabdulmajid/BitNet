@@ -39,7 +39,7 @@ expanding the evidence manifest.
 | Row-scale versus tensor-scale | complete for Qwen2.5-1.5B dense-head | row-scale full ten-task mean `0.499459`; paired CI `[+0.009028, +0.021134]` vs tensor-scale dense-head | still below FP |
 | GGUF conversion and packed CPU inference | partial | static-ternary materialization, reusable bridge runner `benchmarks/build_static_ternary_gguf_bridge.py`, direct dense GGUF bridge `benchmarks/convert_static_ternary_to_gguf.py`, direct scalar/row-prototype/`I2_SR` writer `benchmarks/convert_static_ternary_to_i2s_gguf.py`, direct packed support audit `benchmarks/results/direct_packed_gguf_support_2026-05-13.md`, direct row control `benchmarks/results/direct_row_i2s_qwen05b_2026-05-13.md`, candidate `I2_SR` notes `benchmarks/results/i2sr_candidate_patch_2026-05-13.md` and `benchmarks/results/i2sr_x86act_fix_2026-05-13.md`, TQ2_0, tensor-scale I2_S, row-scale I2_S prototype; `patches/llama-i2s-row-scale.patch`; `patches/llama-i2sr-row-scale-qtype.patch` | direct scalar `I2_S` export now loads/runs with finite but weak Qwen0.5B PPL `423.4528`; direct row-scale prototype writes per-row scales but Qwen0.5B quality is catastrophic; fixed candidate `I2_SR` preserves Qwen1.5B row-scale quality but still requires a downstream runtime patch |
 | TL2 conversion and CPU inference | partial | `benchmarks/results/conversion_support_audit_2026-05-05.md`; `benchmarks/results/tl2_shape_support_audit_2026-05-05.md`; `benchmarks/results/tl2_scale_semantics_2026-05-05.md`; Qwen0.5B TL2 probe `benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json` | dense Qwen0.5B TL2 is model-specific and quality-failed; current TL2 one-scale semantics are mathematically invalid for the strong row-scale Qwen1.5B checkpoint; Qwen2MoE and Kimi remain unvalidated |
-| Row-scale I2_S/I2_SR quality preservation | complete as prototype/candidate | heap-fix confirmation `benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json`; fixed I2_SR suite `benchmark_results/i2sr-row-scale-qwen15b-x86act-suite-2026-05-13/summary.json`; audit `benchmark_results/evidence_audit/qwen15b_row_i2s_heapfix.md`; format audit `benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md`; qtype gate `benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md` | not an upstream/default stable GGUF format; fixed `I2_SR` still requires a downstream patch and regression tests |
+| Row-scale I2_S/I2_SR quality preservation | complete as prototype/candidate | heap-fix confirmation `benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json`; fixed I2_SR suite `benchmark_results/i2sr-row-scale-qwen15b-x86act-suite-2026-05-13/summary.json`; byte-layout verifier `benchmarks/results/i2s_packing_layout_verify_2026-05-13.md`; audit `benchmark_results/evidence_audit/qwen15b_row_i2s_heapfix.md`; format audit `benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md`; qtype gate `benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md` | not an upstream/default stable GGUF format; fixed `I2_SR` still requires a downstream patch |
 | Row-scale I2_S thread scaling | complete as prototype | `benchmarks/results/i2s_thread_scaling_2026-05-05.md`; audit `benchmark_results/evidence_audit/qwen15b_row_i2s_thread_scaling.md` | decode remains around `18-20 tok/s` after 4 threads |
 | Native AVX-512 check | complete | `benchmark_results/gguf-qwen15b-row-i2s-prototype-native-suite/summary.json`; audit `benchmark_results/evidence_audit/qwen15b_row_i2s_native.md` | no AVX-512 speedup shown |
 | Packed GGUF RSS | complete for current row-scale suite | `benchmarks/results/gguf_memory_2026-05-05.md`; `benchmarks/results/gguf_context_scaling_2026-05-05.md`; audits `benchmark_results/evidence_audit/qwen15b_row_i2s_rss.md` and `benchmark_results/evidence_audit/qwen15b_context_scaling_rss.md` | none for dense Qwen2.5-1.5B GGUF RSS; still not MoE/TL2 |
@@ -70,8 +70,8 @@ quality-preserving Qwen TL2 path, and MoE/Kimi proof.
 1. Promote the fixed `I2_SR` GGUF type into the active runtime contract. The
    format audit shows default row-scale `I2_S` is `30836.21x` worse than
    row-scale `TQ2_0` by PPL, while the patched prototype is `1.0016x`. The
-   fixed `I2_SR` artifact reaches PPL `38.8477`, but it still depends on
-   `patches/llama-i2sr-row-scale-qtype.patch`.
+   fixed `I2_SR` artifact reaches PPL `38.8477` and passes `5/5` byte-layout
+   checks, but it still depends on `patches/llama-i2sr-row-scale-qtype.patch`.
 2. Extend direct GGUF ingestion for `ternary_state_dict.pt` from the current
    dense F16 and scalar `I2_S` bridges to a production row-scale-aware writer.
    The scalar `I2_S` writer proves the C++ runtime can load direct packed
@@ -79,8 +79,8 @@ quality-preserving Qwen TL2 path, and MoE/Kimi proof.
    finite but weak (`423.4528` PPL). The direct row-scale prototype writes
    per-row scales, but its Qwen2.5-0.5B control remains catastrophic
    (`59401.5449` PPL). The fixed `I2_SR` path validates the stronger 1.5B
-   checkpoint; next it needs byte-layout regression tests and an active stable
-   runtime qtype.
+   checkpoint and now has byte-layout regression evidence; next it needs an
+   active stable runtime qtype.
 3. Implement and benchmark a row-scale-aware Qwen2.5-1.5B TL2 path, or keep
    TL2 out of the supported product claim. The current Qwen0.5B TL2 probe is a
    model-specific engineering result with NaN PPL, and the current TL2
