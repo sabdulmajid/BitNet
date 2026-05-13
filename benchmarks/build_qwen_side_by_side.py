@@ -24,6 +24,9 @@ SELECTED_LM_EVAL_METRICS = {
 }
 
 
+CATASTROPHIC_PPL_THRESHOLD = 1.0e4
+
+
 PPL_RUNS = [
     ("FP", "benchmark_results/quality-9735/qwen15b_fp_wikitext.json", "benchmark_results/quality-9735/qwen15b_fp_fineweb_heldout.json"),
     ("naive PTQ", "benchmark_results/quality-ptq-qwen15b/qwen15b_naive_ptq_wikitext.json", "benchmark_results/quality-ptq-qwen15b/qwen15b_naive_ptq_fineweb_heldout.json"),
@@ -67,6 +70,16 @@ def fmt(value: Any, digits: int = 3) -> str:
     if isinstance(value, (int, float)) and math.isfinite(float(value)):
         return f"{float(value):.{digits}f}"
     return "-" if value is None else str(value)
+
+
+def quality_status(ppl: Any) -> str:
+    if ppl is None:
+        return "missing"
+    if not isinstance(ppl, (int, float)) or not math.isfinite(float(ppl)):
+        return "nan-fail"
+    if float(ppl) >= CATASTROPHIC_PPL_THRESHOLD:
+        return "catastrophic"
+    return "ok"
 
 
 def md_table(headers: list[str], rows: list[list[str]]) -> str:
@@ -169,8 +182,9 @@ def build_gguf_table() -> str:
                 fmt(bench.get("prefill", {}).get("tok_s"), 2),
                 fmt(bench.get("decode", {}).get("tok_s"), 2),
                 fmt(ppl, 4),
+                quality_status(ppl),
             ])
-    return md_table(["suite", "CPU", "artifact", "kind", "file MiB", "prefill tok/s", "decode tok/s", "PPL"], rows)
+    return md_table(["suite", "CPU", "artifact", "kind", "file MiB", "prefill tok/s", "decode tok/s", "PPL", "quality status"], rows)
 
 
 def build_gguf_memory_table() -> str:

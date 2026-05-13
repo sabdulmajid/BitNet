@@ -16,8 +16,8 @@
       "label": "side_by_side_report",
       "metrics": {},
       "path": "benchmarks/results/qwen_side_by_side_2026-05-05.md",
-      "sha256": "570856967359d030c3816c993b5a340e19c34eba4364223b548c6576d585755c",
-      "size_bytes": 12585
+      "sha256": "1729d20a5d2a98be5b70f1c1f9513798a75edb773613cdb5c8db8b9cb8d78005",
+      "size_bytes": 12803
     },
     {
       "exists": true,
@@ -25,8 +25,8 @@
       "label": "publishable_claims",
       "metrics": {},
       "path": "benchmarks/results/publishable_claims_2026-05-05.md",
-      "sha256": "91966011ad7c492dbe7f46514ef5438fc3770bbf7d138ccc6149535eab3d9d0f",
-      "size_bytes": 8403
+      "sha256": "5d2ec28b422d8128b5fd41f8d39d26a2729fc163cddbcea56548fbe9c0aa4f0a",
+      "size_bytes": 9045
     },
     {
       "exists": true,
