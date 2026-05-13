@@ -648,6 +648,16 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"submodule={metrics.get('submodule_short', '-')}, "
                 f"blockers={len(metrics.get('blockers', []))}"
             )
+        elif entry["kind"] == "i2sr_promotion_handoff_json":
+            summary = (
+                f"ready={metrics.get('ready_for_handoff', '-')}, "
+                f"root_clean={metrics.get('root_clean', '-')}, "
+                f"submodule_clean={metrics.get('submodule_clean', '-')}, "
+                f"root_patch={metrics.get('root_patch_applies', '-')}, "
+                f"submodule_patch={metrics.get('submodule_patch_applies', '-')}, "
+                f"fork_reachable={metrics.get('candidate_fork_reachable', '-')}, "
+                f"blockers={len(metrics.get('blockers', []))}"
+            )
         elif entry["kind"] == "moe_support_json":
             summary = (
                 f"present={metrics.get('present_checks', '-')}/{metrics.get('checks', '-')}, "

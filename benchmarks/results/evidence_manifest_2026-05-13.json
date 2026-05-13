@@ -1,5 +1,5 @@
 {
-  "artifact_count": 100,
+  "artifact_count": 102,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "104d89dac8778f36a413f618e28f8fac0c0248b599b9a1b1d3e406c6fb82e254",
-      "size_bytes": 51754
+      "sha256": "f55578819b1b4dc129e6057f04ba02cbd3eca21fe972c6ef8e1d1f328b6aef9c",
+      "size_bytes": 51918
     },
     {
       "exists": true,
@@ -207,6 +207,15 @@
       "path": "benchmarks/results/row_scale_qtype_productization_gate_i2sr_promotion_rehearsal_2026-05-13.md",
       "sha256": "f734b60cc1ec39233ef41c4d9d357d2fa1f712408af1726ce3979aebd7d0de04",
       "size_bytes": 2671
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2sr_promotion_handoff_report",
+      "metrics": {},
+      "path": "benchmarks/results/i2sr_promotion_handoff_2026-05-13.md",
+      "sha256": "f36eeeef0932a2fde31b4cad643cd67c7b178bae4195acfd792c21dd335a95c6",
+      "size_bytes": 3108
     },
     {
       "exists": true,
@@ -1653,6 +1662,25 @@
       "path": "benchmark_results/row_scale_qtype_productization_gate_i2sr_promotion_rehearsal_2026-05-13.json",
       "sha256": "6ffc161b446b0c2eeb764a907ef60b1b759539e121258f7928a90e1b87017040",
       "size_bytes": 3897
+    },
+    {
+      "exists": true,
+      "kind": "i2sr_promotion_handoff_json",
+      "label": "i2sr_promotion_handoff_json",
+      "metrics": {
+        "blockers": [
+          "Candidate llama.cpp fork URL is not reachable."
+        ],
+        "candidate_fork_reachable": false,
+        "ready_for_handoff": false,
+        "root_clean": true,
+        "root_patch_applies": true,
+        "submodule_clean": true,
+        "submodule_patch_applies": true
+      },
+      "path": "benchmark_results/i2sr_promotion_handoff_2026-05-13.json",
+      "sha256": "dbafdab0263e4b342382c5f54915f43109ac55324322cd0d0502c062dbdcf3f9",
+      "size_bytes": 3725
     },
     {
       "exists": true,

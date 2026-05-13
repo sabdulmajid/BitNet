@@ -1,8 +1,8 @@
 # Evidence Manifest, 2026-05-13
-Artifacts: `100`. Missing: `0`.
+Artifacts: `102`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 51754 | 104d89dac877 |  |
+| README | tracked_report | yes | 51918 | f55578819b1b |  |
 | side_by_side_report | tracked_report | yes | 16950 | 6c2b35ecbfae |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
 | paired_row_minus_ptq_report | tracked_report | yes | 1332 | 20a5aee1eb99 |  |
@@ -25,6 +25,7 @@ Artifacts: `100`. Missing: `0`.
 | row_scale_qtype_productization_gate_report | tracked_report | yes | 2717 | eec414acdcd3 |  |
 | row_scale_qtype_i2sr_active_patch_gate_report | tracked_report | yes | 2390 | 42acb39176cb |  |
 | row_scale_qtype_i2sr_promotion_rehearsal_report | tracked_report | yes | 2671 | f734b60cc1ec |  |
+| i2sr_promotion_handoff_report | tracked_report | yes | 3108 | f36eeeef0932 |  |
 | i2sr_qwen15b_candidate_report | tracked_report | yes | 2330 | 0e61281598ce |  |
 | i2sr_x86act_fix_report | tracked_report | yes | 2113 | 828c0baaa784 |  |
 | i2s_packing_layout_verify_report | tracked_report | yes | 1075 | c11acd561e3c |  |
@@ -91,6 +92,7 @@ Artifacts: `100`. Missing: `0`.
 | row_scale_qtype_productization_gate_json | row_scale_qtype_gate_json | yes | 3795 | 10e3f5519b9e | passed=False, gates=9, failed=3, stable_qtype=False, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | row_scale_qtype_i2sr_active_patch_gate_json | row_scale_qtype_gate_json | yes | 3616 | cb42720567a1 | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | row_scale_qtype_i2sr_promotion_rehearsal_json | row_scale_qtype_gate_json | yes | 3897 | 6ffc161b446b | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
+| i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 3725 | dbafdab0263e |  |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
 | benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5393 | e8c6cf145330 | passed=True, checks=33, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 14806 | 81dd93e8dab5 | achieved=False, status=not_complete, complete=7/9, open=2 |
