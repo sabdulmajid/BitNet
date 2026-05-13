@@ -93,10 +93,19 @@ conservative:
   directly into GGUF `I2_S` without editing the vendored `llama.cpp` submodule.
   The Qwen2.5-0.5B KL-only scalar checkpoint loads and runs on CPU as `168`
   `i2_s` tensors, shrinking file size from `948.1` MiB FP16 to `610.6` MiB and
-  improving fixed-excerpt prefill/decode throughput from `328.21`/`16.31` tok/s
-  to `502.31`/`37.41` tok/s. Quality fails: PPL is `NaN` and deterministic
+  improving fixed-excerpt prefill/decode throughput from `331.42`/`16.30` tok/s
+  to `523.69`/`37.30` tok/s. Quality fails: PPL is `NaN` and deterministic
   smoke output is punctuation spam. This is a runtime-format milestone, not a
   publishable model-quality claim.
+- **Direct row-scale `I2_S` export remains experimental and failed on the
+  Qwen2.5-0.5B row checkpoint.** The direct writer now matches BitNet's 1x4
+  row-interleaved `I2_S` packing layout. Its `--row-scale-prototype` mode can
+  write one scale per output row, but this is not a stable GGUF contract and it
+  did not rescue the weak 0.5B row checkpoint: materialized F16 PPL was
+  `578.4833`, direct row-scale `I2_S` prototype PPL was `59401.5449`,
+  materialized-then-`I2_S` was `NaN`, and materialized-then-`TQ2_0` was
+  `5118527.5782`. The quality-preserving packed row-scale evidence remains the
+  separate 1.5B patched-runtime prototype, not default `I2_S`.
 - **TL2 is now a partial dense-Qwen engineering probe, not a product claim.**
   This fork can generate a Qwen2.5-0.5B TL2 GGUF only after exact
   model-specific TL2 code generation and a matching `BITNET_X86_TL2=ON`
@@ -153,6 +162,8 @@ The direct packed GGUF support audit is
 [benchmarks/results/direct_packed_gguf_support_2026-05-13.md](benchmarks/results/direct_packed_gguf_support_2026-05-13.md).
 The direct scalar `I2_S` GGUF export note is
 [benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md](benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md).
+The direct row-scale `I2_S` Qwen0.5B control is
+[benchmarks/results/direct_row_i2s_qwen05b_2026-05-13.md](benchmarks/results/direct_row_i2s_qwen05b_2026-05-13.md).
 The publishable-claims ledger is
 [benchmarks/results/publishable_claims_2026-05-05.md](benchmarks/results/publishable_claims_2026-05-05.md).
 The compact evidence manifest with hashes and parsed metrics is

@@ -35,6 +35,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "direct_static_ternary_gguf_report", "kind": "tracked_report", "path": "benchmarks/results/direct_static_ternary_gguf_2026-05-13.md"},
     {"label": "direct_packed_gguf_support_report", "kind": "tracked_report", "path": "benchmarks/results/direct_packed_gguf_support_2026-05-13.md"},
     {"label": "direct_i2s_scalar_gguf_report", "kind": "tracked_report", "path": "benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md"},
+    {"label": "direct_row_i2s_qwen05b_report", "kind": "tracked_report", "path": "benchmarks/results/direct_row_i2s_qwen05b_2026-05-13.md"},
     {"label": "tl2_shape_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_shape_support_audit_2026-05-05.md"},
     {"label": "tl2_probe_report", "kind": "tracked_report", "path": "benchmarks/results/qwen05b_tl2_probe_2026-05-05.md"},
     {"label": "tl2_scale_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_scale_semantics_2026-05-05.md"},
@@ -79,6 +80,11 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "direct_i2s_tiny", "kind": "direct_i2s_json", "path": "benchmark_results/direct-i2s-tiny-2026-05-13/selfcontained_summary.json"},
     {"label": "direct_i2s_qwen05b_conversion", "kind": "direct_i2s_json", "path": "benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/conversion_summary.json"},
     {"label": "direct_i2s_qwen05b_suite", "kind": "gguf_summary_json", "path": "benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/summary.json"},
+    {"label": "direct_row_i2s_qwen05b_conversion", "kind": "direct_i2s_json", "path": "benchmark_results/direct-row-i2s-qwen05b-2026-05-13/conversion_summary.json"},
+    {"label": "direct_row_i2s_qwen05b_suite", "kind": "gguf_summary_json", "path": "benchmark_results/direct-row-i2s-qwen05b-portable-2026-05-13/summary.json"},
+    {"label": "row_f16_qwen05b_suite", "kind": "gguf_summary_json", "path": "benchmark_results/row-f16-qwen05b-2026-05-13/summary.json"},
+    {"label": "row_i2s_quantized_qwen05b_suite", "kind": "gguf_summary_json", "path": "benchmark_results/quantized-row-i2s-qwen05b-2026-05-13/summary.json"},
+    {"label": "row_tq2_qwen05b_suite", "kind": "gguf_summary_json", "path": "benchmark_results/row-tq2-qwen05b-2026-05-13/summary.json"},
     {"label": "direct_packed_gguf_support_json", "kind": "direct_packed_support_json", "path": "benchmark_results/direct_packed_gguf_support_2026-05-13.json"},
     {"label": "tl2_shape_json", "kind": "tl2_shape_json", "path": "benchmark_results/tl2_shape_support_audit_2026-05-05.json"},
     {"label": "tl2_scale_json", "kind": "tl2_scale_json", "path": "benchmark_results/tl2_scale_semantics_2026-05-05.json"},
@@ -228,11 +234,13 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "architecture": data.get("architecture"),
             "has_native_gguf_python_constants": data.get("has_native_gguf_python_constants"),
             "ternary_i2s_packed": data.get("ternary_i2s_packed"),
+            "row_scale_i2s_packed": data.get("row_scale_i2s_packed"),
             "output_f16_tensors": data.get("output_f16_tensors"),
             "copied_tensors": data.get("copied_tensors"),
             "output_tensors": data.get("output_tensors"),
             "outfile_size_bytes": data.get("outfile_size_bytes"),
             "row_scale_rejected": data.get("row_scale_rejected"),
+            "row_scale_prototype": data.get("row_scale_prototype"),
         }
     if kind == "direct_packed_support_json":
         verdict = data.get("verdict", {})
@@ -357,6 +365,7 @@ def build_report(manifest: dict[str, Any]) -> str:
         elif entry["kind"] == "direct_i2s_json":
             summary = (
                 f"arch={metrics.get('architecture', '-')}, packed={metrics.get('ternary_i2s_packed', '-')}, "
+                f"row_packed={metrics.get('row_scale_i2s_packed', '-')}, "
                 f"out_f16={metrics.get('output_f16_tensors', '-')}, tensors={metrics.get('output_tensors', '-')}, "
                 f"native_py_consts={metrics.get('has_native_gguf_python_constants', '-')}"
             )

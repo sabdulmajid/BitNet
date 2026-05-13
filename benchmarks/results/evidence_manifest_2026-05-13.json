@@ -1,5 +1,5 @@
 {
-  "artifact_count": 55,
+  "artifact_count": 61,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "75166bcd08ec92738015f5380ad3c87295a12c585d59edc2796660ec8683f204",
-      "size_bytes": 46252
+      "sha256": "64d09cba47c1560645594d5f0a8cd598e464cad1dcee7e1a9cabfeebb6d68b5e",
+      "size_bytes": 47080
     },
     {
       "exists": true,
@@ -70,8 +70,17 @@
       "label": "direct_i2s_scalar_gguf_report",
       "metrics": {},
       "path": "benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md",
-      "sha256": "58997cd5dbe70f1bbb206991f84aca84b3be56ca7107c70499e2173f84df93e8",
-      "size_bytes": 5389
+      "sha256": "2c5a76508f7a7894ba50a0795441c4f5953bc8db0420f3cde74ddcfc32a2cd6c",
+      "size_bytes": 5514
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "direct_row_i2s_qwen05b_report",
+      "metrics": {},
+      "path": "benchmarks/results/direct_row_i2s_qwen05b_2026-05-13.md",
+      "sha256": "7986c373ad38af92c8dd590e5875648e32018ef0d41c37f7e8c05630586fe1a1",
+      "size_bytes": 3648
     },
     {
       "exists": true,
@@ -812,12 +821,14 @@
         "outfile_size_bytes": 25339392,
         "output_f16_tensors": 1,
         "output_tensors": 12,
+        "row_scale_i2s_packed": 0,
+        "row_scale_prototype": false,
         "row_scale_rejected": 0,
         "ternary_i2s_packed": 7
       },
       "path": "benchmark_results/direct-i2s-tiny-2026-05-13/selfcontained_summary.json",
-      "sha256": "d4fa8a211c215fe28ea69537a4f0fc03cbec24fcecdd26f53919c17a17bff2c5",
-      "size_bytes": 841
+      "sha256": "496c4a2bac8d54913ec5bf8571de7b43675a7d3efb4674533c90408077154dee",
+      "size_bytes": 1087
     },
     {
       "exists": true,
@@ -830,12 +841,14 @@
         "outfile_size_bytes": 640231936,
         "output_f16_tensors": 1,
         "output_tensors": 291,
+        "row_scale_i2s_packed": 0,
+        "row_scale_prototype": false,
         "row_scale_rejected": 0,
         "ternary_i2s_packed": 168
       },
       "path": "benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/conversion_summary.json",
-      "sha256": "bc3e80077c9b425ac5b9c6466a5b1336a0d037ab3ca0de12e085caa32129b94c",
-      "size_bytes": 900
+      "sha256": "deecbf0d1031eb5dd6146a85126cf79c87cff3dd06521e64d3cf9d64b0b8ff7e",
+      "size_bytes": 1146
     },
     {
       "exists": true,
@@ -844,20 +857,20 @@
       "metrics": {
         "artifacts": [
           {
-            "decode_tok_s": 16.30706,
+            "decode_tok_s": 16.296986,
             "file_mib": 948.098876953125,
             "kind": "fp16-baseline",
             "name": "qwen05b_fp_f16",
             "ppl": 18.0984,
-            "prefill_tok_s": 328.210498
+            "prefill_tok_s": 331.419753
           },
           {
-            "decode_tok_s": 37.408742,
+            "decode_tok_s": 37.302017,
             "file_mib": 610.57275390625,
             "kind": "direct-scalar-i2s",
             "name": "qwen05b_klonly_direct_i2_s",
             "ppl": "NaN",
-            "prefill_tok_s": 502.310892
+            "prefill_tok_s": 523.685215
           }
         ],
         "failed": [],
@@ -867,8 +880,154 @@
         "rows": 2
       },
       "path": "benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/summary.json",
-      "sha256": "a82fe992c60773b945493c1b824f6b695c900d57b3714f4223c261ec9f948b74",
-      "size_bytes": 2558
+      "sha256": "d6451c122755b39b3f80b49d1252a915ba4dd4dfd2305a7a931ccb6f1d852950",
+      "size_bytes": 2559
+    },
+    {
+      "exists": true,
+      "kind": "direct_i2s_json",
+      "label": "direct_row_i2s_qwen05b_conversion",
+      "metrics": {
+        "architecture": "Qwen2ForCausalLM",
+        "copied_tensors": 122,
+        "has_native_gguf_python_constants": false,
+        "outfile_size_bytes": 641448448,
+        "output_f16_tensors": 1,
+        "output_tensors": 291,
+        "row_scale_i2s_packed": 168,
+        "row_scale_prototype": true,
+        "row_scale_rejected": 0,
+        "ternary_i2s_packed": 168
+      },
+      "path": "benchmark_results/direct-row-i2s-qwen05b-2026-05-13/conversion_summary.json",
+      "sha256": "a7ee2b556bc3867a31381b3a83f2057f884ba3ab7eb830374b4850506df0ba0c",
+      "size_bytes": 1157
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "direct_row_i2s_qwen05b_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 16.609699,
+            "file_mib": 948.098876953125,
+            "kind": "fp16-baseline",
+            "name": "qwen05b_fp_f16",
+            "ppl": 18.0986,
+            "prefill_tok_s": 365.735135
+          },
+          {
+            "decode_tok_s": 39.556297,
+            "file_mib": 611.73291015625,
+            "kind": "direct-row-i2s-prototype",
+            "name": "qwen05b_row_direct_i2_s_prototype",
+            "ppl": 59401.5449,
+            "prefill_tok_s": 544.865326
+          }
+        ],
+        "failed": [],
+        "nan_ppl": [],
+        "rows": 2
+      },
+      "path": "benchmark_results/direct-row-i2s-qwen05b-portable-2026-05-13/summary.json",
+      "sha256": "ebdafab23882aae87929970077951cfac915c11d58f911d985e9b6be4d464550",
+      "size_bytes": 2637
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "row_f16_qwen05b_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 16.610504,
+            "file_mib": 948.098876953125,
+            "kind": "fp16-baseline",
+            "name": "qwen05b_fp_f16",
+            "ppl": 18.0986,
+            "prefill_tok_s": 365.320107
+          },
+          {
+            "decode_tok_s": 16.457316,
+            "file_mib": 1207.7550659179688,
+            "kind": "materialized-row-f16",
+            "name": "qwen05b_row_materialized_f16",
+            "ppl": 578.4833,
+            "prefill_tok_s": 367.597655
+          }
+        ],
+        "failed": [],
+        "nan_ppl": [],
+        "rows": 2
+      },
+      "path": "benchmark_results/row-f16-qwen05b-2026-05-13/summary.json",
+      "sha256": "cc45835930427167a37752cbecff9f7d448c4e63dbb4d6b13f0faafb780e42f3",
+      "size_bytes": 2575
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "row_i2s_quantized_qwen05b_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 16.627707,
+            "file_mib": 948.098876953125,
+            "kind": "fp16-baseline",
+            "name": "qwen05b_fp_f16",
+            "ppl": 18.0986,
+            "prefill_tok_s": 365.557662
+          },
+          {
+            "decode_tok_s": 56.470084,
+            "file_mib": 490.63348388671875,
+            "kind": "materialized-row-i2s-quantized",
+            "name": "qwen05b_row_materialized_i2_s_quantized",
+            "ppl": "NaN",
+            "prefill_tok_s": 548.130546
+          }
+        ],
+        "failed": [],
+        "nan_ppl": [
+          "qwen05b_row_materialized_i2_s_quantized"
+        ],
+        "rows": 2
+      },
+      "path": "benchmark_results/quantized-row-i2s-qwen05b-2026-05-13/summary.json",
+      "sha256": "23b71114cdaee41d839ec2d1b2e31b45b1e81c82b649e23061cba6954affe0cf",
+      "size_bytes": 2645
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "row_tq2_qwen05b_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 16.483184,
+            "file_mib": 948.098876953125,
+            "kind": "fp16-baseline",
+            "name": "qwen05b_fp_f16",
+            "ppl": 18.0986,
+            "prefill_tok_s": 365.162742
+          },
+          {
+            "decode_tok_s": 57.922909,
+            "file_mib": 491.51971435546875,
+            "kind": "materialized-row-tq2_0",
+            "name": "qwen05b_row_materialized_tq2_0_t1",
+            "ppl": 5118527.5782,
+            "prefill_tok_s": 430.517012
+          }
+        ],
+        "failed": [],
+        "nan_ppl": [],
+        "rows": 2
+      },
+      "path": "benchmark_results/row-tq2-qwen05b-2026-05-13/summary.json",
+      "sha256": "d3005c427d44807b3bd0d1d52cf7ef03522a5fa3be5a1b604d1fd9d391d59139",
+      "size_bytes": 2667
     },
     {
       "exists": true,

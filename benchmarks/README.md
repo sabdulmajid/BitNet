@@ -321,12 +321,21 @@ python benchmarks/convert_static_ternary_to_i2s_gguf.py \
   --summary-json benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/conversion_summary.json
 ```
 
-This path intentionally rejects row-scale checkpoints. On the Qwen2.5-0.5B
-KL-only scalar checkpoint it produced a loadable `I2_S` GGUF with `168` packed
-projection tensors, but the fixed-excerpt CPU benchmark failed quality
-(`NaN` PPL, punctuation-only smoke). Treat it as a scalar-format/runtime probe,
-not as the row-scale product path. See
+By default this path intentionally rejects row-scale checkpoints. On the
+Qwen2.5-0.5B KL-only scalar checkpoint it produced a loadable `I2_S` GGUF with
+`168` packed projection tensors, but the fixed-excerpt CPU benchmark failed
+quality (`NaN` PPL, punctuation-only smoke). Treat it as a scalar-format/runtime
+probe, not as the row-scale product path. See
 `benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md`.
+
+For debugging only, `--row-scale-prototype` writes one float32 scale per output
+row after the packed 1x4 `I2_S` codes. This requires a matching experimental
+runtime layout and is not a stable GGUF contract. The Qwen2.5-0.5B row-scale
+control failed quality even after correcting the packing layout:
+materialized-F16 PPL `578.4833`, direct row-scale `I2_S` PPL `59401.5449`,
+materialized-then-`I2_S` PPL `NaN`, and materialized-then-`TQ2_0` PPL
+`5118527.5782`. See
+`benchmarks/results/direct_row_i2s_qwen05b_2026-05-13.md`.
 
 For QAT checkpoints, do not convert `model.safetensors` directly and treat it
 as the trained ternary artifact. The validated bridge is:

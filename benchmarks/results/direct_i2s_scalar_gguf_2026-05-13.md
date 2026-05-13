@@ -29,6 +29,8 @@ model metadata/tokenizer path, overrides tensor preparation, and packs
 layout:
 
 - four ternary codes per byte, encoded as `{-1,0,1} -> {0,1,2}`;
+- the byte order matches the BitNet CPU 1x4 x86 layout: four output rows for
+  the same input column are stored in one byte;
 - one float32 tensor scale appended after the packed code bytes;
 - `output.weight` kept F16 by default, matching `llama-quantize` policy;
 - non-ternary tensors copied as F32 for 1D/norm tensors and F16 for dense 2D
@@ -107,11 +109,11 @@ Result:
 
 | artifact | file MiB | PPL | PPL tok/s | prefill tok/s | decode tok/s | smoke |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| Qwen2.5-0.5B FP16 | 948.1 | 18.0984 | 217.03 | 328.21 | 16.31 | `Paris. It is the capital of France. It is the capital of France.` |
-| Qwen2.5-0.5B scalar direct `I2_S` | 610.6 | NaN | 289.96 | 502.31 | 37.41 | `!!!!!!!!!!!!!!!!` |
+| Qwen2.5-0.5B FP16 | 948.1 | 18.0984 | 218.47 | 331.42 | 16.30 | `Paris. It is the capital of France. It is the capital of France.` |
+| Qwen2.5-0.5B scalar direct `I2_S` | 610.6 | NaN | 291.05 | 523.69 | 37.30 | `!!!!!!!!!!!!!!!!` |
 
 The scalar direct `I2_S` artifact is approximately `35.6%` smaller than FP16,
-`1.53x` faster on prefill, and `2.29x` faster on decode in this run. The
+`1.58x` faster on prefill, and `2.29x` faster on decode in this run. The
 quality result is invalid for product use: the perplexity log reports every
 chunk at vocabulary-size PPL (`151936.0000`) and then terminates with
 `Unexpected negative standard deviation of log(prob)`.

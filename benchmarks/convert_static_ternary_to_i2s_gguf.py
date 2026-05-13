@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Directly pack scalar-scale static ternary checkpoints as I2_S GGUF.
+"""Directly pack static ternary checkpoints as I2_S GGUF.
 
-This writer handles the scalar/tensor-scale case only. Row-scale checkpoints
-need a compatibility-safe row-scale GGUF type or versioned layout and are
-rejected by default.
+This writer handles the scalar/tensor-scale case by default. Row-scale
+checkpoints need a compatibility-safe GGUF type or versioned layout and are
+therefore rejected unless --row-scale-prototype is passed.
 """
 
 from __future__ import annotations
@@ -62,25 +62,60 @@ def validate_ternary_codes(key: str, tensor: torch.Tensor) -> None:
         raise ValueError(f"{key} contains non-ternary codes: {invalid.tolist()}")
 
 
-def pack_i2_s_scalar(codes: torch.Tensor, scale: torch.Tensor) -> np.ndarray:
+def pack_i2_s_codes_1x4(codes: torch.Tensor) -> np.ndarray:
+    """Pack BitNet's CPU I2_S 1x4 layout.
+
+    The current x86 non-ACT_PARALLEL path stores four output rows for the same
+    input column in one byte, not four consecutive row-major values.
+    """
     if codes.ndim != 2:
         raise ValueError(f"I2_S packing expects a 2D weight matrix, got shape {tuple(codes.shape)}")
+    rows, cols = map(int, codes.shape)
+    if rows % 4 != 0:
+        raise ValueError(f"I2_S 1x4 packing expects row count divisible by 4, got {rows}")
+
+    q8 = (codes.to(torch.int16).cpu().numpy() + 1).astype(np.uint8, copy=False)
+    packed = np.empty((rows // 4, cols), dtype=np.uint8)
+    for group in range(rows // 4):
+        quad = q8[group * 4 : group * 4 + 4, :]
+        packed[group, :] = (
+            (quad[0, :] << np.uint8(6))
+            | (quad[1, :] << np.uint8(4))
+            | (quad[2, :] << np.uint8(2))
+            | quad[3, :]
+        ).astype(np.uint8, copy=False)
+    return packed.reshape(-1)
+
+
+def pack_i2_s_scalar(codes: torch.Tensor, scale: torch.Tensor) -> np.ndarray:
     if scale.numel() != 1:
         raise ValueError(f"scalar I2_S packing expects one scale, got shape {tuple(scale.shape)}")
 
-    flat = (codes.to(torch.int16).cpu().numpy().reshape(-1) + 1).astype(np.uint8)
-    if flat.size % 4 != 0:
-        raise ValueError(f"I2_S code count must be divisible by 4, got {flat.size}")
-    packed = (
-        (flat[0::4] << np.uint8(6))
-        | (flat[1::4] << np.uint8(4))
-        | (flat[2::4] << np.uint8(2))
-        | flat[3::4]
-    ).astype(np.uint8)
+    packed = pack_i2_s_codes_1x4(codes)
 
     output = np.zeros(packed.size + 32, dtype=np.uint8)
     output[: packed.size] = packed
     output[packed.size : packed.size + 4] = np.asarray([float(scale.reshape(-1)[0].item())], dtype=np.float32).view(np.uint8)
+    return output
+
+
+def pack_i2_s_row_prototype(codes: torch.Tensor, scale: torch.Tensor) -> np.ndarray:
+    if codes.ndim != 2:
+        raise ValueError(f"I2_S row-scale packing expects a 2D weight matrix, got shape {tuple(codes.shape)}")
+
+    rows = int(codes.shape[0])
+    row_scales = scale.reshape(-1)
+    if row_scales.numel() != rows:
+        raise ValueError(f"row-scale I2_S packing expects {rows} scales, got shape {tuple(scale.shape)}")
+
+    packed = pack_i2_s_codes_1x4(codes)
+    if packed.size % 4 != 0:
+        raise ValueError(f"row-scale I2_S scale offset must be 4-byte aligned, got {packed.size}")
+
+    scale_bytes = row_scales.to(dtype=torch.float32).cpu().numpy().astype(np.float32, copy=False).view(np.uint8)
+    output = np.zeros(packed.size + scale_bytes.size + 32, dtype=np.uint8)
+    output[: packed.size] = packed
+    output[packed.size : packed.size + scale_bytes.size] = scale_bytes
     return output
 
 
@@ -109,6 +144,7 @@ def make_i2s_model_class(
             copied_tensors = 0
             output_f16 = 0
             row_scale_rejected = 0
+            row_scale_packed = 0
             packed_bytes = 0
 
             for key, tensor in state.items():
@@ -124,18 +160,23 @@ def make_i2s_model_class(
                         validate_ternary_codes(key, tensor)
                     new_name = self.map_tensor_name(f"{prefix}.weight")
                     scale = state[scale_key]
-                    if scale.numel() != 1:
+                    is_output = args.keep_output_f16 and new_name == self.format_tensor_name(gguf.MODEL_TENSOR.OUTPUT)
+                    if scale.numel() != 1 and not args.row_scale_prototype:
                         row_scale_rejected += 1
                         raise ValueError(
                             f"{scale_key} has row or non-scalar scale shape {tuple(scale.shape)}; "
-                            "direct I2_S writer currently supports scalar-scale checkpoints only"
+                            "direct I2_S writer supports row scales only with --row-scale-prototype"
                         )
-                    if args.keep_output_f16 and new_name == self.format_tensor_name(gguf.MODEL_TENSOR.OUTPUT):
+                    if is_output:
                         dense = tensor.to(dtype=torch.float16).mul(scale.to(dtype=torch.float16)).squeeze().numpy()
                         self.gguf_writer.add_tensor(new_name, dense, raw_dtype=gguf.GGMLQuantizationType.F16)
                         output_f16 += 1
                     else:
-                        packed = pack_i2_s_scalar(tensor, scale)
+                        if scale.numel() == 1:
+                            packed = pack_i2_s_scalar(tensor, scale)
+                        else:
+                            packed = pack_i2_s_row_prototype(tensor, scale)
+                            row_scale_packed += 1
                         self.gguf_writer.add_tensor(
                             new_name,
                             packed,
@@ -163,6 +204,7 @@ def make_i2s_model_class(
             summary.update(
                 {
                     "ternary_i2s_packed": ternary_packed,
+                    "row_scale_i2s_packed": row_scale_packed,
                     "copied_tensors": copied_tensors,
                     "output_f16_tensors": output_f16,
                     "row_scale_rejected": row_scale_rejected,
@@ -185,6 +227,11 @@ def main() -> None:
     parser.add_argument("--summary-json", type=Path, default=None)
     parser.add_argument("--validate-codes", action="store_true")
     parser.add_argument("--keep-output-f16", action="store_true", default=True)
+    parser.add_argument(
+        "--row-scale-prototype",
+        action="store_true",
+        help="Allow row-scale checkpoints using the experimental per-output-row I2_S layout.",
+    )
     args = parser.parse_args()
 
     ternary_state = args.ternary_state or args.checkpoint_dir / "ternary_state_dict.pt"
@@ -202,15 +249,17 @@ def main() -> None:
         "architecture": architecture,
         "outfile": str(args.outfile),
         "converter": str(args.converter),
-        "format_scope": "scalar-scale I2_S only",
+        "format_scope": "scalar-scale I2_S by default; row-scale only with --row-scale-prototype",
         "i2_s_dtype": int(i2_s_dtype),
         "mostly_i2_s_file_type": int(mostly_i2_s_ftype),
         "has_native_gguf_python_constants": has_native_gguf_constants,
         "limitations": [
-            "Rejects row-scale checkpoints.",
-            "Uses existing tensor-scale I2_S layout.",
+            "Rejects row-scale checkpoints unless --row-scale-prototype is passed.",
+            "Scalar mode uses the existing tensor-scale I2_S layout.",
+            "Row-scale prototype mode requires a matching experimental runtime layout.",
             "Keeps output.weight in F16 by default to match llama-quantize policy.",
         ],
+        "row_scale_prototype": bool(args.row_scale_prototype),
     }
 
     model_cls = make_i2s_model_class(base_cls, state, converter, args, summary, i2_s_dtype)
