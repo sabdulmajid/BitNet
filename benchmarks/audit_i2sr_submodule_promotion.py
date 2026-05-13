@@ -57,7 +57,29 @@ def remote_write_probe(submodule: Path, branch: str) -> dict[str, Any]:
     }
 
 
-def build_audit(root: Path, *, check_remote_write: bool = False, remote_probe_branch: str = "i2sr-row-scale-runtime") -> dict[str, Any]:
+def remote_read_probe(url: str) -> dict[str, Any]:
+    completed = run(["git", "ls-remote", "--heads", url], cwd=Path.cwd())
+    heads = []
+    for line in completed.stdout.splitlines():
+        parts = line.split()
+        if len(parts) == 2 and parts[1].startswith("refs/heads/"):
+            heads.append(parts[1].removeprefix("refs/heads/"))
+    return {
+        "url": url,
+        "returncode": completed.returncode,
+        "reachable": completed.returncode == 0,
+        "heads": heads,
+        "stderr": completed.stderr.strip(),
+    }
+
+
+def build_audit(
+    root: Path,
+    *,
+    check_remote_write: bool = False,
+    remote_probe_branch: str = "i2sr-row-scale-runtime",
+    candidate_fork_url: str | None = None,
+) -> dict[str, Any]:
     submodule = root / SUBMODULE_PATH
     patch = root / PATCH_PATH
     gitmodules_url = git_output(["git", "config", "-f", ".gitmodules", "--get", "submodule.3rdparty/llama.cpp.url"], cwd=root)
@@ -68,6 +90,7 @@ def build_audit(root: Path, *, check_remote_write: bool = False, remote_probe_br
     submodule_status = git_output(["git", "status", "--short", "--branch"], cwd=submodule)
     remote_contains = git_output(["git", "branch", "--remotes", "--contains", "HEAD"], cwd=submodule).splitlines()
     remote_write = remote_write_probe(submodule, remote_probe_branch) if check_remote_write else None
+    candidate_fork = remote_read_probe(candidate_fork_url) if candidate_fork_url else None
 
     patch_applies = run(["git", "apply", "--check", str(patch)], cwd=root).returncode == 0
     patch_already_applied = run(["git", "apply", "--reverse", "--check", str(patch)], cwd=root).returncode == 0
@@ -103,6 +126,8 @@ def build_audit(root: Path, *, check_remote_write: bool = False, remote_probe_br
         blockers.append("Submodule HEAD is not reachable from a fetched remote branch; a superproject pointer would not be reproducible.")
     if remote_write and not remote_write["writable"]:
         blockers.append("Configured llama.cpp submodule remote is not writable from this environment; use a fork or writable branch.")
+    if candidate_fork and not candidate_fork["reachable"]:
+        blockers.append("Candidate llama.cpp fork URL is not reachable; create the fork or provide the correct writable URL before promotion.")
     if not root_split_applies or not submodule_split_applies:
         blockers.append("Split root/submodule I2_SR promotion patches are missing or do not apply cleanly.")
     if any(line.startswith(" M ") or line.startswith("?? ") for line in submodule_status.splitlines()):
@@ -129,6 +154,7 @@ def build_audit(root: Path, *, check_remote_write: bool = False, remote_probe_br
         "submodule_short": submodule_short,
         "remote_branches_containing_head": [line.strip() for line in remote_contains],
         "remote_write_probe": remote_write,
+        "candidate_fork_probe": candidate_fork,
         "superproject_status": superproject_status,
         "submodule_status": submodule_status,
         "active_checks": active_checks,
@@ -165,6 +191,7 @@ def render_markdown(result: dict[str, Any]) -> str:
     blocker_rows = [[blocker] for blocker in result["blockers"]] or [["none"]]
     next_rows = [[step] for step in result["next_steps"]]
     remote_write = result.get("remote_write_probe")
+    candidate_fork = result.get("candidate_fork_probe")
     remote_write_lines = []
     if remote_write:
         stderr = remote_write.get("stderr", "").replace("\n", " ")
@@ -177,6 +204,23 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["returncode", f"`{remote_write.get('returncode')}`"],
                     ["writable", md_bool(bool(remote_write.get("writable")))],
                     ["permission_denied", md_bool(bool(remote_write.get("permission_denied")))],
+                    ["stderr", f"`{stderr}`"],
+                ],
+            ),
+        ]
+    candidate_fork_lines = []
+    if candidate_fork:
+        stderr = candidate_fork.get("stderr", "").replace("\n", " ")
+        heads = ", ".join(candidate_fork.get("heads") or [])
+        candidate_fork_lines = [
+            "## Candidate Fork Probe",
+            md_table(
+                ["field", "value"],
+                [
+                    ["url", f"`{candidate_fork.get('url')}`"],
+                    ["returncode", f"`{candidate_fork.get('returncode')}`"],
+                    ["reachable", md_bool(bool(candidate_fork.get("reachable")))],
+                    ["heads", f"`{heads}`"],
                     ["stderr", f"`{stderr}`"],
                 ],
             ),
@@ -195,6 +239,7 @@ def render_markdown(result: dict[str, Any]) -> str:
             "## Blockers",
             md_table(["blocker"], blocker_rows),
             *remote_write_lines,
+            *candidate_fork_lines,
             "## Split Promotion Patches",
             md_table(["path", "applies cleanly"], split_rows),
             "## Patch Touches",
@@ -214,12 +259,21 @@ def main() -> None:
         help="Run a non-mutating git push --dry-run probe against the configured submodule origin.",
     )
     parser.add_argument("--remote-probe-branch", default="i2sr-row-scale-runtime")
+    parser.add_argument(
+        "--candidate-fork-url",
+        help="Optional writable llama.cpp fork URL to probe with git ls-remote --heads.",
+    )
     parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json"))
     parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md"))
     args = parser.parse_args()
 
     root = args.repo_root.resolve()
-    result = build_audit(root, check_remote_write=args.check_remote_write, remote_probe_branch=args.remote_probe_branch)
+    result = build_audit(
+        root,
+        check_remote_write=args.check_remote_write,
+        remote_probe_branch=args.remote_probe_branch,
+        candidate_fork_url=args.candidate_fork_url,
+    )
     output_json = args.output_json if args.output_json.is_absolute() else root / args.output_json
     output_md = args.output_md if args.output_md.is_absolute() else root / args.output_md
     output_json.parent.mkdir(parents=True, exist_ok=True)

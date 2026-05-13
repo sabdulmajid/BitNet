@@ -88,8 +88,8 @@
       "label": "i2sr_submodule_promotion_audit",
       "metrics": {},
       "path": "benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md",
-      "sha256": "3bf77dd62e65eb58d521a65396bbf14c539007856c25b869512d52adee9b2681",
-      "size_bytes": 2494
+      "sha256": "014d7a43f05f0a5de9bee29310bc85d5d6bc46079dd9c46b736e00809d5ad759",
+      "size_bytes": 2913
     },
     {
       "exists": true,
@@ -1703,15 +1703,16 @@
         "blockers": [
           "I2_SR qtype/file-type/runtime support is not present in the active submodule/root runtime files.",
           "The I2_SR support still exists as an unapplied patch rather than active committed code.",
-          "Configured llama.cpp submodule remote is not writable from this environment; use a fork or writable branch."
+          "Configured llama.cpp submodule remote is not writable from this environment; use a fork or writable branch.",
+          "Candidate llama.cpp fork URL is not reachable; create the fork or provide the correct writable URL before promotion."
         ],
         "patch_applies_cleanly": true,
         "promotion_ready": false,
         "submodule_short": "1f86f058"
       },
       "path": "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json",
-      "sha256": "6c98638def767fad6f197ab6a120d3b033aac661487af7902ad7a1976cfbe373",
-      "size_bytes": 3314
+      "sha256": "8bf5a4845054b51b94e3380363783afcf4da893d7525b24a0ea6a7f2dcdbe9bc",
+      "size_bytes": 3201
     },
     {
       "exists": true,

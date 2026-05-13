@@ -239,10 +239,21 @@ rather than only available as a patch:
 python benchmarks/audit_i2sr_submodule_promotion.py
 ```
 
+To include the current Git blocker in the audit, probe the configured upstream
+for non-mutating write access and probe the intended writable fork URL:
+
+```bash
+python benchmarks/audit_i2sr_submodule_promotion.py \
+  --check-remote-write \
+  --candidate-fork-url https://github.com/sabdulmajid/llama.cpp.git
+```
+
 The current report is
 `benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md`; it is
 expected to fail until the submodule points at a pushed branch containing the
-row-scale qtype/runtime changes.
+row-scale qtype/runtime changes. The current failure is specific: the upstream
+submodule remote returns 403 for this user, and the expected
+`sabdulmajid/llama.cpp` fork URL is not reachable from this environment.
 
 The monolithic candidate patch can be split into promotion-ready pieces with:
 

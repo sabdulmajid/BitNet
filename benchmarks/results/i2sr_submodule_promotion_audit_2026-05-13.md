@@ -29,6 +29,7 @@ Remote branches containing HEAD: `origin/merge-dev`.
 | I2_SR qtype/file-type/runtime support is not present in the active submodule/root runtime files. |
 | The I2_SR support still exists as an unapplied patch rather than active committed code. |
 | Configured llama.cpp submodule remote is not writable from this environment; use a fork or writable branch. |
+| Candidate llama.cpp fork URL is not reachable; create the fork or provide the correct writable URL before promotion. |
 
 ## Remote Write Probe
 
@@ -39,6 +40,16 @@ Remote branches containing HEAD: `origin/merge-dev`.
 | writable | `false` |
 | permission_denied | `true` |
 | stderr | `remote: Permission to Eddie-Wang1120/llama.cpp.git denied to sabdulmajid. fatal: unable to access 'https://github.com/Eddie-Wang1120/llama.cpp.git/': The requested URL returned error: 403` |
+
+## Candidate Fork Probe
+
+| field | value |
+| --- | --- |
+| url | `https://github.com/sabdulmajid/llama.cpp.git` |
+| returncode | `128` |
+| reachable | `false` |
+| heads | `` |
+| stderr | `remote: Repository not found. fatal: repository 'https://github.com/sabdulmajid/llama.cpp.git/' not found` |
 
 ## Split Promotion Patches
 
