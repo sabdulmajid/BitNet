@@ -1,5 +1,5 @@
 {
-  "artifact_count": 74,
+  "artifact_count": 76,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "c5cc278e76ef16039c20e164439b333424f11e046947e0a392391ded681f062b",
-      "size_bytes": 48943
+      "sha256": "a21e17f7db8dcc06b5a9638b372302789fb85d4c39fe24817278038cfc9316a4",
+      "size_bytes": 49072
     },
     {
       "exists": true,
@@ -25,8 +25,8 @@
       "label": "publishable_claims",
       "metrics": {},
       "path": "benchmarks/results/publishable_claims_2026-05-05.md",
-      "sha256": "b3df90102b6e8c1fc131eac044f9777eaa0a94b0a9132e9da6bd42d85b3dda1c",
-      "size_bytes": 10078
+      "sha256": "1dc76bd4d7daee273acb0414836afb610c7b0cc2ce0ebc70489c0a411a7e773c",
+      "size_bytes": 10257
     },
     {
       "exists": true,
@@ -34,8 +34,8 @@
       "label": "progress_audit",
       "metrics": {},
       "path": "benchmarks/results/progress_audit_2026-05-05.md",
-      "sha256": "8bea0052af6121fbaf58f724160dfa818916424e6623097f4dfeb936ba381d25",
-      "size_bytes": 23926
+      "sha256": "34d41a3e1fc0cf21cd53bb32907d48fe89b2955eccd3082354aa1aeb9e0ed4e5",
+      "size_bytes": 24169
     },
     {
       "exists": true,
@@ -43,8 +43,8 @@
       "label": "active_goal_audit",
       "metrics": {},
       "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md",
-      "sha256": "65c06a16a35c05852de04fa3760df0566426b2c05c1fad676d05ff217c7a683f",
-      "size_bytes": 9775
+      "sha256": "8a4a13da9ebf1fa27ec48f90514775d37f43b6a28f11ee00e4499821495d1245",
+      "size_bytes": 9843
     },
     {
       "exists": true,
@@ -153,6 +153,15 @@
       "path": "benchmarks/results/i2s_packing_layout_verify_2026-05-13.md",
       "sha256": "c11acd561e3c069ab3595231a42fcdb48974b2a3fc06727531d6e18412f9cb4c",
       "size_bytes": 1075
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2sr_rss_report",
+      "metrics": {},
+      "path": "benchmarks/results/i2sr_rss_2026-05-13.md",
+      "sha256": "35a2a4b8c40b4f22f1e093e8ddee4ffda3060d50e6a4c90e997219c347e8abf7",
+      "size_bytes": 1318
     },
     {
       "exists": true,
@@ -824,6 +833,20 @@
       "path": "benchmark_results/gguf-rss-qwen15b-context-scaling-2026-05-05/summary.json",
       "sha256": "fd135b202cfdc42036221a9a99b76fa6b8046f45cf0726df178bb1d432bfbcef",
       "size_bytes": 9911
+    },
+    {
+      "exists": true,
+      "kind": "gguf_memory_json",
+      "label": "i2sr_x86act_rss",
+      "metrics": {
+        "contexts": [
+          512
+        ],
+        "rows": 1
+      },
+      "path": "benchmark_results/gguf-rss-qwen15b-i2sr-x86act-2026-05-13/summary.json",
+      "sha256": "2c32abec22da68fc2dde9afbf10ab74e9e11fa8315deea652d262072df8a8e1b",
+      "size_bytes": 817
     },
     {
       "exists": true,

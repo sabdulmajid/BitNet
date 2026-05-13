@@ -47,6 +47,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "i2sr_qwen15b_candidate_report", "kind": "tracked_report", "path": "benchmarks/results/i2sr_qwen15b_candidate_2026-05-13.md"},
     {"label": "i2sr_x86act_fix_report", "kind": "tracked_report", "path": "benchmarks/results/i2sr_x86act_fix_2026-05-13.md"},
     {"label": "i2s_packing_layout_verify_report", "kind": "tracked_report", "path": "benchmarks/results/i2s_packing_layout_verify_2026-05-13.md"},
+    {"label": "i2sr_rss_report", "kind": "tracked_report", "path": "benchmarks/results/i2sr_rss_2026-05-13.md"},
     {"label": "moe_report", "kind": "tracked_report", "path": "benchmarks/results/moe_support_audit_2026-05-05.md"},
     # Mechanical audits.
     {"label": "latest_nonrow_audit", "kind": "evidence_audit_md", "path": "benchmark_results/evidence_audit/latest_nonrow.md"},
@@ -82,6 +83,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "gguf_row_i2s_heapfix", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json"},
     {"label": "gguf_row_i2s_thread_scaling", "kind": "thread_scaling_json", "path": "benchmark_results/i2s-row-scale-thread-scaling-fixed-2026-05-05/summary.json"},
     {"label": "gguf_context_rss", "kind": "gguf_memory_json", "path": "benchmark_results/gguf-rss-qwen15b-context-scaling-2026-05-05/summary.json"},
+    {"label": "i2sr_x86act_rss", "kind": "gguf_memory_json", "path": "benchmark_results/gguf-rss-qwen15b-i2sr-x86act-2026-05-13/summary.json"},
     {"label": "direct_gguf_tiny", "kind": "direct_gguf_json", "path": "benchmark_results/direct-gguf-tiny-2026-05-13/summary.json"},
     {"label": "direct_gguf_qwen05b", "kind": "direct_gguf_json", "path": "benchmark_results/direct-gguf-qwen05b-klonly-notie-2026-05-13/summary.json"},
     {"label": "direct_i2s_tiny", "kind": "direct_i2s_json", "path": "benchmark_results/direct-i2s-tiny-2026-05-13/selfcontained_summary.json"},

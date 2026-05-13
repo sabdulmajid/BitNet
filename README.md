@@ -247,11 +247,12 @@ current row-scale patch includes a heap-buffer fix for the earlier low-thread
 `llama-bench` crash.
 At `-c 512`, `/usr/bin/time -v` reports peak RSS `1.250 GiB` for row-scale
 `I2_S`, `1.257 GiB` for row-scale `TQ2_0`, `2.948 GiB` for FP F16, and
-`0.985 GiB` for FP Q4_K_M. The same probe at `-c 32768` reports `2.114 GiB`
-for row-scale `I2_S`, `2.121 GiB` for row-scale `TQ2_0`, `3.812 GiB` for FP
-F16, and `1.850 GiB` for FP Q4_K_M. This preserves the ternary-vs-FP16 memory
-advantage at long context, but it still does not beat the dense `Q4_K_M`
-baseline on RSS.
+`0.985 GiB` for FP Q4_K_M. The fixed direct `I2_SR` candidate also reports
+`1.250 GiB` at `-c 512` with the downstream qtype patch applied. The same
+context-scaling probe at `-c 32768` reports `2.114 GiB` for row-scale `I2_S`,
+`2.121 GiB` for row-scale `TQ2_0`, `3.812 GiB` for FP F16, and `1.850 GiB`
+for FP Q4_K_M. This preserves the ternary-vs-FP16 memory advantage at long
+context, but it still does not beat the dense `Q4_K_M` baseline on RSS.
 
 ### Practical Product Direction
 
