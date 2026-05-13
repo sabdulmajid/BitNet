@@ -1,17 +1,18 @@
 # Evidence Manifest, 2026-05-13
-Artifacts: `86`. Missing: `0`.
+Artifacts: `88`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 49682 | 9357a430f81a |  |
+| README | tracked_report | yes | 49855 | e6df06b97258 |  |
 | side_by_side_report | tracked_report | yes | 16010 | 934726f28907 |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
 | paired_row_minus_ptq_report | tracked_report | yes | 1332 | 20a5aee1eb99 |  |
 | publishable_claims | tracked_report | yes | 11054 | 63c5e9babbc1 |  |
 | progress_audit | tracked_report | yes | 25612 | 74e3b96847bf |  |
 | active_goal_audit | tracked_report | yes | 10765 | 255dacfeae0a |  |
-| objective_completion_audit | tracked_report | yes | 4607 | 276e47b35d9b |  |
+| objective_completion_audit | tracked_report | yes | 4607 | 6d179a960388 |  |
 | product_scope_gate | tracked_report | yes | 2812 | 3c7f37313807 |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 2865 | eb5d7c226cdf |  |
+| i2sr_submodule_promotion_audit | tracked_report | yes | 1819 | 7de7d284f7c9 |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 2865 | 93c3f4872e46 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2174 | d6e0c6ec52ec |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -82,9 +83,10 @@ Artifacts: `86`. Missing: `0`.
 | row_scale_qtype_productization_gate_json | row_scale_qtype_gate_json | yes | 3795 | 10e3f5519b9e | passed=False, gates=9, failed=3, stable_qtype=False, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | row_scale_qtype_i2sr_active_patch_gate_json | row_scale_qtype_gate_json | yes | 3616 | cb42720567a1 | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5392 | b39f894321a0 | passed=True, checks=33, failed=0 |
-| objective_completion_audit_json | objective_completion_audit_json | yes | 14327 | 2d3f1c5c5cb1 | achieved=False, status=not_complete, complete=7/9, open=2 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5392 | 3d87ce099da4 | passed=True, checks=33, failed=0 |
+| objective_completion_audit_json | objective_completion_audit_json | yes | 14327 | 9d09a6370e99 | achieved=False, status=not_complete, complete=7/9, open=2 |
 | product_scope_gate_json | product_scope_gate_json | yes | 3471 | baa7c6e01235 | scope=research_mvp_only, supported=2, unsupported=5 |
+| i2sr_submodule_promotion_audit_json | i2sr_submodule_promotion_audit_json | yes | 2227 | f82b6b897b5c | ready=False, active=False, patch_applies=True, submodule=1f86f058, blockers=2 |
 | tl2_generic_summary | gguf_summary_json | yes | 4494 | 306a682203b2 | rows=4, failed=2, nan=1, catastrophic=0, max_ppl=18.8044 |
 | tl2_avx512_summary | gguf_summary_json | yes | 4573 | 6ec820472f37 | rows=4, failed=0, nan=2, catastrophic=0, max_ppl=18.8239 |
 | ptq_math | math_json | yes | 14010 | 8cedd88658e0 | trials=10, rel_error=0.512542 |

@@ -39,6 +39,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "active_goal_audit", "kind": "tracked_report", "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md"},
     {"label": "objective_completion_audit", "kind": "tracked_report", "path": "benchmarks/results/objective_completion_audit_2026-05-13.md"},
     {"label": "product_scope_gate", "kind": "tracked_report", "path": "benchmarks/results/product_scope_gate_2026-05-13.md"},
+    {"label": "i2sr_submodule_promotion_audit", "kind": "tracked_report", "path": "benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md"},
     {"label": "benchmark_coverage_gate_report", "kind": "tracked_report", "path": "benchmarks/results/benchmark_coverage_gate_2026-05-13.md"},
     {"label": "direct_static_ternary_gguf_report", "kind": "tracked_report", "path": "benchmarks/results/direct_static_ternary_gguf_2026-05-13.md"},
     {"label": "direct_packed_gguf_support_report", "kind": "tracked_report", "path": "benchmarks/results/direct_packed_gguf_support_2026-05-13.md"},
@@ -117,6 +118,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "benchmark_coverage_gate_json", "kind": "benchmark_coverage_gate_json", "path": "benchmark_results/benchmark_coverage_gate_2026-05-13.json"},
     {"label": "objective_completion_audit_json", "kind": "objective_completion_audit_json", "path": "benchmark_results/objective_completion_audit_2026-05-13.json"},
     {"label": "product_scope_gate_json", "kind": "product_scope_gate_json", "path": "benchmark_results/product_scope_gate_2026-05-13.json"},
+    {"label": "i2sr_submodule_promotion_audit_json", "kind": "i2sr_submodule_promotion_audit_json", "path": "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json"},
     {"label": "tl2_generic_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json"},
     {"label": "tl2_avx512_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json"},
     {"label": "ptq_math", "kind": "math_json", "path": "benchmark_results/math_viability_gaussian_10trial_2026-05-05.json"},
@@ -395,6 +397,14 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "unsupported_claim_count": data.get("unsupported_claim_count"),
             "publishable_angle": data.get("publishable_angle"),
         }
+    if kind == "i2sr_submodule_promotion_audit_json":
+        return {
+            "promotion_ready": data.get("promotion_ready"),
+            "active_runtime_support": data.get("active_runtime_support"),
+            "patch_applies_cleanly": data.get("patch_applies_cleanly"),
+            "submodule_short": data.get("submodule_short"),
+            "blockers": data.get("blockers"),
+        }
     if kind == "math_json":
         aggregate = data.get("aggregate", {})
         mean_abs = aggregate.get("mean_abs_ternary_repo_formula", {})
@@ -529,6 +539,14 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"scope={metrics.get('scope_status', '-')}, "
                 f"supported={metrics.get('supported_claim_count', '-')}, "
                 f"unsupported={metrics.get('unsupported_claim_count', '-')}"
+            )
+        elif entry["kind"] == "i2sr_submodule_promotion_audit_json":
+            summary = (
+                f"ready={metrics.get('promotion_ready', '-')}, "
+                f"active={metrics.get('active_runtime_support', '-')}, "
+                f"patch_applies={metrics.get('patch_applies_cleanly', '-')}, "
+                f"submodule={metrics.get('submodule_short', '-')}, "
+                f"blockers={len(metrics.get('blockers', []))}"
             )
         elif entry["kind"] == "math_json":
             summary = f"trials={metrics.get('trials', '-')}, rel_error={fmt_metric(metrics.get('relative_output_fro_error_mean'))}"

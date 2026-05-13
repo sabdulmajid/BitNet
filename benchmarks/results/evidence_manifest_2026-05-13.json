@@ -1,5 +1,5 @@
 {
-  "artifact_count": 86,
+  "artifact_count": 88,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "9357a430f81afa6bfe4018c212fea53f5b3afb0104380d8fe3f9c71552e279f7",
-      "size_bytes": 49682
+      "sha256": "e6df06b97258914d55fedf246c473847dd0d3cf7fa46e093e83b809ba5cafa3e",
+      "size_bytes": 49855
     },
     {
       "exists": true,
@@ -70,7 +70,7 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-13.md",
-      "sha256": "276e47b35d9b4a099a3052f228ed8f86a8eb00e7d5cbb00e9b7bce5bd50698a0",
+      "sha256": "6d179a960388872d7ffac97a4198dd6c9cb95e7728451b15badd8e802dc2fc7c",
       "size_bytes": 4607
     },
     {
@@ -85,10 +85,19 @@
     {
       "exists": true,
       "kind": "tracked_report",
+      "label": "i2sr_submodule_promotion_audit",
+      "metrics": {},
+      "path": "benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md",
+      "sha256": "7de7d284f7c9ee2a01850022c51e992542c14c1c9cd116ccd43bcdf2c069a439",
+      "size_bytes": 1819
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-13.md",
-      "sha256": "eb5d7c226cdfdd03f2dc7d18a8fb2e31f54c3698c9a9f83c0de879e0e40cc3b0",
+      "sha256": "93c3f4872e46845f8a30ef0aa315d9bace1b6fbc17638c6e2526b383e68657d7",
       "size_bytes": 2865
     },
     {
@@ -1552,7 +1561,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-13.json",
-      "sha256": "b39f894321a087268e6378242dcd9379cd7c64c23ccce4bb7e2f5b11126e62cb",
+      "sha256": "3d87ce099da4b7f60800912a90c974a470ab50f6b959cb859bb66bb0e6944cc9",
       "size_bytes": 5392
     },
     {
@@ -1570,7 +1579,7 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-13.json",
-      "sha256": "2d3f1c5c5cb160380d3a146a4351639209ccbc2cc76925d4e55331d8cf27402d",
+      "sha256": "9d09a6370e998823da2c328d227d492b1537d9c68b83e54d021d48d4d0188c19",
       "size_bytes": 14327
     },
     {
@@ -1586,6 +1595,24 @@
       "path": "benchmark_results/product_scope_gate_2026-05-13.json",
       "sha256": "baa7c6e01235d9182d7af039b2014f140c6b2ffc9bc592bc9bbbc39d156fd383",
       "size_bytes": 3471
+    },
+    {
+      "exists": true,
+      "kind": "i2sr_submodule_promotion_audit_json",
+      "label": "i2sr_submodule_promotion_audit_json",
+      "metrics": {
+        "active_runtime_support": false,
+        "blockers": [
+          "I2_SR qtype/file-type/runtime support is not present in the active submodule/root runtime files.",
+          "The I2_SR support still exists as an unapplied patch rather than active committed code."
+        ],
+        "patch_applies_cleanly": true,
+        "promotion_ready": false,
+        "submodule_short": "1f86f058"
+      },
+      "path": "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json",
+      "sha256": "f82b6b897b5ce0cae258284a74915fbb7ab8312438f813cae2bc1d571d695940",
+      "size_bytes": 2227
     },
     {
       "exists": true,

@@ -232,6 +232,18 @@ The current scope gate is
 supported dense-Qwen negative result plus row-scale recovery path from
 unsupported one-click, TL2, default-runtime, and MoE/Kimi claims.
 
+To verify whether `I2_SR` is actually active in the committed submodule state
+rather than only available as a patch:
+
+```bash
+python benchmarks/audit_i2sr_submodule_promotion.py
+```
+
+The current report is
+`benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md`; it is
+expected to fail until the submodule points at a pushed branch containing the
+row-scale qtype/runtime changes.
+
 Large checkpoints, model conversions, and CPU benchmark byproducts are ignored
 by Git. To make pruning reproducible, generate the dry-run artifact plan before
 deleting anything:
