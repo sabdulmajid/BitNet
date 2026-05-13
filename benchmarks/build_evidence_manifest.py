@@ -58,6 +58,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "i2sr_x86act_fix_report", "kind": "tracked_report", "path": "benchmarks/results/i2sr_x86act_fix_2026-05-13.md"},
     {"label": "i2s_packing_layout_verify_report", "kind": "tracked_report", "path": "benchmarks/results/i2s_packing_layout_verify_2026-05-13.md"},
     {"label": "i2sr_rss_report", "kind": "tracked_report", "path": "benchmarks/results/i2sr_rss_2026-05-13.md"},
+    {"label": "artifact_prune_application_report", "kind": "tracked_report", "path": "benchmarks/results/artifact_prune_application_2026-05-13.md"},
     {"label": "moe_report", "kind": "tracked_report", "path": "benchmarks/results/moe_support_audit_2026-05-05.md"},
     {"label": "moe_packing_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_packing_contract_2026-05-13.md"},
     {"label": "moe_tl2_runtime_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_tl2_runtime_contract_2026-05-13.md"},

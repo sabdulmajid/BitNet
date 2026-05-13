@@ -339,6 +339,16 @@ evidence manifest files, benchmark-manifest model paths, and final checkpoints,
 then separates intermediate checkpoint cleanup from rebuildable caches and model
 artifacts.
 
+Use `benchmarks/apply_artifact_prune_plan.py` for a guarded dry run before
+deleting anything:
+
+```bash
+python benchmarks/apply_artifact_prune_plan.py
+```
+
+The default group is `prune_intermediate_checkpoints`. Destructive cleanup
+requires an explicit `--execute` and a clean Git worktree.
+
 For the Qwen2.5-1.5B row-scale dense-head ablation, the postprocess wrapper
 audits the final checkpoint/eval artifacts and writes paired lm-eval comparison
 tables after the quality, MC, and full ten-task jobs complete:

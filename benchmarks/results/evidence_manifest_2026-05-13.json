@@ -1,5 +1,5 @@
 {
-  "artifact_count": 104,
+  "artifact_count": 105,
   "entries": [
     {
       "exists": true,
@@ -70,7 +70,7 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-13.md",
-      "sha256": "3ee167dfea1e4c2938a7ae4ab60b19130ce5b3e695d16021ec084a59974015cb",
+      "sha256": "c040f46ef9a77e1d7293c00a5f6f5400e98af205394224f3b3ebaa9fee9d3804",
       "size_bytes": 5101
     },
     {
@@ -252,6 +252,15 @@
       "path": "benchmarks/results/i2sr_rss_2026-05-13.md",
       "sha256": "cd21d1ee3435e4d0f287d235397cce29973e6e0ff76f07cf73c1a6dad644b209",
       "size_bytes": 1698
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "artifact_prune_application_report",
+      "metrics": {},
+      "path": "benchmarks/results/artifact_prune_application_2026-05-13.md",
+      "sha256": "803c9fe72cdb098b402b873bb1b3191dcd93f364f5e58863b3def67cf59ab3cc",
+      "size_bytes": 4276
     },
     {
       "exists": true,
@@ -1732,7 +1741,7 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-13.json",
-      "sha256": "820d0a389481094dc26383c1f56ec934bd3020fb32f2c0b2b3acca6038ac2880",
+      "sha256": "0d911a29d8852e1a6a39d7b065e30cea381c493ea1eb60f125af59ecdd2ead06",
       "size_bytes": 14839
     },
     {

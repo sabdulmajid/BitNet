@@ -1,5 +1,5 @@
 # Evidence Manifest, 2026-05-13
-Artifacts: `104`. Missing: `0`.
+Artifacts: `105`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
 | README | tracked_report | yes | 52227 | fdb33d03c1aa |  |
@@ -9,7 +9,7 @@ Artifacts: `104`. Missing: `0`.
 | publishable_claims | tracked_report | yes | 11054 | 63c5e9babbc1 |  |
 | progress_audit | tracked_report | yes | 25612 | 74e3b96847bf |  |
 | active_goal_audit | tracked_report | yes | 10765 | 255dacfeae0a |  |
-| objective_completion_audit | tracked_report | yes | 5101 | 3ee167dfea1e |  |
+| objective_completion_audit | tracked_report | yes | 5101 | c040f46ef9a7 |  |
 | product_scope_gate | tracked_report | yes | 3226 | 7c97b38f6d45 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 3097 | 3fb7dcf980ce |  |
 | benchmark_coverage_gate_report | tracked_report | yes | 2866 | 1d9aa0605ab4 |  |
@@ -30,6 +30,7 @@ Artifacts: `104`. Missing: `0`.
 | i2sr_x86act_fix_report | tracked_report | yes | 2113 | 828c0baaa784 |  |
 | i2s_packing_layout_verify_report | tracked_report | yes | 1075 | c11acd561e3c |  |
 | i2sr_rss_report | tracked_report | yes | 1698 | cd21d1ee3435 |  |
+| artifact_prune_application_report | tracked_report | yes | 4276 | 803c9fe72cdb |  |
 | moe_report | tracked_report | yes | 4107 | 7b456fcc675d |  |
 | moe_packing_contract_report | tracked_report | yes | 1887 | f67484f46161 |  |
 | moe_tl2_runtime_contract_report | tracked_report | yes | 2602 | 729fd5580945 |  |
@@ -96,7 +97,7 @@ Artifacts: `104`. Missing: `0`.
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4441 | e3a0b8c604d6 | ready=False, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=False, blockers=1 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
 | benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5393 | 69194a94c6c1 | passed=True, checks=33, failed=0 |
-| objective_completion_audit_json | objective_completion_audit_json | yes | 14839 | 820d0a389481 | achieved=False, status=not_complete, complete=7/9, open=2 |
+| objective_completion_audit_json | objective_completion_audit_json | yes | 14839 | 0d911a29d885 | achieved=False, status=not_complete, complete=7/9, open=2 |
 | product_scope_gate_json | product_scope_gate_json | yes | 3885 | 1352532bc5cc | scope=research_mvp_only, supported=2, unsupported=5 |
 | i2sr_submodule_promotion_audit_json | i2sr_submodule_promotion_audit_json | yes | 3583 | c7e94523c8fb | ready=False, active=False, patch_applies=True, submodule=1f86f058, blockers=4 |
 | moe_support_json | moe_support_json | yes | 10013 | f650b04a567a | present=5/5, gates=6, failed=3, kimi_artifacts=0 |
