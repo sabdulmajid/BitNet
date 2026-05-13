@@ -1,15 +1,16 @@
 # Evidence Manifest, 2026-05-13
-Artifacts: `82`. Missing: `0`.
+Artifacts: `84`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 49552 | 29a06c7dee4b |  |
+| README | tracked_report | yes | 49548 | 70327e2debf4 |  |
 | side_by_side_report | tracked_report | yes | 16010 | 934726f28907 |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
 | paired_row_minus_ptq_report | tracked_report | yes | 1332 | 20a5aee1eb99 |  |
 | publishable_claims | tracked_report | yes | 11054 | 63c5e9babbc1 |  |
 | progress_audit | tracked_report | yes | 25612 | 74e3b96847bf |  |
 | active_goal_audit | tracked_report | yes | 10765 | 255dacfeae0a |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 2865 | 45a3d24f067c |  |
+| objective_completion_audit | tracked_report | yes | 4607 | 560cfebee354 |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 2865 | 5b8eec834b62 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2174 | d6e0c6ec52ec |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -80,7 +81,8 @@ Artifacts: `82`. Missing: `0`.
 | row_scale_qtype_productization_gate_json | row_scale_qtype_gate_json | yes | 3795 | 10e3f5519b9e | passed=False, gates=9, failed=3, stable_qtype=False, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | row_scale_qtype_i2sr_active_patch_gate_json | row_scale_qtype_gate_json | yes | 3616 | cb42720567a1 | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5392 | 952981248690 | passed=True, checks=33, failed=0 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5392 | b88bfc582a24 | passed=True, checks=33, failed=0 |
+| objective_completion_audit_json | objective_completion_audit_json | yes | 14327 | 2cb1c8deb29b | achieved=False, status=not_complete, complete=7/9, open=2 |
 | tl2_generic_summary | gguf_summary_json | yes | 4494 | 306a682203b2 | rows=4, failed=2, nan=1, catastrophic=0, max_ppl=18.8044 |
 | tl2_avx512_summary | gguf_summary_json | yes | 4573 | 6ec820472f37 | rows=4, failed=0, nan=2, catastrophic=0, max_ppl=18.8239 |
 | ptq_math | math_json | yes | 14010 | 8cedd88658e0 | trials=10, rel_error=0.512542 |

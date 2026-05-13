@@ -37,6 +37,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "publishable_claims", "kind": "tracked_report", "path": "benchmarks/results/publishable_claims_2026-05-05.md"},
     {"label": "progress_audit", "kind": "tracked_report", "path": "benchmarks/results/progress_audit_2026-05-05.md"},
     {"label": "active_goal_audit", "kind": "tracked_report", "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md"},
+    {"label": "objective_completion_audit", "kind": "tracked_report", "path": "benchmarks/results/objective_completion_audit_2026-05-13.md"},
     {"label": "benchmark_coverage_gate_report", "kind": "tracked_report", "path": "benchmarks/results/benchmark_coverage_gate_2026-05-13.md"},
     {"label": "direct_static_ternary_gguf_report", "kind": "tracked_report", "path": "benchmarks/results/direct_static_ternary_gguf_2026-05-13.md"},
     {"label": "direct_packed_gguf_support_report", "kind": "tracked_report", "path": "benchmarks/results/direct_packed_gguf_support_2026-05-13.md"},
@@ -113,6 +114,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "row_scale_qtype_i2sr_active_patch_gate_json", "kind": "row_scale_qtype_gate_json", "path": "benchmark_results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.json"},
     {"label": "i2s_packing_layout_verify_json", "kind": "packing_verify_json", "path": "benchmark_results/i2s-packing-layout-verify-2026-05-13/summary.json"},
     {"label": "benchmark_coverage_gate_json", "kind": "benchmark_coverage_gate_json", "path": "benchmark_results/benchmark_coverage_gate_2026-05-13.json"},
+    {"label": "objective_completion_audit_json", "kind": "objective_completion_audit_json", "path": "benchmark_results/objective_completion_audit_2026-05-13.json"},
     {"label": "tl2_generic_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json"},
     {"label": "tl2_avx512_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json"},
     {"label": "ptq_math", "kind": "math_json", "path": "benchmark_results/math_viability_gaussian_10trial_2026-05-05.json"},
@@ -376,6 +378,14 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "check_count": data.get("check_count"),
             "failed": data.get("failed"),
         }
+    if kind == "objective_completion_audit_json":
+        return {
+            "objective_achieved": data.get("objective_achieved"),
+            "completion_status": data.get("completion_status"),
+            "check_count": data.get("check_count"),
+            "complete_count": data.get("complete_count"),
+            "partial_or_missing": data.get("partial_or_missing"),
+        }
     if kind == "math_json":
         aggregate = data.get("aggregate", {})
         mean_abs = aggregate.get("mean_abs_ternary_repo_formula", {})
@@ -497,6 +507,13 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"passed={metrics.get('passed', '-')}, "
                 f"checks={metrics.get('check_count', '-')}, "
                 f"failed={len(metrics.get('failed', []))}"
+            )
+        elif entry["kind"] == "objective_completion_audit_json":
+            summary = (
+                f"achieved={metrics.get('objective_achieved', '-')}, "
+                f"status={metrics.get('completion_status', '-')}, "
+                f"complete={metrics.get('complete_count', '-')}/{metrics.get('check_count', '-')}, "
+                f"open={len(metrics.get('partial_or_missing', []))}"
             )
         elif entry["kind"] == "math_json":
             summary = f"trials={metrics.get('trials', '-')}, rel_error={fmt_metric(metrics.get('relative_output_fro_error_mean'))}"

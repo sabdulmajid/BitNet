@@ -1,5 +1,5 @@
 {
-  "artifact_count": 82,
+  "artifact_count": 84,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "29a06c7dee4b9301fd6e23cfcc771002add1afd259a78630619f0fe9098dd767",
-      "size_bytes": 49552
+      "sha256": "70327e2debf45ee7a2791b5d53d573dbe5006bb6c9d02718e91eed1472109a71",
+      "size_bytes": 49548
     },
     {
       "exists": true,
@@ -67,10 +67,19 @@
     {
       "exists": true,
       "kind": "tracked_report",
+      "label": "objective_completion_audit",
+      "metrics": {},
+      "path": "benchmarks/results/objective_completion_audit_2026-05-13.md",
+      "sha256": "560cfebee3548a0b2c3059da0dc8e17b52677b40b0546e653a999daaa2bfe19a",
+      "size_bytes": 4607
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-13.md",
-      "sha256": "45a3d24f067cfd1147af1cb83ce7c74bfb84bdfdca44f13e9dafc3fc1a147171",
+      "sha256": "5b8eec834b62559acef2afb7bdfcde0af556380a24f021e1bc525036d7435a02",
       "size_bytes": 2865
     },
     {
@@ -1534,8 +1543,26 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-13.json",
-      "sha256": "952981248690d45033731599947083cf8b9369f2f4944c071628b3ff8e7ccb41",
+      "sha256": "b88bfc582a242f52622f544169afe67f116b65c68b52d9303c69dbc3a4643bb0",
       "size_bytes": 5392
+    },
+    {
+      "exists": true,
+      "kind": "objective_completion_audit_json",
+      "label": "objective_completion_audit_json",
+      "metrics": {
+        "check_count": 9,
+        "complete_count": 7,
+        "completion_status": "not_complete",
+        "objective_achieved": false,
+        "partial_or_missing": [
+          "Convert repaired checkpoints into GGUF/TL2/I2_S and run actual bitnet.cpp/llama.cpp CPU inference",
+          "Evaluate MoE/Kimi feasibility including converter mapping, router/expert execution, quality, throughput, and locality"
+        ]
+      },
+      "path": "benchmark_results/objective_completion_audit_2026-05-13.json",
+      "sha256": "2cb1c8deb29b2910e49317f066debe99b919f2d09aa6b6d4ba45f439647c45ca",
+      "size_bytes": 14327
     },
     {
       "exists": true,

@@ -208,6 +208,19 @@ python benchmarks/audit_evidence.py \
   --output-md benchmark_results/evidence_audit/current.md
 ```
 
+To audit the full user-facing objective rather than only artifact structure,
+generate the current prompt-to-artifact completion report:
+
+```bash
+python benchmarks/audit_objective_completion.py
+```
+
+The current report is
+`benchmarks/results/objective_completion_audit_2026-05-13.md`. It is expected
+to report `Objective achieved: False` until row-scale `I2_SR` is an active
+runtime contract or explicitly scoped as downstream, and until TL2/MoE claims
+are either benchmarked or removed from the product scope.
+
 Large checkpoints, model conversions, and CPU benchmark byproducts are ignored
 by Git. To make pruning reproducible, generate the dry-run artifact plan before
 deleting anything:
