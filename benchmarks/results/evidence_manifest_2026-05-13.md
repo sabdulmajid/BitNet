@@ -1,15 +1,16 @@
 # Evidence Manifest, 2026-05-13
-Artifacts: `44`. Missing: `0`.
+Artifacts: `46`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 44838 | e060f079ee88 |  |
+| README | tracked_report | yes | 45013 | 4cc9780a8506 |  |
 | side_by_side_report | tracked_report | yes | 12585 | 570856967359 |  |
-| publishable_claims | tracked_report | yes | 7055 | 372b8aeed38a |  |
-| progress_audit | tracked_report | yes | 17370 | 0a1546330dcf |  |
-| active_goal_audit | tracked_report | yes | 7542 | ad6b497a44c3 |  |
+| publishable_claims | tracked_report | yes | 7164 | a59f71bc8fd1 |  |
+| progress_audit | tracked_report | yes | 17697 | f7bb7e9f4052 |  |
+| active_goal_audit | tracked_report | yes | 7922 | d1c6204304db |  |
 | tl2_shape_report | tracked_report | yes | 2817 | 8dddd65315e0 |  |
 | tl2_probe_report | tracked_report | yes | 3608 | dd7e4fa29cc1 |  |
 | tl2_scale_report | tracked_report | yes | 2321 | 30bbfbd22559 |  |
+| i2s_row_scale_format_report | tracked_report | yes | 1759 | 256abf73581c |  |
 | moe_report | tracked_report | yes | 1882 | 342ac496a28d |  |
 | latest_nonrow_audit | evidence_audit_md | yes | 4396 | 6d8c31e958f1 |  |
 | row_notie_5000_audit | evidence_audit_md | yes | 2569 | 4615a642257d |  |
@@ -43,6 +44,7 @@ Artifacts: `44`. Missing: `0`.
 | gguf_context_rss | gguf_memory_json | yes | 9911 | fd135b202cfd | rows=24, contexts=[512, 2048, 8192, 32768] |
 | tl2_shape_json | tl2_shape_json | yes | 12054 | a99430f0f4b0 |  |
 | tl2_scale_json | tl2_scale_json | yes | 14344 | bf2d36674b72 | qwen15b_tensor_scale err=0; qwen15b_row_scale err=1.90423 |
+| i2s_row_scale_format_json | i2s_format_json | yes | 1528 | e17297539b9d | default_ratio=30836.2, prototype_ratio=1.00157, stable_format_required=True |
 | tl2_generic_summary | gguf_summary_json | yes | 4494 | 306a682203b2 | rows=4, failed=2, nan=1 |
 | tl2_avx512_summary | gguf_summary_json | yes | 4573 | 6ec820472f37 | rows=4, failed=0, nan=2 |
 | ptq_math | math_json | yes | 14010 | 8cedd88658e0 | trials=10, rel_error=0.512542 |

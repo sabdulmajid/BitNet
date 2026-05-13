@@ -35,6 +35,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "tl2_shape_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_shape_support_audit_2026-05-05.md"},
     {"label": "tl2_probe_report", "kind": "tracked_report", "path": "benchmarks/results/qwen05b_tl2_probe_2026-05-05.md"},
     {"label": "tl2_scale_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_scale_semantics_2026-05-05.md"},
+    {"label": "i2s_row_scale_format_report", "kind": "tracked_report", "path": "benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md"},
     {"label": "moe_report", "kind": "tracked_report", "path": "benchmarks/results/moe_support_audit_2026-05-05.md"},
     # Mechanical audits.
     {"label": "latest_nonrow_audit", "kind": "evidence_audit_md", "path": "benchmark_results/evidence_audit/latest_nonrow.md"},
@@ -72,6 +73,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "gguf_context_rss", "kind": "gguf_memory_json", "path": "benchmark_results/gguf-rss-qwen15b-context-scaling-2026-05-05/summary.json"},
     {"label": "tl2_shape_json", "kind": "tl2_shape_json", "path": "benchmark_results/tl2_shape_support_audit_2026-05-05.json"},
     {"label": "tl2_scale_json", "kind": "tl2_scale_json", "path": "benchmark_results/tl2_scale_semantics_2026-05-05.json"},
+    {"label": "i2s_row_scale_format_json", "kind": "i2s_format_json", "path": "benchmark_results/i2s_row_scale_format_audit_2026-05-13.json"},
     {"label": "tl2_generic_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json"},
     {"label": "tl2_avx512_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json"},
     {"label": "ptq_math", "kind": "math_json", "path": "benchmark_results/math_viability_gaussian_10trial_2026-05-05.json"},
@@ -228,6 +230,17 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
                 if isinstance(result, dict)
             ]
         }
+    if kind == "i2s_format_json":
+        metrics = data.get("metrics", {})
+        verdict = data.get("verdict", {})
+        return {
+            "default_i2s_to_tq2_ppl_ratio": metrics.get("default_row_scale_i2s_to_tq2_ppl_ratio"),
+            "prototype_i2s_to_tq2_ppl_ratio": metrics.get("prototype_row_scale_i2s_to_tq2_ppl_ratio"),
+            "row_scale_i2s_physically_possible": verdict.get("row_scale_i2s_physically_possible"),
+            "current_patch_is_product_format_safe": verdict.get("current_patch_is_product_format_safe"),
+            "stable_new_format_required": verdict.get("stable_new_format_required"),
+            "direct_ternary_gguf_writer_still_required": verdict.get("direct_ternary_gguf_writer_still_required"),
+        }
     if kind == "math_json":
         aggregate = data.get("aggregate", {})
         mean_abs = aggregate.get("mean_abs_ternary_repo_formula", {})
@@ -291,6 +304,12 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"{value.get('label')} err={fmt_metric(value.get('total_relative_fro_error_if_one_scale'))}"
                 for value in values
                 if isinstance(value, dict)
+            )
+        elif entry["kind"] == "i2s_format_json":
+            summary = (
+                f"default_ratio={fmt_metric(metrics.get('default_i2s_to_tq2_ppl_ratio'))}, "
+                f"prototype_ratio={fmt_metric(metrics.get('prototype_i2s_to_tq2_ppl_ratio'))}, "
+                f"stable_format_required={metrics.get('stable_new_format_required', '-')}"
             )
         elif entry["kind"] == "math_json":
             summary = f"trials={metrics.get('trials', '-')}, rel_error={fmt_metric(metrics.get('relative_output_fro_error_mean'))}"

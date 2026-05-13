@@ -6,7 +6,7 @@ claim below is scoped to the cited artifact family.
 
 The compact artifact manifest is
 `benchmarks/results/evidence_manifest_2026-05-13.md`; it records hashes and
-parsed headline metrics for 44 cited artifacts with zero missing entries.
+parsed headline metrics for cited artifacts with zero missing entries.
 
 ## Supported Claims
 
@@ -19,7 +19,7 @@ parsed headline metrics for 44 cited artifacts with zero missing entries.
 | Row-wise ternary scales are the strongest tested PyTorch-quality ablation | supported | `benchmark_results/quality-qwen15b-klonly-row-notiehead-5000`; `benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10`; `benchmark_results/evidence_audit/qwen15b_row_notie_5000.md` | Qwen2.5-1.5B KL-only dense-`lm_head`; still below FP |
 | Static ternary materialization can preserve the trained ternary checkpoint semantics through GGUF F16/TQ2_0 | supported | `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json`; `benchmarks/build_static_ternary_gguf_bridge.py` | bridge path, not direct packed ternary-state GGUF writing |
 | Default row-scale `I2_S` is not valid for row-scale checkpoints | supported | `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json`; `benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/audit.md` | current default layout stores one tensor scale and loses row-scale magnitudes |
-| A local row-scale-aware `I2_S` prototype fixes that specific packed-format failure | supported as prototype | `patches/llama-i2s-row-scale.patch`; `benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json`; `benchmark_results/evidence_audit/qwen15b_row_i2s_heapfix.md` | local replacement layout; not a stable upstream GGUF type |
+| A local row-scale-aware `I2_S` prototype fixes that specific packed-format failure | supported as prototype | `patches/llama-i2s-row-scale.patch`; `benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json`; `benchmark_results/evidence_audit/qwen15b_row_i2s_heapfix.md`; `benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md` | local replacement layout; not a stable upstream GGUF type; format audit shows it overloads existing `I2_S` |
 | Row-scale `I2_S` prefill scales with threads while decode saturates early | supported | `benchmarks/results/i2s_thread_scaling_2026-05-05.md`; `benchmark_results/evidence_audit/qwen15b_row_i2s_thread_scaling.md` | Xeon Silver 4116, portable AVX2 build, patched row-scale `I2_S` artifact |
 | Row-scale `I2_S` keeps a memory advantage over FP16 at long context but not over Q4_K_M | supported | `benchmarks/results/gguf_context_scaling_2026-05-05.md`; `benchmark_results/evidence_audit/qwen15b_context_scaling_rss.md` | Qwen2.5-1.5B row-scale dense-`lm_head`, contexts 512/2048/8192/32768 |
 | Dense Qwen TL2 export is possible only with model-specific code generation, and the tested 0.5B TL2 checkpoint fails quality | supported | `benchmarks/results/tl2_shape_support_audit_2026-05-05.md`; `benchmarks/results/qwen05b_tl2_probe_2026-05-05.md`; `benchmark_results/evidence_audit/qwen05b_tl2_probe.md` | Qwen2.5-0.5B dense checkpoint; generated TL2 shapes plus a `BITNET_X86_TL2=ON` AVX-512 build; PPL is NaN |

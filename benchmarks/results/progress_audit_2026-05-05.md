@@ -152,7 +152,7 @@ when deciding what can be stated publicly.
 The compact evidence manifest is tracked at
 `benchmarks/results/evidence_manifest_2026-05-13.md` and
 `benchmarks/results/evidence_manifest_2026-05-13.json`. It records SHA-256
-hashes, sizes, existence checks, and parsed headline metrics for 44 cited
+hashes, sizes, existence checks, and parsed headline metrics for the cited
 artifacts; the current manifest has zero missing artifacts.
 
 Key audited values:
@@ -182,6 +182,9 @@ Key audited values:
 | Qwen2.5-1.5B row-scale dense-head I2_S prototype prompt tok/s on Xeon 4116 | 218.17 |
 | Qwen2.5-1.5B row-scale dense-head I2_S prototype decode tok/s on Xeon 4116 | 18.97 |
 | Qwen2.5-1.5B row-scale dense-head I2_S prototype GGUF file size | 1,211.3 MiB |
+| Default row-scale I2_S / TQ2_0 PPL ratio | 30836.21 |
+| Patched row-scale I2_S / TQ2_0 PPL ratio | 1.0016 |
+| Row-scale I2_S patch defines a new stable qtype | false |
 | Qwen2.5-1.5B row-scale dense-head native AVX-512 I2_S prototype PPL on Xeon 4116 | 38.8853 |
 | Qwen2.5-1.5B row-scale dense-head native AVX-512 I2_S prototype prompt tok/s on Xeon 4116 | 207.35 |
 | Qwen2.5-1.5B row-scale dense-head native AVX-512 I2_S prototype decode tok/s on Xeon 4116 | 18.37 |
@@ -210,7 +213,9 @@ Key audited values:
    `I2_S` packing path loses row-scale magnitudes and fails the GGUF audit with
    PPL `1.197e6`; the prototype patch stores one scale per output row and
    recovers PPL `38.8832`, but the format change still needs integration,
-   compatibility policy, and regeneration of affected artifacts.
+   compatibility policy, and regeneration of affected artifacts. The
+   row-scale format audit shows the prototype currently overloads the existing
+   `I2_S` type instead of defining a compatibility-safe row-scale qtype.
 2. Native direct GGUF writing from `ternary_state_dict.pt` is not complete.
    Static-ternary materialization is a validated bridge, not the final storage
    path. `benchmarks/build_static_ternary_gguf_bridge.py` now makes that bridge

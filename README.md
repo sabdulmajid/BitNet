@@ -132,6 +132,8 @@ The Qwen2.5-0.5B TL2 probe is
 [benchmarks/results/qwen05b_tl2_probe_2026-05-05.md](benchmarks/results/qwen05b_tl2_probe_2026-05-05.md).
 The TL2 scale-semantics audit is
 [benchmarks/results/tl2_scale_semantics_2026-05-05.md](benchmarks/results/tl2_scale_semantics_2026-05-05.md).
+The row-scale `I2_S` format compatibility audit is
+[benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md](benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md).
 The MoE support audit is
 [benchmarks/results/moe_support_audit_2026-05-05.md](benchmarks/results/moe_support_audit_2026-05-05.md).
 The reusable static-ternary GGUF bridge note is

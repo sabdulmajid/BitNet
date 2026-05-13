@@ -1,5 +1,5 @@
 {
-  "artifact_count": 44,
+  "artifact_count": 46,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "e060f079ee88f23cd854b5647b9acc2babf91c15afab46ea39f5afccf7dc748d",
-      "size_bytes": 44838
+      "sha256": "4cc9780a8506118b1a80796bac86fe2b55f82e31e203b44b83385e0ad191b974",
+      "size_bytes": 45013
     },
     {
       "exists": true,
@@ -25,8 +25,8 @@
       "label": "publishable_claims",
       "metrics": {},
       "path": "benchmarks/results/publishable_claims_2026-05-05.md",
-      "sha256": "372b8aeed38a7e4c464007ffb8d4655aef53e67c977f8cbc2a995cad73870d88",
-      "size_bytes": 7055
+      "sha256": "a59f71bc8fd1c30177ed480229c42cc75fec2488415ea54e685700558c66e8f4",
+      "size_bytes": 7164
     },
     {
       "exists": true,
@@ -34,8 +34,8 @@
       "label": "progress_audit",
       "metrics": {},
       "path": "benchmarks/results/progress_audit_2026-05-05.md",
-      "sha256": "0a1546330dcf39b859d8fa06945a6543fb35d9527b0773a41656a3eeca6c2f5b",
-      "size_bytes": 17370
+      "sha256": "f7bb7e9f4052c836f0c79f4939eb457b8ba075ff9d8e916e7eec2adc8d2c2892",
+      "size_bytes": 17697
     },
     {
       "exists": true,
@@ -43,8 +43,8 @@
       "label": "active_goal_audit",
       "metrics": {},
       "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md",
-      "sha256": "ad6b497a44c39a620fe7f86679ae7c78c0af5c9d98c845a9f0c451bca7b45d29",
-      "size_bytes": 7542
+      "sha256": "d1c6204304dbb4791499fd8c38271a9ad841eaf91837cc4e96c95e7b9735cc9f",
+      "size_bytes": 7922
     },
     {
       "exists": true,
@@ -72,6 +72,15 @@
       "path": "benchmarks/results/tl2_scale_semantics_2026-05-05.md",
       "sha256": "30bbfbd225596b9776e3651fe474f059c9467726e6c737cd867d6c7cd42da2ad",
       "size_bytes": 2321
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2s_row_scale_format_report",
+      "metrics": {},
+      "path": "benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md",
+      "sha256": "256abf73581c7d5d49ea22d6f1ec0bf6e3cf8e17dd5fafbdafd47242c77484b5",
+      "size_bytes": 1759
     },
     {
       "exists": true,
@@ -790,6 +799,22 @@
       "path": "benchmark_results/tl2_scale_semantics_2026-05-05.json",
       "sha256": "bf2d36674b725708d1978cb5e1d59c4b0db73120a67577c7c7ab8649e05966df",
       "size_bytes": 14344
+    },
+    {
+      "exists": true,
+      "kind": "i2s_format_json",
+      "label": "i2s_row_scale_format_json",
+      "metrics": {
+        "current_patch_is_product_format_safe": false,
+        "default_i2s_to_tq2_ppl_ratio": 30836.207570886912,
+        "direct_ternary_gguf_writer_still_required": true,
+        "prototype_i2s_to_tq2_ppl_ratio": 1.0015661061655128,
+        "row_scale_i2s_physically_possible": true,
+        "stable_new_format_required": true
+      },
+      "path": "benchmark_results/i2s_row_scale_format_audit_2026-05-13.json",
+      "sha256": "e17297539b9d50082fb6fee89bf5744517b521ffb342135900935eedf3eeb23f",
+      "size_bytes": 1528
     },
     {
       "exists": true,
