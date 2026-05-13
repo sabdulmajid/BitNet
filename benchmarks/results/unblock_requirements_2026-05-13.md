@@ -8,13 +8,13 @@ Product scope: `research_mvp_only`.
 
 Can continue productively without new input: `false`.
 
-Next required input: Create/provide a reachable writable llama.cpp fork URL, then push the submodule I2_SR patch branch.
+Next required input: Create/provide a reachable writable llama.cpp fork URL, then push the prepared submodule I2_SR patch branch.
 
 ## Requirements
 
 | requirement | status | evidence | unblock action |
 | --- | --- | --- | --- |
-| Writable llama.cpp fork or branch | missing | promotion_ready=False; candidate_fork_reachable=False; submodule_patch_applies=True | Create/provide a reachable writable llama.cpp fork URL, then push the submodule I2_SR patch branch. |
+| Writable llama.cpp fork or branch | missing | promotion_ready=False; candidate_fork_reachable=False; submodule_patch_applies=True; local_handoff_prepared=True; local_handoff_commit=cb38942486a05e3a1212e6eba1462e178478f459 | Create/provide a reachable writable llama.cpp fork URL, then push the prepared submodule I2_SR patch branch. |
 | GitHub automation credential | missing | gh_path=not_found | Install/authenticate GitHub CLI or refresh the GitHub connector token if repository creation/push automation is desired. |
 | Local Kimi/Qwen2MoE model artifact | missing | artifacts=0 | Provide a licensed Kimi or Qwen2MoE checkpoint/tokenizer artifact plus its FP and quantized baselines. |
 | MoE 3D expert tensor packing support | missing | tl2_3d=False; i2sr_3d=True; 2d_control=True | Implement remaining TL2 3D expert packing and full MoE GGUF/runtime byte tests before any Kimi runtime benchmark. |

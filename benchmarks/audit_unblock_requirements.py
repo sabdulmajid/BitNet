@@ -63,6 +63,7 @@ def make_requirement(name: str, status: str, evidence: str, unblock_action: str)
 def build_audit(root: Path, *, candidate_fork_url: str) -> dict[str, Any]:
     objective = read_json(root / "benchmark_results/objective_completion_audit_2026-05-13.json")
     i2sr = read_json(root / "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json")
+    handoff = read_json(root / "benchmark_results/i2sr_promotion_handoff_2026-05-13.json")
     moe = read_json(root / "benchmark_results/moe_support_audit_2026-05-05.json")
     moe_contract = read_json(root / "benchmark_results/moe_packing_contract_2026-05-13.json")
     scope = read_json(root / "benchmark_results/product_scope_gate_2026-05-13.json")
@@ -71,6 +72,9 @@ def build_audit(root: Path, *, candidate_fork_url: str) -> dict[str, Any]:
     kimi_artifacts = local_kimi_artifacts(root)
 
     i2sr_blocked = not bool(i2sr.get("promotion_ready"))
+    handoff_worktree = handoff.get("worktree_result") if isinstance(handoff.get("worktree_result"), dict) else {}
+    handoff_prepared = bool(handoff_worktree.get("prepared"))
+    handoff_commit = handoff_worktree.get("commit_sha") or ""
     moe_verdict = moe_contract.get("verdict", {}) if isinstance(moe_contract.get("verdict"), dict) else {}
     moe_gates = moe.get("productization_gates", [])
     failed_moe_gates = [gate.get("name") for gate in moe_gates if isinstance(gate, dict) and not gate.get("passed")]
@@ -82,9 +86,11 @@ def build_audit(root: Path, *, candidate_fork_url: str) -> dict[str, Any]:
             (
                 f"promotion_ready={i2sr.get('promotion_ready')}; "
                 f"candidate_fork_reachable={fork_probe['reachable']}; "
-                f"submodule_patch_applies={i2sr.get('patch_applies_cleanly')}"
+                f"submodule_patch_applies={i2sr.get('patch_applies_cleanly')}; "
+                f"local_handoff_prepared={handoff_prepared}; "
+                f"local_handoff_commit={handoff_commit or 'n/a'}"
             ),
-            "Create/provide a reachable writable llama.cpp fork URL, then push the submodule I2_SR patch branch.",
+            "Create/provide a reachable writable llama.cpp fork URL, then push the prepared submodule I2_SR patch branch.",
         ),
         make_requirement(
             "GitHub automation credential",

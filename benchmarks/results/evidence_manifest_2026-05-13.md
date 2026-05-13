@@ -33,7 +33,7 @@ Artifacts: `104`. Missing: `0`.
 | moe_report | tracked_report | yes | 4107 | 7b456fcc675d |  |
 | moe_packing_contract_report | tracked_report | yes | 1887 | f67484f46161 |  |
 | moe_tl2_runtime_contract_report | tracked_report | yes | 2602 | 729fd5580945 |  |
-| unblock_requirements_report | tracked_report | yes | 1851 | ff2983c75977 |  |
+| unblock_requirements_report | tracked_report | yes | 1961 | 84ced033c74d |  |
 | i2sr_combined_patch | tracked_report | yes | 26764 | d02e20bd9e00 |  |
 | i2sr_root_runtime_patch | tracked_report | yes | 5408 | c4c30c8e2053 |  |
 | i2sr_submodule_patch | tracked_report | yes | 20824 | aa68da60931a |  |
@@ -102,7 +102,7 @@ Artifacts: `104`. Missing: `0`.
 | moe_support_json | moe_support_json | yes | 10013 | f650b04a567a | present=5/5, gates=6, failed=3, kimi_artifacts=0 |
 | moe_packing_contract_json | moe_packing_contract_json | yes | 2966 | 538939fcb10b | ready=False, tl2_3d=False, i2sr_3d=True, control_2d=True, layout=4/4, blockers=1 |
 | moe_tl2_runtime_contract_json | moe_tl2_runtime_contract_json | yes | 2985 | e5b03c961bf5 | ready=False, checks=5, failed=3, underreport=69632, ratio=3.99312, blockers=3 |
-| unblock_requirements_json | unblock_requirements_json | yes | 2196 | 4e36524a49c8 | missing=5/5, can_continue=False, fork_reachable=False |
+| unblock_requirements_json | unblock_requirements_json | yes | 2306 | 9bb10f9ee9f9 | missing=5/5, can_continue=False, fork_reachable=False |
 | tl2_generic_summary | gguf_summary_json | yes | 4494 | 306a682203b2 | rows=4, failed=2, nan=1, catastrophic=0, max_ppl=18.8044 |
 | tl2_avx512_summary | gguf_summary_json | yes | 4573 | 6ec820472f37 | rows=4, failed=0, nan=2, catastrophic=0, max_ppl=18.8239 |
 | ptq_math | math_json | yes | 14010 | 8cedd88658e0 | trials=10, rel_error=0.512542 |
