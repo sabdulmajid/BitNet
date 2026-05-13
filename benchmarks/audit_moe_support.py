@@ -40,7 +40,7 @@ def run_check(check: PatternCheck) -> dict[str, Any]:
 def search_tree(root: Path, needle: str) -> list[str]:
     matches: list[str] = []
     suffixes = {".py", ".cpp", ".c", ".h", ".hpp"}
-    skip_dirs = {".git", "benchmark_results", "checkpoints", "models", "__pycache__"}
+    skip_dirs = {".git", "benchmark_results", "benchmarks", "checkpoints", "models", "__pycache__"}
     for path in root.rglob("*"):
         if any(part in skip_dirs for part in path.parts):
             continue
@@ -121,9 +121,9 @@ def build_report(data: dict[str, Any]) -> str:
         else "No local Kimi benchmark artifacts were found under benchmark_results."
     )
     kimi_note = (
-        f"Kimi string matches in tracked source files: {len(data['kimi_source_matches'])}."
+        f"Kimi string matches in converter/runtime source files: {len(data['kimi_source_matches'])}."
         if data["kimi_source_matches"]
-        else "No Kimi-specific converter/runtime mapping was found in tracked source files."
+        else "No Kimi-specific converter/runtime mapping was found in converter/runtime source files."
     )
     contract = data.get("moe_packing_contract") or {}
     contract_verdict = contract.get("verdict", {})
@@ -142,8 +142,9 @@ def build_report(data: dict[str, Any]) -> str:
         "top-k expert execution with `ggml_mul_mat_id`. This does not prove "
         "Kimi support: no Kimi-specific mapping or benchmark artifact is present, "
         "the TL2-capable BitNet converter still lacks Qwen2MoE registration, "
-        "and the current TL2/I2_SR packing code paths are 2D-matrix oriented "
-        "rather than validated for merged 3D expert tensors."
+        "and the TL2 packing path remains 2D-matrix oriented. The direct "
+        "I2_S/I2_SR path is only a synthetic packing contract until it is "
+        "validated with a full MoE GGUF/runtime artifact."
     )
     gate_rows = [
         [
@@ -157,8 +158,8 @@ def build_report(data: dict[str, Any]) -> str:
     required_plan = (
         "Required MoE/Kimi path: add an explicit Kimi/Qwen2MoE BitNet converter "
         "registration, map router/shared-expert/expert tensor names, decide which "
-        "router and shared-expert tensors stay dense, extend TL2/I2_SR packing and "
-        "runtime tests to 3D expert tensors, distill router and expert weights under "
+        "router and shared-expert tensors stay dense, extend TL2 packing plus "
+        "full GGUF/runtime tests to 3D expert tensors, distill router and expert weights under "
         "ternary constraints, then run quality, throughput, RSS, and expert-locality "
         "benchmarks against dense and llama.cpp quantized MoE baselines."
     )
@@ -231,7 +232,7 @@ def build_productization_gates(
                 f"contract_available={contract_available}; contract_i2sr_3d={contract_i2sr_3d}; "
                 f"contract_2d_control={contract_2d_control}; direct_i2sr_writer_rejects_non_2d={direct_i2sr_is_2d}"
             ),
-            "The direct packed I2_S/I2_SR writer rejects non-2D ternary weights, so merged expert tensors need new packing/layout tests.",
+            "The direct packed I2_S/I2_SR writer must accept synthetic 3D expert tensors without regressing 2D dense packing.",
         ),
         make_gate(
             "local Kimi model/eval artifacts exist",

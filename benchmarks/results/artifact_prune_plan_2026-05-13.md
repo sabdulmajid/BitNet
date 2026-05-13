@@ -1,7 +1,7 @@
 # Artifact Prune Plan
 
-Generated UTC: `2026-05-13T09:59:38+00:00`
-Git HEAD at generation time: `cd3c3034c315`
+Generated UTC: `2026-05-13T10:12:03+00:00`
+Git HEAD at generation time: `e87f018c06dc`
 
 This is a dry-run plan. No files were deleted by the generator.
 

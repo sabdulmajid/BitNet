@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "d392b8618cad97006b5d88a6ffb5c16d0451c45418762f216d31fef9b3e18767",
-      "size_bytes": 51626
+      "sha256": "104d89dac8778f36a413f618e28f8fac0c0248b599b9a1b1d3e406c6fb82e254",
+      "size_bytes": 51754
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "side_by_side_report",
       "metrics": {},
       "path": "benchmarks/results/qwen_side_by_side_2026-05-05.md",
-      "sha256": "129ccd2b1ac291c8a8fbb06f321ee98b02255fa4d1373f8624528b96d2fd3506",
-      "size_bytes": 16937
+      "sha256": "6c2b35ecbfaed4be7921558868d4ab138ec465d00e55b18f1942fcb18faa7b2b",
+      "size_bytes": 16950
     },
     {
       "exists": true,
@@ -70,8 +70,8 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-13.md",
-      "sha256": "213c744a8bfdc26f428d7cc04478055decd42073c4d85659e614f265628ce1ef",
-      "size_bytes": 4837
+      "sha256": "a954729ba9ac49262ed051d42e894ce9c3f4fc815895d841ed99b90197db2b94",
+      "size_bytes": 5035
     },
     {
       "exists": true,
@@ -79,8 +79,8 @@
       "label": "product_scope_gate",
       "metrics": {},
       "path": "benchmarks/results/product_scope_gate_2026-05-13.md",
-      "sha256": "a264791e31dfaaa6e0169dd365ad8bff0e9820dc8566fc16db473d72534b5392",
-      "size_bytes": 3078
+      "sha256": "551a446ee614d19d2bb2898d6d68e548c0c9a67baadf59090769f387b89b2d16",
+      "size_bytes": 3131
     },
     {
       "exists": true,
@@ -250,8 +250,8 @@
       "label": "moe_report",
       "metrics": {},
       "path": "benchmarks/results/moe_support_audit_2026-05-05.md",
-      "sha256": "7dbf6a078be8be77b5c71472612cbdd7c8807f222ab8c8bc6941494719818eaa",
-      "size_bytes": 4007
+      "sha256": "0b076a359d7632dc52644db6bd278a11d177ad072e9faaf465a9f43b2d10c445",
+      "size_bytes": 3986
     },
     {
       "exists": true,
@@ -259,8 +259,8 @@
       "label": "moe_packing_contract_report",
       "metrics": {},
       "path": "benchmarks/results/moe_packing_contract_2026-05-13.md",
-      "sha256": "41f1773d62d903796fb86fa6eb15fdbb3dc77236953495ffca08a65e5a2ebc3c",
-      "size_bytes": 1310
+      "sha256": "d28b768f109106f0ea76d084abaea7ca61eda900c33fd3df2bc3f9d8ddd82f11",
+      "size_bytes": 1558
     },
     {
       "exists": true,
@@ -268,8 +268,8 @@
       "label": "unblock_requirements_report",
       "metrics": {},
       "path": "benchmarks/results/unblock_requirements_2026-05-13.md",
-      "sha256": "aba00d8146660a46404f267c4db9192db9956e5ddae3f6e25220076f3144e418",
-      "size_bytes": 1829
+      "sha256": "c0fc2e3462714de036476ff6eef8dcc2211e838798ef985b84f3cd7c1135d3b3",
+      "size_bytes": 1851
     },
     {
       "exists": true,
@@ -1695,8 +1695,8 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-13.json",
-      "sha256": "bb18a8f23b5c4b7ae7b714bc4da67b249932523928a55d1be223d7c143688276",
-      "size_bytes": 14707
+      "sha256": "81dd93e8dab5866a9a9e55b25068bb1fd489c43456e3f8e4e0ed961b21d45e9e",
+      "size_bytes": 14806
     },
     {
       "exists": true,
@@ -1709,8 +1709,8 @@
         "unsupported_claim_count": 5
       },
       "path": "benchmark_results/product_scope_gate_2026-05-13.json",
-      "sha256": "cf93002c371a2c05a1e5d2a7919c3e8263458c75a6b97ffed7e933721941b675",
-      "size_bytes": 3737
+      "sha256": "1ce6347c5fa59f263463a10e6619c53e8dfa5be843a099e96ff3169639397dd5",
+      "size_bytes": 3790
     },
     {
       "exists": true,
@@ -1741,18 +1741,17 @@
         "failed_gates": [
           "BitNet converter has explicit Qwen2MoE/Kimi registration",
           "TL2 converter path is validated for merged 3D expert tensors",
-          "direct I2_SR writer is validated for merged 3D expert tensors",
           "local Kimi model/eval artifacts exist",
           "MoE quality and locality benchmarks exist"
         ],
         "gates": 6,
-        "kimi_source_matches": 4,
+        "kimi_source_matches": 0,
         "local_kimi_artifacts": 0,
         "present_checks": 5
       },
       "path": "benchmark_results/moe_support_audit_2026-05-05.json",
-      "sha256": "236d0e01ccc3f68265575302508e7183bf62bf8adcad1831a779e688640c49ae",
-      "size_bytes": 5643
+      "sha256": "252978c41268becddaabd23119d3ec5d70d7754a1a4bb9295bd78beb8f63100e",
+      "size_bytes": 5959
     },
     {
       "exists": true,
@@ -1760,18 +1759,17 @@
       "label": "moe_packing_contract_json",
       "metrics": {
         "blockers": [
-          "TL2 preprocessing rejects merged 3D expert tensors before kernel lookup.",
-          "Direct I2_S/I2_SR code packing rejects merged 3D expert tensors."
+          "TL2 preprocessing still rejects merged 3D expert tensors before kernel lookup."
         ],
-        "checks": 3,
+        "checks": 5,
         "dense_2d_control": true,
-        "i2sr_3d": false,
+        "i2sr_3d": true,
         "moe_packing_ready": false,
         "tl2_3d": false
       },
       "path": "benchmark_results/moe_packing_contract_2026-05-13.json",
-      "sha256": "1abe9027c4b80325cd840be405edee340de9495c800f48da26220e89d387f0c5",
-      "size_bytes": 1514
+      "sha256": "290879d928f8ba1f0ce832118ec44ddb98625cdcb19a0689e708f9bf6cc66f6d",
+      "size_bytes": 2084
     },
     {
       "exists": true,
@@ -1792,8 +1790,8 @@
         "requirements": 5
       },
       "path": "benchmark_results/unblock_requirements_2026-05-13.json",
-      "sha256": "65d12be0467985730bafaa5cf68a1888c66c3129e6ff46c8d6308bafa4aa380c",
-      "size_bytes": 2174
+      "sha256": "2f2456be4305bcb8245efd1d83bdf1ee8318cadd35cd67c03b4f280b21c944c6",
+      "size_bytes": 2196
     },
     {
       "exists": true,

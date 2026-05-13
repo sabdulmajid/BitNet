@@ -146,11 +146,12 @@ conservative:
   converter has partial Qwen-style expert packing. This repo has not yet shown a
   Kimi-compatible ternary converter, expert-router distillation, or a Kimi/MoE
   benchmark. The mechanical MoE audit confirms generic Qwen2MoE infrastructure
-  exists, but five of six MoE productization gates fail: the TL2-capable BitNet
+  exists, but four of six MoE productization gates still fail: the TL2-capable BitNet
   converter does not explicitly register Qwen2MoE/Kimi, the TL2 path unpacks
-  weights as 2D matrices, the direct `I2_SR` writer rejects non-2D ternary
-  tensors, no local Kimi artifacts exist, and no quality/throughput/RSS or
-  expert-locality benchmarks exist.
+  weights as 2D matrices, no local Kimi artifacts exist, and no
+  quality/throughput/RSS or expert-locality benchmarks exist. The direct
+  `I2_S`/`I2_SR` writer now passes a synthetic `[experts, out, in]` packing
+  contract, but that is not a Kimi runtime benchmark.
 
 Current evidence is tracked in
 [benchmarks/results/qwen_retrofit_2026-05-03.md](benchmarks/results/qwen_retrofit_2026-05-03.md).
@@ -304,9 +305,10 @@ already preserves the best row-scale checkpoint's quality and passes the
 promotion rehearsal. Production TL2 export for strong row-scale Qwen checkpoints
 needs row/group-scale metadata plus generated kernels that index those scales;
 it is not blocked by scale-storage size. MoE models such as Kimi need explicit
-converter registration, router/shared-expert tensor mapping, 3D expert packing
-tests for TL2/`I2_SR`, router/expert distillation, and quality, throughput, RSS,
-and expert-locality benchmarks. Quality guarantees for arbitrary architectures
+converter registration, router/shared-expert tensor mapping, TL2 3D expert
+packing support, full GGUF/runtime tests for direct `I2_S`/`I2_SR`,
+router/expert distillation, and quality, throughput, RSS, and expert-locality
+benchmarks. Quality guarantees for arbitrary architectures
 remain research tasks.
 The current toolchain split is mechanical: the BitNet HF converter now exposes
 `tl2`, registers dense `Qwen2ForCausalLM`, and accepts `--kernel-config` for

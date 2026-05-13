@@ -178,7 +178,7 @@ def build_gate(root: Path) -> dict[str, Any]:
         "unsupported",
         f"Kimi artifacts={len(kimi_artifacts)}; Kimi source matches={len(kimi_source_matches)}; failed MoE gates={len(moe_failed_gates)}/{len(moe_gates)}",
         "Treat as separate research milestone.",
-        "No Kimi/Qwen2MoE BitNet converter mapping, 3D expert TL2/I2_SR packing support, router distillation, quality benchmark, or expert-locality benchmark exists.",
+        "No Kimi/Qwen2MoE BitNet converter mapping, TL2 3D expert packing support, router distillation, quality benchmark, or expert-locality benchmark exists; direct I2_S/I2_SR expert packing is only synthetic so far.",
     )
 
     supported = [claim for claim in claims if claim["status"] in {"supported", "supported_with_patch"}]

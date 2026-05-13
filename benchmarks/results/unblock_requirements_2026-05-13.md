@@ -17,8 +17,8 @@ Next required input: Create/provide a reachable writable llama.cpp fork URL, the
 | Writable llama.cpp fork or branch | missing | promotion_ready=False; candidate_fork_reachable=False; submodule_patch_applies=True | Create/provide a reachable writable llama.cpp fork URL, then push the submodule I2_SR patch branch. |
 | GitHub automation credential | missing | gh_path=not_found | Install/authenticate GitHub CLI or refresh the GitHub connector token if repository creation/push automation is desired. |
 | Local Kimi/Qwen2MoE model artifact | missing | artifacts=0 | Provide a licensed Kimi or Qwen2MoE checkpoint/tokenizer artifact plus its FP and quantized baselines. |
-| MoE 3D expert tensor packing support | missing | tl2_3d=False; i2sr_3d=False; 2d_control=True | Implement and byte-test 3D expert packing for TL2/I2_SR before any Kimi runtime benchmark. |
-| MoE quality/locality benchmark artifacts | missing | failed_moe_gates=5; kimi_artifacts=0 | Run router accuracy, expert locality, quality, throughput, and RSS benchmarks after model and packing support exist. |
+| MoE 3D expert tensor packing support | missing | tl2_3d=False; i2sr_3d=True; 2d_control=True | Implement remaining TL2 3D expert packing and full MoE GGUF/runtime byte tests before any Kimi runtime benchmark. |
+| MoE quality/locality benchmark artifacts | missing | failed_moe_gates=4; kimi_artifacts=0 | Run router accuracy, expert locality, quality, throughput, and RSS benchmarks after model and packing support exist. |
 
 ## Candidate Fork Probe
 

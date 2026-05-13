@@ -13,22 +13,22 @@
 | gate | status | evidence | blocker |
 | --- | --- | --- | --- |
 | generic GGUF/runtime MoE support exists | pass | gguf_schema=True; runtime=True; llama_qwen2moe_converter=True |  |
-| BitNet converter has explicit Qwen2MoE/Kimi registration | fail | qwen2moe_registration=False; kimi_converter_match=False; tracked_kimi_mentions=4 | The TL2-capable BitNet converter registers Qwen2 dense/Mixtral-style models but not Qwen2MoE or Kimi. |
+| BitNet converter has explicit Qwen2MoE/Kimi registration | fail | qwen2moe_registration=False; kimi_converter_match=False; tracked_kimi_mentions=0 | The TL2-capable BitNet converter registers Qwen2 dense/Mixtral-style models but not Qwen2MoE or Kimi. |
 | TL2 converter path is validated for merged 3D expert tensors | fail | contract_available=True; contract_tl2_3d=False; preprocess_weights_tl2_uses_2d_unpack=True | `preprocess_weights_tl2` unpacks `M, K = w.shape`, so merged expert tensors with shape [experts, out, in] are not supported. |
-| direct I2_SR writer is validated for merged 3D expert tensors | fail | contract_available=True; contract_i2sr_3d=False; contract_2d_control=True; direct_i2sr_writer_rejects_non_2d=True | The direct packed I2_S/I2_SR writer rejects non-2D ternary weights, so merged expert tensors need new packing/layout tests. |
+| direct I2_SR writer is validated for merged 3D expert tensors | pass | contract_available=True; contract_i2sr_3d=True; contract_2d_control=True; direct_i2sr_writer_rejects_non_2d=False |  |
 | local Kimi model/eval artifacts exist | fail | kimi_artifacts=0 | No local Kimi checkpoint, conversion, quality, throughput, RSS, or expert-locality artifact exists. |
 | MoE quality and locality benchmarks exist | fail | quality_runs=0; throughput_runs=0; expert_locality_runs=0 | No benchmark measures router accuracy, expert selection locality, sparse expert throughput, or quality degradation. |
 
 ## Negative Checks
 
-Kimi string matches in tracked source files: 4.
+No Kimi-specific converter/runtime mapping was found in converter/runtime source files.
 No local Kimi benchmark artifacts were found under benchmark_results.
-Synthetic MoE packing contract: TL2 3D supported=False; I2_S/I2_SR 3D supported=False; 2D control supported=True.
+Synthetic MoE packing contract: TL2 3D supported=False; I2_S/I2_SR 3D supported=True; 2D control supported=True.
 
 ## Verdict
 
-Generic MoE infrastructure is present: GGUF metadata has expert counts, Qwen2MoE is registered in the vendored llama.cpp converter, expert weights are merged into 3D tensors, and the runtime builds sparse top-k expert execution with `ggml_mul_mat_id`. This does not prove Kimi support: no Kimi-specific mapping or benchmark artifact is present, the TL2-capable BitNet converter still lacks Qwen2MoE registration, and the current TL2/I2_SR packing code paths are 2D-matrix oriented rather than validated for merged 3D expert tensors.
+Generic MoE infrastructure is present: GGUF metadata has expert counts, Qwen2MoE is registered in the vendored llama.cpp converter, expert weights are merged into 3D tensors, and the runtime builds sparse top-k expert execution with `ggml_mul_mat_id`. This does not prove Kimi support: no Kimi-specific mapping or benchmark artifact is present, the TL2-capable BitNet converter still lacks Qwen2MoE registration, and the TL2 packing path remains 2D-matrix oriented. The direct I2_S/I2_SR path is only a synthetic packing contract until it is validated with a full MoE GGUF/runtime artifact.
 
 ## Required Plan
 
-Required MoE/Kimi path: add an explicit Kimi/Qwen2MoE BitNet converter registration, map router/shared-expert/expert tensor names, decide which router and shared-expert tensors stay dense, extend TL2/I2_SR packing and runtime tests to 3D expert tensors, distill router and expert weights under ternary constraints, then run quality, throughput, RSS, and expert-locality benchmarks against dense and llama.cpp quantized MoE baselines.
+Required MoE/Kimi path: add an explicit Kimi/Qwen2MoE BitNet converter registration, map router/shared-expert/expert tensor names, decide which router and shared-expert tensors stay dense, extend TL2 packing plus full GGUF/runtime tests to 3D expert tensors, distill router and expert weights under ternary constraints, then run quality, throughput, RSS, and expert-locality benchmarks against dense and llama.cpp quantized MoE baselines.

@@ -64,6 +64,12 @@ def validate_ternary_codes(key: str, tensor: torch.Tensor) -> None:
         raise ValueError(f"{key} contains non-ternary codes: {invalid.tolist()}")
 
 
+def i2_s_logical_rows(codes: torch.Tensor) -> int:
+    if codes.ndim not in {2, 3}:
+        raise ValueError(f"I2_S packing expects a 2D matrix or 3D merged expert tensor, got shape {tuple(codes.shape)}")
+    return int(np.prod(tuple(codes.shape[:-1])))
+
+
 def pack_i2_s_codes_x86_act(codes: torch.Tensor) -> np.ndarray:
     """Pack BitNet's active x86 I2_S layout.
 
@@ -71,17 +77,22 @@ def pack_i2_s_codes_x86_act(codes: torch.Tensor) -> np.ndarray:
     runtime packs each flat row-major group of 128 ternary codes into 32 bytes.
     This is the layout produced by `quantize_i2_s` and consumed by the current
     `ggml_vec_dot_i2_i8_s` kernels.
+
+    Dense tensors are shaped `[out, in]`. Merged MoE expert tensors are shaped
+    `[experts, out, in]`; they are packed as expert-major logical rows while
+    preserving the 3D GGUF raw shape at the caller.
     """
-    if codes.ndim != 2:
-        raise ValueError(f"I2_S packing expects a 2D weight matrix, got shape {tuple(codes.shape)}")
+    _ = i2_s_logical_rows(codes)
 
     q8 = (codes.to(torch.int16).cpu().numpy() + 1).astype(np.uint8, copy=False)
-    flat = q8.reshape(-1)
     qk_i2_s = 128
-    if flat.size % qk_i2_s != 0:
-        raise ValueError(f"I2_S x86 ACT_PARALLEL packing expects element count divisible by {qk_i2_s}, got {flat.size}")
+    if q8.shape[-1] % qk_i2_s != 0:
+        raise ValueError(
+            "I2_S x86 ACT_PARALLEL packing expects each logical row's input "
+            f"dimension to be divisible by {qk_i2_s}, got shape {tuple(codes.shape)}"
+        )
 
-    groups = flat.reshape(-1, qk_i2_s)
+    groups = q8.reshape(-1, qk_i2_s)
     packed = (
         (groups[:, 0:32] << np.uint8(6))
         | (groups[:, 32:64] << np.uint8(4))
@@ -104,13 +115,13 @@ def pack_i2_s_scalar(codes: torch.Tensor, scale: torch.Tensor) -> np.ndarray:
 
 
 def pack_i2_s_row_prototype(codes: torch.Tensor, scale: torch.Tensor) -> np.ndarray:
-    if codes.ndim != 2:
-        raise ValueError(f"I2_S row-scale packing expects a 2D weight matrix, got shape {tuple(codes.shape)}")
-
-    rows = int(codes.shape[0])
+    rows = i2_s_logical_rows(codes)
     row_scales = scale.reshape(-1)
     if row_scales.numel() != rows:
-        raise ValueError(f"row-scale I2_S packing expects {rows} scales, got shape {tuple(scale.shape)}")
+        raise ValueError(
+            f"row-scale I2_S packing expects {rows} logical row scales for "
+            f"weight shape {tuple(codes.shape)}, got scale shape {tuple(scale.shape)}"
+        )
 
     packed = pack_i2_s_codes_x86_act(codes)
     if packed.size % 4 != 0:

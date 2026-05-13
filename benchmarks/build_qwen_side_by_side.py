@@ -294,7 +294,7 @@ def build_reviewer_gate_table() -> str:
                 f"i2sr_3d={moe_verdict.get('merged_3d_i2s_i2sr_supported')}; "
                 f"2d_control={moe_verdict.get('dense_2d_i2s_control_supported')}"
             ),
-            "Synthetic contract test rejects merged expert tensors; no Kimi artifact exists.",
+            "Synthetic contract now separates direct I2_S/I2_SR packing from TL2; no Kimi artifact exists.",
         ],
     ]
     return md_table(["gate", "status", "evidence", "reviewer implication"], rows)

@@ -2,9 +2,8 @@
 """Executable contract check for MoE merged-expert packing gaps.
 
 llama.cpp stores many MoE expert weights as merged 3D tensors with shape
-`[experts, out, in]`. Dense Qwen ternary packing in this fork currently handles
-2D matrices. This audit uses synthetic tensors to verify whether the TL2 and
-direct I2_S/I2_SR packers accept or reject merged expert tensors.
+`[experts, out, in]`. This audit uses synthetic tensors to verify whether the
+TL2 and direct I2_S/I2_SR packers accept or reject merged expert tensors.
 """
 
 from __future__ import annotations
@@ -39,12 +38,14 @@ def call_contract(label: str, func: Any, *args: Any) -> dict[str, Any]:
     try:
         output = func(*args)
         shape = list(output.shape) if hasattr(output, "shape") else None
+        nbytes = int(output.nbytes) if hasattr(output, "nbytes") else None
         return {
             "label": label,
             "accepted": True,
             "error_type": None,
             "error": None,
             "output_shape": shape,
+            "output_nbytes": nbytes,
         }
     except Exception as exc:  # noqa: BLE001 - this is an audit of the failure surface.
         return {
@@ -53,6 +54,7 @@ def call_contract(label: str, func: Any, *args: Any) -> dict[str, Any]:
             "error_type": type(exc).__name__,
             "error": str(exc),
             "output_shape": None,
+            "output_nbytes": None,
         }
 
 
@@ -79,26 +81,43 @@ def build_audit(root: Path) -> dict[str, Any]:
 
     tl2_expert = np.zeros((2, 4, 128), dtype=np.float32)
     i2s_expert = torch.zeros((2, 4, 128), dtype=torch.int8)
+    i2s_expert_scalar = torch.tensor([1.0], dtype=torch.float32)
+    i2s_expert_row_scale = torch.ones((2, 4), dtype=torch.float32)
     i2s_dense_control = torch.zeros((4, 128), dtype=torch.int8)
 
     checks = [
         call_contract("tl2_merged_3d_expert", bitnet_converter.preprocess_weights_tl2, tl2_expert),
-        call_contract("i2s_merged_3d_expert", direct_writer.pack_i2_s_codes_x86_act, i2s_expert),
+        call_contract("i2s_merged_3d_expert_codes", direct_writer.pack_i2_s_codes_x86_act, i2s_expert),
+        call_contract("i2s_merged_3d_expert_scalar", direct_writer.pack_i2_s_scalar, i2s_expert, i2s_expert_scalar),
+        call_contract("i2sr_merged_3d_expert_row_scale", direct_writer.pack_i2_s_row_prototype, i2s_expert, i2s_expert_row_scale),
         call_contract("i2s_2d_dense_control", direct_writer.pack_i2_s_codes_x86_act, i2s_dense_control),
     ]
 
     tl2_3d = next(item for item in checks if item["label"] == "tl2_merged_3d_expert")
-    i2s_3d = next(item for item in checks if item["label"] == "i2s_merged_3d_expert")
+    i2s_3d_codes = next(item for item in checks if item["label"] == "i2s_merged_3d_expert_codes")
+    i2s_3d_scalar = next(item for item in checks if item["label"] == "i2s_merged_3d_expert_scalar")
+    i2sr_3d_row = next(item for item in checks if item["label"] == "i2sr_merged_3d_expert_row_scale")
     i2s_2d = next(item for item in checks if item["label"] == "i2s_2d_dense_control")
     verdict = {
         "merged_3d_tl2_supported": bool(tl2_3d["accepted"]),
-        "merged_3d_i2s_i2sr_supported": bool(i2s_3d["accepted"]),
+        "merged_3d_i2s_code_packing_supported": bool(i2s_3d_codes["accepted"]),
+        "merged_3d_i2s_scalar_supported": bool(i2s_3d_scalar["accepted"]),
+        "merged_3d_i2sr_row_scale_supported": bool(i2sr_3d_row["accepted"]),
+        "merged_3d_i2s_i2sr_supported": bool(
+            i2s_3d_codes["accepted"] and i2s_3d_scalar["accepted"] and i2sr_3d_row["accepted"]
+        ),
         "dense_2d_i2s_control_supported": bool(i2s_2d["accepted"]),
-        "moe_packing_ready": bool(tl2_3d["accepted"] and i2s_3d["accepted"] and i2s_2d["accepted"]),
+        "moe_packing_ready": bool(
+            tl2_3d["accepted"]
+            and i2s_3d_codes["accepted"]
+            and i2s_3d_scalar["accepted"]
+            and i2sr_3d_row["accepted"]
+            and i2s_2d["accepted"]
+        ),
     }
     blockers = []
     if not verdict["merged_3d_tl2_supported"]:
-        blockers.append("TL2 preprocessing rejects merged 3D expert tensors before kernel lookup.")
+        blockers.append("TL2 preprocessing still rejects merged 3D expert tensors before kernel lookup.")
     if not verdict["merged_3d_i2s_i2sr_supported"]:
         blockers.append("Direct I2_S/I2_SR code packing rejects merged 3D expert tensors.")
     if not verdict["dense_2d_i2s_control_supported"]:
@@ -115,10 +134,10 @@ def build_audit(root: Path) -> dict[str, Any]:
         "verdict": verdict,
         "blockers": blockers,
         "required_next_steps": [
-            "Define a 3D expert tensor layout for TL2 and I2_SR instead of flattening expert identity away.",
-            "Add per-expert or per-expert-row scale metadata semantics.",
-            "Add byte-layout regression tests for merged expert tensors.",
-            "Only then run Kimi/Qwen2MoE quality, throughput, RSS, and expert-locality benchmarks.",
+            "Define and implement a 3D expert tensor layout for TL2 instead of flattening expert identity away.",
+            "Add TL2 per-expert or per-expert-row scale metadata semantics.",
+            "Add full GGUF byte-layout regression tests for merged expert tensors after a real MoE checkpoint exists.",
+            "Then run Kimi/Qwen2MoE quality, throughput, RSS, and expert-locality benchmarks.",
         ],
     }
 
@@ -133,6 +152,7 @@ def render_markdown(result: dict[str, Any]) -> str:
                 f"`{check['error_type'] or ''}`",
                 f"`{(check['error'] or '').replace('|', '/')}`",
                 f"`{check['output_shape'] or ''}`",
+                f"`{check['output_nbytes'] or ''}`",
             ]
         )
     verdict_rows = [[key, md_bool(bool(value))] for key, value in result["verdict"].items()]
@@ -143,7 +163,7 @@ def render_markdown(result: dict[str, Any]) -> str:
             f"# MoE Packing Contract Audit, {DATE}",
             "This audit uses synthetic merged expert tensors with shape `[experts, out, in]` to test whether current dense ternary packers support MoE weight layout.",
             "## Checks",
-            md_table(["check", "accepted", "error type", "error", "output shape"], rows),
+            md_table(["check", "accepted", "error type", "error", "output shape", "output bytes"], rows),
             "## Verdict",
             md_table(["field", "value"], verdict_rows),
             "## Blockers",

@@ -106,7 +106,7 @@ def build_audit(root: Path, *, candidate_fork_url: str) -> dict[str, Any]:
                 f"i2sr_3d={moe_verdict.get('merged_3d_i2s_i2sr_supported')}; "
                 f"2d_control={moe_verdict.get('dense_2d_i2s_control_supported')}"
             ),
-            "Implement and byte-test 3D expert packing for TL2/I2_SR before any Kimi runtime benchmark.",
+            "Implement remaining TL2 3D expert packing and full MoE GGUF/runtime byte tests before any Kimi runtime benchmark.",
         ),
         make_requirement(
             "MoE quality/locality benchmark artifacts",

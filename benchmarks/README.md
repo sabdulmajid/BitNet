@@ -250,9 +250,9 @@ python benchmarks/audit_moe_packing_contract.py
 ```
 
 The current report is
-`benchmarks/results/moe_packing_contract_2026-05-13.md`. It shows that TL2 and
-direct `I2_S`/`I2_SR` packing reject `[experts, out, in]` tensors while the 2D
-dense control still packs successfully.
+`benchmarks/results/moe_packing_contract_2026-05-13.md`. It shows that TL2
+still rejects `[experts, out, in]` tensors, while direct `I2_S`/`I2_SR` synthetic
+packing and the 2D dense control pack successfully.
 
 To verify whether `I2_SR` is actually active in the committed submodule state
 rather than only available as a patch:
