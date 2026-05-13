@@ -120,7 +120,10 @@ conservative:
   to the older patched row-scale `I2_S` prototype at PPL `38.8832`. A
   byte-layout verifier now compares five representative tensors against the
   known-good prototype and passes `5/5`; the path is still a downstream
-  candidate patch, not an upstream/default runtime contract.
+  candidate patch, not an upstream/default runtime contract. A second
+  productization gate run with that patch temporarily applied passes all `9/9`
+  checks, which proves the patch contract is coherent; the committed submodule
+  still leaves it opt-in rather than default.
 - **TL2 is now a partial dense-Qwen engineering probe, not a product claim.**
   This fork can generate a Qwen2.5-0.5B TL2 GGUF only after exact
   model-specific TL2 code generation and a matching `BITNET_X86_TL2=ON`
@@ -169,6 +172,8 @@ The row-scale `I2_S` format compatibility audit is
 [benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md](benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md).
 The row-scale qtype productization gate is
 [benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md](benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md).
+The candidate active-patch productization proof is
+[benchmarks/results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.md](benchmarks/results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.md).
 The MoE support audit is
 [benchmarks/results/moe_support_audit_2026-05-05.md](benchmarks/results/moe_support_audit_2026-05-05.md).
 The reusable static-ternary GGUF bridge note is

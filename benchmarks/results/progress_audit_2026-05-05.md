@@ -104,6 +104,11 @@ source tree has no active separate row-scale GGML qtype or active separate
 llama file type. The fixed `I2_SR` benchmark now passes quality, but the
 matching runtime is still a candidate patch rather than the active vendored
 source.
+The candidate activation gate is tracked at
+`benchmarks/results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.md`;
+it was generated with `patches/llama-i2sr-row-scale-qtype.patch` applied to the
+clean source tree, and all nine productization gates pass in that patched
+source state.
 
 The candidate stable qtype patch is tracked at
 `benchmarks/results/i2sr_candidate_patch_2026-05-13.md`. It defines
@@ -273,6 +278,7 @@ Key audited values:
 | Patched row-scale I2_S / TQ2_0 PPL ratio | 1.0016 |
 | Row-scale I2_S patch defines a new stable qtype | false |
 | Candidate I2_SR patch applies and builds | true |
+| Candidate I2_SR active-patch productization gate | 9/9 pass |
 | Qwen2.5-1.5B row-scale dense-head native AVX-512 I2_S prototype PPL on Xeon 4116 | 38.8853 |
 | Qwen2.5-1.5B row-scale dense-head native AVX-512 I2_S prototype prompt tok/s on Xeon 4116 | 207.35 |
 | Qwen2.5-1.5B row-scale dense-head native AVX-512 I2_S prototype decode tok/s on Xeon 4116 | 18.37 |

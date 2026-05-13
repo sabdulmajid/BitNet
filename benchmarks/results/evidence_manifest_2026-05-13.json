@@ -1,5 +1,5 @@
 {
-  "artifact_count": 80,
+  "artifact_count": 82,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "37e45f88c9def32aed5ad5ec41efb9fd5b10913b650a53019a9cd6b369000b8f",
-      "size_bytes": 49110
+      "sha256": "29a06c7dee4b9301fd6e23cfcc771002add1afd259a78630619f0fe9098dd767",
+      "size_bytes": 49552
     },
     {
       "exists": true,
@@ -43,8 +43,8 @@
       "label": "publishable_claims",
       "metrics": {},
       "path": "benchmarks/results/publishable_claims_2026-05-05.md",
-      "sha256": "d2da163fd608847b90e52e945c239b413c790349f08b6cdb1164abb95f557ffa",
-      "size_bytes": 10531
+      "sha256": "63c5e9babbc19d2f95bf5433dbe134781934131158581ee86d2d7eff5a28bbda",
+      "size_bytes": 11054
     },
     {
       "exists": true,
@@ -52,8 +52,8 @@
       "label": "progress_audit",
       "metrics": {},
       "path": "benchmarks/results/progress_audit_2026-05-05.md",
-      "sha256": "27658efa57d2b545276c21c7745e48f3ba6c18ef6cf3ee88dc5ee5dfc0e87e8c",
-      "size_bytes": 25246
+      "sha256": "74e3b96847bfc34eb02c8d862a8e1fe680626b8f69507bcbdead95847482eb4c",
+      "size_bytes": 25612
     },
     {
       "exists": true,
@@ -61,8 +61,8 @@
       "label": "active_goal_audit",
       "metrics": {},
       "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md",
-      "sha256": "1247ae06e4d441767ae7d3cfd0ce009dab8d3ba44be88d3402914803c4dca562",
-      "size_bytes": 10410
+      "sha256": "255dacfeae0a7c3c4e095e0ab86bc9ca43026a4c87ede3b6e7d874cbb05bd248",
+      "size_bytes": 10765
     },
     {
       "exists": true,
@@ -70,7 +70,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-13.md",
-      "sha256": "e4ed19bdf1db80f608aa897e9e66b34a5cba9d5a990cbf045ea77d347fb72570",
+      "sha256": "45a3d24f067cfd1147af1cb83ce7c74bfb84bdfdca44f13e9dafc3fc1a147171",
       "size_bytes": 2865
     },
     {
@@ -151,8 +151,17 @@
       "label": "row_scale_qtype_productization_gate_report",
       "metrics": {},
       "path": "benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md",
-      "sha256": "a912181890668473a4adff38fced90ae87cd1b2411973de429e7caa61c15a41a",
-      "size_bytes": 2516
+      "sha256": "eec414acdcd3c7cde465b4f05531bbf8716c243197e84ad542c8f67e4fa10526",
+      "size_bytes": 2717
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "row_scale_qtype_i2sr_active_patch_gate_report",
+      "metrics": {},
+      "path": "benchmarks/results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.md",
+      "sha256": "8c7b7393771ee0dfc7447a206ce76131165fc0bbbc9d75bba0603bc7fb250349",
+      "size_bytes": 2392
     },
     {
       "exists": true,
@@ -1476,8 +1485,31 @@
         "stable_benchmark_quality_ok": true
       },
       "path": "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json",
-      "sha256": "223df0d152f9ab166c7c8dfd445eb753585996c0ed974bf4a3858f2017412f9b",
-      "size_bytes": 3604
+      "sha256": "10e3f5519b9ed58122cf30d5957a71282c28178a3c7d0153f0f5729ec3487724",
+      "size_bytes": 3795
+    },
+    {
+      "exists": true,
+      "kind": "row_scale_qtype_gate_json",
+      "label": "row_scale_qtype_i2sr_active_patch_gate_json",
+      "metrics": {
+        "default_ratio": 30836.207570886912,
+        "direct_writer_emits_stable_qtype": true,
+        "failed": [],
+        "gates": 9,
+        "has_ggml_stable_qtype": true,
+        "has_llama_stable_ftype": true,
+        "packing_verification_checked_tensors": 5,
+        "packing_verification_passed": true,
+        "passed": true,
+        "prototype_ratio": 1.0015661061655128,
+        "stable_benchmark_max_ppl": 38.8477,
+        "stable_benchmark_present": true,
+        "stable_benchmark_quality_ok": true
+      },
+      "path": "benchmark_results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.json",
+      "sha256": "3f239a45212e783710d331a539b813766ddcbdb634eb053f74e3433f9725633f",
+      "size_bytes": 3618
     },
     {
       "exists": true,
@@ -1502,7 +1534,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-13.json",
-      "sha256": "8c619705ac4eba7c25070075b51440bc2faee700e5079e3df6690583cabc865a",
+      "sha256": "952981248690d45033731599947083cf8b9369f2f4944c071628b3ff8e7ccb41",
       "size_bytes": 5392
     },
     {

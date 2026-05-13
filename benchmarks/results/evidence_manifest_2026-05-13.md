@@ -1,15 +1,15 @@
 # Evidence Manifest, 2026-05-13
-Artifacts: `80`. Missing: `0`.
+Artifacts: `82`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 49110 | 37e45f88c9de |  |
+| README | tracked_report | yes | 49552 | 29a06c7dee4b |  |
 | side_by_side_report | tracked_report | yes | 16010 | 934726f28907 |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
 | paired_row_minus_ptq_report | tracked_report | yes | 1332 | 20a5aee1eb99 |  |
-| publishable_claims | tracked_report | yes | 10531 | d2da163fd608 |  |
-| progress_audit | tracked_report | yes | 25246 | 27658efa57d2 |  |
-| active_goal_audit | tracked_report | yes | 10410 | 1247ae06e4d4 |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 2865 | e4ed19bdf1db |  |
+| publishable_claims | tracked_report | yes | 11054 | 63c5e9babbc1 |  |
+| progress_audit | tracked_report | yes | 25612 | 74e3b96847bf |  |
+| active_goal_audit | tracked_report | yes | 10765 | 255dacfeae0a |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 2865 | 45a3d24f067c |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2174 | d6e0c6ec52ec |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -18,7 +18,8 @@ Artifacts: `80`. Missing: `0`.
 | tl2_probe_report | tracked_report | yes | 3608 | dd7e4fa29cc1 |  |
 | tl2_scale_report | tracked_report | yes | 2321 | 30bbfbd22559 |  |
 | i2s_row_scale_format_report | tracked_report | yes | 1759 | 256abf73581c |  |
-| row_scale_qtype_productization_gate_report | tracked_report | yes | 2516 | a91218189066 |  |
+| row_scale_qtype_productization_gate_report | tracked_report | yes | 2717 | eec414acdcd3 |  |
+| row_scale_qtype_i2sr_active_patch_gate_report | tracked_report | yes | 2392 | 8c7b7393771e |  |
 | i2sr_qwen15b_candidate_report | tracked_report | yes | 2330 | 0e61281598ce |  |
 | i2sr_x86act_fix_report | tracked_report | yes | 2113 | 828c0baaa784 |  |
 | i2s_packing_layout_verify_report | tracked_report | yes | 1075 | c11acd561e3c |  |
@@ -76,9 +77,10 @@ Artifacts: `80`. Missing: `0`.
 | tl2_shape_json | tl2_shape_json | yes | 12054 | a99430f0f4b0 |  |
 | tl2_scale_json | tl2_scale_json | yes | 14344 | bf2d36674b72 | qwen15b_tensor_scale err=0; qwen15b_row_scale err=1.90423 |
 | i2s_row_scale_format_json | i2s_format_json | yes | 1528 | e17297539b9d | default_ratio=30836.2, prototype_ratio=1.00157, stable_format_required=True |
-| row_scale_qtype_productization_gate_json | row_scale_qtype_gate_json | yes | 3604 | 223df0d152f9 | passed=False, gates=9, failed=3, stable_qtype=False, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
+| row_scale_qtype_productization_gate_json | row_scale_qtype_gate_json | yes | 3795 | 10e3f5519b9e | passed=False, gates=9, failed=3, stable_qtype=False, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
+| row_scale_qtype_i2sr_active_patch_gate_json | row_scale_qtype_gate_json | yes | 3618 | 3f239a45212e | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5392 | 8c619705ac4e | passed=True, checks=33, failed=0 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5392 | 952981248690 | passed=True, checks=33, failed=0 |
 | tl2_generic_summary | gguf_summary_json | yes | 4494 | 306a682203b2 | rows=4, failed=2, nan=1, catastrophic=0, max_ppl=18.8044 |
 | tl2_avx512_summary | gguf_summary_json | yes | 4573 | 6ec820472f37 | rows=4, failed=0, nan=2, catastrophic=0, max_ppl=18.8239 |
 | ptq_math | math_json | yes | 14010 | 8cedd88658e0 | trials=10, rel_error=0.512542 |

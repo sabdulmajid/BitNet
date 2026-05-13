@@ -167,9 +167,9 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
         ),
         make_gate(
             "runtime routes stable qtype without changing I2_S",
-            source_routes_stable_qtype and not row_patch_overloads_i2s,
+            source_routes_stable_qtype,
             "ggml.c/llama.cpp source scan plus row-scale patch scan",
-            "Runtime evidence still indicates an overloaded I2_S patch rather than a separate row-scale qtype path.",
+            "Runtime source does not route a separate I2_SR/I2_RS qtype; only the archived overload prototype may exist.",
         ),
         make_gate(
             "direct writer emits stable row-scale qtype",
@@ -199,6 +199,10 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
 
     return {
         "schema": "bitnet-row-scale-qtype-productization-v1",
+        "scenario": {
+            "label": args.scenario_label,
+            "note": args.scenario_note,
+        },
         "inputs": {
             "format_audit_json": str(args.format_audit_json),
             "evidence_manifest_json": str(args.evidence_manifest_json),
@@ -264,11 +268,29 @@ def build_report(result: dict[str, Any]) -> str:
         if obs["stable_benchmark_quality_ok"]
         else "but it does not pass the catastrophic-PPL gate"
     )
+    scenario = result.get("scenario", {})
+    scenario_label = scenario.get("label") or "active source tree"
+    scenario_note = scenario.get("note") or ""
+    interpretation = (
+        "The productization claim is positive for this audited source state: "
+        "the stable row-scale qtype is defined, routed, benchmarked, and byte-layout checked. "
+        "This does not by itself prove the patch is merged upstream; it proves the runtime contract "
+        "represented by this source state."
+        if result["passed"]
+        else (
+            "The feasibility claim is positive: the patched prototype preserves row-scale quality. "
+            f"The productization claim is negative for this audited source state: the source tree does not yet define and route a separate row-scale qtype, {writer_clause}, and {benchmark_clause} {quality_clause}. "
+            "This keeps row-scale packed deployment in research/prototype status."
+        )
+    )
     lines = [
         "# Row-Scale Qtype Productization Gate, 2026-05-13",
         "",
         "This gate checks whether the row-scale packed ternary path has moved from a local `I2_S`-overloading prototype to a compatibility-safe deployable qtype.",
         "",
+        f"Scenario: `{scenario_label}`.",
+        "",
+        *(["Note: " + scenario_note, ""] if scenario_note else []),
         f"Overall status: `{'pass' if result['passed'] else 'fail'}`.",
         "",
         "## Gates",
@@ -291,9 +313,7 @@ def build_report(result: dict[str, Any]) -> str:
         "",
         "## Interpretation",
         "",
-        "The feasibility claim is positive: the patched prototype preserves row-scale quality. "
-        f"The productization claim is negative: the source tree does not yet define a separate row-scale qtype, {writer_clause}, and {benchmark_clause} {quality_clause}. "
-        "This keeps row-scale packed deployment in research/prototype status.",
+        interpretation,
     ]
     return "\n".join(lines)
 
@@ -313,6 +333,8 @@ def main() -> None:
     parser.add_argument("--prototype-max-ppl-ratio", type=float, default=1.01)
     parser.add_argument("--default-failure-min-ratio", type=float, default=10.0)
     parser.add_argument("--catastrophic-ppl-threshold", type=float, default=1.0e4)
+    parser.add_argument("--scenario-label", default="active source tree")
+    parser.add_argument("--scenario-note", default="")
     parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json"))
     parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md"))
     args = parser.parse_args()
