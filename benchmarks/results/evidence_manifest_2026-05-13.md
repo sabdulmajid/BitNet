@@ -5,8 +5,8 @@ Artifacts: `61`. Missing: `0`.
 | README | tracked_report | yes | 47080 | 64d09cba47c1 |  |
 | side_by_side_report | tracked_report | yes | 12585 | 570856967359 |  |
 | publishable_claims | tracked_report | yes | 8403 | 91966011ad7c |  |
-| progress_audit | tracked_report | yes | 19707 | 20fd1e06767e |  |
-| active_goal_audit | tracked_report | yes | 8585 | 356501a5e22b |  |
+| progress_audit | tracked_report | yes | 20955 | 0aaf99659780 |  |
+| active_goal_audit | tracked_report | yes | 9129 | 837af7a23742 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2063 | 8b12a3dc950e |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 5514 | 2c5a76508f7a |  |
@@ -40,26 +40,26 @@ Artifacts: `61`. Missing: `0`.
 | lm_eval_kl | lm_eval_json | yes | 87321092 | 602e3c07c792 | mean=0.483438, tasks=10, samples=22382 |
 | lm_eval_kl_dense_head | lm_eval_json | yes | 87322204 | 7ea31be6cee4 | mean=0.484378, tasks=10, samples=22382 |
 | lm_eval_row_dense_head | lm_eval_json | yes | 87327355 | 50cda719e02a | mean=0.499459, tasks=10, samples=22382 |
-| gguf_kl_suite | gguf_summary_json | yes | 9552 | 07a517cd5c67 | rows=8, failed=0, nan=0 |
-| gguf_dense_head_suite | gguf_summary_json | yes | 7291 | bd4f50ffc310 | rows=6, failed=0, nan=0 |
-| gguf_row_dense_head_suite | gguf_summary_json | yes | 7297 | 228c6502be56 | rows=6, failed=0, nan=0 |
-| gguf_row_i2s_heapfix | gguf_summary_json | yes | 1647 | 734fa7c103f1 | rows=1, failed=0, nan=0 |
+| gguf_kl_suite | gguf_summary_json | yes | 9552 | 07a517cd5c67 | rows=8, failed=0, nan=0, catastrophic=2, max_ppl=1.20612e+51 |
+| gguf_dense_head_suite | gguf_summary_json | yes | 7291 | bd4f50ffc310 | rows=6, failed=0, nan=0, catastrophic=0, max_ppl=47.3435 |
+| gguf_row_dense_head_suite | gguf_summary_json | yes | 7297 | 228c6502be56 | rows=6, failed=0, nan=0, catastrophic=1, max_ppl=1.19714e+06 |
+| gguf_row_i2s_heapfix | gguf_summary_json | yes | 1647 | 734fa7c103f1 | rows=1, failed=0, nan=0, catastrophic=0, max_ppl=38.8832 |
 | gguf_row_i2s_thread_scaling | thread_scaling_json | yes | 2296 | 0396f5c951bd | rows=7, max_prefill=245.314, max_decode=19.4941 |
 | gguf_context_rss | gguf_memory_json | yes | 9911 | fd135b202cfd | rows=24, contexts=[512, 2048, 8192, 32768] |
 | direct_gguf_tiny | direct_gguf_json | yes | 1972 | a01c51bbb398 | arch=LlamaForCausalLM, outtype=f16, ternary=8, tensors=12, reader_rc=0, smoke_rc=None |
 | direct_gguf_qwen05b | direct_gguf_json | yes | 2546 | fb82f94beb57 | arch=Qwen2ForCausalLM, outtype=f16, ternary=168, tensors=291, reader_rc=0, smoke_rc=0 |
 | direct_i2s_tiny | direct_i2s_json | yes | 1087 | 496c4a2bac8d | arch=LlamaForCausalLM, packed=7, row_packed=0, out_f16=1, tensors=12, native_py_consts=False |
 | direct_i2s_qwen05b_conversion | direct_i2s_json | yes | 1146 | deecbf0d1031 | arch=Qwen2ForCausalLM, packed=168, row_packed=0, out_f16=1, tensors=291, native_py_consts=False |
-| direct_i2s_qwen05b_suite | gguf_summary_json | yes | 2559 | d6451c122755 | rows=2, failed=0, nan=1 |
+| direct_i2s_qwen05b_suite | gguf_summary_json | yes | 2559 | d6451c122755 | rows=2, failed=0, nan=1, catastrophic=0, max_ppl=18.0984 |
 | direct_row_i2s_qwen05b_conversion | direct_i2s_json | yes | 1157 | a7ee2b556bc3 | arch=Qwen2ForCausalLM, packed=168, row_packed=168, out_f16=1, tensors=291, native_py_consts=False |
-| direct_row_i2s_qwen05b_suite | gguf_summary_json | yes | 2637 | ebdafab23882 | rows=2, failed=0, nan=0 |
-| row_f16_qwen05b_suite | gguf_summary_json | yes | 2575 | cc4583593042 | rows=2, failed=0, nan=0 |
-| row_i2s_quantized_qwen05b_suite | gguf_summary_json | yes | 2645 | 23b71114cdae | rows=2, failed=0, nan=1 |
-| row_tq2_qwen05b_suite | gguf_summary_json | yes | 2667 | d3005c427d44 | rows=2, failed=0, nan=0 |
+| direct_row_i2s_qwen05b_suite | gguf_summary_json | yes | 2637 | ebdafab23882 | rows=2, failed=0, nan=0, catastrophic=1, max_ppl=59401.5 |
+| row_f16_qwen05b_suite | gguf_summary_json | yes | 2575 | cc4583593042 | rows=2, failed=0, nan=0, catastrophic=0, max_ppl=578.483 |
+| row_i2s_quantized_qwen05b_suite | gguf_summary_json | yes | 2645 | 23b71114cdae | rows=2, failed=0, nan=1, catastrophic=0, max_ppl=18.0986 |
+| row_tq2_qwen05b_suite | gguf_summary_json | yes | 2667 | d3005c427d44 | rows=2, failed=0, nan=0, catastrophic=1, max_ppl=5.11853e+06 |
 | direct_packed_gguf_support_json | direct_packed_support_json | yes | 2040 | 175fc0758125 | dense=True, packed_i2s=False, row_safe=False |
 | tl2_shape_json | tl2_shape_json | yes | 12054 | a99430f0f4b0 |  |
 | tl2_scale_json | tl2_scale_json | yes | 14344 | bf2d36674b72 | qwen15b_tensor_scale err=0; qwen15b_row_scale err=1.90423 |
 | i2s_row_scale_format_json | i2s_format_json | yes | 1528 | e17297539b9d | default_ratio=30836.2, prototype_ratio=1.00157, stable_format_required=True |
-| tl2_generic_summary | gguf_summary_json | yes | 4494 | 306a682203b2 | rows=4, failed=2, nan=1 |
-| tl2_avx512_summary | gguf_summary_json | yes | 4573 | 6ec820472f37 | rows=4, failed=0, nan=2 |
+| tl2_generic_summary | gguf_summary_json | yes | 4494 | 306a682203b2 | rows=4, failed=2, nan=1, catastrophic=0, max_ppl=18.8044 |
+| tl2_avx512_summary | gguf_summary_json | yes | 4573 | 6ec820472f37 | rows=4, failed=0, nan=2, catastrophic=0, max_ppl=18.8239 |
 | ptq_math | math_json | yes | 14010 | 8cedd88658e0 | trials=10, rel_error=0.512542 |

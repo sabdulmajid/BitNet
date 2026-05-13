@@ -34,8 +34,8 @@
       "label": "progress_audit",
       "metrics": {},
       "path": "benchmarks/results/progress_audit_2026-05-05.md",
-      "sha256": "20fd1e06767edbcace0ea44c52e4691f4846554556d7b27df47ff05907c070e9",
-      "size_bytes": 19707
+      "sha256": "0aaf996597800cb2107b6e18b9292d961d9bdf00cf1cbcb3849542fb31881f81",
+      "size_bytes": 20955
     },
     {
       "exists": true,
@@ -43,8 +43,8 @@
       "label": "active_goal_audit",
       "metrics": {},
       "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md",
-      "sha256": "356501a5e22b642988d24582ebd5f72b37977bdf580549528c90b31662c2eea4",
-      "size_bytes": 8585
+      "sha256": "837af7a23742711cbc094a96c4bbf77e697075473c92b94f8149d62396ebf039",
+      "size_bytes": 9129
     },
     {
       "exists": true,
@@ -576,7 +576,13 @@
             "prefill_tok_s": 205.762345
           }
         ],
+        "catastrophic_ppl": [
+          "qwen15b_fp_tq2_0",
+          "qwen15b_fp_i2_s"
+        ],
+        "catastrophic_ppl_threshold": 10000.0,
         "failed": [],
+        "max_finite_ppl": 1.2061220080732695e+51,
         "nan_ppl": [],
         "rows": 8
       },
@@ -639,7 +645,10 @@
             "prefill_tok_s": 464.194972
           }
         ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
         "failed": [],
+        "max_finite_ppl": 47.3435,
         "nan_ppl": [],
         "rows": 6
       },
@@ -702,7 +711,12 @@
             "prefill_tok_s": 465.341117
           }
         ],
+        "catastrophic_ppl": [
+          "qwen15b_klonly_row_notie_static_ternary_i2_s"
+        ],
+        "catastrophic_ppl_threshold": 10000.0,
         "failed": [],
+        "max_finite_ppl": 1197135.5848,
         "nan_ppl": [],
         "rows": 6
       },
@@ -725,7 +739,10 @@
             "prefill_tok_s": 218.172685
           }
         ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
         "failed": [],
+        "max_finite_ppl": 38.8832,
         "nan_ppl": [],
         "rows": 1
       },
@@ -873,7 +890,10 @@
             "prefill_tok_s": 523.685215
           }
         ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
         "failed": [],
+        "max_finite_ppl": 18.0984,
         "nan_ppl": [
           "qwen05b_klonly_direct_i2_s"
         ],
@@ -926,7 +946,12 @@
             "prefill_tok_s": 544.865326
           }
         ],
+        "catastrophic_ppl": [
+          "qwen05b_row_direct_i2_s_prototype"
+        ],
+        "catastrophic_ppl_threshold": 10000.0,
         "failed": [],
+        "max_finite_ppl": 59401.5449,
         "nan_ppl": [],
         "rows": 2
       },
@@ -957,7 +982,10 @@
             "prefill_tok_s": 367.597655
           }
         ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
         "failed": [],
+        "max_finite_ppl": 578.4833,
         "nan_ppl": [],
         "rows": 2
       },
@@ -988,7 +1016,10 @@
             "prefill_tok_s": 548.130546
           }
         ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
         "failed": [],
+        "max_finite_ppl": 18.0986,
         "nan_ppl": [
           "qwen05b_row_materialized_i2_s_quantized"
         ],
@@ -1021,7 +1052,12 @@
             "prefill_tok_s": 430.517012
           }
         ],
+        "catastrophic_ppl": [
+          "qwen05b_row_materialized_tq2_0_t1"
+        ],
+        "catastrophic_ppl_threshold": 10000.0,
         "failed": [],
+        "max_finite_ppl": 5118527.5782,
         "nan_ppl": [],
         "rows": 2
       },
@@ -1163,10 +1199,13 @@
             "prefill_tok_s": 265.776754
           }
         ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
         "failed": [
           "qwen05b_qat_tl2:smoke_returncode=-11",
           "qwen05b_qat_tl2:ppl_returncode=-11"
         ],
+        "max_finite_ppl": 18.8044,
         "nan_ppl": [
           "qwen05b_qat_i2_s"
         ],
@@ -1215,7 +1254,10 @@
             "prefill_tok_s": 229.517043
           }
         ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
         "failed": [],
+        "max_finite_ppl": 18.8239,
         "nan_ppl": [
           "qwen05b_qat_i2_s",
           "qwen05b_qat_tl2"

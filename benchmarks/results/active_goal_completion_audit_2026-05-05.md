@@ -4,6 +4,9 @@ This audit checks the active user goal against concrete artifacts in this fork.
 It is not a success declaration. The goal is not complete because several
 requirements are still partial or unproven.
 
+Last refreshed on 2026-05-13 after adding direct scalar and row-scale `I2_S`
+GGUF controls plus the expanded evidence manifest.
+
 ## Success Criteria
 
 1. Repair and re-export the Qwen2.5-1.5B FSDP ternary checkpoint with the
@@ -33,7 +36,7 @@ requirements are still partial or unproven.
 | llama.cpp Q4_K_M and Q8_0 baselines | complete for Qwen2.5-1.5B | GGUF summaries and RSS probe in `benchmark_results/gguf-*` and `benchmark_results/gguf-rss-qwen15b-row-i2s-fixed-2026-05-05` | none for current dense-Qwen scope |
 | QAT with and without hidden MSE | complete | hidden-MSE, KL-only, dense-head, and row-scale checkpoints/evals summarized in side-by-side report | longer training remains research, not a completed proof |
 | Row-scale versus tensor-scale | complete for Qwen2.5-1.5B dense-head | row-scale full ten-task mean `0.499459`; paired CI `[+0.009028, +0.021134]` vs tensor-scale dense-head | still below FP |
-| GGUF conversion and packed CPU inference | partial | static-ternary materialization, reusable bridge runner `benchmarks/build_static_ternary_gguf_bridge.py`, direct dense GGUF bridge `benchmarks/convert_static_ternary_to_gguf.py`, direct scalar `I2_S` writer `benchmarks/convert_static_ternary_to_i2s_gguf.py`, direct packed support audit `benchmarks/results/direct_packed_gguf_support_2026-05-13.md`, TQ2_0, tensor-scale I2_S, row-scale I2_S prototype; `patches/llama-i2s-row-scale.patch` | direct scalar `I2_S` export loads/runs but Qwen0.5B quality fails as NaN PPL; direct packed row-scale `I2_S` GGUF writing is not complete and needs a stable row-scale format |
+| GGUF conversion and packed CPU inference | partial | static-ternary materialization, reusable bridge runner `benchmarks/build_static_ternary_gguf_bridge.py`, direct dense GGUF bridge `benchmarks/convert_static_ternary_to_gguf.py`, direct scalar/row-prototype `I2_S` writer `benchmarks/convert_static_ternary_to_i2s_gguf.py`, direct packed support audit `benchmarks/results/direct_packed_gguf_support_2026-05-13.md`, direct row control `benchmarks/results/direct_row_i2s_qwen05b_2026-05-13.md`, TQ2_0, tensor-scale I2_S, row-scale I2_S prototype; `patches/llama-i2s-row-scale.patch` | direct scalar `I2_S` export loads/runs but Qwen0.5B quality fails as NaN PPL; direct row-scale prototype writes per-row scales but Qwen0.5B quality is catastrophic; quality-preserving direct packed row-scale `I2_S` still needs a stable row-scale format and matching runtime |
 | TL2 conversion and CPU inference | partial | `benchmarks/results/conversion_support_audit_2026-05-05.md`; `benchmarks/results/tl2_shape_support_audit_2026-05-05.md`; `benchmarks/results/tl2_scale_semantics_2026-05-05.md`; Qwen0.5B TL2 probe `benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json` | dense Qwen0.5B TL2 is model-specific and quality-failed; current TL2 one-scale semantics are mathematically invalid for the strong row-scale Qwen1.5B checkpoint; Qwen2MoE and Kimi remain unvalidated |
 | Row-scale I2_S quality preservation | complete as prototype | heap-fix confirmation `benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json`; audit `benchmark_results/evidence_audit/qwen15b_row_i2s_heapfix.md`; format audit `benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md` | not an upstream/default stable GGUF format; current patch overloads `I2_S` rather than defining a new row-scale qtype |
 | Row-scale I2_S thread scaling | complete as prototype | `benchmarks/results/i2s_thread_scaling_2026-05-05.md`; audit `benchmark_results/evidence_audit/qwen15b_row_i2s_thread_scaling.md` | decode remains around `18-20 tok/s` after 4 threads |
@@ -67,10 +70,13 @@ GGUF ingestion, a quality-preserving Qwen TL2 path, and MoE/Kimi proof.
    by PPL, while the patched prototype is `1.0016x`, but the patch reuses the
    existing `I2_S` type and is not product-format safe.
 2. Extend direct GGUF ingestion for `ternary_state_dict.pt` from the current
-   dense F16 and scalar `I2_S` bridges to a packed row-scale-aware writer. The
-   scalar `I2_S` writer proves the C++ runtime can load direct packed tensors,
-   but Qwen2.5-0.5B scalar quality fails with NaN PPL. Row-scale quality still
-   requires a compatibility-safe per-row-scale layout or new GGUF qtype.
+   dense F16 and scalar `I2_S` bridges to a production row-scale-aware writer.
+   The scalar `I2_S` writer proves the C++ runtime can load direct packed
+   tensors, but Qwen2.5-0.5B scalar quality fails with NaN PPL. The direct
+   row-scale prototype now matches the 1x4 packing layout and writes per-row
+   scales, but its Qwen2.5-0.5B control remains catastrophic (`59401.5449`
+   PPL). Row-scale quality still requires a compatibility-safe per-row-scale
+   layout or new GGUF qtype plus the stronger 1.5B checkpoint/runtime path.
 3. Implement and benchmark a row-scale-aware Qwen2.5-1.5B TL2 path, or keep
    TL2 out of the supported product claim. The current Qwen0.5B TL2 probe is a
    model-specific engineering result with NaN PPL, and the current TL2

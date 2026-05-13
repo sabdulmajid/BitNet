@@ -25,6 +25,9 @@ SELECTED_LM_EVAL_METRICS = {
 }
 
 
+CATASTROPHIC_PPL_THRESHOLD = 1.0e4
+
+
 ARTIFACTS: list[dict[str, str]] = [
     # Tracked reports.
     {"label": "README", "kind": "tracked_report", "path": "README.md"},
@@ -154,8 +157,18 @@ def parse_gguf_summary(data: dict[str, Any]) -> dict[str, Any]:
     parsed_rows: list[dict[str, Any]] = []
     failed: list[str] = []
     nan_ppl: list[str] = []
+    catastrophic_ppl: list[str] = []
+    finite_ppl_values: list[float] = []
     if not isinstance(rows, list):
-        return {"rows": 0, "failed": ["rows-not-list"], "nan_ppl": [], "artifacts": []}
+        return {
+            "rows": 0,
+            "failed": ["rows-not-list"],
+            "nan_ppl": [],
+            "catastrophic_ppl": [],
+            "catastrophic_ppl_threshold": CATASTROPHIC_PPL_THRESHOLD,
+            "max_finite_ppl": None,
+            "artifacts": [],
+        }
     for row in rows:
         if not isinstance(row, dict):
             failed.append("non-object-row")
@@ -167,6 +180,11 @@ def parse_gguf_summary(data: dict[str, Any]) -> dict[str, Any]:
         ppl = row.get("perplexity", {}).get("ppl") if isinstance(row.get("perplexity"), dict) else None
         if ppl is not None and (not isinstance(ppl, (int, float)) or not math.isfinite(float(ppl))):
             nan_ppl.append(name)
+        elif isinstance(ppl, (int, float)) and math.isfinite(float(ppl)):
+            finite_ppl = float(ppl)
+            finite_ppl_values.append(finite_ppl)
+            if finite_ppl >= CATASTROPHIC_PPL_THRESHOLD:
+                catastrophic_ppl.append(name)
         parsed_rows.append(
             {
                 "name": name,
@@ -177,7 +195,15 @@ def parse_gguf_summary(data: dict[str, Any]) -> dict[str, Any]:
                 "decode_tok_s": row.get("bench", {}).get("decode", {}).get("tok_s") if isinstance(row.get("bench"), dict) else None,
             }
         )
-    return {"rows": len(rows), "failed": failed, "nan_ppl": nan_ppl, "artifacts": parsed_rows}
+    return {
+        "rows": len(rows),
+        "failed": failed,
+        "nan_ppl": nan_ppl,
+        "catastrophic_ppl": catastrophic_ppl,
+        "catastrophic_ppl_threshold": CATASTROPHIC_PPL_THRESHOLD,
+        "max_finite_ppl": max(finite_ppl_values, default=None),
+        "artifacts": parsed_rows,
+    }
 
 
 def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
@@ -345,7 +371,11 @@ def build_report(manifest: dict[str, Any]) -> str:
         elif entry["kind"] == "lm_eval_json":
             summary = f"mean={fmt_metric(metrics.get('selected_mean'))}, tasks={metrics.get('selected_tasks', '-')}, samples={metrics.get('samples', '-')}"
         elif entry["kind"] == "gguf_summary_json":
-            summary = f"rows={metrics.get('rows', '-')}, failed={len(metrics.get('failed', []))}, nan={len(metrics.get('nan_ppl', []))}"
+            summary = (
+                f"rows={metrics.get('rows', '-')}, failed={len(metrics.get('failed', []))}, "
+                f"nan={len(metrics.get('nan_ppl', []))}, catastrophic={len(metrics.get('catastrophic_ppl', []))}, "
+                f"max_ppl={fmt_metric(metrics.get('max_finite_ppl'))}"
+            )
         elif entry["kind"] == "thread_scaling_json":
             summary = f"rows={metrics.get('rows', '-')}, max_prefill={fmt_metric(metrics.get('max_prefill_tok_s'))}, max_decode={fmt_metric(metrics.get('max_decode_tok_s'))}"
         elif entry["kind"] == "gguf_memory_json":
