@@ -149,6 +149,12 @@ The publishable-claims ledger is tracked at
 claims from unsupported or not-yet claims and should be the first artifact used
 when deciding what can be stated publicly.
 
+The compact evidence manifest is tracked at
+`benchmarks/results/evidence_manifest_2026-05-13.md` and
+`benchmarks/results/evidence_manifest_2026-05-13.json`. It records SHA-256
+hashes, sizes, existence checks, and parsed headline metrics for 44 cited
+artifacts; the current manifest has zero missing artifacts.
+
 Key audited values:
 
 | artifact | audited value |

@@ -1,0 +1,336 @@
+#!/usr/bin/env python3
+"""Build a compact manifest for cited benchmark evidence artifacts."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import math
+from pathlib import Path
+from typing import Any
+
+
+SELECTED_LM_EVAL_METRICS = {
+    "arc_challenge": "acc_norm",
+    "arc_easy": "acc_norm",
+    "hellaswag": "acc_norm",
+    "piqa": "acc_norm",
+    "winogrande": "acc",
+    "boolq": "acc",
+    "copa": "acc",
+    "openbookqa": "acc_norm",
+    "sciq": "acc_norm",
+    "truthfulqa_mc1": "acc",
+}
+
+
+ARTIFACTS: list[dict[str, str]] = [
+    # Tracked reports.
+    {"label": "README", "kind": "tracked_report", "path": "README.md"},
+    {"label": "side_by_side_report", "kind": "tracked_report", "path": "benchmarks/results/qwen_side_by_side_2026-05-05.md"},
+    {"label": "publishable_claims", "kind": "tracked_report", "path": "benchmarks/results/publishable_claims_2026-05-05.md"},
+    {"label": "progress_audit", "kind": "tracked_report", "path": "benchmarks/results/progress_audit_2026-05-05.md"},
+    {"label": "active_goal_audit", "kind": "tracked_report", "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md"},
+    {"label": "tl2_shape_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_shape_support_audit_2026-05-05.md"},
+    {"label": "tl2_probe_report", "kind": "tracked_report", "path": "benchmarks/results/qwen05b_tl2_probe_2026-05-05.md"},
+    {"label": "tl2_scale_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_scale_semantics_2026-05-05.md"},
+    {"label": "moe_report", "kind": "tracked_report", "path": "benchmarks/results/moe_support_audit_2026-05-05.md"},
+    # Mechanical audits.
+    {"label": "latest_nonrow_audit", "kind": "evidence_audit_md", "path": "benchmark_results/evidence_audit/latest_nonrow.md"},
+    {"label": "row_notie_5000_audit", "kind": "evidence_audit_md", "path": "benchmark_results/evidence_audit/qwen15b_row_notie_5000.md"},
+    {"label": "row_i2s_heapfix_audit", "kind": "evidence_audit_md", "path": "benchmark_results/evidence_audit/qwen15b_row_i2s_heapfix.md"},
+    {"label": "row_i2s_thread_scaling_audit", "kind": "evidence_audit_md", "path": "benchmark_results/evidence_audit/qwen15b_row_i2s_thread_scaling.md"},
+    {"label": "context_scaling_rss_audit", "kind": "evidence_audit_md", "path": "benchmark_results/evidence_audit/qwen15b_context_scaling_rss.md"},
+    {"label": "qwen05b_tl2_probe_audit", "kind": "evidence_audit_md", "path": "benchmark_results/evidence_audit/qwen05b_tl2_probe.md"},
+    # PPL quality artifacts.
+    {"label": "fp_wikitext", "kind": "perplexity_json", "path": "benchmark_results/quality-9735/qwen15b_fp_wikitext.json"},
+    {"label": "fp_fineweb", "kind": "perplexity_json", "path": "benchmark_results/quality-9735/qwen15b_fp_fineweb_heldout.json"},
+    {"label": "ptq_wikitext", "kind": "perplexity_json", "path": "benchmark_results/quality-ptq-qwen15b/qwen15b_naive_ptq_wikitext.json"},
+    {"label": "ptq_fineweb", "kind": "perplexity_json", "path": "benchmark_results/quality-ptq-qwen15b/qwen15b_naive_ptq_fineweb_heldout.json"},
+    {"label": "hidden_mse_wikitext", "kind": "perplexity_json", "path": "benchmark_results/quality-9735/qwen15b_ternary_wikitext.json"},
+    {"label": "hidden_mse_fineweb", "kind": "perplexity_json", "path": "benchmark_results/quality-9735/qwen15b_ternary_fineweb_heldout.json"},
+    {"label": "kl_wikitext", "kind": "perplexity_json", "path": "benchmark_results/quality-qwen15b-klonly-5000/qwen15b_ternary_wikitext.json"},
+    {"label": "kl_fineweb", "kind": "perplexity_json", "path": "benchmark_results/quality-qwen15b-klonly-5000/qwen15b_ternary_fineweb_heldout.json"},
+    {"label": "kl_dense_head_wikitext", "kind": "perplexity_json", "path": "benchmark_results/quality-qwen15b-klonly-notiehead-5000/qwen15b_ternary_wikitext.json"},
+    {"label": "kl_dense_head_fineweb", "kind": "perplexity_json", "path": "benchmark_results/quality-qwen15b-klonly-notiehead-5000/qwen15b_ternary_fineweb_heldout.json"},
+    {"label": "row_dense_head_wikitext", "kind": "perplexity_json", "path": "benchmark_results/quality-qwen15b-klonly-row-notiehead-5000/qwen15b_ternary_wikitext.json"},
+    {"label": "row_dense_head_fineweb", "kind": "perplexity_json", "path": "benchmark_results/quality-qwen15b-klonly-row-notiehead-5000/qwen15b_ternary_fineweb_heldout.json"},
+    # Full ten-task lm-eval artifacts.
+    {"label": "lm_eval_fp", "kind": "lm_eval_json", "path": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json"},
+    {"label": "lm_eval_ptq", "kind": "lm_eval_json", "path": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json"},
+    {"label": "lm_eval_hidden_mse", "kind": "lm_eval_json", "path": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_qat_ternary.json"},
+    {"label": "lm_eval_kl", "kind": "lm_eval_json", "path": "benchmark_results/lm-eval-qwen15b-klonly-full10/qwen15b_qat_ternary.json"},
+    {"label": "lm_eval_kl_dense_head", "kind": "lm_eval_json", "path": "benchmark_results/lm-eval-qwen15b-klonly-notiehead-full10/qwen15b_qat_ternary.json"},
+    {"label": "lm_eval_row_dense_head", "kind": "lm_eval_json", "path": "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/qwen15b_qat_ternary.json"},
+    # GGUF summaries and targeted JSON audits.
+    {"label": "gguf_kl_suite", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen15b-klonly-suite/summary.json"},
+    {"label": "gguf_dense_head_suite", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json"},
+    {"label": "gguf_row_dense_head_suite", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json"},
+    {"label": "gguf_row_i2s_heapfix", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json"},
+    {"label": "gguf_row_i2s_thread_scaling", "kind": "thread_scaling_json", "path": "benchmark_results/i2s-row-scale-thread-scaling-fixed-2026-05-05/summary.json"},
+    {"label": "gguf_context_rss", "kind": "gguf_memory_json", "path": "benchmark_results/gguf-rss-qwen15b-context-scaling-2026-05-05/summary.json"},
+    {"label": "tl2_shape_json", "kind": "tl2_shape_json", "path": "benchmark_results/tl2_shape_support_audit_2026-05-05.json"},
+    {"label": "tl2_scale_json", "kind": "tl2_scale_json", "path": "benchmark_results/tl2_scale_semantics_2026-05-05.json"},
+    {"label": "tl2_generic_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json"},
+    {"label": "tl2_avx512_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json"},
+    {"label": "ptq_math", "kind": "math_json", "path": "benchmark_results/math_viability_gaussian_10trial_2026-05-05.json"},
+]
+
+
+def sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(chunk_size), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def read_json(path: Path) -> dict[str, Any] | None:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return None
+
+
+def metric_value(task_results: dict[str, Any], metric: str) -> float:
+    for key in (metric, f"{metric},none"):
+        value = task_results.get(key)
+        if isinstance(value, (int, float)):
+            return float(value)
+    raise KeyError(metric)
+
+
+def parse_lm_eval(data: dict[str, Any]) -> dict[str, Any]:
+    results = data.get("results", {})
+    samples = data.get("samples", {})
+    values: list[float] = []
+    sample_count = 0
+    missing: list[str] = []
+    task_metrics: dict[str, float] = {}
+    for task, metric in SELECTED_LM_EVAL_METRICS.items():
+        task_result = results.get(task)
+        if not isinstance(task_result, dict):
+            missing.append(task)
+            continue
+        try:
+            value = metric_value(task_result, metric)
+        except KeyError:
+            missing.append(task)
+            continue
+        values.append(value)
+        task_metrics[task] = value
+        task_samples = samples.get(task, [])
+        if isinstance(task_samples, list):
+            sample_count += len(task_samples)
+    return {
+        "selected_mean": sum(values) / len(values) if values else None,
+        "selected_tasks": len(values),
+        "samples": sample_count,
+        "missing": missing,
+        "task_metrics": task_metrics,
+    }
+
+
+def parse_gguf_summary(data: dict[str, Any]) -> dict[str, Any]:
+    rows = data.get("rows", [])
+    parsed_rows: list[dict[str, Any]] = []
+    failed: list[str] = []
+    nan_ppl: list[str] = []
+    if not isinstance(rows, list):
+        return {"rows": 0, "failed": ["rows-not-list"], "nan_ppl": [], "artifacts": []}
+    for row in rows:
+        if not isinstance(row, dict):
+            failed.append("non-object-row")
+            continue
+        name = str(row.get("name", ""))
+        for key in ("smoke_returncode", "bench_returncode", "ppl_returncode"):
+            if key in row and int(row.get(key, 1)) != 0:
+                failed.append(f"{name}:{key}={row.get(key)}")
+        ppl = row.get("perplexity", {}).get("ppl") if isinstance(row.get("perplexity"), dict) else None
+        if ppl is not None and (not isinstance(ppl, (int, float)) or not math.isfinite(float(ppl))):
+            nan_ppl.append(name)
+        parsed_rows.append(
+            {
+                "name": name,
+                "kind": row.get("kind"),
+                "file_mib": row.get("file_mib"),
+                "ppl": ppl,
+                "prefill_tok_s": row.get("bench", {}).get("prefill", {}).get("tok_s") if isinstance(row.get("bench"), dict) else None,
+                "decode_tok_s": row.get("bench", {}).get("decode", {}).get("tok_s") if isinstance(row.get("bench"), dict) else None,
+            }
+        )
+    return {"rows": len(rows), "failed": failed, "nan_ppl": nan_ppl, "artifacts": parsed_rows}
+
+
+def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
+    data = read_json(path) if path.suffix == ".json" else None
+    if data is None:
+        return {}
+    if kind == "perplexity_json":
+        return {
+            "perplexity": data.get("perplexity"),
+            "nll": data.get("nll"),
+            "eval_tokens": data.get("eval_tokens"),
+            "model_kind": data.get("model_kind"),
+        }
+    if kind == "lm_eval_json":
+        return parse_lm_eval(data)
+    if kind == "gguf_summary_json":
+        return parse_gguf_summary(data)
+    if kind == "thread_scaling_json":
+        rows = data.get("rows", [])
+        return {
+            "rows": len(rows) if isinstance(rows, list) else None,
+            "threads": [row.get("threads") for row in rows if isinstance(row, dict)],
+            "max_prefill_tok_s": max(
+                [float(row.get("prefill_tok_s")) for row in rows if isinstance(row, dict) and isinstance(row.get("prefill_tok_s"), (int, float))],
+                default=None,
+            ),
+            "max_decode_tok_s": max(
+                [float(row.get("decode_tok_s")) for row in rows if isinstance(row, dict) and isinstance(row.get("decode_tok_s"), (int, float))],
+                default=None,
+            ),
+        }
+    if kind == "gguf_memory_json":
+        rows = data.get("rows", [])
+        return {
+            "rows": len(rows) if isinstance(rows, list) else None,
+            "contexts": sorted({int(row.get("ctx_size")) for row in rows if isinstance(row, dict) and isinstance(row.get("ctx_size"), (int, float))}),
+        }
+    if kind == "tl2_shape_json":
+        models = data.get("models", [])
+        return {
+            "models": [
+                {
+                    "label": model.get("label"),
+                    "eligible_tensors": model.get("eligible_tensors"),
+                    "unique_shapes": len(model.get("unique_shapes", [])) if isinstance(model.get("unique_shapes"), list) else None,
+                }
+                for model in models
+                if isinstance(model, dict)
+            ],
+            "builds": data.get("builds", []),
+        }
+    if kind == "tl2_scale_json":
+        results = data.get("results", [])
+        return {
+            "results": [
+                {
+                    "label": result.get("label"),
+                    "tensors": result.get("tensors"),
+                    "row_scale_tensors": result.get("row_scale_tensors"),
+                    "scalar_scale_tensors": result.get("scalar_scale_tensors"),
+                    "total_relative_fro_error_if_one_scale": result.get("total_relative_fro_error_if_one_scale"),
+                    "max_tensor_relative_fro_error": result.get("max_tensor_relative_fro_error"),
+                }
+                for result in results
+                if isinstance(result, dict)
+            ]
+        }
+    if kind == "math_json":
+        aggregate = data.get("aggregate", {})
+        mean_abs = aggregate.get("mean_abs_ternary_repo_formula", {})
+        return {
+            "trials": data.get("trials"),
+            "theoretical_mean_abs_relative_fro_error": data.get("theoretical_mean_abs_relative_fro_error"),
+            "relative_output_fro_error_mean": mean_abs.get("relative_output_fro_error", {}).get("mean") if isinstance(mean_abs, dict) else None,
+        }
+    return {}
+
+
+def build_manifest(repo_root: Path) -> dict[str, Any]:
+    entries: list[dict[str, Any]] = []
+    for item in ARTIFACTS:
+        path = repo_root / item["path"]
+        entry: dict[str, Any] = {
+            "label": item["label"],
+            "kind": item["kind"],
+            "path": item["path"],
+            "exists": path.exists(),
+        }
+        if path.exists():
+            entry["size_bytes"] = path.stat().st_size
+            entry["sha256"] = sha256_file(path)
+            entry["metrics"] = extract_metrics(item["kind"], path)
+        entries.append(entry)
+    missing = [entry["label"] for entry in entries if not entry["exists"]]
+    return {
+        "schema": "bitnet-evidence-manifest-v1",
+        "artifact_count": len(entries),
+        "missing_count": len(missing),
+        "missing": missing,
+        "entries": entries,
+    }
+
+
+def fmt_metric(value: Any) -> str:
+    if isinstance(value, float) and math.isfinite(value):
+        return f"{value:.6g}"
+    return "-" if value is None else str(value)
+
+
+def build_report(manifest: dict[str, Any]) -> str:
+    rows = []
+    for entry in manifest["entries"]:
+        metrics = entry.get("metrics", {})
+        summary = ""
+        if entry["kind"] == "perplexity_json":
+            summary = f"ppl={fmt_metric(metrics.get('perplexity'))}, tokens={metrics.get('eval_tokens', '-')}"
+        elif entry["kind"] == "lm_eval_json":
+            summary = f"mean={fmt_metric(metrics.get('selected_mean'))}, tasks={metrics.get('selected_tasks', '-')}, samples={metrics.get('samples', '-')}"
+        elif entry["kind"] == "gguf_summary_json":
+            summary = f"rows={metrics.get('rows', '-')}, failed={len(metrics.get('failed', []))}, nan={len(metrics.get('nan_ppl', []))}"
+        elif entry["kind"] == "thread_scaling_json":
+            summary = f"rows={metrics.get('rows', '-')}, max_prefill={fmt_metric(metrics.get('max_prefill_tok_s'))}, max_decode={fmt_metric(metrics.get('max_decode_tok_s'))}"
+        elif entry["kind"] == "gguf_memory_json":
+            summary = f"rows={metrics.get('rows', '-')}, contexts={metrics.get('contexts', '-')}"
+        elif entry["kind"] == "tl2_scale_json":
+            values = metrics.get("results", [])
+            summary = "; ".join(
+                f"{value.get('label')} err={fmt_metric(value.get('total_relative_fro_error_if_one_scale'))}"
+                for value in values
+                if isinstance(value, dict)
+            )
+        elif entry["kind"] == "math_json":
+            summary = f"trials={metrics.get('trials', '-')}, rel_error={fmt_metric(metrics.get('relative_output_fro_error_mean'))}"
+        rows.append(
+            [
+                str(entry["label"]),
+                str(entry["kind"]),
+                "yes" if entry["exists"] else "no",
+                str(entry.get("size_bytes", "-")),
+                str(entry.get("sha256", "-"))[:12],
+                summary,
+            ]
+        )
+    lines = [
+        "# Evidence Manifest, 2026-05-13",
+        f"Artifacts: `{manifest['artifact_count']}`. Missing: `{manifest['missing_count']}`.",
+        "| label | kind | exists | size bytes | sha256 prefix | parsed summary |",
+        "| --- | --- | --- | ---: | --- | --- |",
+    ]
+    lines.extend("| " + " | ".join(row) + " |" for row in rows)
+    return "\n".join(lines)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output-json", type=Path, required=True)
+    parser.add_argument("--output-md", type=Path, required=True)
+    args = parser.parse_args()
+
+    repo_root = Path.cwd()
+    manifest = build_manifest(repo_root)
+    report = build_report(manifest)
+    args.output_json.parent.mkdir(parents=True, exist_ok=True)
+    args.output_json.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    args.output_md.parent.mkdir(parents=True, exist_ok=True)
+    args.output_md.write_text(report + "\n", encoding="utf-8")
+    print(report)
+    if manifest["missing_count"]:
+        raise SystemExit(1)
+
+
+if __name__ == "__main__":
+    main()

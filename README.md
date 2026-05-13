@@ -138,6 +138,8 @@ The reusable static-ternary GGUF bridge note is
 [benchmarks/results/static_ternary_gguf_bridge_2026-05-05.md](benchmarks/results/static_ternary_gguf_bridge_2026-05-05.md).
 The publishable-claims ledger is
 [benchmarks/results/publishable_claims_2026-05-05.md](benchmarks/results/publishable_claims_2026-05-05.md).
+The compact evidence manifest with hashes and parsed metrics is
+[benchmarks/results/evidence_manifest_2026-05-13.md](benchmarks/results/evidence_manifest_2026-05-13.md).
 The benchmark harnesses are in [benchmarks/](benchmarks/).
 
 ### Current Perplexity Snapshot

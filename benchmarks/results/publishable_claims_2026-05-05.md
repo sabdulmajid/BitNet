@@ -4,6 +4,10 @@ This ledger separates claims supported by artifacts in this fork from claims
 that are not yet supported. It is intended for public review: every positive
 claim below is scoped to the cited artifact family.
 
+The compact artifact manifest is
+`benchmarks/results/evidence_manifest_2026-05-13.md`; it records hashes and
+parsed headline metrics for 44 cited artifacts with zero missing entries.
+
 ## Supported Claims
 
 | claim | status | evidence | precise scope |
