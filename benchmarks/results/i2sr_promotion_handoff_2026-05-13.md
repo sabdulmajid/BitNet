@@ -33,6 +33,12 @@ Branch: `i2sr-row-scale-runtime`.
 (cd /mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/i2sr-promotion-llama-worktree && git push https://github.com/sabdulmajid/llama.cpp.git HEAD:refs/heads/i2sr-row-scale-runtime)
 ```
 
+## Push Existing Prepared Branch
+
+```bash
+(cd /mnt/slurm_nfs/a6abdulm/projects/BitNet && python benchmarks/prepare_i2sr_promotion_handoff.py --fork-url https://github.com/sabdulmajid/llama.cpp.git --branch i2sr-row-scale-runtime --worktree-dir /mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/i2sr-promotion-llama-worktree --push-existing-worktree)
+```
+
 ## Update Superproject Pointer
 
 ```bash

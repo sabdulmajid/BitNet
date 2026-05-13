@@ -25,7 +25,7 @@ Artifacts: `104`. Missing: `0`.
 | row_scale_qtype_productization_gate_report | tracked_report | yes | 2717 | eec414acdcd3 |  |
 | row_scale_qtype_i2sr_active_patch_gate_report | tracked_report | yes | 2390 | 42acb39176cb |  |
 | row_scale_qtype_i2sr_promotion_rehearsal_report | tracked_report | yes | 2671 | f734b60cc1ec |  |
-| i2sr_promotion_handoff_report | tracked_report | yes | 3238 | 4e283d698901 |  |
+| i2sr_promotion_handoff_report | tracked_report | yes | 3601 | 157386ad3485 |  |
 | i2sr_qwen15b_candidate_report | tracked_report | yes | 2330 | 0e61281598ce |  |
 | i2sr_x86act_fix_report | tracked_report | yes | 2113 | 828c0baaa784 |  |
 | i2s_packing_layout_verify_report | tracked_report | yes | 1075 | c11acd561e3c |  |
@@ -93,7 +93,7 @@ Artifacts: `104`. Missing: `0`.
 | row_scale_qtype_productization_gate_json | row_scale_qtype_gate_json | yes | 3795 | 10e3f5519b9e | passed=False, gates=9, failed=3, stable_qtype=False, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | row_scale_qtype_i2sr_active_patch_gate_json | row_scale_qtype_gate_json | yes | 3616 | cb42720567a1 | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | row_scale_qtype_i2sr_promotion_rehearsal_json | row_scale_qtype_gate_json | yes | 3897 | 6ffc161b446b | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
-| i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 5368 | 7da46b3353d3 | ready=False, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=False, blockers=1 |
+| i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4441 | e3a0b8c604d6 | ready=False, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=False, blockers=1 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
 | benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5393 | 69194a94c6c1 | passed=True, checks=33, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 14839 | 820d0a389481 | achieved=False, status=not_complete, complete=7/9, open=2 |

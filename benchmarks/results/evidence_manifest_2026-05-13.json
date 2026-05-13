@@ -214,8 +214,8 @@
       "label": "i2sr_promotion_handoff_report",
       "metrics": {},
       "path": "benchmarks/results/i2sr_promotion_handoff_2026-05-13.md",
-      "sha256": "4e283d698901d821417b41a5409bc63aa66f5de4f5af917954d237f5704ba1c8",
-      "size_bytes": 3238
+      "sha256": "157386ad3485634e4cef937e4426b7cf0acdcd8b50a4d42ff45b5e799d8af214",
+      "size_bytes": 3601
     },
     {
       "exists": true,
@@ -1688,8 +1688,8 @@
         "submodule_patch_applies": true
       },
       "path": "benchmark_results/i2sr_promotion_handoff_2026-05-13.json",
-      "sha256": "7da46b3353d37e3c95e61f6cb168c81f436b18543848f8f63b982b5dad460d41",
-      "size_bytes": 5368
+      "sha256": "e3a0b8c604d690c0b40cf5608e5441b50919394b7df782c6bd95e3317a5a3ac9",
+      "size_bytes": 4441
     },
     {
       "exists": true,
