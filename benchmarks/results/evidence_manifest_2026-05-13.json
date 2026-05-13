@@ -1,5 +1,5 @@
 {
-  "artifact_count": 49,
+  "artifact_count": 51,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "762378b7b07ca86ffccf621abb2dac0bf2279a75e8f5a94b1194a303b7493dc7",
-      "size_bytes": 45183
+      "sha256": "7f99e9166d208cbcf03e4eb13b4ca3fc554f0bbf2a25684933939713e39a5ec8",
+      "size_bytes": 45347
     },
     {
       "exists": true,
@@ -25,8 +25,8 @@
       "label": "publishable_claims",
       "metrics": {},
       "path": "benchmarks/results/publishable_claims_2026-05-05.md",
-      "sha256": "5643883ce87c1907b29faac4dd9867448b146151239d00b62448726808ade89b",
-      "size_bytes": 7553
+      "sha256": "d4b80f3ef31d7d25f2cae844883a198de92aa617d17d62d41e5b18303293c30d",
+      "size_bytes": 7863
     },
     {
       "exists": true,
@@ -34,8 +34,8 @@
       "label": "progress_audit",
       "metrics": {},
       "path": "benchmarks/results/progress_audit_2026-05-05.md",
-      "sha256": "309eba7b6f4e35d4e92b214ad121ef60c0fe26dced3a0df65785260d3439647a",
-      "size_bytes": 18378
+      "sha256": "5d69561cfef841758b8a59448057dd5db19d67984fa3cc8e1635df32c66ac6d1",
+      "size_bytes": 18867
     },
     {
       "exists": true,
@@ -43,8 +43,8 @@
       "label": "active_goal_audit",
       "metrics": {},
       "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md",
-      "sha256": "6ef6a4e52a881a158e12eaf15f44181f26566194f6a51ac182a55696fe61a89c",
-      "size_bytes": 8278
+      "sha256": "64e3d97ff2e1d86db5aed3d71fcfe5796adf7e343f615649b2d3bf9f2317de01",
+      "size_bytes": 8608
     },
     {
       "exists": true,
@@ -54,6 +54,15 @@
       "path": "benchmarks/results/direct_static_ternary_gguf_2026-05-13.md",
       "sha256": "ff830f6c1d725e7c233409f9840d98dfdb9d8879e9f556db21a9f2bc9f3deea9",
       "size_bytes": 2072
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "direct_packed_gguf_support_report",
+      "metrics": {},
+      "path": "benchmarks/results/direct_packed_gguf_support_2026-05-13.md",
+      "sha256": "8b12a3dc950e1aa4fa5e84fdf9c5345e41b2d102c1370c6fd76fd8a64a19c6bf",
+      "size_bytes": 2063
     },
     {
       "exists": true,
@@ -782,6 +791,21 @@
       "path": "benchmark_results/direct-gguf-qwen05b-klonly-notie-2026-05-13/summary.json",
       "sha256": "fb82f94beb5754b9e385d1bc1fadcc2755924887c8b40584eeace8d9b9f44998",
       "size_bytes": 2546
+    },
+    {
+      "exists": true,
+      "kind": "direct_packed_support_json",
+      "label": "direct_packed_gguf_support_json",
+      "metrics": {
+        "direct_dense_gguf_supported": true,
+        "direct_packed_i2s_supported": false,
+        "product_safe_row_scale_packed_supported": false,
+        "py_gguf_has_i2s_quant_type": false,
+        "requires_stable_row_scale_type_or_version": true
+      },
+      "path": "benchmark_results/direct_packed_gguf_support_2026-05-13.json",
+      "sha256": "175fc0758125780cbe09f5b196765e509c7acc92667f57a80db3c227beb8150e",
+      "size_bytes": 2040
     },
     {
       "exists": true,

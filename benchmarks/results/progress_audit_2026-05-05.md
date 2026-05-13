@@ -152,6 +152,13 @@ and Qwen2.5-0.5B dense-head F16 GGUF load/smoke, but direct packed `TQ2_0`
 through the Python converter fell back to F16 for Qwen shapes; packed `I2_S`
 still needs the stable row-scale writer/type.
 
+The direct packed GGUF support audit is tracked at
+`benchmarks/results/direct_packed_gguf_support_2026-05-13.md`. It confirms the
+C++ runtime and `llama-quantize` path expose `I2_S`, while the Python GGUF
+writer stack used for direct `ternary_state_dict.pt` export lacks `I2_S`
+quantization constants, file-type metadata, quant-size metadata, and special
+layout handling.
+
 The publishable-claims ledger is tracked at
 `benchmarks/results/publishable_claims_2026-05-05.md`. It separates supported
 claims from unsupported or not-yet claims and should be the first artifact used
@@ -202,6 +209,8 @@ Key audited values:
 | Direct tiny static-ternary GGUF tensors | 12 |
 | Direct Qwen2.5-0.5B static-ternary F16 GGUF tensors | 291 |
 | Direct Qwen2.5-0.5B static-ternary F16 GGUF smoke return code | 0 |
+| Direct packed I2_S support in Python GGUF writer | false |
+| Product-safe row-scale packed GGUF support | false |
 | Qwen2.5-1.5B FP F16 GGUF max RSS at `-c 512` | 2.948 GiB |
 | Qwen2.5-1.5B FP Q4_K_M GGUF max RSS at `-c 512` | 0.985 GiB |
 | Qwen2.5-1.5B row-scale dense-head I2_S max RSS at `-c 512` | 1.250 GiB |

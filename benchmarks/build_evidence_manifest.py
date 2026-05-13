@@ -33,6 +33,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "progress_audit", "kind": "tracked_report", "path": "benchmarks/results/progress_audit_2026-05-05.md"},
     {"label": "active_goal_audit", "kind": "tracked_report", "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md"},
     {"label": "direct_static_ternary_gguf_report", "kind": "tracked_report", "path": "benchmarks/results/direct_static_ternary_gguf_2026-05-13.md"},
+    {"label": "direct_packed_gguf_support_report", "kind": "tracked_report", "path": "benchmarks/results/direct_packed_gguf_support_2026-05-13.md"},
     {"label": "tl2_shape_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_shape_support_audit_2026-05-05.md"},
     {"label": "tl2_probe_report", "kind": "tracked_report", "path": "benchmarks/results/qwen05b_tl2_probe_2026-05-05.md"},
     {"label": "tl2_scale_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_scale_semantics_2026-05-05.md"},
@@ -74,6 +75,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "gguf_context_rss", "kind": "gguf_memory_json", "path": "benchmark_results/gguf-rss-qwen15b-context-scaling-2026-05-05/summary.json"},
     {"label": "direct_gguf_tiny", "kind": "direct_gguf_json", "path": "benchmark_results/direct-gguf-tiny-2026-05-13/summary.json"},
     {"label": "direct_gguf_qwen05b", "kind": "direct_gguf_json", "path": "benchmark_results/direct-gguf-qwen05b-klonly-notie-2026-05-13/summary.json"},
+    {"label": "direct_packed_gguf_support_json", "kind": "direct_packed_support_json", "path": "benchmark_results/direct_packed_gguf_support_2026-05-13.json"},
     {"label": "tl2_shape_json", "kind": "tl2_shape_json", "path": "benchmark_results/tl2_shape_support_audit_2026-05-05.json"},
     {"label": "tl2_scale_json", "kind": "tl2_scale_json", "path": "benchmark_results/tl2_scale_semantics_2026-05-05.json"},
     {"label": "i2s_row_scale_format_json", "kind": "i2s_format_json", "path": "benchmark_results/i2s_row_scale_format_audit_2026-05-13.json"},
@@ -217,6 +219,16 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "gguf_reader_tensors": reader.get("n_tensors") if isinstance(reader, dict) else None,
             "smoke_returncode": smoke.get("returncode") if isinstance(smoke, dict) else None,
         }
+    if kind == "direct_packed_support_json":
+        verdict = data.get("verdict", {})
+        checks = data.get("checks", {})
+        return {
+            "direct_dense_gguf_supported": verdict.get("direct_dense_gguf_supported"),
+            "direct_packed_i2s_supported": verdict.get("direct_packed_i2s_supported"),
+            "product_safe_row_scale_packed_supported": verdict.get("product_safe_row_scale_packed_supported"),
+            "py_gguf_has_i2s_quant_type": checks.get("py_gguf_has_i2s_quant_type"),
+            "requires_stable_row_scale_type_or_version": verdict.get("requires_stable_row_scale_type_or_version"),
+        }
     if kind == "tl2_shape_json":
         models = data.get("models", [])
         return {
@@ -320,6 +332,12 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"arch={metrics.get('architecture', '-')}, outtype={metrics.get('outtype', '-')}, "
                 f"ternary={metrics.get('ternary_materialized', '-')}, tensors={metrics.get('output_tensors', '-')}, "
                 f"reader_rc={metrics.get('gguf_reader_returncode', '-')}, smoke_rc={metrics.get('smoke_returncode', '-')}"
+            )
+        elif entry["kind"] == "direct_packed_support_json":
+            summary = (
+                f"dense={metrics.get('direct_dense_gguf_supported', '-')}, "
+                f"packed_i2s={metrics.get('direct_packed_i2s_supported', '-')}, "
+                f"row_safe={metrics.get('product_safe_row_scale_packed_supported', '-')}"
             )
         elif entry["kind"] == "tl2_scale_json":
             values = metrics.get("results", [])

@@ -304,6 +304,9 @@ python benchmarks/convert_static_ternary_to_gguf.py \
 
 This is not the final packed `I2_S` writer. Quantized Python-converter outtypes
 are blocked by default because unsupported Qwen shapes can fall back to F16.
+Use `benchmarks/audit_direct_packed_gguf_support.py` to check the current
+direct packed-writer gates; the current audit reports dense direct GGUF support
+as present and direct packed row-scale support as absent.
 
 For QAT checkpoints, do not convert `model.safetensors` directly and treat it
 as the trained ternary artifact. The validated bridge is:
