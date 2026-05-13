@@ -13,16 +13,17 @@
 | gate | status | evidence | blocker |
 | --- | --- | --- | --- |
 | generic GGUF/runtime MoE support exists | pass | gguf_schema=True; runtime=True; llama_qwen2moe_converter=True |  |
-| BitNet converter has explicit Qwen2MoE/Kimi registration | fail | qwen2moe_registration=False; kimi_converter_match=False; tracked_kimi_mentions=2 | The TL2-capable BitNet converter registers Qwen2 dense/Mixtral-style models but not Qwen2MoE or Kimi. |
-| TL2 converter path is validated for merged 3D expert tensors | fail | preprocess_weights_tl2_uses_2d_unpack=True | `preprocess_weights_tl2` unpacks `M, K = w.shape`, so merged expert tensors with shape [experts, out, in] are not supported. |
-| direct I2_SR writer is validated for merged 3D expert tensors | fail | direct_i2sr_writer_rejects_non_2d=True | The direct packed I2_S/I2_SR writer rejects non-2D ternary weights, so merged expert tensors need new packing/layout tests. |
+| BitNet converter has explicit Qwen2MoE/Kimi registration | fail | qwen2moe_registration=False; kimi_converter_match=False; tracked_kimi_mentions=4 | The TL2-capable BitNet converter registers Qwen2 dense/Mixtral-style models but not Qwen2MoE or Kimi. |
+| TL2 converter path is validated for merged 3D expert tensors | fail | contract_available=True; contract_tl2_3d=False; preprocess_weights_tl2_uses_2d_unpack=True | `preprocess_weights_tl2` unpacks `M, K = w.shape`, so merged expert tensors with shape [experts, out, in] are not supported. |
+| direct I2_SR writer is validated for merged 3D expert tensors | fail | contract_available=True; contract_i2sr_3d=False; contract_2d_control=True; direct_i2sr_writer_rejects_non_2d=True | The direct packed I2_S/I2_SR writer rejects non-2D ternary weights, so merged expert tensors need new packing/layout tests. |
 | local Kimi model/eval artifacts exist | fail | kimi_artifacts=0 | No local Kimi checkpoint, conversion, quality, throughput, RSS, or expert-locality artifact exists. |
 | MoE quality and locality benchmarks exist | fail | quality_runs=0; throughput_runs=0; expert_locality_runs=0 | No benchmark measures router accuracy, expert selection locality, sparse expert throughput, or quality degradation. |
 
 ## Negative Checks
 
-Kimi string matches in tracked source files: 2.
+Kimi string matches in tracked source files: 4.
 No local Kimi benchmark artifacts were found under benchmark_results.
+Synthetic MoE packing contract: TL2 3D supported=False; I2_S/I2_SR 3D supported=False; 2D control supported=True.
 
 ## Verdict
 

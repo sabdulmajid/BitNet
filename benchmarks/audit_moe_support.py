@@ -64,6 +64,12 @@ def file_contains(path: Path, patterns: tuple[str, ...]) -> bool:
     return all(pattern in text for pattern in patterns)
 
 
+def read_json(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def make_gate(name: str, passed: bool, evidence: str, blocker: str = "") -> dict[str, Any]:
     return {
         "name": name,
@@ -119,6 +125,16 @@ def build_report(data: dict[str, Any]) -> str:
         if data["kimi_source_matches"]
         else "No Kimi-specific converter/runtime mapping was found in tracked source files."
     )
+    contract = data.get("moe_packing_contract") or {}
+    contract_verdict = contract.get("verdict", {})
+    contract_note = (
+        "Synthetic MoE packing contract: "
+        f"TL2 3D supported={contract_verdict.get('merged_3d_tl2_supported')}; "
+        f"I2_S/I2_SR 3D supported={contract_verdict.get('merged_3d_i2s_i2sr_supported')}; "
+        f"2D control supported={contract_verdict.get('dense_2d_i2s_control_supported')}."
+        if contract
+        else "Synthetic MoE packing contract artifact is missing."
+    )
     verdict = (
         "Generic MoE infrastructure is present: GGUF metadata has expert counts, "
         "Qwen2MoE is registered in the vendored llama.cpp converter, expert "
@@ -153,7 +169,7 @@ def build_report(data: dict[str, Any]) -> str:
             "## Productization Gates",
             md_table(["gate", "status", "evidence", "blocker"], gate_rows),
             "## Negative Checks",
-            "\n".join([kimi_note, artifact_note]),
+            "\n".join([kimi_note, artifact_note, contract_note]),
             "## Verdict",
             verdict,
             "## Required Plan",
@@ -162,7 +178,13 @@ def build_report(data: dict[str, Any]) -> str:
     )
 
 
-def build_productization_gates(root: Path, checks: list[dict[str, Any]], kimi_matches: list[str], kimi_artifacts: list[str]) -> list[dict[str, Any]]:
+def build_productization_gates(
+    root: Path,
+    checks: list[dict[str, Any]],
+    kimi_matches: list[str],
+    kimi_artifacts: list[str],
+    moe_packing_contract: dict[str, Any],
+) -> list[dict[str, Any]]:
     check_by_label = {check["label"]: check for check in checks}
     generic_runtime = check_by_label.get("Runtime sparse expert execution", {}).get("status") == "present"
     gguf_schema = check_by_label.get("Qwen2MoE tensor schema", {}).get("status") == "present"
@@ -174,6 +196,11 @@ def build_productization_gates(root: Path, checks: list[dict[str, Any]], kimi_ma
     direct_i2sr_is_2d = file_contains(direct_i2sr_writer, ("codes.ndim != 2", "I2_S packing expects a 2D weight matrix"))
     bitnet_qwen2moe = file_contains(bitnet_converter, ('@Model.register("Qwen2MoeForCausalLM")',))
     bitnet_kimi = file_contains(bitnet_converter, ("Kimi",))
+    contract_verdict = moe_packing_contract.get("verdict", {})
+    contract_tl2_3d = bool(contract_verdict.get("merged_3d_tl2_supported"))
+    contract_i2sr_3d = bool(contract_verdict.get("merged_3d_i2s_i2sr_supported"))
+    contract_2d_control = bool(contract_verdict.get("dense_2d_i2s_control_supported"))
+    contract_available = bool(contract_verdict)
 
     return [
         make_gate(
@@ -190,14 +217,20 @@ def build_productization_gates(root: Path, checks: list[dict[str, Any]], kimi_ma
         ),
         make_gate(
             "TL2 converter path is validated for merged 3D expert tensors",
-            not tl2_is_2d,
-            f"preprocess_weights_tl2_uses_2d_unpack={tl2_is_2d}",
+            contract_tl2_3d,
+            (
+                f"contract_available={contract_available}; contract_tl2_3d={contract_tl2_3d}; "
+                f"preprocess_weights_tl2_uses_2d_unpack={tl2_is_2d}"
+            ),
             "`preprocess_weights_tl2` unpacks `M, K = w.shape`, so merged expert tensors with shape [experts, out, in] are not supported.",
         ),
         make_gate(
             "direct I2_SR writer is validated for merged 3D expert tensors",
-            not direct_i2sr_is_2d,
-            f"direct_i2sr_writer_rejects_non_2d={direct_i2sr_is_2d}",
+            contract_i2sr_3d and contract_2d_control,
+            (
+                f"contract_available={contract_available}; contract_i2sr_3d={contract_i2sr_3d}; "
+                f"contract_2d_control={contract_2d_control}; direct_i2sr_writer_rejects_non_2d={direct_i2sr_is_2d}"
+            ),
             "The direct packed I2_S/I2_SR writer rejects non-2D ternary weights, so merged expert tensors need new packing/layout tests.",
         ),
         make_gate(
@@ -259,11 +292,19 @@ def main() -> None:
     check_results = [run_check(check) for check in checks]
     kimi_source_matches = search_tree(root, "Kimi")
     local_kimi_results = local_artifacts(root / "benchmark_results")
+    moe_packing_contract = read_json(root / "benchmark_results/moe_packing_contract_2026-05-13.json")
     data: dict[str, Any] = {
         "checks": check_results,
-        "productization_gates": build_productization_gates(root, check_results, kimi_source_matches, local_kimi_results),
+        "productization_gates": build_productization_gates(
+            root,
+            check_results,
+            kimi_source_matches,
+            local_kimi_results,
+            moe_packing_contract,
+        ),
         "kimi_source_matches": kimi_source_matches,
         "local_kimi_artifacts": local_kimi_results,
+        "moe_packing_contract": moe_packing_contract,
     }
     report = build_report(data)
     args.output_md.parent.mkdir(parents=True, exist_ok=True)

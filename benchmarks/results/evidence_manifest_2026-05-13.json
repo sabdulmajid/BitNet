@@ -1,5 +1,5 @@
 {
-  "artifact_count": 96,
+  "artifact_count": 98,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "a3dcaa608d8add5588416ac5a8fb8133cf3092a807fc13be2676651591dc92b9",
-      "size_bytes": 51311
+      "sha256": "08a9e50003493196c01fd394d59c9dad45b99c673b9ad0c6b7d5398956930358",
+      "size_bytes": 51467
     },
     {
       "exists": true,
@@ -70,7 +70,7 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-13.md",
-      "sha256": "e27e94a04cd177afe0e5b1acf2516329c477eb819f7a4e318cba9d97a892ea7c",
+      "sha256": "e5ace2efd97d9cbbe54e02d2cafdf460675f841fa4ece7b2953081e5ed028d27",
       "size_bytes": 4836
     },
     {
@@ -79,7 +79,7 @@
       "label": "product_scope_gate",
       "metrics": {},
       "path": "benchmarks/results/product_scope_gate_2026-05-13.md",
-      "sha256": "6fd0a9ff59bd775a4054a3b5d36eb31b3db99748f2cbdcd1415459acaabf9f97",
+      "sha256": "a264791e31dfaaa6e0169dd365ad8bff0e9820dc8566fc16db473d72534b5392",
       "size_bytes": 3078
     },
     {
@@ -97,7 +97,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-13.md",
-      "sha256": "852ca8a572ced063254e509ab74a1288def54c67e7ba4405253b58d7e7b78ca5",
+      "sha256": "1f927dd96365cd2db366d8c9f9aa8e66bbd7780589b34adf0b30bb0eaed6e6e2",
       "size_bytes": 2865
     },
     {
@@ -250,8 +250,17 @@
       "label": "moe_report",
       "metrics": {},
       "path": "benchmarks/results/moe_support_audit_2026-05-05.md",
-      "sha256": "f56743131e725305e1d06e38cf68a3d172901e6e8003a91a05f5193d7cc57c03",
-      "size_bytes": 3770
+      "sha256": "7dbf6a078be8be77b5c71472612cbdd7c8807f222ab8c8bc6941494719818eaa",
+      "size_bytes": 4007
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "moe_packing_contract_report",
+      "metrics": {},
+      "path": "benchmarks/results/moe_packing_contract_2026-05-13.md",
+      "sha256": "41f1773d62d903796fb86fa6eb15fdbb3dc77236953495ffca08a65e5a2ebc3c",
+      "size_bytes": 1310
     },
     {
       "exists": true,
@@ -1659,7 +1668,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-13.json",
-      "sha256": "2466d1e8babb4544fd172bfbeb6fc03b70cf9045ef689ad1cfdced5756730966",
+      "sha256": "ad9f61fd268dfbcec73b33de7544020f38d8dfe227b7aec8ab61738b4c68539c",
       "size_bytes": 5392
     },
     {
@@ -1677,7 +1686,7 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-13.json",
-      "sha256": "5ae7063fe1dd7072c4b06bc53eef38bb88e531efce1fbb17722a40291e6d6cbf",
+      "sha256": "747a1c8a68bd06bf356b1ccf420af796669d8229cb599bd9ec7d4ace8face45d",
       "size_bytes": 14705
     },
     {
@@ -1691,7 +1700,7 @@
         "unsupported_claim_count": 5
       },
       "path": "benchmark_results/product_scope_gate_2026-05-13.json",
-      "sha256": "2d6338ceecd47232b94f36a5cec0fb37ce5fc53a5462d6b6553c5574ca1159dc",
+      "sha256": "cf93002c371a2c05a1e5d2a7919c3e8263458c75a6b97ffed7e933721941b675",
       "size_bytes": 3737
     },
     {
@@ -1728,13 +1737,32 @@
           "MoE quality and locality benchmarks exist"
         ],
         "gates": 6,
-        "kimi_source_matches": 2,
+        "kimi_source_matches": 4,
         "local_kimi_artifacts": 0,
         "present_checks": 5
       },
       "path": "benchmark_results/moe_support_audit_2026-05-05.json",
-      "sha256": "c331885edde62f0461e34a3edbc757d0c277607c28a87430d7a591bdeeb5264b",
-      "size_bytes": 3776
+      "sha256": "236d0e01ccc3f68265575302508e7183bf62bf8adcad1831a779e688640c49ae",
+      "size_bytes": 5643
+    },
+    {
+      "exists": true,
+      "kind": "moe_packing_contract_json",
+      "label": "moe_packing_contract_json",
+      "metrics": {
+        "blockers": [
+          "TL2 preprocessing rejects merged 3D expert tensors before kernel lookup.",
+          "Direct I2_S/I2_SR code packing rejects merged 3D expert tensors."
+        ],
+        "checks": 3,
+        "dense_2d_control": true,
+        "i2sr_3d": false,
+        "moe_packing_ready": false,
+        "tl2_3d": false
+      },
+      "path": "benchmark_results/moe_packing_contract_2026-05-13.json",
+      "sha256": "1abe9027c4b80325cd840be405edee340de9495c800f48da26220e89d387f0c5",
+      "size_bytes": 1514
     },
     {
       "exists": true,

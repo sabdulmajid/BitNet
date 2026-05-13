@@ -232,6 +232,17 @@ The current scope gate is
 supported dense-Qwen negative result plus row-scale recovery path from
 unsupported one-click, TL2, default-runtime, and MoE/Kimi claims.
 
+To verify the current MoE packing blocker with synthetic merged expert tensors:
+
+```bash
+python benchmarks/audit_moe_packing_contract.py
+```
+
+The current report is
+`benchmarks/results/moe_packing_contract_2026-05-13.md`. It shows that TL2 and
+direct `I2_S`/`I2_SR` packing reject `[experts, out, in]` tensors while the 2D
+dense control still packs successfully.
+
 To verify whether `I2_SR` is actually active in the committed submodule state
 rather than only available as a patch:
 

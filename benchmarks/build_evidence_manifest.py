@@ -58,6 +58,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "i2s_packing_layout_verify_report", "kind": "tracked_report", "path": "benchmarks/results/i2s_packing_layout_verify_2026-05-13.md"},
     {"label": "i2sr_rss_report", "kind": "tracked_report", "path": "benchmarks/results/i2sr_rss_2026-05-13.md"},
     {"label": "moe_report", "kind": "tracked_report", "path": "benchmarks/results/moe_support_audit_2026-05-05.md"},
+    {"label": "moe_packing_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_packing_contract_2026-05-13.md"},
     {"label": "i2sr_combined_patch", "kind": "tracked_report", "path": "patches/llama-i2sr-row-scale-qtype.patch"},
     {"label": "i2sr_root_runtime_patch", "kind": "tracked_report", "path": "patches/bitnet-i2sr-root-runtime.patch"},
     {"label": "i2sr_submodule_patch", "kind": "tracked_report", "path": "patches/llama-i2sr-row-scale-qtype.submodule.patch"},
@@ -127,6 +128,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "product_scope_gate_json", "kind": "product_scope_gate_json", "path": "benchmark_results/product_scope_gate_2026-05-13.json"},
     {"label": "i2sr_submodule_promotion_audit_json", "kind": "i2sr_submodule_promotion_audit_json", "path": "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json"},
     {"label": "moe_support_json", "kind": "moe_support_json", "path": "benchmark_results/moe_support_audit_2026-05-05.json"},
+    {"label": "moe_packing_contract_json", "kind": "moe_packing_contract_json", "path": "benchmark_results/moe_packing_contract_2026-05-13.json"},
     {"label": "tl2_generic_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json"},
     {"label": "tl2_avx512_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json"},
     {"label": "ptq_math", "kind": "math_json", "path": "benchmark_results/math_viability_gaussian_10trial_2026-05-05.json"},
@@ -450,6 +452,17 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "kimi_source_matches": len(data.get("kimi_source_matches", [])),
             "local_kimi_artifacts": len(data.get("local_kimi_artifacts", [])),
         }
+    if kind == "moe_packing_contract_json":
+        verdict = data.get("verdict", {})
+        checks = data.get("checks", [])
+        return {
+            "checks": len(checks) if isinstance(checks, list) else None,
+            "moe_packing_ready": verdict.get("moe_packing_ready"),
+            "tl2_3d": verdict.get("merged_3d_tl2_supported"),
+            "i2sr_3d": verdict.get("merged_3d_i2s_i2sr_supported"),
+            "dense_2d_control": verdict.get("dense_2d_i2s_control_supported"),
+            "blockers": data.get("blockers", []),
+        }
     if kind == "math_json":
         aggregate = data.get("aggregate", {})
         mean_abs = aggregate.get("mean_abs_ternary_repo_formula", {})
@@ -609,6 +622,14 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"present={metrics.get('present_checks', '-')}/{metrics.get('checks', '-')}, "
                 f"gates={metrics.get('gates', '-')}, failed={len(metrics.get('failed_gates', []))}, "
                 f"kimi_artifacts={metrics.get('local_kimi_artifacts', '-')}"
+            )
+        elif entry["kind"] == "moe_packing_contract_json":
+            summary = (
+                f"ready={metrics.get('moe_packing_ready', '-')}, "
+                f"tl2_3d={metrics.get('tl2_3d', '-')}, "
+                f"i2sr_3d={metrics.get('i2sr_3d', '-')}, "
+                f"control_2d={metrics.get('dense_2d_control', '-')}, "
+                f"blockers={len(metrics.get('blockers', []))}"
             )
         elif entry["kind"] == "math_json":
             summary = f"trials={metrics.get('trials', '-')}, rel_error={fmt_metric(metrics.get('relative_output_fro_error_mean'))}"

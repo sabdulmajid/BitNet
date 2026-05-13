@@ -1,14 +1,14 @@
 # Artifact Prune Plan
 
-Generated UTC: `2026-05-13T09:40:42+00:00`
-Git HEAD at generation time: `4037e1385c9c`
+Generated UTC: `2026-05-13T09:50:33+00:00`
+Git HEAD at generation time: `c1b2beee4f1e`
 
 This is a dry-run plan. No files were deleted by the generator.
 
 ## Guardrails
 
 - Evidence manifest: `benchmarks/results/evidence_manifest_2026-05-13.json`
-- Protected evidence files: `96`
+- Protected evidence files: `98`
 - Protected benchmark-manifest paths: `31`
 - Protected checkpoint directories: `12`
 
