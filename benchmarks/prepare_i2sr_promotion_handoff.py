@@ -155,6 +155,52 @@ def prepare_worktree(root: Path, worktree_dir: Path, branch: str, fork_url: str,
     }
 
 
+def inspect_existing_worktree(worktree_dir: Path, branch: str) -> dict[str, Any] | None:
+    if not worktree_dir.exists():
+        return None
+    if not (worktree_dir / ".git").exists():
+        return None
+
+    head = run(["git", "rev-parse", "HEAD"], cwd=worktree_dir)
+    current_branch = run(["git", "branch", "--show-current"], cwd=worktree_dir)
+    status = run(["git", "status", "--porcelain"], cwd=worktree_dir)
+    if head.returncode != 0 or current_branch.returncode != 0 or status.returncode != 0:
+        return None
+
+    actual_branch = current_branch.stdout.strip()
+    return {
+        "prepared": actual_branch == branch and status.stdout.strip() == "",
+        "worktree_dir": str(worktree_dir),
+        "branch": actual_branch,
+        "commit_sha": head.stdout.strip(),
+        "pushed": False,
+        "status": status.stdout.strip(),
+        "steps": [],
+    }
+
+
+def push_existing_worktree(worktree_dir: Path, branch: str, fork_url: str) -> dict[str, Any]:
+    worktree = inspect_existing_worktree(worktree_dir, branch)
+    if worktree is None:
+        raise SystemExit(f"prepared worktree path is missing or invalid: {worktree_dir}")
+    if not worktree["prepared"]:
+        raise SystemExit(f"prepared worktree is not clean on branch {branch}: {worktree}")
+
+    completed = run(["git", "push", fork_url, f"HEAD:refs/heads/{branch}"], cwd=worktree_dir)
+    step = {
+        "command": command_text(["git", "push", fork_url, f"HEAD:refs/heads/{branch}"], cwd=worktree_dir),
+        "returncode": completed.returncode,
+        "stdout": completed.stdout.strip(),
+        "stderr": completed.stderr.strip(),
+    }
+    if completed.returncode != 0:
+        raise SystemExit(f"command failed: {step['command']}")
+
+    worktree["pushed"] = True
+    worktree["steps"] = [step]
+    return worktree
+
+
 def build_handoff(
     root: Path,
     *,
@@ -163,6 +209,7 @@ def build_handoff(
     worktree_dir: Path,
     prepare: bool,
     push: bool,
+    push_existing: bool,
     skip_remote_check: bool,
 ) -> dict[str, Any]:
     submodule = root / SUBMODULE_PATH
@@ -202,15 +249,25 @@ def build_handoff(
         message = "--push requires --prepare-worktree."
         blockers.append(message)
         prepare_blockers.append(message)
+    if push_existing and prepare:
+        message = "--push-existing-worktree cannot be combined with --prepare-worktree."
+        blockers.append(message)
+        prepare_blockers.append(message)
     if push and skip_remote_check:
         message = "--push requires a real remote reachability check."
         blockers.append(message)
         prepare_blockers.append(message)
+    if push_existing and skip_remote_check:
+        message = "--push-existing-worktree requires a real remote reachability check."
+        blockers.append(message)
+        prepare_blockers.append(message)
     if push and not fork.get("reachable"):
         prepare_blockers.append("Cannot push because the candidate llama.cpp fork URL is not reachable.")
+    if push_existing and not fork.get("reachable"):
+        prepare_blockers.append("Cannot push existing worktree because the candidate llama.cpp fork URL is not reachable.")
 
     commands = build_commands(root, fork_url, branch, worktree_dir)
-    worktree_result = None
+    worktree_result = inspect_existing_worktree(worktree_dir, branch)
     can_prepare = root_clean and submodule_clean and root_patch_check["applies"] and submodule_patch_check["applies"]
     if prepare:
         if prepare_blockers:
@@ -218,6 +275,10 @@ def build_handoff(
         if not can_prepare:
             raise SystemExit("cannot prepare worktree; preflight failed")
         worktree_result = prepare_worktree(root, worktree_dir, branch, fork_url, push=push)
+    if push_existing:
+        if prepare_blockers:
+            raise SystemExit("cannot push existing worktree while blockers remain: " + "; ".join(prepare_blockers))
+        worktree_result = push_existing_worktree(worktree_dir, branch, fork_url)
 
     return {
         "schema": "bitnet-i2sr-promotion-handoff-v1",
@@ -234,9 +295,11 @@ def build_handoff(
         "candidate_fork_probe": fork,
         "prepare_requested": prepare,
         "push_requested": push,
+        "push_existing_requested": push_existing,
         "prepare_blockers": prepare_blockers,
         "worktree_result": worktree_result,
-        "ready_for_handoff": can_prepare and (skip_remote_check or bool(fork.get("reachable"))),
+        "ready_for_handoff": (can_prepare or bool(worktree_result and worktree_result.get("prepared")))
+        and (skip_remote_check or bool(fork.get("reachable"))),
         "blockers": blockers,
         "commands": commands,
     }
@@ -318,6 +381,7 @@ def main() -> None:
     )
     parser.add_argument("--prepare-worktree", action="store_true", help="Create a local worktree and commit the submodule patch.")
     parser.add_argument("--push", action="store_true", help="Push the prepared branch to --fork-url. Requires --prepare-worktree.")
+    parser.add_argument("--push-existing-worktree", action="store_true", help="Push an already prepared clean worktree to --fork-url.")
     parser.add_argument("--skip-remote-check", action="store_true", help="Skip git ls-remote preflight; not allowed with --push.")
     parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/i2sr_promotion_handoff_2026-05-13.json"))
     parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/i2sr_promotion_handoff_2026-05-13.md"))
@@ -332,6 +396,7 @@ def main() -> None:
         worktree_dir=worktree_dir,
         prepare=args.prepare_worktree,
         push=args.push,
+        push_existing=args.push_existing_worktree,
         skip_remote_check=args.skip_remote_check,
     )
 
