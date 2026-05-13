@@ -60,6 +60,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "i2sr_rss_report", "kind": "tracked_report", "path": "benchmarks/results/i2sr_rss_2026-05-13.md"},
     {"label": "moe_report", "kind": "tracked_report", "path": "benchmarks/results/moe_support_audit_2026-05-05.md"},
     {"label": "moe_packing_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_packing_contract_2026-05-13.md"},
+    {"label": "moe_tl2_runtime_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_tl2_runtime_contract_2026-05-13.md"},
     {"label": "unblock_requirements_report", "kind": "tracked_report", "path": "benchmarks/results/unblock_requirements_2026-05-13.md"},
     {"label": "i2sr_combined_patch", "kind": "tracked_report", "path": "patches/llama-i2sr-row-scale-qtype.patch"},
     {"label": "i2sr_root_runtime_patch", "kind": "tracked_report", "path": "patches/bitnet-i2sr-root-runtime.patch"},
@@ -132,6 +133,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "i2sr_submodule_promotion_audit_json", "kind": "i2sr_submodule_promotion_audit_json", "path": "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json"},
     {"label": "moe_support_json", "kind": "moe_support_json", "path": "benchmark_results/moe_support_audit_2026-05-05.json"},
     {"label": "moe_packing_contract_json", "kind": "moe_packing_contract_json", "path": "benchmark_results/moe_packing_contract_2026-05-13.json"},
+    {"label": "moe_tl2_runtime_contract_json", "kind": "moe_tl2_runtime_contract_json", "path": "benchmark_results/moe_tl2_runtime_contract_2026-05-13.json"},
     {"label": "unblock_requirements_json", "kind": "unblock_requirements_json", "path": "benchmark_results/unblock_requirements_2026-05-13.json"},
     {"label": "tl2_generic_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json"},
     {"label": "tl2_avx512_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json"},
@@ -482,6 +484,18 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "layout_checks": len(layout_checks),
             "blockers": data.get("blockers", []),
         }
+    if kind == "moe_tl2_runtime_contract_json":
+        byte_probe = data.get("byte_size_probe", {})
+        checks = data.get("checks", [])
+        failed = [check.get("name") for check in checks if isinstance(check, dict) and not check.get("passed")]
+        return {
+            "tl2_moe_runtime_ready": data.get("tl2_moe_runtime_ready"),
+            "checks": len(checks) if isinstance(checks, list) else None,
+            "failed": failed,
+            "underreport_bytes": byte_probe.get("underreport_bytes") if isinstance(byte_probe, dict) else None,
+            "underreport_ratio": byte_probe.get("underreport_ratio") if isinstance(byte_probe, dict) else None,
+            "blockers": data.get("blockers", []),
+        }
     if kind == "unblock_requirements_json":
         requirements = data.get("requirements", [])
         missing = [item for item in requirements if isinstance(item, dict) and item.get("status") == "missing"]
@@ -671,6 +685,15 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"i2sr_3d={metrics.get('i2sr_3d', '-')}, "
                 f"control_2d={metrics.get('dense_2d_control', '-')}, "
                 f"layout={metrics.get('layout_verified', '-')}/{metrics.get('layout_checks', '-')}, "
+                f"blockers={len(metrics.get('blockers', []))}"
+            )
+        elif entry["kind"] == "moe_tl2_runtime_contract_json":
+            summary = (
+                f"ready={metrics.get('tl2_moe_runtime_ready', '-')}, "
+                f"checks={metrics.get('checks', '-')}, "
+                f"failed={len(metrics.get('failed', []))}, "
+                f"underreport={metrics.get('underreport_bytes', '-')}, "
+                f"ratio={fmt_metric(metrics.get('underreport_ratio'))}, "
                 f"blockers={len(metrics.get('blockers', []))}"
             )
         elif entry["kind"] == "unblock_requirements_json":

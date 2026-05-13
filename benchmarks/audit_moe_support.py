@@ -135,6 +135,14 @@ def build_report(data: dict[str, Any]) -> str:
         if contract
         else "Synthetic MoE packing contract artifact is missing."
     )
+    tl2_contract = data.get("moe_tl2_runtime_contract") or {}
+    tl2_note = (
+        "TL2 MoE runtime contract: "
+        f"ready={tl2_contract.get('tl2_moe_runtime_ready')}; "
+        f"blockers={len(tl2_contract.get('blockers', []))}."
+        if tl2_contract
+        else "TL2 MoE runtime contract artifact is missing."
+    )
     verdict = (
         "Generic MoE infrastructure is present: GGUF metadata has expert counts, "
         "Qwen2MoE is registered in the vendored llama.cpp converter, expert "
@@ -142,9 +150,10 @@ def build_report(data: dict[str, Any]) -> str:
         "top-k expert execution with `ggml_mul_mat_id`. This does not prove "
         "Kimi support: no Kimi-specific mapping or benchmark artifact is present, "
         "the TL2-capable BitNet converter still lacks Qwen2MoE registration, "
-        "and the TL2 packing path remains 2D-matrix oriented. The direct "
-        "I2_S/I2_SR path is only a synthetic packing contract until it is "
-        "validated with a full MoE GGUF/runtime artifact."
+        "the TL2 packing path remains 2D-matrix oriented, and the active TL2 "
+        "runtime contract does not size or route merged experts correctly. The "
+        "direct I2_S/I2_SR path is only a synthetic packing contract until it "
+        "is validated with a full MoE GGUF/runtime artifact."
     )
     gate_rows = [
         [
@@ -170,7 +179,7 @@ def build_report(data: dict[str, Any]) -> str:
             "## Productization Gates",
             md_table(["gate", "status", "evidence", "blocker"], gate_rows),
             "## Negative Checks",
-            "\n".join([kimi_note, artifact_note, contract_note]),
+            "\n".join([kimi_note, artifact_note, contract_note, tl2_note]),
             "## Verdict",
             verdict,
             "## Required Plan",
@@ -185,6 +194,7 @@ def build_productization_gates(
     kimi_matches: list[str],
     kimi_artifacts: list[str],
     moe_packing_contract: dict[str, Any],
+    moe_tl2_runtime_contract: dict[str, Any],
 ) -> list[dict[str, Any]]:
     check_by_label = {check["label"]: check for check in checks}
     generic_runtime = check_by_label.get("Runtime sparse expert execution", {}).get("status") == "present"
@@ -202,6 +212,9 @@ def build_productization_gates(
     contract_i2sr_3d = bool(contract_verdict.get("merged_3d_i2s_i2sr_supported"))
     contract_2d_control = bool(contract_verdict.get("dense_2d_i2s_control_supported"))
     contract_available = bool(contract_verdict)
+    runtime_ready = bool(moe_tl2_runtime_contract.get("tl2_moe_runtime_ready"))
+    runtime_blockers = moe_tl2_runtime_contract.get("blockers", [])
+    byte_probe = moe_tl2_runtime_contract.get("byte_size_probe", {})
 
     return [
         make_gate(
@@ -218,12 +231,14 @@ def build_productization_gates(
         ),
         make_gate(
             "TL2 converter path is validated for merged 3D expert tensors",
-            contract_tl2_3d,
+            contract_tl2_3d and runtime_ready,
             (
                 f"contract_available={contract_available}; contract_tl2_3d={contract_tl2_3d}; "
-                f"preprocess_weights_tl2_uses_2d_unpack={tl2_is_2d}"
+                f"preprocess_weights_tl2_uses_2d_unpack={tl2_is_2d}; runtime_ready={runtime_ready}; "
+                f"runtime_blockers={len(runtime_blockers)}; "
+                f"tl2_expert_byte_underreport={byte_probe.get('underreport_bytes')}"
             ),
-            "`preprocess_weights_tl2` unpacks `M, K = w.shape`, so merged expert tensors with shape [experts, out, in] are not supported.",
+            "`preprocess_weights_tl2` rejects 3D tensors, and the active TL2 runtime contract also under-sizes and misroutes merged expert tensors.",
         ),
         make_gate(
             "direct I2_SR writer is validated for merged 3D expert tensors",
@@ -294,6 +309,7 @@ def main() -> None:
     kimi_source_matches = search_tree(root, "Kimi")
     local_kimi_results = local_artifacts(root / "benchmark_results")
     moe_packing_contract = read_json(root / "benchmark_results/moe_packing_contract_2026-05-13.json")
+    moe_tl2_runtime_contract = read_json(root / "benchmark_results/moe_tl2_runtime_contract_2026-05-13.json")
     data: dict[str, Any] = {
         "checks": check_results,
         "productization_gates": build_productization_gates(
@@ -302,10 +318,12 @@ def main() -> None:
             kimi_source_matches,
             local_kimi_results,
             moe_packing_contract,
+            moe_tl2_runtime_contract,
         ),
         "kimi_source_matches": kimi_source_matches,
         "local_kimi_artifacts": local_kimi_results,
         "moe_packing_contract": moe_packing_contract,
+        "moe_tl2_runtime_contract": moe_tl2_runtime_contract,
     }
     report = build_report(data)
     args.output_md.parent.mkdir(parents=True, exist_ok=True)

@@ -254,6 +254,17 @@ The current report is
 still rejects `[experts, out, in]` tensors, while direct `I2_S`/`I2_SR` synthetic
 packing and the 2D dense control pack successfully.
 
+To verify the deeper TL2 runtime contract for MoE expert tensors:
+
+```bash
+python benchmarks/audit_moe_tl2_runtime_contract.py
+```
+
+The current report is
+`benchmarks/results/moe_tl2_runtime_contract_2026-05-13.md`. It checks the
+Python TL2 preprocessor, the active `ggml_nbytes` TL2 size contract, and whether
+`ggml_mul_mat_id` routes TL2 expert matmuls through the BitNet LUT path.
+
 To verify whether `I2_SR` is actually active in the committed submodule state
 rather than only available as a patch:
 

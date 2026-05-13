@@ -118,6 +118,8 @@ def build_gate(root: Path) -> dict[str, Any]:
     kimi_source_matches = moe.get("kimi_source_matches", [])
     moe_gates = moe.get("productization_gates", [])
     moe_failed_gates = [gate.get("name") for gate in moe_gates if isinstance(gate, dict) and not gate.get("passed")]
+    moe_tl2 = read_json(root / "benchmark_results/moe_tl2_runtime_contract_2026-05-13.json")
+    moe_tl2_byte_probe = moe_tl2.get("byte_size_probe", {})
 
     claims: list[dict[str, Any]] = []
     add_claim(
@@ -176,9 +178,14 @@ def build_gate(root: Path) -> dict[str, Any]:
         claims,
         "MoE/Kimi retrofit and CPU runtime support",
         "unsupported",
-        f"Kimi artifacts={len(kimi_artifacts)}; Kimi source matches={len(kimi_source_matches)}; failed MoE gates={len(moe_failed_gates)}/{len(moe_gates)}",
+        (
+            f"Kimi artifacts={len(kimi_artifacts)}; Kimi source matches={len(kimi_source_matches)}; "
+            f"failed MoE gates={len(moe_failed_gates)}/{len(moe_gates)}; "
+            f"TL2 MoE runtime ready={moe_tl2.get('tl2_moe_runtime_ready')}; "
+            f"TL2 expert byte underreport={moe_tl2_byte_probe.get('underreport_bytes')}"
+        ),
         "Treat as separate research milestone.",
-        "No Kimi/Qwen2MoE BitNet converter mapping, TL2 3D expert packing support, router distillation, quality benchmark, or expert-locality benchmark exists; direct I2_S/I2_SR expert packing is only synthetic so far.",
+        "No Kimi/Qwen2MoE BitNet converter mapping, TL2 3D expert packing/runtime support, router distillation, quality benchmark, or expert-locality benchmark exists; direct I2_S/I2_SR expert packing is only synthetic so far.",
     )
 
     supported = [claim for claim in claims if claim["status"] in {"supported", "supported_with_patch"}]

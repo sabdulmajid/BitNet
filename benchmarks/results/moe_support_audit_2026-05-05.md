@@ -14,7 +14,7 @@
 | --- | --- | --- | --- |
 | generic GGUF/runtime MoE support exists | pass | gguf_schema=True; runtime=True; llama_qwen2moe_converter=True |  |
 | BitNet converter has explicit Qwen2MoE/Kimi registration | fail | qwen2moe_registration=False; kimi_converter_match=False; tracked_kimi_mentions=0 | The TL2-capable BitNet converter registers Qwen2 dense/Mixtral-style models but not Qwen2MoE or Kimi. |
-| TL2 converter path is validated for merged 3D expert tensors | fail | contract_available=True; contract_tl2_3d=False; preprocess_weights_tl2_uses_2d_unpack=True | `preprocess_weights_tl2` unpacks `M, K = w.shape`, so merged expert tensors with shape [experts, out, in] are not supported. |
+| TL2 converter path is validated for merged 3D expert tensors | fail | contract_available=True; contract_tl2_3d=False; preprocess_weights_tl2_uses_2d_unpack=True; runtime_ready=False; runtime_blockers=3; tl2_expert_byte_underreport=69632 | `preprocess_weights_tl2` rejects 3D tensors, and the active TL2 runtime contract also under-sizes and misroutes merged expert tensors. |
 | direct I2_SR writer is validated for merged 3D expert tensors | pass | contract_available=True; contract_i2sr_3d=True; contract_2d_control=True; direct_i2sr_writer_rejects_non_2d=False |  |
 | local Kimi model/eval artifacts exist | fail | kimi_artifacts=0 | No local Kimi checkpoint, conversion, quality, throughput, RSS, or expert-locality artifact exists. |
 | MoE quality and locality benchmarks exist | fail | quality_runs=0; throughput_runs=0; expert_locality_runs=0 | No benchmark measures router accuracy, expert selection locality, sparse expert throughput, or quality degradation. |
@@ -24,10 +24,11 @@
 No Kimi-specific converter/runtime mapping was found in converter/runtime source files.
 No local Kimi benchmark artifacts were found under benchmark_results.
 Synthetic MoE packing contract: TL2 3D supported=False; I2_S/I2_SR 3D supported=True; 2D control supported=True.
+TL2 MoE runtime contract: ready=False; blockers=3.
 
 ## Verdict
 
-Generic MoE infrastructure is present: GGUF metadata has expert counts, Qwen2MoE is registered in the vendored llama.cpp converter, expert weights are merged into 3D tensors, and the runtime builds sparse top-k expert execution with `ggml_mul_mat_id`. This does not prove Kimi support: no Kimi-specific mapping or benchmark artifact is present, the TL2-capable BitNet converter still lacks Qwen2MoE registration, and the TL2 packing path remains 2D-matrix oriented. The direct I2_S/I2_SR path is only a synthetic packing contract until it is validated with a full MoE GGUF/runtime artifact.
+Generic MoE infrastructure is present: GGUF metadata has expert counts, Qwen2MoE is registered in the vendored llama.cpp converter, expert weights are merged into 3D tensors, and the runtime builds sparse top-k expert execution with `ggml_mul_mat_id`. This does not prove Kimi support: no Kimi-specific mapping or benchmark artifact is present, the TL2-capable BitNet converter still lacks Qwen2MoE registration, the TL2 packing path remains 2D-matrix oriented, and the active TL2 runtime contract does not size or route merged experts correctly. The direct I2_S/I2_SR path is only a synthetic packing contract until it is validated with a full MoE GGUF/runtime artifact.
 
 ## Required Plan
 

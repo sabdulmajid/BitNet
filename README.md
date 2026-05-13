@@ -197,6 +197,8 @@ The MoE support audit is
 [benchmarks/results/moe_support_audit_2026-05-05.md](benchmarks/results/moe_support_audit_2026-05-05.md).
 The synthetic MoE packing contract audit is
 [benchmarks/results/moe_packing_contract_2026-05-13.md](benchmarks/results/moe_packing_contract_2026-05-13.md).
+The TL2 MoE runtime-contract audit is
+[benchmarks/results/moe_tl2_runtime_contract_2026-05-13.md](benchmarks/results/moe_tl2_runtime_contract_2026-05-13.md).
 The consolidated unblock requirements audit is
 [benchmarks/results/unblock_requirements_2026-05-13.md](benchmarks/results/unblock_requirements_2026-05-13.md).
 The reusable static-ternary GGUF bridge note is

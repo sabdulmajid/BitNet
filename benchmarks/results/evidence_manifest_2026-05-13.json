@@ -1,5 +1,5 @@
 {
-  "artifact_count": 102,
+  "artifact_count": 104,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "f55578819b1b4dc129e6057f04ba02cbd3eca21fe972c6ef8e1d1f328b6aef9c",
-      "size_bytes": 51918
+      "sha256": "173de64c4c403420576ea91d8f11746522a3b1a85a5267f37276843464f63674",
+      "size_bytes": 52076
     },
     {
       "exists": true,
@@ -70,7 +70,7 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-13.md",
-      "sha256": "a954729ba9ac49262ed051d42e894ce9c3f4fc815895d841ed99b90197db2b94",
+      "sha256": "35424700f7525885a9310c68f889aaa4014b5d6f47d99e4f58cffc749602d6d2",
       "size_bytes": 5035
     },
     {
@@ -79,8 +79,8 @@
       "label": "product_scope_gate",
       "metrics": {},
       "path": "benchmarks/results/product_scope_gate_2026-05-13.md",
-      "sha256": "551a446ee614d19d2bb2898d6d68e548c0c9a67baadf59090769f387b89b2d16",
-      "size_bytes": 3131
+      "sha256": "9313ccc31d4fdd2797c5f105e980cc1ae6650965770a25a6401e2addf06121ab",
+      "size_bytes": 3203
     },
     {
       "exists": true,
@@ -97,7 +97,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-13.md",
-      "sha256": "f67f46e9d6378cc4963ab9877936530337386dd2f6a5c32426ae5a8d1b98a2e6",
+      "sha256": "1d9aa0605ab4c99e8e56001d23878787a3147be1f063efa96e71a5b088187340",
       "size_bytes": 2866
     },
     {
@@ -259,8 +259,8 @@
       "label": "moe_report",
       "metrics": {},
       "path": "benchmarks/results/moe_support_audit_2026-05-05.md",
-      "sha256": "0b076a359d7632dc52644db6bd278a11d177ad072e9faaf465a9f43b2d10c445",
-      "size_bytes": 3986
+      "sha256": "7117c8894372b769528d960c6d85ab676f41663fc6821b16133bd2fca4174ea2",
+      "size_bytes": 4204
     },
     {
       "exists": true,
@@ -270,6 +270,15 @@
       "path": "benchmarks/results/moe_packing_contract_2026-05-13.md",
       "sha256": "f67484f4616192a2a6a2063322e06471e3cefde0a7e0802c396db09ff5aebe8f",
       "size_bytes": 1887
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "moe_tl2_runtime_contract_report",
+      "metrics": {},
+      "path": "benchmarks/results/moe_tl2_runtime_contract_2026-05-13.md",
+      "sha256": "729fd55809450d2df9ce69f70ce3a1348013fc2c74dacb8eb60a07dd7d632c12",
+      "size_bytes": 2602
     },
     {
       "exists": true,
@@ -1705,7 +1714,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-13.json",
-      "sha256": "e8c6cf145330177fe1d6f9e7d7811378c2da37defa5291a2f625f19574e29e64",
+      "sha256": "69194a94c6c1a7d0bcac9b2bcdfc6f9714ca8b7d7e7163afd0f13fa437369c90",
       "size_bytes": 5393
     },
     {
@@ -1723,7 +1732,7 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-13.json",
-      "sha256": "81dd93e8dab5866a9a9e55b25068bb1fd489c43456e3f8e4e0ed961b21d45e9e",
+      "sha256": "d80939653d258a38ae082296c797c2bfe8a74888dc551ee47813aa61bb8791c2",
       "size_bytes": 14806
     },
     {
@@ -1737,8 +1746,8 @@
         "unsupported_claim_count": 5
       },
       "path": "benchmark_results/product_scope_gate_2026-05-13.json",
-      "sha256": "1ce6347c5fa59f263463a10e6619c53e8dfa5be843a099e96ff3169639397dd5",
-      "size_bytes": 3790
+      "sha256": "e8b7b597ce7ceffb8be8ce44a613ab568488d4f69e06ffe056566ea807c6e652",
+      "size_bytes": 3862
     },
     {
       "exists": true,
@@ -1778,8 +1787,8 @@
         "present_checks": 5
       },
       "path": "benchmark_results/moe_support_audit_2026-05-05.json",
-      "sha256": "5601f272909c44808c05ffcc4c03758e217d30a560bdbfeee8c68ff82bc16405",
-      "size_bytes": 6883
+      "sha256": "50d6b377d8823c3980e8813f13b057c2eaaac3635940ec78b9f910a03b7bbca5",
+      "size_bytes": 10113
     },
     {
       "exists": true,
@@ -1800,6 +1809,30 @@
       "path": "benchmark_results/moe_packing_contract_2026-05-13.json",
       "sha256": "538939fcb10b3ba0764ef61abcb7e14b34a5aaddac9d7db0695baadbc1c93d22",
       "size_bytes": 2966
+    },
+    {
+      "exists": true,
+      "kind": "moe_tl2_runtime_contract_json",
+      "label": "moe_tl2_runtime_contract_json",
+      "metrics": {
+        "blockers": [
+          "`preprocess_weights_tl2` still unpacks `M, K = w.shape`, so [experts, out, in] tensors fail before packing.",
+          "The active TL2 byte-size formula ignores tensor->ne[2]/ne[3], so merged expert tensors would be under-sized.",
+          "`ggml_compute_forward_mul_mat_id` does not route TL2 through the BitNet LUT kernel; TL2 type traits fall back to F32 vec-dot semantics."
+        ],
+        "checks": 5,
+        "failed": [
+          "TL2 Python preprocessor accepts explicit 3D expert tensors",
+          "TL2 ggml_nbytes accounts for expert dimension",
+          "TL2 LUT kernel is routed for MoE ggml_mul_mat_id"
+        ],
+        "tl2_moe_runtime_ready": false,
+        "underreport_bytes": 69632,
+        "underreport_ratio": 3.9931224209078406
+      },
+      "path": "benchmark_results/moe_tl2_runtime_contract_2026-05-13.json",
+      "sha256": "e5b03c961bf5ccd849969868f25c72823dc1188929e1950c1e40e033f3ae9172",
+      "size_bytes": 2985
     },
     {
       "exists": true,
