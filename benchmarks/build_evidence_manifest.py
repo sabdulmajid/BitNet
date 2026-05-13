@@ -32,6 +32,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "publishable_claims", "kind": "tracked_report", "path": "benchmarks/results/publishable_claims_2026-05-05.md"},
     {"label": "progress_audit", "kind": "tracked_report", "path": "benchmarks/results/progress_audit_2026-05-05.md"},
     {"label": "active_goal_audit", "kind": "tracked_report", "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md"},
+    {"label": "direct_static_ternary_gguf_report", "kind": "tracked_report", "path": "benchmarks/results/direct_static_ternary_gguf_2026-05-13.md"},
     {"label": "tl2_shape_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_shape_support_audit_2026-05-05.md"},
     {"label": "tl2_probe_report", "kind": "tracked_report", "path": "benchmarks/results/qwen05b_tl2_probe_2026-05-05.md"},
     {"label": "tl2_scale_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_scale_semantics_2026-05-05.md"},
@@ -71,6 +72,8 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "gguf_row_i2s_heapfix", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json"},
     {"label": "gguf_row_i2s_thread_scaling", "kind": "thread_scaling_json", "path": "benchmark_results/i2s-row-scale-thread-scaling-fixed-2026-05-05/summary.json"},
     {"label": "gguf_context_rss", "kind": "gguf_memory_json", "path": "benchmark_results/gguf-rss-qwen15b-context-scaling-2026-05-05/summary.json"},
+    {"label": "direct_gguf_tiny", "kind": "direct_gguf_json", "path": "benchmark_results/direct-gguf-tiny-2026-05-13/summary.json"},
+    {"label": "direct_gguf_qwen05b", "kind": "direct_gguf_json", "path": "benchmark_results/direct-gguf-qwen05b-klonly-notie-2026-05-13/summary.json"},
     {"label": "tl2_shape_json", "kind": "tl2_shape_json", "path": "benchmark_results/tl2_shape_support_audit_2026-05-05.json"},
     {"label": "tl2_scale_json", "kind": "tl2_scale_json", "path": "benchmark_results/tl2_scale_semantics_2026-05-05.json"},
     {"label": "i2s_row_scale_format_json", "kind": "i2s_format_json", "path": "benchmark_results/i2s_row_scale_format_audit_2026-05-13.json"},
@@ -200,6 +203,20 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "rows": len(rows) if isinstance(rows, list) else None,
             "contexts": sorted({int(row.get("ctx_size")) for row in rows if isinstance(row, dict) and isinstance(row.get("ctx_size"), (int, float))}),
         }
+    if kind == "direct_gguf_json":
+        smoke = data.get("smoke", {})
+        reader = data.get("gguf_reader", {})
+        return {
+            "architecture": data.get("architecture"),
+            "outtype": data.get("outtype"),
+            "ternary_materialized": data.get("ternary_materialized"),
+            "copied_tensors": data.get("copied_tensors"),
+            "output_tensors": data.get("output_tensors"),
+            "outfile_size_bytes": data.get("outfile_size_bytes"),
+            "gguf_reader_returncode": reader.get("returncode") if isinstance(reader, dict) else None,
+            "gguf_reader_tensors": reader.get("n_tensors") if isinstance(reader, dict) else None,
+            "smoke_returncode": smoke.get("returncode") if isinstance(smoke, dict) else None,
+        }
     if kind == "tl2_shape_json":
         models = data.get("models", [])
         return {
@@ -298,6 +315,12 @@ def build_report(manifest: dict[str, Any]) -> str:
             summary = f"rows={metrics.get('rows', '-')}, max_prefill={fmt_metric(metrics.get('max_prefill_tok_s'))}, max_decode={fmt_metric(metrics.get('max_decode_tok_s'))}"
         elif entry["kind"] == "gguf_memory_json":
             summary = f"rows={metrics.get('rows', '-')}, contexts={metrics.get('contexts', '-')}"
+        elif entry["kind"] == "direct_gguf_json":
+            summary = (
+                f"arch={metrics.get('architecture', '-')}, outtype={metrics.get('outtype', '-')}, "
+                f"ternary={metrics.get('ternary_materialized', '-')}, tensors={metrics.get('output_tensors', '-')}, "
+                f"reader_rc={metrics.get('gguf_reader_returncode', '-')}, smoke_rc={metrics.get('smoke_returncode', '-')}"
+            )
         elif entry["kind"] == "tl2_scale_json":
             values = metrics.get("results", [])
             summary = "; ".join(

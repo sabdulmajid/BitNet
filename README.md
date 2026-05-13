@@ -138,6 +138,8 @@ The MoE support audit is
 [benchmarks/results/moe_support_audit_2026-05-05.md](benchmarks/results/moe_support_audit_2026-05-05.md).
 The reusable static-ternary GGUF bridge note is
 [benchmarks/results/static_ternary_gguf_bridge_2026-05-05.md](benchmarks/results/static_ternary_gguf_bridge_2026-05-05.md).
+The direct static-ternary GGUF bridge note is
+[benchmarks/results/direct_static_ternary_gguf_2026-05-13.md](benchmarks/results/direct_static_ternary_gguf_2026-05-13.md).
 The publishable-claims ledger is
 [benchmarks/results/publishable_claims_2026-05-05.md](benchmarks/results/publishable_claims_2026-05-05.md).
 The compact evidence manifest with hashes and parsed metrics is

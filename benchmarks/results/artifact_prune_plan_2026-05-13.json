@@ -1,9 +1,19 @@
 {
   "evidence_manifest": "benchmarks/results/evidence_manifest_2026-05-13.json",
-  "generated_utc": "2026-05-13T03:39:42+00:00",
-  "git_head": "61a3c1c82079",
+  "generated_utc": "2026-05-13T03:51:35+00:00",
+  "git_head": "b5a6683e06ee",
   "groups": {
     "keep_by_default_model_artifacts": [
+      {
+        "path": "models/eval-ternary-tiny-direct",
+        "reason": "Generated model/GGUF directory; useful for reruns and protected if referenced by a benchmark manifest.",
+        "size_bytes": 25361184
+      },
+      {
+        "path": "models/qwen2.5-0.5b-direct-static-ternary",
+        "reason": "Generated model/GGUF directory; useful for reruns and protected if referenced by a benchmark manifest.",
+        "size_bytes": 1266427136
+      },
       {
         "path": "models/qwen2.5-0.5b-fp",
         "reason": "Generated model/GGUF directory; useful for reruns and protected if referenced by a benchmark manifest.",
@@ -219,11 +229,13 @@
   },
   "protected_counts": {
     "benchmark_manifest_paths": 27,
-    "evidence_manifest_files": 46,
+    "evidence_manifest_files": 49,
     "protected_checkpoint_dirs": 12
   },
   "protected_paths": [
     "README.md",
+    "benchmark_results/direct-gguf-qwen05b-klonly-notie-2026-05-13/summary.json",
+    "benchmark_results/direct-gguf-tiny-2026-05-13/summary.json",
     "benchmark_results/evidence_audit/latest_nonrow.md",
     "benchmark_results/evidence_audit/qwen05b_tl2_probe.md",
     "benchmark_results/evidence_audit/qwen15b_context_scaling_rss.md",
@@ -262,6 +274,7 @@
     "benchmark_results/tl2_scale_semantics_2026-05-05.json",
     "benchmark_results/tl2_shape_support_audit_2026-05-05.json",
     "benchmarks/results/active_goal_completion_audit_2026-05-05.md",
+    "benchmarks/results/direct_static_ternary_gguf_2026-05-13.md",
     "benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md",
     "benchmarks/results/moe_support_audit_2026-05-05.md",
     "benchmarks/results/progress_audit_2026-05-05.md",
@@ -302,7 +315,7 @@
   ],
   "schema": "bitnet-artifact-prune-plan-v1",
   "totals": {
-    "keep_by_default_model_artifacts": 56925945020,
+    "keep_by_default_model_artifacts": 58217733340,
     "prune_intermediate_checkpoints": 217345585819,
     "remove_local_caches": 4386032852,
     "remove_rebuildable_build_dirs": 86093832

@@ -289,6 +289,22 @@ RESULTS_DIR=benchmark_results/gguf-qwen15b-klonly-notiehead-suite \
 sbatch --export=ALL slurm_gguf_static_ternary_suite.sh
 ```
 
+For dense GGUF export only, `convert_static_ternary_to_gguf.py` skips the
+intermediate Hugging Face materialization directory and streams effective
+dense tensors from `ternary_state_dict.pt` into the llama.cpp GGUF writer:
+
+```bash
+python benchmarks/convert_static_ternary_to_gguf.py \
+  --checkpoint-dir checkpoints/qwen2.5-0.5b-fineweb-edu-klonly-notiehead-1000/step-1000 \
+  --outfile models/qwen2.5-0.5b-direct-static-ternary/qwen05b_klonly_notie_direct_f16.gguf \
+  --outtype f16 \
+  --expect-ternary-keys 168 \
+  --validate-codes
+```
+
+This is not the final packed `I2_S` writer. Quantized Python-converter outtypes
+are blocked by default because unsupported Qwen shapes can fall back to F16.
+
 For QAT checkpoints, do not convert `model.safetensors` directly and treat it
 as the trained ternary artifact. The validated bridge is:
 

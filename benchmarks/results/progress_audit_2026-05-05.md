@@ -144,6 +144,14 @@ and optional evidence audit commands. This improves reproducibility but remains
 a dense-materialization bridge, not direct GGUF ingestion of
 `ternary_state_dict.pt`.
 
+The direct dense GGUF bridge is tracked at
+`benchmarks/results/direct_static_ternary_gguf_2026-05-13.md`. It uses
+`ternary_state_dict.pt` directly as the source and skips the intermediate dense
+HF `model.safetensors` directory. It validated a tiny Llama-style checkpoint
+and Qwen2.5-0.5B dense-head F16 GGUF load/smoke, but direct packed `TQ2_0`
+through the Python converter fell back to F16 for Qwen shapes; packed `I2_S`
+still needs the stable row-scale writer/type.
+
 The publishable-claims ledger is tracked at
 `benchmarks/results/publishable_claims_2026-05-05.md`. It separates supported
 claims from unsupported or not-yet claims and should be the first artifact used
@@ -191,6 +199,9 @@ Key audited values:
 | Row-scale dense-head I2_S portable AVX2 prompt tok/s at 1 thread | 22.02 |
 | Row-scale dense-head I2_S portable AVX2 prompt tok/s at 24 threads | 245.31 |
 | Row-scale dense-head I2_S portable AVX2 decode tok/s range, all thread rows | 8.57-19.49 |
+| Direct tiny static-ternary GGUF tensors | 12 |
+| Direct Qwen2.5-0.5B static-ternary F16 GGUF tensors | 291 |
+| Direct Qwen2.5-0.5B static-ternary F16 GGUF smoke return code | 0 |
 | Qwen2.5-1.5B FP F16 GGUF max RSS at `-c 512` | 2.948 GiB |
 | Qwen2.5-1.5B FP Q4_K_M GGUF max RSS at `-c 512` | 0.985 GiB |
 | Qwen2.5-1.5B row-scale dense-head I2_S max RSS at `-c 512` | 1.250 GiB |
@@ -216,10 +227,10 @@ Key audited values:
    compatibility policy, and regeneration of affected artifacts. The
    row-scale format audit shows the prototype currently overloads the existing
    `I2_S` type instead of defining a compatibility-safe row-scale qtype.
-2. Native direct GGUF writing from `ternary_state_dict.pt` is not complete.
-   Static-ternary materialization is a validated bridge, not the final storage
-   path. `benchmarks/build_static_ternary_gguf_bridge.py` now makes that bridge
-   reproducible and auditable.
+2. Native direct packed GGUF writing from `ternary_state_dict.pt` is not
+   complete. Static-ternary dense GGUF export now has two validated bridges:
+   the older HF-materialization bridge and the newer in-memory direct dense
+   bridge. Neither is the final row-scale-aware packed `I2_S` writer.
 3. Qwen TL2 is not complete. Dense Qwen2.5-0.5B TL2 export now works after
    exact shape codegen and a matching TL2 build, but the tested checkpoint has
    NaN PPL. `llama-quantize` still does not expose TL2, Qwen2MoE/Kimi are not

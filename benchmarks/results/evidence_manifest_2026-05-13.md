@@ -1,12 +1,13 @@
 # Evidence Manifest, 2026-05-13
-Artifacts: `46`. Missing: `0`.
+Artifacts: `49`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 45013 | 4cc9780a8506 |  |
+| README | tracked_report | yes | 45183 | 762378b7b07c |  |
 | side_by_side_report | tracked_report | yes | 12585 | 570856967359 |  |
-| publishable_claims | tracked_report | yes | 7164 | a59f71bc8fd1 |  |
-| progress_audit | tracked_report | yes | 17697 | f7bb7e9f4052 |  |
-| active_goal_audit | tracked_report | yes | 7922 | d1c6204304db |  |
+| publishable_claims | tracked_report | yes | 7553 | 5643883ce87c |  |
+| progress_audit | tracked_report | yes | 18378 | 309eba7b6f4e |  |
+| active_goal_audit | tracked_report | yes | 8278 | 6ef6a4e52a88 |  |
+| direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | tl2_shape_report | tracked_report | yes | 2817 | 8dddd65315e0 |  |
 | tl2_probe_report | tracked_report | yes | 3608 | dd7e4fa29cc1 |  |
 | tl2_scale_report | tracked_report | yes | 2321 | 30bbfbd22559 |  |
@@ -42,6 +43,8 @@ Artifacts: `46`. Missing: `0`.
 | gguf_row_i2s_heapfix | gguf_summary_json | yes | 1647 | 734fa7c103f1 | rows=1, failed=0, nan=0 |
 | gguf_row_i2s_thread_scaling | thread_scaling_json | yes | 2296 | 0396f5c951bd | rows=7, max_prefill=245.314, max_decode=19.4941 |
 | gguf_context_rss | gguf_memory_json | yes | 9911 | fd135b202cfd | rows=24, contexts=[512, 2048, 8192, 32768] |
+| direct_gguf_tiny | direct_gguf_json | yes | 1972 | a01c51bbb398 | arch=LlamaForCausalLM, outtype=f16, ternary=8, tensors=12, reader_rc=0, smoke_rc=None |
+| direct_gguf_qwen05b | direct_gguf_json | yes | 2546 | fb82f94beb57 | arch=Qwen2ForCausalLM, outtype=f16, ternary=168, tensors=291, reader_rc=0, smoke_rc=0 |
 | tl2_shape_json | tl2_shape_json | yes | 12054 | a99430f0f4b0 |  |
 | tl2_scale_json | tl2_scale_json | yes | 14344 | bf2d36674b72 | qwen15b_tensor_scale err=0; qwen15b_row_scale err=1.90423 |
 | i2s_row_scale_format_json | i2s_format_json | yes | 1528 | e17297539b9d | default_ratio=30836.2, prototype_ratio=1.00157, stable_format_required=True |
