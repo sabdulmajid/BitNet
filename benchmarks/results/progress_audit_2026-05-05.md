@@ -232,6 +232,12 @@ against both endpoints of the main verdict: it beats naive PTQ by macro delta
 `+0.150788` with paired 95% CI `[+0.053427, +0.248149]`, but remains below FP
 by `-0.144710` with paired 95% CI `[-0.185756, -0.103664]`.
 
+The benchmark coverage gate is tracked at
+`benchmarks/results/benchmark_coverage_gate_2026-05-13.md`. It passes `33/33`
+checks covering six ten-task lm-eval artifacts, four paired-delta reports,
+six Xeon packed CPU rows, fixed `I2_SR` RSS contexts, the evidence manifest,
+and the expected not-production-ready productization gate.
+
 Key audited values:
 
 | artifact | audited value |

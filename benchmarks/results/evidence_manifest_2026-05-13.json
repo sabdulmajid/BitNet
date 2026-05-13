@@ -1,5 +1,5 @@
 {
-  "artifact_count": 78,
+  "artifact_count": 80,
   "entries": [
     {
       "exists": true,
@@ -52,8 +52,8 @@
       "label": "progress_audit",
       "metrics": {},
       "path": "benchmarks/results/progress_audit_2026-05-05.md",
-      "sha256": "77cc8d90c35a0b33094f70d2cbdecf54fba60f92aba687dab0ce3adfb72af506",
-      "size_bytes": 24914
+      "sha256": "27658efa57d2b545276c21c7745e48f3ba6c18ef6cf3ee88dc5ee5dfc0e87e8c",
+      "size_bytes": 25246
     },
     {
       "exists": true,
@@ -61,8 +61,17 @@
       "label": "active_goal_audit",
       "metrics": {},
       "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md",
-      "sha256": "86477ceca75bad40c91e72147969b514ed664416d8c1d5409d868a70aaad03c9",
-      "size_bytes": 10220
+      "sha256": "1247ae06e4d441767ae7d3cfd0ce009dab8d3ba44be88d3402914803c4dca562",
+      "size_bytes": 10410
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "benchmark_coverage_gate_report",
+      "metrics": {},
+      "path": "benchmarks/results/benchmark_coverage_gate_2026-05-13.md",
+      "sha256": "e4ed19bdf1db80f608aa897e9e66b34a5cba9d5a990cbf045ea77d347fb72570",
+      "size_bytes": 2865
     },
     {
       "exists": true,
@@ -1482,6 +1491,19 @@
       "path": "benchmark_results/i2s-packing-layout-verify-2026-05-13/summary.json",
       "sha256": "88fee552ba2ebc123fc8063f3b1ab94f67acbeadc29b90df5c7d0abe23bcc7c3",
       "size_bytes": 3409
+    },
+    {
+      "exists": true,
+      "kind": "benchmark_coverage_gate_json",
+      "label": "benchmark_coverage_gate_json",
+      "metrics": {
+        "check_count": 33,
+        "failed": [],
+        "passed": true
+      },
+      "path": "benchmark_results/benchmark_coverage_gate_2026-05-13.json",
+      "sha256": "8c619705ac4eba7c25070075b51440bc2faee700e5079e3df6690583cabc865a",
+      "size_bytes": 5392
     },
     {
       "exists": true,

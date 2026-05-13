@@ -1,5 +1,5 @@
 # Evidence Manifest, 2026-05-13
-Artifacts: `78`. Missing: `0`.
+Artifacts: `80`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
 | README | tracked_report | yes | 49110 | 37e45f88c9de |  |
@@ -7,8 +7,9 @@ Artifacts: `78`. Missing: `0`.
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
 | paired_row_minus_ptq_report | tracked_report | yes | 1332 | 20a5aee1eb99 |  |
 | publishable_claims | tracked_report | yes | 10531 | d2da163fd608 |  |
-| progress_audit | tracked_report | yes | 24914 | 77cc8d90c35a |  |
-| active_goal_audit | tracked_report | yes | 10220 | 86477ceca75b |  |
+| progress_audit | tracked_report | yes | 25246 | 27658efa57d2 |  |
+| active_goal_audit | tracked_report | yes | 10410 | 1247ae06e4d4 |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 2865 | e4ed19bdf1db |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2174 | d6e0c6ec52ec |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -77,6 +78,7 @@ Artifacts: `78`. Missing: `0`.
 | i2s_row_scale_format_json | i2s_format_json | yes | 1528 | e17297539b9d | default_ratio=30836.2, prototype_ratio=1.00157, stable_format_required=True |
 | row_scale_qtype_productization_gate_json | row_scale_qtype_gate_json | yes | 3604 | 223df0d152f9 | passed=False, gates=9, failed=3, stable_qtype=False, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5392 | 8c619705ac4e | passed=True, checks=33, failed=0 |
 | tl2_generic_summary | gguf_summary_json | yes | 4494 | 306a682203b2 | rows=4, failed=2, nan=1, catastrophic=0, max_ppl=18.8044 |
 | tl2_avx512_summary | gguf_summary_json | yes | 4573 | 6ec820472f37 | rows=4, failed=0, nan=2, catastrophic=0, max_ppl=18.8239 |
 | ptq_math | math_json | yes | 14010 | 8cedd88658e0 | trials=10, rel_error=0.512542 |
