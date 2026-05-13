@@ -1,5 +1,5 @@
 # Evidence Manifest, 2026-05-13
-Artifacts: `95`. Missing: `0`.
+Artifacts: `96`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
 | README | tracked_report | yes | 49855 | e6df06b97258 |  |
@@ -9,10 +9,10 @@ Artifacts: `95`. Missing: `0`.
 | publishable_claims | tracked_report | yes | 11054 | 63c5e9babbc1 |  |
 | progress_audit | tracked_report | yes | 25612 | 74e3b96847bf |  |
 | active_goal_audit | tracked_report | yes | 10765 | 255dacfeae0a |  |
-| objective_completion_audit | tracked_report | yes | 4731 | 1f9ee481611f |  |
-| product_scope_gate | tracked_report | yes | 3020 | f447c3a2b032 |  |
+| objective_completion_audit | tracked_report | yes | 4836 | e27e94a04cd1 |  |
+| product_scope_gate | tracked_report | yes | 3078 | 6fd0a9ff59bd |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 2494 | 3bf77dd62e65 |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 2865 | e1e57180b308 |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 2865 | 852ca8a572ce |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2174 | d6e0c6ec52ec |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -29,7 +29,7 @@ Artifacts: `95`. Missing: `0`.
 | i2sr_x86act_fix_report | tracked_report | yes | 2113 | 828c0baaa784 |  |
 | i2s_packing_layout_verify_report | tracked_report | yes | 1075 | c11acd561e3c |  |
 | i2sr_rss_report | tracked_report | yes | 1698 | cd21d1ee3435 |  |
-| moe_report | tracked_report | yes | 1882 | 342ac496a28d |  |
+| moe_report | tracked_report | yes | 3770 | f56743131e72 |  |
 | i2sr_combined_patch | tracked_report | yes | 26764 | d02e20bd9e00 |  |
 | i2sr_root_runtime_patch | tracked_report | yes | 5408 | c4c30c8e2053 |  |
 | i2sr_submodule_patch | tracked_report | yes | 20824 | aa68da60931a |  |
@@ -90,10 +90,11 @@ Artifacts: `95`. Missing: `0`.
 | row_scale_qtype_i2sr_active_patch_gate_json | row_scale_qtype_gate_json | yes | 3616 | cb42720567a1 | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | row_scale_qtype_i2sr_promotion_rehearsal_json | row_scale_qtype_gate_json | yes | 3897 | 6ffc161b446b | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5392 | ec67aec472e5 | passed=True, checks=33, failed=0 |
-| objective_completion_audit_json | objective_completion_audit_json | yes | 14553 | 3afe1d508993 | achieved=False, status=not_complete, complete=7/9, open=2 |
-| product_scope_gate_json | product_scope_gate_json | yes | 3679 | a321f3031314 | scope=research_mvp_only, supported=2, unsupported=5 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5392 | 2466d1e8babb | passed=True, checks=33, failed=0 |
+| objective_completion_audit_json | objective_completion_audit_json | yes | 14705 | 5ae7063fe1dd | achieved=False, status=not_complete, complete=7/9, open=2 |
+| product_scope_gate_json | product_scope_gate_json | yes | 3737 | 2d6338ceecd4 | scope=research_mvp_only, supported=2, unsupported=5 |
 | i2sr_submodule_promotion_audit_json | i2sr_submodule_promotion_audit_json | yes | 3314 | 6c98638def76 | ready=False, active=False, patch_applies=True, submodule=1f86f058, blockers=3 |
+| moe_support_json | moe_support_json | yes | 3776 | c331885edde6 | present=5/5, gates=6, failed=5, kimi_artifacts=0 |
 | tl2_generic_summary | gguf_summary_json | yes | 4494 | 306a682203b2 | rows=4, failed=2, nan=1, catastrophic=0, max_ppl=18.8044 |
 | tl2_avx512_summary | gguf_summary_json | yes | 4573 | 6ec820472f37 | rows=4, failed=0, nan=2, catastrophic=0, max_ppl=18.8239 |
 | ptq_math | math_json | yes | 14010 | 8cedd88658e0 | trials=10, rel_error=0.512542 |

@@ -126,6 +126,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "objective_completion_audit_json", "kind": "objective_completion_audit_json", "path": "benchmark_results/objective_completion_audit_2026-05-13.json"},
     {"label": "product_scope_gate_json", "kind": "product_scope_gate_json", "path": "benchmark_results/product_scope_gate_2026-05-13.json"},
     {"label": "i2sr_submodule_promotion_audit_json", "kind": "i2sr_submodule_promotion_audit_json", "path": "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json"},
+    {"label": "moe_support_json", "kind": "moe_support_json", "path": "benchmark_results/moe_support_audit_2026-05-05.json"},
     {"label": "tl2_generic_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json"},
     {"label": "tl2_avx512_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json"},
     {"label": "ptq_math", "kind": "math_json", "path": "benchmark_results/math_viability_gaussian_10trial_2026-05-05.json"},
@@ -437,6 +438,18 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "submodule_short": data.get("submodule_short"),
             "blockers": data.get("blockers"),
         }
+    if kind == "moe_support_json":
+        gates = data.get("productization_gates", [])
+        failed = [gate.get("name") for gate in gates if isinstance(gate, dict) and not gate.get("passed")]
+        checks = data.get("checks", [])
+        return {
+            "checks": len(checks) if isinstance(checks, list) else None,
+            "present_checks": sum(1 for check in checks if isinstance(check, dict) and check.get("status") == "present"),
+            "gates": len(gates) if isinstance(gates, list) else None,
+            "failed_gates": failed,
+            "kimi_source_matches": len(data.get("kimi_source_matches", [])),
+            "local_kimi_artifacts": len(data.get("local_kimi_artifacts", [])),
+        }
     if kind == "math_json":
         aggregate = data.get("aggregate", {})
         mean_abs = aggregate.get("mean_abs_ternary_repo_formula", {})
@@ -590,6 +603,12 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"patch_applies={metrics.get('patch_applies_cleanly', '-')}, "
                 f"submodule={metrics.get('submodule_short', '-')}, "
                 f"blockers={len(metrics.get('blockers', []))}"
+            )
+        elif entry["kind"] == "moe_support_json":
+            summary = (
+                f"present={metrics.get('present_checks', '-')}/{metrics.get('checks', '-')}, "
+                f"gates={metrics.get('gates', '-')}, failed={len(metrics.get('failed_gates', []))}, "
+                f"kimi_artifacts={metrics.get('local_kimi_artifacts', '-')}"
             )
         elif entry["kind"] == "math_json":
             summary = f"trials={metrics.get('trials', '-')}, rel_error={fmt_metric(metrics.get('relative_output_fro_error_mean'))}"

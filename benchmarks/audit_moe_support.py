@@ -57,6 +57,22 @@ def search_tree(root: Path, needle: str) -> list[str]:
     return sorted(matches)
 
 
+def file_contains(path: Path, patterns: tuple[str, ...]) -> bool:
+    if not path.exists():
+        return False
+    text = path.read_text(encoding="utf-8", errors="replace")
+    return all(pattern in text for pattern in patterns)
+
+
+def make_gate(name: str, passed: bool, evidence: str, blocker: str = "") -> dict[str, Any]:
+    return {
+        "name": name,
+        "passed": passed,
+        "evidence": evidence,
+        "blocker": "" if passed else blocker,
+    }
+
+
 def local_artifacts(root: Path) -> list[str]:
     artifacts: list[str] = []
     if not root.exists():
@@ -109,18 +125,94 @@ def build_report(data: dict[str, Any]) -> str:
         "weights are merged into 3D tensors, and the runtime builds sparse "
         "top-k expert execution with `ggml_mul_mat_id`. This does not prove "
         "Kimi support: no Kimi-specific mapping or benchmark artifact is present, "
-        "and the TL2-capable BitNet converter still lacks Qwen2MoE registration."
+        "the TL2-capable BitNet converter still lacks Qwen2MoE registration, "
+        "and the current TL2/I2_SR packing code paths are 2D-matrix oriented "
+        "rather than validated for merged 3D expert tensors."
+    )
+    gate_rows = [
+        [
+            gate["name"],
+            "pass" if gate["passed"] else "fail",
+            gate["evidence"],
+            gate["blocker"],
+        ]
+        for gate in data["productization_gates"]
+    ]
+    required_plan = (
+        "Required MoE/Kimi path: add an explicit Kimi/Qwen2MoE BitNet converter "
+        "registration, map router/shared-expert/expert tensor names, decide which "
+        "router and shared-expert tensors stay dense, extend TL2/I2_SR packing and "
+        "runtime tests to 3D expert tensors, distill router and expert weights under "
+        "ternary constraints, then run quality, throughput, RSS, and expert-locality "
+        "benchmarks against dense and llama.cpp quantized MoE baselines."
     )
     return "\n\n".join(
         [
             "# MoE Support Audit, 2026-05-05",
             md_table(["check", "path", "status", "expectation", "evidence"], rows),
+            "## Productization Gates",
+            md_table(["gate", "status", "evidence", "blocker"], gate_rows),
             "## Negative Checks",
             "\n".join([kimi_note, artifact_note]),
             "## Verdict",
             verdict,
+            "## Required Plan",
+            required_plan,
         ]
     )
+
+
+def build_productization_gates(root: Path, checks: list[dict[str, Any]], kimi_matches: list[str], kimi_artifacts: list[str]) -> list[dict[str, Any]]:
+    check_by_label = {check["label"]: check for check in checks}
+    generic_runtime = check_by_label.get("Runtime sparse expert execution", {}).get("status") == "present"
+    gguf_schema = check_by_label.get("Qwen2MoE tensor schema", {}).get("status") == "present"
+    llama_qwen2moe = check_by_label.get("llama.cpp Qwen2MoE converter", {}).get("status") == "present"
+
+    bitnet_converter = root / "utils/convert-hf-to-gguf-bitnet.py"
+    direct_i2sr_writer = root / "benchmarks/convert_static_ternary_to_i2s_gguf.py"
+    tl2_is_2d = file_contains(bitnet_converter, ("def preprocess_weights_tl2", "M, K = w.shape"))
+    direct_i2sr_is_2d = file_contains(direct_i2sr_writer, ("codes.ndim != 2", "I2_S packing expects a 2D weight matrix"))
+    bitnet_qwen2moe = file_contains(bitnet_converter, ('@Model.register("Qwen2MoeForCausalLM")',))
+    bitnet_kimi = file_contains(bitnet_converter, ("Kimi",))
+
+    return [
+        make_gate(
+            "generic GGUF/runtime MoE support exists",
+            gguf_schema and generic_runtime and llama_qwen2moe,
+            f"gguf_schema={gguf_schema}; runtime={generic_runtime}; llama_qwen2moe_converter={llama_qwen2moe}",
+            "The vendored llama.cpp layer must expose MoE metadata, conversion, and routed execution.",
+        ),
+        make_gate(
+            "BitNet converter has explicit Qwen2MoE/Kimi registration",
+            bitnet_qwen2moe or bitnet_kimi,
+            f"qwen2moe_registration={bitnet_qwen2moe}; kimi_converter_match={bitnet_kimi}; tracked_kimi_mentions={len(kimi_matches)}",
+            "The TL2-capable BitNet converter registers Qwen2 dense/Mixtral-style models but not Qwen2MoE or Kimi.",
+        ),
+        make_gate(
+            "TL2 converter path is validated for merged 3D expert tensors",
+            not tl2_is_2d,
+            f"preprocess_weights_tl2_uses_2d_unpack={tl2_is_2d}",
+            "`preprocess_weights_tl2` unpacks `M, K = w.shape`, so merged expert tensors with shape [experts, out, in] are not supported.",
+        ),
+        make_gate(
+            "direct I2_SR writer is validated for merged 3D expert tensors",
+            not direct_i2sr_is_2d,
+            f"direct_i2sr_writer_rejects_non_2d={direct_i2sr_is_2d}",
+            "The direct packed I2_S/I2_SR writer rejects non-2D ternary weights, so merged expert tensors need new packing/layout tests.",
+        ),
+        make_gate(
+            "local Kimi model/eval artifacts exist",
+            bool(kimi_artifacts),
+            f"kimi_artifacts={len(kimi_artifacts)}",
+            "No local Kimi checkpoint, conversion, quality, throughput, RSS, or expert-locality artifact exists.",
+        ),
+        make_gate(
+            "MoE quality and locality benchmarks exist",
+            False,
+            "quality_runs=0; throughput_runs=0; expert_locality_runs=0",
+            "No benchmark measures router accuracy, expert selection locality, sparse expert throughput, or quality degradation.",
+        ),
+    ]
 
 
 def main() -> None:
@@ -164,10 +256,14 @@ def main() -> None:
         ),
     ]
 
+    check_results = [run_check(check) for check in checks]
+    kimi_source_matches = search_tree(root, "Kimi")
+    local_kimi_results = local_artifacts(root / "benchmark_results")
     data: dict[str, Any] = {
-        "checks": [run_check(check) for check in checks],
-        "kimi_source_matches": search_tree(root, "Kimi"),
-        "local_kimi_artifacts": local_artifacts(root / "benchmark_results"),
+        "checks": check_results,
+        "productization_gates": build_productization_gates(root, check_results, kimi_source_matches, local_kimi_results),
+        "kimi_source_matches": kimi_source_matches,
+        "local_kimi_artifacts": local_kimi_results,
     }
     report = build_report(data)
     args.output_md.parent.mkdir(parents=True, exist_ok=True)

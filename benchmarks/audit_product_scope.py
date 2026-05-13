@@ -116,6 +116,8 @@ def build_gate(root: Path) -> dict[str, Any]:
     moe = read_json(root / "benchmark_results/moe_support_audit_2026-05-05.json")
     kimi_artifacts = moe.get("local_kimi_artifacts", [])
     kimi_source_matches = moe.get("kimi_source_matches", [])
+    moe_gates = moe.get("productization_gates", [])
+    moe_failed_gates = [gate.get("name") for gate in moe_gates if isinstance(gate, dict) and not gate.get("passed")]
 
     claims: list[dict[str, Any]] = []
     add_claim(
@@ -174,9 +176,9 @@ def build_gate(root: Path) -> dict[str, Any]:
         claims,
         "MoE/Kimi retrofit and CPU runtime support",
         "unsupported",
-        f"Kimi artifacts={len(kimi_artifacts)}; Kimi source matches={len(kimi_source_matches)}",
+        f"Kimi artifacts={len(kimi_artifacts)}; Kimi source matches={len(kimi_source_matches)}; failed MoE gates={len(moe_failed_gates)}/{len(moe_gates)}",
         "Treat as separate research milestone.",
-        "No Kimi-specific converter/runtime mapping, router distillation, quality benchmark, or expert-locality benchmark exists.",
+        "No Kimi/Qwen2MoE BitNet converter mapping, 3D expert TL2/I2_SR packing support, router distillation, quality benchmark, or expert-locality benchmark exists.",
     )
 
     supported = [claim for claim in claims if claim["status"] in {"supported", "supported_with_patch"}]

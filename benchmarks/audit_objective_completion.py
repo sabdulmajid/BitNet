@@ -403,8 +403,12 @@ def audit_moe(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -
     local_kimi = moe.get("local_kimi_artifacts", [])
     source_kimi = moe.get("kimi_source_matches", [])
     present_checks = [check for check in moe.get("checks", []) if check.get("status") == "present"]
+    productization_gates = moe.get("productization_gates", [])
+    failed_gates = [gate for gate in productization_gates if isinstance(gate, dict) and not gate.get("passed")]
     metrics["moe"] = {
         "present_generic_checks": len(present_checks),
+        "productization_gate_count": len(productization_gates),
+        "failed_productization_gate_count": len(failed_gates),
         "local_kimi_artifact_count": len(local_kimi),
         "kimi_source_match_count": len(source_kimi),
     }
@@ -412,8 +416,11 @@ def audit_moe(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -
         rows,
         "Evaluate MoE/Kimi feasibility including converter mapping, router/expert execution, quality, throughput, and locality",
         "not_complete",
-        f"generic MoE checks present={len(present_checks)}; Kimi artifacts={len(local_kimi)}; Kimi source matches={len(source_kimi)}",
-        "No Kimi-specific converter/runtime mapping, router distillation, MoE quality run, throughput run, or expert-locality benchmark exists.",
+        (
+            f"generic MoE checks present={len(present_checks)}; productization gates failed={len(failed_gates)}/{len(productization_gates)}; "
+            f"Kimi artifacts={len(local_kimi)}; Kimi source matches={len(source_kimi)}"
+        ),
+        "No Kimi/Qwen2MoE BitNet converter mapping, 3D expert TL2/I2_SR packing support, router distillation, MoE quality run, throughput run, or expert-locality benchmark exists.",
     )
 
 
