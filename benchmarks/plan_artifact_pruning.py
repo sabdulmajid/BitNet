@@ -244,7 +244,7 @@ def render_markdown(plan: dict[str, Any]) -> str:
         "# Artifact Prune Plan",
         "",
         f"Generated UTC: `{plan['generated_utc']}`",
-        f"Git HEAD: `{plan.get('git_head') or 'unknown'}`",
+        f"Git HEAD at generation time: `{plan.get('git_head') or 'unknown'}`",
         "",
         "This is a dry-run plan. No files were deleted by the generator.",
         "",
