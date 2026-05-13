@@ -1,7 +1,7 @@
 {
   "evidence_manifest": "benchmarks/results/evidence_manifest_2026-05-13.json",
-  "generated_utc": "2026-05-13T08:25:17+00:00",
-  "git_head": "8c50fc8d76f9",
+  "generated_utc": "2026-05-13T08:48:19+00:00",
+  "git_head": "609bad7af938",
   "groups": {
     "keep_by_default_model_artifacts": [
       {
@@ -234,7 +234,7 @@
   },
   "protected_counts": {
     "benchmark_manifest_paths": 31,
-    "evidence_manifest_files": 91,
+    "evidence_manifest_files": 93,
     "protected_checkpoint_dirs": 12
   },
   "protected_paths": [
@@ -299,6 +299,7 @@
     "benchmark_results/row-tq2-qwen05b-2026-05-13/summary.json",
     "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json",
     "benchmark_results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.json",
+    "benchmark_results/row_scale_qtype_productization_gate_i2sr_promotion_rehearsal_2026-05-13.json",
     "benchmark_results/tl2_probe/qwen05b-bitnet-tl2.gguf",
     "benchmark_results/tl2_scale_semantics_2026-05-05.json",
     "benchmark_results/tl2_shape_support_audit_2026-05-05.json",
@@ -325,6 +326,7 @@
     "benchmarks/results/qwen_side_by_side_2026-05-05.md",
     "benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md",
     "benchmarks/results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.md",
+    "benchmarks/results/row_scale_qtype_productization_gate_i2sr_promotion_rehearsal_2026-05-13.md",
     "benchmarks/results/tl2_scale_semantics_2026-05-05.md",
     "benchmarks/results/tl2_shape_support_audit_2026-05-05.md",
     "checkpoints/qwen2.5-0.5b-fineweb-edu-12/step-1000",

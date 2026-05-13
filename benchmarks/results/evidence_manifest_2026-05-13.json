@@ -1,5 +1,5 @@
 {
-  "artifact_count": 91,
+  "artifact_count": 93,
   "entries": [
     {
       "exists": true,
@@ -70,7 +70,7 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-13.md",
-      "sha256": "286d35c5f243048aab222cd480edab024d0cc550609773ce664d833963cef959",
+      "sha256": "fa443ddf671472fbdfaebff2362f3dd5ed81ca3b8bc5b6d6fc860ec79199121c",
       "size_bytes": 4607
     },
     {
@@ -97,7 +97,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-13.md",
-      "sha256": "f77ef3139ff6a170861747ff2480f812ee191dca76a7779caa5eccfd2f4274ad",
+      "sha256": "f65cae600a577b5432d52863f51e014ecf9123adb960cb87fe5db8877d87944a",
       "size_bytes": 2865
     },
     {
@@ -189,6 +189,15 @@
       "path": "benchmarks/results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.md",
       "sha256": "42acb39176cb4f5fc9a3b6b54b8ba3ab90b4c01df7f96811b9725904204c3bca",
       "size_bytes": 2390
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "row_scale_qtype_i2sr_promotion_rehearsal_report",
+      "metrics": {},
+      "path": "benchmarks/results/row_scale_qtype_productization_gate_i2sr_promotion_rehearsal_2026-05-13.md",
+      "sha256": "f734b60cc1ec39233ef41c4d9d357d2fa1f712408af1726ce3979aebd7d0de04",
+      "size_bytes": 2671
     },
     {
       "exists": true,
@@ -1567,6 +1576,29 @@
     },
     {
       "exists": true,
+      "kind": "row_scale_qtype_gate_json",
+      "label": "row_scale_qtype_i2sr_promotion_rehearsal_json",
+      "metrics": {
+        "default_ratio": 30836.207570886912,
+        "direct_writer_emits_stable_qtype": true,
+        "failed": [],
+        "gates": 9,
+        "has_ggml_stable_qtype": true,
+        "has_llama_stable_ftype": true,
+        "packing_verification_checked_tensors": 5,
+        "packing_verification_passed": true,
+        "passed": true,
+        "prototype_ratio": 1.0015661061655128,
+        "stable_benchmark_max_ppl": 38.8477,
+        "stable_benchmark_present": true,
+        "stable_benchmark_quality_ok": true
+      },
+      "path": "benchmark_results/row_scale_qtype_productization_gate_i2sr_promotion_rehearsal_2026-05-13.json",
+      "sha256": "6ffc161b446b0c2eeb764a907ef60b1b759539e121258f7928a90e1b87017040",
+      "size_bytes": 3897
+    },
+    {
+      "exists": true,
       "kind": "packing_verify_json",
       "label": "i2s_packing_layout_verify_json",
       "metrics": {
@@ -1588,7 +1620,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-13.json",
-      "sha256": "2007da2c6dab172d0a3791bad6add141550aeb54a696b1858b9d00f6833b0bf6",
+      "sha256": "41b2dbb6001fed7b45428278a5e0808b28b6ae67d67cf669df979f7fce1e344c",
       "size_bytes": 5392
     },
     {
@@ -1606,7 +1638,7 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-13.json",
-      "sha256": "e1107e3f5c5e12007d3d9ba7406cdec18954e60eee4f7312115e00c7c6826c87",
+      "sha256": "794db11108f79ecdd366274228e53e447cea25e4ca7da2ef025774c0ab5f35b9",
       "size_bytes": 14327
     },
     {
@@ -1639,8 +1671,8 @@
         "submodule_short": "1f86f058"
       },
       "path": "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json",
-      "sha256": "ad03cebb11b5e00bd0accbc24751becdee1290335a524acacf96e60b73be228f",
-      "size_bytes": 3066
+      "sha256": "6c98638def767fad6f197ab6a120d3b033aac661487af7902ad7a1976cfbe373",
+      "size_bytes": 3314
     },
     {
       "exists": true,

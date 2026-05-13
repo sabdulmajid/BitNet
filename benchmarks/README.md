@@ -256,6 +256,16 @@ The generated split patches are tracked as
 `patches/bitnet-i2sr-root-runtime.patch` and
 `patches/llama-i2sr-row-scale-qtype.submodule.patch`.
 
+To rehearse promotion with those split patches, including patched build,
+productization gate, patch reversal, and optional unpatched rebuild:
+
+```bash
+python benchmarks/run_i2sr_promotion_rehearsal.py --restore-build
+```
+
+The current rehearsal report is
+`benchmarks/results/row_scale_qtype_productization_gate_i2sr_promotion_rehearsal_2026-05-13.md`.
+
 Large checkpoints, model conversions, and CPU benchmark byproducts are ignored
 by Git. To make pruning reproducible, generate the dry-run artifact plan before
 deleting anything:
