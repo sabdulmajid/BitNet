@@ -87,6 +87,22 @@ def build_commands(root: Path, fork_url: str, branch: str, worktree_dir: Path) -
             command_text(["git", "commit", "-m", "Add I2_SR row-scale runtime"], cwd=worktree_dir),
             command_text(["git", "push", fork_url, f"HEAD:refs/heads/{branch}"], cwd=worktree_dir),
         ],
+        "push_existing_worktree": [
+            command_text(
+                [
+                    "python",
+                    "benchmarks/prepare_i2sr_promotion_handoff.py",
+                    "--fork-url",
+                    fork_url,
+                    "--branch",
+                    branch,
+                    "--worktree-dir",
+                    str(worktree_dir),
+                    "--push-existing-worktree",
+                ],
+                cwd=root,
+            )
+        ],
         "update_superproject_pointer": [
             command_text(["git", "config", "-f", ".gitmodules", "submodule.3rdparty/llama.cpp.url", fork_url], cwd=root),
             command_text(["git", "submodule", "sync", "3rdparty/llama.cpp"], cwd=root),
@@ -350,6 +366,8 @@ def render_markdown(result: dict[str, Any]) -> str:
             md_table(["blocker"], blockers),
             "## Prepare Submodule Branch",
             command_block(commands["prepare_submodule_branch"]),
+            "## Push Existing Prepared Branch",
+            command_block(commands["push_existing_worktree"]),
             "## Update Superproject Pointer",
             command_block(commands["update_superproject_pointer"]),
             "## Post-Promotion Gates",
