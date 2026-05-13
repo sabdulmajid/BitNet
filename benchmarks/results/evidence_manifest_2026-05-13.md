@@ -3,7 +3,7 @@ Artifacts: `76`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
 | README | tracked_report | yes | 49110 | 37e45f88c9de |  |
-| side_by_side_report | tracked_report | yes | 12803 | 1729d20a5d2a |  |
+| side_by_side_report | tracked_report | yes | 15428 | 2ace1d489711 |  |
 | publishable_claims | tracked_report | yes | 10262 | 351f254f8573 |  |
 | progress_audit | tracked_report | yes | 24310 | 0c92c45d4949 |  |
 | active_goal_audit | tracked_report | yes | 9843 | 8a4a13da9ebf |  |

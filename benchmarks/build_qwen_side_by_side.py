@@ -52,12 +52,25 @@ GGUF_SUMMARIES = [
     ("KL-only row dense lm_head I2_S row-scale prototype suite", "benchmark_results/gguf-qwen15b-row-i2s-prototype-suite/summary.json"),
     ("KL-only row dense lm_head I2_S row-scale prototype native suite", "benchmark_results/gguf-qwen15b-row-i2s-prototype-native-suite/summary.json"),
     ("KL-only row dense lm_head I2_S heap-fix confirmation", "benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json"),
+    ("KL-only row dense lm_head I2_SR fixed x86 ACT candidate", "benchmark_results/i2sr-row-scale-qwen15b-x86act-suite-2026-05-13/summary.json"),
 ]
 
 GGUF_MEMORY_SUMMARIES = [
     ("Qwen2.5-1.5B row-scale I2_S RSS probe", "benchmark_results/gguf-rss-qwen15b-row-i2s-fixed-2026-05-05/summary.json"),
     ("Qwen2.5-1.5B row-scale I2_S RSS context scaling", "benchmark_results/gguf-rss-qwen15b-context-scaling-2026-05-05/summary.json"),
+    ("Qwen2.5-1.5B row-scale I2_SR fixed x86 ACT RSS context scaling", "benchmark_results/gguf-rss-qwen15b-i2sr-x86act-context-2026-05-13/summary.json"),
 ]
+
+HEADLINE_CPU_ROWS = [
+    ("FP F16", "benchmark_results/gguf-qwen15b-row-i2s-prototype-suite/summary.json", "qwen15b_fp_f16"),
+    ("FP Q8_0", "benchmark_results/gguf-qwen15b-row-i2s-prototype-suite/summary.json", "qwen15b_fp_q8_0"),
+    ("FP Q4_K_M", "benchmark_results/gguf-qwen15b-row-i2s-prototype-suite/summary.json", "qwen15b_fp_q4_k_m"),
+    ("row-scale ternary TQ2_0", "benchmark_results/gguf-qwen15b-row-i2s-prototype-suite/summary.json", "qwen15b_klonly_row_notie_static_ternary_tq2_0"),
+    ("row-scale ternary I2_S prototype", "benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json", "qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale"),
+    ("row-scale ternary I2_SR fixed candidate", "benchmark_results/i2sr-row-scale-qwen15b-x86act-suite-2026-05-13/summary.json", "qwen15b_klonly_row_notie_static_ternary_i2_sr_x86act"),
+]
+
+PRODUCTIZATION_GATE = "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json"
 
 
 def read_json(path: Path) -> dict[str, Any] | None:
@@ -159,6 +172,93 @@ def build_lm_eval_detail_table() -> str:
     return md_table(["task", "metric", *[label for label, _ in loaded]], rows)
 
 
+def find_summary_row(path: Path, name: str) -> dict[str, Any] | None:
+    summary = read_json(path)
+    if summary is None:
+        return None
+    for row in summary.get("rows", []):
+        if row.get("name") == name:
+            return row
+    return None
+
+
+def build_headline_table() -> str:
+    rows: list[list[str]] = []
+    fp_lm_mean, _, _ = selected_lm_eval_mean(Path("benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json"))
+    best_lm_mean, _, _ = selected_lm_eval_mean(Path("benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/qwen15b_qat_ternary.json"))
+    fp_wiki = read_json(Path("benchmark_results/quality-9735/qwen15b_fp_wikitext.json"))
+    best_wiki = read_json(Path("benchmark_results/quality-qwen15b-klonly-row-notiehead-5000/qwen15b_ternary_wikitext.json"))
+    fp_fineweb = read_json(Path("benchmark_results/quality-9735/qwen15b_fp_fineweb_heldout.json"))
+    best_fineweb = read_json(Path("benchmark_results/quality-qwen15b-klonly-row-notiehead-5000/qwen15b_ternary_fineweb_heldout.json"))
+
+    rows.append([
+        "best HF quality recovery",
+        "QAT KL-only row-scale dense lm_head",
+        fmt(best_wiki.get("perplexity") if best_wiki else None, 3),
+        fmt(fp_wiki.get("perplexity") if fp_wiki else None, 3),
+        fmt(best_fineweb.get("perplexity") if best_fineweb else None, 3),
+        fmt(fp_fineweb.get("perplexity") if fp_fineweb else None, 3),
+        fmt(best_lm_mean, 6),
+        fmt(fp_lm_mean, 6),
+        "not FP-quality",
+    ])
+
+    gate = read_json(Path(PRODUCTIZATION_GATE))
+    gate_status = "missing"
+    if gate is not None:
+        failed = [item.get("name", "") for item in gate.get("gates", []) if not item.get("passed")]
+        gate_status = "production gate pass" if gate.get("passed") else f"not production-ready; {len(failed)} qtype/runtime gates fail"
+
+    rows.append([
+        "packed CPU candidate",
+        "direct I2_SR fixed x86 ACT",
+        "38.848",
+        "12.281",
+        "-",
+        "-",
+        "-",
+        "-",
+        gate_status,
+    ])
+
+    return md_table(
+        [
+            "claim area",
+            "best current artifact",
+            "artifact Wiki/CPU PPL",
+            "reference FP PPL",
+            "artifact FineWeb/PPL",
+            "reference FP FineWeb/PPL",
+            "artifact ten-task mean",
+            "FP ten-task mean",
+            "status",
+        ],
+        rows,
+    )
+
+
+def build_cpu_headline_table() -> str:
+    rows: list[list[str]] = []
+    for label, path, name in HEADLINE_CPU_ROWS:
+        row = find_summary_row(Path(path), name)
+        if row is None:
+            rows.append([label, "-", "-", "-", "-", "-", "missing"])
+            continue
+        bench = row.get("bench", {})
+        ppl = row.get("perplexity", {}).get("ppl")
+        cpu = bench.get("prefill", {}).get("cpu") or bench.get("decode", {}).get("cpu") or "-"
+        rows.append([
+            label,
+            str(cpu),
+            fmt(row.get("file_mib"), 1),
+            fmt(ppl, 4),
+            fmt(bench.get("prefill", {}).get("tok_s"), 2),
+            fmt(bench.get("decode", {}).get("tok_s"), 2),
+            quality_status(ppl),
+        ])
+    return md_table(["artifact", "CPU", "file MiB", "PPL", "prefill tok/s", "decode tok/s", "quality status"], rows)
+
+
 def build_gguf_table() -> str:
     rows: list[list[str]] = []
     for suite_label, path in GGUF_SUMMARIES:
@@ -168,7 +268,7 @@ def build_gguf_table() -> str:
             continue
         for row in summary.get("rows", []):
             name = str(row.get("name", ""))
-            if not name.endswith(("f16", "q8_0", "q4_k_m", "tq2_0", "i2_s", "i2_s_rowscale")):
+            if not name.endswith(("f16", "q8_0", "q4_k_m", "tq2_0", "i2_s", "i2_s_rowscale", "i2_sr_x86act")):
                 continue
             ppl = row.get("perplexity", {}).get("ppl")
             bench = row.get("bench", {})
@@ -214,13 +314,22 @@ def main() -> None:
 
     report = "\n\n".join([
         "# Qwen2.5-1.5B Side-by-Side Artifact Summary",
-        "Generated from benchmark JSON artifacts. Missing rows are intentionally shown as missing.",
+        (
+            "Generated from benchmark JSON artifacts. Missing rows are intentionally "
+            "shown as missing. The Xeon headline isolates the Intel Xeon Silver 4116 "
+            "runs; the longer GGUF table also preserves older Threadripper control "
+            "runs and should not be used for cross-machine speed ratios."
+        ),
+        "## Headline Verdict",
+        build_headline_table(),
         "## Perplexity",
         build_ppl_table(),
         "## Full Ten-Task lm-eval",
         build_lm_eval_table(),
         "## Full Ten-Task Detail",
         build_lm_eval_detail_table(),
+        "## Xeon Packed Runtime Headline",
+        build_cpu_headline_table(),
         "## Packed GGUF CPU",
         build_gguf_table(),
         "## Packed GGUF RSS",

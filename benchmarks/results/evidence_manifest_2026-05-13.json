@@ -16,8 +16,8 @@
       "label": "side_by_side_report",
       "metrics": {},
       "path": "benchmarks/results/qwen_side_by_side_2026-05-05.md",
-      "sha256": "1729d20a5d2a98be5b70f1c1f9513798a75edb773613cdb5c8db8b9cb8d78005",
-      "size_bytes": 12803
+      "sha256": "2ace1d489711701b8c6c5e2feb018a028b78270b8b0da22c0bc6c8386461ec98",
+      "size_bytes": 15428
     },
     {
       "exists": true,

@@ -1,6 +1,13 @@
 # Qwen2.5-1.5B Side-by-Side Artifact Summary
 
-Generated from benchmark JSON artifacts. Missing rows are intentionally shown as missing.
+Generated from benchmark JSON artifacts. Missing rows are intentionally shown as missing. The Xeon headline isolates the Intel Xeon Silver 4116 runs; the longer GGUF table also preserves older Threadripper control runs and should not be used for cross-machine speed ratios.
+
+## Headline Verdict
+
+| claim area | best current artifact | artifact Wiki/CPU PPL | reference FP PPL | artifact FineWeb/PPL | reference FP FineWeb/PPL | artifact ten-task mean | FP ten-task mean | status |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| best HF quality recovery | QAT KL-only row-scale dense lm_head | 38.580 | 13.901 | 21.333 | 10.269 | 0.499459 | 0.644169 | not FP-quality |
+| packed CPU candidate | direct I2_SR fixed x86 ACT | 38.848 | 12.281 | - | - | - | - | not production-ready; 3 qtype/runtime gates fail |
 
 ## Perplexity
 
@@ -39,6 +46,17 @@ Generated from benchmark JSON artifacts. Missing rows are intentionally shown as
 | sciq | acc_norm | 0.934 | 0.199 | 0.613 | 0.695 | 0.700 | 0.733 |
 | truthfulqa_mc1 | acc | 0.305 | 0.220 | 0.241 | 0.241 | 0.233 | 0.261 |
 
+## Xeon Packed Runtime Headline
+
+| artifact | CPU | file MiB | PPL | prefill tok/s | decode tok/s | quality status |
+| --- | --- | --- | --- | --- | --- | --- |
+| FP F16 | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | 2950.4 | 12.2808 | 114.47 | 5.56 | ok |
+| FP Q8_0 | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | 1570.3 | 12.3056 | 124.86 | 10.13 | ok |
+| FP Q4_K_M | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | 940.4 | 12.8112 | 92.08 | 16.01 | ok |
+| row-scale ternary TQ2_0 | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | 1218.6 | 38.8224 | 169.46 | 18.68 | ok |
+| row-scale ternary I2_S prototype | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | 1211.3 | 38.8832 | 218.17 | 18.97 | ok |
+| row-scale ternary I2_SR fixed candidate | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | 1211.3 | 38.8477 | 211.67 | 19.07 | ok |
+
 ## Packed GGUF CPU
 
 | suite | CPU | artifact | kind | file MiB | prefill tok/s | decode tok/s | PPL | quality status |
@@ -76,6 +94,7 @@ Generated from benchmark JSON artifacts. Missing rows are intentionally shown as
 | KL-only row dense lm_head I2_S row-scale prototype native suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_klonly_row_notie_static_ternary_tq2_0 | static_ternary_tq2 | 1218.6 | 161.67 | 18.14 | 38.8357 | ok |
 | KL-only row dense lm_head I2_S row-scale prototype native suite | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale | static_ternary_i2s_row_scale_prototype | 1211.3 | 207.35 | 18.37 | 38.8853 | ok |
 | KL-only row dense lm_head I2_S heap-fix confirmation | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale | static_ternary_i2s_row_scale_prototype_heap_tmp_fix | 1211.3 | 218.17 | 18.97 | 38.8832 | ok |
+| KL-only row dense lm_head I2_SR fixed x86 ACT candidate | Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz | qwen15b_klonly_row_notie_static_ternary_i2_sr_x86act | static_ternary_i2sr_row_scale_candidate_x86_act_pack | 1211.3 | 211.67 | 19.07 | 38.8477 | ok |
 
 ## Packed GGUF RSS
 
@@ -111,3 +130,7 @@ Generated from benchmark JSON artifacts. Missing rows are intentionally shown as
 | Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_klonly_row_notie_static_ternary_f16 | static_ternary_materialized | 32768 | 3395.5 | 4.247 | 0 |
 | Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_klonly_row_notie_static_ternary_tq2_0 | static_ternary_tq2 | 32768 | 1218.6 | 2.121 | 0 |
 | Qwen2.5-1.5B row-scale I2_S RSS context scaling | qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale | static_ternary_i2s_row_scale_prototype | 32768 | 1211.3 | 2.114 | 0 |
+| Qwen2.5-1.5B row-scale I2_SR fixed x86 ACT RSS context scaling | qwen15b_klonly_row_notie_static_ternary_i2_sr_x86act | static_ternary_i2sr_row_scale_candidate_x86_act_pack | 512 | 1211.3 | 1.250 | 0 |
+| Qwen2.5-1.5B row-scale I2_SR fixed x86 ACT RSS context scaling | qwen15b_klonly_row_notie_static_ternary_i2_sr_x86act | static_ternary_i2sr_row_scale_candidate_x86_act_pack | 2048 | 1211.3 | 1.291 | 0 |
+| Qwen2.5-1.5B row-scale I2_SR fixed x86 ACT RSS context scaling | qwen15b_klonly_row_notie_static_ternary_i2_sr_x86act | static_ternary_i2sr_row_scale_candidate_x86_act_pack | 8192 | 1211.3 | 1.455 | 0 |
+| Qwen2.5-1.5B row-scale I2_SR fixed x86 ACT RSS context scaling | qwen15b_klonly_row_notie_static_ternary_i2_sr_x86act | static_ternary_i2sr_row_scale_candidate_x86_act_pack | 32768 | 1211.3 | 2.114 | 0 |
