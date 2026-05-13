@@ -146,9 +146,11 @@ conservative:
   converter has partial Qwen-style expert packing. This repo has not yet shown a
   Kimi-compatible ternary converter, expert-router distillation, or a Kimi/MoE
   benchmark. The mechanical MoE audit confirms generic Qwen2MoE infrastructure
-  exists, but four of six MoE productization gates still fail: the TL2-capable BitNet
-  converter does not explicitly register Qwen2MoE/Kimi, the TL2 path unpacks
-  weights as 2D matrices, no local Kimi artifacts exist, and no
+  exists, but the remaining MoE productization gates still fail: the
+  TL2-capable BitNet converter now has a narrow Qwen2MoE expert-merge mapping,
+  but there is no Kimi-specific mapping or real Qwen2MoE/Kimi conversion and
+  evaluation artifact; the TL2 path still unpacks weights as 2D matrices; no
+  local Kimi artifacts exist; and no
   quality/throughput/RSS or expert-locality benchmarks exist. The direct
   `I2_S`/`I2_SR` writer now passes a synthetic `[experts, out, in]` packing
   contract, but that is not a Kimi runtime benchmark.
@@ -308,17 +310,18 @@ near-term runtime path is to promote the downstream `I2_SR` patch, because it
 already preserves the best row-scale checkpoint's quality and passes the
 promotion rehearsal. Production TL2 export for strong row-scale Qwen checkpoints
 needs row/group-scale metadata plus generated kernels that index those scales;
-it is not blocked by scale-storage size. MoE models such as Kimi need explicit
-converter registration, router/shared-expert tensor mapping, TL2 3D expert
-packing support, full GGUF/runtime tests for direct `I2_S`/`I2_SR`,
+it is not blocked by scale-storage size. MoE models such as Kimi need
+Kimi-specific converter mapping, router/shared-expert tensor mapping, TL2 3D
+expert packing support, full GGUF/runtime tests for direct `I2_S`/`I2_SR`,
 router/expert distillation, and quality, throughput, RSS, and expert-locality
-benchmarks. Quality guarantees for arbitrary architectures
-remain research tasks.
+benchmarks. Quality guarantees for arbitrary architectures remain research
+tasks.
 The current toolchain split is mechanical: the BitNet HF converter now exposes
 `tl2`, registers dense `Qwen2ForCausalLM`, and accepts `--kernel-config` for
-model-specific TL2 shape tables, but it still does not register Qwen2MoE/Kimi
-and TL2 still needs a matching generated LUT runtime. The vendored llama.cpp HF
-converter registers Qwen2/Qwen2MoE but exposes only
+model-specific TL2 shape tables, and has a narrow Qwen2MoE expert-merge
+mapping, but it still does not register Kimi and TL2 still needs a matching
+generated LUT runtime. The vendored llama.cpp HF converter registers
+Qwen2/Qwen2MoE but exposes only
 `f32/f16/bf16/q8_0/tq1_0/tq2_0/auto`.
 `llama-quantize` exposes `I2_S`, but it requires an existing GGUF input.
 

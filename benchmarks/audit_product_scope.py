@@ -185,7 +185,7 @@ def build_gate(root: Path) -> dict[str, Any]:
             f"TL2 expert byte underreport={moe_tl2_byte_probe.get('underreport_bytes')}"
         ),
         "Treat as separate research milestone.",
-        "No Kimi/Qwen2MoE BitNet converter mapping, TL2 3D expert packing/runtime support, router distillation, quality benchmark, or expert-locality benchmark exists; direct I2_S/I2_SR expert packing is only synthetic so far.",
+        "No Kimi-specific mapping, real Qwen2MoE/Kimi conversion artifact, TL2 3D expert packing/runtime support, router distillation, quality benchmark, or expert-locality benchmark exists; direct I2_S/I2_SR expert packing is only synthetic so far.",
     )
 
     supported = [claim for claim in claims if claim["status"] in {"supported", "supported_with_patch"}]

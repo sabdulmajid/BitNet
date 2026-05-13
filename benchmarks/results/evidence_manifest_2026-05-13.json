@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "173de64c4c403420576ea91d8f11746522a3b1a85a5267f37276843464f63674",
-      "size_bytes": 52076
+      "sha256": "fdb33d03c1aac034b53f267cfafb94b409be84117be29bb6bb0a231772aaaa94",
+      "size_bytes": 52227
     },
     {
       "exists": true,
@@ -70,8 +70,8 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-13.md",
-      "sha256": "35424700f7525885a9310c68f889aaa4014b5d6f47d99e4f58cffc749602d6d2",
-      "size_bytes": 5035
+      "sha256": "3ee167dfea1e4c2938a7ae4ab60b19130ce5b3e695d16021ec084a59974015cb",
+      "size_bytes": 5101
     },
     {
       "exists": true,
@@ -79,8 +79,8 @@
       "label": "product_scope_gate",
       "metrics": {},
       "path": "benchmarks/results/product_scope_gate_2026-05-13.md",
-      "sha256": "9313ccc31d4fdd2797c5f105e980cc1ae6650965770a25a6401e2addf06121ab",
-      "size_bytes": 3203
+      "sha256": "7c97b38f6d451113c3358294723f88753799296cda2140ddb3a8b41ba1de5b45",
+      "size_bytes": 3226
     },
     {
       "exists": true,
@@ -259,8 +259,8 @@
       "label": "moe_report",
       "metrics": {},
       "path": "benchmarks/results/moe_support_audit_2026-05-05.md",
-      "sha256": "7117c8894372b769528d960c6d85ab676f41663fc6821b16133bd2fca4174ea2",
-      "size_bytes": 4204
+      "sha256": "7b456fcc675d13ab8ed4e2b481e7734d2049892acb99df66ac7ec70c72a68a04",
+      "size_bytes": 4107
     },
     {
       "exists": true,
@@ -286,7 +286,7 @@
       "label": "unblock_requirements_report",
       "metrics": {},
       "path": "benchmarks/results/unblock_requirements_2026-05-13.md",
-      "sha256": "c0fc2e3462714de036476ff6eef8dcc2211e838798ef985b84f3cd7c1135d3b3",
+      "sha256": "ff2983c7597770487ef3c41dfd8748ce0608f22f4dfbf4349c62883e179fa35f",
       "size_bytes": 1851
     },
     {
@@ -1732,8 +1732,8 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-13.json",
-      "sha256": "d80939653d258a38ae082296c797c2bfe8a74888dc551ee47813aa61bb8791c2",
-      "size_bytes": 14806
+      "sha256": "820d0a389481094dc26383c1f56ec934bd3020fb32f2c0b2b3acca6038ac2880",
+      "size_bytes": 14839
     },
     {
       "exists": true,
@@ -1746,8 +1746,8 @@
         "unsupported_claim_count": 5
       },
       "path": "benchmark_results/product_scope_gate_2026-05-13.json",
-      "sha256": "e8b7b597ce7ceffb8be8ce44a613ab568488d4f69e06ffe056566ea807c6e652",
-      "size_bytes": 3862
+      "sha256": "1352532bc5ccc2a52ec37c7d73e057a8fc46a8de144ef65147e5d4fd38cd4ce2",
+      "size_bytes": 3885
     },
     {
       "exists": true,
@@ -1776,7 +1776,6 @@
       "metrics": {
         "checks": 5,
         "failed_gates": [
-          "BitNet converter has explicit Qwen2MoE/Kimi registration",
           "TL2 converter path is validated for merged 3D expert tensors",
           "local Kimi model/eval artifacts exist",
           "MoE quality and locality benchmarks exist"
@@ -1787,8 +1786,8 @@
         "present_checks": 5
       },
       "path": "benchmark_results/moe_support_audit_2026-05-05.json",
-      "sha256": "50d6b377d8823c3980e8813f13b057c2eaaac3635940ec78b9f910a03b7bbca5",
-      "size_bytes": 10113
+      "sha256": "f650b04a567a0f17639e034af8f54b5da8dcf37fdc9a0486b3bf24d1b8303c4a",
+      "size_bytes": 10013
     },
     {
       "exists": true,
@@ -1853,7 +1852,7 @@
         "requirements": 5
       },
       "path": "benchmark_results/unblock_requirements_2026-05-13.json",
-      "sha256": "2f2456be4305bcb8245efd1d83bdf1ee8318cadd35cd67c03b4f280b21c944c6",
+      "sha256": "4e36524a49c8daa2509a3f23f044485b6fa1ab865dfcd6c2931e7f8bc8c85942",
       "size_bytes": 2196
     },
     {

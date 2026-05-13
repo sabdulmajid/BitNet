@@ -149,7 +149,7 @@ def build_report(data: dict[str, Any]) -> str:
         "weights are merged into 3D tensors, and the runtime builds sparse "
         "top-k expert execution with `ggml_mul_mat_id`. This does not prove "
         "Kimi support: no Kimi-specific mapping or benchmark artifact is present, "
-        "the TL2-capable BitNet converter still lacks Qwen2MoE registration, "
+        "Qwen2MoE mapping still lacks a real converted/evaluated artifact, "
         "the TL2 packing path remains 2D-matrix oriented, and the active TL2 "
         "runtime contract does not size or route merged experts correctly. The "
         "direct I2_S/I2_SR path is only a synthetic packing contract until it "
@@ -165,12 +165,12 @@ def build_report(data: dict[str, Any]) -> str:
         for gate in data["productization_gates"]
     ]
     required_plan = (
-        "Required MoE/Kimi path: add an explicit Kimi/Qwen2MoE BitNet converter "
-        "registration, map router/shared-expert/expert tensor names, decide which "
-        "router and shared-expert tensors stay dense, extend TL2 packing plus "
-        "full GGUF/runtime tests to 3D expert tensors, distill router and expert weights under "
-        "ternary constraints, then run quality, throughput, RSS, and expert-locality "
-        "benchmarks against dense and llama.cpp quantized MoE baselines."
+        "Required MoE/Kimi path: validate the new Qwen2MoE BitNet converter "
+        "mapping on a real checkpoint, add any Kimi-specific tensor mapping, decide "
+        "which router and shared-expert tensors stay dense, extend TL2 packing plus "
+        "full GGUF/runtime tests to 3D expert tensors, distill router and expert "
+        "weights under ternary constraints, then run quality, throughput, RSS, and "
+        "expert-locality benchmarks against dense and llama.cpp quantized MoE baselines."
     )
     return "\n\n".join(
         [
@@ -224,10 +224,10 @@ def build_productization_gates(
             "The vendored llama.cpp layer must expose MoE metadata, conversion, and routed execution.",
         ),
         make_gate(
-            "BitNet converter has explicit Qwen2MoE/Kimi registration",
+            "BitNet converter has explicit Qwen2MoE-or-Kimi registration",
             bitnet_qwen2moe or bitnet_kimi,
             f"qwen2moe_registration={bitnet_qwen2moe}; kimi_converter_match={bitnet_kimi}; tracked_kimi_mentions={len(kimi_matches)}",
-            "The TL2-capable BitNet converter registers Qwen2 dense/Mixtral-style models but not Qwen2MoE or Kimi.",
+            "The TL2-capable BitNet converter must register at least one MoE-family architecture before real MoE conversion can be tested.",
         ),
         make_gate(
             "TL2 converter path is validated for merged 3D expert tensors",
