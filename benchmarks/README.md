@@ -302,10 +302,26 @@ Measure prompt throughput, decode throughput, RSS, model file size, and perplexi
 
 Current Qwen status: I2_S and TQ2_0 are benchmarked through the static-ternary
 materialization bridge. TL2 is not yet a validated Qwen path. `llama-quantize`
-does not expose TL2 as an allowed output type, and the BitNet-specific
-`utils/convert-hf-to-gguf-bitnet.py --outtype tl2` converter does not register
-`Qwen2ForCausalLM`. Treat TL2 as pending until there is a Qwen-aware TL2 GGUF
-writer and a TL2-enabled build has passed smoke, PPL, and throughput audits.
+does not expose TL2 as an allowed output type, and the BitNet-specific TL2 path
+requires exact model-shape code generation plus a matching `--kernel-config`
+and TL2-enabled runtime build. The Qwen2.5-0.5B TL2 probe is mechanically
+convertible but quality-invalid (`NaN` PPL). For the stronger Qwen2.5-1.5B
+row-scale checkpoint, the current one-scale TL2 format has expected relative
+linear output RMS error `1.904230`; exact fp16 row scales reduce that design
+error to `0.000197` with only `1.230 MiB` of scale metadata, but no generated
+TL2 runtime here indexes those row scales yet. Treat TL2 as pending until there
+is row/group-scale metadata support and a TL2-enabled build has passed smoke,
+PPL, throughput, and RSS audits.
+
+The TL2 scale-design audit is reproducible with:
+
+```bash
+python benchmarks/audit_tl2_row_scale_design.py \
+  --state qwen15b_tensor_scale=checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-5000/step-5000/ternary_state_dict.pt \
+  --state qwen15b_row_scale=checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-row-notiehead-5000/step-5000/ternary_state_dict.pt \
+  --output-json benchmark_results/tl2_row_scale_design_2026-05-13.json \
+  --output-md benchmarks/results/tl2_row_scale_design_2026-05-13.md
+```
 
 The reusable GGUF suite runner consumes a manifest and writes raw logs plus
 machine-readable summaries:

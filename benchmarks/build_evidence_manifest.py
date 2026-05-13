@@ -48,6 +48,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "tl2_shape_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_shape_support_audit_2026-05-05.md"},
     {"label": "tl2_probe_report", "kind": "tracked_report", "path": "benchmarks/results/qwen05b_tl2_probe_2026-05-05.md"},
     {"label": "tl2_scale_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_scale_semantics_2026-05-05.md"},
+    {"label": "tl2_row_scale_design_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_row_scale_design_2026-05-13.md"},
     {"label": "i2s_row_scale_format_report", "kind": "tracked_report", "path": "benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md"},
     {"label": "row_scale_qtype_productization_gate_report", "kind": "tracked_report", "path": "benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md"},
     {"label": "row_scale_qtype_i2sr_active_patch_gate_report", "kind": "tracked_report", "path": "benchmarks/results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.md"},
@@ -115,6 +116,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "direct_packed_gguf_support_json", "kind": "direct_packed_support_json", "path": "benchmark_results/direct_packed_gguf_support_2026-05-13.json"},
     {"label": "tl2_shape_json", "kind": "tl2_shape_json", "path": "benchmark_results/tl2_shape_support_audit_2026-05-05.json"},
     {"label": "tl2_scale_json", "kind": "tl2_scale_json", "path": "benchmark_results/tl2_scale_semantics_2026-05-05.json"},
+    {"label": "tl2_row_scale_design_json", "kind": "tl2_row_scale_design_json", "path": "benchmark_results/tl2_row_scale_design_2026-05-13.json"},
     {"label": "i2s_row_scale_format_json", "kind": "i2s_format_json", "path": "benchmark_results/i2s_row_scale_format_audit_2026-05-13.json"},
     {"label": "row_scale_qtype_productization_gate_json", "kind": "row_scale_qtype_gate_json", "path": "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json"},
     {"label": "row_scale_qtype_i2sr_active_patch_gate_json", "kind": "row_scale_qtype_gate_json", "path": "benchmark_results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.json"},
@@ -345,6 +347,31 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
                 if isinstance(result, dict)
             ]
         }
+    if kind == "tl2_row_scale_design_json":
+        parsed = []
+        for result in data.get("results", []):
+            if not isinstance(result, dict):
+                continue
+            strategies = {
+                row.get("name"): row
+                for row in result.get("strategies", [])
+                if isinstance(row, dict) and isinstance(row.get("name"), str)
+            }
+            current = strategies.get("current_tl2_tensor_max_fp32", {})
+            row_fp16 = strategies.get("row_exact_fp16", {})
+            group32 = strategies.get("group32_l2_optimal_fp16", {})
+            parsed.append(
+                {
+                    "label": result.get("label"),
+                    "tensors": result.get("tensors"),
+                    "row_scale_tensors": result.get("row_scale_tensors"),
+                    "current_tl2_error": current.get("expected_relative_output_rms_error"),
+                    "group32_fp16_error": group32.get("expected_relative_output_rms_error"),
+                    "row_fp16_error": row_fp16.get("expected_relative_output_rms_error"),
+                    "row_fp16_scale_mib": row_fp16.get("scale_mib_fp16"),
+                }
+            )
+        return {"results": parsed}
     if kind == "i2s_format_json":
         metrics = data.get("metrics", {})
         verdict = data.get("verdict", {})
@@ -501,6 +528,17 @@ def build_report(manifest: dict[str, Any]) -> str:
             values = metrics.get("results", [])
             summary = "; ".join(
                 f"{value.get('label')} err={fmt_metric(value.get('total_relative_fro_error_if_one_scale'))}"
+                for value in values
+                if isinstance(value, dict)
+            )
+        elif entry["kind"] == "tl2_row_scale_design_json":
+            values = metrics.get("results", [])
+            summary = "; ".join(
+                (
+                    f"{value.get('label')} current={fmt_metric(value.get('current_tl2_error'))}, "
+                    f"row_fp16={fmt_metric(value.get('row_fp16_error'))}, "
+                    f"scaleMiB={fmt_metric(value.get('row_fp16_scale_mib'))}"
+                )
                 for value in values
                 if isinstance(value, dict)
             )

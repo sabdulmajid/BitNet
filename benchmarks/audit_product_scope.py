@@ -99,6 +99,16 @@ def build_gate(root: Path) -> dict[str, Any]:
 
     tl2_scale = read_json(root / "benchmark_results/tl2_scale_semantics_2026-05-05.json")
     tl2_row = next((item for item in tl2_scale.get("results", []) if item.get("label") == "qwen15b_row_scale"), {})
+    tl2_design = read_json(root / "benchmark_results/tl2_row_scale_design_2026-05-13.json")
+    tl2_design_row = next((item for item in tl2_design.get("results", []) if item.get("label") == "qwen15b_row_scale"), {})
+    tl2_design_strategies = {
+        item.get("name"): item
+        for item in tl2_design_row.get("strategies", [])
+        if isinstance(item, dict) and isinstance(item.get("name"), str)
+    }
+    tl2_row_fp16 = tl2_design_strategies.get("row_exact_fp16", {})
+    tl2_group2 = tl2_design_strategies.get("group2_l2_optimal_fp16", {})
+    tl2_group32 = tl2_design_strategies.get("group32_l2_optimal_fp16", {})
     tl2_avx = read_json(root / "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json")
     tl2_artifact = find_row(tl2_avx, "qwen05b_qat_tl2") or {}
     tl2_ppl = tl2_artifact.get("perplexity", {}).get("ppl")
@@ -150,9 +160,15 @@ def build_gate(root: Path) -> dict[str, Any]:
         claims,
         "TL2 product support for the strong row-scale Qwen checkpoint",
         "unsupported",
-        f"Qwen0.5B TL2 PPL={tl2_ppl}; Qwen1.5B row-scale one-scale error={tl2_row.get('total_relative_fro_error_if_one_scale')}",
+        (
+            f"Qwen0.5B TL2 PPL={tl2_ppl}; Qwen1.5B row-scale one-scale error={tl2_row.get('total_relative_fro_error_if_one_scale')}; "
+            f"group2 fp16 design error={tl2_group2.get('expected_relative_output_rms_error')}; "
+            f"group32 fp16 design error={tl2_group32.get('expected_relative_output_rms_error')}; "
+            f"exact row-fp16 design error={tl2_row_fp16.get('expected_relative_output_rms_error')} "
+            f"at {tl2_row_fp16.get('scale_mib_fp16')} MiB"
+        ),
         "Exclude TL2 from MVP claims.",
-        "Current TL2 scale semantics are incompatible with row-scale checkpoint quality and the tested TL2 artifact has NaN quality.",
+        "Current TL2 scale semantics are incompatible with row-scale checkpoint quality; fixing it requires row/group-scale metadata and generated kernels that index those scales.",
     )
     add_claim(
         claims,

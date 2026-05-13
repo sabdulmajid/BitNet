@@ -1,5 +1,5 @@
 # Evidence Manifest, 2026-05-13
-Artifacts: `93`. Missing: `0`.
+Artifacts: `95`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
 | README | tracked_report | yes | 49855 | e6df06b97258 |  |
@@ -9,10 +9,10 @@ Artifacts: `93`. Missing: `0`.
 | publishable_claims | tracked_report | yes | 11054 | 63c5e9babbc1 |  |
 | progress_audit | tracked_report | yes | 25612 | 74e3b96847bf |  |
 | active_goal_audit | tracked_report | yes | 10765 | 255dacfeae0a |  |
-| objective_completion_audit | tracked_report | yes | 4607 | fa443ddf6714 |  |
-| product_scope_gate | tracked_report | yes | 2812 | 3c7f37313807 |  |
+| objective_completion_audit | tracked_report | yes | 4731 | 1f9ee481611f |  |
+| product_scope_gate | tracked_report | yes | 3020 | f447c3a2b032 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 2494 | 3bf77dd62e65 |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 2865 | f65cae600a57 |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 2865 | e1e57180b308 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2174 | d6e0c6ec52ec |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -20,6 +20,7 @@ Artifacts: `93`. Missing: `0`.
 | tl2_shape_report | tracked_report | yes | 2817 | 8dddd65315e0 |  |
 | tl2_probe_report | tracked_report | yes | 3608 | dd7e4fa29cc1 |  |
 | tl2_scale_report | tracked_report | yes | 2321 | 30bbfbd22559 |  |
+| tl2_row_scale_design_report | tracked_report | yes | 4004 | fd035ed1fd6d |  |
 | i2s_row_scale_format_report | tracked_report | yes | 1759 | 256abf73581c |  |
 | row_scale_qtype_productization_gate_report | tracked_report | yes | 2717 | eec414acdcd3 |  |
 | row_scale_qtype_i2sr_active_patch_gate_report | tracked_report | yes | 2390 | 42acb39176cb |  |
@@ -83,14 +84,15 @@ Artifacts: `93`. Missing: `0`.
 | direct_packed_gguf_support_json | direct_packed_support_json | yes | 2798 | 4130b3f67c9e | dense=True, packed_i2s=True, row_safe=False |
 | tl2_shape_json | tl2_shape_json | yes | 12054 | a99430f0f4b0 |  |
 | tl2_scale_json | tl2_scale_json | yes | 14344 | bf2d36674b72 | qwen15b_tensor_scale err=0; qwen15b_row_scale err=1.90423 |
+| tl2_row_scale_design_json | tl2_row_scale_design_json | yes | 29878 | 0fd577484ee8 | qwen15b_tensor_scale current=0, row_fp16=0.000175008, scaleMiB=1.52026; qwen15b_row_scale current=1.90423, row_fp16=0.000197446, scaleMiB=1.23047 |
 | i2s_row_scale_format_json | i2s_format_json | yes | 1528 | e17297539b9d | default_ratio=30836.2, prototype_ratio=1.00157, stable_format_required=True |
 | row_scale_qtype_productization_gate_json | row_scale_qtype_gate_json | yes | 3795 | 10e3f5519b9e | passed=False, gates=9, failed=3, stable_qtype=False, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | row_scale_qtype_i2sr_active_patch_gate_json | row_scale_qtype_gate_json | yes | 3616 | cb42720567a1 | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | row_scale_qtype_i2sr_promotion_rehearsal_json | row_scale_qtype_gate_json | yes | 3897 | 6ffc161b446b | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5392 | 41b2dbb6001f | passed=True, checks=33, failed=0 |
-| objective_completion_audit_json | objective_completion_audit_json | yes | 14327 | 794db11108f7 | achieved=False, status=not_complete, complete=7/9, open=2 |
-| product_scope_gate_json | product_scope_gate_json | yes | 3471 | baa7c6e01235 | scope=research_mvp_only, supported=2, unsupported=5 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5392 | ec67aec472e5 | passed=True, checks=33, failed=0 |
+| objective_completion_audit_json | objective_completion_audit_json | yes | 14553 | 3afe1d508993 | achieved=False, status=not_complete, complete=7/9, open=2 |
+| product_scope_gate_json | product_scope_gate_json | yes | 3679 | a321f3031314 | scope=research_mvp_only, supported=2, unsupported=5 |
 | i2sr_submodule_promotion_audit_json | i2sr_submodule_promotion_audit_json | yes | 3314 | 6c98638def76 | ready=False, active=False, patch_applies=True, submodule=1f86f058, blockers=3 |
 | tl2_generic_summary | gguf_summary_json | yes | 4494 | 306a682203b2 | rows=4, failed=2, nan=1, catastrophic=0, max_ppl=18.8044 |
 | tl2_avx512_summary | gguf_summary_json | yes | 4573 | 6ec820472f37 | rows=4, failed=0, nan=2, catastrophic=0, max_ppl=18.8239 |

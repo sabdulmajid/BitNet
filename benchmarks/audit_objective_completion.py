@@ -368,11 +368,21 @@ def audit_productization(root: Path, rows: list[dict[str, Any]], metrics: dict[s
     direct = read_json(root / "benchmark_results/direct_packed_gguf_support_2026-05-13.json")
     tl2 = read_json(root / "benchmark_results/tl2_scale_semantics_2026-05-05.json")
     tl2_row = next((item for item in tl2.get("results", []) if item.get("label") == "qwen15b_row_scale"), {})
+    tl2_design = read_json(root / "benchmark_results/tl2_row_scale_design_2026-05-13.json")
+    tl2_design_row = next((item for item in tl2_design.get("results", []) if item.get("label") == "qwen15b_row_scale"), {})
+    tl2_design_strategies = {
+        item.get("name"): item
+        for item in tl2_design_row.get("strategies", [])
+        if isinstance(item, dict) and isinstance(item.get("name"), str)
+    }
+    tl2_row_fp16 = tl2_design_strategies.get("row_exact_fp16", {})
     metrics["productization"] = {
         "active_qtype_gate_passed": active.get("passed"),
         "candidate_patch_gate_passed": candidate.get("passed"),
         "direct_packed_verdict": direct.get("verdict", {}),
         "qwen15b_row_scale_tl2_one_scale_error": tl2_row.get("total_relative_fro_error_if_one_scale"),
+        "qwen15b_row_scale_tl2_row_fp16_error": tl2_row_fp16.get("expected_relative_output_rms_error"),
+        "qwen15b_row_scale_tl2_row_fp16_scale_mib": tl2_row_fp16.get("scale_mib_fp16"),
     }
     status = "partial"
     add_row(
@@ -381,9 +391,10 @@ def audit_productization(root: Path, rows: list[dict[str, Any]], metrics: dict[s
         status,
         (
             f"direct dense/scalar writers exist; I2_SR candidate gate={candidate.get('passed')}; "
-            f"active default gate={active.get('passed')}; TL2 row-scale one-scale error={tl2_row.get('total_relative_fro_error_if_one_scale')}"
+            f"active default gate={active.get('passed')}; TL2 row-scale one-scale error={tl2_row.get('total_relative_fro_error_if_one_scale')}; "
+            f"row-fp16 design error={tl2_row_fp16.get('expected_relative_output_rms_error')} at {tl2_row_fp16.get('scale_mib_fp16')} MiB"
         ),
-        "Packed row-scale CPU inference is proven only through the downstream I2_SR patch; TL2 quality-preserving row-scale Qwen1.5B remains unimplemented.",
+        "Packed row-scale CPU inference is proven only through the downstream I2_SR patch; TL2 quality-preserving row-scale Qwen1.5B requires row/group-scale runtime and kernel support.",
     )
 
 
