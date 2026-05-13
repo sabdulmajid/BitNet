@@ -44,6 +44,47 @@ def make_gate(name: str, passed: bool, evidence: str, blocker: str) -> dict[str,
     }
 
 
+def summarize_stable_qtype_benchmark(path: Path, catastrophic_ppl_threshold: float) -> dict[str, Any]:
+    if not path.exists():
+        return {
+            "exists": False,
+            "rows": 0,
+            "failed_returncodes": [],
+            "finite_ppl": [],
+            "max_ppl": None,
+            "quality_ok": False,
+        }
+    data = read_json(path)
+    rows = data.get("rows", [])
+    failed_returncodes: list[str] = []
+    finite_ppl: list[float] = []
+    if isinstance(rows, list):
+        for row in rows:
+            if not isinstance(row, dict):
+                failed_returncodes.append("non-object-row")
+                continue
+            name = str(row.get("name", ""))
+            for key in ("smoke_returncode", "bench_returncode", "ppl_returncode"):
+                if key in row and int(row.get(key, 1)) != 0:
+                    failed_returncodes.append(f"{name}:{key}={row.get(key)}")
+            perplexity = row.get("perplexity", {})
+            ppl = perplexity.get("ppl") if isinstance(perplexity, dict) else None
+            if isinstance(ppl, (int, float)) and math.isfinite(float(ppl)):
+                finite_ppl.append(float(ppl))
+            else:
+                failed_returncodes.append(f"{name}:ppl={ppl}")
+    max_ppl = max(finite_ppl, default=None)
+    quality_ok = bool(rows) and not failed_returncodes and max_ppl is not None and max_ppl < catastrophic_ppl_threshold
+    return {
+        "exists": True,
+        "rows": len(rows) if isinstance(rows, list) else 0,
+        "failed_returncodes": failed_returncodes,
+        "finite_ppl": finite_ppl,
+        "max_ppl": max_ppl,
+        "quality_ok": quality_ok,
+    }
+
+
 def audit(args: argparse.Namespace) -> dict[str, Any]:
     format_audit = read_json(args.format_audit_json)
     evidence_manifest = read_json(args.evidence_manifest_json)
@@ -78,7 +119,13 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
     default_ratio = metrics.get("default_row_scale_i2s_to_tq2_ppl_ratio")
     prototype_quality_ok = isinstance(prototype_ratio, (int, float)) and float(prototype_ratio) <= args.prototype_max_ppl_ratio
     default_failure_proven = isinstance(default_ratio, (int, float)) and float(default_ratio) >= args.default_failure_min_ratio
-    stable_benchmark_present = "i2sr_row_scale_qwen15b_suite" in labels or "i2rs_row_scale_qwen15b_suite" in labels
+    stable_benchmark = summarize_stable_qtype_benchmark(args.stable_qtype_summary_json, args.catastrophic_ppl_threshold)
+    stable_benchmark_present = (
+        "i2sr_row_scale_qwen15b_suite" in labels
+        or "i2rs_row_scale_qwen15b_suite" in labels
+        or stable_benchmark["exists"]
+    )
+    stable_benchmark_quality_ok = stable_benchmark_present and bool(stable_benchmark["quality_ok"])
 
     gates = [
         make_gate(
@@ -123,6 +170,12 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
             str(args.evidence_manifest_json),
             "Evidence manifest has no stable I2_SR/I2_RS row-scale benchmark suite.",
         ),
+        make_gate(
+            "stable qtype benchmark preserves quality",
+            stable_benchmark_quality_ok,
+            str(args.stable_qtype_summary_json),
+            f"Stable qtype benchmark is missing or has catastrophic/invalid PPL >= {args.catastrophic_ppl_threshold:g}.",
+        ),
     ]
 
     return {
@@ -136,10 +189,12 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
             "llama_cpp": str(args.llama_cpp),
             "direct_writer": str(args.direct_writer),
             "row_patch": str(args.row_patch),
+            "stable_qtype_summary_json": str(args.stable_qtype_summary_json),
         },
         "thresholds": {
             "prototype_max_ppl_ratio": args.prototype_max_ppl_ratio,
             "default_failure_min_ratio": args.default_failure_min_ratio,
+            "catastrophic_ppl_threshold": args.catastrophic_ppl_threshold,
         },
         "observations": {
             "prototype_row_scale_i2s_to_tq2_ppl_ratio": prototype_ratio,
@@ -149,6 +204,10 @@ def audit(args: argparse.Namespace) -> dict[str, Any]:
             "has_llama_stable_ftype": has_llama_ftype,
             "direct_writer_emits_stable_qtype": direct_writer_emits_stable_qtype,
             "stable_benchmark_present": stable_benchmark_present,
+            "stable_benchmark_quality_ok": stable_benchmark_quality_ok,
+            "stable_benchmark_rows": stable_benchmark["rows"],
+            "stable_benchmark_max_ppl": stable_benchmark["max_ppl"],
+            "stable_benchmark_failed_returncodes": stable_benchmark["failed_returncodes"],
         },
         "gates": gates,
         "passed": all(gate["passed"] for gate in gates),
@@ -176,6 +235,11 @@ def build_report(result: dict[str, Any]) -> str:
         if obs["stable_benchmark_present"]
         else "the manifest has no stable-qtype benchmark"
     )
+    quality_clause = (
+        "and it passes the catastrophic-PPL gate"
+        if obs["stable_benchmark_quality_ok"]
+        else "but it does not pass the catastrophic-PPL gate"
+    )
     lines = [
         "# Row-Scale Qtype Productization Gate, 2026-05-13",
         "",
@@ -196,11 +260,13 @@ def build_report(result: dict[str, Any]) -> str:
         f"- Stable llama file type present: `{obs['has_llama_stable_ftype']}`.",
         f"- Direct writer emits stable row-scale qtype: `{obs['direct_writer_emits_stable_qtype']}`.",
         f"- Stable qtype benchmark present in manifest: `{obs['stable_benchmark_present']}`.",
+        f"- Stable qtype benchmark quality acceptable: `{obs['stable_benchmark_quality_ok']}`.",
+        f"- Stable qtype benchmark max finite PPL: `{fmt(obs['stable_benchmark_max_ppl'], 4)}`.",
         "",
         "## Interpretation",
         "",
         "The feasibility claim is positive: the patched prototype preserves row-scale quality. "
-        f"The productization claim is negative: the source tree does not yet define a separate row-scale qtype, {writer_clause}, and {benchmark_clause}. "
+        f"The productization claim is negative: the source tree does not yet define a separate row-scale qtype, {writer_clause}, and {benchmark_clause} {quality_clause}. "
         "This keeps row-scale packed deployment in research/prototype status.",
     ]
     return "\n".join(lines)
@@ -216,8 +282,10 @@ def main() -> None:
     parser.add_argument("--llama-cpp", type=Path, default=Path("3rdparty/llama.cpp/src/llama.cpp"))
     parser.add_argument("--direct-writer", type=Path, default=Path("benchmarks/convert_static_ternary_to_i2s_gguf.py"))
     parser.add_argument("--row-patch", type=Path, default=Path("patches/llama-i2s-row-scale.patch"))
+    parser.add_argument("--stable-qtype-summary-json", type=Path, default=Path("benchmark_results/i2sr-row-scale-qwen15b-suite-2026-05-13/summary.json"))
     parser.add_argument("--prototype-max-ppl-ratio", type=float, default=1.01)
     parser.add_argument("--default-failure-min-ratio", type=float, default=10.0)
+    parser.add_argument("--catastrophic-ppl-threshold", type=float, default=1.0e4)
     parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json"))
     parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md"))
     args = parser.parse_args()

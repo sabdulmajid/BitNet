@@ -14,7 +14,8 @@ Overall status: `fail`.
 | stable llama file type is defined | fail | 3rdparty/llama.cpp/include/llama.h | No separate LLAMA_FTYPE_MOSTLY_I2_SR/I2_RS value is present. |
 | runtime routes stable qtype without changing I2_S | fail | ggml.c/llama.cpp source scan plus row-scale patch scan | Runtime evidence still indicates an overloaded I2_S patch rather than a separate row-scale qtype path. |
 | direct writer emits stable row-scale qtype | pass | benchmarks/convert_static_ternary_to_i2s_gguf.py |  |
-| stable qtype benchmark evidence exists | fail | benchmarks/results/evidence_manifest_2026-05-13.json | Evidence manifest has no stable I2_SR/I2_RS row-scale benchmark suite. |
+| stable qtype benchmark evidence exists | pass | benchmarks/results/evidence_manifest_2026-05-13.json |  |
+| stable qtype benchmark preserves quality | fail | benchmark_results/i2sr-row-scale-qwen15b-suite-2026-05-13/summary.json | Stable qtype benchmark is missing or has catastrophic/invalid PPL >= 10000. |
 
 ## Observations
 
@@ -24,8 +25,10 @@ Overall status: `fail`.
 - Stable GGML qtype present: `False`.
 - Stable llama file type present: `False`.
 - Direct writer emits stable row-scale qtype: `True`.
-- Stable qtype benchmark present in manifest: `False`.
+- Stable qtype benchmark present in manifest: `True`.
+- Stable qtype benchmark quality acceptable: `False`.
+- Stable qtype benchmark max finite PPL: `20074699.9423`.
 
 ## Interpretation
 
-The feasibility claim is positive: the patched prototype preserves row-scale quality. The productization claim is negative: the source tree does not yet define a separate row-scale qtype, the direct writer now has an `I2_SR` emission mode, and the manifest has no stable-qtype benchmark. This keeps row-scale packed deployment in research/prototype status.
+The feasibility claim is positive: the patched prototype preserves row-scale quality. The productization claim is negative: the source tree does not yet define a separate row-scale qtype, the direct writer now has an `I2_SR` emission mode, and a stable-qtype benchmark is present but it does not pass the catastrophic-PPL gate. This keeps row-scale packed deployment in research/prototype status.

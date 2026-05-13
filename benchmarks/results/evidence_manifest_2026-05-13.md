@@ -1,10 +1,10 @@
 # Evidence Manifest, 2026-05-13
-Artifacts: `64`. Missing: `0`.
+Artifacts: `67`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 48050 | af3109405c34 |  |
+| README | tracked_report | yes | 48495 | b9a753265eca |  |
 | side_by_side_report | tracked_report | yes | 12803 | 1729d20a5d2a |  |
-| publishable_claims | tracked_report | yes | 9726 | 9a01e43a6856 |  |
+| publishable_claims | tracked_report | yes | 9997 | 96c4ec0e5a21 |  |
 | progress_audit | tracked_report | yes | 22913 | d5d5679e3fc3 |  |
 | active_goal_audit | tracked_report | yes | 9724 | cbe862d8b210 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
@@ -15,7 +15,8 @@ Artifacts: `64`. Missing: `0`.
 | tl2_probe_report | tracked_report | yes | 3608 | dd7e4fa29cc1 |  |
 | tl2_scale_report | tracked_report | yes | 2321 | 30bbfbd22559 |  |
 | i2s_row_scale_format_report | tracked_report | yes | 1759 | 256abf73581c |  |
-| row_scale_qtype_productization_gate_report | tracked_report | yes | 2099 | 9562e3121111 |  |
+| row_scale_qtype_productization_gate_report | tracked_report | yes | 2383 | 4d9ec58650d5 |  |
+| i2sr_qwen15b_candidate_report | tracked_report | yes | 2476 | 84768020bf76 |  |
 | moe_report | tracked_report | yes | 1882 | 342ac496a28d |  |
 | latest_nonrow_audit | evidence_audit_md | yes | 4396 | 6d8c31e958f1 |  |
 | row_notie_5000_audit | evidence_audit_md | yes | 2569 | 4615a642257d |  |
@@ -54,6 +55,8 @@ Artifacts: `64`. Missing: `0`.
 | direct_i2s_qwen05b_suite | gguf_summary_json | yes | 2559 | d6451c122755 | rows=2, failed=0, nan=1, catastrophic=0, max_ppl=18.0984 |
 | direct_row_i2s_qwen05b_conversion | direct_i2s_json | yes | 1157 | a7ee2b556bc3 | arch=Qwen2ForCausalLM, packed=168, row_packed=168, out_f16=1, tensors=291, row_qtype=None, native_py_consts=False |
 | i2sr_writer_smoke_qwen05b | direct_i2s_json | yes | 1421 | 42f8bed864e7 | arch=Qwen2ForCausalLM, packed=168, row_packed=168, out_f16=1, tensors=291, row_qtype=i2_sr, native_py_consts={'i2s': False, 'i2sr': False} |
+| i2sr_row_scale_qwen15b_conversion | direct_i2s_json | yes | 1495 | a2b6641a4a55 | arch=Qwen2ForCausalLM, packed=196, row_packed=196, out_f16=0, tensors=339, row_qtype=i2_sr, native_py_consts={'i2s': True, 'i2sr': True} |
+| i2sr_row_scale_qwen15b_suite | gguf_summary_json | yes | 1670 | d31d7de92fa1 | rows=1, failed=0, nan=0, catastrophic=1, max_ppl=2.00747e+07 |
 | direct_row_i2s_qwen05b_suite | gguf_summary_json | yes | 2637 | ebdafab23882 | rows=2, failed=0, nan=0, catastrophic=1, max_ppl=59401.5 |
 | row_f16_qwen05b_suite | gguf_summary_json | yes | 2575 | cc4583593042 | rows=2, failed=0, nan=0, catastrophic=0, max_ppl=578.483 |
 | row_i2s_quantized_qwen05b_suite | gguf_summary_json | yes | 2645 | 23b71114cdae | rows=2, failed=0, nan=1, catastrophic=0, max_ppl=18.0986 |
@@ -62,7 +65,7 @@ Artifacts: `64`. Missing: `0`.
 | tl2_shape_json | tl2_shape_json | yes | 12054 | a99430f0f4b0 |  |
 | tl2_scale_json | tl2_scale_json | yes | 14344 | bf2d36674b72 | qwen15b_tensor_scale err=0; qwen15b_row_scale err=1.90423 |
 | i2s_row_scale_format_json | i2s_format_json | yes | 1528 | e17297539b9d | default_ratio=30836.2, prototype_ratio=1.00157, stable_format_required=True |
-| row_scale_qtype_productization_gate_json | row_scale_qtype_gate_json | yes | 2654 | cc961131c059 | passed=False, gates=7, failed=4, stable_qtype=False, writer=True |
+| row_scale_qtype_productization_gate_json | row_scale_qtype_gate_json | yes | 3181 | 35d29a51a6d1 | passed=False, gates=8, failed=4, stable_qtype=False, writer=True, stable_quality=False, stable_max_ppl=2.00747e+07 |
 | tl2_generic_summary | gguf_summary_json | yes | 4494 | 306a682203b2 | rows=4, failed=2, nan=1, catastrophic=0, max_ppl=18.8044 |
 | tl2_avx512_summary | gguf_summary_json | yes | 4573 | 6ec820472f37 | rows=4, failed=0, nan=2, catastrophic=0, max_ppl=18.8239 |
 | ptq_math | math_json | yes | 14010 | 8cedd88658e0 | trials=10, rel_error=0.512542 |

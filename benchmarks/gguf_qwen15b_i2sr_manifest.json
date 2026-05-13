@@ -1,0 +1,7 @@
+[
+  {
+    "name": "qwen15b_klonly_row_notie_static_ternary_i2_sr",
+    "kind": "static_ternary_i2sr_row_scale_candidate",
+    "path": "models/qwen2.5-1.5b-klonly-row-notie-static-ternary-dense/qwen15b_klonly_row_notie_static_ternary_i2_sr.gguf"
+  }
+]

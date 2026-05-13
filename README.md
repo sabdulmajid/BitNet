@@ -106,15 +106,16 @@ conservative:
   materialized-then-`I2_S` was `NaN`, and materialized-then-`TQ2_0` was
   `5118527.5782`. The quality-preserving packed row-scale evidence remains the
   separate 1.5B patched-runtime prototype, not default `I2_S`.
-- **A candidate stable `I2_SR` path now exists, but it is not benchmark-proven
-  yet.** `patches/llama-i2sr-row-scale-qtype.patch` introduces a separate
-  row-scale qtype/file type instead of changing the existing `I2_S` contract.
-  The patch applies cleanly and built in `build-portable-avx2`; the direct
-  writer can emit `--row-scale-qtype i2_sr` and smoke-wrote the Qwen2.5-0.5B
-  row checkpoint as `168` row-scale tensors plus a dense F16 output tensor.
-  This is writer/runtime plumbing, not a quality claim; the next required
-  evidence is a full applied-patch `I2_SR` GGUF suite on the strong 1.5B
-  row-scale checkpoint.
+- **A candidate stable `I2_SR` path now exists, but its first full benchmark
+  failed quality.** `patches/llama-i2sr-row-scale-qtype.patch` introduces a
+  separate row-scale qtype/file type instead of changing the existing `I2_S`
+  contract. The patch applies, builds, and the direct writer emits
+  `--row-scale-qtype i2_sr`. The strong Qwen2.5-1.5B row-scale checkpoint
+  loads and runs as `196` `i2_sr` tensors at `212.10` prompt tok/s and
+  `19.01` decode tok/s on the Xeon 4116, but fixed-excerpt PPL is
+  `20,074,699.9423`. That is a semantic/layout failure, not a publishable
+  quality result. The known-good row-scale packed result remains the older
+  patched `I2_S` prototype at PPL `38.8832`.
 - **TL2 is now a partial dense-Qwen engineering probe, not a product claim.**
   This fork can generate a Qwen2.5-0.5B TL2 GGUF only after exact
   model-specific TL2 code generation and a matching `BITNET_X86_TL2=ON`
@@ -219,6 +220,7 @@ same CPU family shown in the table.
 | Intel Xeon Silver 4116 | KL-only row-scale static ternary F16, dense tied `lm_head` | 3,395.5 | 38.8651 | 114.75 | 5.49 |
 | Intel Xeon Silver 4116 | KL-only row-scale static ternary TQ2_0, dense tied `lm_head` | 1,218.6 | 38.8224 | 169.46 | 18.68 |
 | Intel Xeon Silver 4116 | KL-only row-scale static ternary I2_S prototype, dense tied `lm_head` | 1,211.3 | 38.8832 | 218.17 | 18.97 |
+| Intel Xeon Silver 4116 | KL-only row-scale static ternary I2_SR candidate, dense tied `lm_head` | 1,211.3 | 2.007e7 | 212.10 | 19.01 |
 | AMD Ryzen Threadripper PRO 5945WX | KL-only static ternary I2_S, dense tied `lm_head` | 1,208.9 | 47.3435 | 464.19 | 45.50 |
 | AMD Ryzen Threadripper PRO 5945WX | KL-only row-scale static ternary TQ2_0, dense tied `lm_head` | 1,218.6 | 38.8224 | 345.32 | 44.85 |
 | AMD Ryzen Threadripper PRO 5945WX | KL-only row-scale static ternary I2_S, dense tied `lm_head` | 1,208.9 | 1.197e6 | 465.34 | 46.13 |
@@ -226,6 +228,9 @@ same CPU family shown in the table.
 The AMD row-scale `I2_S` row is the failed default layout result. The Xeon
 row-scale `I2_S` prototype row uses `patches/llama-i2s-row-scale.patch`, which
 changes the packed tensor layout to store one scale per output row.
+The Xeon `I2_SR` candidate row uses the separate-qtype patch, loads and runs,
+but fails quality badly; it should be treated as a direct-writer/runtime layout
+debug target rather than evidence that stable row-scale deployment is solved.
 The same patched row-scale `I2_S` artifact also passed a native AVX-512-enabled
 Xeon run at PPL `38.8853`, `207.35` prompt tok/s, and `18.37` decode tok/s;
 quality is preserved, but throughput did not beat the portable AVX2 build.

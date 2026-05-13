@@ -1,5 +1,5 @@
 {
-  "artifact_count": 64,
+  "artifact_count": 67,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "af3109405c34b006b1c68bfd87b698b4cd6775d2e2027d36e38594b52b3248f1",
-      "size_bytes": 48050
+      "sha256": "b9a753265ecaec66f9a26ce8718b03f8565157586835f60712c7d7b3b40ba333",
+      "size_bytes": 48495
     },
     {
       "exists": true,
@@ -25,8 +25,8 @@
       "label": "publishable_claims",
       "metrics": {},
       "path": "benchmarks/results/publishable_claims_2026-05-05.md",
-      "sha256": "9a01e43a68560b5bf627f19d794466625aeec8e6ecfc0edea3ac71948fb4cd29",
-      "size_bytes": 9726
+      "sha256": "96c4ec0e5a211158245ff2a92640dde7f6b7144fc78b8cd2cc9ab3f4c8455193",
+      "size_bytes": 9997
     },
     {
       "exists": true,
@@ -124,8 +124,17 @@
       "label": "row_scale_qtype_productization_gate_report",
       "metrics": {},
       "path": "benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md",
-      "sha256": "9562e31211113aa5d2725a8f01b61e7c6b1a171630216c58932aa13eeb885e8b",
-      "size_bytes": 2099
+      "sha256": "4d9ec58650d5d55401bb046157cc1c5e1b08525e7644df6704b085c76ab035d1",
+      "size_bytes": 2383
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2sr_qwen15b_candidate_report",
+      "metrics": {},
+      "path": "benchmarks/results/i2sr_qwen15b_candidate_2026-05-13.md",
+      "sha256": "84768020bf76563ae0d2949cc10fcbf8537f4cbb0d5daea7106102c7f3dad6b4",
+      "size_bytes": 2476
     },
     {
       "exists": true,
@@ -974,6 +983,59 @@
     },
     {
       "exists": true,
+      "kind": "direct_i2s_json",
+      "label": "i2sr_row_scale_qwen15b_conversion",
+      "metrics": {
+        "architecture": "Qwen2ForCausalLM",
+        "copied_tensors": 143,
+        "has_native_gguf_python_constants": null,
+        "has_native_i2s_gguf_python_constants": true,
+        "has_native_i2sr_gguf_python_constants": true,
+        "i2_sr_dtype": 40,
+        "mostly_i2_sr_file_type": 41,
+        "outfile_size_bytes": 1270157888,
+        "output_f16_tensors": 0,
+        "output_tensors": 339,
+        "row_scale_i2s_packed": 196,
+        "row_scale_prototype": false,
+        "row_scale_qtype": "i2_sr",
+        "row_scale_rejected": 0,
+        "ternary_i2s_packed": 196
+      },
+      "path": "benchmark_results/i2sr-row-scale-qwen15b-convert-2026-05-13/summary.json",
+      "sha256": "a2b6641a4a553293cae88ada3156c185db91b7334b9756064d16b0885ad335e9",
+      "size_bytes": 1495
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "i2sr_row_scale_qwen15b_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 19.009282,
+            "file_mib": 1211.3169555664062,
+            "kind": "static_ternary_i2sr_row_scale_candidate",
+            "name": "qwen15b_klonly_row_notie_static_ternary_i2_sr",
+            "ppl": 20074699.9423,
+            "prefill_tok_s": 212.095876
+          }
+        ],
+        "catastrophic_ppl": [
+          "qwen15b_klonly_row_notie_static_ternary_i2_sr"
+        ],
+        "catastrophic_ppl_threshold": 10000.0,
+        "failed": [],
+        "max_finite_ppl": 20074699.9423,
+        "nan_ppl": [],
+        "rows": 1
+      },
+      "path": "benchmark_results/i2sr-row-scale-qwen15b-suite-2026-05-13/summary.json",
+      "sha256": "d31d7de92fa12494e7c5afe513347bd9f5bca92a5dc4620f9e3ca223bc2311b6",
+      "size_bytes": 1670
+    },
+    {
+      "exists": true,
       "kind": "gguf_summary_json",
       "label": "direct_row_i2s_qwen05b_suite",
       "metrics": {
@@ -1220,18 +1282,20 @@
           "stable GGML row-scale qtype is defined",
           "stable llama file type is defined",
           "runtime routes stable qtype without changing I2_S",
-          "stable qtype benchmark evidence exists"
+          "stable qtype benchmark preserves quality"
         ],
-        "gates": 7,
+        "gates": 8,
         "has_ggml_stable_qtype": false,
         "has_llama_stable_ftype": false,
         "passed": false,
         "prototype_ratio": 1.0015661061655128,
-        "stable_benchmark_present": false
+        "stable_benchmark_max_ppl": 20074699.9423,
+        "stable_benchmark_present": true,
+        "stable_benchmark_quality_ok": false
       },
       "path": "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json",
-      "sha256": "cc961131c059a23d8cc6955379227f5a44e1c211ce11c09bea946761c2de5d74",
-      "size_bytes": 2654
+      "sha256": "35d29a51a6d17dae36e6bd9e01e6d58b479b8ae96d092d3308dcba2b6d88632d",
+      "size_bytes": 3181
     },
     {
       "exists": true,

@@ -54,21 +54,31 @@ Writer-smoke facts:
 The temporary GGUF was removed after the smoke test; the small summary is kept
 under `benchmark_results/i2sr-writer-smoke-2026-05-13/summary.json`.
 
+## Full 1.5B Follow-Up
+
+After this smoke test, the same patch was applied to the portable AVX2 build
+and the strong Qwen2.5-1.5B KL-only row-scale dense-`lm_head` checkpoint was
+converted with `--row-scale-qtype i2_sr`.
+
+| field | value |
+| --- | ---: |
+| packed row-scale tensors | `196` |
+| output tensors | `339` |
+| GGUF size | `1,270,157,888` bytes |
+| fixed-excerpt PPL | `20,074,699.9423` |
+| prompt throughput | `212.10` tok/s |
+| decode throughput | `19.01` tok/s |
+
+The artifact loads and runs, but quality is catastrophic. The known-good
+row-scale packed prototype on the same checkpoint reaches PPL `38.8832`, so
+this result points to a remaining semantic/layout mismatch in the direct
+`I2_SR` path. The detailed negative result is recorded in
+`benchmarks/results/i2sr_qwen15b_candidate_2026-05-13.md`.
+
 ## Current Status
 
-This is a real engineering step, but it is not yet a publishable quality claim.
-The productization gate still fails because the stable qtype is present as a
-candidate patch, not as the active vendored runtime, and there is no
-quality/throughput benchmark suite for an applied `I2_SR` artifact in the
-evidence manifest.
-
-Required next benchmark before any stronger claim:
-
-1. Apply `patches/llama-i2sr-row-scale-qtype.patch`.
-2. Rebuild the target `bitnet.cpp`/llama.cpp runtime.
-3. Emit the strong Qwen2.5-1.5B row-scale dense-head checkpoint with
-   `--row-scale-qtype i2_sr`.
-4. Run the same GGUF suite used for F16, `TQ2_0`, default `I2_S`, and the older
-   row-scale prototype.
-5. Compare PPL, smoke text, prompt throughput, decode throughput, RSS, and file
-   size against the existing row-scale `TQ2_0` and prototype `I2_S` rows.
+This is a real engineering step, but it is not a publishable quality claim.
+The productization gate still fails because the stable qtype is a candidate
+patch rather than the active vendored runtime, and the first full applied
+`I2_SR` artifact quality-fails. Required next work is layout-equivalence
+debugging against the known-good patched `llama-quantize` row-scale path.

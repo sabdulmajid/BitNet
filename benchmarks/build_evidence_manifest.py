@@ -44,6 +44,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "tl2_scale_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_scale_semantics_2026-05-05.md"},
     {"label": "i2s_row_scale_format_report", "kind": "tracked_report", "path": "benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md"},
     {"label": "row_scale_qtype_productization_gate_report", "kind": "tracked_report", "path": "benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md"},
+    {"label": "i2sr_qwen15b_candidate_report", "kind": "tracked_report", "path": "benchmarks/results/i2sr_qwen15b_candidate_2026-05-13.md"},
     {"label": "moe_report", "kind": "tracked_report", "path": "benchmarks/results/moe_support_audit_2026-05-05.md"},
     # Mechanical audits.
     {"label": "latest_nonrow_audit", "kind": "evidence_audit_md", "path": "benchmark_results/evidence_audit/latest_nonrow.md"},
@@ -86,6 +87,8 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "direct_i2s_qwen05b_suite", "kind": "gguf_summary_json", "path": "benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/summary.json"},
     {"label": "direct_row_i2s_qwen05b_conversion", "kind": "direct_i2s_json", "path": "benchmark_results/direct-row-i2s-qwen05b-2026-05-13/conversion_summary.json"},
     {"label": "i2sr_writer_smoke_qwen05b", "kind": "direct_i2s_json", "path": "benchmark_results/i2sr-writer-smoke-2026-05-13/summary.json"},
+    {"label": "i2sr_row_scale_qwen15b_conversion", "kind": "direct_i2s_json", "path": "benchmark_results/i2sr-row-scale-qwen15b-convert-2026-05-13/summary.json"},
+    {"label": "i2sr_row_scale_qwen15b_suite", "kind": "gguf_summary_json", "path": "benchmark_results/i2sr-row-scale-qwen15b-suite-2026-05-13/summary.json"},
     {"label": "direct_row_i2s_qwen05b_suite", "kind": "gguf_summary_json", "path": "benchmark_results/direct-row-i2s-qwen05b-portable-2026-05-13/summary.json"},
     {"label": "row_f16_qwen05b_suite", "kind": "gguf_summary_json", "path": "benchmark_results/row-f16-qwen05b-2026-05-13/summary.json"},
     {"label": "row_i2s_quantized_qwen05b_suite", "kind": "gguf_summary_json", "path": "benchmark_results/quantized-row-i2s-qwen05b-2026-05-13/summary.json"},
@@ -341,6 +344,8 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "has_llama_stable_ftype": observations.get("has_llama_stable_ftype"),
             "direct_writer_emits_stable_qtype": observations.get("direct_writer_emits_stable_qtype"),
             "stable_benchmark_present": observations.get("stable_benchmark_present"),
+            "stable_benchmark_quality_ok": observations.get("stable_benchmark_quality_ok"),
+            "stable_benchmark_max_ppl": observations.get("stable_benchmark_max_ppl"),
         }
     if kind == "math_json":
         aggregate = data.get("aggregate", {})
@@ -447,7 +452,9 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"passed={metrics.get('passed', '-')}, gates={metrics.get('gates', '-')}, "
                 f"failed={len(metrics.get('failed', []))}, "
                 f"stable_qtype={metrics.get('has_ggml_stable_qtype', '-')}, "
-                f"writer={metrics.get('direct_writer_emits_stable_qtype', '-')}"
+                f"writer={metrics.get('direct_writer_emits_stable_qtype', '-')}, "
+                f"stable_quality={metrics.get('stable_benchmark_quality_ok', '-')}, "
+                f"stable_max_ppl={fmt_metric(metrics.get('stable_benchmark_max_ppl'))}"
             )
         elif entry["kind"] == "math_json":
             summary = f"trials={metrics.get('trials', '-')}, rel_error={fmt_metric(metrics.get('relative_output_fro_error_mean'))}"
