@@ -227,6 +227,11 @@ The compact evidence manifest is tracked at
 hashes, sizes, existence checks, and parsed headline metrics for the cited
 artifacts; the current manifest has zero missing artifacts.
 
+The strongest row-scale QAT checkpoint now has tracked paired ten-task reports
+against both endpoints of the main verdict: it beats naive PTQ by macro delta
+`+0.150788` with paired 95% CI `[+0.053427, +0.248149]`, but remains below FP
+by `-0.144710` with paired 95% CI `[-0.185756, -0.103664]`.
+
 Key audited values:
 
 | artifact | audited value |
@@ -237,6 +242,10 @@ Key audited values:
 | Qwen2.5-1.5B KL-only QAT ten-task mean | 0.483438 |
 | Qwen2.5-1.5B KL-only dense-head ten-task mean | 0.484378 |
 | Qwen2.5-1.5B KL-only row-scale dense-head ten-task mean | 0.499459 |
+| Row-scale dense-head minus FP paired ten-task macro delta | -0.144710 |
+| Row-scale dense-head minus FP paired 95% CI | [-0.185756, -0.103664] |
+| Row-scale dense-head minus naive PTQ paired ten-task macro delta | +0.150788 |
+| Row-scale dense-head minus naive PTQ paired 95% CI | [+0.053427, +0.248149] |
 | Qwen2.5-1.5B KL-only dense-head WikiText PPL | 43.372 |
 | Qwen2.5-1.5B KL-only dense-head FineWeb-heldout PPL | 22.759 |
 | Qwen2.5-1.5B KL-only row-scale dense-head WikiText PPL | 38.580 |

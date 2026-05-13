@@ -1,7 +1,7 @@
 {
   "evidence_manifest": "benchmarks/results/evidence_manifest_2026-05-13.json",
-  "generated_utc": "2026-05-13T06:41:04+00:00",
-  "git_head": "f7805871be30",
+  "generated_utc": "2026-05-13T06:47:55+00:00",
+  "git_head": "99fa7642fc90",
   "groups": {
     "keep_by_default_model_artifacts": [
       {
@@ -234,7 +234,7 @@
   },
   "protected_counts": {
     "benchmark_manifest_paths": 31,
-    "evidence_manifest_files": 76,
+    "evidence_manifest_files": 78,
     "protected_checkpoint_dirs": 12
   },
   "protected_paths": [
@@ -308,6 +308,8 @@
     "benchmarks/results/i2sr_rss_2026-05-13.md",
     "benchmarks/results/i2sr_x86act_fix_2026-05-13.md",
     "benchmarks/results/moe_support_audit_2026-05-05.md",
+    "benchmarks/results/paired_row_densehead_minus_fp_2026-05-13.md",
+    "benchmarks/results/paired_row_densehead_minus_ptq_2026-05-13.md",
     "benchmarks/results/progress_audit_2026-05-05.md",
     "benchmarks/results/publishable_claims_2026-05-05.md",
     "benchmarks/results/qwen05b_tl2_probe_2026-05-05.md",

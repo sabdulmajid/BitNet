@@ -32,6 +32,8 @@ ARTIFACTS: list[dict[str, str]] = [
     # Tracked reports.
     {"label": "README", "kind": "tracked_report", "path": "README.md"},
     {"label": "side_by_side_report", "kind": "tracked_report", "path": "benchmarks/results/qwen_side_by_side_2026-05-05.md"},
+    {"label": "paired_row_minus_fp_report", "kind": "tracked_report", "path": "benchmarks/results/paired_row_densehead_minus_fp_2026-05-13.md"},
+    {"label": "paired_row_minus_ptq_report", "kind": "tracked_report", "path": "benchmarks/results/paired_row_densehead_minus_ptq_2026-05-13.md"},
     {"label": "publishable_claims", "kind": "tracked_report", "path": "benchmarks/results/publishable_claims_2026-05-05.md"},
     {"label": "progress_audit", "kind": "tracked_report", "path": "benchmarks/results/progress_audit_2026-05-05.md"},
     {"label": "active_goal_audit", "kind": "tracked_report", "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md"},

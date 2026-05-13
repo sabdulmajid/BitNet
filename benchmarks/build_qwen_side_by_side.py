@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 from pathlib import Path
 from typing import Any
 
@@ -71,6 +72,19 @@ HEADLINE_CPU_ROWS = [
 ]
 
 PRODUCTIZATION_GATE = "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json"
+
+PAIRED_DELTA_REPORTS = [
+    ("QAT row-scale minus FP", "benchmarks/results/paired_row_densehead_minus_fp_2026-05-13.md"),
+    ("QAT row-scale minus naive PTQ", "benchmarks/results/paired_row_densehead_minus_ptq_2026-05-13.md"),
+    (
+        "QAT row-scale minus tensor-scale dense lm_head",
+        "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/paired_row_densehead_minus_tensor_densehead.md",
+    ),
+    (
+        "QAT row-scale minus KL-only tensor-scale",
+        "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/paired_row_densehead_minus_klonly.md",
+    ),
+]
 
 
 def read_json(path: Path) -> dict[str, Any] | None:
@@ -259,6 +273,32 @@ def build_cpu_headline_table() -> str:
     return md_table(["artifact", "CPU", "file MiB", "PPL", "prefill tok/s", "decode tok/s", "quality status"], rows)
 
 
+def parse_paired_summary(path: Path) -> dict[str, str] | None:
+    if not path.exists():
+        return None
+    text = path.read_text(encoding="utf-8")
+    macro = re.search(r"\| macro mean delta \| ([^|]+) \|", text)
+    weighted = re.search(r"\| example-weighted delta \| ([^|]+) \|", text)
+    tasks = re.findall(r"^\| [a-z0-9_]+ \| [a-z_]+ \| ([0-9]+) \|", text, flags=re.MULTILINE)
+    return {
+        "macro": macro.group(1).strip() if macro else "-",
+        "weighted": weighted.group(1).strip() if weighted else "-",
+        "tasks": str(len(tasks)),
+        "matched": str(sum(int(value) for value in tasks)) if tasks else "-",
+    }
+
+
+def build_paired_delta_table() -> str:
+    rows: list[list[str]] = []
+    for label, path in PAIRED_DELTA_REPORTS:
+        summary = parse_paired_summary(Path(path))
+        if summary is None:
+            rows.append([label, "-", "-", "-", "missing"])
+            continue
+        rows.append([label, summary["macro"], summary["weighted"], summary["matched"], "present"])
+    return md_table(["comparison", "macro mean delta with 95% CI", "example-weighted delta", "matched examples", "status"], rows)
+
+
 def build_gguf_table() -> str:
     rows: list[list[str]] = []
     for suite_label, path in GGUF_SUMMARIES:
@@ -328,6 +368,8 @@ def main() -> None:
         build_lm_eval_table(),
         "## Full Ten-Task Detail",
         build_lm_eval_detail_table(),
+        "## Paired Ten-Task Delta Checks",
+        build_paired_delta_table(),
         "## Xeon Packed Runtime Headline",
         build_cpu_headline_table(),
         "## Packed GGUF CPU",

@@ -1,12 +1,14 @@
 # Evidence Manifest, 2026-05-13
-Artifacts: `76`. Missing: `0`.
+Artifacts: `78`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
 | README | tracked_report | yes | 49110 | 37e45f88c9de |  |
-| side_by_side_report | tracked_report | yes | 15428 | 2ace1d489711 |  |
-| publishable_claims | tracked_report | yes | 10262 | 351f254f8573 |  |
-| progress_audit | tracked_report | yes | 24310 | 0c92c45d4949 |  |
-| active_goal_audit | tracked_report | yes | 9843 | 8a4a13da9ebf |  |
+| side_by_side_report | tracked_report | yes | 16010 | 934726f28907 |  |
+| paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
+| paired_row_minus_ptq_report | tracked_report | yes | 1332 | 20a5aee1eb99 |  |
+| publishable_claims | tracked_report | yes | 10531 | d2da163fd608 |  |
+| progress_audit | tracked_report | yes | 24914 | 77cc8d90c35a |  |
+| active_goal_audit | tracked_report | yes | 10220 | 86477ceca75b |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2174 | d6e0c6ec52ec |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |

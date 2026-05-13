@@ -1,5 +1,5 @@
 {
-  "artifact_count": 76,
+  "artifact_count": 78,
   "entries": [
     {
       "exists": true,
@@ -16,8 +16,26 @@
       "label": "side_by_side_report",
       "metrics": {},
       "path": "benchmarks/results/qwen_side_by_side_2026-05-05.md",
-      "sha256": "2ace1d489711701b8c6c5e2feb018a028b78270b8b0da22c0bc6c8386461ec98",
-      "size_bytes": 15428
+      "sha256": "934726f28907d1e3b40763a2be8b2eea487acb54bfadfaef5c43f98f9bec991a",
+      "size_bytes": 16010
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "paired_row_minus_fp_report",
+      "metrics": {},
+      "path": "benchmarks/results/paired_row_densehead_minus_fp_2026-05-13.md",
+      "sha256": "21aa1b85402fd18ebbc925ef95cc0c089df6f6091d5a497a546594db4b4527d3",
+      "size_bytes": 1311
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "paired_row_minus_ptq_report",
+      "metrics": {},
+      "path": "benchmarks/results/paired_row_densehead_minus_ptq_2026-05-13.md",
+      "sha256": "20a5aee1eb9940fbe97256d1839f92ae990423c4b33927c3bf29bbc50dc02b4a",
+      "size_bytes": 1332
     },
     {
       "exists": true,
@@ -25,8 +43,8 @@
       "label": "publishable_claims",
       "metrics": {},
       "path": "benchmarks/results/publishable_claims_2026-05-05.md",
-      "sha256": "351f254f857318cacbfa3cdc1105c0841d3d820e38f7fec788080e97f602397e",
-      "size_bytes": 10262
+      "sha256": "d2da163fd608847b90e52e945c239b413c790349f08b6cdb1164abb95f557ffa",
+      "size_bytes": 10531
     },
     {
       "exists": true,
@@ -34,8 +52,8 @@
       "label": "progress_audit",
       "metrics": {},
       "path": "benchmarks/results/progress_audit_2026-05-05.md",
-      "sha256": "0c92c45d49491f929a566398543bebae5d2c9be9ecc2811e68b15f326441f923",
-      "size_bytes": 24310
+      "sha256": "77cc8d90c35a0b33094f70d2cbdecf54fba60f92aba687dab0ce3adfb72af506",
+      "size_bytes": 24914
     },
     {
       "exists": true,
@@ -43,8 +61,8 @@
       "label": "active_goal_audit",
       "metrics": {},
       "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md",
-      "sha256": "8a4a13da9ebf1fa27ec48f90514775d37f43b6a28f11ee00e4499821495d1245",
-      "size_bytes": 9843
+      "sha256": "86477ceca75bad40c91e72147969b514ed664416d8c1d5409d868a70aaad03c9",
+      "size_bytes": 10220
     },
     {
       "exists": true,

@@ -46,6 +46,15 @@ Generated from benchmark JSON artifacts. Missing rows are intentionally shown as
 | sciq | acc_norm | 0.934 | 0.199 | 0.613 | 0.695 | 0.700 | 0.733 |
 | truthfulqa_mc1 | acc | 0.305 | 0.220 | 0.241 | 0.241 | 0.233 | 0.261 |
 
+## Paired Ten-Task Delta Checks
+
+| comparison | macro mean delta with 95% CI | example-weighted delta | matched examples | status |
+| --- | --- | --- | --- | --- |
+| QAT row-scale minus FP | -0.144710 [-0.185756, -0.103664] | -0.195336 | 22382 | present |
+| QAT row-scale minus naive PTQ | +0.150788 [+0.053427, +0.248149] | +0.151506 | 22382 | present |
+| QAT row-scale minus tensor-scale dense lm_head | +0.015081 [+0.009028, +0.021134] | +0.016755 | 22382 | present |
+| QAT row-scale minus KL-only tensor-scale | +0.016021 [+0.006145, +0.025897] | +0.024975 | 22382 | present |
+
 ## Xeon Packed Runtime Headline
 
 | artifact | CPU | file MiB | PPL | prefill tok/s | decode tok/s | quality status |

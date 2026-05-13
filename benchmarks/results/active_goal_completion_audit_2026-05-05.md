@@ -31,7 +31,7 @@ expanding the evidence manifest.
 | Re-export repaired 1.5B from checkpoint state | complete | repaired step-5000 directory contains ternary state, `model.safetensors`, config, tokenizer files | none |
 | Fixed prompt suites for repaired 1.5B and 0.5B | complete as sanity check | `benchmark_results/generation/qwen15b_step5000_core_cpu_16tok.jsonl`; `benchmark_results/generation/qwen05b_step1000_core_cpu.jsonl` | prompt suites are sanity checks, not quality proof |
 | WikiText and FineWeb heldout perplexity | complete for cited dense-Qwen families | `benchmark_results/quality-*/*.json`; summarized in `benchmarks/results/qwen_side_by_side_2026-05-05.md` | broader corpora still optional future work |
-| HellaSwag/PIQA/ARC and broader lm-eval | complete for current ten selected tasks | `benchmark_results/lm-eval-qwen15b-full10`; `benchmark_results/lm-eval-qwen15b-klonly-full10`; `benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10` | not a full leaderboard suite |
+| HellaSwag/PIQA/ARC and broader lm-eval | complete for current ten selected tasks | `benchmark_results/lm-eval-qwen15b-full10`; `benchmark_results/lm-eval-qwen15b-klonly-full10`; `benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10`; paired row-scale reports `benchmarks/results/paired_row_densehead_minus_fp_2026-05-13.md` and `benchmarks/results/paired_row_densehead_minus_ptq_2026-05-13.md` | not a full leaderboard suite |
 | FP baseline | complete | FP PPL, ten-task lm-eval, GGUF F16/Q8/Q4 rows in side-by-side report | none for current dense-Qwen scope |
 | Naive PTQ baseline | complete | PTQ checkpoints and PPL/lm-eval files under `benchmark_results/quality-ptq-*` and `benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json` | none for current dense-Qwen scope |
 | llama.cpp Q4_K_M and Q8_0 baselines | complete for Qwen2.5-1.5B | GGUF summaries and RSS probe in `benchmark_results/gguf-*` and `benchmark_results/gguf-rss-qwen15b-row-i2s-fixed-2026-05-05` | none for current dense-Qwen scope |
@@ -55,6 +55,9 @@ measured recovery path:
 - blind FP/BF16-to-ternary PTQ fails mathematically and empirically;
 - QAT/distillation under ternary-forward constraints recovers significant
   quality but does not reach FP quality;
+- the strongest row-scale QAT checkpoint beats naive PTQ by paired ten-task
+  macro delta `+0.150788` with 95% CI `[+0.053427, +0.248149]`, but remains
+  below FP by `-0.144710` with 95% CI `[-0.185756, -0.103664]`;
 - row-wise scales and a dense tied `lm_head` are the strongest tested recipe;
 - a row-scale-aware `I2_S` prototype preserves row-scale quality and runs on
   commodity CPU;
