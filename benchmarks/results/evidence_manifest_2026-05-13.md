@@ -1,12 +1,12 @@
 # Evidence Manifest, 2026-05-13
-Artifacts: `61`. Missing: `0`.
+Artifacts: `63`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 47080 | 64d09cba47c1 |  |
+| README | tracked_report | yes | 47265 | 5f392b29b868 |  |
 | side_by_side_report | tracked_report | yes | 12803 | 1729d20a5d2a |  |
-| publishable_claims | tracked_report | yes | 9045 | 5d2ec28b422d |  |
-| progress_audit | tracked_report | yes | 20955 | 0aaf99659780 |  |
-| active_goal_audit | tracked_report | yes | 9129 | 837af7a23742 |  |
+| publishable_claims | tracked_report | yes | 9162 | 4f511348da26 |  |
+| progress_audit | tracked_report | yes | 21514 | b5598326ec90 |  |
+| active_goal_audit | tracked_report | yes | 9236 | ad83dd0dd2ed |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2063 | 8b12a3dc950e |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 5514 | 2c5a76508f7a |  |
@@ -15,6 +15,7 @@ Artifacts: `61`. Missing: `0`.
 | tl2_probe_report | tracked_report | yes | 3608 | dd7e4fa29cc1 |  |
 | tl2_scale_report | tracked_report | yes | 2321 | 30bbfbd22559 |  |
 | i2s_row_scale_format_report | tracked_report | yes | 1759 | 256abf73581c |  |
+| row_scale_qtype_productization_gate_report | tracked_report | yes | 2158 | 03bfdb019e95 |  |
 | moe_report | tracked_report | yes | 1882 | 342ac496a28d |  |
 | latest_nonrow_audit | evidence_audit_md | yes | 4396 | 6d8c31e958f1 |  |
 | row_notie_5000_audit | evidence_audit_md | yes | 2569 | 4615a642257d |  |
@@ -60,6 +61,7 @@ Artifacts: `61`. Missing: `0`.
 | tl2_shape_json | tl2_shape_json | yes | 12054 | a99430f0f4b0 |  |
 | tl2_scale_json | tl2_scale_json | yes | 14344 | bf2d36674b72 | qwen15b_tensor_scale err=0; qwen15b_row_scale err=1.90423 |
 | i2s_row_scale_format_json | i2s_format_json | yes | 1528 | e17297539b9d | default_ratio=30836.2, prototype_ratio=1.00157, stable_format_required=True |
+| row_scale_qtype_productization_gate_json | row_scale_qtype_gate_json | yes | 2729 | 1c9145ee3859 | passed=False, gates=7, failed=5, stable_qtype=False, writer=False |
 | tl2_generic_summary | gguf_summary_json | yes | 4494 | 306a682203b2 | rows=4, failed=2, nan=1, catastrophic=0, max_ppl=18.8044 |
 | tl2_avx512_summary | gguf_summary_json | yes | 4573 | 6ec820472f37 | rows=4, failed=0, nan=2, catastrophic=0, max_ppl=18.8239 |
 | ptq_math | math_json | yes | 14010 | 8cedd88658e0 | trials=10, rel_error=0.512542 |

@@ -94,6 +94,13 @@ The post-heap-fix row-scale `I2_S` quality confirmation is under
 mechanical audit is `benchmark_results/evidence_audit/qwen15b_row_i2s_heapfix.md`,
 which passes with one row, PPL `38.8832`, and no failed return codes.
 
+The row-scale qtype productization gate is tracked at
+`benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md`. It
+passes the feasibility gates (`1.001566` prototype/TQ2_0 PPL ratio and
+`30836.21` default/TQ2_0 failure ratio) but fails productization because the
+source tree has no separate row-scale GGML qtype, no separate llama file type,
+no stable-qtype direct writer, and no stable-qtype benchmark artifact.
+
 The packed GGUF RSS probe is tracked at
 `benchmarks/results/gguf_memory_2026-05-05.md`. Its mechanical audit is
 `benchmark_results/evidence_audit/qwen15b_row_i2s_rss.md`, which passes all six
@@ -264,6 +271,8 @@ Key audited values:
    compatibility policy, and regeneration of affected artifacts. The
    row-scale format audit shows the prototype currently overloads the existing
    `I2_S` type instead of defining a compatibility-safe row-scale qtype.
+   The productization gate now machine-checks this and fails until a stable
+   row-scale qtype, writer, and benchmark suite exist.
 2. Native quality-preserving direct packed GGUF writing from
    `ternary_state_dict.pt` is not complete. Static-ternary dense GGUF export
    now has two validated bridges, scalar direct `I2_S` export is loadable but

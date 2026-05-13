@@ -1,7 +1,7 @@
 {
   "evidence_manifest": "benchmarks/results/evidence_manifest_2026-05-13.json",
-  "generated_utc": "2026-05-13T04:46:22+00:00",
-  "git_head": "56649ab5cb0c",
+  "generated_utc": "2026-05-13T04:50:57+00:00",
+  "git_head": "1f47ec07c846",
   "groups": {
     "keep_by_default_model_artifacts": [
       {
@@ -234,7 +234,7 @@
   },
   "protected_counts": {
     "benchmark_manifest_paths": 27,
-    "evidence_manifest_files": 61,
+    "evidence_manifest_files": 63,
     "protected_checkpoint_dirs": 12
   },
   "protected_paths": [
@@ -284,6 +284,7 @@
     "benchmark_results/quantized-row-i2s-qwen05b-2026-05-13/summary.json",
     "benchmark_results/row-f16-qwen05b-2026-05-13/summary.json",
     "benchmark_results/row-tq2-qwen05b-2026-05-13/summary.json",
+    "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json",
     "benchmark_results/tl2_probe/qwen05b-bitnet-tl2.gguf",
     "benchmark_results/tl2_scale_semantics_2026-05-05.json",
     "benchmark_results/tl2_shape_support_audit_2026-05-05.json",
@@ -298,6 +299,7 @@
     "benchmarks/results/publishable_claims_2026-05-05.md",
     "benchmarks/results/qwen05b_tl2_probe_2026-05-05.md",
     "benchmarks/results/qwen_side_by_side_2026-05-05.md",
+    "benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md",
     "benchmarks/results/tl2_scale_semantics_2026-05-05.md",
     "benchmarks/results/tl2_shape_support_audit_2026-05-05.md",
     "checkpoints/qwen2.5-0.5b-fineweb-edu-12/step-1000",

@@ -43,6 +43,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "tl2_probe_report", "kind": "tracked_report", "path": "benchmarks/results/qwen05b_tl2_probe_2026-05-05.md"},
     {"label": "tl2_scale_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_scale_semantics_2026-05-05.md"},
     {"label": "i2s_row_scale_format_report", "kind": "tracked_report", "path": "benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md"},
+    {"label": "row_scale_qtype_productization_gate_report", "kind": "tracked_report", "path": "benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md"},
     {"label": "moe_report", "kind": "tracked_report", "path": "benchmarks/results/moe_support_audit_2026-05-05.md"},
     # Mechanical audits.
     {"label": "latest_nonrow_audit", "kind": "evidence_audit_md", "path": "benchmark_results/evidence_audit/latest_nonrow.md"},
@@ -92,6 +93,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "tl2_shape_json", "kind": "tl2_shape_json", "path": "benchmark_results/tl2_shape_support_audit_2026-05-05.json"},
     {"label": "tl2_scale_json", "kind": "tl2_scale_json", "path": "benchmark_results/tl2_scale_semantics_2026-05-05.json"},
     {"label": "i2s_row_scale_format_json", "kind": "i2s_format_json", "path": "benchmark_results/i2s_row_scale_format_audit_2026-05-13.json"},
+    {"label": "row_scale_qtype_productization_gate_json", "kind": "row_scale_qtype_gate_json", "path": "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json"},
     {"label": "tl2_generic_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json"},
     {"label": "tl2_avx512_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json"},
     {"label": "ptq_math", "kind": "math_json", "path": "benchmark_results/math_viability_gaussian_10trial_2026-05-05.json"},
@@ -319,6 +321,21 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "stable_new_format_required": verdict.get("stable_new_format_required"),
             "direct_ternary_gguf_writer_still_required": verdict.get("direct_ternary_gguf_writer_still_required"),
         }
+    if kind == "row_scale_qtype_gate_json":
+        gates = data.get("gates", [])
+        failed = [gate.get("name") for gate in gates if isinstance(gate, dict) and not gate.get("passed")]
+        observations = data.get("observations", {})
+        return {
+            "passed": data.get("passed"),
+            "gates": len(gates) if isinstance(gates, list) else None,
+            "failed": failed,
+            "prototype_ratio": observations.get("prototype_row_scale_i2s_to_tq2_ppl_ratio"),
+            "default_ratio": observations.get("default_row_scale_i2s_to_tq2_ppl_ratio"),
+            "has_ggml_stable_qtype": observations.get("has_ggml_stable_qtype"),
+            "has_llama_stable_ftype": observations.get("has_llama_stable_ftype"),
+            "direct_writer_emits_stable_qtype": observations.get("direct_writer_emits_stable_qtype"),
+            "stable_benchmark_present": observations.get("stable_benchmark_present"),
+        }
     if kind == "math_json":
         aggregate = data.get("aggregate", {})
         mean_abs = aggregate.get("mean_abs_ternary_repo_formula", {})
@@ -411,6 +428,13 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"default_ratio={fmt_metric(metrics.get('default_i2s_to_tq2_ppl_ratio'))}, "
                 f"prototype_ratio={fmt_metric(metrics.get('prototype_i2s_to_tq2_ppl_ratio'))}, "
                 f"stable_format_required={metrics.get('stable_new_format_required', '-')}"
+            )
+        elif entry["kind"] == "row_scale_qtype_gate_json":
+            summary = (
+                f"passed={metrics.get('passed', '-')}, gates={metrics.get('gates', '-')}, "
+                f"failed={len(metrics.get('failed', []))}, "
+                f"stable_qtype={metrics.get('has_ggml_stable_qtype', '-')}, "
+                f"writer={metrics.get('direct_writer_emits_stable_qtype', '-')}"
             )
         elif entry["kind"] == "math_json":
             summary = f"trials={metrics.get('trials', '-')}, rel_error={fmt_metric(metrics.get('relative_output_fro_error_mean'))}"
