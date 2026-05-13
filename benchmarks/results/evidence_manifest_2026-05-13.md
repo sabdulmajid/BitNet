@@ -30,7 +30,7 @@ Artifacts: `100`. Missing: `0`.
 | i2s_packing_layout_verify_report | tracked_report | yes | 1075 | c11acd561e3c |  |
 | i2sr_rss_report | tracked_report | yes | 1698 | cd21d1ee3435 |  |
 | moe_report | tracked_report | yes | 3986 | 0b076a359d76 |  |
-| moe_packing_contract_report | tracked_report | yes | 1558 | d28b768f1091 |  |
+| moe_packing_contract_report | tracked_report | yes | 1887 | f67484f46161 |  |
 | unblock_requirements_report | tracked_report | yes | 1851 | c0fc2e346271 |  |
 | i2sr_combined_patch | tracked_report | yes | 26764 | d02e20bd9e00 |  |
 | i2sr_root_runtime_patch | tracked_report | yes | 5408 | c4c30c8e2053 |  |
@@ -96,8 +96,8 @@ Artifacts: `100`. Missing: `0`.
 | objective_completion_audit_json | objective_completion_audit_json | yes | 14806 | 81dd93e8dab5 | achieved=False, status=not_complete, complete=7/9, open=2 |
 | product_scope_gate_json | product_scope_gate_json | yes | 3790 | 1ce6347c5fa5 | scope=research_mvp_only, supported=2, unsupported=5 |
 | i2sr_submodule_promotion_audit_json | i2sr_submodule_promotion_audit_json | yes | 3201 | 8bf5a4845054 | ready=False, active=False, patch_applies=True, submodule=1f86f058, blockers=4 |
-| moe_support_json | moe_support_json | yes | 5959 | 252978c41268 | present=5/5, gates=6, failed=4, kimi_artifacts=0 |
-| moe_packing_contract_json | moe_packing_contract_json | yes | 2084 | 290879d928f8 | ready=False, tl2_3d=False, i2sr_3d=True, control_2d=True, blockers=1 |
+| moe_support_json | moe_support_json | yes | 6883 | 5601f272909c | present=5/5, gates=6, failed=4, kimi_artifacts=0 |
+| moe_packing_contract_json | moe_packing_contract_json | yes | 2966 | 538939fcb10b | ready=False, tl2_3d=False, i2sr_3d=True, control_2d=True, layout=4/4, blockers=1 |
 | unblock_requirements_json | unblock_requirements_json | yes | 2196 | 2f2456be4305 | missing=5/5, can_continue=False, fork_reachable=False |
 | tl2_generic_summary | gguf_summary_json | yes | 4494 | 306a682203b2 | rows=4, failed=2, nan=1, catastrophic=0, max_ppl=18.8044 |
 | tl2_avx512_summary | gguf_summary_json | yes | 4573 | 6ec820472f37 | rows=4, failed=0, nan=2, catastrophic=0, max_ppl=18.8239 |

@@ -457,12 +457,16 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
     if kind == "moe_packing_contract_json":
         verdict = data.get("verdict", {})
         checks = data.get("checks", [])
+        layout_checks = [check for check in checks if isinstance(check, dict) and check.get("layout_verified") is not None]
+        layout_verified = [check for check in layout_checks if check.get("layout_verified") is True]
         return {
             "checks": len(checks) if isinstance(checks, list) else None,
             "moe_packing_ready": verdict.get("moe_packing_ready"),
             "tl2_3d": verdict.get("merged_3d_tl2_supported"),
             "i2sr_3d": verdict.get("merged_3d_i2s_i2sr_supported"),
             "dense_2d_control": verdict.get("dense_2d_i2s_control_supported"),
+            "layout_verified": len(layout_verified),
+            "layout_checks": len(layout_checks),
             "blockers": data.get("blockers", []),
         }
     if kind == "unblock_requirements_json":
@@ -643,6 +647,7 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"tl2_3d={metrics.get('tl2_3d', '-')}, "
                 f"i2sr_3d={metrics.get('i2sr_3d', '-')}, "
                 f"control_2d={metrics.get('dense_2d_control', '-')}, "
+                f"layout={metrics.get('layout_verified', '-')}/{metrics.get('layout_checks', '-')}, "
                 f"blockers={len(metrics.get('blockers', []))}"
             )
         elif entry["kind"] == "unblock_requirements_json":

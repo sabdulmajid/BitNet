@@ -259,8 +259,8 @@
       "label": "moe_packing_contract_report",
       "metrics": {},
       "path": "benchmarks/results/moe_packing_contract_2026-05-13.md",
-      "sha256": "d28b768f109106f0ea76d084abaea7ca61eda900c33fd3df2bc3f9d8ddd82f11",
-      "size_bytes": 1558
+      "sha256": "f67484f4616192a2a6a2063322e06471e3cefde0a7e0802c396db09ff5aebe8f",
+      "size_bytes": 1887
     },
     {
       "exists": true,
@@ -1750,8 +1750,8 @@
         "present_checks": 5
       },
       "path": "benchmark_results/moe_support_audit_2026-05-05.json",
-      "sha256": "252978c41268becddaabd23119d3ec5d70d7754a1a4bb9295bd78beb8f63100e",
-      "size_bytes": 5959
+      "sha256": "5601f272909c44808c05ffcc4c03758e217d30a560bdbfeee8c68ff82bc16405",
+      "size_bytes": 6883
     },
     {
       "exists": true,
@@ -1764,12 +1764,14 @@
         "checks": 5,
         "dense_2d_control": true,
         "i2sr_3d": true,
+        "layout_checks": 4,
+        "layout_verified": 4,
         "moe_packing_ready": false,
         "tl2_3d": false
       },
       "path": "benchmark_results/moe_packing_contract_2026-05-13.json",
-      "sha256": "290879d928f8ba1f0ce832118ec44ddb98625cdcb19a0689e708f9bf6cc66f6d",
-      "size_bytes": 2084
+      "sha256": "538939fcb10b3ba0764ef61abcb7e14b34a5aaddac9d7db0695baadbc1c93d22",
+      "size_bytes": 2966
     },
     {
       "exists": true,

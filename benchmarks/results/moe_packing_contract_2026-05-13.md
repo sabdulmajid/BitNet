@@ -1,16 +1,16 @@
 # MoE Packing Contract Audit, 2026-05-13
 
-This audit uses synthetic merged expert tensors with shape `[experts, out, in]` to test whether current dense ternary packers support MoE weight layout.
+This audit uses nonzero synthetic merged expert tensors with shape `[experts, out, in]` to test whether current dense ternary packers support MoE weight layout and byte order.
 
 ## Checks
 
-| check | accepted | error type | error | output shape | output bytes |
-| --- | --- | --- | --- | --- | --- |
-| tl2_merged_3d_expert | `false` | `ValueError` | `too many values to unpack (expected 2)` | `` | `` |
-| i2s_merged_3d_expert_codes | `true` | `` | `` | `[256]` | `256` |
-| i2s_merged_3d_expert_scalar | `true` | `` | `` | `[288]` | `288` |
-| i2sr_merged_3d_expert_row_scale | `true` | `` | `` | `[320]` | `320` |
-| i2s_2d_dense_control | `true` | `` | `` | `[128]` | `128` |
+| check | accepted | error type | error | output shape | output bytes | layout verified | output sha | expected sha | verification error |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| tl2_merged_3d_expert | `false` | `ValueError` | `too many values to unpack (expected 2)` | `` | `` | `n/a` | `` | `` | `` |
+| i2s_merged_3d_expert_codes | `true` | `` | `` | `[256]` | `256` | `true` | `6c6964433e63` | `6c6964433e63` | `` |
+| i2s_merged_3d_expert_scalar | `true` | `` | `` | `[288]` | `288` | `true` | `8c053b11af12` | `8c053b11af12` | `` |
+| i2sr_merged_3d_expert_row_scale | `true` | `` | `` | `[320]` | `320` | `true` | `3ee604fc95a7` | `3ee604fc95a7` | `` |
+| i2s_2d_dense_control | `true` | `` | `` | `[128]` | `128` | `true` | `67ac0ecbbc97` | `67ac0ecbbc97` | `` |
 
 ## Verdict
 
