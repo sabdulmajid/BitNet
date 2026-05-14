@@ -293,6 +293,17 @@ The monitor reads the latest
 log, queries `squeue` when available, and reports whether downstream metrics
 have materialized.
 
+To gate the exact MNLI/QNLI/SST2 reproduction target against the FP16-SFT
+baselines:
+
+```bash
+python benchmarks/gate_bitdistill_reproduction.py
+```
+
+The gate reports whether the paper-style tensor candidate and the row-scale
+candidate are complete and whether each is within the configured FP16-SFT
+accuracy gap. Missing long-warm-up outputs are treated as pending failures.
+
 To consolidate the inputs required before the remaining open claims can advance:
 
 ```bash
