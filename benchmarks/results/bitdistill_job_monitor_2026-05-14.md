@@ -6,7 +6,7 @@ Job tables: `/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/bitdistil
 
 | log | step | max steps | progress | latest CE | effective tokens | target tokens | ETA |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| /mnt/slurm_nfs/a6abdulm/projects/BitNet/logs/bitdistill-glue-9894.out | 1960 | 20000 | 0.098000 | 4.882624 | 16056320 | 163840000 | 9.12h |
+| /mnt/slurm_nfs/a6abdulm/projects/BitNet/logs/bitdistill-glue-9894.out | 2390 | 20000 | 0.119500 | 5.023254 | 19578880 | 163840000 | 8.91h |
 
 ## Downstream Jobs
 
