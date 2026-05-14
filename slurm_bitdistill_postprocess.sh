@@ -32,6 +32,10 @@ python benchmarks/audit_bitdistill_loss_scales.py \
   --output-json "benchmark_results/bitdistill_loss_scale_audit_${DATE}.json" \
   --output-md "benchmarks/results/bitdistill_loss_scale_audit_${DATE}.md"
 
+python benchmarks/audit_tl2_row_scale_runtime_contract.py \
+  --output-json "benchmark_results/tl2_row_scale_runtime_contract_${DATE}.json" \
+  --output-md "benchmarks/results/tl2_row_scale_runtime_contract_${DATE}.md"
+
 python benchmarks/summarize_bitdistill_variants.py \
   --roots \
     checkpoints/bitdistill-glue-seqcls \

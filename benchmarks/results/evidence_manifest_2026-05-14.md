@@ -1,23 +1,23 @@
 # Evidence Manifest, 2026-05-14
-Artifacts: `121`. Missing: `0`.
+Artifacts: `123`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 16302 | a35ae650c5fd |  |
+| README | tracked_report | yes | 16515 | 5dd6acb326b7 |  |
 | side_by_side_report | tracked_report | yes | 17129 | 4802f8068ba3 |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
 | paired_row_minus_ptq_report | tracked_report | yes | 1332 | 20a5aee1eb99 |  |
 | publishable_claims | tracked_report | yes | 11054 | 63c5e9babbc1 |  |
 | progress_audit | tracked_report | yes | 25612 | 74e3b96847bf |  |
 | active_goal_audit | tracked_report | yes | 10765 | 255dacfeae0a |  |
-| objective_completion_audit | tracked_report | yes | 5125 | 189d9c4dacd9 |  |
+| objective_completion_audit | tracked_report | yes | 5125 | 5c03e1a86c14 |  |
 | product_scope_gate | tracked_report | yes | 3928 | 20902739007d |  |
 | bitdistill_reproduction_status | tracked_report | yes | 8481 | 3f0e6a6abc2f |  |
 | bitdistill_reproduction_gate_report | tracked_report | yes | 5786 | 10cc824d730c |  |
-| bitdistill_paper_alignment_report | tracked_report | yes | 5819 | 735ce5e5f6f6 |  |
+| bitdistill_paper_alignment_report | tracked_report | yes | 5819 | f57da64f3ea6 |  |
 | bitdistill_loss_scale_report | tracked_report | yes | 6846 | 65816a5d56a5 |  |
 | bitdistill_cpu_gate_report | tracked_report | yes | 4007 | fe558c83ae1f |  |
 | bitdistill_i2sr_gate_report | tracked_report | yes | 3227 | cbba7847c611 |  |
-| bitdistill_job_monitor_report | tracked_report | yes | 5581 | c4dc8261c062 |  |
+| bitdistill_job_monitor_report | tracked_report | yes | 5581 | 10f6599bc904 |  |
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 2048 | 11fc209f78db |  |
@@ -30,6 +30,7 @@ Artifacts: `121`. Missing: `0`.
 | tl2_probe_report | tracked_report | yes | 3608 | dd7e4fa29cc1 |  |
 | tl2_scale_report | tracked_report | yes | 2321 | 30bbfbd22559 |  |
 | tl2_row_scale_design_report | tracked_report | yes | 4004 | fd035ed1fd6d |  |
+| tl2_row_scale_runtime_contract_report | tracked_report | yes | 4164 | 2ba383105ffc |  |
 | i2s_row_scale_format_report | tracked_report | yes | 1759 | 256abf73581c |  |
 | row_scale_qtype_productization_gate_report | tracked_report | yes | 2399 | cdfb84616ba1 |  |
 | row_scale_qtype_i2sr_active_patch_gate_report | tracked_report | yes | 2390 | 42acb39176cb |  |
@@ -100,6 +101,7 @@ Artifacts: `121`. Missing: `0`.
 | tl2_shape_json | tl2_shape_json | yes | 12054 | a99430f0f4b0 |  |
 | tl2_scale_json | tl2_scale_json | yes | 14344 | bf2d36674b72 | qwen15b_tensor_scale err=0; qwen15b_row_scale err=1.90423 |
 | tl2_row_scale_design_json | tl2_row_scale_design_json | yes | 29878 | 0fd577484ee8 | qwen15b_tensor_scale current=0, row_fp16=0.000175008, scaleMiB=1.52026; qwen15b_row_scale current=1.90423, row_fp16=0.000197446, scaleMiB=1.23047 |
+| tl2_row_scale_runtime_contract_json | tl2_row_scale_runtime_contract_json | yes | 4548 | a6e216b6a7e0 | ready=False, checks=7, failed=6, current=1.90423, row_fp16=0.000197446, scaleMiB=1.23047, bench_rows=0 |
 | i2s_row_scale_format_json | i2s_format_json | yes | 1528 | e17297539b9d | default_ratio=30836.2, prototype_ratio=1.00157, stable_format_required=True |
 | row_scale_qtype_productization_gate_json | row_scale_qtype_gate_json | yes | 3610 | 87f2e567d27c | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | row_scale_qtype_i2sr_active_patch_gate_json | row_scale_qtype_gate_json | yes | 3616 | cb42720567a1 | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
@@ -107,12 +109,12 @@ Artifacts: `121`. Missing: `0`.
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
 | benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5386 | 1c4f17cc5f51 | passed=True, checks=33, failed=0 |
-| objective_completion_audit_json | objective_completion_audit_json | yes | 15055 | b261f465adbe | achieved=False, status=not_complete, complete=7/9, open=2 |
+| objective_completion_audit_json | objective_completion_audit_json | yes | 15134 | cbd77c7e0d2c | achieved=False, status=not_complete, complete=7/9, open=2 |
 | product_scope_gate_json | product_scope_gate_json | yes | 4683 | e81e174ee842 | scope=research_mvp_only, supported=4, unsupported=4 |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 10456 | 8b57426d097d | present=13/24, paper_complete=False, paper_passed=False, row_complete=False, row_passed=False |
 | bitdistill_cpu_gate_json | bitdistill_cpu_gate_json | yes | 5949 | bf57042d5030 | passed=False, input=False, critical=0/21, blockers=1 |
 | bitdistill_i2sr_gate_json | bitdistill_i2sr_gate_json | yes | 4976 | 956d783c5645 | passed=False, complete=0/6, tasks=['mnli', 'qnli', 'sst2'], scales=['tensor', 'row'], blockers=4 |
-| bitdistill_job_monitor_json | bitdistill_job_monitor_json | yes | 34157 | 9ea78a7797bb | warmup=3900/20000, progress=0.195, ce=4.47512, snapshots=0, downstream=17 |
+| bitdistill_job_monitor_json | bitdistill_job_monitor_json | yes | 34156 | 5a888eb3ef18 | warmup=4950/20000, progress=0.2475, ce=4.12689, snapshots=0, downstream=17 |
 | bitdistill_loss_scale_json | bitdistill_loss_scale_json | yes | 22028 | 785e1591ed56 | rows=11/28, gamma=100000, projected_attn_ce=[837.539, 13035.1] |
 | i2sr_submodule_promotion_audit_json | i2sr_submodule_promotion_audit_json | yes | 3425 | 56ba835820a1 | ready=True, active=True, patch_applies=False, submodule=285decfe2, blockers=0 |
 | moe_support_json | moe_support_json | yes | 15462 | 03e744bf4cab | present=6/6, gates=7, failed=3, kimi_artifacts=0, tiny_qwen2moe=True |

@@ -54,7 +54,7 @@ with the active `i2sr-row-scale-runtime` branch.
 | Distillation/QAT can recover useful signal | **Yes, partially** | Best row-scale dense-Qwen run reaches ten-task mean `0.499459`, well above naive PTQ but below FP. |
 | Stable CPU row-scale packed inference exists for dense Qwen | **Yes, for the audited path** | `I2_SR` productization gate passes `9/9`; Xeon I2_SR PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
 | BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B short-budget GLUE3 sequence-classification runs remain 11.0-30.2 accuracy points below FP16-SFT. |
-| TL2 is ready for the best row-scale checkpoint | **No** | Current TL2 scale semantics cannot represent the learned row scales without row/group-scale metadata and kernels. |
+| TL2 is ready for the best row-scale checkpoint | **No** | Runtime contract gate fails: current TL2 one-scale error is `1.904230` relative output RMS; exact fp16 row scales would be `0.000197` with only `1.230469` MiB of scales, but converter/runtime/kernel metadata do not carry them. |
 | Kimi/MoE retrofit is proven | **No** | A tiny random Qwen2MoE FP16 fixture now passes converter/runtime smoke, but there is no Kimi mapping, trained MoE artifact, router distillation, ternary MoE quality, throughput, or expert-locality benchmark. |
 
 ## BitDistill Reproduction Status
@@ -280,6 +280,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Row-scale qtype productization gate](benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md)
 - [Direct packed GGUF support audit](benchmarks/results/direct_packed_gguf_support_2026-05-13.md)
 - [TL2 row-scale design audit](benchmarks/results/tl2_row_scale_design_2026-05-13.md)
+- [TL2 row-scale runtime contract](benchmarks/results/tl2_row_scale_runtime_contract_2026-05-14.md)
 - [MoE support audit](benchmarks/results/moe_support_audit_2026-05-14.md)
 - [Tiny Qwen2MoE runtime fixture](benchmarks/results/tiny_qwen2moe_fixture_2026-05-14.md)
 - [Unblock requirements audit](benchmarks/results/unblock_requirements_2026-05-14.md)

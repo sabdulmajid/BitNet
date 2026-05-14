@@ -1,5 +1,5 @@
 {
-  "artifact_count": 121,
+  "artifact_count": 123,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "a35ae650c5fd0b8815adba16976f981f132ea6c23db8d18665415f98a89e119e",
-      "size_bytes": 16302
+      "sha256": "5dd6acb326b735d97b68b485f0e27a9e31e33f3b6c55dee686f260191077f063",
+      "size_bytes": 16515
     },
     {
       "exists": true,
@@ -70,7 +70,7 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-14.md",
-      "sha256": "189d9c4dacd9c8b827d60db2ac24344447854bc304116aae145026e563069e71",
+      "sha256": "5c03e1a86c14440ff976b791617f21e74ddaba688b36ff487d6dfd58469b18b0",
       "size_bytes": 5125
     },
     {
@@ -106,7 +106,7 @@
       "label": "bitdistill_paper_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_paper_alignment_2026-05-14.md",
-      "sha256": "735ce5e5f6f63a409785d027e36b8cb9cfa14687f7e14cd30c2426df77f6b336",
+      "sha256": "f57da64f3ea648960d3bfe23bee75fcdceaf6ac29ce4a71a8f1285f20ff554a5",
       "size_bytes": 5819
     },
     {
@@ -142,7 +142,7 @@
       "label": "bitdistill_job_monitor_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_job_monitor_2026-05-14.md",
-      "sha256": "c4dc8261c062ddf33430446944fd67b80f3691826a4033bd26ba66c98a4af808",
+      "sha256": "10f6599bc904faa1550ab9bb35c660bc9d622f62567ae10b2ce6341eb7e38cce",
       "size_bytes": 5581
     },
     {
@@ -252,6 +252,15 @@
       "path": "benchmarks/results/tl2_row_scale_design_2026-05-13.md",
       "sha256": "fd035ed1fd6dbda71a473810567368e24bc7be3738ad665d8d0d47677ecdd71e",
       "size_bytes": 4004
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "tl2_row_scale_runtime_contract_report",
+      "metrics": {},
+      "path": "benchmarks/results/tl2_row_scale_runtime_contract_2026-05-14.md",
+      "sha256": "2ba383105ffc5627673a943bdaae5519a83e62c3f39f588de489486aa2da5b02",
+      "size_bytes": 4164
     },
     {
       "exists": true,
@@ -1684,6 +1693,31 @@
     },
     {
       "exists": true,
+      "kind": "tl2_row_scale_runtime_contract_json",
+      "label": "tl2_row_scale_runtime_contract_json",
+      "metrics": {
+        "checks": 7,
+        "current_tl2_tensor_max_error": 1.9042302114103853,
+        "failed": [
+          "Existing TL2 one-scale error is below product threshold",
+          "TL2 converter accepts learned row/group scale metadata",
+          "TL2 converter no longer recomputes one scalar max scale",
+          "ggml TL2 storage accounts for row/group-scale sidecar",
+          "TL2 transform metadata is row/group-scale aware",
+          "Row-scale TL2 has quality and speed benchmark evidence"
+        ],
+        "ready": false,
+        "row_fp16_error": 0.00019744640689756221,
+        "row_fp16_scale_mib": 1.23046875,
+        "row_scale_tl2_finite_quality_rows": 0,
+        "row_scale_tl2_rows": 0
+      },
+      "path": "benchmark_results/tl2_row_scale_runtime_contract_2026-05-14.json",
+      "sha256": "a6e216b6a7e0a1f3da7be50d2c114acff3662c3c4180375443f2f559b966d13c",
+      "size_bytes": 4548
+    },
+    {
+      "exists": true,
       "kind": "i2s_format_json",
       "label": "i2s_row_scale_format_json",
       "metrics": {
@@ -1825,8 +1859,8 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-14.json",
-      "sha256": "b261f465adbe7dbd19ddfb22f1961e147dcd86fe557e2fde1b7153b122298605",
-      "size_bytes": 15055
+      "sha256": "cbd77c7e0d2c1cc3b3649901ca284001bc2da9e245a0535e0f6d5583da799e79",
+      "size_bytes": 15134
     },
     {
       "exists": true,
@@ -1919,16 +1953,16 @@
         "downstream_states": [
           "PENDING"
         ],
-        "warmup_latest_ce": 4.475124,
+        "warmup_latest_ce": 4.12689,
         "warmup_max_steps": 20000,
-        "warmup_progress": 0.195,
+        "warmup_progress": 0.2475,
         "warmup_save_every_steps": 0,
         "warmup_snapshots": 0,
-        "warmup_step": 3900
+        "warmup_step": 4950
       },
       "path": "benchmark_results/bitdistill_job_monitor_2026-05-14.json",
-      "sha256": "9ea78a7797bb30adf5ca2c987e0e5b952f44523d82e5a3b9d96998ce8cf12cdb",
-      "size_bytes": 34157
+      "sha256": "5a888eb3ef18f954c14cc80602a66c84bcb89299678433e2bcaef52dacd6b7ee",
+      "size_bytes": 34156
     },
     {
       "exists": true,
