@@ -1,5 +1,5 @@
 {
-  "artifact_count": 135,
+  "artifact_count": 137,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "74d43711c7d8254a4dffc4caa68edd2ff26a7eda8aec1476a34548db6be87061",
-      "size_bytes": 16797
+      "sha256": "0cc843c71da68c0e951381504452b0f24410715e1e9dccfd61be9ed0b58b431a",
+      "size_bytes": 16892
     },
     {
       "exists": true,
@@ -157,6 +157,15 @@
     {
       "exists": true,
       "kind": "tracked_report",
+      "label": "bitdistill_warmup_health_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_warmup_health_2026-05-14.md",
+      "sha256": "9d2b0c1c29ed25c277c3ddcb03e37b66fe3219921a0d1247e54dc17f05c70c94",
+      "size_bytes": 1315
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
       "label": "bitdistill_job_matrix_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_job_matrix_audit_2026-05-14.md",
@@ -232,7 +241,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-14.md",
-      "sha256": "e20c86d30cf3a4a23eecd18e73ab179ab4faf3d7c1f5e16b7ba04ecd5cf39d6f",
+      "sha256": "bf235868b497d3c83b760903e6c053cf2e8f9892638b0b30f717a5ec6227d9fd",
       "size_bytes": 2937
     },
     {
@@ -1895,7 +1904,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-14.json",
-      "sha256": "37ed794295fd84f2e01dc4d334678d4a5d11a168f541903a0af45b7066f0e33c",
+      "sha256": "4adf3fdc74ed2d4e6f076a7a1fa198a0feafe555c55037e44fc1e3b048846c7a",
       "size_bytes": 5488
     },
     {
@@ -2043,6 +2052,29 @@
       "path": "benchmark_results/bitdistill_dependency_graph_2026-05-14.json",
       "sha256": "3ad2595c0e1c5901907bc4c1b8ee4d90b725a6ac381b56fd4f93718997f3ce8f",
       "size_bytes": 14869
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_warmup_health_json",
+      "label": "bitdistill_warmup_health_json",
+      "metrics": {
+        "checks": 8,
+        "eta_seconds": 22681.16604774536,
+        "failed": 0,
+        "final_state_exists": false,
+        "last_ce_mean": 4.36947346,
+        "latest_ce": 4.452291,
+        "max_steps": 20000,
+        "passed": true,
+        "progress": 0.377,
+        "seconds_per_step": 1.820318302387268,
+        "snapshot_count": 0,
+        "step": 7540,
+        "warnings": 1
+      },
+      "path": "benchmark_results/bitdistill_warmup_health_2026-05-14.json",
+      "sha256": "4c151a105ab2b3c4fde47af2604ff996e4f2ceed7c9a03cd551f9e27c1d1d465",
+      "size_bytes": 3916
     },
     {
       "exists": true,

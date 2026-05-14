@@ -24,6 +24,10 @@ python benchmarks/audit_bitdistill_dependency_graph.py \
   --output-json "benchmark_results/bitdistill_dependency_graph_${DATE}.json" \
   --output-md "benchmarks/results/bitdistill_dependency_graph_${DATE}.md"
 
+python benchmarks/audit_bitdistill_warmup_health.py \
+  --output-json "benchmark_results/bitdistill_warmup_health_${DATE}.json" \
+  --output-md "benchmarks/results/bitdistill_warmup_health_${DATE}.md"
+
 python benchmarks/audit_bitdistill_job_matrix.py \
   --monitor-json "benchmark_results/bitdistill_job_monitor_${DATE}.json" \
   --output-json "benchmark_results/bitdistill_job_matrix_audit_${DATE}.json" \

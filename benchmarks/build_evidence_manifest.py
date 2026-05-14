@@ -49,6 +49,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "bitdistill_i2sr_gate_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_i2sr_export_gate_{DATE}.md"},
     {"label": "bitdistill_job_monitor_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_job_monitor_{DATE}.md"},
     {"label": "bitdistill_dependency_graph_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_dependency_graph_{DATE}.md"},
+    {"label": "bitdistill_warmup_health_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_warmup_health_{DATE}.md"},
     {"label": "bitdistill_job_matrix_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_job_matrix_audit_{DATE}.md"},
     {"label": "bitdistill_active_goal_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_active_goal_audit_{DATE}.md"},
     {"label": "bitdistill_smoke_contract_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_smoke_contract_{DATE}.md"},
@@ -156,6 +157,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "bitdistill_i2sr_gate_json", "kind": "bitdistill_i2sr_gate_json", "path": f"benchmark_results/bitdistill_i2sr_export_gate_{DATE}.json"},
     {"label": "bitdistill_job_monitor_json", "kind": "bitdistill_job_monitor_json", "path": f"benchmark_results/bitdistill_job_monitor_{DATE}.json"},
     {"label": "bitdistill_dependency_graph_json", "kind": "bitdistill_dependency_graph_json", "path": f"benchmark_results/bitdistill_dependency_graph_{DATE}.json"},
+    {"label": "bitdistill_warmup_health_json", "kind": "bitdistill_warmup_health_json", "path": f"benchmark_results/bitdistill_warmup_health_{DATE}.json"},
     {"label": "bitdistill_job_matrix_json", "kind": "bitdistill_job_matrix_json", "path": f"benchmark_results/bitdistill_job_matrix_audit_{DATE}.json"},
     {"label": "bitdistill_active_goal_json", "kind": "bitdistill_active_goal_json", "path": f"benchmark_results/bitdistill_active_goal_audit_{DATE}.json"},
     {"label": "bitdistill_smoke_contract_json", "kind": "bitdistill_smoke_contract_json", "path": f"benchmark_results/bitdistill_smoke_contract_{DATE}.json"},
@@ -569,6 +571,23 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "warnings": data.get("warnings", []),
             "blockers": data.get("blockers", []),
         }
+    if kind == "bitdistill_warmup_health_json":
+        latest = data.get("latest_step", {}) if isinstance(data.get("latest_step"), dict) else {}
+        return {
+            "passed": data.get("passed"),
+            "checks": len(data.get("checks", [])) if isinstance(data.get("checks"), list) else None,
+            "failed": len(data.get("failed", [])) if isinstance(data.get("failed"), list) else None,
+            "warnings": len(data.get("warnings", [])) if isinstance(data.get("warnings"), list) else None,
+            "step": latest.get("step"),
+            "max_steps": data.get("max_steps"),
+            "progress": data.get("progress"),
+            "latest_ce": latest.get("ce"),
+            "last_ce_mean": (data.get("last_window") or {}).get("mean"),
+            "seconds_per_step": data.get("seconds_per_step"),
+            "eta_seconds": data.get("eta_seconds"),
+            "snapshot_count": data.get("snapshot_count"),
+            "final_state_exists": data.get("final_state_exists"),
+        }
     if kind == "bitdistill_job_matrix_json":
         return {
             "passed": data.get("passed"),
@@ -937,6 +956,17 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"warmup={metrics.get('warmup_step', '-')}/{metrics.get('warmup_max_steps', '-')}, "
                 f"warnings={len(metrics.get('warnings', [])) if isinstance(metrics.get('warnings'), list) else '-'}, "
                 f"blockers={len(metrics.get('blockers', [])) if isinstance(metrics.get('blockers'), list) else '-'}"
+            )
+        elif entry["kind"] == "bitdistill_warmup_health_json":
+            summary = (
+                f"passed={metrics.get('passed', '-')}, "
+                f"checks={metrics.get('checks', '-')}, failed={metrics.get('failed', '-')}, "
+                f"warnings={metrics.get('warnings', '-')}, "
+                f"warmup={metrics.get('step', '-')}/{metrics.get('max_steps', '-')}, "
+                f"progress={fmt_metric(metrics.get('progress'))}, "
+                f"ce={fmt_metric(metrics.get('latest_ce'))}, "
+                f"sec_step={fmt_metric(metrics.get('seconds_per_step'))}, "
+                f"snapshots={metrics.get('snapshot_count', '-')}"
             )
         elif entry["kind"] == "bitdistill_job_matrix_json":
             summary = (
