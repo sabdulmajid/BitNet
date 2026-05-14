@@ -5,12 +5,14 @@ from __future__ import annotations
 
 import argparse
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
 TASKS = ["mnli", "qnli", "sst2"]
 METHOD_ORDER = ["fp16_sft", "bitnet_sft", "bitdistill_tensor", "bitdistill_row"]
+DATE = datetime.now(timezone.utc).date().isoformat()
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -19,23 +21,25 @@ def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def find_metrics(root: Path, model: str, task: str, method: str, scale: str) -> dict[str, Any]:
-    path = root / model.replace("/", "-") / task / f"{method}-{scale}-layer-1" / "metrics.json"
+def find_metrics(root: Path, model: str, task: str, template: str) -> dict[str, Any]:
+    path = root / model.replace("/", "-") / task / template / "metrics.json"
     data = read_json(path)
     return {"path": str(path), "exists": bool(data), "data": data}
 
 
 def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     rows: list[dict[str, Any]] = []
+    fp_root = args.fp_root or args.root
+    bitnet_root = args.bitnet_root or args.root
     for task in args.tasks:
         specs = [
-            ("fp16_sft", "fp16_sft", "tensor"),
-            ("bitnet_sft", "bitnet_sft", "tensor"),
-            ("bitdistill_tensor", "bitdistill", "tensor"),
-            ("bitdistill_row", "bitdistill", "row"),
+            ("fp16_sft", fp_root, args.fp_template, "tensor"),
+            ("bitnet_sft", bitnet_root, args.bitnet_template, "tensor"),
+            ("bitdistill_tensor", args.root, args.bitdistill_tensor_template, "tensor"),
+            ("bitdistill_row", args.root, args.bitdistill_row_template, "row"),
         ]
-        for label, method, scale in specs:
-            item = find_metrics(args.root, args.model, task, method, scale)
+        for label, root, template, scale in specs:
+            item = find_metrics(root, args.model, task, template)
             data = item["data"]
             eval_metrics = data.get("eval", {}) if isinstance(data.get("eval"), dict) else {}
             last = data.get("last", {}) if isinstance(data.get("last"), dict) else {}
@@ -108,9 +112,18 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         )
     return {
         "schema": "bitdistill-glue-summary-v1",
+        "date": DATE,
         "root": str(args.root),
+        "fp_root": str(fp_root),
+        "bitnet_root": str(bitnet_root),
         "model": args.model,
         "tasks": args.tasks,
+        "templates": {
+            "fp16_sft": args.fp_template,
+            "bitnet_sft": args.bitnet_template,
+            "bitdistill_tensor": args.bitdistill_tensor_template,
+            "bitdistill_row": args.bitdistill_row_template,
+        },
         "max_fp_gap": args.max_fp_gap,
         "rows": rows,
         "verdicts": verdicts,
@@ -174,8 +187,9 @@ def render_markdown(summary: dict[str, Any]) -> str:
     ]
     return "\n\n".join(
         [
-            "# BitDistill GLUE Summary, 2026-05-14",
+            f"# BitDistill GLUE Summary, {summary.get('date', DATE)}",
             f"Model: `{summary['model']}`.",
+            f"Root: `{summary['root']}`. FP root: `{summary['fp_root']}`. BitNet root: `{summary['bitnet_root']}`.",
             f"Overall threshold pass: `{summary['passed']}` with max FP gap `{summary['max_fp_gap']}`.",
             "## Metrics",
             md_table(
@@ -213,11 +227,17 @@ def render_markdown(summary: dict[str, Any]) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path("checkpoints/bitdistill-glue"))
+    parser.add_argument("--fp-root", type=Path, default=None)
+    parser.add_argument("--bitnet-root", type=Path, default=None)
     parser.add_argument("--model", default="Qwen/Qwen2.5-0.5B")
     parser.add_argument("--tasks", nargs="+", default=TASKS, choices=TASKS)
     parser.add_argument("--max-fp-gap", type=float, default=0.01)
-    parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/bitdistill_glue_summary_2026-05-14.json"))
-    parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/bitdistill_glue_summary_2026-05-14.md"))
+    parser.add_argument("--fp-template", default="fp16_sft-tensor-layer-1")
+    parser.add_argument("--bitnet-template", default="bitnet_sft-tensor-layer-1")
+    parser.add_argument("--bitdistill-tensor-template", default="bitdistill-tensor-layer-1")
+    parser.add_argument("--bitdistill-row-template", default="bitdistill-row-layer-1")
+    parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_glue_summary_{DATE}.json"))
+    parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/bitdistill_glue_summary_{DATE}.md"))
     args = parser.parse_args()
 
     summary = build_summary(args)

@@ -10,11 +10,13 @@ from __future__ import annotations
 
 import argparse
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
 TASKS = ["mnli", "qnli", "sst2"]
+DATE = datetime.now(timezone.utc).date().isoformat()
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -165,9 +167,9 @@ def main() -> None:
     parser.add_argument("--fp-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls"))
     parser.add_argument("--model", default="Qwen/Qwen2.5-0.5B")
     parser.add_argument("--tasks", nargs="+", choices=TASKS, default=TASKS)
-    parser.add_argument("--title", default="BitDistill Variant Summary, 2026-05-14")
-    parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/bitdistill_variant_summary_2026-05-14.json"))
-    parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/bitdistill_variant_summary_2026-05-14.md"))
+    parser.add_argument("--title", default=f"BitDistill Variant Summary, {DATE}")
+    parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_variant_summary_{DATE}.json"))
+    parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/bitdistill_variant_summary_{DATE}.md"))
     args = parser.parse_args()
 
     rows = discover_rows(args)

@@ -1,5 +1,5 @@
 {
-  "artifact_count": 123,
+  "artifact_count": 129,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "5dd6acb326b735d97b68b485f0e27a9e31e33f3b6c55dee686f260191077f063",
-      "size_bytes": 16515
+      "sha256": "426923a76965c96cc8dbe0c4400faf50dd5425ce42edb003bb049148c3763519",
+      "size_bytes": 16701
     },
     {
       "exists": true,
@@ -106,7 +106,7 @@
       "label": "bitdistill_paper_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_paper_alignment_2026-05-14.md",
-      "sha256": "8e867c796b1dc67216324703772db8f13e319ba22c8d31f6f72e09d5d7ac89ae",
+      "sha256": "e94c4115eb00b20a22bc23a51c0c09de2f151578006b1f7f4062cb762eb3f13a",
       "size_bytes": 5819
     },
     {
@@ -142,8 +142,35 @@
       "label": "bitdistill_job_monitor_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_job_monitor_2026-05-14.md",
-      "sha256": "1c6b9f7f442c80ce54d41ab941d9f22682565ec17501a291e680e35eff08953c",
+      "sha256": "b501c22f71c0c26a29d3ac757d281736855a4b6486c176eb6da872b93410711b",
       "size_bytes": 5755
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_dependency_graph_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_dependency_graph_2026-05-14.md",
+      "sha256": "8cef4df81fd670a9e4b4f48e6579d53527c017350c7c5d49b439470111142909",
+      "size_bytes": 5927
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_variant_summary_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_variant_summary_2026-05-14.md",
+      "sha256": "3d50206548217f425cc02e478ed7d1a1046546e6b9e5fdf674850e4c53fbd0cd",
+      "size_bytes": 8218
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_causal_longwarmup_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_causal_longwarmup_densehead_summary_2026-05-14.md",
+      "sha256": "cd7036ae78d9a1f8dbd13b3a1ce139c8fe5eb4d9933b569d3e3e0b7e4c5bac32",
+      "size_bytes": 3592
     },
     {
       "exists": true,
@@ -177,9 +204,9 @@
       "kind": "tracked_report",
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
-      "path": "benchmarks/results/benchmark_coverage_gate_2026-05-13.md",
-      "sha256": "4f0869dd21c41c864f6af0bdf746a6cc5e4b858364dd807598d74bf70208be53",
-      "size_bytes": 2859
+      "path": "benchmarks/results/benchmark_coverage_gate_2026-05-14.md",
+      "sha256": "cdc41009abfef3a598906afcc86a3dc68dc3faec4903c9fbc7fd1d80f57c72b0",
+      "size_bytes": 2937
     },
     {
       "exists": true,
@@ -1840,9 +1867,9 @@
         "failed": [],
         "passed": true
       },
-      "path": "benchmark_results/benchmark_coverage_gate_2026-05-13.json",
-      "sha256": "1c4f17cc5f51f8e8cec73e84f4bb0b04046a9d3f5501189649da74c317a8c483",
-      "size_bytes": 5386
+      "path": "benchmark_results/benchmark_coverage_gate_2026-05-14.json",
+      "sha256": "5dbfd0a87dd4270d26333d0742a19dd0e5da8e8ccb5456b90242bf78c4ca49dd",
+      "size_bytes": 5488
     },
     {
       "exists": true,
@@ -1859,8 +1886,8 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-14.json",
-      "sha256": "cbd77c7e0d2c1cc3b3649901ca284001bc2da9e245a0535e0f6d5583da799e79",
-      "size_bytes": 15134
+      "sha256": "61d9714884c520e03bd2dc826f37bd899c8850e6147588780200f22e05681098",
+      "size_bytes": 15218
     },
     {
       "exists": true,
@@ -1953,19 +1980,88 @@
         "downstream_states": [
           "PENDING"
         ],
-        "warmup_latest_ce": 4.365892,
+        "warmup_latest_ce": 4.057357,
         "warmup_max_steps": 20000,
-        "warmup_progress": 0.252,
+        "warmup_progress": 0.2925,
         "warmup_save_every_steps": 0,
         "warmup_snapshots": 0,
-        "warmup_step": 5040,
+        "warmup_step": 5850,
         "warmup_warnings": [
           "Stage-2 warm-up is running without intermediate snapshots; if the job fails, progress before final save is not recoverable."
         ]
       },
       "path": "benchmark_results/bitdistill_job_monitor_2026-05-14.json",
-      "sha256": "e724a126a17b3a73b4ba1d89eaae77e59eba556f5d8f16eb08c15f6e88d09852",
-      "size_bytes": 34312
+      "sha256": "4e8aac1606d78d5f628d85e86004547a9df48bede7b2cea81664b42da32ee909",
+      "size_bytes": 34315
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_dependency_graph_json",
+      "label": "bitdistill_dependency_graph_json",
+      "metrics": {
+        "active_rows": 17,
+        "blockers": [],
+        "checks": 4,
+        "deduped_rows": 17,
+        "failed": 0,
+        "raw_rows": 29,
+        "ready": true,
+        "warmup_max_steps": 20000,
+        "warmup_step": 5850,
+        "warnings": [
+          "11 output directories appear in multiple historical submission tables; audit uses the latest row per output directory.",
+          "Warm-up final state is expectedly absent until Stage-2 finishes; downstream jobs are correctly dependency-blocked."
+        ]
+      },
+      "path": "benchmark_results/bitdistill_dependency_graph_2026-05-14.json",
+      "sha256": "fe70f4d437add867fe48f06473fe27ffa768df30750526c5965eb357801029b0",
+      "size_bytes": 13935
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_variant_summary_json",
+      "label": "bitdistill_variant_summary_json",
+      "metrics": {
+        "materialized_rows": 21,
+        "roots": [
+          "checkpoints/bitdistill-glue-seqcls",
+          "checkpoints/bitdistill-glue-seqcls-paperlogit",
+          "checkpoints/bitdistill-glue-seqcls-ablate",
+          "checkpoints/bitdistill-glue-seqcls-longwarmup",
+          "checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma",
+          "checkpoints/bitdistill-glue-seqcls-longwarmup-gamma1k",
+          "checkpoints/bitdistill-glue-seqcls-longwarmup-gamma10k"
+        ],
+        "rows": 21,
+        "tasks": [
+          "mnli",
+          "qnli",
+          "sst2"
+        ]
+      },
+      "path": "benchmark_results/bitdistill_variant_summary_2026-05-14.json",
+      "sha256": "ab26e5610a5a13667f28f4aa2bbfa6866d9979212305e26bf6f7ac8e4bfde9db",
+      "size_bytes": 18545
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_causal_summary_json",
+      "label": "bitdistill_causal_longwarmup_json",
+      "metrics": {
+        "materialized_rows": 6,
+        "passed": false,
+        "passed_verdicts": 0,
+        "rows": 12,
+        "tasks": [
+          "mnli",
+          "qnli",
+          "sst2"
+        ],
+        "verdicts": 3
+      },
+      "path": "benchmark_results/bitdistill_causal_longwarmup_densehead_summary_2026-05-14.json",
+      "sha256": "a229947af0e517db23a83f67be17ed0f96bae9ac7117e59a4b88d24b06b1902b",
+      "size_bytes": 11519
     },
     {
       "exists": true,

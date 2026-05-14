@@ -55,7 +55,11 @@ python benchmarks/summarize_bitdistill_variants.py \
 
 python benchmarks/summarize_bitdistill_glue.py \
   --root checkpoints/bitdistill-glue-causal-longwarmup-densehead \
+  --fp-root checkpoints/bitdistill-glue \
+  --bitnet-root checkpoints/bitdistill-glue \
   --tasks mnli qnli sst2 \
+  --bitdistill-tensor-template bitdistill-longwarmup-tensor-layer-8 \
+  --bitdistill-row-template bitdistill-longwarmup-row-layer-8 \
   --output-json "benchmark_results/bitdistill_causal_longwarmup_densehead_summary_${DATE}.json" \
   --output-md "benchmarks/results/bitdistill_causal_longwarmup_densehead_summary_${DATE}.md"
 
@@ -92,6 +96,17 @@ python benchmarks/audit_product_scope.py \
 
 python benchmarks/build_qwen_side_by_side.py \
   --output-md "benchmarks/results/qwen_side_by_side_${DATE}.md"
+
+python benchmarks/build_evidence_manifest.py \
+  --allow-missing-label benchmark_coverage_gate_report \
+  --allow-missing-label benchmark_coverage_gate_json \
+  --output-json "benchmarks/results/evidence_manifest_${DATE}.json" \
+  --output-md "benchmarks/results/evidence_manifest_${DATE}.md"
+
+python benchmarks/audit_benchmark_coverage.py \
+  --manifest-path "benchmarks/results/evidence_manifest_${DATE}.json" \
+  --output-json "benchmark_results/benchmark_coverage_gate_${DATE}.json" \
+  --output-md "benchmarks/results/benchmark_coverage_gate_${DATE}.md"
 
 python benchmarks/build_evidence_manifest.py \
   --output-json "benchmarks/results/evidence_manifest_${DATE}.json" \

@@ -33,22 +33,24 @@ DATE = datetime.now(timezone.utc).date().isoformat()
 ARTIFACTS: list[dict[str, str]] = [
     # Tracked reports.
     {"label": "README", "kind": "tracked_report", "path": "README.md"},
-    {"label": "side_by_side_report", "kind": "tracked_report", "path": "benchmarks/results/qwen_side_by_side_2026-05-14.md"},
+    {"label": "side_by_side_report", "kind": "tracked_report", "path": f"benchmarks/results/qwen_side_by_side_{DATE}.md"},
     {"label": "paired_row_minus_fp_report", "kind": "tracked_report", "path": "benchmarks/results/paired_row_densehead_minus_fp_2026-05-13.md"},
     {"label": "paired_row_minus_ptq_report", "kind": "tracked_report", "path": "benchmarks/results/paired_row_densehead_minus_ptq_2026-05-13.md"},
     {"label": "publishable_claims", "kind": "tracked_report", "path": "benchmarks/results/publishable_claims_2026-05-05.md"},
     {"label": "progress_audit", "kind": "tracked_report", "path": "benchmarks/results/progress_audit_2026-05-05.md"},
     {"label": "active_goal_audit", "kind": "tracked_report", "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md"},
-    {"label": "objective_completion_audit", "kind": "tracked_report", "path": "benchmarks/results/objective_completion_audit_2026-05-14.md"},
-    {"label": "product_scope_gate", "kind": "tracked_report", "path": "benchmarks/results/product_scope_gate_2026-05-14.md"},
+    {"label": "objective_completion_audit", "kind": "tracked_report", "path": f"benchmarks/results/objective_completion_audit_{DATE}.md"},
+    {"label": "product_scope_gate", "kind": "tracked_report", "path": f"benchmarks/results/product_scope_gate_{DATE}.md"},
     {"label": "bitdistill_reproduction_status", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_reproduction_status_2026-05-14.md"},
-    {"label": "bitdistill_reproduction_gate_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_reproduction_gate_2026-05-14.md"},
-    {"label": "bitdistill_paper_alignment_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_paper_alignment_2026-05-14.md"},
-    {"label": "bitdistill_loss_scale_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_loss_scale_audit_2026-05-14.md"},
-    {"label": "bitdistill_cpu_gate_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_glue_cpu_gate_2026-05-14.md"},
-    {"label": "bitdistill_i2sr_gate_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_i2sr_export_gate_2026-05-14.md"},
-    {"label": "bitdistill_job_monitor_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_job_monitor_2026-05-14.md"},
-    {"label": "bitdistill_dependency_graph_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_dependency_graph_2026-05-14.md"},
+    {"label": "bitdistill_reproduction_gate_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_reproduction_gate_{DATE}.md"},
+    {"label": "bitdistill_paper_alignment_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_paper_alignment_{DATE}.md"},
+    {"label": "bitdistill_loss_scale_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_loss_scale_audit_{DATE}.md"},
+    {"label": "bitdistill_cpu_gate_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_glue_cpu_gate_{DATE}.md"},
+    {"label": "bitdistill_i2sr_gate_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_i2sr_export_gate_{DATE}.md"},
+    {"label": "bitdistill_job_monitor_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_job_monitor_{DATE}.md"},
+    {"label": "bitdistill_dependency_graph_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_dependency_graph_{DATE}.md"},
+    {"label": "bitdistill_variant_summary_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_variant_summary_{DATE}.md"},
+    {"label": "bitdistill_causal_longwarmup_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_causal_longwarmup_densehead_summary_{DATE}.md"},
     {"label": "bitdistill_glue3_summary_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_seqcls_glue3_primary_summary_2026-05-14.md"},
     {"label": "bitdistill_mnli_diagnostic_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_seqcls_mnli_diagnostic_variant_summary_2026-05-14.md"},
     {"label": "i2sr_submodule_promotion_audit", "kind": "tracked_report", "path": "benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md"},
@@ -61,7 +63,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "tl2_probe_report", "kind": "tracked_report", "path": "benchmarks/results/qwen05b_tl2_probe_2026-05-05.md"},
     {"label": "tl2_scale_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_scale_semantics_2026-05-05.md"},
     {"label": "tl2_row_scale_design_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_row_scale_design_2026-05-13.md"},
-    {"label": "tl2_row_scale_runtime_contract_report", "kind": "tracked_report", "path": "benchmarks/results/tl2_row_scale_runtime_contract_2026-05-14.md"},
+    {"label": "tl2_row_scale_runtime_contract_report", "kind": "tracked_report", "path": f"benchmarks/results/tl2_row_scale_runtime_contract_{DATE}.md"},
     {"label": "i2s_row_scale_format_report", "kind": "tracked_report", "path": "benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md"},
     {"label": "row_scale_qtype_productization_gate_report", "kind": "tracked_report", "path": "benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md"},
     {"label": "row_scale_qtype_i2sr_active_patch_gate_report", "kind": "tracked_report", "path": "benchmarks/results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.md"},
@@ -72,11 +74,11 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "i2s_packing_layout_verify_report", "kind": "tracked_report", "path": "benchmarks/results/i2s_packing_layout_verify_2026-05-13.md"},
     {"label": "i2sr_rss_report", "kind": "tracked_report", "path": "benchmarks/results/i2sr_rss_2026-05-13.md"},
     {"label": "artifact_prune_application_report", "kind": "tracked_report", "path": "benchmarks/results/artifact_prune_application_2026-05-13.md"},
-    {"label": "moe_report", "kind": "tracked_report", "path": "benchmarks/results/moe_support_audit_2026-05-14.md"},
+    {"label": "moe_report", "kind": "tracked_report", "path": f"benchmarks/results/moe_support_audit_{DATE}.md"},
     {"label": "moe_packing_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_packing_contract_2026-05-14.md"},
     {"label": "moe_tl2_runtime_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_tl2_runtime_contract_2026-05-14.md"},
-    {"label": "tiny_qwen2moe_fixture_report", "kind": "tracked_report", "path": "benchmarks/results/tiny_qwen2moe_fixture_2026-05-14.md"},
-    {"label": "unblock_requirements_report", "kind": "tracked_report", "path": "benchmarks/results/unblock_requirements_2026-05-14.md"},
+    {"label": "tiny_qwen2moe_fixture_report", "kind": "tracked_report", "path": f"benchmarks/results/tiny_qwen2moe_fixture_{DATE}.md"},
+    {"label": "unblock_requirements_report", "kind": "tracked_report", "path": f"benchmarks/results/unblock_requirements_{DATE}.md"},
     {"label": "i2sr_combined_patch", "kind": "tracked_report", "path": "patches/llama-i2sr-row-scale-qtype.patch"},
     {"label": "i2sr_root_runtime_patch", "kind": "tracked_report", "path": "patches/bitnet-i2sr-root-runtime.patch"},
     {"label": "i2sr_submodule_patch", "kind": "tracked_report", "path": "patches/llama-i2sr-row-scale-qtype.submodule.patch"},
@@ -136,7 +138,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "tl2_shape_json", "kind": "tl2_shape_json", "path": "benchmark_results/tl2_shape_support_audit_2026-05-05.json"},
     {"label": "tl2_scale_json", "kind": "tl2_scale_json", "path": "benchmark_results/tl2_scale_semantics_2026-05-05.json"},
     {"label": "tl2_row_scale_design_json", "kind": "tl2_row_scale_design_json", "path": "benchmark_results/tl2_row_scale_design_2026-05-13.json"},
-    {"label": "tl2_row_scale_runtime_contract_json", "kind": "tl2_row_scale_runtime_contract_json", "path": "benchmark_results/tl2_row_scale_runtime_contract_2026-05-14.json"},
+    {"label": "tl2_row_scale_runtime_contract_json", "kind": "tl2_row_scale_runtime_contract_json", "path": f"benchmark_results/tl2_row_scale_runtime_contract_{DATE}.json"},
     {"label": "i2s_row_scale_format_json", "kind": "i2s_format_json", "path": "benchmark_results/i2s_row_scale_format_audit_2026-05-13.json"},
     {"label": "row_scale_qtype_productization_gate_json", "kind": "row_scale_qtype_gate_json", "path": "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json"},
     {"label": "row_scale_qtype_i2sr_active_patch_gate_json", "kind": "row_scale_qtype_gate_json", "path": "benchmark_results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.json"},
@@ -144,20 +146,22 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "i2sr_promotion_handoff_json", "kind": "i2sr_promotion_handoff_json", "path": "benchmark_results/i2sr_promotion_handoff_2026-05-13.json"},
     {"label": "i2s_packing_layout_verify_json", "kind": "packing_verify_json", "path": "benchmark_results/i2s-packing-layout-verify-2026-05-13/summary.json"},
     {"label": "benchmark_coverage_gate_json", "kind": "benchmark_coverage_gate_json", "path": f"benchmark_results/benchmark_coverage_gate_{DATE}.json"},
-    {"label": "objective_completion_audit_json", "kind": "objective_completion_audit_json", "path": "benchmark_results/objective_completion_audit_2026-05-14.json"},
-    {"label": "product_scope_gate_json", "kind": "product_scope_gate_json", "path": "benchmark_results/product_scope_gate_2026-05-14.json"},
-    {"label": "bitdistill_reproduction_gate_json", "kind": "bitdistill_reproduction_gate_json", "path": "benchmark_results/bitdistill_reproduction_gate_2026-05-14.json"},
-    {"label": "bitdistill_cpu_gate_json", "kind": "bitdistill_cpu_gate_json", "path": "benchmark_results/bitdistill_glue_cpu_gate_2026-05-14.json"},
-    {"label": "bitdistill_i2sr_gate_json", "kind": "bitdistill_i2sr_gate_json", "path": "benchmark_results/bitdistill_i2sr_export_gate_2026-05-14.json"},
-    {"label": "bitdistill_job_monitor_json", "kind": "bitdistill_job_monitor_json", "path": "benchmark_results/bitdistill_job_monitor_2026-05-14.json"},
-    {"label": "bitdistill_dependency_graph_json", "kind": "bitdistill_dependency_graph_json", "path": "benchmark_results/bitdistill_dependency_graph_2026-05-14.json"},
-    {"label": "bitdistill_loss_scale_json", "kind": "bitdistill_loss_scale_json", "path": "benchmark_results/bitdistill_loss_scale_audit_2026-05-14.json"},
+    {"label": "objective_completion_audit_json", "kind": "objective_completion_audit_json", "path": f"benchmark_results/objective_completion_audit_{DATE}.json"},
+    {"label": "product_scope_gate_json", "kind": "product_scope_gate_json", "path": f"benchmark_results/product_scope_gate_{DATE}.json"},
+    {"label": "bitdistill_reproduction_gate_json", "kind": "bitdistill_reproduction_gate_json", "path": f"benchmark_results/bitdistill_reproduction_gate_{DATE}.json"},
+    {"label": "bitdistill_cpu_gate_json", "kind": "bitdistill_cpu_gate_json", "path": f"benchmark_results/bitdistill_glue_cpu_gate_{DATE}.json"},
+    {"label": "bitdistill_i2sr_gate_json", "kind": "bitdistill_i2sr_gate_json", "path": f"benchmark_results/bitdistill_i2sr_export_gate_{DATE}.json"},
+    {"label": "bitdistill_job_monitor_json", "kind": "bitdistill_job_monitor_json", "path": f"benchmark_results/bitdistill_job_monitor_{DATE}.json"},
+    {"label": "bitdistill_dependency_graph_json", "kind": "bitdistill_dependency_graph_json", "path": f"benchmark_results/bitdistill_dependency_graph_{DATE}.json"},
+    {"label": "bitdistill_variant_summary_json", "kind": "bitdistill_variant_summary_json", "path": f"benchmark_results/bitdistill_variant_summary_{DATE}.json"},
+    {"label": "bitdistill_causal_longwarmup_json", "kind": "bitdistill_causal_summary_json", "path": f"benchmark_results/bitdistill_causal_longwarmup_densehead_summary_{DATE}.json"},
+    {"label": "bitdistill_loss_scale_json", "kind": "bitdistill_loss_scale_json", "path": f"benchmark_results/bitdistill_loss_scale_audit_{DATE}.json"},
     {"label": "i2sr_submodule_promotion_audit_json", "kind": "i2sr_submodule_promotion_audit_json", "path": "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json"},
-    {"label": "moe_support_json", "kind": "moe_support_json", "path": "benchmark_results/moe_support_audit_2026-05-14.json"},
+    {"label": "moe_support_json", "kind": "moe_support_json", "path": f"benchmark_results/moe_support_audit_{DATE}.json"},
     {"label": "moe_packing_contract_json", "kind": "moe_packing_contract_json", "path": "benchmark_results/moe_packing_contract_2026-05-14.json"},
     {"label": "moe_tl2_runtime_contract_json", "kind": "moe_tl2_runtime_contract_json", "path": "benchmark_results/moe_tl2_runtime_contract_2026-05-14.json"},
-    {"label": "tiny_qwen2moe_fixture_json", "kind": "tiny_qwen2moe_fixture_json", "path": "benchmark_results/tiny_qwen2moe_fixture_2026-05-14.json"},
-    {"label": "unblock_requirements_json", "kind": "unblock_requirements_json", "path": "benchmark_results/unblock_requirements_2026-05-14.json"},
+    {"label": "tiny_qwen2moe_fixture_json", "kind": "tiny_qwen2moe_fixture_json", "path": f"benchmark_results/tiny_qwen2moe_fixture_{DATE}.json"},
+    {"label": "unblock_requirements_json", "kind": "unblock_requirements_json", "path": f"benchmark_results/unblock_requirements_{DATE}.json"},
     {"label": "tl2_generic_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json"},
     {"label": "tl2_avx512_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json"},
     {"label": "ptq_math", "kind": "math_json", "path": "benchmark_results/math_viability_gaussian_10trial_2026-05-05.json"},
@@ -559,6 +563,40 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "warnings": data.get("warnings", []),
             "blockers": data.get("blockers", []),
         }
+    if kind == "bitdistill_variant_summary_json":
+        rows = data.get("rows", [])
+        materialized = [
+            row
+            for row in rows
+            if isinstance(row, dict) and isinstance(row.get("accuracy"), (int, float))
+        ]
+        return {
+            "rows": len(rows) if isinstance(rows, list) else None,
+            "materialized_rows": len(materialized),
+            "roots": data.get("roots", []),
+            "tasks": data.get("tasks", []),
+        }
+    if kind == "bitdistill_causal_summary_json":
+        rows = data.get("rows", [])
+        verdicts = data.get("verdicts", [])
+        materialized = [
+            row
+            for row in rows
+            if isinstance(row, dict) and row.get("exists")
+        ]
+        passed_verdicts = [
+            row
+            for row in verdicts
+            if isinstance(row, dict) and row.get("passes_fp_gap")
+        ]
+        return {
+            "passed": data.get("passed"),
+            "rows": len(rows) if isinstance(rows, list) else None,
+            "materialized_rows": len(materialized),
+            "verdicts": len(verdicts) if isinstance(verdicts, list) else None,
+            "passed_verdicts": len(passed_verdicts),
+            "tasks": data.get("tasks", []),
+        }
     if kind == "bitdistill_loss_scale_json":
         return {
             "rows": len(data.get("rows", [])) if isinstance(data.get("rows"), list) else None,
@@ -851,6 +889,18 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"warnings={len(metrics.get('warnings', [])) if isinstance(metrics.get('warnings'), list) else '-'}, "
                 f"blockers={len(metrics.get('blockers', [])) if isinstance(metrics.get('blockers'), list) else '-'}"
             )
+        elif entry["kind"] == "bitdistill_variant_summary_json":
+            summary = (
+                f"rows={metrics.get('materialized_rows', '-')}/{metrics.get('rows', '-')}, "
+                f"tasks={metrics.get('tasks', '-')}"
+            )
+        elif entry["kind"] == "bitdistill_causal_summary_json":
+            summary = (
+                f"passed={metrics.get('passed', '-')}, "
+                f"rows={metrics.get('materialized_rows', '-')}/{metrics.get('rows', '-')}, "
+                f"verdicts={metrics.get('passed_verdicts', '-')}/{metrics.get('verdicts', '-')}, "
+                f"tasks={metrics.get('tasks', '-')}"
+            )
         elif entry["kind"] == "bitdistill_loss_scale_json":
             summary = (
                 f"rows={metrics.get('materialized_rows', '-')}/{metrics.get('rows', '-')}, "
@@ -942,6 +992,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-json", type=Path, required=True)
     parser.add_argument("--output-md", type=Path, required=True)
+    parser.add_argument(
+        "--allow-missing-label",
+        action="append",
+        default=[],
+        help="Artifact label that may be missing without making this preflight manifest fail.",
+    )
     args = parser.parse_args()
 
     repo_root = Path.cwd()
@@ -952,7 +1008,8 @@ def main() -> None:
     args.output_md.parent.mkdir(parents=True, exist_ok=True)
     args.output_md.write_text(report + "\n", encoding="utf-8")
     print(report)
-    if manifest["missing_count"]:
+    blocking_missing = sorted(set(manifest["missing"]) - set(args.allow_missing_label))
+    if blocking_missing:
         raise SystemExit(1)
 
 

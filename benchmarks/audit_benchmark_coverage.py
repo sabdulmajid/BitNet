@@ -170,7 +170,14 @@ def audit_cpu_rows(root: Path, checks: list[dict[str, Any]]) -> None:
         )
 
 
-def audit_rss_and_gates(root: Path, checks: list[dict[str, Any]]) -> None:
+def manifest_missing_is_only_self_coverage(manifest: dict[str, Any]) -> bool:
+    missing = manifest.get("missing", [])
+    if not isinstance(missing, list):
+        return False
+    return set(missing) <= {"benchmark_coverage_gate_report", "benchmark_coverage_gate_json"}
+
+
+def audit_rss_and_gates(root: Path, checks: list[dict[str, Any]], manifest_path_arg: Path | None) -> None:
     rss_path = root / "benchmark_results/gguf-rss-qwen15b-i2sr-x86act-context-2026-05-13/summary.json"
     rss = read_json(rss_path)
     contexts = sorted({int(row.get("ctx_size")) for row in rss.get("rows", []) if row.get("returncode") == 0})
@@ -182,17 +189,18 @@ def audit_rss_and_gates(root: Path, checks: list[dict[str, Any]]) -> None:
         f"expected {EXPECTED_RSS_CONTEXTS}",
     )
 
-    manifest_path = latest_artifact(
-        root,
-        "benchmarks/results/evidence_manifest_*.json",
-        "benchmarks/results/evidence_manifest_2026-05-13.json",
+    manifest_path = (
+        manifest_path_arg
+        if manifest_path_arg is not None
+        else latest_artifact(root, "benchmarks/results/evidence_manifest_*.json", "benchmarks/results/evidence_manifest_2026-05-13.json")
     )
     manifest = read_json(manifest_path)
+    missing_ok = manifest.get("missing_count") == 0 or manifest_missing_is_only_self_coverage(manifest)
     add_check(
         checks,
         "evidence manifest has no missing artifacts",
-        manifest.get("missing_count") == 0 and manifest.get("artifact_count", 0) >= 78,
-        f"path={manifest_path.relative_to(root)}, artifacts={manifest.get('artifact_count')}, missing={manifest.get('missing_count')}",
+        missing_ok and manifest.get("artifact_count", 0) >= 78,
+        f"path={manifest_path.relative_to(root)}, artifacts={manifest.get('artifact_count')}, missing={manifest.get('missing_count')}, missing_labels={manifest.get('missing', [])}",
         "manifest is missing one or more cited artifacts",
     )
 
@@ -240,6 +248,7 @@ def render_markdown(result: dict[str, Any]) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
+    parser.add_argument("--manifest-path", type=Path, default=None)
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/benchmark_coverage_gate_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/benchmark_coverage_gate_{DATE}.md"))
     args = parser.parse_args()
@@ -249,7 +258,8 @@ def main() -> None:
     audit_lm_eval(root, checks)
     audit_paired_reports(root, checks)
     audit_cpu_rows(root, checks)
-    audit_rss_and_gates(root, checks)
+    manifest_path = args.manifest_path.resolve() if args.manifest_path is not None else None
+    audit_rss_and_gates(root, checks, manifest_path)
 
     result = {
         "schema": "benchmark_coverage_gate.v1",
