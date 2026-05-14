@@ -6,10 +6,12 @@ from __future__ import annotations
 import argparse
 import json
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
+DATE = datetime.now(timezone.utc).date().isoformat()
 SELECTED_METRICS = {
     "arc_challenge": "acc_norm",
     "arc_easy": "acc_norm",
@@ -55,6 +57,11 @@ EXPECTED_RSS_CONTEXTS = [512, 2048, 8192, 32768]
 
 def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def latest_artifact(root: Path, pattern: str, fallback: str) -> Path:
+    matches = sorted(root.glob(pattern))
+    return matches[-1] if matches else root / fallback
 
 
 def metric_value(task_results: dict[str, Any], metric: str) -> float | None:
@@ -175,12 +182,17 @@ def audit_rss_and_gates(root: Path, checks: list[dict[str, Any]]) -> None:
         f"expected {EXPECTED_RSS_CONTEXTS}",
     )
 
-    manifest = read_json(root / "benchmarks/results/evidence_manifest_2026-05-13.json")
+    manifest_path = latest_artifact(
+        root,
+        "benchmarks/results/evidence_manifest_*.json",
+        "benchmarks/results/evidence_manifest_2026-05-13.json",
+    )
+    manifest = read_json(manifest_path)
     add_check(
         checks,
         "evidence manifest has no missing artifacts",
         manifest.get("missing_count") == 0 and manifest.get("artifact_count", 0) >= 78,
-        f"artifacts={manifest.get('artifact_count')}, missing={manifest.get('missing_count')}",
+        f"path={manifest_path.relative_to(root)}, artifacts={manifest.get('artifact_count')}, missing={manifest.get('missing_count')}",
         "manifest is missing one or more cited artifacts",
     )
 
@@ -218,7 +230,7 @@ def render_markdown(result: dict[str, Any]) -> str:
     status = "PASS" if result["passed"] else "FAIL"
     return "\n\n".join(
         [
-            "# Benchmark Coverage Gate, 2026-05-13",
+            f"# Benchmark Coverage Gate, {result['date']}",
             f"Overall status: **{status}**.",
             md_table(["check", "status", "evidence", "blocker"], rows),
         ]
@@ -228,8 +240,8 @@ def render_markdown(result: dict[str, Any]) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
-    parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/benchmark_coverage_gate_2026-05-13.json"))
-    parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/benchmark_coverage_gate_2026-05-13.md"))
+    parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/benchmark_coverage_gate_{DATE}.json"))
+    parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/benchmark_coverage_gate_{DATE}.md"))
     args = parser.parse_args()
 
     root = args.repo_root.resolve()
@@ -241,6 +253,7 @@ def main() -> None:
 
     result = {
         "schema": "benchmark_coverage_gate.v1",
+        "date": DATE,
         "passed": all(check["passed"] for check in checks),
         "check_count": len(checks),
         "failed": [check["name"] for check in checks if not check["passed"]],

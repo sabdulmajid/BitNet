@@ -446,10 +446,16 @@ def audit_publishability(root: Path, rows: list[dict[str, Any]], metrics: dict[s
         "benchmarks/results/evidence_manifest_2026-05-13.json",
     )
     manifest = read_json(manifest_path)
-    coverage = read_json(root / "benchmark_results/benchmark_coverage_gate_2026-05-13.json")
+    coverage_path = latest_artifact(
+        root,
+        "benchmark_results/benchmark_coverage_gate_*.json",
+        "benchmark_results/benchmark_coverage_gate_2026-05-13.json",
+    )
+    coverage = read_json(coverage_path)
     prune = read_json(root / "benchmarks/results/artifact_prune_plan_2026-05-13.json")
     metrics["meta"] = {
         "manifest_path": str(manifest_path.relative_to(root)) if manifest_path.is_relative_to(root) else str(manifest_path),
+        "coverage_path": str(coverage_path.relative_to(root)) if coverage_path.is_relative_to(root) else str(coverage_path),
         "manifest_artifacts": manifest.get("artifact_count"),
         "manifest_missing": manifest.get("missing_count"),
         "coverage_passed": coverage.get("passed"),
