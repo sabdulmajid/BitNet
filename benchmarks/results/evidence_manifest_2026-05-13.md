@@ -2,19 +2,19 @@
 Artifacts: `105`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 52227 | fdb33d03c1aa |  |
-| side_by_side_report | tracked_report | yes | 16950 | 6c2b35ecbfae |  |
+| README | tracked_report | yes | 9401 | 4b3509b6b958 |  |
+| side_by_side_report | tracked_report | yes | 16913 | db616081b3d9 |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
 | paired_row_minus_ptq_report | tracked_report | yes | 1332 | 20a5aee1eb99 |  |
 | publishable_claims | tracked_report | yes | 11054 | 63c5e9babbc1 |  |
 | progress_audit | tracked_report | yes | 25612 | 74e3b96847bf |  |
 | active_goal_audit | tracked_report | yes | 10765 | 255dacfeae0a |  |
-| objective_completion_audit | tracked_report | yes | 5101 | c040f46ef9a7 |  |
-| product_scope_gate | tracked_report | yes | 3226 | 7c97b38f6d45 |  |
-| i2sr_submodule_promotion_audit | tracked_report | yes | 3097 | 3fb7dcf980ce |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 2866 | 1d9aa0605ab4 |  |
+| objective_completion_audit | tracked_report | yes | 5041 | 924a4567101d |  |
+| product_scope_gate | tracked_report | yes | 3107 | ff92422cc9f9 |  |
+| i2sr_submodule_promotion_audit | tracked_report | yes | 2048 | 11fc209f78db |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 2859 | 4f0869dd21c4 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
-| direct_packed_gguf_support_report | tracked_report | yes | 2174 | d6e0c6ec52ec |  |
+| direct_packed_gguf_support_report | tracked_report | yes | 2569 | 51da6738be9d |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
 | direct_row_i2s_qwen05b_report | tracked_report | yes | 3967 | f5f6d912626b |  |
 | tl2_shape_report | tracked_report | yes | 2817 | 8dddd65315e0 |  |
@@ -22,10 +22,10 @@ Artifacts: `105`. Missing: `0`.
 | tl2_scale_report | tracked_report | yes | 2321 | 30bbfbd22559 |  |
 | tl2_row_scale_design_report | tracked_report | yes | 4004 | fd035ed1fd6d |  |
 | i2s_row_scale_format_report | tracked_report | yes | 1759 | 256abf73581c |  |
-| row_scale_qtype_productization_gate_report | tracked_report | yes | 2717 | eec414acdcd3 |  |
+| row_scale_qtype_productization_gate_report | tracked_report | yes | 2399 | cdfb84616ba1 |  |
 | row_scale_qtype_i2sr_active_patch_gate_report | tracked_report | yes | 2390 | 42acb39176cb |  |
 | row_scale_qtype_i2sr_promotion_rehearsal_report | tracked_report | yes | 2671 | f734b60cc1ec |  |
-| i2sr_promotion_handoff_report | tracked_report | yes | 3601 | 157386ad3485 |  |
+| i2sr_promotion_handoff_report | tracked_report | yes | 3556 | 8d68db61ff05 |  |
 | i2sr_qwen15b_candidate_report | tracked_report | yes | 2330 | 0e61281598ce |  |
 | i2sr_x86act_fix_report | tracked_report | yes | 2113 | 828c0baaa784 |  |
 | i2s_packing_layout_verify_report | tracked_report | yes | 1075 | c11acd561e3c |  |
@@ -34,7 +34,7 @@ Artifacts: `105`. Missing: `0`.
 | moe_report | tracked_report | yes | 4107 | 7b456fcc675d |  |
 | moe_packing_contract_report | tracked_report | yes | 1887 | f67484f46161 |  |
 | moe_tl2_runtime_contract_report | tracked_report | yes | 2602 | 729fd5580945 |  |
-| unblock_requirements_report | tracked_report | yes | 1961 | 84ced033c74d |  |
+| unblock_requirements_report | tracked_report | yes | 1820 | bf91a5853d99 |  |
 | i2sr_combined_patch | tracked_report | yes | 26764 | d02e20bd9e00 |  |
 | i2sr_root_runtime_patch | tracked_report | yes | 5408 | c4c30c8e2053 |  |
 | i2sr_submodule_patch | tracked_report | yes | 20824 | aa68da60931a |  |
@@ -86,24 +86,24 @@ Artifacts: `105`. Missing: `0`.
 | row_f16_qwen05b_suite | gguf_summary_json | yes | 2575 | cc4583593042 | rows=2, failed=0, nan=0, catastrophic=0, max_ppl=578.483 |
 | row_i2s_quantized_qwen05b_suite | gguf_summary_json | yes | 2645 | 23b71114cdae | rows=2, failed=0, nan=1, catastrophic=0, max_ppl=18.0986 |
 | row_tq2_qwen05b_suite | gguf_summary_json | yes | 2667 | d3005c427d44 | rows=2, failed=0, nan=0, catastrophic=1, max_ppl=5.11853e+06 |
-| direct_packed_gguf_support_json | direct_packed_support_json | yes | 2798 | 4130b3f67c9e | dense=True, packed_i2s=True, row_safe=False |
+| direct_packed_gguf_support_json | direct_packed_support_json | yes | 3199 | 995eab70b207 | dense=True, packed_i2s=True, row_safe=True |
 | tl2_shape_json | tl2_shape_json | yes | 12054 | a99430f0f4b0 |  |
 | tl2_scale_json | tl2_scale_json | yes | 14344 | bf2d36674b72 | qwen15b_tensor_scale err=0; qwen15b_row_scale err=1.90423 |
 | tl2_row_scale_design_json | tl2_row_scale_design_json | yes | 29878 | 0fd577484ee8 | qwen15b_tensor_scale current=0, row_fp16=0.000175008, scaleMiB=1.52026; qwen15b_row_scale current=1.90423, row_fp16=0.000197446, scaleMiB=1.23047 |
 | i2s_row_scale_format_json | i2s_format_json | yes | 1528 | e17297539b9d | default_ratio=30836.2, prototype_ratio=1.00157, stable_format_required=True |
-| row_scale_qtype_productization_gate_json | row_scale_qtype_gate_json | yes | 3795 | 10e3f5519b9e | passed=False, gates=9, failed=3, stable_qtype=False, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
+| row_scale_qtype_productization_gate_json | row_scale_qtype_gate_json | yes | 3610 | 87f2e567d27c | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | row_scale_qtype_i2sr_active_patch_gate_json | row_scale_qtype_gate_json | yes | 3616 | cb42720567a1 | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | row_scale_qtype_i2sr_promotion_rehearsal_json | row_scale_qtype_gate_json | yes | 3897 | 6ffc161b446b | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
-| i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4441 | e3a0b8c604d6 | ready=False, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=False, blockers=1 |
+| i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5393 | 69194a94c6c1 | passed=True, checks=33, failed=0 |
-| objective_completion_audit_json | objective_completion_audit_json | yes | 14839 | 0d911a29d885 | achieved=False, status=not_complete, complete=7/9, open=2 |
-| product_scope_gate_json | product_scope_gate_json | yes | 3885 | 1352532bc5cc | scope=research_mvp_only, supported=2, unsupported=5 |
-| i2sr_submodule_promotion_audit_json | i2sr_submodule_promotion_audit_json | yes | 3583 | c7e94523c8fb | ready=False, active=False, patch_applies=True, submodule=1f86f058, blockers=4 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5386 | 1c4f17cc5f51 | passed=True, checks=33, failed=0 |
+| objective_completion_audit_json | objective_completion_audit_json | yes | 14888 | 0cfc77beaafe | achieved=False, status=not_complete, complete=7/9, open=2 |
+| product_scope_gate_json | product_scope_gate_json | yes | 3766 | 23306ae68953 | scope=research_mvp_only, supported=4, unsupported=3 |
+| i2sr_submodule_promotion_audit_json | i2sr_submodule_promotion_audit_json | yes | 3425 | 56ba835820a1 | ready=True, active=True, patch_applies=False, submodule=285decfe2, blockers=0 |
 | moe_support_json | moe_support_json | yes | 10013 | f650b04a567a | present=5/5, gates=6, failed=3, kimi_artifacts=0 |
 | moe_packing_contract_json | moe_packing_contract_json | yes | 2966 | 538939fcb10b | ready=False, tl2_3d=False, i2sr_3d=True, control_2d=True, layout=4/4, blockers=1 |
 | moe_tl2_runtime_contract_json | moe_tl2_runtime_contract_json | yes | 2985 | e5b03c961bf5 | ready=False, checks=5, failed=3, underreport=69632, ratio=3.99312, blockers=3 |
-| unblock_requirements_json | unblock_requirements_json | yes | 2306 | 9bb10f9ee9f9 | missing=5/5, can_continue=False, fork_reachable=False |
+| unblock_requirements_json | unblock_requirements_json | yes | 2164 | e08404541841 | missing=3/5, can_continue=False, fork_reachable=True |
 | tl2_generic_summary | gguf_summary_json | yes | 4494 | 306a682203b2 | rows=4, failed=2, nan=1, catastrophic=0, max_ppl=18.8044 |
 | tl2_avx512_summary | gguf_summary_json | yes | 4573 | 6ec820472f37 | rows=4, failed=0, nan=2, catastrophic=0, max_ppl=18.8239 |
 | ptq_math | math_json | yes | 14010 | 8cedd88658e0 | trials=10, rel_error=0.512542 |

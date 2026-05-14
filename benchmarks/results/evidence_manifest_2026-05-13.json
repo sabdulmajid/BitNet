@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "fdb33d03c1aac034b53f267cfafb94b409be84117be29bb6bb0a231772aaaa94",
-      "size_bytes": 52227
+      "sha256": "4b3509b6b958aeeae7d44d3ddf11fe5c2644d633f6faa9d9f14b3cc5d75d0359",
+      "size_bytes": 9401
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "side_by_side_report",
       "metrics": {},
       "path": "benchmarks/results/qwen_side_by_side_2026-05-05.md",
-      "sha256": "6c2b35ecbfaed4be7921558868d4ab138ec465d00e55b18f1942fcb18faa7b2b",
-      "size_bytes": 16950
+      "sha256": "db616081b3d9b234cd36a9b084fe6cfd005d3ad7d0801fe3a6962e857c1ff350",
+      "size_bytes": 16913
     },
     {
       "exists": true,
@@ -70,8 +70,8 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-13.md",
-      "sha256": "c040f46ef9a77e1d7293c00a5f6f5400e98af205394224f3b3ebaa9fee9d3804",
-      "size_bytes": 5101
+      "sha256": "924a4567101dc1248d121e9b7a0a55f793f26e74f9bab50f1c51c304a23b4393",
+      "size_bytes": 5041
     },
     {
       "exists": true,
@@ -79,8 +79,8 @@
       "label": "product_scope_gate",
       "metrics": {},
       "path": "benchmarks/results/product_scope_gate_2026-05-13.md",
-      "sha256": "7c97b38f6d451113c3358294723f88753799296cda2140ddb3a8b41ba1de5b45",
-      "size_bytes": 3226
+      "sha256": "ff92422cc9f928b04cc040f161aeca8f15a3dca1a95cd9c40c91efce2db238ee",
+      "size_bytes": 3107
     },
     {
       "exists": true,
@@ -88,8 +88,8 @@
       "label": "i2sr_submodule_promotion_audit",
       "metrics": {},
       "path": "benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md",
-      "sha256": "3fb7dcf980ce7bf784998ef4743734f6faac425f63c432a8615e845717101165",
-      "size_bytes": 3097
+      "sha256": "11fc209f78db79029879eec289d92416391c5317d629c27360cfb42a3445f30b",
+      "size_bytes": 2048
     },
     {
       "exists": true,
@@ -97,8 +97,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-13.md",
-      "sha256": "1d9aa0605ab4c99e8e56001d23878787a3147be1f063efa96e71a5b088187340",
-      "size_bytes": 2866
+      "sha256": "4f0869dd21c41c864f6af0bdf746a6cc5e4b858364dd807598d74bf70208be53",
+      "size_bytes": 2859
     },
     {
       "exists": true,
@@ -115,8 +115,8 @@
       "label": "direct_packed_gguf_support_report",
       "metrics": {},
       "path": "benchmarks/results/direct_packed_gguf_support_2026-05-13.md",
-      "sha256": "d6e0c6ec52ecf68cd1371c78120c3fda965695433a164d81d32d49ee0b30ed32",
-      "size_bytes": 2174
+      "sha256": "51da6738be9de86d49ca313b0daf06c8c31a3a471752769816f59e297aea62d4",
+      "size_bytes": 2569
     },
     {
       "exists": true,
@@ -187,8 +187,8 @@
       "label": "row_scale_qtype_productization_gate_report",
       "metrics": {},
       "path": "benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md",
-      "sha256": "eec414acdcd3c7cde465b4f05531bbf8716c243197e84ad542c8f67e4fa10526",
-      "size_bytes": 2717
+      "sha256": "cdfb84616ba1d06deb4673dc02c29a7f802cdcffdd6bbd4ed78e04f211fae8d4",
+      "size_bytes": 2399
     },
     {
       "exists": true,
@@ -214,8 +214,8 @@
       "label": "i2sr_promotion_handoff_report",
       "metrics": {},
       "path": "benchmarks/results/i2sr_promotion_handoff_2026-05-13.md",
-      "sha256": "157386ad3485634e4cef937e4426b7cf0acdcd8b50a4d42ff45b5e799d8af214",
-      "size_bytes": 3601
+      "sha256": "8d68db61ff0565590b0e4cc65023354c92f641fa4f52f80e85e594832386fb54",
+      "size_bytes": 3556
     },
     {
       "exists": true,
@@ -295,8 +295,8 @@
       "label": "unblock_requirements_report",
       "metrics": {},
       "path": "benchmarks/results/unblock_requirements_2026-05-13.md",
-      "sha256": "84ced033c74d08bf187c0edcaa1d05e11d736625c04a87bc867893ea34c9d228",
-      "size_bytes": 1961
+      "sha256": "bf91a5853d99b7a8b361ee23ae4cfc7f41ec9640c4b44805a2636f70ecfa16cb",
+      "size_bytes": 1820
     },
     {
       "exists": true,
@@ -1490,13 +1490,13 @@
       "metrics": {
         "direct_dense_gguf_supported": true,
         "direct_packed_i2s_supported": true,
-        "product_safe_row_scale_packed_supported": false,
-        "py_gguf_has_i2s_quant_type": false,
-        "requires_stable_row_scale_type_or_version": true
+        "product_safe_row_scale_packed_supported": true,
+        "py_gguf_has_i2s_quant_type": true,
+        "requires_stable_row_scale_type_or_version": false
       },
       "path": "benchmark_results/direct_packed_gguf_support_2026-05-13.json",
-      "sha256": "4130b3f67c9ee943cdf4d3bece395d7214e30070cbb96e935d150889a331bcb4",
-      "size_bytes": 2798
+      "sha256": "995eab70b2070b3db20f01cbea883718b38405d832654a3ade1172b90f8b5762",
+      "size_bytes": 3199
     },
     {
       "exists": true,
@@ -1615,25 +1615,21 @@
       "metrics": {
         "default_ratio": 30836.207570886912,
         "direct_writer_emits_stable_qtype": true,
-        "failed": [
-          "stable GGML row-scale qtype is defined",
-          "stable llama file type is defined",
-          "runtime routes stable qtype without changing I2_S"
-        ],
+        "failed": [],
         "gates": 9,
-        "has_ggml_stable_qtype": false,
-        "has_llama_stable_ftype": false,
+        "has_ggml_stable_qtype": true,
+        "has_llama_stable_ftype": true,
         "packing_verification_checked_tensors": 5,
         "packing_verification_passed": true,
-        "passed": false,
+        "passed": true,
         "prototype_ratio": 1.0015661061655128,
         "stable_benchmark_max_ppl": 38.8477,
         "stable_benchmark_present": true,
         "stable_benchmark_quality_ok": true
       },
       "path": "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json",
-      "sha256": "10e3f5519b9ed58122cf30d5957a71282c28178a3c7d0153f0f5729ec3487724",
-      "size_bytes": 3795
+      "sha256": "87f2e567d27c73bf8041d7fc4bdca97975bd6608ae805c47401fbebfe007f820",
+      "size_bytes": 3610
     },
     {
       "exists": true,
@@ -1686,19 +1682,17 @@
       "kind": "i2sr_promotion_handoff_json",
       "label": "i2sr_promotion_handoff_json",
       "metrics": {
-        "blockers": [
-          "Candidate llama.cpp fork URL is not reachable."
-        ],
-        "candidate_fork_reachable": false,
-        "ready_for_handoff": false,
+        "blockers": [],
+        "candidate_fork_reachable": true,
+        "ready_for_handoff": true,
         "root_clean": true,
         "root_patch_applies": true,
         "submodule_clean": true,
         "submodule_patch_applies": true
       },
       "path": "benchmark_results/i2sr_promotion_handoff_2026-05-13.json",
-      "sha256": "e3a0b8c604d690c0b40cf5608e5441b50919394b7df782c6bd95e3317a5a3ac9",
-      "size_bytes": 4441
+      "sha256": "cf5aa0d11481b4ff8c6dade4ccc1562a64766da2416387b8070b53168ebe9db5",
+      "size_bytes": 4901
     },
     {
       "exists": true,
@@ -1723,8 +1717,8 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-13.json",
-      "sha256": "69194a94c6c1a7d0bcac9b2bcdfc6f9714ca8b7d7e7163afd0f13fa437369c90",
-      "size_bytes": 5393
+      "sha256": "1c4f17cc5f51f8e8cec73e84f4bb0b04046a9d3f5501189649da74c317a8c483",
+      "size_bytes": 5386
     },
     {
       "exists": true,
@@ -1741,8 +1735,8 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-13.json",
-      "sha256": "0d911a29d8852e1a6a39d7b065e30cea381c493ea1eb60f125af59ecdd2ead06",
-      "size_bytes": 14839
+      "sha256": "0cfc77beaafecabf1b122311962b0bb3c2944425eb809d51f08df71c42234933",
+      "size_bytes": 14888
     },
     {
       "exists": true,
@@ -1751,32 +1745,27 @@
       "metrics": {
         "publishable_angle": "negative arbitrary-retrofit result plus dense-Qwen row-scale recovery path",
         "scope_status": "research_mvp_only",
-        "supported_claim_count": 2,
-        "unsupported_claim_count": 5
+        "supported_claim_count": 4,
+        "unsupported_claim_count": 3
       },
       "path": "benchmark_results/product_scope_gate_2026-05-13.json",
-      "sha256": "1352532bc5ccc2a52ec37c7d73e057a8fc46a8de144ef65147e5d4fd38cd4ce2",
-      "size_bytes": 3885
+      "sha256": "23306ae689533dee81a381d961986dccf833d835d6ddf233f822be99f14b55b5",
+      "size_bytes": 3766
     },
     {
       "exists": true,
       "kind": "i2sr_submodule_promotion_audit_json",
       "label": "i2sr_submodule_promotion_audit_json",
       "metrics": {
-        "active_runtime_support": false,
-        "blockers": [
-          "I2_SR qtype/file-type/runtime support is not present in the active submodule/root runtime files.",
-          "The I2_SR support still exists as an unapplied patch rather than active committed code.",
-          "Configured llama.cpp submodule remote is not writable from this environment; use a fork or writable branch.",
-          "Candidate llama.cpp fork URL is not reachable; create the fork or provide the correct writable URL before promotion."
-        ],
-        "patch_applies_cleanly": true,
-        "promotion_ready": false,
-        "submodule_short": "1f86f058"
+        "active_runtime_support": true,
+        "blockers": [],
+        "patch_applies_cleanly": false,
+        "promotion_ready": true,
+        "submodule_short": "285decfe2"
       },
       "path": "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json",
-      "sha256": "c7e94523c8fbd530f0c6c554a5893c1ebd69a7eb21b5951ee718c9ea42f67178",
-      "size_bytes": 3583
+      "sha256": "56ba835820a1e87a22e424ce6cb9364bc8abe58d94f184f3a27779059a80d99b",
+      "size_bytes": 3425
     },
     {
       "exists": true,
@@ -1848,21 +1837,19 @@
       "label": "unblock_requirements_json",
       "metrics": {
         "can_continue_productively_without_input": false,
-        "candidate_fork_reachable": false,
+        "candidate_fork_reachable": true,
         "missing": [
-          "Writable llama.cpp fork or branch",
-          "GitHub automation credential",
           "Local Kimi/Qwen2MoE model artifact",
           "MoE 3D expert tensor packing support",
           "MoE quality/locality benchmark artifacts"
         ],
-        "missing_count": 5,
+        "missing_count": 3,
         "objective_status": "not_complete",
         "requirements": 5
       },
       "path": "benchmark_results/unblock_requirements_2026-05-13.json",
-      "sha256": "9bb10f9ee9f9cf5f6f513111f9c5469c4b4bc624c830f198402fc35c1dbfad29",
-      "size_bytes": 2306
+      "sha256": "e08404541841f2eeb6cd589c90b2a45dc7267814190b15e666a96af68ba98d79",
+      "size_bytes": 2164
     },
     {
       "exists": true,
