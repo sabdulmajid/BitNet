@@ -12,17 +12,23 @@ import argparse
 import json
 import shutil
 import subprocess
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
-DATE = "2026-05-13"
+DATE = datetime.now(timezone.utc).date().isoformat()
 
 
 def read_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def latest_artifact(root: Path, pattern: str, fallback: str) -> Path:
+    matches = sorted(root.glob(pattern))
+    return matches[-1] if matches else root / fallback
 
 
 def run(command: list[str], *, cwd: Path) -> subprocess.CompletedProcess[str]:
@@ -51,6 +57,11 @@ def local_kimi_artifacts(root: Path) -> list[str]:
     return sorted(artifacts)
 
 
+def is_tiny_fixture_artifact(path: str) -> bool:
+    lowered = path.lower()
+    return "tiny-qwen2moe-fixture" in lowered or "tiny_qwen2moe_fixture" in lowered
+
+
 def make_requirement(name: str, status: str, evidence: str, unblock_action: str) -> dict[str, str]:
     return {
         "name": name,
@@ -61,15 +72,17 @@ def make_requirement(name: str, status: str, evidence: str, unblock_action: str)
 
 
 def build_audit(root: Path, *, candidate_fork_url: str) -> dict[str, Any]:
-    objective = read_json(root / "benchmark_results/objective_completion_audit_2026-05-13.json")
+    objective = read_json(latest_artifact(root, "benchmark_results/objective_completion_audit_*.json", "benchmark_results/objective_completion_audit_2026-05-13.json"))
     i2sr = read_json(root / "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json")
     handoff = read_json(root / "benchmark_results/i2sr_promotion_handoff_2026-05-13.json")
-    moe = read_json(root / "benchmark_results/moe_support_audit_2026-05-05.json")
-    moe_contract = read_json(root / "benchmark_results/moe_packing_contract_2026-05-13.json")
-    scope = read_json(root / "benchmark_results/product_scope_gate_2026-05-13.json")
+    moe = read_json(latest_artifact(root, "benchmark_results/moe_support_audit_*.json", "benchmark_results/moe_support_audit_2026-05-05.json"))
+    moe_contract = read_json(latest_artifact(root, "benchmark_results/moe_packing_contract_*.json", "benchmark_results/moe_packing_contract_2026-05-13.json"))
+    scope = read_json(latest_artifact(root, "benchmark_results/product_scope_gate_*.json", "benchmark_results/product_scope_gate_2026-05-13.json"))
     fork_probe = probe_remote(candidate_fork_url, cwd=root)
     gh_path = shutil.which("gh")
     kimi_artifacts = local_kimi_artifacts(root)
+    production_moe_artifacts = [artifact for artifact in kimi_artifacts if not is_tiny_fixture_artifact(artifact)]
+    tiny_qwen2moe = moe.get("tiny_qwen2moe_fixture", {}) if isinstance(moe.get("tiny_qwen2moe_fixture"), dict) else {}
 
     i2sr_blocked = not bool(i2sr.get("promotion_ready"))
     handoff_worktree = handoff.get("worktree_result") if isinstance(handoff.get("worktree_result"), dict) else {}
@@ -104,10 +117,10 @@ def build_audit(root: Path, *, candidate_fork_url: str) -> dict[str, Any]:
             "Install/authenticate GitHub CLI or refresh the GitHub connector token if repository creation/push automation is desired.",
         ),
         make_requirement(
-            "Local Kimi/Qwen2MoE model artifact",
-            "missing" if not kimi_artifacts else "available",
-            f"artifacts={len(kimi_artifacts)}",
-            "Provide a licensed Kimi or Qwen2MoE checkpoint/tokenizer artifact plus its FP and quantized baselines.",
+            "Local trained Kimi/Qwen2MoE model artifact",
+            "missing" if not production_moe_artifacts else "available",
+            f"trained_artifacts={len(production_moe_artifacts)}; tiny_fixture_passed={tiny_qwen2moe.get('passed')}; all_moe_named_artifacts={len(kimi_artifacts)}",
+            "Provide a licensed trained Kimi or Qwen2MoE checkpoint/tokenizer artifact plus its FP and quantized baselines. The tiny random Qwen2MoE fixture is not a substitute.",
         ),
         make_requirement(
             "MoE 3D expert tensor packing support",
@@ -122,7 +135,7 @@ def build_audit(root: Path, *, candidate_fork_url: str) -> dict[str, Any]:
         make_requirement(
             "MoE quality/locality benchmark artifacts",
             "missing" if failed_moe_gates else "ready",
-            f"failed_moe_gates={len(failed_moe_gates)}; kimi_artifacts={len(kimi_artifacts)}",
+            f"failed_moe_gates={len(failed_moe_gates)}; trained_artifacts={len(production_moe_artifacts)}; tiny_fixture_passed={tiny_qwen2moe.get('passed')}",
             "Run router accuracy, expert locality, quality, throughput, and RSS benchmarks after model and packing support exist.",
         ),
     ]
@@ -138,6 +151,8 @@ def build_audit(root: Path, *, candidate_fork_url: str) -> dict[str, Any]:
         "candidate_fork_probe": fork_probe,
         "gh_path": gh_path,
         "local_kimi_artifacts": kimi_artifacts,
+        "local_trained_moe_artifacts": production_moe_artifacts,
+        "tiny_qwen2moe_fixture_passed": tiny_qwen2moe.get("passed"),
         "requirements": requirements,
         "missing_count": len(missing),
         "can_continue_productively_without_input": len(missing) == 0,
@@ -195,8 +210,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     parser.add_argument("--candidate-fork-url", default="https://github.com/sabdulmajid/llama.cpp.git")
-    parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/unblock_requirements_2026-05-13.json"))
-    parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/unblock_requirements_2026-05-13.md"))
+    parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/unblock_requirements_{DATE}.json"))
+    parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/unblock_requirements_{DATE}.md"))
     args = parser.parse_args()
 
     root = args.repo_root.resolve()

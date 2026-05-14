@@ -415,7 +415,7 @@ To consolidate the inputs required before the remaining open claims can advance:
 python benchmarks/audit_unblock_requirements.py
 ```
 
-The current report is `benchmarks/results/unblock_requirements_2026-05-13.md`.
+The current report is `benchmarks/results/unblock_requirements_2026-05-14.md`.
 It checks the writable `llama.cpp` fork requirement, local Kimi/Qwen2MoE
 artifacts, MoE packing readiness, and whether more local benchmarking can
 continue productively without new input.
@@ -442,6 +442,20 @@ The current report is
 `benchmarks/results/moe_tl2_runtime_contract_2026-05-14.md`. It checks the
 Python TL2 preprocessor, the active `ggml_nbytes` TL2 size contract, and whether
 `ggml_mul_mat_id` routes TL2 expert matmuls through the BitNet LUT path.
+
+To verify the minimal executable Qwen2MoE converter/runtime fixture:
+
+```bash
+python benchmarks/run_tiny_qwen2moe_fixture.py --skip-existing
+```
+
+The current report is
+`benchmarks/results/tiny_qwen2moe_fixture_2026-05-14.md`. It creates a tiny
+random `Qwen2MoeForCausalLM`, converts it to FP16 GGUF with the vendored
+llama.cpp converter, and runs `llama-cli` on CPU. This is only a plumbing
+fixture; it does not prove Kimi support, ternary MoE quality, router
+distillation, expert locality, TL2 expert kernels, or row-scale `I2_SR` MoE
+runtime correctness.
 
 To verify whether `I2_SR` is actually active in the committed submodule state
 rather than only available as a patch:

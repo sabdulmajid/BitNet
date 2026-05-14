@@ -76,9 +76,11 @@ OBJECTIVE_AUDIT = "benchmark_results/objective_completion_audit_2026-05-13.json"
 PRODUCT_SCOPE_GATE = "benchmark_results/product_scope_gate_2026-05-13.json"
 I2SR_PROMOTION_AUDIT = "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json"
 MOE_PACKING_CONTRACT = "benchmark_results/moe_packing_contract_2026-05-13.json"
+TINY_QWEN2MOE_FIXTURE = "benchmark_results/tiny_qwen2moe_fixture_2026-05-14.json"
 LATEST_OBJECTIVE_AUDIT = "benchmark_results/objective_completion_audit_*.json"
 LATEST_PRODUCT_SCOPE_GATE = "benchmark_results/product_scope_gate_*.json"
 LATEST_MOE_PACKING_CONTRACT = "benchmark_results/moe_packing_contract_*.json"
+LATEST_TINY_QWEN2MOE_FIXTURE = "benchmark_results/tiny_qwen2moe_fixture_*.json"
 
 PAIRED_DELTA_REPORTS = [
     ("QAT row-scale minus FP", "benchmarks/results/paired_row_densehead_minus_fp_2026-05-13.md"),
@@ -267,11 +269,14 @@ def build_reviewer_gate_table() -> str:
     objective_path = latest_json(LATEST_OBJECTIVE_AUDIT, OBJECTIVE_AUDIT)
     scope_path = latest_json(LATEST_PRODUCT_SCOPE_GATE, PRODUCT_SCOPE_GATE)
     moe_path = latest_json(LATEST_MOE_PACKING_CONTRACT, MOE_PACKING_CONTRACT)
+    tiny_moe_path = latest_json(LATEST_TINY_QWEN2MOE_FIXTURE, TINY_QWEN2MOE_FIXTURE)
     objective = read_json(objective_path) or {}
     scope = read_json(scope_path) or {}
     i2sr = read_json(Path(I2SR_PROMOTION_AUDIT)) or {}
     moe = read_json(moe_path) or {}
+    tiny_moe = read_json(tiny_moe_path) or {}
     moe_verdict = moe.get("verdict", {}) if isinstance(moe.get("verdict"), dict) else {}
+    tiny_smoke = tiny_moe.get("smoke", {}) if isinstance(tiny_moe.get("smoke"), dict) else {}
     rows = [
         [
             "benchmark coverage",
@@ -305,7 +310,16 @@ def build_reviewer_gate_table() -> str:
                 f"i2sr_3d={moe_verdict.get('merged_3d_i2s_i2sr_supported')}; "
                 f"2d_control={moe_verdict.get('dense_2d_i2s_control_supported')}"
             ),
-            "Synthetic contract now separates direct I2_S/I2_SR packing from TL2; no Kimi artifact exists.",
+            "Synthetic contract separates direct I2_S/I2_SR packing from TL2; still no trained MoE or Kimi artifact.",
+        ],
+        [
+            "tiny Qwen2MoE FP16 fixture",
+            "pass" if tiny_moe.get("passed") else "missing",
+            (
+                f"arch={tiny_smoke.get('architecture')}; experts={tiny_smoke.get('expert_count')}; "
+                f"used={tiny_smoke.get('expert_used_count')}; decode={tiny_smoke.get('decode_tok_s')} tok/s"
+            ),
+            "Positive converter/runtime smoke only; no quality, Kimi, ternary, TL2, or I2_SR MoE claim.",
         ],
     ]
     return md_table(["gate", "status", "evidence", "reviewer implication"], rows)

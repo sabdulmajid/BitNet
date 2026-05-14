@@ -416,6 +416,7 @@ def audit_moe(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -
     present_checks = [check for check in moe.get("checks", []) if check.get("status") == "present"]
     productization_gates = moe.get("productization_gates", [])
     failed_gates = [gate for gate in productization_gates if isinstance(gate, dict) and not gate.get("passed")]
+    tiny_qwen2moe = moe.get("tiny_qwen2moe_fixture", {}) if isinstance(moe.get("tiny_qwen2moe_fixture"), dict) else {}
     metrics["moe"] = {
         "path": str(moe_path.relative_to(root)) if moe_path.is_relative_to(root) else str(moe_path),
         "present_generic_checks": len(present_checks),
@@ -423,6 +424,7 @@ def audit_moe(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -
         "failed_productization_gate_count": len(failed_gates),
         "local_kimi_artifact_count": len(local_kimi),
         "kimi_source_match_count": len(source_kimi),
+        "tiny_qwen2moe_fixture_passed": tiny_qwen2moe.get("passed"),
     }
     add_row(
         rows,
@@ -430,9 +432,10 @@ def audit_moe(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -
         "not_complete",
         (
             f"generic MoE checks present={len(present_checks)}; productization gates failed={len(failed_gates)}/{len(productization_gates)}; "
-            f"Kimi artifacts={len(local_kimi)}; Kimi source matches={len(source_kimi)}"
+            f"Kimi artifacts={len(local_kimi)}; Kimi source matches={len(source_kimi)}; "
+            f"tiny Qwen2MoE FP16 fixture passed={tiny_qwen2moe.get('passed')}"
         ),
-        "No validated Kimi-specific mapping, real Qwen2MoE/Kimi conversion artifact, TL2 MoE runtime support, router distillation, MoE quality run, throughput run, or expert-locality benchmark exists. Direct I2_S/I2_SR and TL2 3D packing are synthetic contracts until a real MoE GGUF/runtime artifact exists.",
+        "A tiny random Qwen2MoE FP16 GGUF fixture now validates generic converter/runtime plumbing, but no validated Kimi-specific mapping, trained Qwen2MoE/Kimi quality artifact, ternary MoE runtime artifact, TL2 MoE runtime support, router distillation, MoE quality run, throughput run, or expert-locality benchmark exists.",
     )
 
 
@@ -486,7 +489,7 @@ def render_markdown(result: dict[str, Any]) -> str:
         f"Objective achieved: `{result['objective_achieved']}`.",
         f"Completion status: `{result['completion_status']}`.",
         f"Complete rows: `{result['complete_count']}` / `{result['check_count']}`.",
-        "The dense-Qwen negative result, row-scale recovery path, and stable I2_SR CPU route are well supported. The full objective is still incomplete because quality-preserving TL2 support for the strong row-scale checkpoint and MoE/Kimi evidence remain missing.",
+        "The dense-Qwen negative result, row-scale recovery path, and stable I2_SR CPU route are well supported. The full objective is still incomplete because quality-preserving TL2 support for the strong row-scale checkpoint and trained/Kimi/ternary MoE evidence remain missing.",
         "## Prompt-To-Artifact Checklist",
         md_table(["requirement", "status", "evidence", "remaining gap"], checklist_rows),
         "## Remaining Blockers",

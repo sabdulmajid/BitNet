@@ -17,7 +17,8 @@ Generated from benchmark JSON artifacts. Missing rows are intentionally shown as
 | objective completion | not_complete | 7/9 complete | Open items are TL2 row/group-scale quality support and MoE/Kimi evidence. |
 | product scope | research_mvp_only | negative arbitrary-retrofit result plus dense-Qwen row-scale recovery path | Do not claim arbitrary lossless retrofit or MoE/Kimi support. |
 | I2_SR active submodule | ready | active=True; patch_applies=False; blockers=0 | Quality-valid CPU path is active when the fork branch is reachable and the superproject pointer is clean. |
-| MoE/Kimi packing | ready | tl2_3d=True; i2sr_3d=True; 2d_control=True | Synthetic contract now separates direct I2_S/I2_SR packing from TL2; no Kimi artifact exists. |
+| MoE/Kimi packing | ready | tl2_3d=True; i2sr_3d=True; 2d_control=True | Synthetic contract separates direct I2_S/I2_SR packing from TL2; still no trained MoE or Kimi artifact. |
+| tiny Qwen2MoE FP16 fixture | pass | arch=qwen2moe; experts=2; used=1; decode=600.7 tok/s | Positive converter/runtime smoke only; no quality, Kimi, ternary, TL2, or I2_SR MoE claim. |
 
 ## Perplexity
 

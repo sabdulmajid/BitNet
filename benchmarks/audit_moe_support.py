@@ -152,17 +152,30 @@ def build_report(data: dict[str, Any]) -> str:
         if tl2_contract
         else "TL2 MoE runtime contract artifact is missing."
     )
+    fixture = data.get("tiny_qwen2moe_fixture") or {}
+    fixture_smoke = fixture.get("smoke", {}) if isinstance(fixture.get("smoke"), dict) else {}
+    fixture_note = (
+        "Tiny Qwen2MoE FP16 runtime fixture: "
+        f"passed={fixture.get('passed')}; "
+        f"arch={fixture_smoke.get('architecture')}; "
+        f"experts={fixture_smoke.get('expert_count')}; "
+        f"used={fixture_smoke.get('expert_used_count')}; "
+        f"decode_tok_s={fixture_smoke.get('decode_tok_s')}."
+        if fixture
+        else "Tiny Qwen2MoE FP16 runtime fixture artifact is missing."
+    )
     verdict = (
         "Generic MoE infrastructure is present: GGUF metadata has expert counts, "
         "Qwen2MoE is registered in the vendored llama.cpp converter, expert "
         "weights are merged into 3D tensors, and the runtime builds sparse "
-        "top-k expert execution with `ggml_mul_mat_id`. This does not prove "
-        "Kimi support: no Kimi-specific mapping or benchmark artifact is present, "
-        "Qwen2MoE mapping still lacks a real converted/evaluated artifact, "
-        "the TL2 packing path is only synthetically validated, and the active TL2 "
+        "top-k expert execution with `ggml_mul_mat_id`. A tiny random Qwen2MoE "
+        "FP16 fixture now validates converter-to-runtime plumbing on CPU. This "
+        "does not prove Kimi support: no Kimi-specific mapping or benchmark "
+        "artifact is present, no trained MoE checkpoint has been evaluated, the "
+        "TL2 packing path is only synthetically validated, and the active TL2 "
         "runtime contract still does not route merged experts correctly. The "
         "direct I2_S/I2_SR path is only a synthetic packing contract until it "
-        "is validated with a full MoE GGUF/runtime artifact."
+        "is validated with a trained MoE GGUF/runtime artifact."
     )
     gate_rows = [
         [
@@ -188,7 +201,7 @@ def build_report(data: dict[str, Any]) -> str:
             "## Productization Gates",
             md_table(["gate", "status", "evidence", "blocker"], gate_rows),
             "## Negative Checks",
-            "\n".join([kimi_note, artifact_note, contract_note, tl2_note]),
+            "\n".join([kimi_note, artifact_note, contract_note, tl2_note, fixture_note]),
             "## Verdict",
             verdict,
             "## Required Plan",
@@ -204,6 +217,7 @@ def build_productization_gates(
     kimi_artifacts: list[str],
     moe_packing_contract: dict[str, Any],
     moe_tl2_runtime_contract: dict[str, Any],
+    tiny_qwen2moe_fixture: dict[str, Any],
 ) -> list[dict[str, Any]]:
     check_by_label = {check["label"]: check for check in checks}
     generic_runtime = check_by_label.get("Runtime sparse expert execution", {}).get("status") == "present"
@@ -224,6 +238,8 @@ def build_productization_gates(
     runtime_ready = bool(moe_tl2_runtime_contract.get("tl2_moe_runtime_ready"))
     runtime_blockers = moe_tl2_runtime_contract.get("blockers", [])
     byte_probe = moe_tl2_runtime_contract.get("byte_size_probe", {})
+    fixture_passed = bool(tiny_qwen2moe_fixture.get("passed"))
+    fixture_smoke = tiny_qwen2moe_fixture.get("smoke", {}) if isinstance(tiny_qwen2moe_fixture.get("smoke"), dict) else {}
 
     return [
         make_gate(
@@ -257,6 +273,16 @@ def build_productization_gates(
                 f"contract_2d_control={contract_2d_control}; direct_i2sr_writer_rejects_non_2d={direct_i2sr_is_2d}"
             ),
             "The direct packed I2_S/I2_SR writer must accept synthetic 3D expert tensors without regressing 2D dense packing.",
+        ),
+        make_gate(
+            "tiny Qwen2MoE FP16 GGUF CPU fixture passes",
+            fixture_passed,
+            (
+                f"passed={fixture_passed}; arch={fixture_smoke.get('architecture')}; "
+                f"experts={fixture_smoke.get('expert_count')}; used={fixture_smoke.get('expert_used_count')}; "
+                f"decode_tok_s={fixture_smoke.get('decode_tok_s')}"
+            ),
+            "The generic Qwen2MoE converter/runtime path needs at least a minimal executable GGUF fixture before real MoE benchmarking.",
         ),
         make_gate(
             "local Kimi model/eval artifacts exist",
@@ -329,6 +355,9 @@ def main() -> None:
     moe_tl2_runtime_contract = read_json(
         latest_artifact(root, "benchmark_results/moe_tl2_runtime_contract_*.json", "benchmark_results/moe_tl2_runtime_contract_2026-05-13.json")
     )
+    tiny_qwen2moe_fixture = read_json(
+        latest_artifact(root, "benchmark_results/tiny_qwen2moe_fixture_*.json", "benchmark_results/tiny_qwen2moe_fixture_2026-05-14.json")
+    )
     data: dict[str, Any] = {
         "schema": "bitnet-moe-support-audit-v1",
         "date": DATE,
@@ -340,11 +369,13 @@ def main() -> None:
             local_kimi_results,
             moe_packing_contract,
             moe_tl2_runtime_contract,
+            tiny_qwen2moe_fixture,
         ),
         "kimi_source_matches": kimi_source_matches,
         "local_kimi_artifacts": local_kimi_results,
         "moe_packing_contract": moe_packing_contract,
         "moe_tl2_runtime_contract": moe_tl2_runtime_contract,
+        "tiny_qwen2moe_fixture": tiny_qwen2moe_fixture,
     }
     report = build_report(data)
     args.output_md.parent.mkdir(parents=True, exist_ok=True)

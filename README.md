@@ -37,6 +37,8 @@ Added work in this fork includes:
   ternary scales in packed CPU inference.
 - MoE/Kimi feasibility audits that separate generic routing support from real
   Kimi/MoE benchmark evidence.
+- A tiny random Qwen2MoE FP16 GGUF runtime fixture proving generic converter
+  and CPU execution plumbing, without claiming Kimi or ternary MoE quality.
 
 The llama.cpp submodule now points at the writable fork:
 
@@ -53,7 +55,7 @@ with the active `i2sr-row-scale-runtime` branch.
 | Stable CPU row-scale packed inference exists for dense Qwen | **Yes, for the audited path** | `I2_SR` productization gate passes `9/9`; Xeon I2_SR PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
 | BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B short-budget GLUE3 sequence-classification runs remain 11.0-30.2 accuracy points below FP16-SFT. |
 | TL2 is ready for the best row-scale checkpoint | **No** | Current TL2 scale semantics cannot represent the learned row scales without row/group-scale metadata and kernels. |
-| Kimi/MoE retrofit is proven | **No** | No local Kimi/Qwen2MoE model artifact, no Kimi mapping, no router distillation, and no MoE quality/throughput/locality benchmark. |
+| Kimi/MoE retrofit is proven | **No** | A tiny random Qwen2MoE FP16 fixture now passes converter/runtime smoke, but there is no Kimi mapping, trained MoE artifact, router distillation, ternary MoE quality, throughput, or expert-locality benchmark. |
 
 ## BitDistill Reproduction Status
 
@@ -182,7 +184,7 @@ It does not make blind PTQ viable.
 - No evidence shows FP-quality 1.58-bit Qwen from this retrofit recipe.
 - No completed local run yet reproduces BitDistill paper-level GLUE quality.
 - No packed `I2_SR` path currently runs the sequence-classification GLUE heads.
-- No evidence validates Kimi or another MoE model in this runtime.
+- No evidence validates Kimi or a trained MoE model in this ternary runtime.
 - TL2 remains an engineering probe for row-scale Qwen, not a supported product
   path for the strongest checkpoint.
 
@@ -249,6 +251,8 @@ MAX_EVAL_SAMPLES=512 sbatch --dependency=afterany:<downstream-job-ids> \
 
 python benchmarks/build_qwen_side_by_side.py \
   --output-md benchmarks/results/qwen_side_by_side_2026-05-14.md
+
+python benchmarks/run_tiny_qwen2moe_fixture.py --skip-existing
 ```
 
 Build smoke used for the active runtime:
@@ -277,7 +281,8 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Direct packed GGUF support audit](benchmarks/results/direct_packed_gguf_support_2026-05-13.md)
 - [TL2 row-scale design audit](benchmarks/results/tl2_row_scale_design_2026-05-13.md)
 - [MoE support audit](benchmarks/results/moe_support_audit_2026-05-14.md)
-- [Unblock requirements audit](benchmarks/results/unblock_requirements_2026-05-13.md)
+- [Tiny Qwen2MoE runtime fixture](benchmarks/results/tiny_qwen2moe_fixture_2026-05-14.md)
+- [Unblock requirements audit](benchmarks/results/unblock_requirements_2026-05-14.md)
 - [Evidence manifest](benchmarks/results/evidence_manifest_2026-05-13.md)
 
 ## Product Direction
@@ -293,8 +298,9 @@ product is a CPU-first retrofit evaluator and distillation pipeline:
    any model is advertised as usable.
 
 MoE/Kimi should be treated as the next research milestone, requiring licensed
-artifacts, router/expert distillation, 3D expert tensor packing, expert-locality
-measurement, and CPU runtime benchmarks.
+artifacts, router/expert distillation, ternary expert runtime validation,
+expert-locality measurement, and CPU quality/throughput/RSS benchmarks. The
+tiny Qwen2MoE fixture only proves generic FP16 converter/runtime plumbing.
 
 ## Upstream Attribution
 

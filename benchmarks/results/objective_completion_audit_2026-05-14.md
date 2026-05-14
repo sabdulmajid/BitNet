@@ -22,7 +22,7 @@ Completion status: `not_complete`.
 
 Complete rows: `7` / `9`.
 
-The dense-Qwen negative result, row-scale recovery path, and stable I2_SR CPU route are well supported. The full objective is still incomplete because quality-preserving TL2 support for the strong row-scale checkpoint and MoE/Kimi evidence remain missing.
+The dense-Qwen negative result, row-scale recovery path, and stable I2_SR CPU route are well supported. The full objective is still incomplete because quality-preserving TL2 support for the strong row-scale checkpoint and trained/Kimi/ternary MoE evidence remain missing.
 
 ## Prompt-To-Artifact Checklist
 
@@ -35,14 +35,14 @@ The dense-Qwen negative result, row-scale recovery path, and stable I2_SR CPU ro
 | Add baselines: original FP, naive PTQ, llama.cpp Q4_K_M/Q8_0, QAT with/without hidden MSE, row-scale versus tensor-scale | complete | row-FP=-0.144710 [-0.185756, -0.103664]; row-PTQ=+0.150788 [+0.053427, +0.248149]; row-tensor=+0.015081 [+0.009028, +0.021134]; row-KL=+0.016021 [+0.006145, +0.025897] |  |
 | Measure Xeon model size, quality, prompt throughput, decode throughput, and RSS/context scaling | complete | I2_SR PPL=38.8477, file=1211.3 MiB, prompt=211.67 tok/s, decode=19.07 tok/s; Q4_K_M file=940.4 MiB; RSS contexts=[512, 2048, 8192, 32768] |  |
 | Convert repaired checkpoints into GGUF/TL2/I2_S and run actual bitnet.cpp/llama.cpp CPU inference | partial | direct dense/scalar writers exist; I2_SR candidate gate=True; active default gate=True; TL2 row-scale one-scale error=1.9042302114103853; row-fp16 design error=0.00019744640689756221 at 1.23046875 MiB | Packed row-scale CPU inference is active through stable I2_SR for dense Qwen; TL2 quality-preserving row-scale Qwen1.5B still requires row/group-scale runtime and kernel support. |
-| Evaluate MoE/Kimi feasibility including converter mapping, router/expert execution, quality, throughput, and locality | not_complete | generic MoE checks present=6; productization gates failed=3/6; Kimi artifacts=0; Kimi source matches=0 | No validated Kimi-specific mapping, real Qwen2MoE/Kimi conversion artifact, TL2 MoE runtime support, router distillation, MoE quality run, throughput run, or expert-locality benchmark exists. Direct I2_S/I2_SR and TL2 3D packing are synthetic contracts until a real MoE GGUF/runtime artifact exists. |
+| Evaluate MoE/Kimi feasibility including converter mapping, router/expert execution, quality, throughput, and locality | not_complete | generic MoE checks present=6; productization gates failed=3/7; Kimi artifacts=0; Kimi source matches=0; tiny Qwen2MoE FP16 fixture passed=True | A tiny random Qwen2MoE FP16 GGUF fixture now validates generic converter/runtime plumbing, but no validated Kimi-specific mapping, trained Qwen2MoE/Kimi quality artifact, ternary MoE runtime artifact, TL2 MoE runtime support, router distillation, MoE quality run, throughput run, or expert-locality benchmark exists. |
 | Produce side-by-side comparison, evidence manifest, prune plan, and honest novelty/product verdict | complete | manifest artifacts=105, missing=0; coverage=True checks=33; publishable ledger scopes negative result plus recovery path |  |
 
 ## Remaining Blockers
 
 - Convert repaired checkpoints into GGUF/TL2/I2_S and run actual bitnet.cpp/llama.cpp CPU inference: Packed row-scale CPU inference is active through stable I2_SR for dense Qwen; TL2 quality-preserving row-scale Qwen1.5B still requires row/group-scale runtime and kernel support.
 
-- Evaluate MoE/Kimi feasibility including converter mapping, router/expert execution, quality, throughput, and locality: No validated Kimi-specific mapping, real Qwen2MoE/Kimi conversion artifact, TL2 MoE runtime support, router distillation, MoE quality run, throughput run, or expert-locality benchmark exists. Direct I2_S/I2_SR and TL2 3D packing are synthetic contracts until a real MoE GGUF/runtime artifact exists.
+- Evaluate MoE/Kimi feasibility including converter mapping, router/expert execution, quality, throughput, and locality: A tiny random Qwen2MoE FP16 GGUF fixture now validates generic converter/runtime plumbing, but no validated Kimi-specific mapping, trained Qwen2MoE/Kimi quality artifact, ternary MoE runtime artifact, TL2 MoE runtime support, router distillation, MoE quality run, throughput run, or expert-locality benchmark exists.
 
 ## Practical Next Step
 

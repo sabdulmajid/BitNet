@@ -150,6 +150,8 @@ def build_gate(root: Path) -> dict[str, Any]:
     kimi_source_matches = moe.get("kimi_source_matches", [])
     moe_gates = moe.get("productization_gates", [])
     moe_failed_gates = [gate.get("name") for gate in moe_gates if isinstance(gate, dict) and not gate.get("passed")]
+    tiny_qwen2moe = moe.get("tiny_qwen2moe_fixture", {}) if isinstance(moe.get("tiny_qwen2moe_fixture"), dict) else {}
+    tiny_qwen2moe_smoke = tiny_qwen2moe.get("smoke", {}) if isinstance(tiny_qwen2moe.get("smoke"), dict) else {}
     moe_tl2 = read_json(
         latest_json_path(
             root,
@@ -233,12 +235,14 @@ def build_gate(root: Path) -> dict[str, Any]:
         "unsupported",
         (
             f"Kimi artifacts={len(kimi_artifacts)}; Kimi source matches={len(kimi_source_matches)}; "
+            f"tiny Qwen2MoE FP16 fixture passed={tiny_qwen2moe.get('passed')}; "
+            f"fixture arch={tiny_qwen2moe_smoke.get('architecture')}; "
             f"failed MoE gates={len(moe_failed_gates)}/{len(moe_gates)}; "
             f"TL2 MoE runtime ready={moe_tl2.get('tl2_moe_runtime_ready')}; "
             f"TL2 expert byte underreport={moe_tl2_byte_probe.get('underreport_bytes')}"
         ),
         "Treat as separate research milestone.",
-        "No Kimi-specific mapping, real Qwen2MoE/Kimi conversion artifact, TL2 3D expert packing/runtime support, router distillation, quality benchmark, or expert-locality benchmark exists; direct I2_S/I2_SR expert packing is only synthetic so far.",
+        "No Kimi-specific mapping, trained Qwen2MoE/Kimi quality artifact, ternary MoE runtime artifact, TL2 3D expert runtime support, router distillation, quality benchmark, or expert-locality benchmark exists; the tiny Qwen2MoE fixture only proves FP16 converter/runtime plumbing.",
     )
 
     supported = [claim for claim in claims if claim["status"] in {"supported", "supported_with_patch"}]
