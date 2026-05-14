@@ -122,8 +122,11 @@ def fmt(value: Any) -> str:
 
 
 def md_table(headers: list[str], rows: list[list[str]]) -> str:
-    lines = ["| " + " | ".join(headers) + " |", "| " + " | ".join(["---"] * len(headers)) + " |"]
-    lines.extend("| " + " | ".join(row) + " |" for row in rows)
+    def cell(value: str) -> str:
+        return value.replace("|", "\\|")
+
+    lines = ["| " + " | ".join(cell(header) for header in headers) + " |", "| " + " | ".join(["---"] * len(headers)) + " |"]
+    lines.extend("| " + " | ".join(cell(value) for value in row) + " |" for row in rows)
     return "\n".join(lines)
 
 
