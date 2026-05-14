@@ -277,6 +277,7 @@ def build_reviewer_gate_table() -> str:
     tiny_moe = read_json(tiny_moe_path) or {}
     moe_verdict = moe.get("verdict", {}) if isinstance(moe.get("verdict"), dict) else {}
     tiny_smoke = tiny_moe.get("smoke", {}) if isinstance(tiny_moe.get("smoke"), dict) else {}
+    tiny_rss = tiny_moe.get("rss", {}) if isinstance(tiny_moe.get("rss"), dict) else {}
     rows = [
         [
             "benchmark coverage",
@@ -317,7 +318,8 @@ def build_reviewer_gate_table() -> str:
             "pass" if tiny_moe.get("passed") else "missing",
             (
                 f"arch={tiny_smoke.get('architecture')}; experts={tiny_smoke.get('expert_count')}; "
-                f"used={tiny_smoke.get('expert_used_count')}; decode={tiny_smoke.get('decode_tok_s')} tok/s"
+                f"used={tiny_smoke.get('expert_used_count')}; decode={tiny_smoke.get('decode_tok_s')} tok/s; "
+                f"rss={tiny_rss.get('max_rss_mib')} MiB"
             ),
             "Positive converter/runtime smoke only; no quality, Kimi, ternary, TL2, or I2_SR MoE claim.",
         ],

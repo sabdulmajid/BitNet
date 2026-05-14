@@ -7,11 +7,12 @@ This fixture creates a tiny random `Qwen2MoeForCausalLM`, converts it to FP16 GG
 | HF checkpoint created | yes | models/tiny-qwen2moe-fixture |
 | GGUF converted | yes | models/tiny-qwen2moe-fixture/tiny-qwen2moe-f16.gguf |
 | CPU smoke executed | yes | 0 |
+| Peak RSS measured | yes | 105.09765625 MiB |
 | Qwen2MoE metadata present | yes | experts=2; used=1 |
 
 ## Runtime Snapshot
 
-Architecture: `qwen2moe`; params: `19.48` M; CPU buffer: `37.16` MiB; prompt: `2496.26` tok/s; decode: `600.7` tok/s.
+Architecture: `qwen2moe`; params: `19.48` M; CPU buffer: `37.16` MiB; peak RSS: `105.09765625` MiB; prompt: `2424.83` tok/s; decode: `601.22` tok/s.
 
 ## Interpretation
 

@@ -166,6 +166,17 @@ def summarize_output(stdout_path: Path, stderr_path: Path) -> dict[str, Any]:
     }
 
 
+def parse_rss(stderr_path: Path) -> dict[str, Any]:
+    text = read_text(stderr_path)
+    rss_kib = parse_int(r"Maximum resident set size \(kbytes\):\s+([0-9]+)", text)
+    elapsed = find_first(r"Elapsed \(wall clock\) time \(h:mm:ss or m:ss\):\s+([^\n]+)", text)
+    return {
+        "max_rss_kib": rss_kib,
+        "max_rss_mib": rss_kib / 1024 if rss_kib is not None else None,
+        "elapsed": elapsed,
+    }
+
+
 def md_bool(value: bool) -> str:
     return "yes" if value else "no"
 
@@ -177,6 +188,7 @@ def render_markdown(result: dict[str, Any]) -> str:
         ["HF checkpoint created", md_bool(gates.get("hf_checkpoint_created", False)), result["hf_model"].get("model_dir", "")],
         ["GGUF converted", md_bool(gates.get("gguf_converted", False)), result.get("gguf_path", "")],
         ["CPU smoke executed", md_bool(gates.get("cpu_smoke_executed", False)), str(result["commands"]["smoke"].get("returncode"))],
+        ["Peak RSS measured", md_bool(gates.get("rss_measured", False)), f"{result.get('rss', {}).get('max_rss_mib')} MiB"],
         ["Qwen2MoE metadata present", md_bool(gates.get("qwen2moe_metadata_present", False)), f"experts={smoke.get('expert_count')}; used={smoke.get('expert_used_count')}"],
     ]
     table = "\n".join(
@@ -196,6 +208,7 @@ def render_markdown(result: dict[str, Any]) -> str:
                 f"Architecture: `{smoke.get('architecture')}`; "
                 f"params: `{smoke.get('model_params_m')}` M; "
                 f"CPU buffer: `{smoke.get('cpu_buffer_mib')}` MiB; "
+                f"peak RSS: `{result.get('rss', {}).get('max_rss_mib')}` MiB; "
                 f"prompt: `{smoke.get('prompt_eval_tok_s')}` tok/s; "
                 f"decode: `{smoke.get('decode_tok_s')}` tok/s."
             ),
@@ -224,6 +237,7 @@ def main() -> None:
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/tiny_qwen2moe_fixture_{DATE}.md"))
     parser.add_argument("--prompt", default="The capital of France is")
     parser.add_argument("--tokens", type=int, default=8)
+    parser.add_argument("--rss-tokens", type=int, default=1)
     parser.add_argument("--threads", type=int, default=4)
     parser.add_argument("--seed", type=int, default=20260514)
     parser.add_argument("--force", action="store_true")
@@ -277,11 +291,37 @@ def main() -> None:
     if smoke["returncode"] != 0:
         raise RuntimeError(f"llama-cli smoke failed; see {smoke_stdout} and {smoke_stderr}")
 
+    rss_stdout = args.out_dir / "rss.stdout"
+    rss_stderr = args.out_dir / "rss.stderr"
+    rss_command = [
+        "/usr/bin/time",
+        "-v",
+        str(args.llama_bin_dir / "llama-cli"),
+        "-m",
+        str(args.gguf),
+        "-p",
+        args.prompt,
+        "-n",
+        str(args.rss_tokens),
+        "-t",
+        str(args.threads),
+        "-ngl",
+        "0",
+        "--temp",
+        "0",
+        "--no-display-prompt",
+    ]
+    rss_run = run_command(rss_command, stdout_path=rss_stdout, stderr_path=rss_stderr, skip_existing=False)
+    if rss_run["returncode"] != 0:
+        raise RuntimeError(f"llama-cli RSS probe failed; see {rss_stdout} and {rss_stderr}")
+
     smoke_summary = summarize_output(smoke_stdout, smoke_stderr)
+    rss_summary = parse_rss(rss_stderr)
     gates = {
         "hf_checkpoint_created": args.model_dir.exists() and (args.model_dir / "config.json").exists(),
         "gguf_converted": args.gguf.exists() and args.gguf.stat().st_size > 0,
         "cpu_smoke_executed": smoke["returncode"] == 0,
+        "rss_measured": rss_summary.get("max_rss_kib") is not None,
         "qwen2moe_metadata_present": smoke_summary.get("architecture") == "qwen2moe"
         and smoke_summary.get("expert_count") == 2
         and smoke_summary.get("expert_used_count") == 1,
@@ -292,8 +332,9 @@ def main() -> None:
         "hf_model": hf_model,
         "gguf_path": str(args.gguf),
         "gguf_mib": args.gguf.stat().st_size / (1024**2) if args.gguf.exists() else None,
-        "commands": {"convert": convert, "smoke": smoke},
+        "commands": {"convert": convert, "smoke": smoke, "rss": rss_run},
         "smoke": smoke_summary,
+        "rss": rss_summary,
         "gates": gates,
         "passed": all(gates.values()),
         "proves": [

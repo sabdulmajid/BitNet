@@ -152,6 +152,7 @@ def build_gate(root: Path) -> dict[str, Any]:
     moe_failed_gates = [gate.get("name") for gate in moe_gates if isinstance(gate, dict) and not gate.get("passed")]
     tiny_qwen2moe = moe.get("tiny_qwen2moe_fixture", {}) if isinstance(moe.get("tiny_qwen2moe_fixture"), dict) else {}
     tiny_qwen2moe_smoke = tiny_qwen2moe.get("smoke", {}) if isinstance(tiny_qwen2moe.get("smoke"), dict) else {}
+    tiny_qwen2moe_rss = tiny_qwen2moe.get("rss", {}) if isinstance(tiny_qwen2moe.get("rss"), dict) else {}
     moe_tl2 = read_json(
         latest_json_path(
             root,
@@ -236,7 +237,7 @@ def build_gate(root: Path) -> dict[str, Any]:
         (
             f"Kimi artifacts={len(kimi_artifacts)}; Kimi source matches={len(kimi_source_matches)}; "
             f"tiny Qwen2MoE FP16 fixture passed={tiny_qwen2moe.get('passed')}; "
-            f"fixture arch={tiny_qwen2moe_smoke.get('architecture')}; "
+            f"fixture arch={tiny_qwen2moe_smoke.get('architecture')}; fixture RSS MiB={tiny_qwen2moe_rss.get('max_rss_mib')}; "
             f"failed MoE gates={len(moe_failed_gates)}/{len(moe_gates)}; "
             f"TL2 MoE runtime ready={moe_tl2.get('tl2_moe_runtime_ready')}; "
             f"TL2 expert byte underreport={moe_tl2_byte_probe.get('underreport_bytes')}"

@@ -154,13 +154,15 @@ def build_report(data: dict[str, Any]) -> str:
     )
     fixture = data.get("tiny_qwen2moe_fixture") or {}
     fixture_smoke = fixture.get("smoke", {}) if isinstance(fixture.get("smoke"), dict) else {}
+    fixture_rss = fixture.get("rss", {}) if isinstance(fixture.get("rss"), dict) else {}
     fixture_note = (
         "Tiny Qwen2MoE FP16 runtime fixture: "
         f"passed={fixture.get('passed')}; "
         f"arch={fixture_smoke.get('architecture')}; "
         f"experts={fixture_smoke.get('expert_count')}; "
         f"used={fixture_smoke.get('expert_used_count')}; "
-        f"decode_tok_s={fixture_smoke.get('decode_tok_s')}."
+        f"decode_tok_s={fixture_smoke.get('decode_tok_s')}; "
+        f"peak_rss_mib={fixture_rss.get('max_rss_mib')}."
         if fixture
         else "Tiny Qwen2MoE FP16 runtime fixture artifact is missing."
     )
@@ -240,6 +242,7 @@ def build_productization_gates(
     byte_probe = moe_tl2_runtime_contract.get("byte_size_probe", {})
     fixture_passed = bool(tiny_qwen2moe_fixture.get("passed"))
     fixture_smoke = tiny_qwen2moe_fixture.get("smoke", {}) if isinstance(tiny_qwen2moe_fixture.get("smoke"), dict) else {}
+    fixture_rss = tiny_qwen2moe_fixture.get("rss", {}) if isinstance(tiny_qwen2moe_fixture.get("rss"), dict) else {}
 
     return [
         make_gate(
@@ -280,7 +283,7 @@ def build_productization_gates(
             (
                 f"passed={fixture_passed}; arch={fixture_smoke.get('architecture')}; "
                 f"experts={fixture_smoke.get('expert_count')}; used={fixture_smoke.get('expert_used_count')}; "
-                f"decode_tok_s={fixture_smoke.get('decode_tok_s')}"
+                f"decode_tok_s={fixture_smoke.get('decode_tok_s')}; peak_rss_mib={fixture_rss.get('max_rss_mib')}"
             ),
             "The generic Qwen2MoE converter/runtime path needs at least a minimal executable GGUF fixture before real MoE benchmarking.",
         ),
