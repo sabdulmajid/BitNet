@@ -30,9 +30,8 @@ def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def latest_job_table(root: Path) -> Path | None:
-    tables = sorted((root / "benchmark_results").glob("bitdistill_longwarmup_downstream_*.tsv"))
-    return tables[-1] if tables else None
+def discover_job_tables(root: Path) -> list[Path]:
+    return sorted((root / "benchmark_results").glob("bitdistill_longwarmup_downstream_*.tsv"))
 
 
 def read_job_table(path: Path | None) -> list[dict[str, str]]:
@@ -40,6 +39,22 @@ def read_job_table(path: Path | None) -> list[dict[str, str]]:
         return []
     with path.open("r", encoding="utf-8", newline="") as handle:
         return list(csv.DictReader(handle, delimiter="\t"))
+
+
+def read_job_tables(paths: list[Path]) -> list[dict[str, str]]:
+    rows: list[dict[str, str]] = []
+    seen_job_ids: set[str] = set()
+    for path in paths:
+        for row in read_job_table(path):
+            job_id = row.get("job_id", "")
+            if job_id and job_id in seen_job_ids:
+                continue
+            if job_id:
+                seen_job_ids.add(job_id)
+            row = dict(row)
+            row["job_table"] = str(path)
+            rows.append(row)
+    return rows
 
 
 def parse_dependency_job_ids(rows: list[dict[str, str]]) -> list[str]:
@@ -220,7 +235,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
     return "\n\n".join(
         [
             f"# BitDistill Job Monitor, {summary['date']}",
-            f"Job table: `{summary['job_table']}`.",
+            f"Job tables: `{', '.join(summary['job_tables'])}`.",
             "## Stage-2 Warm-Up",
             md_table(
                 ["log", "step", "max steps", "progress", "latest CE", "effective tokens", "target tokens", "ETA"],
@@ -237,10 +252,11 @@ def render_markdown(summary: dict[str, Any]) -> str:
 
 def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     root = args.repo_root.resolve()
-    table = args.job_table if args.job_table is not None else latest_job_table(root)
-    if table is not None and not table.is_absolute():
-        table = root / table
-    rows = read_job_table(table)
+    if args.job_table is not None:
+        tables = [args.job_table if args.job_table.is_absolute() else root / args.job_table]
+    else:
+        tables = discover_job_tables(root)
+    rows = read_job_tables(tables)
     warmup_job_ids = parse_dependency_job_ids(rows)
     all_job_ids = sorted(set(warmup_job_ids + [row.get("job_id", "") for row in rows if row.get("job_id")]))
     squeue = collect_squeue(all_job_ids)
@@ -249,7 +265,8 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     return {
         "schema": "bitdistill-job-monitor-v1",
         "date": DATE,
-        "job_table": str(table) if table is not None else "",
+        "job_table": str(tables[-1]) if tables else "",
+        "job_tables": [str(table) for table in tables],
         "warmup_job_ids": warmup_job_ids,
         "squeue": squeue,
         "warmup": warmup,
