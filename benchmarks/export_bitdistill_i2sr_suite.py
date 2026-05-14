@@ -23,6 +23,20 @@ def count_ternary_keys(path: Path) -> int:
     return sum(1 for key in state if key.endswith(".ternary_weight"))
 
 
+def checkpoint_architecture(path: Path) -> str:
+    config_path = path / "config.json"
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    architectures = config.get("architectures")
+    if not isinstance(architectures, list) or not architectures:
+        raise ValueError(f"{config_path} does not contain architectures")
+    return str(architectures[0])
+
+
+def format_run_template(template: str, *, scale: str, layer: int) -> str:
+    safe_layer = str(layer).removeprefix("-")
+    return template.format(scale=scale, layer=layer, safe_layer=safe_layer)
+
+
 def run_command(command: list[str], *, output: Path | None, skip_existing: bool) -> None:
     print("[run] " + " ".join(command), flush=True)
     if output is not None and skip_existing and output.exists():
@@ -43,6 +57,15 @@ def main() -> None:
     parser.add_argument("--tasks", nargs="+", default=["mnli", "qnli", "sst2"])
     parser.add_argument("--scales", nargs="+", default=["row"], choices=["tensor", "row"])
     parser.add_argument("--layer", type=int, default=-1)
+    parser.add_argument(
+        "--run-template",
+        default="bitdistill-{scale}-layer{layer}",
+        help=(
+            "Checkpoint directory name template under each task. Available fields: "
+            "{scale}, {layer}, {safe_layer}. Example for long warm-up runs: "
+            "bitdistill-longwarmup-{scale}-layer-{safe_layer}."
+        ),
+    )
     parser.add_argument("--out-model-dir", type=Path, default=Path("models/bitdistill-i2sr"))
     parser.add_argument("--results-dir", type=Path, default=Path("benchmark_results/bitdistill-i2sr-cpu-2026-05-14"))
     parser.add_argument("--llama-bin-dir", type=Path, default=Path("build/bin"))
@@ -55,6 +78,14 @@ def main() -> None:
     parser.add_argument("--ctx-sizes", type=int, nargs="+", default=[512, 2048, 4096])
     parser.add_argument("--skip-existing", action="store_true")
     parser.add_argument("--allow-missing", action="store_true")
+    parser.add_argument(
+        "--skip-unsupported-architecture",
+        action="store_true",
+        help=(
+            "Record unsupported non-causal checkpoints instead of failing. "
+            "Sequence-classification checkpoints need classifier-head runtime support and are not llama.cpp I2_SR exports."
+        ),
+    )
     parser.add_argument("--run-suite", action="store_true")
     parser.add_argument("--run-memory", action="store_true")
     args = parser.parse_args()
@@ -65,9 +96,10 @@ def main() -> None:
 
     for task in args.tasks:
         for scale in args.scales:
-            checkpoint_dir = args.root / slug / task / f"bitdistill-{scale}-layer{args.layer}"
+            run_name = format_run_template(args.run_template, scale=scale, layer=args.layer)
+            checkpoint_dir = args.root / slug / task / run_name
             ternary_state = checkpoint_dir / "ternary_state_dict.pt"
-            name = f"{slug}_{task}_bitdistill_{scale}_layer{args.layer}"
+            name = f"{slug}_{task}_{run_name}"
             outfile = args.out_model_dir / slug / task / f"{name}_bitnet25_i2sr.gguf"
             summary_json = args.results_dir / "exports" / f"{name}.json"
 
@@ -84,6 +116,26 @@ def main() -> None:
                 if args.allow_missing:
                     continue
                 raise FileNotFoundError(record["error"])
+
+            architecture = checkpoint_architecture(checkpoint_dir)
+            if not architecture.endswith("ForCausalLM"):
+                record = {
+                    "name": name,
+                    "task": task,
+                    "scale": scale,
+                    "checkpoint_dir": str(checkpoint_dir),
+                    "exists": True,
+                    "architecture": architecture,
+                    "exported": False,
+                    "error": (
+                        f"unsupported architecture {architecture!r}; packed llama.cpp I2_SR export "
+                        "currently supports causal-LM checkpoints, not sequence-classification heads"
+                    ),
+                }
+                exports.append(record)
+                if args.skip_unsupported_architecture:
+                    continue
+                raise NotImplementedError(record["error"])
 
             ternary_keys = count_ternary_keys(ternary_state)
             command = [

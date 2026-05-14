@@ -352,6 +352,38 @@ For the active long-warm-up chain, `slurm_bitdistill_cpu_benchmark.sh` runs the
 same benchmark after all downstream jobs finish and includes the strict
 `papergamma` family.
 
+To export row-scale BitDistill checkpoints through the stable packed `I2_SR`
+GGUF path, the checkpoint must be a causal-LM architecture such as
+`Qwen2ForCausalLM`:
+
+```bash
+python benchmarks/export_bitdistill_i2sr_suite.py \
+  --root checkpoints/bitdistill-glue \
+  --tasks mnli \
+  --scales row \
+  --layer -1 \
+  --skip-existing
+```
+
+The active paper-style GLUE reproduction uses
+`Qwen2ForSequenceClassification`. Those checkpoints are intentionally not
+claimed as llama.cpp / `I2_SR` task-runtime artifacts. The exporter records this
+as an unsupported architecture when
+`--skip-unsupported-architecture` is passed:
+
+```bash
+python benchmarks/export_bitdistill_i2sr_suite.py \
+  --root checkpoints/bitdistill-glue-seqcls \
+  --tasks mnli qnli sst2 \
+  --scales row \
+  --layer -1 \
+  --skip-unsupported-architecture
+```
+
+To get packed CPU task inference for the sequence-classification reproduction,
+either train/evaluate the task as causal prompt scoring or add explicit
+classifier-head support to the GGUF mapping and runtime.
+
 For the active Slurm pipeline, queue `slurm_bitdistill_postprocess.sh` with an
 `afterany` dependency on the downstream jobs. It refreshes the monitor,
 reproduction gate, variant summary, and objective audit from the materialized

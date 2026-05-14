@@ -90,10 +90,13 @@ not as a disproof of BitDistill.
 Active follow-ups are probing teacher-head initialization, attention-layer
 selection, paper-style logits KL scaling, CE-only ablations, a longer
 warm-up pilot, and a strict paper-hyperparameter branch with classification
-attention KD weight `1e5`. The earlier completed and queued BitDistill runs use
-attention KD weight `100`; those are useful diagnostics but are not a strict
-match to the paper's reported classification setting. Until those gates close,
-the public claim remains conservative:
+attention KD weight `1e5`. The active long-warmup queue also includes MNLI
+gamma probes at `1e3` and `1e4` because the local relation-loss scale audit
+showed the paper's `1e5` coefficient can dominate CE by orders of magnitude.
+The earlier completed BitDistill runs use attention KD weight `100`; those are
+useful diagnostics but are not a strict match to the paper's reported
+classification setting. Until those gates close, the public claim remains
+conservative:
 **BitDistill is the right class of method, but this fork has not yet reproduced
 paper-level task quality.**
 
@@ -102,6 +105,15 @@ attention-distillation layer improved the best short-budget BitDistill result
 to `0.535711` versus FP16-SFT `0.807641`. CE-only ablations stay near
 `0.492-0.498`, so distillation helps, but the run is still far from
 reproduction-quality.
+
+Runtime boundary: the active paper-style GLUE reproduction uses
+`Qwen2ForSequenceClassification`. Those checkpoints can be evaluated on CPU
+with the PyTorch task benchmark in this fork, but they are **not** valid packed
+llama.cpp / `I2_SR` exports today because the runtime path does not implement a
+Qwen sequence-classification head. The stable `I2_SR` exporter is valid for
+causal-LM BitDistill checkpoints; packed task inference requires either
+causal prompt-scoring checkpoints or new classifier-head support in the
+runtime.
 
 ## Key Dense-Qwen Results
 
@@ -166,6 +178,7 @@ It does not make blind PTQ viable.
 - No evidence supports a one-click arbitrary FP16/BF16-to-ternary product.
 - No evidence shows FP-quality 1.58-bit Qwen from this retrofit recipe.
 - No completed local run yet reproduces BitDistill paper-level GLUE quality.
+- No packed `I2_SR` path currently runs the sequence-classification GLUE heads.
 - No evidence validates Kimi or another MoE model in this runtime.
 - TL2 remains an engineering probe for row-scale Qwen, not a supported product
   path for the strongest checkpoint.
