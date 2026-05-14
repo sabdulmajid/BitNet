@@ -536,6 +536,7 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "warmup_latest_ce": latest.get("ce"),
             "warmup_save_every_steps": warmup.get("save_every_steps"),
             "warmup_snapshots": warmup.get("snapshot_count"),
+            "warmup_warnings": warmup.get("warnings", []),
             "downstream_jobs": len(downstream) if isinstance(downstream, list) else None,
             "downstream_states": sorted(str(state) for state in states if state),
         }
@@ -819,6 +820,7 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"progress={fmt_metric(metrics.get('warmup_progress'))}, "
                 f"ce={fmt_metric(metrics.get('warmup_latest_ce'))}, "
                 f"snapshots={metrics.get('warmup_snapshots', '-')}, "
+                f"warnings={len(metrics.get('warmup_warnings', [])) if isinstance(metrics.get('warmup_warnings'), list) else '-'}, "
                 f"downstream={metrics.get('downstream_jobs', '-')}"
             )
         elif entry["kind"] == "bitdistill_loss_scale_json":

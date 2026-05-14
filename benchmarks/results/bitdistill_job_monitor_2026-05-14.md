@@ -6,7 +6,13 @@ Job tables: `benchmark_results/bitdistill_longwarmup_downstream_20260514_163342.
 
 | log | step | max steps | progress | latest CE | effective tokens | target tokens | save every | snapshots | latest snapshot | ETA |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| logs/bitdistill-glue-9894.out | 4950 | 20000 | 0.247500 | 4.126890 | 40550400 | 163840000 | 0 | 0 | - | 7.61h |
+| logs/bitdistill-glue-9894.out | 5040 | 20000 | 0.252000 | 4.365892 | 41287680 | 163840000 | 0 | 0 | - | 7.56h |
+
+## Operational Warnings
+
+| warning |
+| --- |
+| Stage-2 warm-up is running without intermediate snapshots; if the job fails, progress before final save is not recoverable. |
 
 ## Downstream Jobs
 

@@ -127,6 +127,7 @@ def parse_warmup_log(path: Path, *, root: Path, max_seq_len: int) -> dict[str, A
     if output_dir is not None and not output_dir.is_absolute():
         output_dir = root / output_dir
     snapshot_dirs = sorted(output_dir.glob("checkpoint-*")) if output_dir is not None and output_dir.exists() else []
+    warnings: list[str] = []
     token_step = per_device_batch_size * grad_accum_steps * observed_max_seq_len
     latest = steps[-1] if steps else None
     first = steps[0] if steps else None
@@ -137,6 +138,14 @@ def parse_warmup_log(path: Path, *, root: Path, max_seq_len: int) -> dict[str, A
         if latest["step"] > 0 and latest["elapsed_seconds"] > 0:
             seconds_per_step = latest["elapsed_seconds"] / latest["step"]
             eta_seconds = max(max_steps - latest["step"], 0) * seconds_per_step
+    if latest and max_steps > 0 and latest["step"] < max_steps and save_every_steps <= 0:
+        warnings.append(
+            "Stage-2 warm-up is running without intermediate snapshots; if the job fails, progress before final save is not recoverable."
+        )
+    if latest and save_every_steps > 0 and not snapshot_dirs and latest["step"] >= save_every_steps:
+        warnings.append(
+            f"No checkpoint snapshots found even though SAVE_EVERY_STEPS={save_every_steps} and latest step is {latest['step']}."
+        )
     return {
         "exists": True,
         "path": str(path),
@@ -155,6 +164,7 @@ def parse_warmup_log(path: Path, *, root: Path, max_seq_len: int) -> dict[str, A
         "save_every_steps": save_every_steps,
         "snapshot_count": len(snapshot_dirs),
         "latest_snapshot": str(snapshot_dirs[-1]) if snapshot_dirs else "",
+        "warnings": warnings,
     }
 
 
@@ -260,6 +270,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
         ]
         for row in summary["downstream"]
     ]
+    warning_rows = [[warning] for warning in warmup.get("warnings", [])] or [["none"]]
     return "\n\n".join(
         [
             f"# BitDistill Job Monitor, {summary['date']}",
@@ -281,6 +292,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 ],
                 warmup_rows,
             ),
+            "## Operational Warnings",
+            md_table(["warning"], warning_rows),
             "## Downstream Jobs",
             md_table(
                 [

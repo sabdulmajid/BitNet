@@ -106,7 +106,7 @@
       "label": "bitdistill_paper_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_paper_alignment_2026-05-14.md",
-      "sha256": "f57da64f3ea648960d3bfe23bee75fcdceaf6ac29ce4a71a8f1285f20ff554a5",
+      "sha256": "8e867c796b1dc67216324703772db8f13e319ba22c8d31f6f72e09d5d7ac89ae",
       "size_bytes": 5819
     },
     {
@@ -142,8 +142,8 @@
       "label": "bitdistill_job_monitor_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_job_monitor_2026-05-14.md",
-      "sha256": "10f6599bc904faa1550ab9bb35c660bc9d622f62567ae10b2ce6341eb7e38cce",
-      "size_bytes": 5581
+      "sha256": "1c6b9f7f442c80ce54d41ab941d9f22682565ec17501a291e680e35eff08953c",
+      "size_bytes": 5755
     },
     {
       "exists": true,
@@ -1953,16 +1953,19 @@
         "downstream_states": [
           "PENDING"
         ],
-        "warmup_latest_ce": 4.12689,
+        "warmup_latest_ce": 4.365892,
         "warmup_max_steps": 20000,
-        "warmup_progress": 0.2475,
+        "warmup_progress": 0.252,
         "warmup_save_every_steps": 0,
         "warmup_snapshots": 0,
-        "warmup_step": 4950
+        "warmup_step": 5040,
+        "warmup_warnings": [
+          "Stage-2 warm-up is running without intermediate snapshots; if the job fails, progress before final save is not recoverable."
+        ]
       },
       "path": "benchmark_results/bitdistill_job_monitor_2026-05-14.json",
-      "sha256": "5a888eb3ef18f954c14cc80602a66c84bcb89299678433e2bcaef52dacd6b7ee",
-      "size_bytes": 34156
+      "sha256": "e724a126a17b3a73b4ba1d89eaae77e59eba556f5d8f16eb08c15f6e88d09852",
+      "size_bytes": 34312
     },
     {
       "exists": true,
