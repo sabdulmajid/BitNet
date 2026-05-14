@@ -228,6 +228,9 @@ python benchmarks/benchmark_bitdistill_glue_cpu.py \
 
 sbatch --dependency=afterany:<downstream-job-ids> slurm_bitdistill_postprocess.sh
 
+MAX_EVAL_SAMPLES=512 sbatch --dependency=afterany:<downstream-job-ids> \
+  slurm_bitdistill_cpu_benchmark.sh
+
 python benchmarks/build_qwen_side_by_side.py \
   --output-md benchmarks/results/qwen_side_by_side_2026-05-05.md
 ```

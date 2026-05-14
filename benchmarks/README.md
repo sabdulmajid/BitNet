@@ -338,7 +338,7 @@ checkpoints:
 ```bash
 python benchmarks/benchmark_bitdistill_glue_cpu.py \
   --tasks mnli qnli sst2 \
-  --runs short:fp16_sft-tensor-layer-1 short:bitnet_sft-tensor-layer-1 short:bitdistill-tensor-layer-1 short:bitdistill-row-layer-1 \
+  --runs short:fp16_sft-tensor-layer-1 short:bitnet_sft-tensor-layer-1 short:bitdistill-tensor-layer-1 short:bitdistill-row-layer-1 longwarmup:bitdistill-longwarmup-tensor-layer-8 papergamma:bitdistill-longwarmup-tensor-layer-8 \
   --max-eval-samples 128 \
   --threads 12
 ```
@@ -348,6 +348,9 @@ including SubLN and `BitLinear` modules when present. It reports CPU accuracy,
 examples/sec, batch latency, and RSS. It is a task-runtime probe for the
 sequence-classification checkpoints, not a packed `I2_SR`/llama.cpp inference
 claim.
+For the active long-warm-up chain, `slurm_bitdistill_cpu_benchmark.sh` runs the
+same benchmark after all downstream jobs finish and includes the strict
+`papergamma` family.
 
 For the active Slurm pipeline, queue `slurm_bitdistill_postprocess.sh` with an
 `afterany` dependency on the downstream jobs. It refreshes the monitor,

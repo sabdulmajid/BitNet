@@ -33,6 +33,7 @@ DEFAULT_RUNS = [
     ("short", "bitdistill-tensor-layer-8"),
     ("longwarmup", "bitdistill-longwarmup-tensor-layer-8"),
     ("longwarmup", "bitdistill-longwarmup-row-layer-8"),
+    ("papergamma", "bitdistill-longwarmup-tensor-layer-8"),
 ]
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -78,7 +79,12 @@ def percentile(values: list[float], pct: float) -> float | None:
 
 
 def checkpoint_dir_for(args: argparse.Namespace, task: str, family: str, run: str) -> Path:
-    root = args.longwarmup_root if family == "longwarmup" else args.short_root
+    if family == "longwarmup":
+        root = args.longwarmup_root
+    elif family == "papergamma":
+        root = args.paper_hparam_root
+    else:
+        root = args.short_root
     return root / args.model.replace("/", "-") / task / run
 
 
@@ -258,7 +264,7 @@ def run_parent(args: argparse.Namespace) -> dict[str, Any]:
                     }
                 )
                 continue
-            output = tmp_dir / f"{task}_{run.replace('/', '_')}.json"
+            output = tmp_dir / f"{task}_{family}_{run.replace('/', '_')}.json"
             command = child_command(args, task, family, run, output)
             env = os.environ.copy()
             env.setdefault("TOKENIZERS_PARALLELISM", "false")
@@ -286,6 +292,7 @@ def run_parent(args: argparse.Namespace) -> dict[str, Any]:
         "model": args.model,
         "short_root": str(args.short_root),
         "longwarmup_root": str(args.longwarmup_root),
+        "paper_hparam_root": str(args.paper_hparam_root),
         "tasks": args.tasks,
         "max_eval_samples": args.max_eval_samples,
         "threads": args.threads,
@@ -303,8 +310,8 @@ def parse_runs(values: list[str]) -> list[tuple[str, str]]:
             family, run = value.split(":", 1)
         else:
             family, run = "short", value
-        if family not in {"short", "longwarmup"}:
-            raise ValueError(f"run family must be short or longwarmup: {value}")
+        if family not in {"short", "longwarmup", "papergamma"}:
+            raise ValueError(f"run family must be short, longwarmup, or papergamma: {value}")
         parsed.append((family, run))
     return parsed
 
@@ -378,6 +385,7 @@ def main() -> None:
     parser.add_argument("--model", default="Qwen/Qwen2.5-0.5B")
     parser.add_argument("--short-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls"))
     parser.add_argument("--longwarmup-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup"))
+    parser.add_argument("--paper-hparam-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma"))
     parser.add_argument("--tasks", nargs="+", choices=TASKS, default=TASKS)
     parser.add_argument(
         "--runs",
