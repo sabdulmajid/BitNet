@@ -174,7 +174,13 @@ def manifest_missing_is_only_self_coverage(manifest: dict[str, Any]) -> bool:
     missing = manifest.get("missing", [])
     if not isinstance(missing, list):
         return False
-    return set(missing) <= {"benchmark_coverage_gate_report", "benchmark_coverage_gate_json"}
+    optional_preflight = {
+        "benchmark_coverage_gate_report",
+        "benchmark_coverage_gate_json",
+        "bitdistill_postprocess_dependency_report",
+        "bitdistill_postprocess_dependency_json",
+    }
+    return set(missing) <= optional_preflight
 
 
 def audit_rss_and_gates(root: Path, checks: list[dict[str, Any]], manifest_path_arg: Path | None) -> None:

@@ -120,6 +120,8 @@ python benchmarks/build_qwen_side_by_side.py \
 python benchmarks/build_evidence_manifest.py \
   --allow-missing-label benchmark_coverage_gate_report \
   --allow-missing-label benchmark_coverage_gate_json \
+  --allow-missing-label bitdistill_postprocess_dependency_report \
+  --allow-missing-label bitdistill_postprocess_dependency_json \
   --output-json "benchmarks/results/evidence_manifest_${DATE}.json" \
   --output-md "benchmarks/results/evidence_manifest_${DATE}.md"
 
@@ -129,5 +131,7 @@ python benchmarks/audit_benchmark_coverage.py \
   --output-md "benchmarks/results/benchmark_coverage_gate_${DATE}.md"
 
 python benchmarks/build_evidence_manifest.py \
+  --allow-missing-label bitdistill_postprocess_dependency_report \
+  --allow-missing-label bitdistill_postprocess_dependency_json \
   --output-json "benchmarks/results/evidence_manifest_${DATE}.json" \
   --output-md "benchmarks/results/evidence_manifest_${DATE}.md"

@@ -23,9 +23,9 @@ Verdict: local code contains the major BitDistill mechanisms, but the completed 
 | paper warm-up tokens | 10000000000 |
 | active target tokens | 163840000 |
 | active target / paper | 0.016384 |
-| active effective tokens | 68321280 |
-| active effective / paper | 0.006832 |
-| latest step | 8340 |
+| active effective tokens | 70369280 |
+| active effective / paper | 0.007037 |
+| latest step | 8590 |
 | max steps | 20000 |
 
 ## Current Accuracy Matrix
