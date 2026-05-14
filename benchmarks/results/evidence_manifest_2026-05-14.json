@@ -115,8 +115,8 @@
       "label": "bitdistill_paper_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_paper_alignment_2026-05-14.md",
-      "sha256": "a0326dd304062e233170467df009832eb496ed3632038676deeb43b97c68de65",
-      "size_bytes": 7723
+      "sha256": "e4d14554251833b72cdbb3e1110a993ebe8066169136a1166f04bf0e692142cf",
+      "size_bytes": 7724
     },
     {
       "exists": true,
@@ -151,7 +151,7 @@
       "label": "bitdistill_job_monitor_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_job_monitor_2026-05-14.md",
-      "sha256": "e8509799a69189163d2b6a2b609d4c7daed864f22ece92615a78733f3db933ea",
+      "sha256": "064fbe08c4e76dc7c495d88d8a4832ae7f0d179a18674a1d24d81fdecffcb0cd",
       "size_bytes": 12978
     },
     {
@@ -178,8 +178,8 @@
       "label": "bitdistill_warmup_health_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_warmup_health_2026-05-14.md",
-      "sha256": "df79c427709f4d1a96b9bbb65ad6b051556f093a24913e03922e6685ef8b740a",
-      "size_bytes": 1322
+      "sha256": "36481538ea048c0de92ec56bf2e5ee2398ecc2de7d6b969446d2f755a27405a9",
+      "size_bytes": 1321
     },
     {
       "exists": true,
@@ -196,7 +196,7 @@
       "label": "bitdistill_active_goal_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_active_goal_audit_2026-05-14.md",
-      "sha256": "982efd468ae02286d83b2b35c454dfa3fb2bc53f76418e44fc5eae15340acd26",
+      "sha256": "9517da539e2328f59f901b49aa60d068da01ff9cd84fa2521b78dd077c105bc0",
       "size_bytes": 3201
     },
     {
@@ -2061,19 +2061,19 @@
         "downstream_states": [
           "PENDING"
         ],
-        "warmup_latest_ce": 4.998602,
+        "warmup_latest_ce": 4.430138,
         "warmup_max_steps": 20000,
-        "warmup_progress": 0.5155,
+        "warmup_progress": 0.523,
         "warmup_save_every_steps": 0,
         "warmup_snapshots": 0,
-        "warmup_step": 10310,
+        "warmup_step": 10460,
         "warmup_warnings": [
           "Stage-2 warm-up is running without intermediate snapshots; if the job fails, progress before final save is not recoverable."
         ]
       },
       "path": "benchmark_results/bitdistill_job_monitor_2026-05-14.json",
-      "sha256": "242db6cdd1588f09f770a7575e12b792f242d4ca8462820ad303376b4fcc767d",
-      "size_bytes": 78015
+      "sha256": "cabab3ae9d4d2f7168adafded99ebf644ad9403d6e6c273a1ab853ca2a2ba54a",
+      "size_bytes": 78013
     },
     {
       "exists": true,
@@ -2122,22 +2122,22 @@
       "label": "bitdistill_warmup_health_json",
       "metrics": {
         "checks": 8,
-        "eta_seconds": 17874.908055009822,
+        "eta_seconds": 17364.98891013384,
         "failed": 0,
         "final_state_exists": false,
-        "last_ce_mean": 4.21970183,
-        "latest_ce": 3.854085,
+        "last_ce_mean": 4.2305745,
+        "latest_ce": 4.430138,
         "max_steps": 20000,
         "passed": true,
-        "progress": 0.509,
-        "seconds_per_step": 1.8202554027504911,
+        "progress": 0.523,
+        "seconds_per_step": 1.820229445506692,
         "snapshot_count": 0,
-        "step": 10180,
+        "step": 10460,
         "warnings": 1
       },
       "path": "benchmark_results/bitdistill_warmup_health_2026-05-14.json",
-      "sha256": "13a0f1faddde2284ff074949a78898c404bb391bd3b7310f266278b8cb8d92f3",
-      "size_bytes": 3928
+      "sha256": "01a39e2a7d91328507d37764ff870b7639481d18e9ddf7575ce32125160361f0",
+      "size_bytes": 3931
     },
     {
       "exists": true,
@@ -2178,11 +2178,11 @@
         "pending_count": 3,
         "row_scale_complete": false,
         "warmup_max_steps": 20000,
-        "warmup_step": 10310
+        "warmup_step": 10460
       },
       "path": "benchmark_results/bitdistill_active_goal_audit_2026-05-14.json",
-      "sha256": "b368ead0eb95f8028692db24a2cfb9862e9ca0ead9daaf988b791fd1ecb07d99",
-      "size_bytes": 4792
+      "sha256": "f01b27c4bfca3620d881488bbb349b2979425e12c5f1f968d6652522c34277f6",
+      "size_bytes": 4791
     },
     {
       "exists": true,
