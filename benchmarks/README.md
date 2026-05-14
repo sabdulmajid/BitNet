@@ -407,7 +407,9 @@ interval when submitting `slurm_bitdistill_glue.sh`. This writes restartable
 `checkpoint-<step>/custom_state_dict.pt` snapshots under the run directory.
 The GLUE matrix submitter now does this for Stage-2 by default through
 `CONTINUED_PRETRAIN_SAVE_EVERY_STEPS=1000`; set it explicitly to a different
-positive interval for longer jobs.
+positive interval for longer jobs. The launcher refuses
+`continued_pretrain` with `SAVE_EVERY_STEPS=0` unless
+`ALLOW_NO_WARMUP_SNAPSHOTS=1` is set deliberately.
 
 To consolidate the inputs required before the remaining open claims can advance:
 

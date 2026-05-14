@@ -67,6 +67,10 @@ if [ -z "${SAVE_EVERY_STEPS+x}" ]; then
     SAVE_EVERY_STEPS=0
   fi
 fi
+if [ "$STAGE" = "continued_pretrain" ] && [ "$SAVE_EVERY_STEPS" = "0" ] && [ "${ALLOW_NO_WARMUP_SNAPSHOTS:-0}" != "1" ]; then
+  echo "Refusing continued_pretrain with SAVE_EVERY_STEPS=0. Set SAVE_EVERY_STEPS>0 or ALLOW_NO_WARMUP_SNAPSHOTS=1." >&2
+  exit 2
+fi
 
 echo "SLURM_JOB_ID=${SLURM_JOB_ID:-local}"
 echo "MODEL=$MODEL"
