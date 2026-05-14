@@ -76,6 +76,16 @@ causal-LM BitDistill checkpoint. Those export checks use a smoke-only synthetic
 tokenizer stub, so they prove tensor packing and metadata wiring, not text
 generation quality.
 
+The BitDistill claim-control reports now enforce full GLUE validation counts:
+MNLI `9,815`, QNLI `5,463`, and SST2 `872` examples. Aggregate reproduction
+rows, paired prediction traces, and CPU runtime rows cannot pass as quality
+evidence unless their stored full-validation metrics match those counts. CPU
+runtime sampling remains allowed for speed measurement, but the gate labels it
+as sampled runtime and separately requires the full task-quality metric.
+Packed causal-LM exports are also gated for provenance: the `I2_S`/`I2_SR`
+GGUF file, converter summary, benchmark suite, RSS probe, qtype, SubLN mapping,
+and manifest path must all agree.
+
 Current completed Qwen2.5-0.5B GLUE sequence-classification results:
 
 | task | FP16-SFT | BitNet-SFT | BitDistill tensor | BitDistill row |
@@ -239,6 +249,10 @@ python benchmarks/gate_bitdistill_reproduction.py \
   --output-json benchmark_results/bitdistill_reproduction_gate_2026-05-14.json \
   --output-md benchmarks/results/bitdistill_reproduction_gate_2026-05-14.md
 
+python benchmarks/audit_bitdistill_paired_predictions.py \
+  --output-json benchmark_results/bitdistill_paired_predictions_2026-05-14.json \
+  --output-md benchmarks/results/bitdistill_paired_predictions_2026-05-14.md
+
 python benchmarks/audit_bitdistill_paper_alignment.py \
   --output-json benchmark_results/bitdistill_paper_alignment_2026-05-14.json \
   --output-md benchmarks/results/bitdistill_paper_alignment_2026-05-14.md
@@ -254,6 +268,16 @@ python benchmarks/benchmark_bitdistill_glue_cpu.py \
   --threads 12 \
   --output-json benchmark_results/bitdistill_glue_cpu_2026-05-14.json \
   --output-md benchmarks/results/bitdistill_glue_cpu_2026-05-14.md
+
+python benchmarks/gate_bitdistill_cpu_benchmark.py \
+  --input-json benchmark_results/bitdistill_glue_cpu_latest.json \
+  --output-json benchmark_results/bitdistill_glue_cpu_gate_2026-05-14.json \
+  --output-md benchmarks/results/bitdistill_glue_cpu_gate_2026-05-14.md
+
+python benchmarks/gate_bitdistill_i2sr_export.py \
+  --results-dir benchmark_results/bitdistill-causal-longwarmup-i2sr-2026-05-14 \
+  --output-json benchmark_results/bitdistill_i2sr_export_gate_2026-05-14.json \
+  --output-md benchmarks/results/bitdistill_i2sr_export_gate_2026-05-14.md
 
 python benchmarks/submit_bitdistill_afterany_postprocess.py
 
