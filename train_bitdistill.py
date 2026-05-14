@@ -777,6 +777,31 @@ def causal_sequence_scores(logits: torch.Tensor, labels: torch.Tensor, *, score_
     raise ValueError(f"unsupported candidate_score={score_mode}")
 
 
+def maybe_single_token_label_ids(tokenizer: Any, task_name: str, label_scheme: str) -> list[int] | None:
+    if tokenizer is None:
+        return None
+    label_ids: list[int] = []
+    for label_text in glue_label_texts(task_name, label_scheme):
+        encoded = tokenizer(label_text, add_special_tokens=False)["input_ids"]
+        if len(encoded) != 1:
+            return None
+        label_ids.append(int(encoded[0]))
+    return label_ids
+
+
+def collate_prompt_batch(batch: list[dict[str, torch.Tensor]], *, pad_token_id: int) -> dict[str, torch.Tensor]:
+    max_len = max(int(item["input_ids"].numel()) for item in batch)
+    input_ids = torch.full((len(batch), max_len), pad_token_id, dtype=torch.long)
+    attention_mask = torch.zeros((len(batch), max_len), dtype=torch.long)
+    labels = torch.empty((len(batch),), dtype=torch.long)
+    for row, item in enumerate(batch):
+        length = int(item["input_ids"].numel())
+        input_ids[row, :length] = item["input_ids"]
+        attention_mask[row, :length] = item["attention_mask"]
+        labels[row] = item["label"]
+    return {"input_ids": input_ids, "attention_mask": attention_mask, "labels": labels}
+
+
 def evaluate_causal_glue(
     model: nn.Module,
     tokenizer: Any,
@@ -786,6 +811,57 @@ def evaluate_causal_glue(
 ) -> dict[str, float]:
     model.eval()
     labels = glue_label_texts(args.task_name, args.label_scheme)
+    label_token_ids = maybe_single_token_label_ids(tokenizer, args.task_name, args.label_scheme)
+    pad_id = 0
+    if tokenizer is not None:
+        pad_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
+        if pad_id is None:
+            pad_id = 0
+    if label_token_ids is not None:
+        context_len = max(1, args.max_seq_len - 1)
+        prompt_features: list[dict[str, torch.Tensor]] = []
+        for row in rows:
+            prompt = (
+                format_glue_prompt(args.task_name, row, label_scheme=args.label_scheme)
+                if not args.smoke_test
+                else "Sentence: synthetic\nSentiment:"
+            )
+            prompt_ids = tokenizer(prompt, add_special_tokens=False)["input_ids"][-context_len:]
+            if not prompt_ids:
+                prompt_ids = [int(pad_id)]
+            prompt_features.append(
+                {
+                    "input_ids": torch.tensor(prompt_ids, dtype=torch.long),
+                    "attention_mask": torch.ones(len(prompt_ids), dtype=torch.long),
+                    "label": torch.tensor(int(row["label"]), dtype=torch.long),
+                }
+            )
+        loader = DataLoader(
+            prompt_features,
+            batch_size=args.eval_batch_size,
+            shuffle=False,
+            collate_fn=lambda batch: collate_prompt_batch(batch, pad_token_id=int(pad_id)),
+        )
+        label_index = torch.tensor(label_token_ids, dtype=torch.long, device=device)
+        correct = 0
+        total = 0
+        with torch.no_grad():
+            for batch in loader:
+                batch = move_batch(batch, device)
+                outputs = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], use_cache=False)
+                last_positions = batch["attention_mask"].sum(dim=1).sub(1).clamp_min(0)
+                next_token_logits = outputs.logits[torch.arange(outputs.logits.shape[0], device=device), last_positions]
+                candidate_scores = F.log_softmax(next_token_logits.float(), dim=-1).index_select(dim=-1, index=label_index)
+                predictions = candidate_scores.argmax(dim=-1)
+                correct += int((predictions == batch["labels"]).sum().detach().cpu())
+                total += int(batch["labels"].numel())
+        model.train()
+        return {
+            "accuracy": correct / total if total else 0.0,
+            "eval_examples": float(total),
+            "causal_eval_mode": "single_forward_single_token_labels",
+        }
+
     candidates: list[dict[str, list[int]]] = []
     gold: list[int] = []
     for row in rows:
@@ -804,11 +880,6 @@ def evaluate_causal_glue(
                     max_seq_len=args.max_seq_len,
                 )
             )
-    pad_id = 0
-    if tokenizer is not None:
-        pad_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
-        if pad_id is None:
-            pad_id = 0
     loader = DataLoader(
         CausalGlueDataset(candidates),
         batch_size=args.eval_batch_size,
@@ -840,7 +911,11 @@ def evaluate_causal_glue(
         correct += int(pred == true_label)
     total = len(gold)
     model.train()
-    return {"accuracy": correct / total if total else 0.0, "eval_examples": float(total)}
+    return {
+        "accuracy": correct / total if total else 0.0,
+        "eval_examples": float(total),
+        "causal_eval_mode": "candidate_sequence",
+    }
 
 
 def save_outputs(model: nn.Module, tokenizer: Any, args: argparse.Namespace, metrics: dict[str, Any]) -> None:
