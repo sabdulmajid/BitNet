@@ -357,6 +357,10 @@ For the active Slurm pipeline, queue `slurm_bitdistill_postprocess.sh` with an
 reproduction gate, variant summary, and objective audit from the materialized
 artifacts.
 
+For future long Stage-2 warm-ups, set `SAVE_EVERY_STEPS=1000` or another
+interval when submitting `slurm_bitdistill_glue.sh`. This writes restartable
+`checkpoint-<step>/custom_state_dict.pt` snapshots under the run directory.
+
 To consolidate the inputs required before the remaining open claims can advance:
 
 ```bash

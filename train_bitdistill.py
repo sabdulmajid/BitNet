@@ -982,6 +982,31 @@ def save_outputs(model: nn.Module, tokenizer: Any, args: argparse.Namespace, met
     (output_dir / "metrics.json").write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def save_training_snapshot(
+    model: nn.Module,
+    tokenizer: Any,
+    args: argparse.Namespace,
+    metrics: dict[str, Any],
+    *,
+    step: int,
+) -> None:
+    if not args.output_dir:
+        return
+    snapshot_dir = Path(args.output_dir) / f"checkpoint-{step}"
+    snapshot_dir.mkdir(parents=True, exist_ok=True)
+    if hasattr(model, "config") and hasattr(model.config, "save_pretrained"):
+        model.config.save_pretrained(snapshot_dir)
+    if tokenizer is not None and hasattr(tokenizer, "save_pretrained"):
+        tokenizer.save_pretrained(snapshot_dir)
+    torch.save(model.state_dict(), snapshot_dir / "custom_state_dict.pt")
+    bitlinear_count = sum(1 for module in model.modules() if isinstance(module, BitLinear))
+    if bitlinear_count:
+        torch.save(build_ternary_state_dict(model, model.state_dict()), snapshot_dir / "ternary_state_dict.pt")
+    snapshot_metrics = dict(metrics)
+    snapshot_metrics["snapshot"] = {"step": step, "complete": False}
+    (snapshot_dir / "metrics.json").write_text(json.dumps(snapshot_metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
 def load_optional_state_dict(model: nn.Module, args: argparse.Namespace) -> dict[str, Any]:
     if not args.init_state_dict:
         return {"loaded": False}
@@ -1054,6 +1079,28 @@ def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
             last = StepMetrics(loss=float((loss * args.grad_accum_steps).detach().cpu()), ce=float((loss * args.grad_accum_steps).detach().cpu()), lr=lr)
             if step == 1 or step % args.log_every_steps == 0:
                 print(f"step={step} ce={last.ce:.6f} lr={lr:.3e} elapsed={time.time() - start:.1f}s", flush=True)
+            if args.save_every_steps > 0 and step % args.save_every_steps == 0:
+                snapshot_metrics = {
+                    "stage": args.stage,
+                    "method": args.method,
+                    "student_model": args.student_model,
+                    "scale_mode": args.scale_mode,
+                    "exclude_linear_regex": args.exclude_linear_regex,
+                    "steps": step,
+                    "effective_train_token_presentations": int(step * args.per_device_batch_size * args.grad_accum_steps * args.max_seq_len),
+                    "dataset": {
+                        "name": args.dataset_name,
+                        "config": args.dataset_config,
+                        "split": args.dataset_split,
+                        "num_train_samples": args.num_train_samples,
+                        "max_packed_blocks": args.max_packed_blocks,
+                    },
+                    "last": last.__dict__,
+                    "preparation": prep,
+                    "state_load": state_load,
+                    "elapsed_seconds": time.time() - start,
+                }
+                save_training_snapshot(student, tokenizer, args, snapshot_metrics, step=step)
             if step >= args.max_steps:
                 break
 
@@ -1076,6 +1123,7 @@ def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
         "preparation": prep,
         "state_load": state_load,
         "elapsed_seconds": time.time() - start,
+        "save_every_steps": args.save_every_steps,
     }
     save_outputs(student, tokenizer, args, metrics)
     return metrics
@@ -1315,6 +1363,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", default="")
     parser.add_argument("--device", default="")
     parser.add_argument("--log-every-steps", type=int, default=10)
+    parser.add_argument("--save-every-steps", type=int, default=0)
     parser.add_argument("--seed", type=int, default=1234)
     parser.add_argument("--smoke-test", action="store_true")
     args = parser.parse_args()
