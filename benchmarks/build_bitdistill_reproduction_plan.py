@@ -17,6 +17,9 @@ def make_command(
     *,
     model: str,
     task: str,
+    task_format: str,
+    label_scheme: str,
+    candidate_score: str,
     method: str,
     scale_mode: str,
     distill_layer: int,
@@ -31,15 +34,16 @@ def make_command(
         teacher = f" TEACHER_MODEL={teacher_path}"
         init = f" INIT_STATE_DICT={warmup_state}"
     return (
-        f"MODEL={model} TASK_FORMAT=causal_lm TASK_NAME={task} METHOD={method} SCALE_MODE={scale_mode} "
-        f"DISTILL_LAYER={distill_layer} MAX_STEPS={max_steps}{teacher}{init} "
+        f"MODEL={model} TASK_FORMAT={task_format} LABEL_SCHEME={label_scheme} CANDIDATE_SCORE={candidate_score} "
+        f"TASK_NAME={task} METHOD={method} SCALE_MODE={scale_mode} DISTILL_LAYER={distill_layer} "
+        f"MAX_STEPS={max_steps}{teacher}{init} "
         "sbatch slurm_bitdistill_glue.sh"
     )
 
 
 def build_matrix(args: argparse.Namespace) -> dict[str, Any]:
     runs: list[dict[str, Any]] = []
-    warmup_dir = f"{args.teacher_root}/{args.model.replace('/', '-')}/continued_pretrain/bitdistill-tensor"
+    warmup_dir = f"{args.warmup_root}/{args.model.replace('/', '-')}/continued_pretrain/bitdistill-tensor"
     warmup_state = f"{warmup_dir}/custom_state_dict.pt"
     runs.append(
         {
@@ -67,6 +71,9 @@ def build_matrix(args: argparse.Namespace) -> dict[str, Any]:
                     "command": make_command(
                         model=args.model,
                         task=task,
+                        task_format=args.task_format,
+                        label_scheme=args.label_scheme,
+                        candidate_score=args.candidate_score,
                         method=method,
                         scale_mode="tensor",
                         distill_layer=-1,
@@ -86,6 +93,9 @@ def build_matrix(args: argparse.Namespace) -> dict[str, Any]:
                 "command": make_command(
                     model=args.model,
                     task=task,
+                    task_format=args.task_format,
+                    label_scheme=args.label_scheme,
+                    candidate_score=args.candidate_score,
                     method="bitdistill",
                     scale_mode="row",
                     distill_layer=-1,
@@ -106,6 +116,9 @@ def build_matrix(args: argparse.Namespace) -> dict[str, Any]:
                 "command": make_command(
                     model=args.model,
                     task=args.sweep_task,
+                    task_format=args.task_format,
+                    label_scheme=args.label_scheme,
+                    candidate_score=args.candidate_score,
                     method="bitdistill",
                     scale_mode="tensor",
                     distill_layer=layer,
@@ -118,6 +131,7 @@ def build_matrix(args: argparse.Namespace) -> dict[str, Any]:
     return {
         "schema": "bitdistill-reproduction-plan-v1",
         "model": args.model,
+        "task_format": args.task_format,
         "success_criterion": "BitDistill within 0.5-1.0 accuracy point of FP16-SFT on MNLI/QNLI/SST2.",
         "required_first": "Run FP16-SFT for each task; those checkpoints become task teachers for BitDistill.",
         "required_warmup": f"Run continued pretraining first and pass `{warmup_state}` to every BitDistill task run.",
@@ -148,6 +162,7 @@ def render_markdown(plan: dict[str, Any]) -> str:
         [
             "# BitDistill Reproduction Plan, 2026-05-14",
             f"Model: `{plan['model']}`.",
+            f"Task format: `{plan['task_format']}`.",
             f"Success criterion: {plan['success_criterion']}",
             f"Ordering constraint: {plan['required_first']}",
             f"Warmup constraint: {plan['required_warmup']}",
@@ -160,11 +175,15 @@ def render_markdown(plan: dict[str, Any]) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", default="Qwen/Qwen2.5-0.5B")
-    parser.add_argument("--teacher-root", default="checkpoints/bitdistill-glue")
+    parser.add_argument("--teacher-root", default="checkpoints/bitdistill-glue-seqcls")
+    parser.add_argument("--warmup-root", default="checkpoints/bitdistill-glue")
+    parser.add_argument("--task-format", choices=["sequence_classification", "causal_lm"], default="sequence_classification")
+    parser.add_argument("--label-scheme", choices=["letters", "words"], default="letters")
+    parser.add_argument("--candidate-score", choices=["mean", "sum"], default="mean")
     parser.add_argument("--max-steps", type=int, default=1000)
     parser.add_argument("--continued-pretrain-steps", type=int, default=5000)
     parser.add_argument("--sweep-task", default="mnli", choices=TASKS)
-    parser.add_argument("--layer-sweep", type=int, nargs="+", default=[-1, -2, -4])
+    parser.add_argument("--layer-sweep", type=int, nargs="+", default=[-1, -2, -4, -8])
     parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/bitdistill_reproduction_plan_2026-05-14.json"))
     parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/bitdistill_reproduction_plan_2026-05-14.md"))
     args = parser.parse_args()
