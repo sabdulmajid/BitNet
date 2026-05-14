@@ -140,9 +140,10 @@ Teacher-head initialization, attention-layer sweep, CE-only ablation, and
 longer warm-up jobs are tracked in
 `benchmarks/results/bitdistill_reproduction_status_2026-05-14.md`.
 
-The corrected MNLI diagnostic wave improved the best short-budget BitDistill
-result to `0.532960` against FP16-SFT `0.807641`, so the tau-squared mismatch
-was real but not the main blocker. See
+The corrected MNLI diagnostic wave plus attention-layer sweep improved the best
+short-budget BitDistill result to `0.535711` against FP16-SFT `0.807641`.
+CE-only ablations stay near `0.492-0.498`, so distillation helps but the
+short-warm-up recipe remains far from reproduced. See
 `benchmarks/results/bitdistill_seqcls_mnli_diagnostic_variant_summary_2026-05-14.md`.
 
 ### Tier 2: Fixed Generation Suite

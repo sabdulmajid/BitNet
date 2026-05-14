@@ -103,11 +103,22 @@ initialization.
 | BitDistill row, paper logits | `0.532043` | `0.275599` | none | false | best row result |
 | BitDistill tensor, paper logits + teacher head | `0.532960` | `0.274682` | none | true | best short-budget result |
 | BitDistill row, paper logits + teacher head | `0.530005` | `0.277636` | none | true | head did not help row |
+| BitDistill tensor, paper logits, layer `-2` | `0.532858` | `0.274783` | none | false | attention-layer sweep |
+| BitDistill tensor, paper logits, layer `-4` | `0.532450` | `0.275191` | none | false | attention-layer sweep |
+| BitDistill tensor, paper logits, layer `-8` | `0.535711` | `0.271931` | none | false | best current short-budget result |
+| CE-only tensor | `0.491900` | `0.315741` | none | false | no logits or attention KD |
+| CE-only tensor + teacher head | `0.498319` | `0.309322` | none | true | no logits or attention KD |
 
 Interpretation: the corrected loss and head initialization improve MNLI by
-`+0.007743` over the first tensor BitDistill wave, and row scale helps when
-using paper-style logits without head initialization. These are real but small
-effects. They do not close the roughly 27.5-point FP16 gap.
+`+0.007743` over the first tensor BitDistill wave; attention layer selection
+improves the best short-budget MNLI result to `0.535711`; and row scale helps
+when using paper-style logits without head initialization. These are real but
+small effects. They do not close the roughly 27.2-point FP16 gap.
+
+The CE-only ablations are important: without logits KL and attention-relation
+KD, the student remains around `0.492-0.498`, close to direct BitNet-SFT.
+Therefore the distillation losses are doing real work, but the short continued
+pretraining budget is still not enough.
 
 ## Why This Differs From The Paper
 

@@ -93,9 +93,11 @@ warm-up pilot. Until those gates close, the public claim remains conservative:
 **BitDistill is the right class of method, but this fork has not yet reproduced
 paper-level task quality.**
 
-Focused MNLI diagnostics after fixing logits-KL scaling improved the best
-short-budget BitDistill result to `0.532960` versus FP16-SFT `0.807641`. That
-is useful debugging signal, not a reproduction-quality result.
+Focused MNLI diagnostics after fixing logits-KL scaling and sweeping the
+attention-distillation layer improved the best short-budget BitDistill result
+to `0.535711` versus FP16-SFT `0.807641`. CE-only ablations stay near
+`0.492-0.498`, so distillation helps, but the run is still far from
+reproduction-quality.
 
 ## Key Dense-Qwen Results
 
