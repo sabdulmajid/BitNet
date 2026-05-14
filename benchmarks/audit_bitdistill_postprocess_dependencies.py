@@ -75,6 +75,20 @@ def active_downstream_ids(monitor: dict[str, Any]) -> list[str]:
     return sorted(job_ids)
 
 
+def active_warmup_ids(monitor: dict[str, Any], squeue_rows: list[dict[str, str]]) -> list[str]:
+    job_ids: set[str] = set()
+    for job_id in monitor.get("warmup_job_ids", []) if isinstance(monitor.get("warmup_job_ids"), list) else []:
+        if job_id:
+            job_ids.add(str(job_id))
+    warmup = monitor.get("warmup", {}) if isinstance(monitor.get("warmup"), dict) else {}
+    env = warmup.get("env", {}) if isinstance(warmup.get("env"), dict) else {}
+    if env.get("SLURM_JOB_ID"):
+        job_ids.add(str(env["SLURM_JOB_ID"]))
+
+    active_ids = {row["job_id"] for row in squeue_rows if row.get("state") in ACTIVE_STATES}
+    return sorted(job_ids & active_ids)
+
+
 def find_active_jobs_by_name(squeue_rows: list[dict[str, str]], names: set[str]) -> list[dict[str, str]]:
     return [
         row
@@ -115,8 +129,9 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
     postprocess, postprocess_matches = choose_postprocess(squeue_rows, args.postprocess_job_name, args.postprocess_job_id)
     producer_names = set(args.extra_job_names)
     extra_jobs = find_active_jobs_by_name(squeue_rows, producer_names)
+    warmup_ids = active_warmup_ids(monitor, squeue_rows)
     downstream_ids = active_downstream_ids(monitor)
-    expected_ids = sorted(set(downstream_ids) | {row["job_id"] for row in extra_jobs})
+    expected_ids = sorted(set(warmup_ids) | set(downstream_ids) | {row["job_id"] for row in extra_jobs})
 
     postprocess_info = scontrol_job(postprocess["job_id"]) if postprocess else {}
     dependency_ids = set(postprocess_info.get("dependency_job_ids", []))
@@ -136,7 +151,7 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
         checks,
         "expected producer jobs are active",
         bool(expected_ids),
-        f"downstream={len(downstream_ids)}, extra={len(extra_jobs)}, total={len(expected_ids)}",
+        f"warmup={len(warmup_ids)}, downstream={len(downstream_ids)}, extra={len(extra_jobs)}, total={len(expected_ids)}",
         "no active producer jobs were found; this audit should run before postprocess release",
     )
     add_check(
@@ -163,6 +178,7 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
         },
         "expected_producers": {
             "job_ids": expected_ids,
+            "warmup_job_ids": warmup_ids,
             "downstream_job_ids": downstream_ids,
             "extra_jobs": extra_jobs,
         },
@@ -189,6 +205,7 @@ def render_markdown(result: dict[str, Any]) -> str:
             f"Overall status: `{'pass' if result['passed'] else 'fail'}`.",
             f"Postprocess job: `{(postprocess.get('job') or {}).get('job_id', '-')}`.",
             f"Expected producer jobs: `{len(producer.get('job_ids', []))}`.",
+            f"Warmup producer jobs: `{', '.join(producer.get('warmup_job_ids', [])) or '-'}`.",
             f"Missing dependencies: `{result['missing_dependency_job_ids']}`.",
             "## Checks",
             md_table(["check", "status", "evidence", "blocker"], check_rows),

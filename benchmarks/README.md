@@ -409,10 +409,14 @@ To get packed CPU task inference for the sequence-classification reproduction,
 either train/evaluate the task as causal prompt scoring or add explicit
 classifier-head support to the GGUF mapping and runtime.
 
-For the active Slurm pipeline, queue `slurm_bitdistill_postprocess.sh` with an
-`afterany` dependency on the downstream jobs. It refreshes the monitor,
-reproduction gate, variant summary, and objective audit from the materialized
-artifacts.
+For the active Slurm pipeline, use
+`benchmarks/submit_bitdistill_afterany_postprocess.py` to queue the diagnostic
+postprocess job. It reads the latest monitor JSON and submits
+`slurm_bitdistill_postprocess.sh` with an `afterany` dependency on the Stage-2
+warmup, all downstream rows, and export/CPU producer jobs. The strict
+`afterok` postprocess remains the success gate; the `afterany` job exists so a
+failed producer still leaves monitor, reproduction-gate, variant-summary, and
+objective-audit artifacts.
 
 For future long Stage-2 warm-ups, set `SAVE_EVERY_STEPS=1000` or another
 interval when submitting `slurm_bitdistill_glue.sh`. This writes restartable

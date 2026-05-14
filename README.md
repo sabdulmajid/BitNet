@@ -255,7 +255,13 @@ python benchmarks/benchmark_bitdistill_glue_cpu.py \
   --output-json benchmark_results/bitdistill_glue_cpu_2026-05-14.json \
   --output-md benchmarks/results/bitdistill_glue_cpu_2026-05-14.md
 
-sbatch --dependency=afterany:<downstream-job-ids> slurm_bitdistill_postprocess.sh
+python benchmarks/submit_bitdistill_afterany_postprocess.py
+
+python benchmarks/audit_bitdistill_postprocess_dependencies.py \
+  --postprocess-job-name bitdistill-postprocess-any \
+  --postprocess-job-id <afterany-job-id> \
+  --output-json benchmark_results/bitdistill_afterany_postprocess_dependency_2026-05-14.json \
+  --output-md benchmarks/results/bitdistill_afterany_postprocess_dependency_2026-05-14.md
 
 MAX_EVAL_SAMPLES=512 sbatch --dependency=afterany:<downstream-job-ids> \
   slurm_bitdistill_cpu_benchmark.sh
