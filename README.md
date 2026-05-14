@@ -113,7 +113,10 @@ llama.cpp / `I2_SR` exports today because the runtime path does not implement a
 Qwen sequence-classification head. The stable `I2_SR` exporter is valid for
 causal-LM BitDistill checkpoints; packed task inference requires either
 causal prompt-scoring checkpoints or new classifier-head support in the
-runtime.
+runtime. A causal prompt-scoring long-warmup branch is queued under
+`checkpoints/bitdistill-glue-causal-longwarmup-densehead` to test that
+exportable path without conflating it with the sequence-classification
+reproduction gate.
 
 ## Key Dense-Qwen Results
 

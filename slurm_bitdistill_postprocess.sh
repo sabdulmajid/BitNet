@@ -45,6 +45,12 @@ python benchmarks/summarize_bitdistill_variants.py \
   --output-json "benchmark_results/bitdistill_variant_summary_${DATE}.json" \
   --output-md "benchmarks/results/bitdistill_variant_summary_${DATE}.md"
 
+python benchmarks/summarize_bitdistill_glue.py \
+  --root checkpoints/bitdistill-glue-causal-longwarmup-densehead \
+  --tasks mnli qnli sst2 \
+  --output-json "benchmark_results/bitdistill_causal_longwarmup_densehead_summary_${DATE}.json" \
+  --output-md "benchmarks/results/bitdistill_causal_longwarmup_densehead_summary_${DATE}.md"
+
 python benchmarks/gate_bitdistill_cpu_benchmark.py \
   --input-json "benchmark_results/bitdistill_glue_cpu_latest.json" \
   --output-json "benchmark_results/bitdistill_glue_cpu_gate_${DATE}.json" \
