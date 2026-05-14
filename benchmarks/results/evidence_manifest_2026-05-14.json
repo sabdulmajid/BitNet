@@ -142,7 +142,7 @@
       "label": "bitdistill_job_monitor_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_job_monitor_2026-05-14.md",
-      "sha256": "192d469efa8585d3f5e34a22e745a11624529a7a1856e958c0131875e279b5f0",
+      "sha256": "f18117a4ab6e11400ce9c4a7dd98d944cad342256ef963982bd4b0a1ee3f32de",
       "size_bytes": 5755
     },
     {
@@ -151,7 +151,7 @@
       "label": "bitdistill_dependency_graph_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_dependency_graph_2026-05-14.md",
-      "sha256": "e76a277f0c209fd8793b0e99a10d606b2770af3595e47efd35fc63a456248488",
+      "sha256": "8d78b17c90da590a1a43ae6d58839ca9f8ff5e90dff2ed2433563a14b5701be9",
       "size_bytes": 5927
     },
     {
@@ -160,7 +160,7 @@
       "label": "bitdistill_job_matrix_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_job_matrix_audit_2026-05-14.md",
-      "sha256": "498637cc93ce7f378a64429c833d7b32bbc025facff3392a6eae3500ec05fbeb",
+      "sha256": "1bfe3b06ba4c5fe234a1acdea116d4dff86e2d40007714cb25bb79ed02270fc2",
       "size_bytes": 3663
     },
     {
@@ -1998,19 +1998,19 @@
         "downstream_states": [
           "PENDING"
         ],
-        "warmup_latest_ce": 4.327857,
+        "warmup_latest_ce": 4.383966,
         "warmup_max_steps": 20000,
-        "warmup_progress": 0.34,
+        "warmup_progress": 0.3465,
         "warmup_save_every_steps": 0,
         "warmup_snapshots": 0,
-        "warmup_step": 6800,
+        "warmup_step": 6930,
         "warmup_warnings": [
           "Stage-2 warm-up is running without intermediate snapshots; if the job fails, progress before final save is not recoverable."
         ]
       },
       "path": "benchmark_results/bitdistill_job_monitor_2026-05-14.json",
-      "sha256": "cbb0776ed0b9cb090e53e0eb4441792a9028d69a47db394304449cd2652e1a85",
-      "size_bytes": 34314
+      "sha256": "4077bce0f5b1ac8eafe7932d487b9f3b6f3f4a69039236281588aed4460d2fb3",
+      "size_bytes": 34316
     },
     {
       "exists": true,
@@ -2025,15 +2025,15 @@
         "raw_rows": 29,
         "ready": true,
         "warmup_max_steps": 20000,
-        "warmup_step": 6820,
+        "warmup_step": 6930,
         "warnings": [
           "11 output directories appear in multiple historical submission tables; audit uses the latest row per output directory.",
           "Warm-up final state is expectedly absent until Stage-2 finishes; downstream jobs are correctly dependency-blocked."
         ]
       },
       "path": "benchmark_results/bitdistill_dependency_graph_2026-05-14.json",
-      "sha256": "d2146558727ede06b52244e915e0efaaf65502f9a1f4ae1c95b8b98cffb19bf7",
-      "size_bytes": 13934
+      "sha256": "9630dee474a05d0c8edd348d18b09b286f90cdb978d45631db9d3b7d9adc0d63",
+      "size_bytes": 13935
     },
     {
       "exists": true,
@@ -2051,7 +2051,7 @@
         "passed": true
       },
       "path": "benchmark_results/bitdistill_job_matrix_audit_2026-05-14.json",
-      "sha256": "d3214529e7626abeffb99d413468e59158abfe82e2ce1711f7514521cc1b9ca5",
+      "sha256": "4ed79f35ffe5dc34e155eb48a9c2a108d70eb789d10178c5f36bcac214f8d4b3",
       "size_bytes": 21240
     },
     {

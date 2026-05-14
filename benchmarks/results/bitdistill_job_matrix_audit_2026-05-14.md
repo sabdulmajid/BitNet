@@ -20,7 +20,7 @@ Rows with fields inferred from submitter defaults: `11`.
 | active row count matches design | pass | rows=17, expected=17 |  |
 | output directories are unique | pass | duplicates=[] |  |
 | all expected experiment rows are present and configured | pass | configured=17/17 |  |
-| warm-up progress is finite | pass | step=6800/20000 |  |
+| warm-up progress is finite | pass | step=6930/20000 |  |
 
 ## Expected Matrix
 
