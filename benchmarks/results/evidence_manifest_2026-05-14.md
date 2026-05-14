@@ -20,7 +20,7 @@ Artifacts: `141`. Missing: `0`.
 | bitdistill_i2sr_gate_report | tracked_report | yes | 3450 | 4a31605310e1 |  |
 | bitdistill_job_monitor_report | tracked_report | yes | 10114 | c4c00eb4938b |  |
 | bitdistill_dependency_graph_report | tracked_report | yes | 8590 | f63d02cc7e84 |  |
-| bitdistill_postprocess_dependency_report | tracked_report | yes | 1702 | 5d97933436a2 |  |
+| bitdistill_postprocess_dependency_report | tracked_report | yes | 1951 | 2891bdeb7ef5 |  |
 | bitdistill_warmup_health_report | tracked_report | yes | 1316 | fd41d4563c6e |  |
 | bitdistill_job_matrix_report | tracked_report | yes | 4642 | 72c5deab431e |  |
 | bitdistill_active_goal_report | tracked_report | yes | 3199 | 6e7f5dc74bad |  |
@@ -126,7 +126,7 @@ Artifacts: `141`. Missing: `0`.
 | bitdistill_i2sr_gate_json | bitdistill_i2sr_gate_json | yes | 5345 | 6224d3e866c2 | passed=False, complete=0/6, tasks=['mnli', 'qnli', 'sst2'], scales=['tensor', 'row'], blockers=4 |
 | bitdistill_job_monitor_json | bitdistill_job_monitor_json | yes | 60124 | be6eeb9a2457 | warmup=9130/20000, progress=0.4565, ce=4.24093, snapshots=0, warnings=1, downstream=29 |
 | bitdistill_dependency_graph_json | bitdistill_dependency_graph_json | yes | 20365 | a73abd02af25 | ready=True, checks=4, failed=0, active=29/29, warmup=9140/20000, warnings=2, blockers=0 |
-| bitdistill_postprocess_dependency_json | bitdistill_postprocess_dependency_json | yes | 3972 | ddb9c3521bb3 | passed=True, checks=4, failed=0, expected=31, downstream=29, extra=2, missing=0, postprocess=9977 |
+| bitdistill_postprocess_dependency_json | bitdistill_postprocess_dependency_json | yes | 4566 | 49554f8feb46 | passed=True, checks=4, failed=0, expected=34, downstream=29, extra=5, missing=0, postprocess=9977 |
 | bitdistill_warmup_health_json | bitdistill_warmup_health_json | yes | 3925 | 7f33b927f70e | passed=True, checks=8, failed=0, warnings=1, warmup=9140/20000, progress=0.457, ce=4.468, sec_step=1.82032, snapshots=0 |
 | bitdistill_job_matrix_json | bitdistill_job_matrix_json | yes | 32394 | 612906691da5 | passed=True, configured=29/29, observed=29, states={'PENDING': 29}, inferred_rows=0, blockers=0 |
 | bitdistill_active_goal_json | bitdistill_active_goal_json | yes | 4786 | 4a425cf542d4 | achieved=False, status=partial, complete=1/5, pending=3, warmup=9130/20000, row_complete=False, i2sr=False, cpu=False |

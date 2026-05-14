@@ -169,8 +169,8 @@
       "label": "bitdistill_postprocess_dependency_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_postprocess_dependency_audit_2026-05-14.md",
-      "sha256": "5d97933436a2a1051a7d525f935b46260967dd71846f5b70c8a514ca57943c71",
-      "size_bytes": 1702
+      "sha256": "2891bdeb7ef5969d16ce3392b1d1143e3855c10162b5ab29733beec313a1a69e",
+      "size_bytes": 1951
     },
     {
       "exists": true,
@@ -2096,16 +2096,16 @@
       "metrics": {
         "checks": 4,
         "downstream_jobs": 29,
-        "expected_jobs": 31,
-        "extra_jobs": 2,
+        "expected_jobs": 34,
+        "extra_jobs": 5,
         "failed": 0,
         "missing": [],
         "passed": true,
         "postprocess_job": "9977"
       },
       "path": "benchmark_results/bitdistill_postprocess_dependency_audit_2026-05-14.json",
-      "sha256": "ddb9c3521bb35c5df5688f8ea84415886a3a82d0c5ce683b954f416892a201a0",
-      "size_bytes": 3972
+      "sha256": "49554f8feb46095841737687a5f3fc0d752b69c0084290dfea6a69ebafe02886",
+      "size_bytes": 4566
     },
     {
       "exists": true,
