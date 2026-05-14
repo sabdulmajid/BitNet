@@ -66,21 +66,25 @@ def code_features(root: Path) -> dict[str, bool]:
 def run_matrix(args: argparse.Namespace) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     run_specs = [
-        ("FP16-SFT", args.baseline_root, "fp16_sft-tensor-layer-1", "baseline"),
-        ("BitNet-SFT", args.baseline_root, "bitnet_sft-tensor-layer-1", "baseline"),
-        ("BitDistill short tensor gamma100", args.baseline_root, "bitdistill-tensor-layer-1", "diagnostic"),
-        ("BitDistill short row gamma100", args.baseline_root, "bitdistill-row-layer-1", "diagnostic"),
-        ("BitDistill short tensor layer -8", args.baseline_root, "bitdistill-tensor-layer-8", "diagnostic"),
-        ("BitDistill longwarmup tensor gamma100", args.longwarmup_root, "bitdistill-longwarmup-tensor-layer-8", "diagnostic_pending"),
-        ("BitDistill longwarmup row gamma100", args.longwarmup_root, "bitdistill-longwarmup-row-layer-8", "novelty_pending"),
-        ("BitDistill longwarmup tensor paper gamma", args.paper_hparam_root, "bitdistill-longwarmup-tensor-layer-8", "paper_candidate"),
+        ("FP16-SFT", args.baseline_root, "fp16_sft-tensor-layer-1", "baseline", None),
+        ("BitNet-SFT", args.baseline_root, "bitnet_sft-tensor-layer-1", "baseline", None),
+        ("BitDistill short tensor gamma100", args.baseline_root, "bitdistill-tensor-layer-1", "diagnostic", None),
+        ("BitDistill short row gamma100", args.baseline_root, "bitdistill-row-layer-1", "diagnostic", None),
+        ("BitDistill short tensor layer -8", args.baseline_root, "bitdistill-tensor-layer-8", "diagnostic", None),
+        ("BitDistill longwarmup tensor gamma100", args.longwarmup_root, "bitdistill-longwarmup-tensor-layer-8", "diagnostic_pending", None),
+        ("BitDistill longwarmup row gamma100", args.longwarmup_root, "bitdistill-longwarmup-row-layer-8", "novelty_pending", None),
+        ("BitDistill longwarmup tensor paper gamma", args.paper_hparam_root, "bitdistill-longwarmup-tensor-layer-8", "paper_candidate", None),
+        ("BitDistill longwarmup tensor gamma1k", args.gamma1k_root, "bitdistill-longwarmup-tensor-layer-8", "mnli_gamma_sweep_pending", {"mnli"}),
+        ("BitDistill longwarmup tensor gamma10k", args.gamma10k_root, "bitdistill-longwarmup-tensor-layer-8", "mnli_gamma_sweep_pending", {"mnli"}),
     ]
     fp_by_task = {
         task: accuracy(metric_path(args.baseline_root, args.model, task, "fp16_sft-tensor-layer-1"))
         for task in args.tasks
     }
     for task in args.tasks:
-        for label, root, run, family in run_specs:
+        for label, root, run, family, task_filter in run_specs:
+            if task_filter is not None and task not in task_filter:
+                continue
             path = metric_path(root, args.model, task, run)
             acc = accuracy(path)
             fp = fp_by_task.get(task)
@@ -163,9 +167,9 @@ def alignment_rows(features: dict[str, bool], warmup: dict[str, Any]) -> list[di
         {
             "dimension": "Stage-3 attention KD",
             "paper": "single-layer Q/K/V relation KD, gamma 1e5 for classification",
-            "local": "single-layer Q/K/V KD implemented; completed runs gamma 100; paper-gamma branch pending",
+            "local": "single-layer Q/K/V KD implemented; completed runs gamma 100; long-warmup gamma 1e3/1e4/1e5 branches pending",
             "status": "pending",
-            "note": "This was the main newly found hyperparameter gap.",
+            "note": "The gamma sweep is intentional because local loss-scale probes show the paper gamma can dominate CE.",
         },
         {
             "dimension": "Hyperparameter search",
@@ -277,6 +281,8 @@ def main() -> None:
     parser.add_argument("--baseline-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls"))
     parser.add_argument("--longwarmup-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup"))
     parser.add_argument("--paper-hparam-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma"))
+    parser.add_argument("--gamma1k-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-gamma1k"))
+    parser.add_argument("--gamma10k-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-gamma10k"))
     parser.add_argument("--monitor-json", type=Path, default=Path(f"benchmark_results/bitdistill_job_monitor_{DATE}.json"))
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_paper_alignment_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/bitdistill_paper_alignment_{DATE}.md"))
