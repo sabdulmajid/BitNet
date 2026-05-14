@@ -27,6 +27,17 @@ EVAL_BATCH_SIZE="${EVAL_BATCH_SIZE:-16}"
 GRAD_ACCUM_STEPS="${GRAD_ACCUM_STEPS:-1}"
 LR="${LR:-2e-5}"
 TASK_FORMAT="${TASK_FORMAT:-causal_lm}"
+SBATCH_PARTITION="${SBATCH_PARTITION:-}"
+SBATCH_MEM="${SBATCH_MEM:-}"
+
+common_sbatch_args() {
+  if [ -n "$SBATCH_PARTITION" ]; then
+    printf "%s\n" "--partition=$SBATCH_PARTITION"
+  fi
+  if [ -n "$SBATCH_MEM" ]; then
+    printf "%s\n" "--mem=$SBATCH_MEM"
+  fi
+}
 
 mkdir -p benchmark_results
 JOB_TABLE="benchmark_results/bitdistill_glue_jobs_$(date -u +%Y%m%d_%H%M%S).tsv"
@@ -43,6 +54,9 @@ submit_job() {
   shift 7
 
   local sbatch_args=(--parsable)
+  while IFS= read -r arg; do
+    [ -n "$arg" ] && sbatch_args+=("$arg")
+  done < <(common_sbatch_args)
   if [ -n "$dependency" ]; then
     sbatch_args+=(--dependency="$dependency")
   fi
@@ -73,6 +87,10 @@ submit_job() {
 
 submit_warmup() {
   local output_dir="$OUTPUT_ROOT/$MODEL_SLUG/continued_pretrain/bitdistill-tensor"
+  local sbatch_args=(--parsable)
+  while IFS= read -r arg; do
+    [ -n "$arg" ] && sbatch_args+=("$arg")
+  done < <(common_sbatch_args)
   local job_id
   job_id="$(
     env \
@@ -85,7 +103,7 @@ submit_warmup() {
       GRAD_ACCUM_STEPS="$GRAD_ACCUM_STEPS" \
       LR="$LR" \
       OUTPUT_DIR="$output_dir" \
-      sbatch --parsable slurm_bitdistill_glue.sh
+      sbatch "${sbatch_args[@]}" slurm_bitdistill_glue.sh
   )"
   printf "stage2\t-\tbitdistill\ttensor\t-\t%s\tnone\t%s\n" "$job_id" "$output_dir" | tee -a "$JOB_TABLE"
   echo "$job_id"
