@@ -159,8 +159,8 @@ def build_report(data: dict[str, Any]) -> str:
         "top-k expert execution with `ggml_mul_mat_id`. This does not prove "
         "Kimi support: no Kimi-specific mapping or benchmark artifact is present, "
         "Qwen2MoE mapping still lacks a real converted/evaluated artifact, "
-        "the TL2 packing path remains 2D-matrix oriented, and the active TL2 "
-        "runtime contract does not size or route merged experts correctly. The "
+        "the TL2 packing path is only synthetically validated, and the active TL2 "
+        "runtime contract still does not route merged experts correctly. The "
         "direct I2_S/I2_SR path is only a synthetic packing contract until it "
         "is validated with a full MoE GGUF/runtime artifact."
     )
@@ -247,7 +247,7 @@ def build_productization_gates(
                 f"runtime_blockers={len(runtime_blockers)}; "
                 f"tl2_expert_byte_underreport={byte_probe.get('underreport_bytes')}"
             ),
-            "The TL2 converter accepts the synthetic 3D packing contract, but the active TL2 runtime still under-sizes and misroutes merged expert tensors.",
+            "The TL2 converter accepts the synthetic 3D packing contract and byte sizing now accounts for expert planes, but `ggml_mul_mat_id` still does not route TL2 expert matmuls through the BitNet LUT kernel.",
         ),
         make_gate(
             "direct I2_SR writer is validated for merged 3D expert tensors",

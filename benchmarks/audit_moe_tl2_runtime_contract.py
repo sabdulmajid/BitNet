@@ -41,9 +41,9 @@ def slice_between(text: str, start: str, end: str) -> str:
     return text[start_idx:end_idx]
 
 
-def active_tl2_nbytes(k: int, m: int) -> int:
-    # Mirror the active ggml_nbytes TL2 integer arithmetic.
-    nbytes = (k - 256) * m // 3 * 5 // 8 + 256 * m // 2 * 4 // 8
+def tl2_nbytes_for_rows(k: int, rows: int) -> int:
+    # Mirror the active ggml_nbytes TL2 integer arithmetic for a logical row count.
+    nbytes = (k - 256) * rows // 3 * 5 // 8 + 256 * rows // 2 * 4 // 8
     if nbytes % 32 != 0:
         nbytes = 32 - nbytes % 32 + nbytes
     return nbytes + 32
@@ -77,8 +77,9 @@ def build_audit(root: Path) -> dict[str, Any]:
     converter_has_legacy_2d_unpack = "M, K = w.shape" in preprocess_tl2
     converter_has_ndim_branch = "w.ndim" in preprocess_tl2 or "len(w.shape)" in preprocess_tl2
     converter_has_3d_branch = "w.ndim == 3" in preprocess_tl2
-    nbytes_uses_ne2 = "tensor->ne[2]" in ggml_nbytes or "ne[2]" in ggml_nbytes
-    nbytes_uses_ne3 = "tensor->ne[3]" in ggml_nbytes or "ne[3]" in ggml_nbytes
+    nbytes_uses_nrows = "ggml_nrows(tensor)" in ggml_nbytes
+    nbytes_uses_ne2 = nbytes_uses_nrows or "tensor->ne[2]" in ggml_nbytes or "ne[2]" in ggml_nbytes
+    nbytes_uses_ne3 = nbytes_uses_nrows or "tensor->ne[3]" in ggml_nbytes or "ne[3]" in ggml_nbytes
     mul_mat_has_tl2_lut = "GGML_BITNET_X86_TL2" in mul_mat and "ggml_bitnet_can_mul_mat" in mul_mat and "ggml_qgemm_lut" in mul_mat
     mul_mat_id_has_tl2_lut = "GGML_BITNET_X86_TL2" in mul_mat_id or "ggml_bitnet_can_mul_mat" in mul_mat_id or "ggml_qgemm_lut" in mul_mat_id
     tl2_vec_dot_f32 = "ggml_vec_dot_f32" in type_traits_tl2 and "vec_dot_type             = GGML_TYPE_F32" in type_traits_tl2
@@ -87,10 +88,11 @@ def build_audit(root: Path) -> dict[str, Any]:
     experts = SYNTHETIC_SHAPE["experts"]
     out = SYNTHETIC_SHAPE["out"]
     in_features = SYNTHETIC_SHAPE["in"]
-    active_bytes = active_tl2_nbytes(in_features, out)
-    flat_expert_bytes = active_tl2_nbytes(in_features, out * experts)
-    underreport_bytes = flat_expert_bytes - active_bytes
-    underreport_ratio = flat_expert_bytes / active_bytes if active_bytes else None
+    one_expert_bytes = tl2_nbytes_for_rows(in_features, out)
+    active_3d_bytes = tl2_nbytes_for_rows(in_features, out * experts)
+    flat_expert_bytes = tl2_nbytes_for_rows(in_features, out * experts)
+    underreport_bytes = flat_expert_bytes - active_3d_bytes
+    underreport_ratio = flat_expert_bytes / active_3d_bytes if active_3d_bytes else None
 
     checks = [
         make_check(
@@ -108,8 +110,9 @@ def build_audit(root: Path) -> dict[str, Any]:
             nbytes_uses_ne2 and nbytes_uses_ne3,
             (
                 f"ggml_nbytes_line={first_line(ggml, 'size_t ggml_nbytes')}; "
-                f"uses_ne2={nbytes_uses_ne2}; uses_ne3={nbytes_uses_ne3}; "
-                f"shape=[{experts},{out},{in_features}]; active_bytes={active_bytes}; "
+                f"uses_nrows={nbytes_uses_nrows}; uses_ne2={nbytes_uses_ne2}; uses_ne3={nbytes_uses_ne3}; "
+                f"shape=[{experts},{out},{in_features}]; one_expert_bytes={one_expert_bytes}; "
+                f"active_3d_bytes={active_3d_bytes}; "
                 f"flat_expert_bytes={flat_expert_bytes}; underreport_bytes={underreport_bytes}; "
                 f"underreport_ratio={underreport_ratio:.6f}"
             ),
@@ -150,7 +153,8 @@ def build_audit(root: Path) -> dict[str, Any]:
         "date": DATE,
         "synthetic_shape": SYNTHETIC_SHAPE,
         "byte_size_probe": {
-            "active_tl2_nbytes_one_expert": active_bytes,
+            "tl2_nbytes_one_expert": one_expert_bytes,
+            "active_tl2_nbytes_3d": active_3d_bytes,
             "flat_expert_tl2_nbytes": flat_expert_bytes,
             "underreport_bytes": underreport_bytes,
             "underreport_ratio": underreport_ratio,
@@ -164,7 +168,6 @@ def build_audit(root: Path) -> dict[str, Any]:
         "tl2_moe_runtime_ready": not blockers,
         "blockers": blockers,
         "required_next_steps": [
-            "Change the TL2 byte-size/stride contract so GGUF loading allocates all expert planes.",
             "Route ggml_mul_mat_id for TL2 through expert-aware BitNet LUT kernels, not generic F32 vec-dot fallback.",
             "Define per-expert tensor-scale or row/group-scale metadata semantics before quality benchmarking.",
             "Validate with a real Qwen2MoE/Kimi GGUF and router/expert-locality benchmarks.",
@@ -211,7 +214,8 @@ def render_markdown(result: dict[str, Any]) -> str:
                 ["field", "value"],
                 [
                     ["synthetic shape", f"`{result['synthetic_shape']}`"],
-                    ["active one-expert bytes", f"`{byte_probe['active_tl2_nbytes_one_expert']}`"],
+                    ["one-expert bytes", f"`{byte_probe['tl2_nbytes_one_expert']}`"],
+                    ["active 3D bytes", f"`{byte_probe['active_tl2_nbytes_3d']}`"],
                     ["flat expert bytes", f"`{byte_probe['flat_expert_tl2_nbytes']}`"],
                     ["underreport bytes", f"`{byte_probe['underreport_bytes']}`"],
                     ["underreport ratio", f"`{byte_probe['underreport_ratio']:.6f}`"],
