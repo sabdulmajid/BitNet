@@ -35,7 +35,7 @@ Artifacts: `155`. Missing: `0`.
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 2048 | 11fc209f78db |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 2937 | f1022d9d960a |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 3257 | 4ca367761271 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2569 | 51da6738be9d |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -124,7 +124,7 @@ Artifacts: `155`. Missing: `0`.
 | row_scale_qtype_i2sr_promotion_rehearsal_json | row_scale_qtype_gate_json | yes | 3897 | 6ffc161b446b | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5488 | 493439c9cbbf | passed=True, checks=33, failed=0 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 6039 | 530eafb2ad14 | passed=True, checks=36, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 15953 | a07ee58dabe1 | achieved=False, status=not_complete, complete=7/9, open=2 |
 | product_scope_gate_json | product_scope_gate_json | yes | 5771 | 45198875b1fc | scope=research_mvp_only, supported=4, unsupported=5 |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 26085 | 9f3a8d24ee11 | present=13/36, examples=13, full_eval=13, ci95=13, paper_complete=False, paper_passed=False, row_complete=False, row_passed=False, confidence=0.95 |

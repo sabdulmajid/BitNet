@@ -52,6 +52,7 @@ CPU_ROWS = {
 
 EXPECTED_TASKS = len(SELECTED_METRICS)
 EXPECTED_SAMPLES = 22382
+BITDISTILL_GLUE_EXPECTED = {"mnli": 9815, "qnli": 5463, "sst2": 872}
 EXPECTED_RSS_CONTEXTS = [512, 2048, 8192, 32768]
 
 
@@ -145,6 +146,62 @@ def audit_paired_reports(root: Path, checks: list[dict[str, Any]]) -> None:
             macro.group(1).strip() if macro else "missing",
             "macro delta CI not found",
         )
+
+
+def audit_bitdistill_paired_baselines(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = latest_artifact(
+        root,
+        "benchmark_results/bitdistill_paired_predictions_*.json",
+        f"benchmark_results/bitdistill_paired_predictions_{DATE}.json",
+    )
+    if not path.exists():
+        add_check(checks, "BitDistill paired prediction audit exists", False, str(path), "missing paired audit")
+        return
+    data = read_json(path)
+    rows = data.get("rows", [])
+    if not isinstance(rows, list):
+        rows = []
+    baseline_rows = [
+        row
+        for row in rows
+        if isinstance(row, dict) and row.get("family") == "baseline_vs_fp" and row.get("candidate_label") == "BitNet-SFT"
+    ]
+    full_rows = [
+        row
+        for row in baseline_rows
+        if row.get("status") == "pass"
+        and row.get("matched") == BITDISTILL_GLUE_EXPECTED.get(str(row.get("task")))
+        and row.get("expected_examples") == BITDISTILL_GLUE_EXPECTED.get(str(row.get("task")))
+    ]
+    stats_rows = [
+        row
+        for row in full_rows
+        if isinstance(row.get("paired_ci95"), list)
+        and len(row.get("paired_ci95")) == 2
+        and isinstance(row.get("mcnemar_exact_p"), (int, float))
+    ]
+    add_check(
+        checks,
+        "BitDistill paired audit has BitNet baseline rows",
+        len(baseline_rows) == len(BITDISTILL_GLUE_EXPECTED),
+        f"rows={len(baseline_rows)}, path={path.relative_to(root)}",
+        "expected one BitNet-SFT-vs-FP16 row for each GLUE task",
+    )
+    add_check(
+        checks,
+        "BitNet baseline paired rows cover full GLUE validation",
+        len(full_rows) == len(BITDISTILL_GLUE_EXPECTED)
+        and sum(int(row.get("matched", 0)) for row in full_rows) == sum(BITDISTILL_GLUE_EXPECTED.values()),
+        f"full_rows={len(full_rows)}, matched={sum(int(row.get('matched', 0)) for row in full_rows)}",
+        "paired baseline rows are missing or partial",
+    )
+    add_check(
+        checks,
+        "BitNet baseline paired rows have paired statistics",
+        len(stats_rows) == len(BITDISTILL_GLUE_EXPECTED),
+        f"stats_rows={len(stats_rows)}",
+        "paired CI or McNemar p-value missing",
+    )
 
 
 def find_row(summary: dict[str, Any], name: str) -> dict[str, Any] | None:
@@ -265,6 +322,7 @@ def main() -> None:
     checks: list[dict[str, Any]] = []
     audit_lm_eval(root, checks)
     audit_paired_reports(root, checks)
+    audit_bitdistill_paired_baselines(root, checks)
     audit_cpu_rows(root, checks)
     manifest_path = args.manifest_path.resolve() if args.manifest_path is not None else None
     audit_rss_and_gates(root, checks, manifest_path)

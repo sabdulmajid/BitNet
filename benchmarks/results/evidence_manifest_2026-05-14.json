@@ -304,8 +304,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-14.md",
-      "sha256": "f1022d9d960a72c628a4c663adfc0b9e2a3d67e51d71bce3ede5751daf9bc357",
-      "size_bytes": 2937
+      "sha256": "4ca367761271149e912c13715a075d500d40eb95ce16b1c2d250d6f5744ee5da",
+      "size_bytes": 3257
     },
     {
       "exists": true,
@@ -1980,13 +1980,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 33,
+        "check_count": 36,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-14.json",
-      "sha256": "493439c9cbbffe57d0caf0fa8785f09b6f4bb55a5a72cc15575faf75cf8586f8",
-      "size_bytes": 5488
+      "sha256": "530eafb2ad140adb17795280e084610deec42a6a0a4c574e72e5c173dcc8d267",
+      "size_bytes": 6039
     },
     {
       "exists": true,
