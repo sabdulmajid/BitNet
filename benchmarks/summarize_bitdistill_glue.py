@@ -38,6 +38,9 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
             item = find_metrics(args.root, args.model, task, method, scale)
             data = item["data"]
             eval_metrics = data.get("eval", {}) if isinstance(data.get("eval"), dict) else {}
+            last = data.get("last", {}) if isinstance(data.get("last"), dict) else {}
+            loss_weights = data.get("loss_weights", {}) if isinstance(data.get("loss_weights"), dict) else {}
+            state_load = data.get("state_load", {}) if isinstance(data.get("state_load"), dict) else {}
             rows.append(
                 {
                     "task": task,
@@ -49,6 +52,17 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                     "steps": data.get("steps"),
                     "task_format": data.get("task_format"),
                     "scale_mode": scale,
+                    "ce": last.get("ce"),
+                    "logit_kd": last.get("logit_kd"),
+                    "attention_kd": last.get("attention_kd"),
+                    "weighted_logit_kd": last.get("weighted_logit_kd"),
+                    "weighted_attention_kd": last.get("weighted_attention_kd"),
+                    "logit_kd_weight": loss_weights.get("logit_kd_weight"),
+                    "attention_kd_weight": loss_weights.get("attention_kd_weight"),
+                    "state_loaded": state_load.get("loaded"),
+                    "skipped_shape_mismatches": len(state_load.get("skipped_shape_mismatches", {}))
+                    if isinstance(state_load.get("skipped_shape_mismatches", {}), dict)
+                    else None,
                 }
             )
 
@@ -56,23 +70,30 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     for task in args.tasks:
         fp = next((row for row in rows if row["task"] == task and row["label"] == "fp16_sft"), {})
         bd = next((row for row in rows if row["task"] == task and row["label"] == "bitdistill_tensor"), {})
+        bitnet = next((row for row in rows if row["task"] == task and row["label"] == "bitnet_sft"), {})
         row = next((item for item in rows if item["task"] == task and item["label"] == "bitdistill_row"), {})
         fp_acc = fp.get("accuracy")
         bd_acc = bd.get("accuracy")
+        bitnet_acc = bitnet.get("accuracy")
         row_acc = row.get("accuracy")
         gap = None
+        bitnet_gap = None
         row_delta = None
         passed = False
         if isinstance(fp_acc, (int, float)) and isinstance(bd_acc, (int, float)):
             gap = float(fp_acc) - float(bd_acc)
             passed = abs(gap) <= args.max_fp_gap
+        if isinstance(fp_acc, (int, float)) and isinstance(bitnet_acc, (int, float)):
+            bitnet_gap = float(fp_acc) - float(bitnet_acc)
         if isinstance(row_acc, (int, float)) and isinstance(bd_acc, (int, float)):
             row_delta = float(row_acc) - float(bd_acc)
         verdicts.append(
             {
                 "task": task,
                 "fp16_accuracy": fp_acc,
+                "bitnet_accuracy": bitnet_acc,
                 "bitdistill_accuracy": bd_acc,
+                "fp_minus_bitnet": bitnet_gap,
                 "fp_minus_bitdistill": gap,
                 "row_minus_tensor_bitdistill": row_delta,
                 "passes_fp_gap": passed,
@@ -111,6 +132,10 @@ def render_markdown(summary: dict[str, Any]) -> str:
             fmt(row["accuracy"]),
             fmt(row["examples"]),
             fmt(row["steps"]),
+            fmt(row["ce"]),
+            fmt(row["weighted_logit_kd"]),
+            fmt(row["weighted_attention_kd"]),
+            fmt(row["attention_kd_weight"]),
             row["path"],
         ]
         for row in summary["rows"]
@@ -119,7 +144,9 @@ def render_markdown(summary: dict[str, Any]) -> str:
         [
             row["task"],
             fmt(row["fp16_accuracy"]),
+            fmt(row["bitnet_accuracy"]),
             fmt(row["bitdistill_accuracy"]),
+            fmt(row["fp_minus_bitnet"]),
             fmt(row["fp_minus_bitdistill"]),
             fmt(row["row_minus_tensor_bitdistill"]),
             "pass" if row["passes_fp_gap"] else "fail",
@@ -132,9 +159,27 @@ def render_markdown(summary: dict[str, Any]) -> str:
             f"Model: `{summary['model']}`.",
             f"Overall threshold pass: `{summary['passed']}` with max FP gap `{summary['max_fp_gap']}`.",
             "## Metrics",
-            md_table(["task", "run", "exists", "accuracy", "examples", "steps", "metrics path"], metric_rows),
+            md_table(
+                [
+                    "task",
+                    "run",
+                    "exists",
+                    "accuracy",
+                    "examples",
+                    "steps",
+                    "last CE",
+                    "last wLogitKD",
+                    "last wAttnKD",
+                    "attn weight",
+                    "metrics path",
+                ],
+                metric_rows,
+            ),
             "## Verdicts",
-            md_table(["task", "FP16", "BitDistill", "FP-BitDistill", "row-tensor", "status"], verdict_rows),
+            md_table(
+                ["task", "FP16", "BitNet-SFT", "BitDistill", "FP-BitNet", "FP-BitDistill", "row-tensor", "status"],
+                verdict_rows,
+            ),
         ]
     ) + "\n"
 
