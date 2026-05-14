@@ -93,6 +93,10 @@ warm-up pilot. Until those gates close, the public claim remains conservative:
 **BitDistill is the right class of method, but this fork has not yet reproduced
 paper-level task quality.**
 
+Focused MNLI diagnostics after fixing logits-KL scaling improved the best
+short-budget BitDistill result to `0.532960` versus FP16-SFT `0.807641`. That
+is useful debugging signal, not a reproduction-quality result.
+
 ## Key Dense-Qwen Results
 
 Quality measurements below are Qwen2.5-1.5B unless noted.
@@ -208,6 +212,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Qwen side-by-side summary](benchmarks/results/qwen_side_by_side_2026-05-05.md)
 - [BitDistill reproduction status](benchmarks/results/bitdistill_reproduction_status_2026-05-14.md)
 - [BitDistill GLUE3 primary summary](benchmarks/results/bitdistill_seqcls_glue3_primary_summary_2026-05-14.md)
+- [BitDistill MNLI diagnostic variants](benchmarks/results/bitdistill_seqcls_mnli_diagnostic_variant_summary_2026-05-14.md)
 - [Objective completion audit](benchmarks/results/objective_completion_audit_2026-05-13.md)
 - [Product scope gate](benchmarks/results/product_scope_gate_2026-05-13.md)
 - [I2_SR submodule promotion audit](benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md)

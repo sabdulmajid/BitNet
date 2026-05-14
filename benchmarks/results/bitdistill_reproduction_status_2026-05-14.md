@@ -85,6 +85,30 @@ The results support three conservative conclusions:
 The results do not support claiming a successful BitDistill reproduction, a
 general 1.58-bit model converter, or a row-scale task-quality improvement.
 
+## MNLI Diagnostics After Paper-Style Logits KL
+
+After the first GLUE3 wave, the logits-KL implementation was corrected to match
+the BitDistill equations by removing the tau-squared multiplier. A focused MNLI
+diagnostic wave then tested tensor scale, row scale, and FP16-teacher head
+initialization.
+
+| run | accuracy | FP16 gap | logits temp scale | head init | note |
+| --- | ---: | ---: | --- | --- | --- |
+| FP16-SFT | `0.807641` | `0.000000` | - | - | task teacher/reference |
+| BitNet-SFT | `0.487621` | `0.320020` | - | false | direct ternary SFT |
+| BitNet-SFT + teacher head | `0.496994` | `0.310647` | - | true | head copy gives only `+0.009373` |
+| BitDistill tensor, first wave | `0.525217` | `0.282425` | legacy tau-squared | false | previous best tensor |
+| BitDistill row, first wave | `0.516556` | `0.291085` | legacy tau-squared | false | row hurt in first wave |
+| BitDistill tensor, paper logits | `0.528477` | `0.279165` | none | false | small gain from paper-style KL |
+| BitDistill row, paper logits | `0.532043` | `0.275599` | none | false | best row result |
+| BitDistill tensor, paper logits + teacher head | `0.532960` | `0.274682` | none | true | best short-budget result |
+| BitDistill row, paper logits + teacher head | `0.530005` | `0.277636` | none | true | head did not help row |
+
+Interpretation: the corrected loss and head initialization improve MNLI by
+`+0.007743` over the first tensor BitDistill wave, and row scale helps when
+using paper-style logits without head initialization. These are real but small
+effects. They do not close the roughly 27.5-point FP16 gap.
+
 ## Why This Differs From The Paper
 
 The largest experimental differences are:
@@ -107,8 +131,6 @@ Queued or running diagnostics at report time:
 
 - MNLI teacher-head initialization probe:
   BitNet-SFT, BitDistill tensor, BitDistill row.
-- MNLI paper-style logits-KL rerun:
-  tensor and row, with and without teacher-head initialization.
 - MNLI attention-layer sweep:
   layers `-2`, `-4`, `-8`.
 - MNLI CE-only ablation with and without teacher-head initialization.
