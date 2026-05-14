@@ -42,19 +42,17 @@ def read_job_table(path: Path | None) -> list[dict[str, str]]:
 
 
 def read_job_tables(paths: list[Path]) -> list[dict[str, str]]:
-    rows: list[dict[str, str]] = []
-    seen_job_ids: set[str] = set()
+    rows_by_key: dict[str, dict[str, str]] = {}
+    order: list[str] = []
     for path in paths:
         for row in read_job_table(path):
-            job_id = row.get("job_id", "")
-            if job_id and job_id in seen_job_ids:
-                continue
-            if job_id:
-                seen_job_ids.add(job_id)
             row = dict(row)
             row["job_table"] = str(path)
-            rows.append(row)
-    return rows
+            key = row.get("output_dir") or row.get("job_id") or f"{path}:{len(order)}"
+            if key not in rows_by_key:
+                order.append(key)
+            rows_by_key[key] = row
+    return [rows_by_key[key] for key in order]
 
 
 def parse_dependency_job_ids(rows: list[dict[str, str]]) -> list[str]:
@@ -223,6 +221,10 @@ def render_markdown(summary: dict[str, Any]) -> str:
             row.get("task", "-"),
             row.get("scale", "-"),
             row.get("layer", "-"),
+            row.get("task_max_steps", "-"),
+            row.get("logit_kd_weight", "-"),
+            row.get("attention_kd_weight", "-"),
+            row.get("logit_kd_temperature_scale", "-"),
             row.get("job_status", {}).get("state", "-"),
             row.get("job_status", {}).get("elapsed", "-"),
             row.get("job_status", {}).get("node_or_reason", "-"),
@@ -243,7 +245,22 @@ def render_markdown(summary: dict[str, Any]) -> str:
             ),
             "## Downstream Jobs",
             md_table(
-                ["job", "task", "scale", "layer", "state", "elapsed", "node/reason", "metrics", "accuracy", "metrics path"],
+                [
+                    "job",
+                    "task",
+                    "scale",
+                    "layer",
+                    "steps",
+                    "logit KD",
+                    "attention KD",
+                    "logit temp scale",
+                    "state",
+                    "elapsed",
+                    "node/reason",
+                    "metrics",
+                    "accuracy",
+                    "metrics path",
+                ],
                 downstream_rows,
             ),
         ]

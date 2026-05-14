@@ -59,7 +59,7 @@ common_sbatch_args() {
 
 mkdir -p benchmark_results
 JOB_TABLE="benchmark_results/bitdistill_longwarmup_downstream_$(date -u +%Y%m%d_%H%M%S).tsv"
-printf "phase\ttask\tmethod\tscale\tlayer\tjob_id\tdependency\tteacher\twarmup_state\toutput_dir\n" > "$JOB_TABLE"
+printf "phase\ttask\tmethod\tscale\tlayer\tjob_id\tdependency\tteacher\twarmup_state\toutput_dir\ttask_max_steps\tmax_train_samples\tmax_eval_samples\tper_device_batch_size\tgrad_accum_steps\tlr\tlogit_kd_weight\tattention_kd_weight\tlogit_temperature\tlogit_kd_temperature_scale\tattention_temperature\tinit_output_head_from_teacher\n" > "$JOB_TABLE"
 
 submit_job() {
   local task="$1"
@@ -107,8 +107,11 @@ submit_job() {
       INIT_STATE_DICT="$WARMUP_STATE" \
       sbatch "${sbatch_args[@]}" slurm_bitdistill_glue.sh
   )"
-  printf "longwarmup_downstream\t%s\tbitdistill\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
-    "$task" "$scale" "$layer" "$job_id" "${DEPENDENCY:-none}" "$teacher_dir" "$WARMUP_STATE" "$output_dir" | tee -a "$JOB_TABLE"
+  printf "longwarmup_downstream\t%s\tbitdistill\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+    "$task" "$scale" "$layer" "$job_id" "${DEPENDENCY:-none}" "$teacher_dir" "$WARMUP_STATE" "$output_dir" \
+    "$TASK_MAX_STEPS" "$MAX_TRAIN_SAMPLES" "$MAX_EVAL_SAMPLES" "$PER_DEVICE_BATCH_SIZE" "$GRAD_ACCUM_STEPS" "$LR" \
+    "$LOGIT_KD_WEIGHT" "$ATTENTION_KD_WEIGHT" "$LOGIT_TEMPERATURE" "$LOGIT_KD_TEMPERATURE_SCALE" "$ATTENTION_TEMPERATURE" \
+    "$INIT_OUTPUT_HEAD_FROM_TEACHER" | tee -a "$JOB_TABLE"
 }
 
 for task in "${TASKS[@]}"; do
@@ -127,4 +130,3 @@ for task in "${TASKS[@]}"; do
 done
 
 echo "wrote $JOB_TABLE"
-
