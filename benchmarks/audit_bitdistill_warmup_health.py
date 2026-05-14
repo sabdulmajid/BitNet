@@ -4,11 +4,13 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import re
 import statistics
 import subprocess
+import tempfile
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -115,6 +117,28 @@ def collect_squeue(job_id: str) -> dict[str, str]:
     }
 
 
+def sha256_text(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def stored_batch_script(job_id: str) -> tuple[str, str]:
+    if not job_id:
+        return "", "missing job id"
+    with tempfile.TemporaryDirectory(prefix="bitdistill-warmup-script-") as tmp:
+        path = Path(tmp) / f"job-{job_id}.sh"
+        proc = subprocess.run(
+            ["scontrol", "write", "batch_script", job_id, str(path)],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if proc.returncode != 0:
+            return "", proc.stderr.strip() or proc.stdout.strip() or f"scontrol exited {proc.returncode}"
+        if not path.exists():
+            return "", "scontrol did not materialize a batch script"
+        return path.read_text(encoding="utf-8", errors="replace"), ""
+
+
 def add_check(checks: list[dict[str, Any]], name: str, passed: bool, evidence: str, blocker: str = "") -> None:
     checks.append({"name": name, "passed": bool(passed), "evidence": evidence, "blocker": "" if passed else blocker})
 
@@ -151,6 +175,12 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     job_id = env.get("SLURM_JOB_ID", "")
     squeue = collect_squeue(job_id)
     job_running = squeue.get("state") in {"RUNNING", "CONFIGURING", "COMPLETING"}
+    current_script_path = root / "slurm_bitdistill_glue.sh"
+    current_script = current_script_path.read_text(encoding="utf-8", errors="replace") if current_script_path.exists() else ""
+    stored_script, stored_script_error = stored_batch_script(job_id)
+    stored_script_matches_current = bool(stored_script and current_script and sha256_text(stored_script) == sha256_text(current_script))
+    stored_script_has_snapshot_guard = "Refusing continued_pretrain with SAVE_EVERY_STEPS=0" in stored_script
+    current_script_has_snapshot_guard = "Refusing continued_pretrain with SAVE_EVERY_STEPS=0" in current_script
     final_exists = final_state.exists() if final_state is not None else False
     monitor_env = monitor_warmup.get("env") if isinstance(monitor_warmup.get("env"), dict) else {}
     monitor_job_id = str(monitor_env.get("SLURM_JOB_ID") or "")
@@ -240,6 +270,18 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
 
     if save_every_steps <= 0 and not final_exists:
         warnings.append("SAVE_EVERY_STEPS is 0 and no final state exists yet; a job failure would lose current warm-up progress.")
+    if stored_script_error:
+        warnings.append(f"Could not recover the stored Slurm batch script for provenance: {stored_script_error}.")
+    elif stored_script and not stored_script_matches_current:
+        warnings.append(
+            "The running warm-up was submitted from an older batch script than the current checked-in launcher; "
+            "current future launches have stricter snapshot guards, but this active job retains its submitted script."
+        )
+    if stored_script and not stored_script_has_snapshot_guard and current_script_has_snapshot_guard:
+        warnings.append(
+            "The active warm-up stored script does not contain the current SAVE_EVERY_STEPS safety guard; "
+            "this explains the no-snapshot live run and should not be treated as the current launcher policy."
+        )
     if finite_number(ce_delta) and ce_delta > args.max_ce_mean_increase:
         warnings.append(
             f"Last-window CE mean is {ce_delta:.4f} higher than the first-window mean; inspect for data or optimization drift."
@@ -279,6 +321,16 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "save_every_steps": save_every_steps,
         "snapshot_count": len(snapshots),
         "latest_snapshot": rel(snapshots[-1], root) if snapshots else "",
+        "script_provenance": {
+            "current_script": rel(current_script_path, root),
+            "current_sha256": sha256_text(current_script) if current_script else "",
+            "stored_sha256": sha256_text(stored_script) if stored_script else "",
+            "stored_script_available": bool(stored_script),
+            "stored_script_error": stored_script_error,
+            "stored_script_matches_current": stored_script_matches_current,
+            "stored_script_has_snapshot_guard": stored_script_has_snapshot_guard,
+            "current_script_has_snapshot_guard": current_script_has_snapshot_guard,
+        },
     }
 
 
@@ -327,6 +379,17 @@ def render_markdown(summary: dict[str, Any]) -> str:
         for check in summary["checks"]
     ]
     warning_rows = [[warning] for warning in summary["warnings"]] or [["none"]]
+    provenance = summary.get("script_provenance", {})
+    provenance_rows = [
+        ["current script", str(provenance.get("current_script", "-"))],
+        ["current sha256", str(provenance.get("current_sha256", ""))[:12] or "-"],
+        ["stored sha256", str(provenance.get("stored_sha256", ""))[:12] or "-"],
+        ["stored script available", fmt(provenance.get("stored_script_available"))],
+        ["stored matches current", fmt(provenance.get("stored_script_matches_current"))],
+        ["stored has snapshot guard", fmt(provenance.get("stored_script_has_snapshot_guard"))],
+        ["current has snapshot guard", fmt(provenance.get("current_script_has_snapshot_guard"))],
+        ["stored script error", str(provenance.get("stored_script_error", "")) or "-"],
+    ]
     return "\n\n".join(
         [
             f"# BitDistill Warm-Up Health Audit, {summary['date']}",
@@ -352,6 +415,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
             ),
             "## Checks",
             md_table(["check", "status", "evidence", "blocker"], check_rows),
+            "## Script Provenance",
+            md_table(["field", "value"], provenance_rows),
             "## Warnings",
             md_table(["warning"], warning_rows),
         ]

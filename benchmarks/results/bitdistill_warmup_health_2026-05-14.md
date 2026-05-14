@@ -6,23 +6,38 @@ Overall status: `pass`.
 
 | log | job | state | step | max steps | progress | latest CE | last CE mean | last-first CE mean | sec/step | ETA | final state | snapshots |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| logs/bitdistill-glue-9894.out | 9894 | RUNNING | 14610 | 20000 | 0.730500 | 4.018757 | 4.124794 | -1.810192 | 1.820315 | 2.73h | false | 0 |
+| logs/bitdistill-glue-9894.out | 9894 | RUNNING | 15060 | 20000 | 0.753000 | 4.274324 | 4.106778 | -1.828208 | 1.820319 | 2.50h | false | 0 |
 
 ## Checks
 
 | check | status | evidence | blocker |
 | --- | --- | --- | --- |
 | warm-up log exists | pass | logs/bitdistill-glue-9894.out |  |
-| warm-up has enough observations | pass | observations=1462, required=10 |  |
-| step numbers are strictly increasing | pass | first=1, latest=14610, observations=1462 |  |
-| CE values are finite | pass | nonfinite=0, latest_ce=4.018757 |  |
-| latest progress is within target | pass | latest=14610, max_steps=20000, progress=0.7305 |  |
-| log is fresh while job is active | pass | age_seconds=12.8 |  |
-| ETA is finite | pass | seconds_per_step=1.8203148528405202, eta_seconds=9811.497056810404 |  |
+| warm-up has enough observations | pass | observations=1507, required=10 |  |
+| step numbers are strictly increasing | pass | first=1, latest=15060, observations=1507 |  |
+| CE values are finite | pass | nonfinite=0, latest_ce=4.274324 |  |
+| latest progress is within target | pass | latest=15060, max_steps=20000, progress=0.753 |  |
+| log is fresh while job is active | pass | age_seconds=4.0 |  |
+| ETA is finite | pass | seconds_per_step=1.8203187250996016, eta_seconds=8992.374501992032 |  |
 | monitor identifies same warm-up job | pass | monitor_job=9894, parsed_job=9894 |  |
+
+## Script Provenance
+
+| field | value |
+| --- | --- |
+| current script | slurm_bitdistill_glue.sh |
+| current sha256 | dd5ea8ef8474 |
+| stored sha256 | 57b131e197a5 |
+| stored script available | true |
+| stored matches current | false |
+| stored has snapshot guard | false |
+| current has snapshot guard | true |
+| stored script error | - |
 
 ## Warnings
 
 | warning |
 | --- |
 | SAVE_EVERY_STEPS is 0 and no final state exists yet; a job failure would lose current warm-up progress. |
+| The running warm-up was submitted from an older batch script than the current checked-in launcher; current future launches have stricter snapshot guards, but this active job retains its submitted script. |
+| The active warm-up stored script does not contain the current SAVE_EVERY_STEPS safety guard; this explains the no-snapshot live run and should not be treated as the current launcher policy. |
