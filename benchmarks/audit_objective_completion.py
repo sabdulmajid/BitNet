@@ -94,6 +94,11 @@ def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def latest_artifact(root: Path, pattern: str, fallback: str) -> Path:
+    matches = sorted(root.glob(pattern))
+    return matches[-1] if matches else root / fallback
+
+
 def finite_number(value: Any) -> bool:
     return isinstance(value, (int, float)) and math.isfinite(float(value))
 
@@ -400,13 +405,19 @@ def audit_productization(root: Path, rows: list[dict[str, Any]], metrics: dict[s
 
 
 def audit_moe(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -> None:
-    moe = read_json(root / "benchmark_results/moe_support_audit_2026-05-05.json")
+    moe_path = latest_artifact(
+        root,
+        "benchmark_results/moe_support_audit_*.json",
+        "benchmark_results/moe_support_audit_2026-05-05.json",
+    )
+    moe = read_json(moe_path)
     local_kimi = moe.get("local_kimi_artifacts", [])
     source_kimi = moe.get("kimi_source_matches", [])
     present_checks = [check for check in moe.get("checks", []) if check.get("status") == "present"]
     productization_gates = moe.get("productization_gates", [])
     failed_gates = [gate for gate in productization_gates if isinstance(gate, dict) and not gate.get("passed")]
     metrics["moe"] = {
+        "path": str(moe_path.relative_to(root)) if moe_path.is_relative_to(root) else str(moe_path),
         "present_generic_checks": len(present_checks),
         "productization_gate_count": len(productization_gates),
         "failed_productization_gate_count": len(failed_gates),

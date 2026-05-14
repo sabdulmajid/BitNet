@@ -6,8 +6,12 @@ from __future__ import annotations
 import argparse
 import json
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+
+DATE = datetime.now(timezone.utc).date().isoformat()
 
 
 @dataclass(frozen=True)
@@ -174,7 +178,7 @@ def build_report(data: dict[str, Any]) -> str:
     )
     return "\n\n".join(
         [
-            "# MoE Support Audit, 2026-05-05",
+            f"# MoE Support Audit, {DATE}",
             md_table(["check", "path", "status", "expectation", "evidence"], rows),
             "## Productization Gates",
             md_table(["gate", "status", "evidence", "blocker"], gate_rows),
@@ -298,6 +302,12 @@ def main() -> None:
             "BitNet converter has generic Mixtral-style expert metadata/packing",
         ),
         PatternCheck(
+            "BitNet converter Qwen2MoE registration",
+            root / "utils/convert-hf-to-gguf-bitnet.py",
+            ('@Model.register("Qwen2MoeForCausalLM")', "MODEL_ARCH.QWEN2MOE", "torch.stack(datas, dim=0)"),
+            "BitNet converter explicitly registers Qwen2MoE and merges expert tensors",
+        ),
+        PatternCheck(
             "Runtime sparse expert execution",
             root / "3rdparty/llama.cpp/src/llama.cpp",
             ("llm_build_moe_ffn", "ggml_soft_max", "ggml_top_k", "ggml_mul_mat_id"),
@@ -311,6 +321,8 @@ def main() -> None:
     moe_packing_contract = read_json(root / "benchmark_results/moe_packing_contract_2026-05-13.json")
     moe_tl2_runtime_contract = read_json(root / "benchmark_results/moe_tl2_runtime_contract_2026-05-13.json")
     data: dict[str, Any] = {
+        "schema": "bitnet-moe-support-audit-v1",
+        "date": DATE,
         "checks": check_results,
         "productization_gates": build_productization_gates(
             root,

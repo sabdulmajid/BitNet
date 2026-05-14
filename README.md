@@ -241,7 +241,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Row-scale qtype productization gate](benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md)
 - [Direct packed GGUF support audit](benchmarks/results/direct_packed_gguf_support_2026-05-13.md)
 - [TL2 row-scale design audit](benchmarks/results/tl2_row_scale_design_2026-05-13.md)
-- [MoE support audit](benchmarks/results/moe_support_audit_2026-05-05.md)
+- [MoE support audit](benchmarks/results/moe_support_audit_2026-05-14.md)
 - [Unblock requirements audit](benchmarks/results/unblock_requirements_2026-05-13.md)
 - [Evidence manifest](benchmarks/results/evidence_manifest_2026-05-13.md)
 
