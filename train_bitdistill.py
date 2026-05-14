@@ -71,11 +71,31 @@ GLUE_SPECS = {
     },
 }
 
-GLUE_LABEL_TEXTS = {
+GLUE_LABEL_TEXTS_WORDS = {
     "mnli": [" entailment", " neutral", " contradiction"],
     "qnli": [" entailment", " not_entailment"],
     "sst2": [" negative", " positive"],
 }
+
+GLUE_LABEL_TEXTS_LETTERS = {
+    "mnli": [" A", " B", " C"],
+    "qnli": [" A", " B"],
+    "sst2": [" A", " B"],
+}
+
+GLUE_LABEL_DESCRIPTIONS = {
+    "mnli": ["entailment", "neutral", "contradiction"],
+    "qnli": ["entailment", "not_entailment"],
+    "sst2": ["negative", "positive"],
+}
+
+
+def glue_label_texts(task_name: str, label_scheme: str) -> list[str]:
+    if label_scheme == "words":
+        return GLUE_LABEL_TEXTS_WORDS[task_name]
+    if label_scheme == "letters":
+        return GLUE_LABEL_TEXTS_LETTERS[task_name]
+    raise ValueError(f"unsupported label_scheme={label_scheme}")
 
 
 @dataclass
@@ -479,20 +499,37 @@ def build_glue_loaders(args: argparse.Namespace, tokenizer: Any) -> tuple[DataLo
     )
 
 
-def format_glue_prompt(task_name: str, row: dict[str, Any]) -> str:
+def format_glue_prompt(task_name: str, row: dict[str, Any], *, label_scheme: str = "words") -> str:
+    options = ""
+    answer_field = {
+        "mnli": "Relationship",
+        "qnli": "Entailment",
+        "sst2": "Sentiment",
+    }[task_name]
+    if label_scheme == "letters":
+        descriptions = GLUE_LABEL_DESCRIPTIONS[task_name]
+        choices = [f"{chr(ord('A') + index)}={description}" for index, description in enumerate(descriptions)]
+        options = "\nOptions: " + "; ".join(choices)
     if task_name == "sst2":
-        return f"Sentence: {row['sentence']}\nSentiment:"
+        return f"Sentence: {row['sentence']}{options}\n{answer_field}:"
     if task_name == "qnli":
-        return f"Question: {row['question']}\nSentence: {row['sentence']}\nEntailment:"
+        return f"Question: {row['question']}\nSentence: {row['sentence']}{options}\n{answer_field}:"
     if task_name == "mnli":
-        return f"Premise: {row['premise']}\nHypothesis: {row['hypothesis']}\nRelationship:"
+        return f"Premise: {row['premise']}\nHypothesis: {row['hypothesis']}{options}\n{answer_field}:"
     raise ValueError(f"unsupported task_name={task_name}")
 
 
-def encode_causal_glue_row(tokenizer: Any, task_name: str, row: dict[str, Any], max_seq_len: int) -> dict[str, list[int]]:
+def encode_causal_glue_row(
+    tokenizer: Any,
+    task_name: str,
+    row: dict[str, Any],
+    max_seq_len: int,
+    *,
+    label_scheme: str,
+) -> dict[str, list[int]]:
     label = int(row["label"])
-    label_text = GLUE_LABEL_TEXTS[task_name][label]
-    prompt = format_glue_prompt(task_name, row)
+    label_text = glue_label_texts(task_name, label_scheme)[label]
+    prompt = format_glue_prompt(task_name, row, label_scheme=label_scheme)
     prompt_ids = tokenizer(prompt, add_special_tokens=False)["input_ids"]
     label_ids = tokenizer(label_text, add_special_tokens=False)["input_ids"]
     if not label_ids:
@@ -521,7 +558,10 @@ def build_glue_causal_loaders(args: argparse.Namespace, tokenizer: Any) -> tuple
     if args.max_eval_samples > 0:
         eval_ds = eval_ds.select(range(min(args.max_eval_samples, len(eval_ds))))
 
-    train_features = [encode_causal_glue_row(tokenizer, args.task_name, row, args.max_seq_len) for row in train]
+    train_features = [
+        encode_causal_glue_row(tokenizer, args.task_name, row, args.max_seq_len, label_scheme=args.label_scheme)
+        for row in train
+    ]
     pad_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
     if pad_id is None:
         pad_id = 0
@@ -717,7 +757,7 @@ def encode_causal_label_candidate(
     return {"input_ids": input_ids, "labels": labels}
 
 
-def causal_sequence_logps(logits: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
+def causal_sequence_scores(logits: torch.Tensor, labels: torch.Tensor, *, score_mode: str) -> torch.Tensor:
     shift_logits = logits[:, :-1, :].float().contiguous()
     shift_labels = labels[:, 1:].contiguous()
     flat_loss = F.cross_entropy(
@@ -728,7 +768,13 @@ def causal_sequence_logps(logits: torch.Tensor, labels: torch.Tensor) -> torch.T
     )
     token_loss = flat_loss.view_as(shift_labels)
     supervised = shift_labels.ne(-100)
-    return -(token_loss * supervised).sum(dim=1)
+    total_logp = -(token_loss * supervised).sum(dim=1)
+    if score_mode == "sum":
+        return total_logp
+    if score_mode == "mean":
+        token_count = supervised.sum(dim=1).clamp_min(1)
+        return total_logp / token_count
+    raise ValueError(f"unsupported candidate_score={score_mode}")
 
 
 def evaluate_causal_glue(
@@ -739,11 +785,15 @@ def evaluate_causal_glue(
     device: torch.device,
 ) -> dict[str, float]:
     model.eval()
-    labels = GLUE_LABEL_TEXTS[args.task_name]
+    labels = glue_label_texts(args.task_name, args.label_scheme)
     candidates: list[dict[str, list[int]]] = []
     gold: list[int] = []
     for row in rows:
-        prompt = format_glue_prompt(args.task_name, row) if not args.smoke_test else "Sentence: synthetic\nSentiment:"
+        prompt = (
+            format_glue_prompt(args.task_name, row, label_scheme=args.label_scheme)
+            if not args.smoke_test
+            else "Sentence: synthetic\nSentiment:"
+        )
         gold.append(int(row["label"]))
         for label_text in labels:
             candidates.append(
@@ -770,7 +820,16 @@ def evaluate_causal_glue(
         for batch in loader:
             batch = move_batch(batch, device)
             outputs = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], use_cache=False)
-            scores.extend(float(value) for value in causal_sequence_logps(outputs.logits, batch["labels"]).detach().cpu())
+            scores.extend(
+                float(value)
+                for value in causal_sequence_scores(
+                    outputs.logits,
+                    batch["labels"],
+                    score_mode=args.candidate_score,
+                )
+                .detach()
+                .cpu()
+            )
     if len(scores) != len(candidates):
         raise RuntimeError(f"scored {len(scores)} candidates but expected {len(candidates)}")
     correct = 0
@@ -878,7 +937,17 @@ def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
     metrics = {
         "stage": args.stage,
         "method": args.method,
+        "student_model": args.student_model,
+        "scale_mode": args.scale_mode,
         "steps": step,
+        "effective_train_token_presentations": int(step * args.per_device_batch_size * args.grad_accum_steps * args.max_seq_len),
+        "dataset": {
+            "name": args.dataset_name,
+            "config": args.dataset_config,
+            "split": args.dataset_split,
+            "num_train_samples": args.num_train_samples,
+            "max_packed_blocks": args.max_packed_blocks,
+        },
         "last": last.__dict__,
         "preparation": prep,
         "state_load": state_load,
@@ -997,8 +1066,13 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
     metrics = {
         "stage": args.stage,
         "method": args.method,
+        "student_model": args.student_model,
+        "teacher_model": args.teacher_model,
         "task": args.task_name,
         "task_format": args.task_format,
+        "label_scheme": args.label_scheme,
+        "candidate_score": args.candidate_score,
+        "scale_mode": args.scale_mode,
         "steps": step,
         "last": last.__dict__,
         "eval": eval_metrics,
@@ -1006,6 +1080,17 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
         "state_load": state_load,
         "distill_layer": args.distill_layer,
         "attention_split_heads": args.attention_split_heads,
+        "training_budget": {
+            "max_train_samples": args.max_train_samples,
+            "max_eval_samples": args.max_eval_samples,
+            "max_seq_len": args.max_seq_len,
+            "per_device_batch_size": args.per_device_batch_size,
+            "grad_accum_steps": args.grad_accum_steps,
+            "max_steps": args.max_steps,
+            "effective_train_token_presentations_upper_bound": int(
+                step * args.per_device_batch_size * args.grad_accum_steps * args.max_seq_len
+            ),
+        },
         "loss_weights": {
             "logit_kd_weight": args.logit_kd_weight,
             "attention_kd_weight": args.attention_kd_weight,
@@ -1028,6 +1113,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--init-state-dict", default="")
     parser.add_argument("--task-name", choices=sorted(GLUE_SPECS), default="sst2")
     parser.add_argument("--task-format", choices=["causal_lm", "sequence_classification"], default="causal_lm")
+    parser.add_argument("--label-scheme", choices=["words", "letters"], default="words")
+    parser.add_argument("--candidate-score", choices=["sum", "mean"], default="sum")
     parser.add_argument("--num-labels", type=int, default=2)
     parser.add_argument("--dataset-name", default="HuggingFaceFW/fineweb-edu")
     parser.add_argument("--dataset-config", default="sample-10BT")
