@@ -33,6 +33,7 @@ def make_command(
         teacher_path = f"{teacher_root}/{model.replace('/', '-')}/{task}/fp16_sft-tensor-layer-1"
         teacher = f" TEACHER_MODEL={teacher_path}"
         init = f" INIT_STATE_DICT={warmup_state}"
+        init += " LOGIT_KD_TEMPERATURE_SCALE=none"
     return (
         f"MODEL={model} TASK_FORMAT={task_format} LABEL_SCHEME={label_scheme} CANDIDATE_SCORE={candidate_score} "
         f"TASK_NAME={task} METHOD={method} SCALE_MODE={scale_mode} DISTILL_LAYER={distill_layer} "
@@ -135,6 +136,7 @@ def build_matrix(args: argparse.Namespace) -> dict[str, Any]:
         "success_criterion": "BitDistill within 0.5-1.0 accuracy point of FP16-SFT on MNLI/QNLI/SST2.",
         "required_first": "Run FP16-SFT for each task; those checkpoints become task teachers for BitDistill.",
         "required_warmup": f"Run continued pretraining first and pass `{warmup_state}` to every BitDistill task run.",
+        "logits_kd": "Use paper-style logits KL with `LOGIT_KD_TEMPERATURE_SCALE=none`; the tau-squared convention is available only as an explicit diagnostic.",
         "runs": runs,
     }
 
@@ -166,6 +168,7 @@ def render_markdown(plan: dict[str, Any]) -> str:
             f"Success criterion: {plan['success_criterion']}",
             f"Ordering constraint: {plan['required_first']}",
             f"Warmup constraint: {plan['required_warmup']}",
+            f"Logits-KD constraint: {plan['logits_kd']}",
             "This matrix separates paper reproduction from this fork's novelty claim. The paper reproduction uses tensor-scale BitDistill. The novelty run changes only the scale mode to row and then exports through the stable `I2_SR` path after quality is proven.",
             md_table(["#", "phase", "task", "method", "scale", "layer", "command"], rows),
         ]
