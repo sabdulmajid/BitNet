@@ -48,6 +48,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "bitdistill_cpu_gate_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_glue_cpu_gate_2026-05-14.md"},
     {"label": "bitdistill_i2sr_gate_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_i2sr_export_gate_2026-05-14.md"},
     {"label": "bitdistill_job_monitor_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_job_monitor_2026-05-14.md"},
+    {"label": "bitdistill_dependency_graph_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_dependency_graph_2026-05-14.md"},
     {"label": "bitdistill_glue3_summary_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_seqcls_glue3_primary_summary_2026-05-14.md"},
     {"label": "bitdistill_mnli_diagnostic_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_seqcls_mnli_diagnostic_variant_summary_2026-05-14.md"},
     {"label": "i2sr_submodule_promotion_audit", "kind": "tracked_report", "path": "benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md"},
@@ -149,6 +150,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "bitdistill_cpu_gate_json", "kind": "bitdistill_cpu_gate_json", "path": "benchmark_results/bitdistill_glue_cpu_gate_2026-05-14.json"},
     {"label": "bitdistill_i2sr_gate_json", "kind": "bitdistill_i2sr_gate_json", "path": "benchmark_results/bitdistill_i2sr_export_gate_2026-05-14.json"},
     {"label": "bitdistill_job_monitor_json", "kind": "bitdistill_job_monitor_json", "path": "benchmark_results/bitdistill_job_monitor_2026-05-14.json"},
+    {"label": "bitdistill_dependency_graph_json", "kind": "bitdistill_dependency_graph_json", "path": "benchmark_results/bitdistill_dependency_graph_2026-05-14.json"},
     {"label": "bitdistill_loss_scale_json", "kind": "bitdistill_loss_scale_json", "path": "benchmark_results/bitdistill_loss_scale_audit_2026-05-14.json"},
     {"label": "i2sr_submodule_promotion_audit_json", "kind": "i2sr_submodule_promotion_audit_json", "path": "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json"},
     {"label": "moe_support_json", "kind": "moe_support_json", "path": "benchmark_results/moe_support_audit_2026-05-14.json"},
@@ -540,6 +542,23 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "downstream_jobs": len(downstream) if isinstance(downstream, list) else None,
             "downstream_states": sorted(str(state) for state in states if state),
         }
+    if kind == "bitdistill_dependency_graph_json":
+        warmup = data.get("warmup", {}) if isinstance(data.get("warmup"), dict) else {}
+        latest = warmup.get("latest_step", {}) if isinstance(warmup.get("latest_step"), dict) else {}
+        return {
+            "ready": data.get("ready"),
+            "checks": len(data.get("checks", [])) if isinstance(data.get("checks"), list) else None,
+            "failed": len([check for check in data.get("checks", []) if isinstance(check, dict) and not check.get("passed")])
+            if isinstance(data.get("checks"), list)
+            else None,
+            "active_rows": data.get("active_rows"),
+            "deduped_rows": data.get("deduped_rows"),
+            "raw_rows": data.get("raw_rows"),
+            "warmup_step": latest.get("step"),
+            "warmup_max_steps": warmup.get("max_steps"),
+            "warnings": data.get("warnings", []),
+            "blockers": data.get("blockers", []),
+        }
     if kind == "bitdistill_loss_scale_json":
         return {
             "rows": len(data.get("rows", [])) if isinstance(data.get("rows"), list) else None,
@@ -822,6 +841,15 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"snapshots={metrics.get('warmup_snapshots', '-')}, "
                 f"warnings={len(metrics.get('warmup_warnings', [])) if isinstance(metrics.get('warmup_warnings'), list) else '-'}, "
                 f"downstream={metrics.get('downstream_jobs', '-')}"
+            )
+        elif entry["kind"] == "bitdistill_dependency_graph_json":
+            summary = (
+                f"ready={metrics.get('ready', '-')}, "
+                f"checks={metrics.get('checks', '-')}, failed={metrics.get('failed', '-')}, "
+                f"active={metrics.get('active_rows', '-')}/{metrics.get('deduped_rows', '-')}, "
+                f"warmup={metrics.get('warmup_step', '-')}/{metrics.get('warmup_max_steps', '-')}, "
+                f"warnings={len(metrics.get('warnings', [])) if isinstance(metrics.get('warnings'), list) else '-'}, "
+                f"blockers={len(metrics.get('blockers', [])) if isinstance(metrics.get('blockers'), list) else '-'}"
             )
         elif entry["kind"] == "bitdistill_loss_scale_json":
             summary = (
