@@ -939,6 +939,7 @@ def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
         "method": args.method,
         "student_model": args.student_model,
         "scale_mode": args.scale_mode,
+        "exclude_linear_regex": args.exclude_linear_regex,
         "steps": step,
         "effective_train_token_presentations": int(step * args.per_device_batch_size * args.grad_accum_steps * args.max_seq_len),
         "dataset": {
@@ -1073,6 +1074,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
         "label_scheme": args.label_scheme,
         "candidate_score": args.candidate_score,
         "scale_mode": args.scale_mode,
+        "exclude_linear_regex": args.exclude_linear_regex,
         "steps": step,
         "last": last.__dict__,
         "eval": eval_metrics,

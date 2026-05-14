@@ -18,6 +18,7 @@ WARMUP_STATE="${WARMUP_STATE:-$WARMUP_ROOT/$MODEL_SLUG/continued_pretrain/bitdis
 TASKS=(${TASKS:-mnli qnli sst2})
 SWEEP_TASK="${SWEEP_TASK:-mnli}"
 SWEEP_LAYERS=(${SWEEP_LAYERS:--2 -4})
+ENABLE_SWEEP="${ENABLE_SWEEP:-1}"
 
 TASK_MAX_STEPS="${TASK_MAX_STEPS:-1000}"
 MAX_TRAIN_SAMPLES="${MAX_TRAIN_SAMPLES:-0}"
@@ -29,6 +30,7 @@ LR="${LR:-2e-5}"
 TASK_FORMAT="${TASK_FORMAT:-causal_lm}"
 LABEL_SCHEME="${LABEL_SCHEME:-letters}"
 CANDIDATE_SCORE="${CANDIDATE_SCORE:-mean}"
+EXCLUDE_LINEAR_REGEX="${EXCLUDE_LINEAR_REGEX:-score|classifier}"
 LOGIT_KD_WEIGHT="${LOGIT_KD_WEIGHT:-10.0}"
 ATTENTION_KD_WEIGHT="${ATTENTION_KD_WEIGHT:-100.0}"
 LOGIT_TEMPERATURE="${LOGIT_TEMPERATURE:-5.0}"
@@ -84,6 +86,7 @@ submit_job() {
       TASK_NAME="$task" \
       METHOD="$method" \
       SCALE_MODE="$scale" \
+      EXCLUDE_LINEAR_REGEX="$EXCLUDE_LINEAR_REGEX" \
       DISTILL_LAYER="$layer" \
       MAX_STEPS="$TASK_MAX_STEPS" \
       MAX_TRAIN_SAMPLES="$MAX_TRAIN_SAMPLES" \
@@ -118,12 +121,14 @@ for task in "${TASKS[@]}"; do
     TEACHER_MODEL="$FP_DIR" INIT_STATE_DICT="$WARMUP_STATE" >/dev/null
 done
 
-FP_SWEEP_DIR="$OUTPUT_ROOT/$MODEL_SLUG/$SWEEP_TASK/fp16_sft-tensor-layer-1"
-FP_SWEEP_JOB="$(awk -F '\t' -v task="$SWEEP_TASK" '$1 == "paper_baseline" && $2 == task && $3 == "fp16_sft" { print $6 }' "$JOB_TABLE" | tail -n 1)"
-for layer in "${SWEEP_LAYERS[@]}"; do
-  SWEEP_DIR="$OUTPUT_ROOT/$MODEL_SLUG/$SWEEP_TASK/bitdistill-tensor-layer${layer}"
-  submit_job attention_layer_sweep "$SWEEP_TASK" bitdistill tensor "$layer" "afterok:${FP_SWEEP_JOB}" "$SWEEP_DIR" \
-    TEACHER_MODEL="$FP_SWEEP_DIR" INIT_STATE_DICT="$WARMUP_STATE" >/dev/null
-done
+if [ "$ENABLE_SWEEP" = "1" ]; then
+  FP_SWEEP_DIR="$OUTPUT_ROOT/$MODEL_SLUG/$SWEEP_TASK/fp16_sft-tensor-layer-1"
+  FP_SWEEP_JOB="$(awk -F '\t' -v task="$SWEEP_TASK" '$1 == "paper_baseline" && $2 == task && $3 == "fp16_sft" { print $6 }' "$JOB_TABLE" | tail -n 1)"
+  for layer in "${SWEEP_LAYERS[@]}"; do
+    SWEEP_DIR="$OUTPUT_ROOT/$MODEL_SLUG/$SWEEP_TASK/bitdistill-tensor-layer${layer}"
+    submit_job attention_layer_sweep "$SWEEP_TASK" bitdistill tensor "$layer" "afterok:${FP_SWEEP_JOB}" "$SWEEP_DIR" \
+      TEACHER_MODEL="$FP_SWEEP_DIR" INIT_STATE_DICT="$WARMUP_STATE" >/dev/null
+  done
+fi
 
 echo "wrote $JOB_TABLE"
