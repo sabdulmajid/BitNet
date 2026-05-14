@@ -39,6 +39,7 @@ DEFAULT_RUNS = [
     ("papergamma_lr5", "bitdistill-longwarmup-tensor-layer-8"),
     ("papergamma_headinit", "bitdistill-longwarmup-tensor-layer-8"),
 ]
+VALID_RUN_FAMILIES = tuple(sorted({family for family, _ in DEFAULT_RUNS}))
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
@@ -346,17 +347,8 @@ def parse_runs(values: list[str]) -> list[tuple[str, str]]:
             family, run = value.split(":", 1)
         else:
             family, run = "short", value
-        valid_families = {
-            "short",
-            "longwarmup",
-            "papergamma",
-            "papergamma_row",
-            "papergamma_lr1",
-            "papergamma_lr5",
-            "papergamma_headinit",
-        }
-        if family not in valid_families:
-            raise ValueError(f"run family must be one of {sorted(valid_families)}: {value}")
+        if family not in VALID_RUN_FAMILIES:
+            raise ValueError(f"run family must be one of {list(VALID_RUN_FAMILIES)}: {value}")
         parsed.append((family, run))
     return parsed
 
@@ -440,7 +432,7 @@ def main() -> None:
         "--runs",
         nargs="+",
         default=[f"{family}:{run}" for family, run in DEFAULT_RUNS],
-        help="Run dirs as RUN or FAMILY:RUN, where FAMILY is short or longwarmup.",
+        help=f"Run dirs as RUN or FAMILY:RUN, where FAMILY is one of {list(VALID_RUN_FAMILIES)}.",
     )
     parser.add_argument("--threads", type=int, default=12)
     parser.add_argument("--batch-size", type=int, default=8)
