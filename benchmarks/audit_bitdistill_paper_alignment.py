@@ -17,6 +17,11 @@ from typing import Any
 
 DATE = datetime.now(timezone.utc).date().isoformat()
 TASKS = ["mnli", "qnli", "sst2"]
+EXPECTED_EVAL_EXAMPLES = {
+    "mnli": 9815,
+    "qnli": 5463,
+    "sst2": 872,
+}
 PAPER_WARMUP_TOKENS = 10_000_000_000
 
 
@@ -32,11 +37,20 @@ def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def accuracy(path: Path) -> float | None:
+def metric_summary(path: Path, task: str) -> dict[str, Any]:
     data = read_json(path)
     eval_metrics = data.get("eval", {}) if isinstance(data.get("eval"), dict) else {}
     value = eval_metrics.get("accuracy")
-    return float(value) if isinstance(value, (int, float)) else None
+    examples = eval_metrics.get("eval_examples")
+    accuracy = float(value) if isinstance(value, (int, float)) else None
+    example_count = int(examples) if isinstance(examples, (int, float)) and examples > 0 else None
+    expected = EXPECTED_EVAL_EXAMPLES[task]
+    return {
+        "accuracy": accuracy,
+        "examples": example_count,
+        "expected_examples": expected,
+        "full_eval_examples": example_count == expected,
+    }
 
 
 def metric_path(root: Path, model: str, task: str, run: str) -> Path:
@@ -87,7 +101,7 @@ def run_matrix(args: argparse.Namespace) -> list[dict[str, Any]]:
         ("BitDistill longwarmup tensor layer -4", args.layer_sweep_root, "bitdistill-longwarmup-tensor-layer-4", "mnli_layer_sweep_pending", {"mnli"}),
     ]
     fp_by_task = {
-        task: accuracy(metric_path(args.baseline_root, args.model, task, "fp16_sft-tensor-layer-1"))
+        task: metric_summary(metric_path(args.baseline_root, args.model, task, "fp16_sft-tensor-layer-1"), task)
         for task in args.tasks
     }
     for task in args.tasks:
@@ -95,8 +109,10 @@ def run_matrix(args: argparse.Namespace) -> list[dict[str, Any]]:
             if task_filter is not None and task not in task_filter:
                 continue
             path = metric_path(root, args.model, task, run)
-            acc = accuracy(path)
-            fp = fp_by_task.get(task)
+            metrics = metric_summary(path, task)
+            acc = metrics["accuracy"]
+            fp = fp_by_task.get(task, {})
+            fp_acc = fp.get("accuracy")
             rows.append(
                 {
                     "task": task,
@@ -104,8 +120,12 @@ def run_matrix(args: argparse.Namespace) -> list[dict[str, Any]]:
                     "family": family,
                     "exists": path.exists(),
                     "accuracy": acc,
-                    "fp16_accuracy": fp,
-                    "fp_minus_run": (fp - acc) if fp is not None and acc is not None else None,
+                    "examples": metrics["examples"],
+                    "expected_examples": metrics["expected_examples"],
+                    "full_eval_examples": metrics["full_eval_examples"],
+                    "fp16_accuracy": fp_acc,
+                    "fp16_full_eval": fp.get("full_eval_examples"),
+                    "fp_minus_run": (fp_acc - acc) if fp_acc is not None and acc is not None else None,
                     "metrics_path": str(path),
                 }
             )
@@ -226,7 +246,11 @@ def render_markdown(summary: dict[str, Any]) -> str:
             row["family"],
             fmt(row["exists"]),
             fmt(row["accuracy"]),
+            fmt(row["examples"]),
+            fmt(row["expected_examples"]),
+            fmt(row["full_eval_examples"]),
             fmt(row["fp16_accuracy"]),
+            fmt(row["fp16_full_eval"]),
             fmt(row["fp_minus_run"]),
         ]
         for row in summary["runs"]
@@ -246,12 +270,28 @@ def render_markdown(summary: dict[str, Any]) -> str:
         [
             f"# BitDistill Paper Alignment Audit, {summary['date']}",
             "Verdict: local code contains the major BitDistill mechanisms, but the completed results are not a strict paper reproduction. The strict paper-hyperparameter branch is queued/pending.",
+            f"Full-evaluation contract: `{summary['expected_eval_examples']}` examples. Accuracy rows expose whether each metric is full validation or partial.",
             "## Alignment",
             md_table(["dimension", "paper", "local", "status", "note"], alignment),
             "## Warm-Up Budget",
             md_table(["field", "value"], warmup_rows),
             "## Current Accuracy Matrix",
-            md_table(["task", "run", "family", "exists", "accuracy", "FP16", "FP-run"], metrics),
+            md_table(
+                [
+                    "task",
+                    "run",
+                    "family",
+                    "exists",
+                    "accuracy",
+                    "examples",
+                    "expected",
+                    "full eval",
+                    "FP16",
+                    "FP16 full eval",
+                    "FP-run",
+                ],
+                metrics,
+            ),
             "## Code Feature Checks",
             md_table(["feature", "status"], features),
             "## Interpretation",
@@ -277,6 +317,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "tasks": args.tasks,
         "code_features": features,
         "warmup": warmup,
+        "expected_eval_examples": {task: EXPECTED_EVAL_EXAMPLES[task] for task in args.tasks},
         "alignment": alignment_rows(features, warmup),
         "runs": run_matrix(args),
     }

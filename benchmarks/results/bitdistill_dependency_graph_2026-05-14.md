@@ -6,7 +6,7 @@ Ready for downstream release: `True`.
 
 | log | job | step | max steps | progress | expected state exists | expected state |
 | --- | --- | --- | --- | --- | --- | --- |
-| logs/bitdistill-glue-9894.out | 9894 | 12800 | 20000 | 0.640000 | false | checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/custom_state_dict.pt |
+| logs/bitdistill-glue-9894.out | 9894 | 13080 | 20000 | 0.654000 | false | checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/custom_state_dict.pt |
 
 ## Checks
 

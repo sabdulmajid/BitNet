@@ -2,6 +2,8 @@
 
 Verdict: local code contains the major BitDistill mechanisms, but the completed results are not a strict paper reproduction. The strict paper-hyperparameter branch is queued/pending.
 
+Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. Accuracy rows expose whether each metric is full validation or partial.
+
 ## Alignment
 
 | dimension | paper | local | status | note |
@@ -23,56 +25,56 @@ Verdict: local code contains the major BitDistill mechanisms, but the completed 
 | paper warm-up tokens | 10000000000 |
 | active target tokens | 163840000 |
 | active target / paper | 0.016384 |
-| active effective tokens | 94453760 |
-| active effective / paper | 0.009445 |
-| latest step | 11530 |
+| active effective tokens | 107069440 |
+| active effective / paper | 0.010707 |
+| latest step | 13070 |
 | max steps | 20000 |
 
 ## Current Accuracy Matrix
 
-| task | run | family | exists | accuracy | FP16 | FP-run |
-| --- | --- | --- | --- | --- | --- | --- |
-| mnli | FP16-SFT | baseline | true | 0.807641 | 0.807641 | 0.000000 |
-| mnli | BitNet-SFT | baseline | true | 0.487621 | 0.807641 | 0.320020 |
-| mnli | BitDistill short tensor gamma100 | diagnostic | true | 0.525217 | 0.807641 | 0.282425 |
-| mnli | BitDistill short row gamma100 | diagnostic | true | 0.516556 | 0.807641 | 0.291085 |
-| mnli | BitDistill short tensor layer -8 | diagnostic | true | 0.535711 | 0.807641 | 0.271931 |
-| mnli | BitDistill longwarmup tensor gamma100 | diagnostic_pending | false | - | 0.807641 | - |
-| mnli | BitDistill longwarmup row gamma100 | novelty_pending | false | - | 0.807641 | - |
-| mnli | BitDistill longwarmup tensor paper gamma | paper_candidate | false | - | 0.807641 | - |
-| mnli | BitDistill longwarmup row paper gamma | paper_row_candidate | false | - | 0.807641 | - |
-| mnli | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | false | - | 0.807641 | - |
-| mnli | BitDistill longwarmup tensor paper gamma lr5e-5 | paper_lr_search_pending | false | - | 0.807641 | - |
-| mnli | BitDistill longwarmup tensor paper gamma headinit | paper_headinit_pending | false | - | 0.807641 | - |
-| mnli | BitDistill longwarmup tensor gamma1k | mnli_gamma_sweep_pending | false | - | 0.807641 | - |
-| mnli | BitDistill longwarmup tensor gamma10k | mnli_gamma_sweep_pending | false | - | 0.807641 | - |
-| mnli | BitDistill longwarmup tensor layer -1 | mnli_layer_sweep_pending | false | - | 0.807641 | - |
-| mnli | BitDistill longwarmup tensor layer -2 | mnli_layer_sweep_pending | false | - | 0.807641 | - |
-| mnli | BitDistill longwarmup tensor layer -4 | mnli_layer_sweep_pending | false | - | 0.807641 | - |
-| qnli | FP16-SFT | baseline | true | 0.898957 | 0.898957 | 0.000000 |
-| qnli | BitNet-SFT | baseline | true | 0.596925 | 0.898957 | 0.302032 |
-| qnli | BitDistill short tensor gamma100 | diagnostic | true | 0.596925 | 0.898957 | 0.302032 |
-| qnli | BitDistill short row gamma100 | diagnostic | true | 0.618525 | 0.898957 | 0.280432 |
-| qnli | BitDistill short tensor layer -8 | diagnostic | false | - | 0.898957 | - |
-| qnli | BitDistill longwarmup tensor gamma100 | diagnostic_pending | false | - | 0.898957 | - |
-| qnli | BitDistill longwarmup row gamma100 | novelty_pending | false | - | 0.898957 | - |
-| qnli | BitDistill longwarmup tensor paper gamma | paper_candidate | false | - | 0.898957 | - |
-| qnli | BitDistill longwarmup row paper gamma | paper_row_candidate | false | - | 0.898957 | - |
-| qnli | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | false | - | 0.898957 | - |
-| qnli | BitDistill longwarmup tensor paper gamma lr5e-5 | paper_lr_search_pending | false | - | 0.898957 | - |
-| qnli | BitDistill longwarmup tensor paper gamma headinit | paper_headinit_pending | false | - | 0.898957 | - |
-| sst2 | FP16-SFT | baseline | true | 0.925459 | 0.925459 | 0.000000 |
-| sst2 | BitNet-SFT | baseline | true | 0.770642 | 0.925459 | 0.154817 |
-| sst2 | BitDistill short tensor gamma100 | diagnostic | true | 0.815367 | 0.925459 | 0.110092 |
-| sst2 | BitDistill short row gamma100 | diagnostic | true | 0.808486 | 0.925459 | 0.116972 |
-| sst2 | BitDistill short tensor layer -8 | diagnostic | false | - | 0.925459 | - |
-| sst2 | BitDistill longwarmup tensor gamma100 | diagnostic_pending | false | - | 0.925459 | - |
-| sst2 | BitDistill longwarmup row gamma100 | novelty_pending | false | - | 0.925459 | - |
-| sst2 | BitDistill longwarmup tensor paper gamma | paper_candidate | false | - | 0.925459 | - |
-| sst2 | BitDistill longwarmup row paper gamma | paper_row_candidate | false | - | 0.925459 | - |
-| sst2 | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | false | - | 0.925459 | - |
-| sst2 | BitDistill longwarmup tensor paper gamma lr5e-5 | paper_lr_search_pending | false | - | 0.925459 | - |
-| sst2 | BitDistill longwarmup tensor paper gamma headinit | paper_headinit_pending | false | - | 0.925459 | - |
+| task | run | family | exists | accuracy | examples | expected | full eval | FP16 | FP16 full eval | FP-run |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| mnli | FP16-SFT | baseline | true | 0.807641 | 9815 | 9815 | true | 0.807641 | true | 0.000000 |
+| mnli | BitNet-SFT | baseline | true | 0.487621 | 9815 | 9815 | true | 0.807641 | true | 0.320020 |
+| mnli | BitDistill short tensor gamma100 | diagnostic | true | 0.525217 | 9815 | 9815 | true | 0.807641 | true | 0.282425 |
+| mnli | BitDistill short row gamma100 | diagnostic | true | 0.516556 | 9815 | 9815 | true | 0.807641 | true | 0.291085 |
+| mnli | BitDistill short tensor layer -8 | diagnostic | true | 0.535711 | 9815 | 9815 | true | 0.807641 | true | 0.271931 |
+| mnli | BitDistill longwarmup tensor gamma100 | diagnostic_pending | false | - | - | 9815 | false | 0.807641 | true | - |
+| mnli | BitDistill longwarmup row gamma100 | novelty_pending | false | - | - | 9815 | false | 0.807641 | true | - |
+| mnli | BitDistill longwarmup tensor paper gamma | paper_candidate | false | - | - | 9815 | false | 0.807641 | true | - |
+| mnli | BitDistill longwarmup row paper gamma | paper_row_candidate | false | - | - | 9815 | false | 0.807641 | true | - |
+| mnli | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | false | - | - | 9815 | false | 0.807641 | true | - |
+| mnli | BitDistill longwarmup tensor paper gamma lr5e-5 | paper_lr_search_pending | false | - | - | 9815 | false | 0.807641 | true | - |
+| mnli | BitDistill longwarmup tensor paper gamma headinit | paper_headinit_pending | false | - | - | 9815 | false | 0.807641 | true | - |
+| mnli | BitDistill longwarmup tensor gamma1k | mnli_gamma_sweep_pending | false | - | - | 9815 | false | 0.807641 | true | - |
+| mnli | BitDistill longwarmup tensor gamma10k | mnli_gamma_sweep_pending | false | - | - | 9815 | false | 0.807641 | true | - |
+| mnli | BitDistill longwarmup tensor layer -1 | mnli_layer_sweep_pending | false | - | - | 9815 | false | 0.807641 | true | - |
+| mnli | BitDistill longwarmup tensor layer -2 | mnli_layer_sweep_pending | false | - | - | 9815 | false | 0.807641 | true | - |
+| mnli | BitDistill longwarmup tensor layer -4 | mnli_layer_sweep_pending | false | - | - | 9815 | false | 0.807641 | true | - |
+| qnli | FP16-SFT | baseline | true | 0.898957 | 5463 | 5463 | true | 0.898957 | true | 0.000000 |
+| qnli | BitNet-SFT | baseline | true | 0.596925 | 5463 | 5463 | true | 0.898957 | true | 0.302032 |
+| qnli | BitDistill short tensor gamma100 | diagnostic | true | 0.596925 | 5463 | 5463 | true | 0.898957 | true | 0.302032 |
+| qnli | BitDistill short row gamma100 | diagnostic | true | 0.618525 | 5463 | 5463 | true | 0.898957 | true | 0.280432 |
+| qnli | BitDistill short tensor layer -8 | diagnostic | false | - | - | 5463 | false | 0.898957 | true | - |
+| qnli | BitDistill longwarmup tensor gamma100 | diagnostic_pending | false | - | - | 5463 | false | 0.898957 | true | - |
+| qnli | BitDistill longwarmup row gamma100 | novelty_pending | false | - | - | 5463 | false | 0.898957 | true | - |
+| qnli | BitDistill longwarmup tensor paper gamma | paper_candidate | false | - | - | 5463 | false | 0.898957 | true | - |
+| qnli | BitDistill longwarmup row paper gamma | paper_row_candidate | false | - | - | 5463 | false | 0.898957 | true | - |
+| qnli | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | false | - | - | 5463 | false | 0.898957 | true | - |
+| qnli | BitDistill longwarmup tensor paper gamma lr5e-5 | paper_lr_search_pending | false | - | - | 5463 | false | 0.898957 | true | - |
+| qnli | BitDistill longwarmup tensor paper gamma headinit | paper_headinit_pending | false | - | - | 5463 | false | 0.898957 | true | - |
+| sst2 | FP16-SFT | baseline | true | 0.925459 | 872 | 872 | true | 0.925459 | true | 0.000000 |
+| sst2 | BitNet-SFT | baseline | true | 0.770642 | 872 | 872 | true | 0.925459 | true | 0.154817 |
+| sst2 | BitDistill short tensor gamma100 | diagnostic | true | 0.815367 | 872 | 872 | true | 0.925459 | true | 0.110092 |
+| sst2 | BitDistill short row gamma100 | diagnostic | true | 0.808486 | 872 | 872 | true | 0.925459 | true | 0.116972 |
+| sst2 | BitDistill short tensor layer -8 | diagnostic | false | - | - | 872 | false | 0.925459 | true | - |
+| sst2 | BitDistill longwarmup tensor gamma100 | diagnostic_pending | false | - | - | 872 | false | 0.925459 | true | - |
+| sst2 | BitDistill longwarmup row gamma100 | novelty_pending | false | - | - | 872 | false | 0.925459 | true | - |
+| sst2 | BitDistill longwarmup tensor paper gamma | paper_candidate | false | - | - | 872 | false | 0.925459 | true | - |
+| sst2 | BitDistill longwarmup row paper gamma | paper_row_candidate | false | - | - | 872 | false | 0.925459 | true | - |
+| sst2 | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | false | - | - | 872 | false | 0.925459 | true | - |
+| sst2 | BitDistill longwarmup tensor paper gamma lr5e-5 | paper_lr_search_pending | false | - | - | 872 | false | 0.925459 | true | - |
+| sst2 | BitDistill longwarmup tensor paper gamma headinit | paper_headinit_pending | false | - | - | 872 | false | 0.925459 | true | - |
 
 ## Code Feature Checks
 
