@@ -37,7 +37,7 @@ Artifacts: `137`. Missing: `0`.
 | tl2_probe_report | tracked_report | yes | 3608 | dd7e4fa29cc1 |  |
 | tl2_scale_report | tracked_report | yes | 2321 | 30bbfbd22559 |  |
 | tl2_row_scale_design_report | tracked_report | yes | 4004 | fd035ed1fd6d |  |
-| tl2_row_scale_runtime_contract_report | tracked_report | yes | 4164 | 2ba383105ffc |  |
+| tl2_row_scale_runtime_contract_report | tracked_report | yes | 4226 | 99c58f4ffd2e |  |
 | i2s_row_scale_format_report | tracked_report | yes | 1759 | 256abf73581c |  |
 | row_scale_qtype_productization_gate_report | tracked_report | yes | 2399 | cdfb84616ba1 |  |
 | row_scale_qtype_i2sr_active_patch_gate_report | tracked_report | yes | 2390 | 42acb39176cb |  |
@@ -108,7 +108,7 @@ Artifacts: `137`. Missing: `0`.
 | tl2_shape_json | tl2_shape_json | yes | 12054 | a99430f0f4b0 |  |
 | tl2_scale_json | tl2_scale_json | yes | 14344 | bf2d36674b72 | qwen15b_tensor_scale err=0; qwen15b_row_scale err=1.90423 |
 | tl2_row_scale_design_json | tl2_row_scale_design_json | yes | 29878 | 0fd577484ee8 | qwen15b_tensor_scale current=0, row_fp16=0.000175008, scaleMiB=1.52026; qwen15b_row_scale current=1.90423, row_fp16=0.000197446, scaleMiB=1.23047 |
-| tl2_row_scale_runtime_contract_json | tl2_row_scale_runtime_contract_json | yes | 4548 | a6e216b6a7e0 | ready=False, checks=7, failed=6, current=1.90423, row_fp16=0.000197446, scaleMiB=1.23047, bench_rows=0 |
+| tl2_row_scale_runtime_contract_json | tl2_row_scale_runtime_contract_json | yes | 4687 | be12227028b2 | ready=False, checks=8, failed=6, current=1.90423, row_fp16=0.000197446, scaleMiB=1.23047, bench_rows=0 |
 | i2s_row_scale_format_json | i2s_format_json | yes | 1528 | e17297539b9d | default_ratio=30836.2, prototype_ratio=1.00157, stable_format_required=True |
 | row_scale_qtype_productization_gate_json | row_scale_qtype_gate_json | yes | 3610 | 87f2e567d27c | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | row_scale_qtype_i2sr_active_patch_gate_json | row_scale_qtype_gate_json | yes | 3616 | cb42720567a1 | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |

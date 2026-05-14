@@ -322,8 +322,8 @@
       "label": "tl2_row_scale_runtime_contract_report",
       "metrics": {},
       "path": "benchmarks/results/tl2_row_scale_runtime_contract_2026-05-14.md",
-      "sha256": "2ba383105ffc5627673a943bdaae5519a83e62c3f39f588de489486aa2da5b02",
-      "size_bytes": 4164
+      "sha256": "99c58f4ffd2edfe460a5e0fd4b08e19bce88b02097e707b67539cc48391c6a5b",
+      "size_bytes": 4226
     },
     {
       "exists": true,
@@ -1759,7 +1759,7 @@
       "kind": "tl2_row_scale_runtime_contract_json",
       "label": "tl2_row_scale_runtime_contract_json",
       "metrics": {
-        "checks": 7,
+        "checks": 8,
         "current_tl2_tensor_max_error": 1.9042302114103853,
         "failed": [
           "Existing TL2 one-scale error is below product threshold",
@@ -1776,8 +1776,8 @@
         "row_scale_tl2_rows": 0
       },
       "path": "benchmark_results/tl2_row_scale_runtime_contract_2026-05-14.json",
-      "sha256": "a6e216b6a7e0a1f3da7be50d2c114acff3662c3c4180375443f2f559b966d13c",
-      "size_bytes": 4548
+      "sha256": "be12227028b294306d4713d4576c287be0861ecd11b4688f8030bea0d16acbcf",
+      "size_bytes": 4687
     },
     {
       "exists": true,

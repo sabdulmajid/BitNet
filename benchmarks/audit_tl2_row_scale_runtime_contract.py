@@ -57,6 +57,21 @@ def latest_existing(pattern: str) -> Path | None:
     return sorted(paths)[-1] if paths else None
 
 
+def resolve_under_root(root: Path, path: Path | None) -> Path | None:
+    if path is None:
+        return None
+    return path.resolve() if path.is_absolute() else (root / path).resolve()
+
+
+def display_path(root: Path, path: Path | None) -> str | None:
+    if path is None:
+        return None
+    try:
+        return str(path.relative_to(root))
+    except ValueError:
+        return str(path)
+
+
 def strategy_by_name(result: dict[str, Any]) -> dict[str, dict[str, Any]]:
     rows = result.get("strategies", [])
     if not isinstance(rows, list):
@@ -151,7 +166,7 @@ def build_audit(root: Path, design_json: Path | None, max_existing_tl2_error: fl
     ggml_nbytes = slice_between(ggml, "size_t ggml_nbytes", "size_t ggml_nbytes_pad")
     bitnet_transform = slice_between(bitnet_kernel, "void ggml_bitnet_transform_tensor", "int ggml_bitnet_get_type_bits")
 
-    design_path = design_json or latest_existing(str(root / "benchmark_results/tl2_row_scale_design_*.json"))
+    design_path = resolve_under_root(root, design_json) or latest_existing(str(root / "benchmark_results/tl2_row_scale_design_*.json"))
     design = read_json(design_path) if design_path else {}
     design_result = best_row_scale_result(design)
     strategies = strategy_by_name(design_result)
@@ -168,6 +183,11 @@ def build_audit(root: Path, design_json: Path | None, max_existing_tl2_error: fl
     converter_passes_scale_metadata = "transform_to_tl2(data," in write_tensors or "transform_to_tl2(data_torch" in write_tensors
     converter_has_learned_scale_map = "scale_map" in write_tensors and "weight_scale" in write_tensors
     writer_emits_scale_sidecar = 'new_name + "_scale"' in write_tensors
+    converter_rejects_row_scale_tl2 = (
+        "learned row/group scales" in write_tensors
+        and "TL2 stores one tensor scale" in write_tensors
+        and "I2_SR" in write_tensors
+    )
     nbytes_has_row_scale_sidecar = "GGML_TYPE_TL2" in ggml_nbytes and ("lut_scales_size" in ggml_nbytes or "row_scale" in ggml_nbytes)
     transform_single_scale = "const int lut_scales_size = 1" in bitnet_transform and "i2_scales[0]" in bitnet_transform
     transform_uses_all_rows = "ggml_nrows(tensor)" in bitnet_transform or "tensor->ne[2]" in bitnet_transform
@@ -180,7 +200,7 @@ def build_audit(root: Path, design_json: Path | None, max_existing_tl2_error: fl
         make_check(
             "Existing TL2 one-scale error is below product threshold",
             current_error is not None and current_error <= max_existing_tl2_error,
-            f"design_json={design_path}; current_error={current_error}; threshold={max_existing_tl2_error}",
+            f"design_json={display_path(root, design_path)}; current_error={current_error}; threshold={max_existing_tl2_error}",
             "Existing TL2 collapses learned row scales to one scale and exceeds the allowed relative output RMS error.",
         ),
         make_check(
@@ -201,6 +221,12 @@ def build_audit(root: Path, design_json: Path | None, max_existing_tl2_error: fl
                 f"emits_scale_sidecar={writer_emits_scale_sidecar}"
             ),
             "The converter still derives one scalar `np.max(abs(x))` scale and writes a single sidecar scale tensor.",
+        ),
+        make_check(
+            "TL2 converter refuses row-scale sidecar checkpoints safely",
+            converter_rejects_row_scale_tl2,
+            f"rejects_row_scale_tl2={converter_rejects_row_scale_tl2}",
+            "The converter can still silently export row/group-scale sidecar checkpoints through one-scale TL2.",
         ),
         make_check(
             "ggml TL2 storage accounts for row/group-scale sidecar",
@@ -244,7 +270,7 @@ def build_audit(root: Path, design_json: Path | None, max_existing_tl2_error: fl
             "ggml": str(ggml_path.relative_to(root)),
             "ggml_h": str(ggml_h_path.relative_to(root)),
             "bitnet_kernel": str(bitnet_kernel_path.relative_to(root)),
-            "design_json": str(design_path.relative_to(root)) if design_path else None,
+            "design_json": display_path(root, design_path),
         },
         "math": {
             "label": design_result.get("label"),

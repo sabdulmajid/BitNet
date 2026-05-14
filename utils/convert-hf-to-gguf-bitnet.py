@@ -803,6 +803,9 @@ class LlamaModel(Model):
                 n_dims = len(data.shape)
                 data_dtype = data.dtype
                 data_qtype: gguf.GGMLQuantizationType | None = None
+                scale_key = name.replace(".weight", "")
+                scale_tensor = scale_map.get(scale_key)
+                has_learned_row_scales = scale_tensor is not None and scale_tensor.numel() > 1
 
                 # when both are True, f32 should win
                 # extra_f32 = self.extra_f32_tensors(name, new_name, bid, n_dims)
@@ -842,11 +845,23 @@ class LlamaModel(Model):
                 i2_scale = None
                 if self.ftype != gguf.GGMLQuantizationType.F32 and extra_f16 and not extra_f32:
                     if self.ftype == gguf.GGMLQuantizationType.TL1 and suit_i2:
+                        if has_learned_row_scales:
+                            raise NotImplementedError(
+                                f"{name} carries {scale_tensor.numel()} learned row/group scales, "
+                                "but TL1 stores one tensor scale. Export this checkpoint with a row-scale "
+                                "qtype such as I2_SR, or add explicit TL1 row/group-scale metadata and kernels."
+                            )
                         data, i2_scale = transform_to_tl1(data)
                         assert data.dtype == np.uint8
                         assert i2_scale.dtype == np.float32
                         data_qtype = gguf.GGMLQuantizationType.TL1
                     elif self.ftype == gguf.GGMLQuantizationType.TL2 and suit_i2:
+                        if has_learned_row_scales:
+                            raise NotImplementedError(
+                                f"{name} carries {scale_tensor.numel()} learned row/group scales, "
+                                "but TL2 stores one tensor scale. Export this checkpoint with a row-scale "
+                                "qtype such as I2_SR, or add explicit TL2 row/group-scale metadata and kernels."
+                            )
                         data, i2_scale = transform_to_tl2(data)
                         assert data.dtype == np.uint8
                         assert i2_scale.dtype == np.float32
