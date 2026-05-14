@@ -35,6 +35,9 @@ DEFAULT_RUNS = [
     ("longwarmup", "bitdistill-longwarmup-row-layer-8"),
     ("papergamma", "bitdistill-longwarmup-tensor-layer-8"),
     ("papergamma_row", "bitdistill-longwarmup-row-layer-8"),
+    ("papergamma_lr1", "bitdistill-longwarmup-tensor-layer-8"),
+    ("papergamma_lr5", "bitdistill-longwarmup-tensor-layer-8"),
+    ("papergamma_headinit", "bitdistill-longwarmup-tensor-layer-8"),
 ]
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -86,6 +89,12 @@ def checkpoint_dir_for(args: argparse.Namespace, task: str, family: str, run: st
         root = args.paper_hparam_root
     elif family == "papergamma_row":
         root = args.paper_hparam_row_root
+    elif family == "papergamma_lr1":
+        root = args.paper_hparam_lr1_root
+    elif family == "papergamma_lr5":
+        root = args.paper_hparam_lr5_root
+    elif family == "papergamma_headinit":
+        root = args.paper_hparam_headinit_root
     else:
         root = args.short_root
     return root / args.model.replace("/", "-") / task / run
@@ -414,6 +423,9 @@ def main() -> None:
     parser.add_argument("--longwarmup-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup"))
     parser.add_argument("--paper-hparam-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma"))
     parser.add_argument("--paper-hparam-row-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row"))
+    parser.add_argument("--paper-hparam-lr1-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr1e-5"))
+    parser.add_argument("--paper-hparam-lr5-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr5e-5"))
+    parser.add_argument("--paper-hparam-headinit-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-headinit"))
     parser.add_argument("--tasks", nargs="+", choices=TASKS, default=TASKS)
     parser.add_argument(
         "--runs",

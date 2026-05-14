@@ -42,6 +42,10 @@ python benchmarks/benchmark_bitdistill_glue_cpu.py \
     longwarmup:bitdistill-longwarmup-tensor-layer-8 \
     longwarmup:bitdistill-longwarmup-row-layer-8 \
     papergamma:bitdistill-longwarmup-tensor-layer-8 \
+    papergamma_row:bitdistill-longwarmup-row-layer-8 \
+    papergamma_lr1:bitdistill-longwarmup-tensor-layer-8 \
+    papergamma_lr5:bitdistill-longwarmup-tensor-layer-8 \
+    papergamma_headinit:bitdistill-longwarmup-tensor-layer-8 \
   --threads "${SLURM_CPUS_PER_TASK:-12}" \
   --batch-size "$BATCH_SIZE" \
   --max-eval-samples "$MAX_EVAL_SAMPLES" \

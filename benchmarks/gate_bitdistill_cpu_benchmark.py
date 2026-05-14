@@ -25,6 +25,10 @@ CRITICAL_RUNS = [
     ("longwarmup", "bitdistill-longwarmup-tensor-layer-8"),
     ("longwarmup", "bitdistill-longwarmup-row-layer-8"),
     ("papergamma", "bitdistill-longwarmup-tensor-layer-8"),
+    ("papergamma_row", "bitdistill-longwarmup-row-layer-8"),
+    ("papergamma_lr1", "bitdistill-longwarmup-tensor-layer-8"),
+    ("papergamma_lr5", "bitdistill-longwarmup-tensor-layer-8"),
+    ("papergamma_headinit", "bitdistill-longwarmup-tensor-layer-8"),
 ]
 
 

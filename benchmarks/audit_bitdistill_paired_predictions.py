@@ -38,6 +38,9 @@ LONG_TENSOR = RunRef("BitDistill gamma100 tensor", "longwarmup_root", "{task}/bi
 LONG_ROW = RunRef("BitDistill gamma100 row", "longwarmup_root", "{task}/bitdistill-longwarmup-row-layer-8")
 PAPER_TENSOR = RunRef("BitDistill paper-gamma tensor", "paper_hparam_root", "{task}/bitdistill-longwarmup-tensor-layer-8")
 PAPER_ROW = RunRef("BitDistill paper-gamma row", "paper_hparam_row_root", "{task}/bitdistill-longwarmup-row-layer-8")
+PAPER_LR1 = RunRef("BitDistill paper-gamma tensor lr1e-5", "paper_hparam_lr1_root", "{task}/bitdistill-longwarmup-tensor-layer-8")
+PAPER_LR5 = RunRef("BitDistill paper-gamma tensor lr5e-5", "paper_hparam_lr5_root", "{task}/bitdistill-longwarmup-tensor-layer-8")
+PAPER_HEADINIT = RunRef("BitDistill paper-gamma tensor headinit", "paper_hparam_headinit_root", "{task}/bitdistill-longwarmup-tensor-layer-8")
 
 
 def run_dir(root: Path, model: str, ref: RunRef, task: str) -> Path:
@@ -247,6 +250,12 @@ def comparison_specs(tasks: list[str]) -> list[ComparisonSpec]:
                 ComparisonSpec("gamma100 row minus FP16-SFT", task, FP16, LONG_ROW, "bitdistill_vs_fp"),
                 ComparisonSpec("paper-gamma tensor minus FP16-SFT", task, FP16, PAPER_TENSOR, "bitdistill_vs_fp"),
                 ComparisonSpec("paper-gamma row minus FP16-SFT", task, FP16, PAPER_ROW, "bitdistill_vs_fp"),
+                ComparisonSpec("paper-gamma lr1e-5 tensor minus FP16-SFT", task, FP16, PAPER_LR1, "bitdistill_vs_fp"),
+                ComparisonSpec("paper-gamma lr5e-5 tensor minus FP16-SFT", task, FP16, PAPER_LR5, "bitdistill_vs_fp"),
+                ComparisonSpec("paper-gamma headinit tensor minus FP16-SFT", task, FP16, PAPER_HEADINIT, "bitdistill_vs_fp"),
+                ComparisonSpec("paper-gamma lr1e-5 minus default", task, PAPER_TENSOR, PAPER_LR1, "paper_search"),
+                ComparisonSpec("paper-gamma lr5e-5 minus default", task, PAPER_TENSOR, PAPER_LR5, "paper_search"),
+                ComparisonSpec("paper-gamma headinit minus default", task, PAPER_TENSOR, PAPER_HEADINIT, "paper_search"),
             ]
         )
     return specs
@@ -352,6 +361,9 @@ def main() -> None:
     parser.add_argument("--longwarmup-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup"))
     parser.add_argument("--paper-hparam-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma"))
     parser.add_argument("--paper-hparam-row-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row"))
+    parser.add_argument("--paper-hparam-lr1-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr1e-5"))
+    parser.add_argument("--paper-hparam-lr5-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr5e-5"))
+    parser.add_argument("--paper-hparam-headinit-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-headinit"))
     parser.add_argument("--model", default="Qwen/Qwen2.5-0.5B")
     parser.add_argument("--tasks", nargs="+", choices=TASKS, default=TASKS)
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_paired_predictions_{DATE}.json"))

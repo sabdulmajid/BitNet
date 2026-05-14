@@ -19,6 +19,10 @@ This gate validates PyTorch CPU task-runtime rows only; it is not a packed llama
 | mnli | longwarmup | bitdistill-longwarmup-tensor-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
 | mnli | longwarmup | bitdistill-longwarmup-row-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
 | mnli | papergamma | bitdistill-longwarmup-tensor-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
+| mnli | papergamma_row | bitdistill-longwarmup-row-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
+| mnli | papergamma_lr1 | bitdistill-longwarmup-tensor-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
+| mnli | papergamma_lr5 | bitdistill-longwarmup-tensor-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
+| mnli | papergamma_headinit | bitdistill-longwarmup-tensor-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
 | qnli | short | fp16_sft-tensor-layer-1 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
 | qnli | short | bitnet_sft-tensor-layer-1 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
 | qnli | short | bitdistill-tensor-layer-1 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
@@ -26,6 +30,10 @@ This gate validates PyTorch CPU task-runtime rows only; it is not a packed llama
 | qnli | longwarmup | bitdistill-longwarmup-tensor-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
 | qnli | longwarmup | bitdistill-longwarmup-row-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
 | qnli | papergamma | bitdistill-longwarmup-tensor-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
+| qnli | papergamma_row | bitdistill-longwarmup-row-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
+| qnli | papergamma_lr1 | bitdistill-longwarmup-tensor-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
+| qnli | papergamma_lr5 | bitdistill-longwarmup-tensor-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
+| qnli | papergamma_headinit | bitdistill-longwarmup-tensor-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
 | sst2 | short | fp16_sft-tensor-layer-1 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
 | sst2 | short | bitnet_sft-tensor-layer-1 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
 | sst2 | short | bitdistill-tensor-layer-1 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
@@ -33,6 +41,10 @@ This gate validates PyTorch CPU task-runtime rows only; it is not a packed llama
 | sst2 | longwarmup | bitdistill-longwarmup-tensor-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
 | sst2 | longwarmup | bitdistill-longwarmup-row-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
 | sst2 | papergamma | bitdistill-longwarmup-tensor-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
+| sst2 | papergamma_row | bitdistill-longwarmup-row-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
+| sst2 | papergamma_lr1 | bitdistill-longwarmup-tensor-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
+| sst2 | papergamma_lr5 | bitdistill-longwarmup-tensor-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
+| sst2 | papergamma_headinit | bitdistill-longwarmup-tensor-layer-8 | false | false | - | - | - | - | - | missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-14.json |
 
 ## Blockers
 
