@@ -154,6 +154,7 @@ def build_audit(
         and not submodule_dirty
     )
     blockers = []
+    warnings = []
     if not active_runtime_support:
         blockers.append("I2_SR qtype/file-type/runtime support is not present in the active submodule/root runtime files.")
     if patch_applies:
@@ -164,8 +165,13 @@ def build_audit(
         blockers.append("Configured llama.cpp submodule remote is not writable from this environment; use a fork or writable branch.")
     if candidate_fork and not candidate_fork["reachable"]:
         blockers.append("Candidate llama.cpp fork URL is not reachable; create the fork or provide the correct writable URL before promotion.")
-    if not root_split_state["covered"] or not submodule_split_state["covered"]:
+    split_patch_coverage_issue = not root_split_state["covered"] or not submodule_split_state["covered"]
+    if split_patch_coverage_issue and not promotion_ready:
         blockers.append("Split root/submodule I2_SR promotion patches are missing, unapplied, or not represented in the active source.")
+    elif split_patch_coverage_issue:
+        warnings.append(
+            "A split promotion patch no longer applies cleanly, but the active source is already promoted and the submodule HEAD is reachable from the configured fork branch."
+        )
     if submodule_dirty:
         blockers.append("Submodule working tree is dirty.")
 
@@ -223,6 +229,7 @@ def build_audit(
         "active_checks": active_checks,
         "patch_files": patch_files,
         "blockers": blockers,
+        "warnings": warnings,
         "next_steps": next_steps,
     }
 
@@ -256,6 +263,7 @@ def render_markdown(result: dict[str, Any]) -> str:
         ],
     ]
     blocker_rows = [[blocker] for blocker in result["blockers"]] or [["none"]]
+    warning_rows = [[warning] for warning in result.get("warnings", [])] or [["none"]]
     next_rows = [[step] for step in result["next_steps"]]
     remote_write = result.get("remote_write_probe")
     candidate_fork = result.get("candidate_fork_probe")
@@ -310,6 +318,8 @@ def render_markdown(result: dict[str, Any]) -> str:
             md_table(["check", "present"], active_rows),
             "## Blockers",
             md_table(["blocker"], blocker_rows),
+            "## Warnings",
+            md_table(["warning"], warning_rows),
             *remote_write_lines,
             *candidate_fork_lines,
             "## Split Promotion Patches",
