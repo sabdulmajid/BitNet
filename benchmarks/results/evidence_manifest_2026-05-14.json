@@ -142,8 +142,8 @@
       "label": "bitdistill_i2sr_gate_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_i2sr_export_gate_2026-05-14.md",
-      "sha256": "4a31605310e13bab27a40b609465908d0577720ca2fe7cfe961308c3f9b9c7c4",
-      "size_bytes": 3450
+      "sha256": "78f0393a127902083a3459014124e260a85a0957c9a53416d5b5e5b664bfad01",
+      "size_bytes": 3711
     },
     {
       "exists": true,
@@ -2106,8 +2106,8 @@
         ]
       },
       "path": "benchmark_results/bitdistill_i2sr_export_gate_2026-05-14.json",
-      "sha256": "6224d3e866c2e31feb8dc6472f2b88ec9e2258609a1589a93e35a5fa847e2bc1",
-      "size_bytes": 5345
+      "sha256": "5392dccf358bdde74b959cb88731a5ffd81e1faf4a4a31562f12acd9cb23c0fd",
+      "size_bytes": 5831
     },
     {
       "exists": true,

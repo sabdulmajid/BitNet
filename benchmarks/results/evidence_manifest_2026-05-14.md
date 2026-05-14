@@ -17,7 +17,7 @@ Artifacts: `155`. Missing: `0`.
 | bitdistill_paper_alignment_report | tracked_report | yes | 7724 | da103f6af780 |  |
 | bitdistill_loss_scale_report | tracked_report | yes | 6846 | 65816a5d56a5 |  |
 | bitdistill_cpu_gate_report | tracked_report | yes | 7081 | faf3c415d03e |  |
-| bitdistill_i2sr_gate_report | tracked_report | yes | 3450 | 4a31605310e1 |  |
+| bitdistill_i2sr_gate_report | tracked_report | yes | 3711 | 78f0393a1279 |  |
 | bitdistill_job_monitor_report | tracked_report | yes | 12979 | 2d8e9a571cc2 |  |
 | bitdistill_dependency_graph_report | tracked_report | yes | 10451 | 83bdcc077461 |  |
 | bitdistill_postprocess_submission_report | tracked_report | yes | 1002 | ba6f313aafec |  |
@@ -130,7 +130,7 @@ Artifacts: `155`. Missing: `0`.
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 26085 | 9f3a8d24ee11 | present=13/36, examples=13, full_eval=13, ci95=13, paper_complete=False, paper_passed=False, row_complete=False, row_passed=False, confidence=0.95 |
 | bitdistill_paired_predictions_json | bitdistill_paired_predictions_json | yes | 62769 | 6bc698c10ac9 | status=pending, complete=0/36, pending=36, failed=0 |
 | bitdistill_cpu_gate_json | bitdistill_cpu_gate_json | yes | 9426 | 081ccc64117c | passed=False, input=False, critical=0/33, full_quality=0, sample_n=None, blockers=1 |
-| bitdistill_i2sr_gate_json | bitdistill_i2sr_gate_json | yes | 5345 | 6224d3e866c2 | passed=False, complete=0/6, tasks=['mnli', 'qnli', 'sst2'], scales=['tensor', 'row'], blockers=4 |
+| bitdistill_i2sr_gate_json | bitdistill_i2sr_gate_json | yes | 5831 | 5392dccf358b | passed=False, complete=0/6, tasks=['mnli', 'qnli', 'sst2'], scales=['tensor', 'row'], blockers=4 |
 | bitdistill_job_monitor_json | bitdistill_job_monitor_json | yes | 78006 | 076d0e193b1b | warmup=12800/20000, progress=0.64, ce=4.18056, snapshots=0, warnings=1, downstream=38 |
 | bitdistill_dependency_graph_json | bitdistill_dependency_graph_json | yes | 24680 | ae6bcf74cafc | ready=True, checks=4, failed=0, active=38/38, warmup=12800/20000, warnings=2, blockers=0 |
 | bitdistill_postprocess_submission_json | bitdistill_postprocess_submission_json | yes | 2054 | 8a3a5f68f4ae | submitted=True, job=10009, dep=afterok, producers=41, warmup=1, downstream=38, extra=2 |

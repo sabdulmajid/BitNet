@@ -44,13 +44,25 @@ def expected_name(model: str, task: str, scale: str, layer: int) -> str:
     return f"{model_slug(model)}_{task}_bitdistill-longwarmup-{scale}-layer-{safe_layer}"
 
 
+def expected_kind(scale: str, export_qtype: str) -> str:
+    return f"bitdistill_{scale}_bitnet25_{export_qtype}"
+
+
 def index_by_name(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     return {str(row.get("name", "")): row for row in rows if isinstance(row, dict)}
+
+
+def same_path(left: str | Path | None, right: str | Path | None) -> bool:
+    if not left or not right:
+        return False
+    return Path(left).expanduser().resolve() == Path(right).expanduser().resolve()
 
 
 def collect_row(args: argparse.Namespace, *, task: str, scale: str) -> dict[str, Any]:
     name = expected_name(args.model, task, scale, args.layer)
     blockers: list[str] = []
+    export_qtype = "i2_sr" if scale == "row" else "i2_s"
+    kind = expected_kind(scale, export_qtype)
 
     export_summary = safe_read_json(args.results_dir / "export_summary.json")
     if not isinstance(export_summary, dict):
@@ -61,14 +73,38 @@ def collect_row(args: argparse.Namespace, *, task: str, scale: str) -> dict[str,
     outfile_text = str(export.get("outfile") or "") if export else ""
     outfile = Path(outfile_text) if outfile_text else None
     exported = bool(export and export.get("exists") and outfile and outfile.exists())
+    manifest_text = str(export_summary.get("manifest") or "") if export_summary else ""
+    manifest_path = Path(manifest_text) if manifest_text else None
+    manifest_rows = safe_read_json(manifest_path) if manifest_path else None
+    manifest = index_by_name(manifest_rows if isinstance(manifest_rows, list) else [])
+    manifest_row = manifest.get(name)
     if not export:
         blockers.append("missing export row")
     elif export.get("error"):
         blockers.append(str(export.get("error")))
     elif not exported:
         blockers.append("exported GGUF file is missing")
+    elif export.get("export_qtype") != export_qtype:
+        blockers.append(f"export row qtype={export.get('export_qtype')!r} expected={export_qtype!r}")
     if export and not finite_positive(export.get("ternary_keys")):
         blockers.append("ternary key count missing or zero")
+    if export_summary and not manifest_path:
+        blockers.append("export summary is missing manifest path")
+    elif manifest_path and not isinstance(manifest_rows, list):
+        blockers.append(f"missing export manifest {manifest_path}")
+    elif export and not manifest_row:
+        blockers.append("missing manifest row")
+    elif export and manifest_row:
+        if not same_path(manifest_row.get("path"), outfile):
+            blockers.append("manifest row path does not match exported GGUF")
+        if manifest_row.get("kind") != kind:
+            blockers.append(f"manifest row kind={manifest_row.get('kind')!r} expected={kind!r}")
+        if manifest_row.get("task") != task:
+            blockers.append(f"manifest row task={manifest_row.get('task')!r} expected={task!r}")
+        if manifest_row.get("scale") != scale:
+            blockers.append(f"manifest row scale={manifest_row.get('scale')!r} expected={scale!r}")
+        if manifest_row.get("export_qtype") != export_qtype:
+            blockers.append(f"manifest row qtype={manifest_row.get('export_qtype')!r} expected={export_qtype!r}")
     summary_json_text = str(export.get("summary_json") or "") if export else ""
     summary_json = Path(summary_json_text) if summary_json_text else None
     export_details = safe_read_json(summary_json) if summary_json else None
@@ -79,7 +115,16 @@ def collect_row(args: argparse.Namespace, *, task: str, scale: str) -> dict[str,
         row_scale_qtype = export_details.get("row_scale_qtype")
         row_packed = export_details.get("row_scale_i2s_packed")
         tensor_packed = export_details.get("ternary_i2s_packed")
+        expected_ftype = "MOSTLY_I2_SR" if scale == "row" else "MOSTLY_I2_S"
+        if export_details.get("gguf_arch") != "bitnet-25":
+            blockers.append(f"converter gguf_arch={export_details.get('gguf_arch')!r} expected='bitnet-25'")
+        if export_details.get("bitdistill_subln") is not True:
+            blockers.append("converter did not enable BitDistill SubLN tensor mapping")
+        if export_details.get("output_ftype_name") != expected_ftype:
+            blockers.append(f"converter ftype={export_details.get('output_ftype_name')!r} expected={expected_ftype!r}")
         if scale == "tensor":
+            if export_details.get("has_native_i2s_gguf_python_constants") is not True:
+                blockers.append("converter did not use native I2_S GGUF Python constants")
             if row_scale_qtype is not None:
                 blockers.append(f"tensor baseline incorrectly used row_scale_qtype={row_scale_qtype!r}")
             if row_packed not in (0, None):
@@ -87,6 +132,8 @@ def collect_row(args: argparse.Namespace, *, task: str, scale: str) -> dict[str,
             if not finite_positive(tensor_packed):
                 blockers.append("tensor baseline did not pack scalar I2_S tensors")
         elif scale == "row":
+            if export_details.get("has_native_i2sr_gguf_python_constants") is not True:
+                blockers.append("converter did not use native I2_SR GGUF Python constants")
             if row_scale_qtype != "i2_sr":
                 blockers.append("row baseline did not request stable I2_SR qtype")
             if not finite_positive(row_packed):
@@ -98,10 +145,16 @@ def collect_row(args: argparse.Namespace, *, task: str, scale: str) -> dict[str,
         if not isinstance(suite_summary, dict):
             blockers.append(f"missing suite summary {args.results_dir / 'gguf_suite' / 'summary.json'}")
         else:
+            if manifest_path and not same_path(suite_summary.get("models_json"), manifest_path):
+                blockers.append("gguf suite summary was not generated from the export manifest")
             suite_row = index_by_name(suite_summary.get("rows", []) if isinstance(suite_summary.get("rows"), list) else []).get(name, {})
             if not suite_row:
                 blockers.append("missing gguf suite row")
             else:
+                if suite_row.get("kind") != kind:
+                    blockers.append(f"gguf suite kind={suite_row.get('kind')!r} expected={kind!r}")
+                if not same_path(suite_row.get("path"), outfile):
+                    blockers.append("gguf suite path does not match exported GGUF")
                 bench = suite_row.get("bench", {}) if isinstance(suite_row.get("bench"), dict) else {}
                 prefill = bench.get("prefill", {}) if isinstance(bench.get("prefill"), dict) else {}
                 decode = bench.get("decode", {}) if isinstance(bench.get("decode"), dict) else {}
@@ -125,11 +178,18 @@ def collect_row(args: argparse.Namespace, *, task: str, scale: str) -> dict[str,
         if not isinstance(memory_summary, dict):
             blockers.append(f"missing memory summary {args.results_dir / 'memory' / 'summary.json'}")
         else:
+            if manifest_path and not same_path(memory_summary.get("models_json"), manifest_path):
+                blockers.append("memory summary was not generated from the export manifest")
             memory_rows = [
                 row
                 for row in memory_summary.get("rows", [])
                 if isinstance(row, dict) and str(row.get("name", "")) == name
             ]
+            for row in memory_rows:
+                if row.get("kind") != kind:
+                    blockers.append(f"memory row kind={row.get('kind')!r} expected={kind!r}")
+                if not same_path(row.get("path"), outfile):
+                    blockers.append("memory row path does not match exported GGUF")
             by_ctx = {int(row.get("ctx_size")): row for row in memory_rows if isinstance(row.get("ctx_size"), int)}
             for ctx in args.ctx_sizes:
                 row = by_ctx.get(ctx)
@@ -149,11 +209,13 @@ def collect_row(args: argparse.Namespace, *, task: str, scale: str) -> dict[str,
     return {
         "task": task,
         "scale": scale,
-        "export_qtype": export.get("export_qtype") if export else ("i2_sr" if scale == "row" else "i2_s"),
+        "export_qtype": export.get("export_qtype") if export else export_qtype,
+        "expected_kind": kind,
         "name": name,
         "exported": exported,
         "ternary_keys": export.get("ternary_keys") if export else None,
         "converter_ftype": export_details.get("output_ftype_name") if isinstance(export_details, dict) else None,
+        "manifest": str(manifest_path) if manifest_path else None,
         "outfile": str(outfile) if outfile else None,
         "file_mib": suite_row.get("file_mib") or (outfile.stat().st_size / (1024**2) if outfile and outfile.exists() else None),
         "ppl": ppl.get("ppl"),
@@ -187,10 +249,12 @@ def render_markdown(summary: dict[str, Any]) -> str:
             row["task"],
             row["scale"],
             fmt(row["export_qtype"]),
+            fmt(row["expected_kind"]),
             fmt(row["complete"]),
             fmt(row["exported"]),
             fmt(row["ternary_keys"]),
             fmt(row["converter_ftype"]),
+            fmt(row["manifest"]),
             fmt(row["file_mib"]),
             fmt(row["ppl"]),
             fmt(row["prefill_tok_s"]),
@@ -211,10 +275,12 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 "task",
                 "scale",
                 "qtype",
+                "expected kind",
                 "complete",
                 "exported",
                 "ternary keys",
                 "ftype",
+                "manifest",
                 "file MiB",
                 "PPL",
                 "prefill tok/s",
