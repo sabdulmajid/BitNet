@@ -6,9 +6,9 @@ Monitor JSON: `benchmark_results/bitdistill_job_monitor_2026-05-14.json`.
 
 Warm-up state: `/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/custom_state_dict.pt`.
 
-Observed rows: `23`. Expected rows: `23`. Configured rows: `23`.
+Observed rows: `26`. Expected rows: `26`. Configured rows: `26`.
 
-Job states: `{'PENDING': 23}`.
+Job states: `{'PENDING': 26}`.
 
 Rows with fields inferred from submitter defaults: `0`.
 
@@ -17,10 +17,10 @@ Rows with fields inferred from submitter defaults: `0`.
 | check | status | evidence | blocker |
 | --- | --- | --- | --- |
 | monitor json exists | pass | benchmark_results/bitdistill_job_monitor_2026-05-14.json |  |
-| active row count matches design | pass | rows=23, expected=23 |  |
+| active row count matches design | pass | rows=26, expected=26 |  |
 | output directories are unique | pass | duplicates=[] |  |
-| all expected experiment rows are present and configured | pass | configured=23/23 |  |
-| warm-up progress is finite | pass | step=7720/20000 |  |
+| all expected experiment rows are present and configured | pass | configured=26/26 |  |
+| warm-up progress is finite | pass | step=8340/20000 |  |
 
 ## Expected Matrix
 
@@ -43,6 +43,9 @@ Rows with fields inferred from submitter defaults: `0`.
 | seqcls_paper_gamma100000 | sst2 | sequence_classification | tensor | 100000.000000 | 0 | 9964 | PENDING | true | none | none |
 | mnli_gamma1000 | mnli | sequence_classification | tensor | 1000.000000 | 0 | 9965 | PENDING | true | none | none |
 | mnli_gamma10000 | mnli | sequence_classification | tensor | 10000.000000 | 0 | 9966 | PENDING | true | none | none |
+| mnli_layer_sweep_-1 | mnli | sequence_classification | tensor | 100.000000 | 0 | 9978 | PENDING | true | none | none |
+| mnli_layer_sweep_-2 | mnli | sequence_classification | tensor | 100.000000 | 0 | 9979 | PENDING | true | none | none |
+| mnli_layer_sweep_-4 | mnli | sequence_classification | tensor | 100.000000 | 0 | 9980 | PENDING | true | none | none |
 | causal_densehead_gamma100 | mnli | causal_lm | tensor | 100.000000 | 0 | 9943 | PENDING | true | none | none |
 | causal_densehead_gamma100 | mnli | causal_lm | row | 100.000000 | 0 | 9944 | PENDING | true | none | none |
 | causal_densehead_gamma100 | qnli | causal_lm | tensor | 100.000000 | 0 | 9945 | PENDING | true | none | none |

@@ -64,6 +64,7 @@ python benchmarks/summarize_bitdistill_variants.py \
     checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma \
     checkpoints/bitdistill-glue-seqcls-longwarmup-gamma1k \
     checkpoints/bitdistill-glue-seqcls-longwarmup-gamma10k \
+    checkpoints/bitdistill-glue-seqcls-longwarmup-layer-sweep \
   --title "BitDistill Variant Summary, ${DATE}" \
   --output-json "benchmark_results/bitdistill_variant_summary_${DATE}.json" \
   --output-md "benchmarks/results/bitdistill_variant_summary_${DATE}.md"

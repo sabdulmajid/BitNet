@@ -153,6 +153,25 @@ def expected_rows(model_slug: str, warmup_state: str) -> list[dict[str, Any]]:
                 "warmup_state": warmup_state,
             }
         )
+    for layer in (-1, -2, -4):
+        safe_layer = str(abs(layer))
+        rows.append(
+            {
+                "family": f"mnli_layer_sweep_{layer}",
+                "task": "mnli",
+                "task_format": "sequence_classification",
+                "scale": "tensor",
+                "attention_kd_weight": 100.0,
+                "output_root": (
+                    "checkpoints/bitdistill-glue-seqcls-longwarmup-layer-sweep/"
+                    f"{model_slug}/mnli/bitdistill-longwarmup-tensor-layer-{safe_layer}"
+                ),
+                "teacher_root": f"checkpoints/bitdistill-glue-seqcls/{model_slug}/mnli",
+                "exclude_linear_regex": "score|classifier",
+                "init_output_head_from_teacher": "0",
+                "warmup_state": warmup_state,
+            }
+        )
     for task in TASKS:
         for scale in ("tensor", "row"):
             rows.append(
