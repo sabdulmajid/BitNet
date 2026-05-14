@@ -769,6 +769,8 @@ def evaluate_causal_glue(
             batch = move_batch(batch, device)
             outputs = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], use_cache=False)
             scores.extend(float(value) for value in causal_sequence_logps(outputs.logits, batch["labels"]).detach().cpu())
+    if len(scores) != len(candidates):
+        raise RuntimeError(f"scored {len(scores)} candidates but expected {len(candidates)}")
     correct = 0
     label_count = len(labels)
     for index, true_label in enumerate(gold):
