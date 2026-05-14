@@ -88,6 +88,17 @@ Packed causal-LM exports are also gated for provenance: the `I2_S`/`I2_SR`
 GGUF file, converter summary, benchmark suite, RSS probe, qtype, SubLN mapping,
 and manifest path must all agree.
 
+A separate task-formulation audit prevents overclaiming across incompatible
+GLUE setups. The strict local reproduction branch is
+`Qwen2ForSequenceClassification`; causal-LM prompt-scoring rows are useful
+deployment diagnostics and export candidates, but they are not mixed into the
+headline sequence-classification table. Against the BitDistill excerpt's
+Qwen2.5-0.5B MNLI anchor, the local FP16-SFT baseline is close
+(`0.807641` vs `0.799100`), while BitNet-SFT (`0.487621` vs `0.608000`) and
+short-budget BitDistill (`0.525217` vs `0.799800`) remain far below the paper
+target. That makes the current gap concrete: the baseline task is learnable,
+but the ternary recovery recipe is not yet reproduced.
+
 Current completed Qwen2.5-0.5B GLUE sequence-classification results:
 
 | task | FP16-SFT | BitNet-SFT | BitDistill tensor | BitDistill row |
@@ -257,6 +268,10 @@ python benchmarks/monitor_bitdistill_jobs.py \
 python benchmarks/gate_bitdistill_reproduction.py \
   --output-json benchmark_results/bitdistill_reproduction_gate_2026-05-14.json \
   --output-md benchmarks/results/bitdistill_reproduction_gate_2026-05-14.md
+
+python benchmarks/audit_bitdistill_task_formulation.py \
+  --output-json benchmark_results/bitdistill_task_formulation_audit_2026-05-14.json \
+  --output-md benchmarks/results/bitdistill_task_formulation_audit_2026-05-14.md
 
 python benchmarks/audit_bitdistill_paired_predictions.py \
   --output-json benchmark_results/bitdistill_paired_predictions_2026-05-14.json \

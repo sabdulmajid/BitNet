@@ -121,6 +121,18 @@ python benchmarks/run_bitdistill_smoke_contract.py
 The GGUF export checks use a smoke-only synthetic tokenizer stub. They validate
 packing, metadata, and key mapping; they do not validate generation quality.
 
+Keep sequence-classification and causal prompt-scoring GLUE results separate.
+The public claim-control audit is:
+
+```bash
+python benchmarks/audit_bitdistill_task_formulation.py \
+  --output-json benchmark_results/bitdistill_task_formulation_audit_2026-05-14.json \
+  --output-md benchmarks/results/bitdistill_task_formulation_audit_2026-05-14.md
+```
+
+This report is the guardrail for whether a row is a paper-style reproduction
+candidate or only a deployment-format diagnostic.
+
 Primary GLUE3 sequence-classification wave:
 
 ```bash

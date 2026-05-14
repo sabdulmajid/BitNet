@@ -1,5 +1,5 @@
 {
-  "artifact_count": 155,
+  "artifact_count": 157,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "daae484e1a138c0035eab79151efed2b767715e738fcd26b82bac12a11a0352a",
-      "size_bytes": 19969
+      "sha256": "77e3d0c924ae9605ec2a8c7dd4f8b2f62c31ce35fcbd616046f806e0d2a7553a",
+      "size_bytes": 20899
     },
     {
       "exists": true,
@@ -108,6 +108,15 @@
       "path": "benchmarks/results/bitdistill_paired_predictions_2026-05-14.md",
       "sha256": "261c0d5aec8f3af2089ba21da55358f3c365b4e5d44c18fd44625cb5a143b199",
       "size_bytes": 11743
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_task_formulation_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_task_formulation_audit_2026-05-14.md",
+      "sha256": "da11ffd921d71527cb7383ea147e77163e17d150c89eb5867e6162e9af33be54",
+      "size_bytes": 9794
     },
     {
       "exists": true,
@@ -304,7 +313,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-14.md",
-      "sha256": "4ca367761271149e912c13715a075d500d40eb95ce16b1c2d250d6f5744ee5da",
+      "sha256": "1ba562b9082fa3262278b2f5ef577fef67788fb983cda2c7d90479af50abee05",
       "size_bytes": 3257
     },
     {
@@ -1985,7 +1994,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-14.json",
-      "sha256": "530eafb2ad140adb17795280e084610deec42a6a0a4c574e72e5c173dcc8d267",
+      "sha256": "b11c873ca07a2d71267544eeef650f8b2527d640f309e02bad10c1de4d07b621",
       "size_bytes": 6039
     },
     {
@@ -2060,6 +2069,21 @@
       "path": "benchmark_results/bitdistill_paired_predictions_2026-05-14.json",
       "sha256": "73d16b5d8b2ee6c278e31bd91f54da8c13597f99ed564de6db7553a3bd6c6ed3",
       "size_bytes": 71373
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_task_formulation_json",
+      "label": "bitdistill_task_formulation_json",
+      "metrics": {
+        "causal_rows_materialized": 11,
+        "paper_anchor_source": "BitDistill paper excerpt, Table 3 Qwen2.5-0.5B MNLI row.",
+        "pending_paper_candidates": 9,
+        "rows": 39,
+        "sequence_baselines_full": 6
+      },
+      "path": "benchmark_results/bitdistill_task_formulation_audit_2026-05-14.json",
+      "sha256": "a51361b92b359de547e3eb001df441c935bbda27c4f37f2283d0dbda1c2764a9",
+      "size_bytes": 24000
     },
     {
       "exists": true,

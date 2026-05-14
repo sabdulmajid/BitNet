@@ -44,6 +44,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "bitdistill_reproduction_status", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_reproduction_status_2026-05-14.md"},
     {"label": "bitdistill_reproduction_gate_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_reproduction_gate_{DATE}.md"},
     {"label": "bitdistill_paired_predictions_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_paired_predictions_{DATE}.md"},
+    {"label": "bitdistill_task_formulation_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_task_formulation_audit_{DATE}.md"},
     {"label": "bitdistill_paper_alignment_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_paper_alignment_{DATE}.md"},
     {"label": "bitdistill_loss_scale_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_loss_scale_audit_{DATE}.md"},
     {"label": "bitdistill_cpu_gate_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_glue_cpu_gate_{DATE}.md"},
@@ -163,6 +164,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "product_scope_gate_json", "kind": "product_scope_gate_json", "path": f"benchmark_results/product_scope_gate_{DATE}.json"},
     {"label": "bitdistill_reproduction_gate_json", "kind": "bitdistill_reproduction_gate_json", "path": f"benchmark_results/bitdistill_reproduction_gate_{DATE}.json"},
     {"label": "bitdistill_paired_predictions_json", "kind": "bitdistill_paired_predictions_json", "path": f"benchmark_results/bitdistill_paired_predictions_{DATE}.json"},
+    {"label": "bitdistill_task_formulation_json", "kind": "bitdistill_task_formulation_json", "path": f"benchmark_results/bitdistill_task_formulation_audit_{DATE}.json"},
     {"label": "bitdistill_cpu_gate_json", "kind": "bitdistill_cpu_gate_json", "path": f"benchmark_results/bitdistill_glue_cpu_gate_{DATE}.json"},
     {"label": "bitdistill_i2sr_gate_json", "kind": "bitdistill_i2sr_gate_json", "path": f"benchmark_results/bitdistill_i2sr_export_gate_{DATE}.json"},
     {"label": "bitdistill_job_monitor_json", "kind": "bitdistill_job_monitor_json", "path": f"benchmark_results/bitdistill_job_monitor_{DATE}.json"},
@@ -538,6 +540,14 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "complete": data.get("complete"),
             "pending": data.get("pending"),
             "failed": data.get("failed"),
+        }
+    if kind == "bitdistill_task_formulation_json":
+        return {
+            "sequence_baselines_full": data.get("sequence_baselines_full"),
+            "causal_rows_materialized": data.get("causal_rows_materialized"),
+            "pending_paper_candidates": data.get("pending_paper_candidates"),
+            "paper_anchor_source": data.get("paper_anchor_source"),
+            "rows": len(data.get("rows", [])) if isinstance(data.get("rows"), list) else None,
         }
     if kind == "bitdistill_cpu_gate_json":
         critical = data.get("critical", [])
@@ -1058,6 +1068,13 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"complete={metrics.get('complete', '-')}/{metrics.get('rows', '-')}, "
                 f"pending={metrics.get('pending', '-')}, "
                 f"failed={metrics.get('failed', '-')}"
+            )
+        elif entry["kind"] == "bitdistill_task_formulation_json":
+            summary = (
+                f"seq_full={metrics.get('sequence_baselines_full', '-')}, "
+                f"causal_rows={metrics.get('causal_rows_materialized', '-')}, "
+                f"pending_paper={metrics.get('pending_paper_candidates', '-')}, "
+                f"rows={metrics.get('rows', '-')}"
             )
         elif entry["kind"] == "bitdistill_cpu_gate_json":
             summary = (
