@@ -62,17 +62,26 @@ def build_audit(root: Path) -> dict[str, Any]:
     converter_path = root / "utils/convert-hf-to-gguf-bitnet.py"
     ggml_path = root / "3rdparty/llama.cpp/ggml/src/ggml.c"
     llama_path = root / "3rdparty/llama.cpp/src/llama.cpp"
+    bitnet_lut_path = root / "src/ggml-bitnet-lut.cpp"
+    generated_kernel_path = root / "include/bitnet-lut-kernels.h"
+    preset_kernel_path = root / "preset_kernels/bitnet_b1_58-large/bitnet-lut-kernels-tl2.h"
 
     converter = read_text(converter_path)
     ggml = read_text(ggml_path)
     llama = read_text(llama_path)
+    bitnet_lut = read_text(bitnet_lut_path)
+    generated_kernel = read_text(generated_kernel_path)
+    kernel_path = generated_kernel_path if "void ggml_bitnet_transform_tensor" in generated_kernel else preset_kernel_path
+    bitnet_kernel = generated_kernel if kernel_path == generated_kernel_path else read_text(preset_kernel_path)
 
     preprocess_tl2 = slice_between(converter, "def preprocess_weights_tl2", "def transform_to_tl1")
     ggml_nbytes = slice_between(ggml, "size_t ggml_nbytes", "size_t ggml_nbytes_pad")
     type_traits_tl2 = slice_between(ggml, "[GGML_TYPE_TL2]", "[GGML_TYPE_I8]")
     mul_mat = slice_between(ggml, "static void ggml_compute_forward_mul_mat(", "// ggml_compute_forward_mul_mat_id")
     mul_mat_id = slice_between(ggml, "static void ggml_compute_forward_mul_mat_id(", "// ggml_compute_forward_out_prod")
+    mul_mat_id_wsize = slice_between(ggml, "case GGML_OP_MUL_MAT_ID:", "case GGML_OP_OUT_PROD:")
     quantize_loop = slice_between(llama, "// quantize only 2D and 3D tensors (experts)", "LLAMA_LOG_INFO(\"%s: model size")
+    bitnet_transform = slice_between(bitnet_kernel, "void ggml_bitnet_transform_tensor", "int ggml_bitnet_get_type_bits")
 
     converter_has_legacy_2d_unpack = "M, K = w.shape" in preprocess_tl2
     converter_has_ndim_branch = "w.ndim" in preprocess_tl2 or "len(w.shape)" in preprocess_tl2
@@ -82,8 +91,11 @@ def build_audit(root: Path) -> dict[str, Any]:
     nbytes_uses_ne3 = nbytes_uses_nrows or "tensor->ne[3]" in ggml_nbytes or "ne[3]" in ggml_nbytes
     mul_mat_has_tl2_lut = "GGML_BITNET_X86_TL2" in mul_mat and "ggml_bitnet_can_mul_mat" in mul_mat and "ggml_qgemm_lut" in mul_mat
     mul_mat_id_has_tl2_lut = "GGML_BITNET_X86_TL2" in mul_mat_id or "ggml_bitnet_can_mul_mat" in mul_mat_id or "ggml_qgemm_lut" in mul_mat_id
+    mul_mat_id_wsize_has_bitnet = "ggml_bitnet_mul_mat_get_wsize" in mul_mat_id_wsize
     tl2_vec_dot_f32 = "ggml_vec_dot_f32" in type_traits_tl2 and "vec_dot_type             = GGML_TYPE_F32" in type_traits_tl2
     llama_quantizes_3d = "quantize only 2D and 3D tensors (experts)" in quantize_loop and "tensor->ne[2]" in quantize_loop
+    transform_uses_3d_rows = "ggml_nrows(tensor)" in bitnet_transform or "tensor->ne[2]" in bitnet_transform or "ne[2]" in bitnet_transform
+    transform_has_single_scale = "const int lut_scales_size = 1" in bitnet_transform and "i2_scales[0]" in bitnet_transform
 
     experts = SYNTHETIC_SHAPE["experts"]
     out = SYNTHETIC_SHAPE["out"]
@@ -137,6 +149,25 @@ def build_audit(root: Path) -> dict[str, Any]:
             "`ggml_compute_forward_mul_mat_id` does not route TL2 through the BitNet LUT kernel; TL2 type traits fall back to F32 vec-dot semantics.",
         ),
         make_check(
+            "TL2 mul_mat_id scratch buffer sizes BitNet LUT workspace",
+            mul_mat_id_wsize_has_bitnet,
+            (
+                f"mul_mat_id_wsize_line={first_line(ggml, 'case GGML_OP_MUL_MAT_ID:')}; "
+                f"uses_bitnet_wsize={mul_mat_id_wsize_has_bitnet}"
+            ),
+            "`GGML_OP_MUL_MAT_ID` workspace sizing does not reserve BitNet LUT preprocessor buffers, so adding a kernel route also requires a wsize contract.",
+        ),
+        make_check(
+            "TL2 tensor transform metadata is expert-plane aware",
+            transform_uses_3d_rows and not transform_has_single_scale,
+            (
+                f"bitnet_transform_line={first_line(bitnet_kernel, 'void ggml_bitnet_transform_tensor')}; "
+                f"kernel_source={kernel_path.relative_to(root)}; "
+                f"uses_3d_rows={transform_uses_3d_rows}; single_scale_metadata={transform_has_single_scale}"
+            ),
+            "`ggml_bitnet_transform_tensor` derives metadata from only `tensor->ne[1]` and stores one tensor scale, so merged experts lack explicit per-expert offsets/scales.",
+        ),
+        make_check(
             "llama.cpp generic quantizer is at least 3D-expert aware",
             llama_quantizes_3d,
             (
@@ -163,13 +194,17 @@ def build_audit(root: Path) -> dict[str, Any]:
             "converter": str(converter_path.relative_to(root)),
             "ggml": str(ggml_path.relative_to(root)),
             "llama": str(llama_path.relative_to(root)),
+            "bitnet_lut": str(bitnet_lut_path.relative_to(root)),
+            "bitnet_kernel": str(kernel_path.relative_to(root)),
         },
         "checks": checks,
         "tl2_moe_runtime_ready": not blockers,
         "blockers": blockers,
         "required_next_steps": [
             "Route ggml_mul_mat_id for TL2 through expert-aware BitNet LUT kernels, not generic F32 vec-dot fallback.",
+            "Extend GGML_OP_MUL_MAT_ID workspace sizing to reserve TL2 LUT preprocessor buffers.",
             "Define per-expert tensor-scale or row/group-scale metadata semantics before quality benchmarking.",
+            "Make TL2 tensor transform metadata expert-plane aware so qweight offsets and scales are explicit per expert.",
             "Validate with a real Qwen2MoE/Kimi GGUF and router/expert-locality benchmarks.",
         ],
     }

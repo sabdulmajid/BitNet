@@ -247,7 +247,7 @@ def build_productization_gates(
                 f"runtime_blockers={len(runtime_blockers)}; "
                 f"tl2_expert_byte_underreport={byte_probe.get('underreport_bytes')}"
             ),
-            "The TL2 converter accepts the synthetic 3D packing contract and byte sizing now accounts for expert planes, but `ggml_mul_mat_id` still does not route TL2 expert matmuls through the BitNet LUT kernel.",
+            "The TL2 converter accepts the synthetic 3D packing contract and byte sizing now accounts for expert planes, but routed TL2 experts still lack a `ggml_mul_mat_id` LUT route, matching workspace sizing, and expert-aware transform/scale metadata.",
         ),
         make_gate(
             "direct I2_SR writer is validated for merged 3D expert tensors",
