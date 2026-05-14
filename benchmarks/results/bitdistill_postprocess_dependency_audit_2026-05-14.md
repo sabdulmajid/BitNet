@@ -2,7 +2,7 @@
 
 Overall status: `pass`.
 
-Postprocess job: `9998`.
+Postprocess job: `10004`.
 
 Expected producer jobs: `42`.
 
@@ -15,7 +15,7 @@ Missing dependencies: `[]`.
 | check | status | evidence | blocker |
 | --- | --- | --- | --- |
 | monitor JSON exists | pass | /mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/bitdistill_job_monitor_2026-05-14.json |  |
-| postprocess job is discoverable | pass | name=bitdistill-postprocess, matches=3 |  |
+| postprocess job is discoverable | pass | name=bitdistill-postprocess, matches=1 |  |
 | expected producer jobs are active | pass | warmup=1, downstream=38, extra=3, total=42 |  |
 | postprocess depends on every active producer | pass | expected=42, dependency_ids=42, missing=[] |  |
 

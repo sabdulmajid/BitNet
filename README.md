@@ -257,6 +257,8 @@ python benchmarks/benchmark_bitdistill_glue_cpu.py \
 
 python benchmarks/submit_bitdistill_afterany_postprocess.py
 
+python benchmarks/submit_bitdistill_warmup_finalizer.py
+
 python benchmarks/audit_bitdistill_postprocess_dependencies.py \
   --postprocess-job-name bitdistill-postprocess-any \
   --postprocess-job-id <afterany-job-id> \

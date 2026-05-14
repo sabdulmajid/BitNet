@@ -418,6 +418,10 @@ warmup, all downstream rows, and export/CPU producer jobs. The strict
 failed producer still leaves monitor, reproduction-gate, variant-summary, and
 objective-audit artifacts.
 
+Also queue `benchmarks/submit_bitdistill_warmup_finalizer.py` for the Stage-2
+boundary. That job depends only on the warmup with `afterany`, so it still runs
+if warmup fails before downstream `afterok` jobs can start.
+
 For future long Stage-2 warm-ups, set `SAVE_EVERY_STEPS=1000` or another
 interval when submitting `slurm_bitdistill_glue.sh`. This writes restartable
 `checkpoint-<step>/custom_state_dict.pt` snapshots under the run directory.

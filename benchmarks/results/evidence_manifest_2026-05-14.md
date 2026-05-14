@@ -1,8 +1,8 @@
 # Evidence Manifest, 2026-05-14
-Artifacts: `149`. Missing: `0`.
+Artifacts: `153`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 17966 | 79f31ef4a467 |  |
+| README | tracked_report | yes | 18023 | 0d1ec5a43228 |  |
 | side_by_side_report | tracked_report | yes | 17129 | 4802f8068ba3 |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
 | paired_row_minus_ptq_report | tracked_report | yes | 1332 | 20a5aee1eb99 |  |
@@ -20,10 +20,12 @@ Artifacts: `149`. Missing: `0`.
 | bitdistill_i2sr_gate_report | tracked_report | yes | 3450 | 4a31605310e1 |  |
 | bitdistill_job_monitor_report | tracked_report | yes | 12978 | 5484e1a6ce1e |  |
 | bitdistill_dependency_graph_report | tracked_report | yes | 10451 | 0b5b75f430ce |  |
-| bitdistill_postprocess_dependency_report | tracked_report | yes | 2055 | 23ec0b7e4b2f |  |
-| bitdistill_afterany_postprocess_report | tracked_report | yes | 1130 | 17d7f3286eee |  |
-| bitdistill_afterany_postprocess_dependency_report | tracked_report | yes | 2102 | b1333797d892 |  |
+| bitdistill_postprocess_submission_report | tracked_report | yes | 1011 | 2ea19662e01d |  |
+| bitdistill_postprocess_dependency_report | tracked_report | yes | 2056 | 70e783b5c606 |  |
+| bitdistill_afterany_postprocess_report | tracked_report | yes | 1112 | c637a18869f0 |  |
+| bitdistill_afterany_postprocess_dependency_report | tracked_report | yes | 2102 | 0f2cb4c4ec6b |  |
 | bitdistill_warmup_health_report | tracked_report | yes | 1323 | b12d9ece6c69 |  |
+| bitdistill_warmup_finalizer_submission_report | tracked_report | yes | 404 | 60244b86b074 |  |
 | bitdistill_job_matrix_report | tracked_report | yes | 5942 | 731c25aa0e30 |  |
 | bitdistill_active_goal_report | tracked_report | yes | 3201 | c5f7a381a9da |  |
 | bitdistill_smoke_contract_report | tracked_report | yes | 3670 | 3757863cdec3 |  |
@@ -32,7 +34,7 @@ Artifacts: `149`. Missing: `0`.
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 2048 | 11fc209f78db |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 2937 | 140697c4954e |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 2937 | 621ed497b119 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2569 | 51da6738be9d |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -121,7 +123,7 @@ Artifacts: `149`. Missing: `0`.
 | row_scale_qtype_i2sr_promotion_rehearsal_json | row_scale_qtype_gate_json | yes | 3897 | 6ffc161b446b | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5488 | 150b33e96540 | passed=True, checks=33, failed=0 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5488 | ea09e751d211 | passed=True, checks=33, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 15953 | a07ee58dabe1 | achieved=False, status=not_complete, complete=7/9, open=2 |
 | product_scope_gate_json | product_scope_gate_json | yes | 4831 | 4d0cb4d1046f | scope=research_mvp_only, supported=4, unsupported=4 |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 23575 | 1fbffc7c0f4b | present=13/36, examples=13, ci95=13, paper_complete=False, paper_passed=False, row_complete=False, row_passed=False, confidence=0.95 |
@@ -130,10 +132,12 @@ Artifacts: `149`. Missing: `0`.
 | bitdistill_i2sr_gate_json | bitdistill_i2sr_gate_json | yes | 5345 | 6224d3e866c2 | passed=False, complete=0/6, tasks=['mnli', 'qnli', 'sst2'], scales=['tensor', 'row'], blockers=4 |
 | bitdistill_job_monitor_json | bitdistill_job_monitor_json | yes | 78015 | b34a61011781 | warmup=11530/20000, progress=0.5765, ce=4.4714, snapshots=0, warnings=1, downstream=38 |
 | bitdistill_dependency_graph_json | bitdistill_dependency_graph_json | yes | 24682 | a50d9d54a4e8 | ready=True, checks=4, failed=0, active=38/38, warmup=11550/20000, warnings=2, blockers=0 |
-| bitdistill_postprocess_dependency_json | bitdistill_postprocess_dependency_json | yes | 5151 | e0a0938102d5 | passed=True, checks=4, failed=0, expected=42, warmup=1, downstream=38, extra=3, missing=0, postprocess=9998 |
-| bitdistill_afterany_postprocess_json | bitdistill_afterany_postprocess_submission_json | yes | 2176 | 113c4a3cc88b | submitted=False, job=10000, dep=afterany, producers=42, warmup=1, downstream=38, extra=3 |
-| bitdistill_afterany_postprocess_dependency_json | bitdistill_postprocess_dependency_json | yes | 4915 | 90d0784653eb | passed=True, checks=4, failed=0, expected=42, warmup=1, downstream=38, extra=3, missing=0, postprocess=10000 |
+| bitdistill_postprocess_submission_json | bitdistill_postprocess_submission_json | yes | 2080 | 2e8c5c872a00 | submitted=True, job=10004, dep=afterok, producers=42, warmup=1, downstream=38, extra=3 |
+| bitdistill_postprocess_dependency_json | bitdistill_postprocess_dependency_json | yes | 4861 | 17ba20b3a4f7 | passed=True, checks=4, failed=0, expected=42, warmup=1, downstream=38, extra=3, missing=0, postprocess=10004 |
+| bitdistill_afterany_postprocess_json | bitdistill_afterany_postprocess_submission_json | yes | 2176 | b08c49269cdd | submitted=False, job=10005, dep=afterany, producers=42, warmup=1, downstream=38, extra=3 |
+| bitdistill_afterany_postprocess_dependency_json | bitdistill_postprocess_dependency_json | yes | 4915 | 892a790fa861 | passed=True, checks=4, failed=0, expected=42, warmup=1, downstream=38, extra=3, missing=0, postprocess=10005 |
 | bitdistill_warmup_health_json | bitdistill_warmup_health_json | yes | 3928 | 38d151de26a5 | passed=True, checks=8, failed=0, warnings=1, warmup=11530/20000, progress=0.5765, ce=4.4714, sec_step=1.82017, snapshots=0 |
+| bitdistill_warmup_finalizer_submission_json | bitdistill_warmup_finalizer_submission_json | yes | 661 | a9cf3b295a54 | submitted=True, job=10001, dep=afterany, warmup=1 |
 | bitdistill_job_matrix_json | bitdistill_job_matrix_json | yes | 42598 | 9ec25d5f24a6 | passed=True, configured=38/38, observed=38, states={'PENDING': 38}, inferred_rows=0, blockers=0 |
 | bitdistill_active_goal_json | bitdistill_active_goal_json | yes | 4792 | 820b0b417165 | achieved=False, status=partial, complete=1/5, pending=3, warmup=11530/20000, row_complete=False, i2sr=False, cpu=False |
 | bitdistill_smoke_contract_json | bitdistill_smoke_contract_json | yes | 36210 | 310f744a0114 | passed=True, checks=37, failed=0, continued=bitlinear15/subln4, task=bitlinear15/subln4 |
