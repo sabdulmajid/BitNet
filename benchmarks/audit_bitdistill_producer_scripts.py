@@ -141,21 +141,27 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
 
     current_cpu = (root / "slurm_bitdistill_cpu_benchmark.sh").read_text(encoding="utf-8")
     current_i2sr = (root / "slurm_bitdistill_i2sr_export.sh").read_text(encoding="utf-8")
+    current_postprocess = (root / "slurm_bitdistill_postprocess.sh").read_text(encoding="utf-8")
     cpu_helper = root / "benchmarks/benchmark_bitdistill_glue_cpu.py"
     cpu_gate = root / "benchmarks/gate_bitdistill_cpu_benchmark.py"
     i2sr_helper = root / "benchmarks/export_bitdistill_i2sr_suite.py"
     i2sr_converter = root / "benchmarks/convert_static_ternary_to_i2s_gguf.py"
+    task_formulation_audit = root / "benchmarks/audit_bitdistill_task_formulation.py"
     cpu_job = sorted(cpu_jobs, key=lambda row: int(row["job_id"]))[-1] if cpu_jobs else {}
     i2sr_job = sorted(i2sr_jobs, key=lambda row: int(row["job_id"]))[-1] if i2sr_jobs else {}
+    strict_post_job = sorted(strict_post, key=lambda row: int(row["job_id"]))[-1] if strict_post else {}
+    any_post_job = sorted(any_post, key=lambda row: int(row["job_id"]))[-1] if any_post else {}
     cpu_script = stored_script(str(cpu_job.get("job_id", ""))) if cpu_job else ""
     i2sr_script = stored_script(str(i2sr_job.get("job_id", ""))) if i2sr_job else ""
+    strict_post_script = stored_script(str(strict_post_job.get("job_id", ""))) if strict_post_job else ""
+    any_post_script = stored_script(str(any_post_job.get("job_id", ""))) if any_post_job else ""
     cpu_info = scontrol_job(str(cpu_job.get("job_id", ""))) if cpu_job else {}
     i2sr_info = scontrol_job(str(i2sr_job.get("job_id", ""))) if i2sr_job else {}
-    strict_info = scontrol_job(str(strict_post[-1]["job_id"])) if strict_post else {}
-    any_info = scontrol_job(str(any_post[-1]["job_id"])) if any_post else {}
+    strict_info = scontrol_job(str(strict_post_job.get("job_id", ""))) if strict_post_job else {}
+    any_info = scontrol_job(str(any_post_job.get("job_id", ""))) if any_post_job else {}
 
     cpu_parser_ok, cpu_parser_evidence = parse_cpu_families()
-    helpers_compile, helpers_compile_evidence = py_compile_ok(root, [cpu_helper, cpu_gate, i2sr_helper, i2sr_converter])
+    helpers_compile, helpers_compile_evidence = py_compile_ok(root, [cpu_helper, cpu_gate, i2sr_helper, i2sr_converter, task_formulation_audit])
     stale_cpu_jobs = [row for row in squeue_rows if row.get("job_id") in {"9967", "9997"}]
     checks: list[dict[str, Any]] = []
     add_check(checks, "exactly one active CPU producer", len(cpu_jobs) == 1, f"jobs={cpu_jobs}", "expected one current CPU producer job")
@@ -217,6 +223,27 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
         f"cpu={cpu_job.get('job_id')}, strict={strict_info.get('dependency_job_ids', [])[-5:]}, afterany={any_info.get('dependency_job_ids', [])[-5:]}",
         "postprocess jobs do not wait on the current CPU producer",
     )
+    add_check(
+        checks,
+        "current postprocess script includes task-formulation audit",
+        "benchmarks/audit_bitdistill_task_formulation.py" in current_postprocess,
+        "slurm_bitdistill_postprocess.sh",
+        "postprocess would omit the task-formulation claim-control report",
+    )
+    add_check(
+        checks,
+        "latest strict postprocess stored script matches current script",
+        bool(strict_post_script) and sha256_text(strict_post_script) == sha256_text(current_postprocess),
+        f"job={strict_post_job.get('job_id')}, stored={sha256_text(strict_post_script)[:12] if strict_post_script else '-'}, current={sha256_text(current_postprocess)[:12]}",
+        "latest strict postprocess job was submitted from a stale Slurm script",
+    )
+    add_check(
+        checks,
+        "latest afterany postprocess stored script matches current script",
+        bool(any_post_script) and sha256_text(any_post_script) == sha256_text(current_postprocess),
+        f"job={any_post_job.get('job_id')}, stored={sha256_text(any_post_script)[:12] if any_post_script else '-'}, current={sha256_text(current_postprocess)[:12]}",
+        "latest afterany postprocess job was submitted from a stale Slurm script",
+    )
 
     return {
         "schema": "bitdistill-producer-script-audit-v1",
@@ -232,9 +259,10 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
             str(cpu_gate.relative_to(root)): sha256_file(cpu_gate),
             str(i2sr_helper.relative_to(root)): sha256_file(i2sr_helper),
             str(i2sr_converter.relative_to(root)): sha256_file(i2sr_converter),
+            str(task_formulation_audit.relative_to(root)): sha256_file(task_formulation_audit),
         },
-        "strict_postprocess_job": strict_post[-1] if strict_post else {},
-        "afterany_postprocess_job": any_post[-1] if any_post else {},
+        "strict_postprocess_job": strict_post_job,
+        "afterany_postprocess_job": any_post_job,
     }
 
 

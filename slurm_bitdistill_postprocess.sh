@@ -46,6 +46,10 @@ python benchmarks/audit_bitdistill_paired_predictions.py \
   --output-json "benchmark_results/bitdistill_paired_predictions_${DATE}.json" \
   --output-md "benchmarks/results/bitdistill_paired_predictions_${DATE}.md"
 
+python benchmarks/audit_bitdistill_task_formulation.py \
+  --output-json "benchmark_results/bitdistill_task_formulation_audit_${DATE}.json" \
+  --output-md "benchmarks/results/bitdistill_task_formulation_audit_${DATE}.md"
+
 python benchmarks/audit_bitdistill_paper_alignment.py \
   --output-json "benchmark_results/bitdistill_paper_alignment_${DATE}.json" \
   --output-md "benchmarks/results/bitdistill_paper_alignment_${DATE}.md"
