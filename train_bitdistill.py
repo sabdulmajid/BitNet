@@ -40,6 +40,7 @@ from train_distill import (
     BitLinear,
     build_ternary_state_dict,
     dtype_from_name,
+    mark_untied_output_if_needed,
     replace_linear_layers,
 )
 
@@ -303,7 +304,7 @@ def add_subln_to_qwen_blocks(model: nn.Module, *, eps: float) -> int:
     return inserted
 
 
-def prepare_bitnet_student(model: nn.Module, args: argparse.Namespace) -> dict[str, int]:
+def prepare_bitnet_student(model: nn.Module, args: argparse.Namespace) -> dict[str, Any]:
     subln_inserted = 0
     if args.use_subln:
         subln_inserted = add_subln_to_qwen_blocks(model, eps=args.subln_eps)
@@ -316,7 +317,12 @@ def prepare_bitnet_student(model: nn.Module, args: argparse.Namespace) -> dict[s
     )
     if replaced == 0:
         raise RuntimeError("no nn.Linear modules were replaced with BitLinear")
-    return {"subln_inserted": subln_inserted, "bitlinear_replaced": replaced}
+    untied_output_embeddings = mark_untied_output_if_needed(model)
+    return {
+        "subln_inserted": subln_inserted,
+        "bitlinear_replaced": replaced,
+        "untied_output_embeddings": untied_output_embeddings,
+    }
 
 
 def find_qwen_layers(model: nn.Module) -> list[tuple[str, nn.Module]]:
@@ -385,6 +391,7 @@ def attention_relation_distillation_loss(
     *,
     split_heads: int,
     temperature: float,
+    qkv_reduction: str,
 ) -> torch.Tensor:
     losses: list[torch.Tensor] = []
     for key in ("q", "k", "v"):
@@ -393,7 +400,12 @@ def attention_relation_distillation_loss(
         student_rows = relation_rows(student_qkv[key], attention_mask, split_heads=split_heads, temperature=temperature)
         teacher_rows = relation_rows(teacher_qkv[key], attention_mask, split_heads=split_heads, temperature=temperature)
         losses.append(F.kl_div(torch.log(student_rows), teacher_rows, reduction="batchmean", log_target=False))
-    return torch.stack(losses).mean()
+    stacked = torch.stack(losses)
+    if qkv_reduction == "sum":
+        return stacked.sum()
+    if qkv_reduction == "mean":
+        return stacked.mean()
+    raise ValueError(f"unsupported qkv_reduction={qkv_reduction}")
 
 
 def logits_kd_loss(
@@ -1277,6 +1289,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                         batch["attention_mask"],
                         split_heads=args.attention_split_heads,
                         temperature=args.attention_temperature,
+                        qkv_reduction=args.attention_qkv_reduction,
                     )
                 else:
                     attention_kd = student_outputs.logits.new_zeros(())
@@ -1365,6 +1378,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
             "logit_temperature": args.logit_temperature,
             "logit_kd_temperature_scale": args.logit_kd_temperature_scale,
             "attention_temperature": args.attention_temperature,
+            "attention_qkv_reduction": args.attention_qkv_reduction,
         },
         "elapsed_seconds": time.time() - start,
     }
@@ -1423,6 +1437,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--attention-temperature", type=float, default=1.0)
     parser.add_argument("--attention-kd-weight", type=float, default=100.0)
     parser.add_argument("--attention-split-heads", type=int, default=8)
+    parser.add_argument("--attention-qkv-reduction", choices=["sum", "mean"], default="sum")
     parser.add_argument("--distill-layer", type=int, default=-1)
     parser.add_argument("--init-output-head-from-teacher", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--gradient-checkpointing", action=argparse.BooleanOptionalAction, default=True)

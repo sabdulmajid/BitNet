@@ -14,7 +14,7 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | Stage-1 SubLN | SubLN before attention output projection and FFN down projection | Implemented | matched | Implemented as RMSNorm wrappers around Qwen `o_proj` and `down_proj`. |
 | Stage-2 warm-up | 10B-token continued pretraining | active target 163840000 token presentations | partial | Current target is 0.016384 of the paper token budget. |
 | Stage-3 logits KD | temperature 5, lambda 10 | temperature 5, weight 10, no tau^2 scaling by default | matched | First completed wave used tau^2; current code and pending runs use paper-style scaling. |
-| Stage-3 attention KD | single-layer Q/K/V relation KD, gamma 1e5 for classification | single-layer L2-normalized Q/K/V relation KD implemented; completed runs gamma 100; long-warmup gamma 1e3/1e4/1e5, paper-gamma row/tensor, LR search, headinit, and MNLI layer-sweep branches pending | pending | The gamma sweep is intentional because local loss-scale probes show the paper gamma can dominate CE. |
+| Stage-3 attention KD | single-layer Q/K/V relation KD, gamma 1e5 for classification | single-layer L2-normalized Q/K/V relation KD implemented with paper-style Q/K/V sum by default; completed runs gamma 100; long-warmup gamma 1e3/1e4/1e5, paper-gamma row/tensor, LR search, headinit, and MNLI layer-sweep branches pending | pending | The gamma sweep is intentional because local loss-scale probes show the paper gamma can dominate CE; queued jobs use the corrected paper-style Q/K/V reduction through the default. |
 | Hyperparameter search | greedy search over learning rate and epochs | fixed 1000-step downstream schedule plus queued LR 1e-5/2e-5/5e-5 and output-head initialization diagnostics | pending | The local search is intentionally narrow; a strict paper reproduction still needs epoch/budget search if the queued LR candidates do not close the gap. |
 | Hardware/resources | 8x AMD MI300X training, CPU throughput with 16 threads | single-GPU Slurm jobs; Xeon CPU runtime for local inference | partial | Resource gap affects training budget and wall-clock, not the mathematical objective. |
 
@@ -25,9 +25,9 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | paper warm-up tokens | 10000000000 |
 | active target tokens | 163840000 |
 | active target / paper | 0.016384 |
-| active effective tokens | 113131520 |
-| active effective / paper | 0.011313 |
-| latest step | 13810 |
+| active effective tokens | 118046720 |
+| active effective / paper | 0.011805 |
+| latest step | 14410 |
 | max steps | 20000 |
 
 ## Current Accuracy Matrix
@@ -89,6 +89,7 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | paper_logit_temperature_scale_default | pass |
 | attention_relation_kd | pass |
 | attention_relation_l2_normalization | pass |
+| attention_qkv_sum_default | pass |
 | single_layer_selection | pass |
 | row_scale_mode | pass |
 | longwarmup_submitter | pass |

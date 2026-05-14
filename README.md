@@ -68,9 +68,11 @@ enough." That does not contradict the negative PTQ result in this fork.
 This fork now implements the key BitDistill components for Qwen-style models:
 SubLN insertion, Stage-2 continued pretraining, Stage-3 CE + logits KL +
 Q/K/V attention-relation distillation, attention-layer sweep support, and both
-paper-style tensor-scale and experimental row-scale ternary students.
+paper-style tensor-scale and experimental row-scale ternary students. New
+BitDistill jobs default to paper-style logits KL scaling and paper-style
+summation over Q/K/V relation losses.
 
-The implementation smoke gate currently passes `37/37` checks, including
+The implementation smoke gate currently passes `40/40` checks, including
 tensor-scale GGUF export and row-scale `I2_SR` GGUF export for a tiny
 causal-LM BitDistill checkpoint. Those export checks use a smoke-only synthetic
 tokenizer stub, so they prove tensor packing and metadata wiring, not text
@@ -104,7 +106,9 @@ accuracy point of FP16-SFT. They are also now labeled as a short-budget
 diagnostic rather than a fully paper-faithful reproduction, because the first
 completed wave used the common KD convention of multiplying logits KL by
 `temperature**2`; the BitDistill equations do not include that multiplier.
-The code now defaults new BitDistill runs to paper-style logits KL scaling.
+The completed wave also used a legacy Q/K/V mean for attention relation KD;
+the current code defaults new jobs to the paper-style Q/K/V sum and records
+that setting in each metrics file.
 
 The strongest remaining known gap is training budget:
 the completed Stage-2 warm-up used `40.96M` effective token presentations,

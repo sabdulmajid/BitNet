@@ -6,6 +6,8 @@ Monitor JSON: `benchmark_results/bitdistill_job_monitor_2026-05-14.json`.
 
 Warm-up state: `/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/custom_state_dict.pt`.
 
+train_bitdistill.py sha256: `5442c0d392a1`. Attention Q/K/V reduction default: `sum`.
+
 Observed rows: `38`. Expected rows: `38`. Configured rows: `38`.
 
 Job states: `{'PENDING': 38}`.
@@ -17,10 +19,11 @@ Rows with fields inferred from submitter defaults: `0`.
 | check | status | evidence | blocker |
 | --- | --- | --- | --- |
 | monitor json exists | pass | benchmark_results/bitdistill_job_monitor_2026-05-14.json |  |
+| train_bitdistill defaults to paper-style Q/K/V attention sum | pass | train_bitdistill.py sha256=5442c0d392a1 |  |
 | active row count matches design | pass | rows=38, expected=38 |  |
 | output directories are unique | pass | duplicates=[] |  |
 | all expected experiment rows are present and configured | pass | configured=38/38 |  |
-| warm-up progress is finite | pass | step=13810/20000 |  |
+| warm-up progress is finite | pass | step=14410/20000 |  |
 
 ## Expected Matrix
 

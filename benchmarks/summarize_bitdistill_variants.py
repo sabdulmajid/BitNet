@@ -94,6 +94,7 @@ def discover_rows(args: argparse.Namespace) -> list[dict[str, Any]]:
                         "logit_kd_weight": loss_weights.get("logit_kd_weight"),
                         "logit_kd_temperature_scale": loss_weights.get("logit_kd_temperature_scale"),
                         "attention_kd_weight": loss_weights.get("attention_kd_weight"),
+                        "attention_qkv_reduction": loss_weights.get("attention_qkv_reduction") or "legacy_mean",
                         "metrics_path": str(path),
                     }
                 )
@@ -122,6 +123,7 @@ def render_markdown(args: argparse.Namespace, rows: list[dict[str, Any]]) -> str
             fmt(row["weighted_logit_kd"]),
             row.get("logit_kd_temperature_scale") or "-",
             fmt(row["weighted_attention_kd"]),
+            row.get("attention_qkv_reduction") or "-",
             row["metrics_path"],
         ]
         for row in rows
@@ -153,6 +155,7 @@ def render_markdown(args: argparse.Namespace, rows: list[dict[str, Any]]) -> str
                     "last wLogitKD",
                     "logit temp scale",
                     "last wAttnKD",
+                    "attn QKV reduction",
                     "metrics path",
                 ],
                 metric_rows,

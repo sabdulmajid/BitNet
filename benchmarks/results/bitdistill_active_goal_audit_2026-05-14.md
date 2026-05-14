@@ -12,7 +12,7 @@ Complete rows: `1` / `5`.
 
 Pending rows: `3`.
 
-Warm-up progress: `13810` / `20000` (`0.690500`).
+Warm-up progress: `14410` / `20000` (`0.720500`).
 
 Runtime gates: row-scale complete=`False`, I2_SR=`False`, CPU=`False`.
 
@@ -20,8 +20,8 @@ Runtime gates: row-scale complete=`False`, I2_SR=`False`, CPU=`False`.
 
 | requirement | status | evidence | remaining gap |
 | --- | --- | --- | --- |
-| Reproduce BitDistill GLUE3 baseline on Qwen2.5-0.5B with FP16-SFT, BitNet-SFT, and BitDistill | pending | FP16 tasks=['mnli', 'qnli', 'sst2']; BitNet tasks=['mnli', 'qnli', 'sst2']; paper rows=0/3; matrix=38/38, inferred=0; warm-up=13810/20000 | Long-warmup BitDistill metrics are still pending; short-budget diagnostics are not a paper reproduction. |
-| Implement SubLN, Stage-2 CE, Stage-3 CE+logits KL+attention-relation KD, and layer selection | complete | smoke=True, smoke checks=37, failed features=[] |  |
+| Reproduce BitDistill GLUE3 baseline on Qwen2.5-0.5B with FP16-SFT, BitNet-SFT, and BitDistill | pending | FP16 tasks=['mnli', 'qnli', 'sst2']; BitNet tasks=['mnli', 'qnli', 'sst2']; paper rows=0/3; matrix=38/38, inferred=0; warm-up=14410/20000 | Long-warmup BitDistill metrics are still pending; short-budget diagnostics are not a paper reproduction. |
+| Implement SubLN, Stage-2 CE, Stage-3 CE+logits KL+attention-relation KD, and layer selection | complete | smoke=True, smoke checks=40, failed features=[] |  |
 | Compare paper-style per-tensor BitDistill against row-scale BitDistill | pending | row-scale gate complete=False, passed=False | Row-scale and tensor long-warmup metrics must finish before the novelty comparison is known. |
 | Export row-scale checkpoints through I2_SR and benchmark CPU speed, memory/RSS, and task quality on Xeon | pending | I2_SR gate=False (0/6 rows); CPU gate=False (0/33 critical rows) | Causal export/CPU benchmark jobs are dependency-blocked on unfinished BitDistill checkpoints. |
 | Define publishable scope: independent reproduction, open training implementation, row-scale I2_SR extension, boundary study, and MoE/Kimi limits | partial | product scope=research_mvp_only; supported=4; unsupported=5; paper gaps=['Backbone', 'Baselines', 'Stage-2 warm-up', 'Stage-3 attention KD', 'Hyperparameter search', 'Hardware/resources'] | Publishable claims must wait for the long-warmup BitDistill results; current support is implementation/provenance plus dense-Qwen I2_SR evidence. |

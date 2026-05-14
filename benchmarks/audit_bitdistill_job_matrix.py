@@ -9,6 +9,7 @@ families, scale modes, attention weights, teachers, and output roots are queued.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 from collections import Counter
@@ -25,6 +26,10 @@ def read_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def finite_number(value: Any) -> bool:
@@ -262,6 +267,12 @@ def add_check(checks: list[dict[str, Any]], name: str, passed: bool, evidence: s
 
 
 def build_summary(args: argparse.Namespace) -> dict[str, Any]:
+    train_source = Path("train_bitdistill.py")
+    train_text = train_source.read_text(encoding="utf-8", errors="replace") if train_source.exists() else ""
+    attention_qkv_sum_default = (
+        '--attention-qkv-reduction", choices=["sum", "mean"], default="sum"' in train_text
+        and 'if qkv_reduction == "sum":' in train_text
+    )
     monitor = read_json(args.monitor_json)
     downstream = monitor.get("downstream", []) if isinstance(monitor.get("downstream"), list) else []
     rows = [row for row in downstream if isinstance(row, dict)]
@@ -288,6 +299,13 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     ]
 
     add_check(checks, "monitor json exists", bool(monitor), str(args.monitor_json), "missing BitDistill monitor JSON")
+    add_check(
+        checks,
+        "train_bitdistill defaults to paper-style Q/K/V attention sum",
+        attention_qkv_sum_default,
+        f"train_bitdistill.py sha256={sha256_file(train_source)[:12] if train_source.exists() else '-'}",
+        "queued jobs rely on train_bitdistill.py defaults, but the Q/K/V reduction is not paper-style sum",
+    )
     add_check(checks, "active row count matches design", len(rows) == len(expected), f"rows={len(rows)}, expected={len(expected)}", "wrong active row count")
     add_check(checks, "output directories are unique", not duplicate_outputs, f"duplicates={duplicate_outputs}", "duplicate active output directories")
 
@@ -360,6 +378,8 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "model": model,
         "model_slug": model_slug,
         "warmup_state": warmup_state,
+        "train_bitdistill_sha256": sha256_file(train_source) if train_source.exists() else "",
+        "attention_qkv_sum_default": attention_qkv_sum_default,
         "warmup_job_ids": monitor.get("warmup_job_ids", []),
         "job_states": dict(active_job_states),
         "inferred_field_rows": inferred_field_rows,
@@ -415,6 +435,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
         f"Overall status: `{'pass' if summary['passed'] else 'fail'}`.",
         f"Monitor JSON: `{summary['monitor_json']}`.",
         f"Warm-up state: `{summary['warmup_state']}`.",
+        f"train_bitdistill.py sha256: `{summary.get('train_bitdistill_sha256', '')[:12]}`. Attention Q/K/V reduction default: `{'sum' if summary.get('attention_qkv_sum_default') else 'not-sum'}`.",
         f"Observed rows: `{summary['observed_rows']}`. Expected rows: `{summary['expected_rows']}`. Configured rows: `{summary['configured_rows']}`.",
         f"Job states: `{summary['job_states']}`.",
         f"Rows with fields inferred from submitter defaults: `{len(summary['inferred_field_rows'])}`.",

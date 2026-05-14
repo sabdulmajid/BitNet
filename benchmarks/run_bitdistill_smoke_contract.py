@@ -307,6 +307,14 @@ def main() -> None:
         "F.normalize before relation matmul",
         "attention relation KD is missing the MiniLM/BitDistill state normalization step",
     )
+    add_check(
+        checks,
+        "attention relation KD sums Q/K/V losses by default",
+        '--attention-qkv-reduction", choices=["sum", "mean"], default="sum"' in train_source
+        and 'if qkv_reduction == "sum":' in train_source,
+        "default attention_qkv_reduction=sum",
+        "attention relation KD default no longer matches the BitDistill Q/K/V summation",
+    )
     for name, run in runs.items():
         add_check(checks, f"{name} command exits zero", run["returncode"] == 0, f"returncode={run['returncode']}", "command failed")
 
@@ -388,6 +396,13 @@ def main() -> None:
     )
     add_check(checks, "task-sft logits KD is finite", finite(task_last.get("weighted_logit_kd")), f"weighted_logit_kd={task_last.get('weighted_logit_kd')}", "non-finite logits KD")
     add_check(checks, "task-sft attention KD is finite", finite(task_last.get("weighted_attention_kd")), f"weighted_attention_kd={task_last.get('weighted_attention_kd')}", "non-finite attention KD")
+    add_check(
+        checks,
+        "task-sft records paper-style Q/K/V reduction",
+        task.get("loss_weights", {}).get("attention_qkv_reduction") == "sum",
+        f"attention_qkv_reduction={task.get('loss_weights', {}).get('attention_qkv_reduction')}",
+        "task metrics do not record paper-style Q/K/V reduction",
+    )
     add_check(checks, "task-sft eval accuracy is finite", finite(task_eval.get("accuracy")), f"accuracy={task_eval.get('accuracy')}", "non-finite accuracy")
     add_check(
         checks,
@@ -421,6 +436,13 @@ def main() -> None:
     )
     add_check(checks, "row task-sft logits KD is finite", finite(row_task_last.get("weighted_logit_kd")), f"weighted_logit_kd={row_task_last.get('weighted_logit_kd')}", "non-finite logits KD")
     add_check(checks, "row task-sft attention KD is finite", finite(row_task_last.get("weighted_attention_kd")), f"weighted_attention_kd={row_task_last.get('weighted_attention_kd')}", "non-finite attention KD")
+    add_check(
+        checks,
+        "row task-sft records paper-style Q/K/V reduction",
+        row_task.get("loss_weights", {}).get("attention_qkv_reduction") == "sum",
+        f"attention_qkv_reduction={row_task.get('loss_weights', {}).get('attention_qkv_reduction')}",
+        "row task metrics do not record paper-style Q/K/V reduction",
+    )
     add_check(checks, "row task-sft eval accuracy is finite", finite(row_task_eval.get("accuracy")), f"accuracy={row_task_eval.get('accuracy')}", "non-finite accuracy")
     add_check(
         checks,

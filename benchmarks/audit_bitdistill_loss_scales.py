@@ -79,13 +79,21 @@ def summarize_path(label: str, path: Path) -> dict[str, Any]:
     logit_kd = float(last["logit_kd"]) if finite(last.get("logit_kd")) else None
     attention_kd = float(last["attention_kd"]) if finite(last.get("attention_kd")) else None
     actual_attention_weight = float(weights["attention_kd_weight"]) if finite(weights.get("attention_kd_weight")) else None
+    qkv_reduction = str(weights.get("attention_qkv_reduction") or "legacy_mean")
+    paper_equivalent_attention_kd = (
+        attention_kd * 3.0
+        if attention_kd is not None and qkv_reduction in {"legacy_mean", "mean"}
+        else attention_kd
+    )
     actual_weighted_attention = (
         float(last["weighted_attention_kd"])
         if finite(last.get("weighted_attention_kd"))
         else (actual_attention_weight * attention_kd if actual_attention_weight is not None and attention_kd is not None else None)
     )
     projected_paper_weighted_attention = (
-        PAPER_CLASSIFICATION_ATTENTION_GAMMA * attention_kd if attention_kd is not None else None
+        PAPER_CLASSIFICATION_ATTENTION_GAMMA * paper_equivalent_attention_kd
+        if paper_equivalent_attention_kd is not None
+        else None
     )
     actual_attention_to_ce = (
         actual_weighted_attention / ce if actual_weighted_attention is not None and ce not in (None, 0.0) else None
@@ -106,6 +114,8 @@ def summarize_path(label: str, path: Path) -> dict[str, Any]:
         "ce": ce,
         "logit_kd": logit_kd,
         "attention_kd": attention_kd,
+        "attention_qkv_reduction": qkv_reduction,
+        "paper_equivalent_attention_kd": paper_equivalent_attention_kd,
         "actual_attention_weight": actual_attention_weight,
         "actual_weighted_attention": actual_weighted_attention,
         "projected_paper_attention_weight": PAPER_CLASSIFICATION_ATTENTION_GAMMA,
@@ -137,8 +147,10 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "projected_paper_attention_to_ce_max": max(projected_ratios) if projected_ratios else None,
         "interpretation": (
             "gamma=1e5 is finite in the local smoke test, but it can dominate CE by orders of magnitude "
-            "under this implementation's relation-loss normalization. Treat paper-gamma jobs as strict "
-            "paper-hyperparameter stress tests and compare them to gamma=100 diagnostics."
+            "under this implementation's relation-loss normalization. Legacy rows used a Q/K/V mean; "
+            "the projected paper-gamma column converts those rows to the paper-style Q/K/V sum before "
+            "estimating scale. Treat paper-gamma jobs as strict paper-hyperparameter stress tests and "
+            "compare them to gamma=100 diagnostics."
         ),
     }
 
@@ -153,6 +165,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
             fmt(row.get("distill_layer")),
             fmt(row["ce"]),
             fmt(row["attention_kd"]),
+            fmt(row["attention_qkv_reduction"]),
+            fmt(row["paper_equivalent_attention_kd"]),
             fmt(row["actual_attention_weight"]),
             fmt(row["actual_weighted_attention"]),
             fmt(row["actual_attention_to_ce"]),
@@ -179,6 +193,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
                     "layer",
                     "CE",
                     "attention KD",
+                    "QKV reduction",
+                    "paper-equiv attention KD",
                     "actual gamma",
                     "actual weighted AD",
                     "actual AD/CE",
