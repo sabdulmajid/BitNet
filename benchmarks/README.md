@@ -322,6 +322,16 @@ This report separates implemented mechanisms from unmatched or pending paper
 assumptions such as the 10B-token warm-up, `gamma=1e5`, Qwen3 scale ladder, and
 learning-rate/epoch search.
 
+To inspect whether the paper's classification attention-KD coefficient is on
+the same numerical scale as this implementation's relation loss:
+
+```bash
+python benchmarks/audit_bitdistill_loss_scales.py
+```
+
+The report projects saved gamma-100 runs to `gamma=1e5` and includes the local
+strict-gamma smoke result when present.
+
 To measure PyTorch CPU task runtime for saved GLUE sequence-classification
 checkpoints:
 

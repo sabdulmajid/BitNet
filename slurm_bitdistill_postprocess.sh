@@ -28,6 +28,10 @@ python benchmarks/audit_bitdistill_paper_alignment.py \
   --output-json "benchmark_results/bitdistill_paper_alignment_${DATE}.json" \
   --output-md "benchmarks/results/bitdistill_paper_alignment_${DATE}.md"
 
+python benchmarks/audit_bitdistill_loss_scales.py \
+  --output-json "benchmark_results/bitdistill_loss_scale_audit_${DATE}.json" \
+  --output-md "benchmarks/results/bitdistill_loss_scale_audit_${DATE}.md"
+
 python benchmarks/summarize_bitdistill_variants.py \
   --roots \
     checkpoints/bitdistill-glue-seqcls \
