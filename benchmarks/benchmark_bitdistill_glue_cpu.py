@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import platform
 import resource
 import statistics
 import subprocess
@@ -81,6 +82,61 @@ def percentile(values: list[float], pct: float) -> float | None:
     ordered = sorted(values)
     index = min(max(int(round((pct / 100.0) * (len(ordered) - 1))), 0), len(ordered) - 1)
     return ordered[index]
+
+
+def cpu_environment(threads: int) -> dict[str, Any]:
+    cpuinfo = Path("/proc/cpuinfo")
+    processors = 0
+    model_names: dict[str, int] = {}
+    flags: set[str] = set()
+    physical_cores: set[tuple[str, str]] = set()
+    current_physical_id = ""
+    current_core_id = ""
+
+    if cpuinfo.exists():
+        for line in cpuinfo.read_text(encoding="utf-8", errors="replace").splitlines():
+            if not line.strip():
+                if current_physical_id or current_core_id:
+                    physical_cores.add((current_physical_id, current_core_id))
+                current_physical_id = ""
+                current_core_id = ""
+                continue
+            if ":" not in line:
+                continue
+            key, value = (part.strip() for part in line.split(":", 1))
+            if key == "processor":
+                processors += 1
+            elif key == "model name":
+                model_names[value] = model_names.get(value, 0) + 1
+            elif key == "flags":
+                flags.update(value.split())
+            elif key == "physical id":
+                current_physical_id = value
+            elif key == "core id":
+                current_core_id = value
+        if current_physical_id or current_core_id:
+            physical_cores.add((current_physical_id, current_core_id))
+
+    model_name = max(model_names, key=model_names.get) if model_names else ""
+    relevant_flags = [
+        "avx512f",
+        "avx512dq",
+        "avx512bw",
+        "avx512vl",
+        "avx2",
+        "fma",
+        "bmi2",
+    ]
+    return {
+        "platform": platform.platform(),
+        "python": platform.python_version(),
+        "cpu_model": model_name,
+        "logical_cpus_os": os.cpu_count(),
+        "logical_cpus_cpuinfo": processors or None,
+        "physical_cores_cpuinfo": len(physical_cores) if physical_cores else None,
+        "requested_threads": threads,
+        "isa_flags": {flag: flag in flags for flag in relevant_flags},
+    }
 
 
 def checkpoint_dir_for(args: argparse.Namespace, task: str, family: str, run: str) -> Path:
@@ -335,6 +391,7 @@ def run_parent(args: argparse.Namespace) -> dict[str, Any]:
         "batch_size": args.batch_size,
         "model_dtype": args.model_dtype,
         "child_timeout_seconds": args.child_timeout_seconds,
+        "hardware": cpu_environment(args.threads),
         "note": "PyTorch CPU sequence-classification runtime; not packed I2_SR/llama.cpp inference.",
         "rows": rows,
     }
@@ -370,6 +427,18 @@ def md_table(headers: list[str], rows: list[list[str]]) -> str:
 
 
 def render_markdown(summary: dict[str, Any]) -> str:
+    hardware = summary.get("hardware", {}) if isinstance(summary.get("hardware"), dict) else {}
+    isa = hardware.get("isa_flags", {}) if isinstance(hardware.get("isa_flags"), dict) else {}
+    hardware_rows = [
+        ["CPU model", str(hardware.get("cpu_model") or "-")],
+        ["OS logical CPUs", fmt(hardware.get("logical_cpus_os"))],
+        ["cpuinfo logical CPUs", fmt(hardware.get("logical_cpus_cpuinfo"))],
+        ["cpuinfo physical cores", fmt(hardware.get("physical_cores_cpuinfo"))],
+        ["requested threads", fmt(hardware.get("requested_threads"))],
+        ["ISA flags", ", ".join(f"{key}={fmt(value)}" for key, value in sorted(isa.items())) or "-"],
+        ["platform", str(hardware.get("platform") or "-")],
+        ["python", str(hardware.get("python") or "-")],
+    ]
     table_rows = [
         [
             row.get("task", "-"),
@@ -395,6 +464,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
             f"Model: `{summary['model']}`.",
             f"Threads: `{summary['threads']}`. Batch size: `{summary['batch_size']}`. Max eval samples: `{summary['max_eval_samples']}`. Dtype: `{summary['model_dtype']}`. Child timeout: `{summary['child_timeout_seconds']}` seconds.",
             "This is PyTorch CPU sequence-classification runtime, not packed `I2_SR`/llama.cpp inference. The `accuracy` column is measured on the sampled CPU subset when `max_eval_samples > 0`; full task quality is the stored full validation metric.",
+            "## Hardware",
+            md_table(["field", "value"], hardware_rows),
             "## Runs",
             md_table(
                 [

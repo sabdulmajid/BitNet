@@ -164,6 +164,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "rows": rows,
         "blockers": blockers,
         "benchmark_note": data.get("note"),
+        "hardware": data.get("hardware") if isinstance(data.get("hardware"), dict) else {},
         "threads": data.get("threads"),
         "batch_size": data.get("batch_size"),
         "max_eval_samples": data.get("max_eval_samples"),
@@ -189,6 +190,18 @@ def md_table(headers: list[str], rows: list[list[str]]) -> str:
 
 
 def render_markdown(summary: dict[str, Any]) -> str:
+    hardware = summary.get("hardware", {}) if isinstance(summary.get("hardware"), dict) else {}
+    isa = hardware.get("isa_flags", {}) if isinstance(hardware.get("isa_flags"), dict) else {}
+    hardware_rows = [
+        ["CPU model", str(hardware.get("cpu_model") or "-")],
+        ["OS logical CPUs", fmt(hardware.get("logical_cpus_os"))],
+        ["cpuinfo logical CPUs", fmt(hardware.get("logical_cpus_cpuinfo"))],
+        ["cpuinfo physical cores", fmt(hardware.get("physical_cores_cpuinfo"))],
+        ["requested threads", fmt(hardware.get("requested_threads"))],
+        ["ISA flags", ", ".join(f"{key}={fmt(value)}" for key, value in sorted(isa.items())) or "-"],
+        ["platform", str(hardware.get("platform") or "-")],
+        ["python", str(hardware.get("python") or "-")],
+    ]
     critical_rows = [
         [
             row.get("task", "-"),
@@ -221,6 +234,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
         ),
         f"Full-quality contract: `{summary.get('expected_eval_examples')}` examples from each checkpoint's stored full validation metric.",
         "This gate validates PyTorch CPU sampled task-runtime rows and stored full task-quality metrics; it is not a packed llama.cpp/I2_SR runtime gate.",
+        "## Hardware",
+        md_table(["field", "value"], hardware_rows),
         "## Critical Rows",
         md_table(
             [

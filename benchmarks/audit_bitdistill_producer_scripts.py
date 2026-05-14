@@ -48,6 +48,10 @@ def sha256_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+def sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def collect_squeue(user: str) -> list[dict[str, str]]:
     proc = run(["squeue", "-h", "-u", user, "-o", "%i\t%j\t%T\t%R"])
     rows: list[dict[str, str]] = []
@@ -117,6 +121,12 @@ def parse_cpu_families() -> tuple[bool, str]:
     return parsed_families == CPU_FAMILIES, ",".join(parsed_families)
 
 
+def py_compile_ok(root: Path, paths: list[Path]) -> tuple[bool, str]:
+    proc = run(["python", "-m", "py_compile", *(str(path) for path in paths)])
+    evidence = proc.stderr.strip() or proc.stdout.strip() or ",".join(str(path.relative_to(root)) for path in paths)
+    return proc.returncode == 0, evidence
+
+
 def build_audit(args: argparse.Namespace) -> dict[str, Any]:
     root = args.repo_root.resolve()
     monitor_path = args.monitor_json if args.monitor_json.is_absolute() else root / args.monitor_json
@@ -131,6 +141,10 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
 
     current_cpu = (root / "slurm_bitdistill_cpu_benchmark.sh").read_text(encoding="utf-8")
     current_i2sr = (root / "slurm_bitdistill_i2sr_export.sh").read_text(encoding="utf-8")
+    cpu_helper = root / "benchmarks/benchmark_bitdistill_glue_cpu.py"
+    cpu_gate = root / "benchmarks/gate_bitdistill_cpu_benchmark.py"
+    i2sr_helper = root / "benchmarks/export_bitdistill_i2sr_suite.py"
+    i2sr_converter = root / "benchmarks/convert_static_ternary_to_i2s_gguf.py"
     cpu_job = sorted(cpu_jobs, key=lambda row: int(row["job_id"]))[-1] if cpu_jobs else {}
     i2sr_job = sorted(i2sr_jobs, key=lambda row: int(row["job_id"]))[-1] if i2sr_jobs else {}
     cpu_script = stored_script(str(cpu_job.get("job_id", ""))) if cpu_job else ""
@@ -141,6 +155,7 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
     any_info = scontrol_job(str(any_post[-1]["job_id"])) if any_post else {}
 
     cpu_parser_ok, cpu_parser_evidence = parse_cpu_families()
+    helpers_compile, helpers_compile_evidence = py_compile_ok(root, [cpu_helper, cpu_gate, i2sr_helper, i2sr_converter])
     stale_cpu_jobs = [row for row in squeue_rows if row.get("job_id") in {"9967", "9997"}]
     checks: list[dict[str, Any]] = []
     add_check(checks, "exactly one active CPU producer", len(cpu_jobs) == 1, f"jobs={cpu_jobs}", "expected one current CPU producer job")
@@ -165,6 +180,13 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
         cpu_parser_evidence,
         "benchmark_bitdistill_glue_cpu.py rejects a run family requested by slurm_bitdistill_cpu_benchmark.sh",
     )
+    add_check(
+        checks,
+        "CPU producer script invokes the audited Python benchmark",
+        "benchmarks/benchmark_bitdistill_glue_cpu.py" in current_cpu,
+        f"helper={cpu_helper.relative_to(root)}, sha256={sha256_file(cpu_helper)[:12]}",
+        "CPU Slurm producer does not invoke the audited Python benchmark helper",
+    )
     add_check(checks, "stale CPU jobs are not active", not stale_cpu_jobs, f"stale={stale_cpu_jobs}", "old CPU jobs remain active")
     add_check(checks, "exactly one active I2_SR producer", len(i2sr_jobs) == 1, f"jobs={i2sr_jobs}", "expected one I2_SR producer")
     add_check(
@@ -173,6 +195,20 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
         bool(i2sr_script) and sha256_text(i2sr_script) == sha256_text(current_i2sr),
         f"job={i2sr_job.get('job_id')}, stored={sha256_text(i2sr_script)[:12] if i2sr_script else '-'}, current={sha256_text(current_i2sr)[:12]}",
         "queued I2_SR producer was submitted from a stale Slurm script",
+    )
+    add_check(
+        checks,
+        "I2_SR producer script invokes the audited export helper",
+        "benchmarks/export_bitdistill_i2sr_suite.py" in current_i2sr,
+        f"helper={i2sr_helper.relative_to(root)}, sha256={sha256_file(i2sr_helper)[:12]}",
+        "I2_SR Slurm producer does not invoke the audited export helper",
+    )
+    add_check(
+        checks,
+        "producer Python helpers compile",
+        helpers_compile,
+        helpers_compile_evidence,
+        "At least one producer Python helper has a compile error",
     )
     add_check(
         checks,
@@ -191,6 +227,12 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
         "downstream_job_ids": downstream_ids,
         "cpu_job": cpu_job,
         "i2sr_job": i2sr_job,
+        "producer_helper_hashes": {
+            str(cpu_helper.relative_to(root)): sha256_file(cpu_helper),
+            str(cpu_gate.relative_to(root)): sha256_file(cpu_gate),
+            str(i2sr_helper.relative_to(root)): sha256_file(i2sr_helper),
+            str(i2sr_converter.relative_to(root)): sha256_file(i2sr_converter),
+        },
         "strict_postprocess_job": strict_post[-1] if strict_post else {},
         "afterany_postprocess_job": any_post[-1] if any_post else {},
     }
@@ -214,6 +256,7 @@ def render_markdown(result: dict[str, Any]) -> str:
             f"CPU producer: `{result.get('cpu_job', {}).get('job_id', '-')}`.",
             f"I2_SR producer: `{result.get('i2sr_job', {}).get('job_id', '-')}`.",
             f"Downstream rows: `{len(result.get('downstream_job_ids', []))}`.",
+            f"Producer helper hashes: `{ {key: value[:12] for key, value in result.get('producer_helper_hashes', {}).items()} }`.",
             "## Checks",
             md_table(["check", "status", "evidence", "blocker"], rows),
         ]

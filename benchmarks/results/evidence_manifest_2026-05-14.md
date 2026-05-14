@@ -26,7 +26,7 @@ Artifacts: `155`. Missing: `0`.
 | bitdistill_afterany_postprocess_dependency_report | tracked_report | yes | 2020 | c8aebb0c70b1 |  |
 | bitdistill_warmup_health_report | tracked_report | yes | 1322 | f419c8e2a972 |  |
 | bitdistill_warmup_finalizer_submission_report | tracked_report | yes | 404 | 60244b86b074 |  |
-| bitdistill_producer_script_audit_report | tracked_report | yes | 1338 | c7453e2a7cd9 |  |
+| bitdistill_producer_script_audit_report | tracked_report | yes | 2139 | f4170620d721 |  |
 | bitdistill_job_matrix_report | tracked_report | yes | 5942 | 01859bcdcc7a |  |
 | bitdistill_active_goal_report | tracked_report | yes | 3201 | 46ce7677be0a |  |
 | bitdistill_smoke_contract_report | tracked_report | yes | 3670 | 3757863cdec3 |  |
@@ -139,7 +139,7 @@ Artifacts: `155`. Missing: `0`.
 | bitdistill_afterany_postprocess_dependency_json | bitdistill_postprocess_dependency_json | yes | 4720 | 28f96b282eed | passed=True, checks=4, failed=0, expected=41, warmup=1, downstream=38, extra=2, missing=0, postprocess=10010 |
 | bitdistill_warmup_health_json | bitdistill_warmup_health_json | yes | 3941 | b4fd35ba8d60 | passed=True, checks=8, failed=0, warnings=1, warmup=13820/20000, progress=0.691, ce=4.21026, sec_step=1.8203, snapshots=0 |
 | bitdistill_warmup_finalizer_submission_json | bitdistill_warmup_finalizer_submission_json | yes | 661 | a9cf3b295a54 | submitted=True, job=10001, dep=afterany, warmup=1 |
-| bitdistill_producer_script_audit_json | bitdistill_producer_script_audit_json | yes | 3012 | b9a5f1d94beb | passed=True, checks=8, failed=0, downstream=38, cpu=10006, i2sr=9949, post=10009/10010 |
+| bitdistill_producer_script_audit_json | bitdistill_producer_script_audit_json | yes | 4273 | 02675c1b7717 | passed=True, checks=11, failed=0, downstream=38, cpu=10006, i2sr=9949, post=10009/10010 |
 | bitdistill_job_matrix_json | bitdistill_job_matrix_json | yes | 42598 | 35455b9777e2 | passed=True, configured=38/38, observed=38, states={'PENDING': 38}, inferred_rows=0, blockers=0 |
 | bitdistill_active_goal_json | bitdistill_active_goal_json | yes | 4788 | 4c55bd10de0c | achieved=False, status=partial, complete=1/5, pending=3, warmup=13810/20000, row_complete=False, i2sr=False, cpu=False |
 | bitdistill_smoke_contract_json | bitdistill_smoke_contract_json | yes | 36210 | 310f744a0114 | passed=True, checks=37, failed=0, continued=bitlinear15/subln4, task=bitlinear15/subln4 |

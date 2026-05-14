@@ -223,8 +223,8 @@
       "label": "bitdistill_producer_script_audit_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_producer_script_audit_2026-05-14.md",
-      "sha256": "c7453e2a7cd9af01f38c3fd798ca6ad2e6449b3dae4fdb41dc72cd968f56d356",
-      "size_bytes": 1338
+      "sha256": "f4170620d721a255fb8a9c1f1404c65683871dcfe20eecdc3363696e413f75b7",
+      "size_bytes": 2139
     },
     {
       "exists": true,
@@ -2273,7 +2273,7 @@
       "label": "bitdistill_producer_script_audit_json",
       "metrics": {
         "afterany_postprocess_job": "10010",
-        "checks": 8,
+        "checks": 11,
         "cpu_job": "10006",
         "downstream_jobs": 38,
         "failed": 0,
@@ -2282,8 +2282,8 @@
         "strict_postprocess_job": "10009"
       },
       "path": "benchmark_results/bitdistill_producer_script_audit_2026-05-14.json",
-      "sha256": "b9a5f1d94bebc6a8c059fcc614f78a156347212305652784cb17e3d0f3cfe638",
-      "size_bytes": 3012
+      "sha256": "02675c1b77173c6b837d261953345b68d493380659ef5e14ce0b22828f06356d",
+      "size_bytes": 4273
     },
     {
       "exists": true,
