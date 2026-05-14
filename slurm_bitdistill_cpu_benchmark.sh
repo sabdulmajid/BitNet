@@ -20,9 +20,10 @@ export HF_HOME="${HF_HOME:-$PWD/.hf_cache}"
 export HF_DATASETS_CACHE="${HF_DATASETS_CACHE:-$HF_HOME/datasets}"
 
 DATE="$(date -u +%F)"
-MAX_EVAL_SAMPLES="${MAX_EVAL_SAMPLES:-512}"
+MAX_EVAL_SAMPLES="${MAX_EVAL_SAMPLES:-64}"
 BATCH_SIZE="${BATCH_SIZE:-8}"
 MODEL_DTYPE="${MODEL_DTYPE:-fp32}"
+CHILD_TIMEOUT_SECONDS="${CHILD_TIMEOUT_SECONDS:-900}"
 
 python benchmarks/benchmark_bitdistill_glue_cpu.py \
   --tasks mnli qnli sst2 \
@@ -39,5 +40,6 @@ python benchmarks/benchmark_bitdistill_glue_cpu.py \
   --batch-size "$BATCH_SIZE" \
   --max-eval-samples "$MAX_EVAL_SAMPLES" \
   --model-dtype "$MODEL_DTYPE" \
+  --child-timeout-seconds "$CHILD_TIMEOUT_SECONDS" \
   --output-json "benchmark_results/bitdistill_glue_cpu_${DATE}.json" \
   --output-md "benchmarks/results/bitdistill_glue_cpu_${DATE}.md"

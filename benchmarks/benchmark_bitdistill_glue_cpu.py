@@ -268,7 +268,29 @@ def run_parent(args: argparse.Namespace) -> dict[str, Any]:
             command = child_command(args, task, family, run, output)
             env = os.environ.copy()
             env.setdefault("TOKENIZERS_PARALLELISM", "false")
-            completed = subprocess.run(command, cwd=Path.cwd(), env=env, capture_output=True, text=True)
+            try:
+                completed = subprocess.run(
+                    command,
+                    cwd=Path.cwd(),
+                    env=env,
+                    capture_output=True,
+                    text=True,
+                    timeout=args.child_timeout_seconds if args.child_timeout_seconds > 0 else None,
+                )
+            except subprocess.TimeoutExpired as exc:
+                rows.append(
+                    {
+                        "task": task,
+                        "run": run,
+                        "family": family,
+                        "checkpoint_dir": str(checkpoint_dir),
+                        "status": "timeout",
+                        "timeout_seconds": args.child_timeout_seconds,
+                        "stderr_tail": (exc.stderr or "")[-4000:] if isinstance(exc.stderr, str) else "",
+                        "stdout_tail": (exc.stdout or "")[-1000:] if isinstance(exc.stdout, str) else "",
+                    }
+                )
+                continue
             if completed.returncode != 0:
                 rows.append(
                     {
@@ -298,6 +320,7 @@ def run_parent(args: argparse.Namespace) -> dict[str, Any]:
         "threads": args.threads,
         "batch_size": args.batch_size,
         "model_dtype": args.model_dtype,
+        "child_timeout_seconds": args.child_timeout_seconds,
         "note": "PyTorch CPU sequence-classification runtime; not packed I2_SR/llama.cpp inference.",
         "rows": rows,
     }
@@ -355,7 +378,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
         [
             f"# BitDistill GLUE CPU Benchmark, {summary['date']}",
             f"Model: `{summary['model']}`.",
-            f"Threads: `{summary['threads']}`. Batch size: `{summary['batch_size']}`. Max eval samples: `{summary['max_eval_samples']}`. Dtype: `{summary['model_dtype']}`.",
+            f"Threads: `{summary['threads']}`. Batch size: `{summary['batch_size']}`. Max eval samples: `{summary['max_eval_samples']}`. Dtype: `{summary['model_dtype']}`. Child timeout: `{summary['child_timeout_seconds']}` seconds.",
             "This is PyTorch CPU sequence-classification runtime, not packed `I2_SR`/llama.cpp inference.",
             "## Runs",
             md_table(
@@ -400,6 +423,7 @@ def main() -> None:
     parser.add_argument("--warmup-batches", type=int, default=1)
     parser.add_argument("--pad-to-multiple-of", type=int, default=8)
     parser.add_argument("--model-dtype", choices=["fp32", "bf16"], default="fp32")
+    parser.add_argument("--child-timeout-seconds", type=int, default=0)
     parser.add_argument("--tmp-dir", type=Path, default=Path("benchmark_results/bitdistill_glue_cpu_tmp"))
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_glue_cpu_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/bitdistill_glue_cpu_{DATE}.md"))
