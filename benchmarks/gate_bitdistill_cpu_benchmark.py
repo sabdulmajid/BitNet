@@ -17,6 +17,11 @@ from typing import Any
 
 DATE = datetime.now(timezone.utc).date().isoformat()
 TASKS = ["mnli", "qnli", "sst2"]
+EXPECTED_EVAL_EXAMPLES = {
+    "mnli": 9815,
+    "qnli": 5463,
+    "sst2": 872,
+}
 CRITICAL_RUNS = [
     ("short", "fp16_sft-tensor-layer-1"),
     ("short", "bitnet_sft-tensor-layer-1"),
@@ -47,15 +52,20 @@ def row_key(row: dict[str, Any]) -> tuple[str, str, str]:
     return str(row.get("task", "")), str(row.get("family", "")), str(row.get("run", ""))
 
 
-def row_complete(row: dict[str, Any]) -> tuple[bool, list[str]]:
+def row_complete(row: dict[str, Any], *, expected_full_examples: int, expected_sample_examples: int) -> tuple[bool, list[str]]:
     blockers: list[str] = []
     if row.get("status") != "complete":
         blockers.append(f"status={row.get('status')}")
     for field in ["accuracy", "examples_per_second", "rss_after_load_mib", "maxrss_mib"]:
         if not isinstance(row.get(field), (int, float)):
             blockers.append(f"missing {field}")
-    if not isinstance(row.get("eval_examples"), int) or int(row.get("eval_examples", 0)) <= 0:
-        blockers.append("missing eval_examples")
+    if not isinstance(row.get("eval_examples"), int) or int(row.get("eval_examples", 0)) != expected_sample_examples:
+        blockers.append(f"sampled eval_examples={row.get('eval_examples')} expected={expected_sample_examples}")
+    if not isinstance(row.get("stored_full_eval_accuracy"), (int, float)):
+        blockers.append("missing stored_full_eval_accuracy")
+    stored_examples = row.get("stored_full_eval_examples")
+    if not isinstance(stored_examples, (int, float)) or int(stored_examples) != expected_full_examples:
+        blockers.append(f"stored_full_eval_examples={stored_examples} expected={expected_full_examples}")
     return not blockers, blockers
 
 
@@ -83,15 +93,19 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
             "critical": critical,
             "rows": [],
             "blockers": [f"missing input artifact {args.input_json}"],
+            "expected_eval_examples": {task: EXPECTED_EVAL_EXAMPLES[task] for task in args.tasks},
         }
 
     rows = data.get("rows", [])
     if not isinstance(rows, list):
         rows = []
     by_key = {row_key(row): row for row in rows if isinstance(row, dict)}
+    max_eval_samples = int(data.get("max_eval_samples", 0) or 0)
     critical: list[dict[str, Any]] = []
     blockers: list[str] = []
     for task in args.tasks:
+        expected_full_examples = EXPECTED_EVAL_EXAMPLES[task]
+        expected_sample_examples = min(max_eval_samples, expected_full_examples) if max_eval_samples > 0 else expected_full_examples
         for family, run in CRITICAL_RUNS:
             key = (task, family, run)
             row = by_key.get(key)
@@ -109,7 +123,11 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                     }
                 )
                 continue
-            complete, row_blockers = row_complete(row)
+            complete, row_blockers = row_complete(
+                row,
+                expected_full_examples=expected_full_examples,
+                expected_sample_examples=expected_sample_examples,
+            )
             if not complete:
                 blockers.append(f"{task}:{family}:{run} " + ", ".join(row_blockers))
             critical.append(
@@ -125,6 +143,13 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                     "rss_after_load_mib": row.get("rss_after_load_mib"),
                     "maxrss_mib": row.get("maxrss_mib"),
                     "eval_examples": row.get("eval_examples"),
+                    "expected_sample_examples": expected_sample_examples,
+                    "stored_full_eval_accuracy": row.get("stored_full_eval_accuracy"),
+                    "stored_full_eval_examples": row.get("stored_full_eval_examples"),
+                    "expected_full_examples": expected_full_examples,
+                    "full_quality_available": isinstance(row.get("stored_full_eval_accuracy"), (int, float))
+                    and isinstance(row.get("stored_full_eval_examples"), (int, float))
+                    and int(row.get("stored_full_eval_examples")) == expected_full_examples,
                     "status": row.get("status"),
                 }
             )
@@ -142,6 +167,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "threads": data.get("threads"),
         "batch_size": data.get("batch_size"),
         "max_eval_samples": data.get("max_eval_samples"),
+        "expected_eval_examples": {task: EXPECTED_EVAL_EXAMPLES[task] for task in args.tasks},
         "child_timeout_seconds": data.get("child_timeout_seconds"),
     }
 
@@ -172,6 +198,11 @@ def render_markdown(summary: dict[str, Any]) -> str:
             fmt(row.get("complete")),
             fmt(row.get("status")),
             fmt(row.get("accuracy")),
+            fmt(row.get("eval_examples")),
+            fmt(row.get("expected_sample_examples")),
+            fmt(row.get("stored_full_eval_accuracy")),
+            fmt(row.get("stored_full_eval_examples")),
+            fmt(row.get("full_quality_available")),
             fmt(row.get("examples_per_second")),
             fmt(row.get("rss_after_load_mib")),
             fmt(row.get("maxrss_mib")),
@@ -188,7 +219,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
             f"Max eval samples: `{fmt(summary.get('max_eval_samples'))}`. "
             f"Child timeout seconds: `{fmt(summary.get('child_timeout_seconds'))}`."
         ),
-        "This gate validates PyTorch CPU task-runtime rows only; it is not a packed llama.cpp/I2_SR runtime gate.",
+        f"Full-quality contract: `{summary.get('expected_eval_examples')}` examples from each checkpoint's stored full validation metric.",
+        "This gate validates PyTorch CPU sampled task-runtime rows and stored full task-quality metrics; it is not a packed llama.cpp/I2_SR runtime gate.",
         "## Critical Rows",
         md_table(
             [
@@ -198,7 +230,12 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 "present",
                 "complete",
                 "status",
-                "accuracy",
+                "sampled accuracy",
+                "sampled n",
+                "expected sampled n",
+                "stored full accuracy",
+                "stored full n",
+                "full quality",
                 "examples/s",
                 "RSS load MiB",
                 "max RSS MiB",

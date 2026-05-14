@@ -542,12 +542,15 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
     if kind == "bitdistill_cpu_gate_json":
         critical = data.get("critical", [])
         complete = [row for row in critical if isinstance(row, dict) and row.get("complete")]
+        full_quality = [row for row in critical if isinstance(row, dict) and row.get("full_quality_available")]
         return {
             "passed": data.get("passed"),
             "input_exists": data.get("input_exists"),
             "rows": len(data.get("rows", [])) if isinstance(data.get("rows"), list) else None,
             "critical": len(critical) if isinstance(critical, list) else None,
             "critical_complete": len(complete),
+            "critical_full_quality": len(full_quality),
+            "max_eval_samples": data.get("max_eval_samples"),
             "blockers": data.get("blockers", []),
         }
     if kind == "bitdistill_i2sr_gate_json":
@@ -1061,6 +1064,8 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"passed={metrics.get('passed', '-')}, "
                 f"input={metrics.get('input_exists', '-')}, "
                 f"critical={metrics.get('critical_complete', '-')}/{metrics.get('critical', '-')}, "
+                f"full_quality={metrics.get('critical_full_quality', '-')}, "
+                f"sample_n={metrics.get('max_eval_samples', '-')}, "
                 f"blockers={len(metrics.get('blockers', []))}"
             )
         elif entry["kind"] == "bitdistill_i2sr_gate_json":
