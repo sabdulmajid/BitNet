@@ -45,6 +45,11 @@ python benchmarks/summarize_bitdistill_variants.py \
   --output-json "benchmark_results/bitdistill_variant_summary_${DATE}.json" \
   --output-md "benchmarks/results/bitdistill_variant_summary_${DATE}.md"
 
+python benchmarks/gate_bitdistill_cpu_benchmark.py \
+  --input-json "benchmark_results/bitdistill_glue_cpu_${DATE}.json" \
+  --output-json "benchmark_results/bitdistill_glue_cpu_gate_${DATE}.json" \
+  --output-md "benchmarks/results/bitdistill_glue_cpu_gate_${DATE}.md"
+
 python benchmarks/audit_objective_completion.py \
   --output-json "benchmark_results/objective_completion_audit_${DATE}.json" \
   --output-md "benchmarks/results/objective_completion_audit_${DATE}.md"

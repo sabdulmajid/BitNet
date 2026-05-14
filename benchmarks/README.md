@@ -352,6 +352,17 @@ For the active long-warm-up chain, `slurm_bitdistill_cpu_benchmark.sh` runs the
 same benchmark after all downstream jobs finish and includes the strict
 `papergamma` family.
 
+To gate the CPU task-runtime artifact before citing it:
+
+```bash
+python benchmarks/gate_bitdistill_cpu_benchmark.py
+```
+
+This checks that the critical FP16-SFT, BitNet-SFT, BitDistill tensor,
+BitDistill row, long-warmup, and `papergamma` task rows exist and include
+accuracy, examples/sec, RSS, max RSS, and eval-example counts. Timeout or
+failed rows are blockers, not partial successes.
+
 To export row-scale BitDistill checkpoints through the stable packed `I2_SR`
 GGUF path, the checkpoint must be a causal-LM architecture such as
 `Qwen2ForCausalLM`:
