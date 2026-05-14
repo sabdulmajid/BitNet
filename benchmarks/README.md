@@ -311,6 +311,17 @@ accuracy gap. Missing long-warm-up outputs are treated as pending failures.
 The strict tensor candidate is read from
 `checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma` by default.
 
+To audit whether the local setup is actually comparable to the BitDistill paper
+before interpreting results as a reproduction:
+
+```bash
+python benchmarks/audit_bitdistill_paper_alignment.py
+```
+
+This report separates implemented mechanisms from unmatched or pending paper
+assumptions such as the 10B-token warm-up, `gamma=1e5`, Qwen3 scale ladder, and
+learning-rate/epoch search.
+
 To measure PyTorch CPU task runtime for saved GLUE sequence-classification
 checkpoints:
 

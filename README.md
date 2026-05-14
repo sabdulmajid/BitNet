@@ -210,6 +210,10 @@ python benchmarks/gate_bitdistill_reproduction.py \
   --output-json benchmark_results/bitdistill_reproduction_gate_2026-05-14.json \
   --output-md benchmarks/results/bitdistill_reproduction_gate_2026-05-14.md
 
+python benchmarks/audit_bitdistill_paper_alignment.py \
+  --output-json benchmark_results/bitdistill_paper_alignment_2026-05-14.json \
+  --output-md benchmarks/results/bitdistill_paper_alignment_2026-05-14.md
+
 python benchmarks/benchmark_bitdistill_glue_cpu.py \
   --tasks mnli qnli sst2 \
   --runs short:fp16_sft-tensor-layer-1 short:bitnet_sft-tensor-layer-1 short:bitdistill-tensor-layer-1 short:bitdistill-row-layer-1 \
@@ -237,6 +241,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill reproduction status](benchmarks/results/bitdistill_reproduction_status_2026-05-14.md)
 - [BitDistill active job monitor](benchmarks/results/bitdistill_job_monitor_2026-05-14.md)
 - [BitDistill reproduction gate](benchmarks/results/bitdistill_reproduction_gate_2026-05-14.md)
+- [BitDistill paper alignment audit](benchmarks/results/bitdistill_paper_alignment_2026-05-14.md)
 - [BitDistill GLUE3 primary summary](benchmarks/results/bitdistill_seqcls_glue3_primary_summary_2026-05-14.md)
 - [BitDistill MNLI diagnostic variants](benchmarks/results/bitdistill_seqcls_mnli_diagnostic_variant_summary_2026-05-14.md)
 - [Objective completion audit](benchmarks/results/objective_completion_audit_2026-05-14.md)

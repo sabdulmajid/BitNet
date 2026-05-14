@@ -24,6 +24,10 @@ python benchmarks/gate_bitdistill_reproduction.py \
   --output-json "benchmark_results/bitdistill_reproduction_gate_${DATE}.json" \
   --output-md "benchmarks/results/bitdistill_reproduction_gate_${DATE}.md"
 
+python benchmarks/audit_bitdistill_paper_alignment.py \
+  --output-json "benchmark_results/bitdistill_paper_alignment_${DATE}.json" \
+  --output-md "benchmarks/results/bitdistill_paper_alignment_${DATE}.md"
+
 python benchmarks/summarize_bitdistill_variants.py \
   --roots \
     checkpoints/bitdistill-glue-seqcls \
