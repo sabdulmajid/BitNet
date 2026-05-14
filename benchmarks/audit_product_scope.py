@@ -24,6 +24,13 @@ def latest_json_path(root: Path, pattern: str, fallback: str) -> Path:
     return paths[-1] if paths else root / fallback
 
 
+def display_path(path: Path, root: Path) -> str:
+    try:
+        return str(path.relative_to(root))
+    except ValueError:
+        return str(path)
+
+
 def finite_number(value: Any) -> bool:
     return isinstance(value, (int, float)) and math.isfinite(float(value))
 
@@ -98,6 +105,24 @@ def build_gate(root: Path) -> dict[str, Any]:
     i2sr_prefill = i2sr.get("bench", {}).get("prefill", {}).get("tok_s")
     i2sr_decode = i2sr.get("bench", {}).get("decode", {}).get("tok_s")
     i2sr_file_mib = i2sr.get("file_mib")
+    bitdistill_i2sr_path = latest_json_path(
+        root,
+        "benchmark_results/bitdistill_i2sr_export_gate_*.json",
+        "benchmark_results/bitdistill_i2sr_export_gate_2026-05-14.json",
+    )
+    bitdistill_i2sr = read_json(bitdistill_i2sr_path) if bitdistill_i2sr_path.exists() else {}
+    bitdistill_i2sr_rows = bitdistill_i2sr.get("rows", []) if isinstance(bitdistill_i2sr.get("rows"), list) else []
+    bitdistill_i2sr_complete = sum(1 for row in bitdistill_i2sr_rows if isinstance(row, dict) and row.get("complete"))
+    bitdistill_i2sr_expected = len(bitdistill_i2sr_rows)
+    bitdistill_i2sr_blockers = sorted(
+        {
+            blocker
+            for row in bitdistill_i2sr_rows
+            if isinstance(row, dict)
+            for blocker in row.get("blockers", [])
+            if isinstance(blocker, str)
+        }
+    )
 
     active_gate = read_json(root / "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json")
     patch_gate = read_json(root / "benchmark_results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.json")
@@ -156,6 +181,19 @@ def build_gate(root: Path) -> dict[str, Any]:
         "supported",
         f"I2_SR PPL={i2sr_ppl}; file={i2sr_file_mib:.1f} MiB; prompt={i2sr_prefill:.2f} tok/s; decode={i2sr_decode:.2f} tok/s; active gate={active_gate.get('passed')}; patch gate={patch_gate.get('passed')}",
         "Dense Qwen2.5-1.5B I2_SR evidence in this fork on Intel Xeon Silver 4116.",
+    )
+    bitdistill_i2sr_passed = bool(bitdistill_i2sr.get("passed"))
+    add_claim(
+        claims,
+        "BitDistill task-specific packed I2_SR runtime support",
+        "supported" if bitdistill_i2sr_passed else "unsupported",
+        (
+            f"causal I2_SR gate passed={bitdistill_i2sr.get('passed')}; "
+            f"complete rows={bitdistill_i2sr_complete}/{bitdistill_i2sr_expected}; "
+            f"gate={display_path(bitdistill_i2sr_path, root)}"
+        ),
+        "Only causal prompt-scoring BitDistill checkpoints can use this packed path; sequence-classification heads remain PyTorch-only unless runtime support is added.",
+        "; ".join(bitdistill_i2sr_blockers) if bitdistill_i2sr_blockers else "Causal BitDistill I2_SR export and CPU benchmark artifacts are missing or incomplete.",
     )
     default_runtime_supported = bool(active_gate.get("passed")) and bool(promotion_audit.get("promotion_ready"))
     add_claim(
