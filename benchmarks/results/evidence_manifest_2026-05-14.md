@@ -13,11 +13,11 @@ Artifacts: `123`. Missing: `0`.
 | product_scope_gate | tracked_report | yes | 3928 | 20902739007d |  |
 | bitdistill_reproduction_status | tracked_report | yes | 8481 | 3f0e6a6abc2f |  |
 | bitdistill_reproduction_gate_report | tracked_report | yes | 5786 | 10cc824d730c |  |
-| bitdistill_paper_alignment_report | tracked_report | yes | 5819 | 8e867c796b1d |  |
+| bitdistill_paper_alignment_report | tracked_report | yes | 5819 | fdb137dcdd52 |  |
 | bitdistill_loss_scale_report | tracked_report | yes | 6846 | 65816a5d56a5 |  |
 | bitdistill_cpu_gate_report | tracked_report | yes | 4007 | fe558c83ae1f |  |
 | bitdistill_i2sr_gate_report | tracked_report | yes | 3227 | cbba7847c611 |  |
-| bitdistill_job_monitor_report | tracked_report | yes | 5755 | 1c6b9f7f442c |  |
+| bitdistill_job_monitor_report | tracked_report | yes | 5755 | b2c10e9a2968 |  |
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 2048 | 11fc209f78db |  |
@@ -114,7 +114,7 @@ Artifacts: `123`. Missing: `0`.
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 10456 | 8b57426d097d | present=13/24, paper_complete=False, paper_passed=False, row_complete=False, row_passed=False |
 | bitdistill_cpu_gate_json | bitdistill_cpu_gate_json | yes | 5949 | bf57042d5030 | passed=False, input=False, critical=0/21, blockers=1 |
 | bitdistill_i2sr_gate_json | bitdistill_i2sr_gate_json | yes | 4976 | 956d783c5645 | passed=False, complete=0/6, tasks=['mnli', 'qnli', 'sst2'], scales=['tensor', 'row'], blockers=4 |
-| bitdistill_job_monitor_json | bitdistill_job_monitor_json | yes | 34312 | e724a126a17b | warmup=5040/20000, progress=0.252, ce=4.36589, snapshots=0, warnings=1, downstream=17 |
+| bitdistill_job_monitor_json | bitdistill_job_monitor_json | yes | 34313 | 722a7b836bfb | warmup=5180/20000, progress=0.259, ce=4.5037, snapshots=0, warnings=1, downstream=17 |
 | bitdistill_loss_scale_json | bitdistill_loss_scale_json | yes | 22028 | 785e1591ed56 | rows=11/28, gamma=100000, projected_attn_ce=[837.539, 13035.1] |
 | i2sr_submodule_promotion_audit_json | i2sr_submodule_promotion_audit_json | yes | 3425 | 56ba835820a1 | ready=True, active=True, patch_applies=False, submodule=285decfe2, blockers=0 |
 | moe_support_json | moe_support_json | yes | 15462 | 03e744bf4cab | present=6/6, gates=7, failed=3, kimi_artifacts=0, tiny_qwen2moe=True |

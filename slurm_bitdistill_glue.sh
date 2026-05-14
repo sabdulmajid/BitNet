@@ -60,7 +60,13 @@ MAX_EVAL_SAMPLES="${MAX_EVAL_SAMPLES:-0}"
 OUTPUT_ROOT="${OUTPUT_ROOT:-checkpoints/bitdistill-glue}"
 MODEL_SLUG="${MODEL//\//-}"
 OUTPUT_DIR="${OUTPUT_DIR:-$OUTPUT_ROOT/${MODEL_SLUG}/${TASK_NAME}/${METHOD}-${SCALE_MODE}-layer${DISTILL_LAYER}}"
-SAVE_EVERY_STEPS="${SAVE_EVERY_STEPS:-0}"
+if [ -z "${SAVE_EVERY_STEPS+x}" ]; then
+  if [ "$STAGE" = "continued_pretrain" ]; then
+    SAVE_EVERY_STEPS=1000
+  else
+    SAVE_EVERY_STEPS=0
+  fi
+fi
 
 echo "SLURM_JOB_ID=${SLURM_JOB_ID:-local}"
 echo "MODEL=$MODEL"
