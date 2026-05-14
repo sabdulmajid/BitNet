@@ -178,7 +178,7 @@
       "label": "bitdistill_active_goal_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_active_goal_audit_2026-05-14.md",
-      "sha256": "072f96b91df912ba25c60e93fd9ccd8fb3e6e88412f567d5ce45e17b6931ce9a",
+      "sha256": "fddef68af5cb9ffbb987e85b06e37252031280315bf47d33c65e6817123be416",
       "size_bytes": 3199
     },
     {
@@ -2115,11 +2115,11 @@
         "pending_count": 3,
         "row_scale_complete": false,
         "warmup_max_steps": 20000,
-        "warmup_step": 7250
+        "warmup_step": 7720
       },
       "path": "benchmark_results/bitdistill_active_goal_audit_2026-05-14.json",
-      "sha256": "bb4693ae333e409a183f2875de1ffa66751321ae95f41b235d4b677fbd616683",
-      "size_bytes": 4786
+      "sha256": "691978489480a5c119350f24e09797e6eeb846be72607e39564f1fd8cc3ea165",
+      "size_bytes": 4785
     },
     {
       "exists": true,
