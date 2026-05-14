@@ -56,6 +56,7 @@ def code_features(root: Path) -> dict[str, bool]:
         "logits_kd": "def logits_kd_loss" in train,
         "paper_logit_temperature_scale_default": 'choices=["none", "square"], default="none"' in train,
         "attention_relation_kd": "def attention_relation_distillation_loss" in train,
+        "attention_relation_l2_normalization": "F.normalize(states, dim=-1)" in train and "relation = torch.matmul(states" in train,
         "single_layer_selection": "--distill-layer" in train,
         "row_scale_mode": "--scale-mode" in train and "row" in train,
         "longwarmup_submitter": "WARMUP_STATE" in submit and "INIT_STATE_DICT" in submit,
@@ -167,7 +168,7 @@ def alignment_rows(features: dict[str, bool], warmup: dict[str, Any]) -> list[di
         {
             "dimension": "Stage-3 attention KD",
             "paper": "single-layer Q/K/V relation KD, gamma 1e5 for classification",
-            "local": "single-layer Q/K/V KD implemented; completed runs gamma 100; long-warmup gamma 1e3/1e4/1e5 branches pending",
+            "local": "single-layer L2-normalized Q/K/V relation KD implemented; completed runs gamma 100; long-warmup gamma 1e3/1e4/1e5 branches pending",
             "status": "pending",
             "note": "The gamma sweep is intentional because local loss-scale probes show the paper gamma can dominate CE.",
         },

@@ -4,6 +4,7 @@ Work dir: `benchmark_results/bitdistill-smoke-contract-2026-05-14`.
 
 | check | status | evidence | blocker |
 | --- | --- | --- | --- |
+| attention relation KD uses L2-normalized states | pass | F.normalize before relation matmul |  |
 | help command exits zero | pass | returncode=0 |  |
 | py_compile command exits zero | pass | returncode=0 |  |
 | continued_pretrain command exits zero | pass | returncode=0 |  |

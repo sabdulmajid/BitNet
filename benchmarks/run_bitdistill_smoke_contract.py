@@ -212,6 +212,14 @@ def main() -> None:
     row_task_ternary = inspect_ternary_state(work_dir / "task_sft_row" / "ternary_state_dict.pt")
 
     checks: list[dict[str, Any]] = []
+    train_source = (repo_root / "train_bitdistill.py").read_text(encoding="utf-8", errors="replace")
+    add_check(
+        checks,
+        "attention relation KD uses L2-normalized states",
+        "F.normalize(states, dim=-1)" in train_source and "relation = torch.matmul(states" in train_source,
+        "F.normalize before relation matmul",
+        "attention relation KD is missing the MiniLM/BitDistill state normalization step",
+    )
     for name, run in runs.items():
         add_check(checks, f"{name} command exits zero", run["returncode"] == 0, f"returncode={run['returncode']}", "command failed")
 

@@ -106,8 +106,8 @@
       "label": "bitdistill_paper_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_paper_alignment_2026-05-14.md",
-      "sha256": "f8d35c765cb684845a0bd4d5214cd9cb824c022b8fa31eecfbb2c8b7a2db59c5",
-      "size_bytes": 5819
+      "sha256": "82f615bea30c7d104d3aaa00c7223073dc33ed0d567a1ac06844726de182f5ab",
+      "size_bytes": 5889
     },
     {
       "exists": true,
@@ -187,8 +187,8 @@
       "label": "bitdistill_smoke_contract_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_smoke_contract_2026-05-14.md",
-      "sha256": "ccd8a0706d191579c60b5bc53576286d8fc5b0acb78c837bea23c3a6b76d09bd",
-      "size_bytes": 2115
+      "sha256": "7b7bdac343a0acf57efecc027d68c784cf61ca201c0108f2401107e2e7df38ff",
+      "size_bytes": 2214
     },
     {
       "exists": true,
@@ -2126,8 +2126,8 @@
       "kind": "bitdistill_smoke_contract_json",
       "label": "bitdistill_smoke_contract_json",
       "metrics": {
-        "check_count": 24,
-        "checks": 24,
+        "check_count": 25,
+        "checks": 25,
         "continued_bitlinear": 15,
         "continued_subln": 4,
         "failed_count": 0,
@@ -2136,8 +2136,8 @@
         "task_subln": 4
       },
       "path": "benchmark_results/bitdistill_smoke_contract_2026-05-14.json",
-      "sha256": "da9ac1e868c916956dd5dd030a98f711a67fd120185b4a36103c4be182f9cff9",
-      "size_bytes": 21541
+      "sha256": "0973d9215f3a056ea675d8c796b919d38b3f2277de9f1891548029fe2480fb72",
+      "size_bytes": 21717
     },
     {
       "exists": true,
