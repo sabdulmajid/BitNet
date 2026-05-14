@@ -123,6 +123,42 @@ def build_gate(root: Path) -> dict[str, Any]:
             if isinstance(blocker, str)
         }
     )
+    bitdistill_reproduction_path = latest_json_path(
+        root,
+        "benchmark_results/bitdistill_reproduction_gate_*.json",
+        "benchmark_results/bitdistill_reproduction_gate_2026-05-14.json",
+    )
+    bitdistill_reproduction = read_json(bitdistill_reproduction_path) if bitdistill_reproduction_path.exists() else {}
+    bitdistill_rows = bitdistill_reproduction.get("rows", []) if isinstance(bitdistill_reproduction.get("rows"), list) else []
+    bitdistill_paper_rows = [
+        row
+        for row in bitdistill_rows
+        if isinstance(row, dict) and row.get("family") == "paper_hparam_candidate"
+    ]
+    bitdistill_paper_full_rows = sum(1 for row in bitdistill_paper_rows if row.get("full_eval_examples") is True)
+    bitdistill_paper_passed_rows = sum(1 for row in bitdistill_paper_rows if row.get("passes_fp_gap") is True)
+    bitdistill_expected_examples = bitdistill_reproduction.get("expected_eval_examples", {})
+    bitdistill_paired_path = latest_json_path(
+        root,
+        "benchmark_results/bitdistill_paired_predictions_*.json",
+        "benchmark_results/bitdistill_paired_predictions_2026-05-14.json",
+    )
+    bitdistill_paired = read_json(bitdistill_paired_path) if bitdistill_paired_path.exists() else {}
+    bitdistill_paired_complete = bitdistill_paired.get("complete_count", bitdistill_paired.get("complete"))
+    bitdistill_paired_total = bitdistill_paired.get("check_count", bitdistill_paired.get("total"))
+    bitdistill_cpu_path = latest_json_path(
+        root,
+        "benchmark_results/bitdistill_glue_cpu_gate_*.json",
+        "benchmark_results/bitdistill_glue_cpu_gate_2026-05-14.json",
+    )
+    bitdistill_cpu = read_json(bitdistill_cpu_path) if bitdistill_cpu_path.exists() else {}
+    bitdistill_cpu_critical = (
+        bitdistill_cpu.get("critical", []) if isinstance(bitdistill_cpu.get("critical"), list) else []
+    )
+    bitdistill_cpu_complete = sum(1 for row in bitdistill_cpu_critical if isinstance(row, dict) and row.get("complete"))
+    bitdistill_cpu_full_quality = sum(
+        1 for row in bitdistill_cpu_critical if isinstance(row, dict) and row.get("full_quality_available")
+    )
 
     active_gate = read_json(root / "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json")
     patch_gate = read_json(root / "benchmark_results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.json")
@@ -186,6 +222,25 @@ def build_gate(root: Path) -> dict[str, Any]:
         "supported",
         f"I2_SR PPL={i2sr_ppl}; file={i2sr_file_mib:.1f} MiB; prompt={i2sr_prefill:.2f} tok/s; decode={i2sr_decode:.2f} tok/s; active gate={active_gate.get('passed')}; patch gate={patch_gate.get('passed')}",
         "Dense Qwen2.5-1.5B I2_SR evidence in this fork on Intel Xeon Silver 4116.",
+    )
+    bitdistill_paper_passed = bool(bitdistill_reproduction.get("paper_style_tensor_passed"))
+    add_claim(
+        claims,
+        "BitDistill paper-level GLUE reproduction on Qwen2.5-0.5B",
+        "supported" if bitdistill_paper_passed else "unsupported",
+        (
+            f"paper tensor complete={bitdistill_reproduction.get('paper_style_tensor_complete')}; "
+            f"passed={bitdistill_reproduction.get('paper_style_tensor_passed')}; "
+            f"full rows={bitdistill_paper_full_rows}/{len(bitdistill_paper_rows)}; "
+            f"gap-pass rows={bitdistill_paper_passed_rows}/{len(bitdistill_paper_rows)}; "
+            f"expected eval={bitdistill_expected_examples}; "
+            f"paired status={bitdistill_paired.get('status')}; "
+            f"paired complete={bitdistill_paired_complete}/{bitdistill_paired_total}; "
+            f"cpu gate={bitdistill_cpu.get('passed')} ({bitdistill_cpu_complete}/{len(bitdistill_cpu_critical)} rows, "
+            f"full-quality={bitdistill_cpu_full_quality}/{len(bitdistill_cpu_critical)})"
+        ),
+        "Claim only after MNLI/QNLI/SST2 full-validation BitDistill rows are within the configured FP16 gap and paired traces/CPU gates are complete.",
+        "Long-warmup downstream metrics, paired prediction traces, or CPU full-quality rows are still missing or below the FP16-gap gate.",
     )
     bitdistill_i2sr_passed = bool(bitdistill_i2sr.get("passed"))
     add_claim(
@@ -255,14 +310,14 @@ def build_gate(root: Path) -> dict[str, Any]:
         "schema": "bitnet-product-scope-gate-v1",
         "date": DATE,
         "scope_status": "research_mvp_only",
-        "publishable_angle": "negative arbitrary-retrofit result plus dense-Qwen row-scale recovery path",
+        "publishable_angle": "negative arbitrary-retrofit result plus dense-Qwen row-scale recovery path, with BitDistill reproduction and I2_SR row-scale extensions gated separately",
         "supported_claim_count": len(supported),
         "unsupported_claim_count": len(unsupported),
         "claims": claims,
         "recommendation": {
-            "product": "CPU-first dense-Qwen retrofit evaluator with stable I2_SR runtime support; keep claims limited to distilled dense Qwen until MoE evidence exists.",
-            "paper": "Scope as a negative PTQ result plus measured distillation/row-scale/runtime recovery path; do not claim arbitrary or MoE support.",
-            "next_engineering_gate": "Validate release packaging and keep MoE/Kimi as a separate milestone.",
+            "product": "CPU-first dense-Qwen retrofit evaluator with stable I2_SR runtime support; keep BitDistill quality claims behind the full GLUE reproduction, paired-trace, and CPU full-quality gates.",
+            "paper": "Scope as a negative PTQ result plus measured QAT/row-scale/runtime recovery path; add BitDistill reproduction claims only if the full-validation long-warmup gates pass. Do not claim arbitrary or MoE support.",
+            "next_engineering_gate": "Finish the long-warmup BitDistill dependency chain, then validate row-scale I2_SR export/CPU evidence and keep MoE/Kimi as a separate milestone.",
         },
     }
 
