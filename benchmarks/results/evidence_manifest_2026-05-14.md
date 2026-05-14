@@ -12,7 +12,7 @@ Artifacts: `155`. Missing: `0`.
 | objective_completion_audit | tracked_report | yes | 5645 | 56fb299814a5 |  |
 | product_scope_gate | tracked_report | yes | 4076 | 9f2f57b0f7a2 |  |
 | bitdistill_reproduction_status | tracked_report | yes | 8481 | 3f0e6a6abc2f |  |
-| bitdistill_reproduction_gate_report | tracked_report | yes | 10805 | 1e321d76b1dd |  |
+| bitdistill_reproduction_gate_report | tracked_report | yes | 11734 | 8d6585641fa7 |  |
 | bitdistill_paired_predictions_report | tracked_report | yes | 10936 | 34d5789bb465 |  |
 | bitdistill_paper_alignment_report | tracked_report | yes | 7724 | da103f6af780 |  |
 | bitdistill_loss_scale_report | tracked_report | yes | 6846 | 65816a5d56a5 |  |
@@ -127,7 +127,7 @@ Artifacts: `155`. Missing: `0`.
 | benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5488 | 493439c9cbbf | passed=True, checks=33, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 15953 | a07ee58dabe1 | achieved=False, status=not_complete, complete=7/9, open=2 |
 | product_scope_gate_json | product_scope_gate_json | yes | 4831 | 4d0cb4d1046f | scope=research_mvp_only, supported=4, unsupported=4 |
-| bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 23575 | 1fbffc7c0f4b | present=13/36, examples=13, ci95=13, paper_complete=False, paper_passed=False, row_complete=False, row_passed=False, confidence=0.95 |
+| bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 26085 | 9f3a8d24ee11 | present=13/36, examples=13, full_eval=13, ci95=13, paper_complete=False, paper_passed=False, row_complete=False, row_passed=False, confidence=0.95 |
 | bitdistill_paired_predictions_json | bitdistill_paired_predictions_json | yes | 62769 | 6bc698c10ac9 | status=pending, complete=0/36, pending=36, failed=0 |
 | bitdistill_cpu_gate_json | bitdistill_cpu_gate_json | yes | 9479 | 478fd3910f1c | passed=False, input=False, critical=0/33, blockers=1 |
 | bitdistill_i2sr_gate_json | bitdistill_i2sr_gate_json | yes | 5345 | 6224d3e866c2 | passed=False, complete=0/6, tasks=['mnli', 'qnli', 'sst2'], scales=['tensor', 'row'], blockers=4 |

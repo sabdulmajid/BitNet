@@ -514,12 +514,14 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
         rows = data.get("rows", [])
         present = [row for row in rows if isinstance(row, dict) and row.get("exists")]
         with_examples = [row for row in present if isinstance(row.get("examples"), int)]
+        with_full_eval = [row for row in present if row.get("full_eval_examples") is True]
         with_ci = [row for row in present if isinstance(row.get("accuracy_ci95"), list)]
         return {
             "tasks": data.get("tasks", []),
             "rows": len(rows) if isinstance(rows, list) else None,
             "present_rows": len(present),
             "present_with_examples": len(with_examples),
+            "present_with_full_eval": len(with_full_eval),
             "present_with_accuracy_ci95": len(with_ci),
             "paper_style_tensor_complete": data.get("paper_style_tensor_complete"),
             "paper_style_tensor_passed": data.get("paper_style_tensor_passed"),
@@ -1039,6 +1041,7 @@ def build_report(manifest: dict[str, Any]) -> str:
             summary = (
                 f"present={metrics.get('present_rows', '-')}/{metrics.get('rows', '-')}, "
                 f"examples={metrics.get('present_with_examples', '-')}, "
+                f"full_eval={metrics.get('present_with_full_eval', '-')}, "
                 f"ci95={metrics.get('present_with_accuracy_ci95', '-')}, "
                 f"paper_complete={metrics.get('paper_style_tensor_complete', '-')}, "
                 f"paper_passed={metrics.get('paper_style_tensor_passed', '-')}, "

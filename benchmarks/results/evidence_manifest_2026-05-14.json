@@ -97,8 +97,8 @@
       "label": "bitdistill_reproduction_gate_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_reproduction_gate_2026-05-14.md",
-      "sha256": "1e321d76b1dd5a3031693324f7026458d4f3477ebc53ba3823d20f7f80f78ba1",
-      "size_bytes": 10805
+      "sha256": "8d6585641fa76f34f4b2cc29949cf52f3399ce6770437169aa241f50e37b8934",
+      "size_bytes": 11734
     },
     {
       "exists": true,
@@ -2032,6 +2032,7 @@
         "present_rows": 13,
         "present_with_accuracy_ci95": 13,
         "present_with_examples": 13,
+        "present_with_full_eval": 13,
         "row_scale_complete": false,
         "row_scale_passed": false,
         "rows": 36,
@@ -2042,8 +2043,8 @@
         ]
       },
       "path": "benchmark_results/bitdistill_reproduction_gate_2026-05-14.json",
-      "sha256": "1fbffc7c0f4bfb4f4f02ea27d997d15ec86aa0fc5fe791b9ebc40585a48e116e",
-      "size_bytes": 23575
+      "sha256": "9f3a8d24ee11f6eff345324bcb55937c7e03887258be62ec5d0d49d67846c0f8",
+      "size_bytes": 26085
     },
     {
       "exists": true,

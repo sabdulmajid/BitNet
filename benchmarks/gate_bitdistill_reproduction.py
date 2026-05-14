@@ -14,6 +14,11 @@ from typing import Any
 
 DATE = datetime.now(timezone.utc).date().isoformat()
 TASKS = ["mnli", "qnli", "sst2"]
+EXPECTED_EVAL_EXAMPLES = {
+    "mnli": 9815,
+    "qnli": 5463,
+    "sst2": 872,
+}
 Z_95 = 1.959963984540054
 
 
@@ -76,16 +81,19 @@ def run_path(root: Path, model: str, spec: RunSpec, task: str) -> Path:
     return root / model.replace("/", "-") / spec.template.format(task=task) / "metrics.json"
 
 
-def metric_summary_from_path(path: Path) -> dict[str, Any]:
+def metric_summary_from_path(path: Path, task: str) -> dict[str, Any]:
     data = read_json(path)
     eval_metrics = data.get("eval", {}) if isinstance(data.get("eval"), dict) else {}
     accuracy = eval_metrics.get("accuracy")
     examples = eval_metrics.get("eval_examples")
     accuracy_value = float(accuracy) if isinstance(accuracy, (int, float)) else None
     example_count = int(examples) if isinstance(examples, (int, float)) and examples > 0 else None
+    expected_examples = EXPECTED_EVAL_EXAMPLES[task]
     return {
         "accuracy": accuracy_value,
         "examples": example_count,
+        "expected_examples": expected_examples,
+        "full_eval_examples": example_count == expected_examples,
         "accuracy_ci95": wilson_ci(accuracy_value, example_count),
     }
 
@@ -121,15 +129,15 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     fp_by_task: dict[str, dict[str, Any]] = {}
     for task in args.tasks:
         fp_path = run_path(args.baseline_root, args.model, RUN_SPECS[0], task)
-        fp_metrics = metric_summary_from_path(fp_path)
-        if fp_metrics["accuracy"] is not None:
+        fp_metrics = metric_summary_from_path(fp_path, task)
+        if fp_metrics["accuracy"] is not None and fp_metrics["full_eval_examples"]:
             fp_by_task[task] = fp_metrics
 
     for task in args.tasks:
         for spec in RUN_SPECS:
             root = getattr(args, spec.root_attr)
             path = run_path(root, args.model, spec, task)
-            metrics = metric_summary_from_path(path)
+            metrics = metric_summary_from_path(path, task)
             acc = metrics["accuracy"]
             examples = metrics["examples"]
             fp = fp_by_task.get(task, {})
@@ -145,12 +153,14 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                     "exists": path.exists(),
                     "accuracy": acc,
                     "examples": examples,
+                    "expected_examples": metrics["expected_examples"],
+                    "full_eval_examples": metrics["full_eval_examples"],
                     "accuracy_ci95": metrics["accuracy_ci95"],
                     "fp16_accuracy": fp_acc,
                     "fp16_examples": fp_examples,
                     "fp_minus_run": gap,
                     "fp_minus_run_ci95": difference_ci(fp_acc, fp_examples, acc, examples),
-                    "passes_fp_gap": (abs(gap) <= args.max_fp_gap) if gap is not None else False,
+                    "passes_fp_gap": (metrics["full_eval_examples"] and abs(gap) <= args.max_fp_gap) if gap is not None else False,
                 }
             )
 
@@ -159,9 +169,9 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     tensor_gamma100_rows = [row for row in rows if row["family"] == "longwarmup_gamma100"]
     row_scale_rows = [row for row in rows if row["family"] == "row_scale_candidate"]
     paper_row_rows = [row for row in rows if row["family"] == "paper_hparam_row_candidate"]
-    paper_complete = all(row["exists"] and row["accuracy"] is not None for row in paper_rows)
-    paper_search_complete = all(row["exists"] and row["accuracy"] is not None for row in paper_search_rows)
-    row_complete = all(row["exists"] and row["accuracy"] is not None for row in row_scale_rows)
+    paper_complete = all(row["exists"] and row["accuracy"] is not None and row["full_eval_examples"] for row in paper_rows)
+    paper_search_complete = all(row["exists"] and row["accuracy"] is not None and row["full_eval_examples"] for row in paper_search_rows)
+    row_complete = all(row["exists"] and row["accuracy"] is not None and row["full_eval_examples"] for row in row_scale_rows)
     paper_passed = paper_complete and all(row["passes_fp_gap"] for row in paper_rows)
     paper_search_best: dict[str, dict[str, Any]] = {}
     for task in args.tasks:
@@ -237,6 +247,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
             "accuracy_interval": "Wilson score interval from aggregate accuracy and eval_examples",
             "difference_interval": "Unpaired normal approximation from aggregate accuracies; paired prediction deltas are audited separately when eval_predictions.jsonl exists.",
         },
+        "expected_eval_examples": {task: EXPECTED_EVAL_EXAMPLES[task] for task in args.tasks},
         "baseline_root": str(args.baseline_root),
         "longwarmup_root": str(args.longwarmup_root),
         "paper_hparam_root": str(args.paper_hparam_root),
@@ -290,6 +301,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
             fmt(row["exists"]),
             fmt(row["accuracy"]),
             fmt(row["examples"]),
+            fmt(row["expected_examples"]),
+            "pass" if row["full_eval_examples"] else "fail_or_pending",
             fmt_ci(row.get("accuracy_ci95")),
             fmt(row["fp16_accuracy"]),
             fmt(row["fp_minus_run"]),
@@ -317,6 +330,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
             f"# BitDistill Reproduction Gate, {summary['date']}",
             f"Model: `{summary['model']}`.",
             f"Threshold: absolute FP16-SFT gap <= `{summary['max_fp_gap']}` accuracy.",
+            f"Full-evaluation contract: `{summary['expected_eval_examples']}` examples. Rows that do not match these counts cannot pass this gate.",
             "Confidence intervals: accuracy uses Wilson 95% intervals; this aggregate gate uses unpaired normal delta intervals. The paired-prediction audit is the authoritative example-level comparison when `eval_predictions.jsonl` exists.",
             f"Strict paper-hyperparameter tensor candidate complete: `{summary['paper_style_tensor_complete']}`.",
             f"Strict paper-hyperparameter tensor candidate passed: `{summary['paper_style_tensor_passed']}`.",
@@ -333,6 +347,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
                     "exists",
                     "accuracy",
                     "examples",
+                    "expected examples",
+                    "full eval",
                     "accuracy 95% CI",
                     "FP16",
                     "FP-run",
