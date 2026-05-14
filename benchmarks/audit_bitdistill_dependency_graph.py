@@ -24,12 +24,54 @@ STEP_RE = re.compile(r"step=(?P<step>\d+) ce=(?P<ce>[-+0-9.eE]+) lr=(?P<lr>[-+0-
 DEPENDENCY_RE = re.compile(r"after[a-z]*:(\d+)")
 
 
+def read_json(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def parse_env_lines(text: str) -> dict[str, str]:
     env: dict[str, str] = {}
     for line in text.splitlines():
         for match in ENV_RE.finditer(line):
             env[match.group("key")] = match.group("value")
     return env
+
+
+def resolve_candidate(path_text: str, root: Path) -> Path:
+    path = Path(path_text)
+    return path if path.is_absolute() else root / path
+
+
+def discover_latest_warmup_log(root: Path) -> tuple[Path, str]:
+    candidates: list[tuple[float, Path]] = []
+    for path in (root / "logs").glob("bitdistill-glue-*.out"):
+        try:
+            text = path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        env = parse_env_lines(text)
+        if env.get("STAGE") == "continued_pretrain" and "bitdistill-glue-longwarmup" in env.get("OUTPUT_DIR", ""):
+            candidates.append((path.stat().st_mtime, path))
+    if candidates:
+        return max(candidates, key=lambda item: item[0])[1], "latest-longwarmup-log"
+    return root / "logs" / "bitdistill-glue-9894.out", "legacy-default"
+
+
+def resolve_warmup_log(args: argparse.Namespace, root: Path) -> tuple[Path, str, str]:
+    if args.warmup_log is not None:
+        return resolve_candidate(str(args.warmup_log), root), "explicit", ""
+
+    monitor_path = resolve_candidate(str(args.monitor_json), root)
+    monitor = read_json(monitor_path)
+    warmup = monitor.get("warmup", {}) if isinstance(monitor.get("warmup"), dict) else {}
+    monitor_log = warmup.get("path") if isinstance(warmup.get("path"), str) else ""
+    if monitor_log:
+        return resolve_candidate(monitor_log, root), "monitor", ""
+
+    discovered, source = discover_latest_warmup_log(root)
+    warning = f"monitor JSON did not provide a warm-up log path: {rel(monitor_path, root)}"
+    return discovered, source, warning
 
 
 def parse_warmup_log(path: Path, root: Path) -> dict[str, Any]:
@@ -145,7 +187,7 @@ def rel(path: str | Path, root: Path) -> str:
 
 def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     root = args.repo_root.resolve()
-    warmup_log = args.warmup_log if args.warmup_log.is_absolute() else root / args.warmup_log
+    warmup_log, warmup_log_source, monitor_warning = resolve_warmup_log(args, root)
     warmup = parse_warmup_log(warmup_log, root)
     expected_state = warmup.get("expected_state", "")
 
@@ -169,6 +211,8 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     blockers: list[str] = []
     warnings: list[str] = []
     checks: list[dict[str, Any]] = []
+    if monitor_warning:
+        warnings.append(monitor_warning)
 
     def add_check(name: str, passed: bool, evidence: str, blocker: str = "") -> None:
         checks.append({"name": name, "passed": bool(passed), "evidence": evidence, "blocker": "" if passed else blocker})
@@ -261,6 +305,8 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "blockers": blockers,
         "warnings": warnings,
         "warmup": warmup,
+        "warmup_log_source": warmup_log_source,
+        "monitor_json": str(resolve_candidate(str(args.monitor_json), root)),
         "job_tables": [str(path) for path in table_paths],
         "raw_rows": len(raw_rows),
         "deduped_rows": len(latest_rows),
@@ -324,6 +370,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
         [
             f"# BitDistill Dependency Graph Audit, {summary['date']}",
             f"Ready for downstream release: `{summary['ready']}`.",
+            f"Monitor JSON: `{rel(summary.get('monitor_json', ''), root)}`.",
+            f"Warm-up log source: `{summary.get('warmup_log_source', '-')}`.",
             "## Warm-Up",
             md_table(
                 ["log", "job", "step", "max steps", "progress", "expected state exists", "expected state"],
@@ -360,7 +408,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
-    parser.add_argument("--warmup-log", type=Path, default=Path("logs/bitdistill-glue-9894.out"))
+    parser.add_argument("--monitor-json", type=Path, default=Path(f"benchmark_results/bitdistill_job_monitor_{DATE}.json"))
+    parser.add_argument("--warmup-log", type=Path, default=None)
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_dependency_graph_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/bitdistill_dependency_graph_{DATE}.md"))
     args = parser.parse_args()

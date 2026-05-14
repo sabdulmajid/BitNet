@@ -2,11 +2,15 @@
 
 Ready for downstream release: `True`.
 
+Monitor JSON: `benchmark_results/bitdistill_job_monitor_2026-05-14.json`.
+
+Warm-up log source: `monitor`.
+
 ## Warm-Up
 
 | log | job | step | max steps | progress | expected state exists | expected state |
 | --- | --- | --- | --- | --- | --- | --- |
-| logs/bitdistill-glue-9894.out | 9894 | 13280 | 20000 | 0.664000 | false | checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/custom_state_dict.pt |
+| logs/bitdistill-glue-9894.out | 9894 | 13820 | 20000 | 0.691000 | false | checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/custom_state_dict.pt |
 
 ## Checks
 
