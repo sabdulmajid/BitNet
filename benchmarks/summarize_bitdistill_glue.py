@@ -118,6 +118,8 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def fmt(value: Any) -> str:
+    if isinstance(value, bool):
+        return "true" if value else "false"
     if isinstance(value, (int, float)):
         return f"{float(value):.6f}"
     return "-" if value is None else str(value)

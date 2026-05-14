@@ -97,6 +97,46 @@ variable in the `sbatch` process environment and use `--export=ALL`. Do not put
 `TASKS=a,b,c` inside Slurm's comma-separated `--export=ALL,...` argument unless
 your Slurm version has been explicitly tested with escaped commas.
 
+### BitDistill Reproduction
+
+The BitDistill reproduction harness is centered on `train_bitdistill.py`.
+It is separate from the older generic `train_distill.py` path and implements:
+
+- SubLN insertion before Qwen attention output and MLP down projections.
+- Stage-2 causal-LM continued pretraining with CE.
+- Stage-3 GLUE task fine-tuning with CE, logits KL, and Q/K/V
+  attention-relation distillation.
+- Sequence-classification and causal prompt-scoring GLUE formats.
+- Tensor-scale and row-scale ternary `BitLinear` students.
+
+Primary GLUE3 sequence-classification wave:
+
+```bash
+bash benchmarks/submit_bitdistill_glue_seqcls_wave.sh
+
+python benchmarks/summarize_bitdistill_glue.py \
+  --root checkpoints/bitdistill-glue-seqcls \
+  --tasks mnli qnli sst2 \
+  --output-json benchmark_results/bitdistill_seqcls_glue3_primary_summary_2026-05-14.json \
+  --output-md benchmarks/results/bitdistill_seqcls_glue3_primary_summary_2026-05-14.md
+```
+
+Current status: Qwen2.5-0.5B short-budget BitDistill does not reproduce the
+paper-level target. Completed GLUE3 sequence-classification accuracy is:
+
+| task | FP16-SFT | BitNet-SFT | BitDistill tensor | BitDistill row |
+| --- | ---: | ---: | ---: | ---: |
+| MNLI | `0.807641` | `0.487621` | `0.525217` | `0.516556` |
+| QNLI | `0.898957` | `0.596925` | `0.596925` | `0.618525` |
+| SST2 | `0.925459` | `0.770642` | `0.815367` | `0.808486` |
+
+The known reproduction gap is training budget and search, not a contradiction
+of the paper. The completed Stage-2 warm-up is 40.96M effective token
+presentations, while the paper reports 10B continued-pretraining tokens.
+Teacher-head initialization, attention-layer sweep, CE-only ablation, and
+longer warm-up jobs are tracked in
+`benchmarks/results/bitdistill_reproduction_status_2026-05-14.md`.
+
 ### Tier 2: Fixed Generation Suite
 
 ```bash

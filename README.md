@@ -51,8 +51,40 @@ with the active `i2sr-row-scale-runtime` branch.
 | Arbitrary FP16/BF16 to ternary conversion is lossless | **No** | Qwen2.5-1.5B naive PTQ collapses from ten-task mean `0.644169` to `0.348671`; WikiText PPL jumps from `13.901` to `3,813,121.803`. |
 | Distillation/QAT can recover useful signal | **Yes, partially** | Best row-scale dense-Qwen run reaches ten-task mean `0.499459`, well above naive PTQ but below FP. |
 | Stable CPU row-scale packed inference exists for dense Qwen | **Yes, for the audited path** | `I2_SR` productization gate passes `9/9`; Xeon I2_SR PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
+| BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B short-budget GLUE3 sequence-classification runs remain 11.0-30.2 accuracy points below FP16-SFT. |
 | TL2 is ready for the best row-scale checkpoint | **No** | Current TL2 scale semantics cannot represent the learned row scales without row/group-scale metadata and kernels. |
 | Kimi/MoE retrofit is proven | **No** | No local Kimi/Qwen2MoE model artifact, no Kimi mapping, no router distillation, and no MoE quality/throughput/locality benchmark. |
+
+## BitDistill Reproduction Status
+
+Microsoft's BitDistill paper changes the answer from "PTQ is enough" to
+"task-specific QAT/distillation may work if the training recipe is strong
+enough." That does not contradict the negative PTQ result in this fork.
+
+This fork now implements the key BitDistill components for Qwen-style models:
+SubLN insertion, Stage-2 continued pretraining, Stage-3 CE + logits KL +
+Q/K/V attention-relation distillation, attention-layer sweep support, and both
+paper-style tensor-scale and experimental row-scale ternary students.
+
+Current Qwen2.5-0.5B GLUE sequence-classification results:
+
+| task | FP16-SFT | BitNet-SFT | BitDistill tensor | BitDistill row |
+| --- | ---: | ---: | ---: | ---: |
+| MNLI | `0.807641` | `0.487621` | `0.525217` | `0.516556` |
+| QNLI | `0.898957` | `0.596925` | `0.596925` | `0.618525` |
+| SST2 | `0.925459` | `0.770642` | `0.815367` | `0.808486` |
+
+These runs do **not** reproduce the paper target of being within 0.5-1.0
+accuracy point of FP16-SFT. The strongest known reason is training budget:
+the completed Stage-2 warm-up used `40.96M` effective token presentations,
+while the paper reports `10B` continued-pretraining tokens. The result should
+therefore be read as a failure boundary for direct or short-warm-up retrofit,
+not as a disproof of BitDistill.
+
+Active follow-ups are probing teacher-head initialization, attention-layer
+selection, CE-only ablations, and a longer warm-up pilot. Until those gates
+close, the public claim remains conservative: **BitDistill is the right class
+of method, but this fork has not yet reproduced paper-level task quality.**
 
 ## Key Dense-Qwen Results
 
@@ -108,11 +140,15 @@ It does not make blind PTQ viable.
    format and kernels represent the same scale semantics.
 5. The current dense-Qwen work is useful as a research MVP and evaluator, not as
    a universal model converter.
+6. The current short-budget BitDistill reproduction fails GLUE3, reinforcing
+   that continued pretraining and distillation budget are core parts of the
+   method rather than implementation details.
 
 ## What Is Not Proven
 
 - No evidence supports a one-click arbitrary FP16/BF16-to-ternary product.
 - No evidence shows FP-quality 1.58-bit Qwen from this retrofit recipe.
+- No completed local run yet reproduces BitDistill paper-level GLUE quality.
 - No evidence validates Kimi or another MoE model in this runtime.
 - TL2 remains an engineering probe for row-scale Qwen, not a supported product
   path for the strongest checkpoint.
@@ -163,6 +199,8 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 ## Primary Reports
 
 - [Qwen side-by-side summary](benchmarks/results/qwen_side_by_side_2026-05-05.md)
+- [BitDistill reproduction status](benchmarks/results/bitdistill_reproduction_status_2026-05-14.md)
+- [BitDistill GLUE3 primary summary](benchmarks/results/bitdistill_seqcls_glue3_primary_summary_2026-05-14.md)
 - [Objective completion audit](benchmarks/results/objective_completion_audit_2026-05-13.md)
 - [Product scope gate](benchmarks/results/product_scope_gate_2026-05-13.md)
 - [I2_SR submodule promotion audit](benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md)
