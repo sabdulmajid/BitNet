@@ -80,6 +80,24 @@ def remote_read_probe(url: str) -> dict[str, Any]:
     }
 
 
+def patch_state(root: Path, patch: Path, *, cwd: Path | None = None) -> dict[str, Any]:
+    working_dir = cwd or root
+    patch_path = patch if patch.is_absolute() else root / patch
+    applies = patch_path.exists() and run(["git", "apply", "--check", str(patch_path)], cwd=working_dir).returncode == 0
+    already_applied = patch_path.exists() and run(["git", "apply", "--reverse", "--check", str(patch_path)], cwd=working_dir).returncode == 0
+    try:
+        display_path = str(patch_path.relative_to(root))
+    except ValueError:
+        display_path = str(patch_path)
+    return {
+        "path": display_path,
+        "exists": patch_path.exists(),
+        "applies_cleanly": applies,
+        "already_applied": already_applied,
+        "covered": applies or already_applied,
+    }
+
+
 def build_audit(
     root: Path,
     *,
@@ -95,6 +113,7 @@ def build_audit(
     submodule_short = git_output(["git", "rev-parse", "--short", "HEAD"], cwd=submodule)
     superproject_status = git_output(["git", "status", "--short", "--branch"], cwd=root)
     submodule_status = git_output(["git", "status", "--short", "--branch"], cwd=submodule)
+    run(["git", "fetch", "origin", remote_probe_branch], cwd=submodule)
     remote_contains = git_output(["git", "branch", "--remotes", "--contains", "HEAD"], cwd=submodule).splitlines()
     remote_write = remote_write_probe(submodule, remote_probe_branch) if check_remote_write else None
     candidate_fork = remote_read_probe(candidate_fork_url) if candidate_fork_url else None
@@ -113,8 +132,8 @@ def build_audit(
     stat = patch_stat(root, patch)
     root_split_patch = root / ROOT_SPLIT_PATCH
     submodule_split_patch = root / SUBMODULE_SPLIT_PATCH
-    root_split_applies = root_split_patch.exists() and run(["git", "apply", "--check", str(root_split_patch)], cwd=root).returncode == 0
-    submodule_split_applies = submodule_split_patch.exists() and run(["git", "apply", "--check", str(submodule_split_patch)], cwd=submodule).returncode == 0
+    root_split_state = patch_state(root, root_split_patch, cwd=root)
+    submodule_split_state = patch_state(root, submodule_split_patch, cwd=submodule)
     patch_files = [item["path"] for item in stat["files"]]
     patch_touches_submodule = any(path.startswith(str(SUBMODULE_PATH) + "/") for path in patch_files)
     patch_touches_root_runtime = "src/ggml-bitnet-mad.cpp" in patch_files
@@ -124,14 +143,15 @@ def build_audit(
         "llama_ftype_i2_sr": file_contains(submodule / "include/llama.h", ["LLAMA_FTYPE_MOSTLY_I2_SR"]),
         "gguf_py_i2_sr": file_contains(submodule / "gguf-py/gguf/constants.py", ["I2_SR", "MOSTLY_I2_SR"]),
         "llama_routes_i2_sr": file_contains(submodule / "src/llama.cpp", ["GGML_TYPE_I2_SR", "LLAMA_FTYPE_MOSTLY_I2_SR"]),
+        "quantize_cli_i2_sr": file_contains(submodule / "examples/quantize/quantize.cpp", ["I2_SR", "LLAMA_FTYPE_MOSTLY_I2_SR"]),
         "root_quantize_i2_sr": file_contains(root / "src/ggml-bitnet-mad.cpp", ["quantize_i2_sr", "GGML_TYPE_I2_SR"]),
     }
     active_runtime_support = all(active_checks.values())
+    submodule_dirty = any(line.startswith(" M ") or line.startswith("?? ") for line in submodule_status.splitlines())
     promotion_ready = (
         active_runtime_support
-        and not patch_already_applied
         and bool(remote_contains)
-        and not any(line.startswith(" M ") or line.startswith("?? ") for line in submodule_status.splitlines())
+        and not submodule_dirty
     )
     blockers = []
     if not active_runtime_support:
@@ -144,27 +164,32 @@ def build_audit(
         blockers.append("Configured llama.cpp submodule remote is not writable from this environment; use a fork or writable branch.")
     if candidate_fork and not candidate_fork["reachable"]:
         blockers.append("Candidate llama.cpp fork URL is not reachable; create the fork or provide the correct writable URL before promotion.")
-    if not root_split_applies or not submodule_split_applies:
-        blockers.append("Split root/submodule I2_SR promotion patches are missing or do not apply cleanly.")
-    if any(line.startswith(" M ") or line.startswith("?? ") for line in submodule_status.splitlines()):
+    if not root_split_state["covered"] or not submodule_split_state["covered"]:
+        blockers.append("Split root/submodule I2_SR promotion patches are missing, unapplied, or not represented in the active source.")
+    if submodule_dirty:
         blockers.append("Submodule working tree is dirty.")
 
-    next_steps = [
-        "Create or choose a writable llama.cpp fork/branch for the I2_SR runtime changes.",
-    ]
-    if local_handoff["prepared"]:
-        next_steps.append(
-            f"Push prepared local branch `{local_handoff['branch']}` from `{local_handoff['worktree_dir']}` at `{local_handoff['commit_sha']}`."
-        )
-    else:
-        next_steps.append(f"Apply `{SUBMODULE_SPLIT_PATCH}` inside that branch and commit it.")
-    next_steps.extend(
-        [
-            f"Apply `{ROOT_SPLIT_PATCH}` in this superproject or split it into an equivalent top-level commit.",
-            "Push the submodule branch, update .gitmodules if the URL changes, then update the superproject submodule pointer.",
-            "Run benchmarks/run_i2sr_active_patch_gate.py or the equivalent active-source productization gate after the pointer update.",
+    if promotion_ready:
+        next_steps = [
+            "No external I2_SR promotion input remains; keep the fork branch, submodule pointer, and active-source productization gate in sync.",
         ]
-    )
+    else:
+        next_steps = [
+            "Create or choose a writable llama.cpp fork/branch for the I2_SR runtime changes.",
+        ]
+        if local_handoff["prepared"]:
+            next_steps.append(
+                f"Push prepared local branch `{local_handoff['branch']}` from `{local_handoff['worktree_dir']}` at `{local_handoff['commit_sha']}`."
+            )
+        else:
+            next_steps.append(f"Apply `{SUBMODULE_SPLIT_PATCH}` inside that branch and commit it.")
+        next_steps.extend(
+            [
+                f"Apply `{ROOT_SPLIT_PATCH}` in this superproject or split it into an equivalent top-level commit.",
+                "Push the submodule branch, update .gitmodules if the URL changes, then update the superproject submodule pointer.",
+                "Run benchmarks/run_i2sr_active_patch_gate.py or the equivalent active-source productization gate after the pointer update.",
+            ]
+        )
 
     return {
         "schema": "bitnet-i2sr-submodule-promotion-audit-v1",
@@ -177,9 +202,13 @@ def build_audit(
         "patch_touches_root_runtime": patch_touches_root_runtime,
         "split_patches": {
             "root_patch": str(ROOT_SPLIT_PATCH),
-            "root_patch_applies": root_split_applies,
+            "root_patch_applies": root_split_state["applies_cleanly"],
+            "root_patch_already_applied": root_split_state["already_applied"],
+            "root_patch_covered": root_split_state["covered"],
             "submodule_patch": str(SUBMODULE_SPLIT_PATCH),
-            "submodule_patch_applies": submodule_split_applies,
+            "submodule_patch_applies": submodule_split_state["applies_cleanly"],
+            "submodule_patch_already_applied": submodule_split_state["already_applied"],
+            "submodule_patch_covered": submodule_split_state["covered"],
         },
         "configured_submodule_url": gitmodules_url,
         "configured_submodule_branch": gitmodules_branch,
@@ -213,8 +242,18 @@ def render_markdown(result: dict[str, Any]) -> str:
     patch_rows = [[path] for path in result["patch_files"]]
     split = result["split_patches"]
     split_rows = [
-        [split["root_patch"], md_bool(bool(split["root_patch_applies"]))],
-        [split["submodule_patch"], md_bool(bool(split["submodule_patch_applies"]))],
+        [
+            split["root_patch"],
+            md_bool(bool(split["root_patch_applies"])),
+            md_bool(bool(split.get("root_patch_already_applied"))),
+            md_bool(bool(split.get("root_patch_covered"))),
+        ],
+        [
+            split["submodule_patch"],
+            md_bool(bool(split["submodule_patch_applies"])),
+            md_bool(bool(split.get("submodule_patch_already_applied"))),
+            md_bool(bool(split.get("submodule_patch_covered"))),
+        ],
     ]
     blocker_rows = [[blocker] for blocker in result["blockers"]] or [["none"]]
     next_rows = [[step] for step in result["next_steps"]]
@@ -274,7 +313,7 @@ def render_markdown(result: dict[str, Any]) -> str:
             *remote_write_lines,
             *candidate_fork_lines,
             "## Split Promotion Patches",
-            md_table(["path", "applies cleanly"], split_rows),
+            md_table(["path", "applies cleanly", "already applied", "covered"], split_rows),
             "## Patch Touches",
             md_table(["path"], patch_rows),
             "## Required Promotion Steps",

@@ -79,6 +79,11 @@ def build_audit(root: Path, *, candidate_fork_url: str) -> dict[str, Any]:
     moe_gates = moe.get("productization_gates", [])
     failed_moe_gates = [gate.get("name") for gate in moe_gates if isinstance(gate, dict) and not gate.get("passed")]
 
+    writable_fork_action = (
+        "No action needed; the fork branch is reachable and promotion_ready is true."
+        if not i2sr_blocked
+        else "Create/provide a reachable writable llama.cpp fork URL, then push the prepared submodule I2_SR patch branch."
+    )
     requirements = [
         make_requirement(
             "Writable llama.cpp fork or branch",
@@ -90,11 +95,11 @@ def build_audit(root: Path, *, candidate_fork_url: str) -> dict[str, Any]:
                 f"local_handoff_prepared={handoff_prepared}; "
                 f"local_handoff_commit={handoff_commit or 'n/a'}"
             ),
-            "Create/provide a reachable writable llama.cpp fork URL, then push the prepared submodule I2_SR patch branch.",
+            writable_fork_action,
         ),
         make_requirement(
             "GitHub automation credential",
-            "missing" if gh_path is None else "available",
+            "optional_missing" if gh_path is None else "available",
             f"gh_path={gh_path or 'not_found'}",
             "Install/authenticate GitHub CLI or refresh the GitHub connector token if repository creation/push automation is desired.",
         ),

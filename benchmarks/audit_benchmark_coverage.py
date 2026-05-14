@@ -188,13 +188,13 @@ def audit_rss_and_gates(root: Path, checks: list[dict[str, Any]]) -> None:
     failed = [item for item in gate.get("gates", []) if not item.get("passed")]
     add_check(
         checks,
-        "productization gate fails for the expected reason",
-        gate.get("passed") is False
-        and len(failed) == 3
+        "productization gate passes for stable I2_SR",
+        gate.get("passed") is True
+        and len(failed) == 0
         and gate.get("observations", {}).get("stable_benchmark_quality_ok") is True
         and gate.get("observations", {}).get("packing_verification_passed") is True,
         f"passed={gate.get('passed')}, failed={len(failed)}, stable_quality={gate.get('observations', {}).get('stable_benchmark_quality_ok')}, layout={gate.get('observations', {}).get('packing_verification_passed')}",
-        "gate result no longer matches the scoped not-production-ready verdict",
+        "stable I2_SR productization gate did not pass",
     )
 
 

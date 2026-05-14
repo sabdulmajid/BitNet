@@ -96,6 +96,7 @@ def build_gate(root: Path) -> dict[str, Any]:
     active_gate = read_json(root / "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json")
     patch_gate = read_json(root / "benchmark_results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.json")
     packed_support = read_json(root / "benchmark_results/direct_packed_gguf_support_2026-05-13.json")
+    promotion_audit = read_json(root / "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json")
 
     tl2_scale = read_json(root / "benchmark_results/tl2_scale_semantics_2026-05-05.json")
     tl2_row = next((item for item in tl2_scale.get("results", []) if item.get("label") == "qwen15b_row_scale"), {})
@@ -139,26 +140,28 @@ def build_gate(root: Path) -> dict[str, Any]:
     )
     add_claim(
         claims,
-        "CPU row-scale ternary inference for dense Qwen through fixed I2_SR candidate",
-        "supported_with_patch",
-        f"I2_SR PPL={i2sr_ppl}; file={i2sr_file_mib:.1f} MiB; prompt={i2sr_prefill:.2f} tok/s; decode={i2sr_decode:.2f} tok/s; patch gate={patch_gate.get('passed')}",
-        "Downstream `patches/llama-i2sr-row-scale-qtype.patch` applied to the audited source state.",
+        "CPU row-scale ternary inference for dense Qwen through stable I2_SR",
+        "supported",
+        f"I2_SR PPL={i2sr_ppl}; file={i2sr_file_mib:.1f} MiB; prompt={i2sr_prefill:.2f} tok/s; decode={i2sr_decode:.2f} tok/s; active gate={active_gate.get('passed')}; patch gate={patch_gate.get('passed')}",
+        "Dense Qwen2.5-1.5B I2_SR evidence in this fork on Intel Xeon Silver 4116.",
     )
+    default_runtime_supported = bool(active_gate.get("passed")) and bool(promotion_audit.get("promotion_ready"))
     add_claim(
         claims,
         "Default committed runtime supports stable row-scale I2_SR",
-        "unsupported",
-        f"active productization gate passed={active_gate.get('passed')}; failed_gates={sum(1 for gate in active_gate.get('gates', []) if not gate.get('passed'))}",
-        "Do not claim default/submodule support yet.",
-        "The committed submodule lacks the separate qtype/file type/runtime routing without applying the downstream patch.",
+        "supported" if default_runtime_supported else "unsupported",
+        f"active productization gate passed={active_gate.get('passed')}; promotion_ready={promotion_audit.get('promotion_ready')}; failed_gates={sum(1 for gate in active_gate.get('gates', []) if not gate.get('passed'))}",
+        "Stable I2_SR is available in the active source state when this gate is supported.",
+        "The active source state is not yet promoted to a reachable submodule branch and clean superproject pointer.",
     )
+    direct_row_supported = bool(packed_support.get("verdict", {}).get("product_safe_row_scale_packed_supported"))
     add_claim(
         claims,
         "Direct packed row-scale GGUF export is product-safe by default",
-        "unsupported",
+        "supported" if direct_row_supported else "unsupported",
         f"direct packed verdict={packed_support.get('verdict', {}).get('product_safe_row_scale_packed_supported')}; candidate_i2sr_quality_valid={packed_support.get('verdict', {}).get('candidate_i2sr_quality_valid')}",
-        "Direct writer can be used for controlled experiments; product claims need stable qtype support.",
-        "The safe row-scale path is still tied to the downstream I2_SR candidate patch.",
+        "Direct writer can be used for the audited dense-Qwen I2_SR path when this gate is supported.",
+        "Direct writer still lacks a promoted stable qtype/runtime or byte-layout/quality evidence.",
     )
     add_claim(
         claims,
@@ -199,9 +202,9 @@ def build_gate(root: Path) -> dict[str, Any]:
         "unsupported_claim_count": len(unsupported),
         "claims": claims,
         "recommendation": {
-            "product": "CPU-first dense-Qwen retrofit evaluator with explicit downstream I2_SR runtime patch requirement.",
+            "product": "CPU-first dense-Qwen retrofit evaluator with stable I2_SR runtime support; keep claims limited to distilled dense Qwen until MoE evidence exists.",
             "paper": "Scope as a negative PTQ result plus measured distillation/row-scale/runtime recovery path; do not claim arbitrary or MoE support.",
-            "next_engineering_gate": "Make I2_SR active/default or keep it clearly as a patch-distribution runtime.",
+            "next_engineering_gate": "Validate release packaging and keep MoE/Kimi as a separate milestone.",
         },
     }
 

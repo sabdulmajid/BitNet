@@ -394,7 +394,7 @@ def audit_productization(root: Path, rows: list[dict[str, Any]], metrics: dict[s
             f"active default gate={active.get('passed')}; TL2 row-scale one-scale error={tl2_row.get('total_relative_fro_error_if_one_scale')}; "
             f"row-fp16 design error={tl2_row_fp16.get('expected_relative_output_rms_error')} at {tl2_row_fp16.get('scale_mib_fp16')} MiB"
         ),
-        "Packed row-scale CPU inference is proven only through the downstream I2_SR patch; TL2 quality-preserving row-scale Qwen1.5B requires row/group-scale runtime and kernel support.",
+        "Packed row-scale CPU inference is active through stable I2_SR for dense Qwen; TL2 quality-preserving row-scale Qwen1.5B still requires row/group-scale runtime and kernel support.",
     )
 
 
@@ -474,7 +474,7 @@ def render_markdown(result: dict[str, Any]) -> str:
         f"Objective achieved: `{result['objective_achieved']}`.",
         f"Completion status: `{result['completion_status']}`.",
         f"Complete rows: `{result['complete_count']}` / `{result['check_count']}`.",
-        "The dense-Qwen negative result and row-scale recovery path are well supported. The full objective is still incomplete because product-default row-scale qtype support, quality-preserving TL2 for the strong row-scale checkpoint, and MoE/Kimi evidence remain missing.",
+        "The dense-Qwen negative result, row-scale recovery path, and stable I2_SR CPU route are well supported. The full objective is still incomplete because quality-preserving TL2 support for the strong row-scale checkpoint and MoE/Kimi evidence remain missing.",
         "## Prompt-To-Artifact Checklist",
         md_table(["requirement", "status", "evidence", "remaining gap"], checklist_rows),
         "## Remaining Blockers",
@@ -483,7 +483,7 @@ def render_markdown(result: dict[str, Any]) -> str:
     lines.extend(
         [
             "## Practical Next Step",
-            "Promote the `I2_SR` candidate patch into the active runtime contract or keep it explicitly documented as a downstream patch. Do not expand product claims to TL2 or MoE/Kimi until those paths have quality-valid CPU benchmark artifacts.",
+            "Keep the stable `I2_SR` route packaged and benchmarked for dense Qwen. Do not expand product claims to TL2 or MoE/Kimi until those paths have quality-valid CPU benchmark artifacts.",
         ]
     )
     return "\n\n".join(lines) + "\n"

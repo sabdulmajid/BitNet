@@ -4,8 +4,8 @@
 This writer handles the scalar/tensor-scale case by default. Row-scale
 checkpoints need a compatibility-safe GGUF type or versioned layout and are
 therefore rejected unless --row-scale-prototype or --row-scale-qtype=i2_sr is
-passed. The i2_sr mode emits the candidate stable row-scale type IDs used by
-patches/llama-i2sr-row-scale-qtype.patch.
+passed. The i2_sr mode emits the stable row-scale type IDs used by this fork's
+promoted I2_SR runtime.
 """
 
 from __future__ import annotations
@@ -268,8 +268,8 @@ def main() -> None:
         choices=["i2_sr"],
         default=None,
         help=(
-            "Emit a candidate stable row-scale qtype instead of overloading I2_S. "
-            "Requires a runtime with patches/llama-i2sr-row-scale-qtype.patch applied."
+            "Emit the stable row-scale qtype instead of overloading I2_S. "
+            "Requires a runtime with stable I2_SR qtype support."
         ),
     )
     args = parser.parse_args()

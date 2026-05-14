@@ -301,7 +301,7 @@ def build_report(result: dict[str, Any]) -> str:
         "",
         f"- Prototype row-scale `I2_S` / `TQ2_0` PPL ratio: `{fmt(obs['prototype_row_scale_i2s_to_tq2_ppl_ratio'], 6)}`.",
         f"- Default row-scale `I2_S` / `TQ2_0` PPL ratio: `{fmt(obs['default_row_scale_i2s_to_tq2_ppl_ratio'], 2)}`.",
-        f"- Current row-scale patch overloads existing `I2_S`: `{obs['patch_overloads_existing_i2s']}`.",
+        f"- Archived legacy row-scale `I2_S` patch overloads existing `I2_S`: `{obs['patch_overloads_existing_i2s']}`.",
         f"- Stable GGML qtype present: `{obs['has_ggml_stable_qtype']}`.",
         f"- Stable llama file type present: `{obs['has_llama_stable_ftype']}`.",
         f"- Direct writer emits stable row-scale qtype: `{obs['direct_writer_emits_stable_qtype']}`.",

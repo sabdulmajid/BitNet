@@ -272,7 +272,7 @@ def build_reviewer_gate_table() -> str:
             "objective completion",
             str(objective.get("completion_status", "missing")),
             f"{objective.get('complete_count', '-')}/{objective.get('check_count', '-')} complete",
-            "Open items are default row-scale runtime promotion and MoE/Kimi evidence.",
+            "Open items are TL2 row/group-scale quality support and MoE/Kimi evidence.",
         ],
         [
             "product scope",
@@ -284,7 +284,7 @@ def build_reviewer_gate_table() -> str:
             "I2_SR active submodule",
             "ready" if i2sr.get("promotion_ready") else "blocked",
             f"active={i2sr.get('active_runtime_support')}; patch_applies={i2sr.get('patch_applies_cleanly')}; blockers={len(i2sr.get('blockers', []))}",
-            "Quality-valid CPU path exists only with the downstream patch until a writable llama.cpp fork/branch is provided.",
+            "Quality-valid CPU path is active when the fork branch is reachable and the superproject pointer is clean.",
         ],
         [
             "MoE/Kimi packing",

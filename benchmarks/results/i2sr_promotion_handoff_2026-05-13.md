@@ -14,14 +14,14 @@ Branch: `i2sr-row-scale-runtime`.
 | submodule clean | `true` |
 | root patch applies | `true` |
 | submodule patch applies | `true` |
-| candidate fork reachable | `false` |
-| ready for handoff | `false` |
+| candidate fork reachable | `true` |
+| ready for handoff | `true` |
 
 ## Blockers
 
 | blocker |
 | --- |
-| Candidate llama.cpp fork URL is not reachable. |
+| none |
 
 ## Prepare Submodule Branch
 
@@ -66,6 +66,6 @@ Branch: `i2sr-row-scale-runtime`.
 | field | value |
 | --- | --- |
 | prepared | `true` |
-| pushed | `false` |
+| pushed | `true` |
 | commit | `cb38942486a05e3a1212e6eba1462e178478f459` |
 | worktree | `/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/i2sr-promotion-llama-worktree` |

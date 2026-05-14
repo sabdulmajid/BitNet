@@ -7,16 +7,16 @@ Generated from benchmark JSON artifacts. Missing rows are intentionally shown as
 | claim area | best current artifact | artifact Wiki/CPU PPL | reference FP PPL | artifact FineWeb/PPL | reference FP FineWeb/PPL | artifact ten-task mean | FP ten-task mean | status |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | best HF quality recovery | QAT KL-only row-scale dense lm_head | 38.580 | 13.901 | 21.333 | 10.269 | 0.499459 | 0.644169 | not FP-quality |
-| packed CPU candidate | direct I2_SR fixed x86 ACT | 38.848 | 12.281 | - | - | - | - | not production-ready; 3 qtype/runtime gates fail |
+| packed CPU candidate | direct I2_SR fixed x86 ACT | 38.848 | 12.281 | - | - | - | - | production gate pass |
 
 ## Reviewer Gate Summary
 
 | gate | status | evidence | reviewer implication |
 | --- | --- | --- | --- |
 | benchmark coverage | pass | full ten-task, paired deltas, CPU quality/speed/RSS, manifest | This confirms artifact coverage, not product completion. |
-| objective completion | not_complete | 7/9 complete | Open items are default row-scale runtime promotion and MoE/Kimi evidence. |
+| objective completion | not_complete | 7/9 complete | Open items are TL2 row/group-scale quality support and MoE/Kimi evidence. |
 | product scope | research_mvp_only | negative arbitrary-retrofit result plus dense-Qwen row-scale recovery path | Do not claim arbitrary lossless retrofit or MoE/Kimi support. |
-| I2_SR active submodule | blocked | active=False; patch_applies=True; blockers=4 | Quality-valid CPU path exists only with the downstream patch until a writable llama.cpp fork/branch is provided. |
+| I2_SR active submodule | ready | active=True; patch_applies=False; blockers=0 | Quality-valid CPU path is active when the fork branch is reachable and the superproject pointer is clean. |
 | MoE/Kimi packing | blocked | tl2_3d=False; i2sr_3d=True; 2d_control=True | Synthetic contract now separates direct I2_S/I2_SR packing from TL2; no Kimi artifact exists. |
 
 ## Perplexity
