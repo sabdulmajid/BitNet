@@ -102,7 +102,7 @@ def parse_env_lines(text: str) -> dict[str, str]:
     return env
 
 
-def parse_warmup_log(path: Path, *, max_seq_len: int) -> dict[str, Any]:
+def parse_warmup_log(path: Path, *, root: Path, max_seq_len: int) -> dict[str, Any]:
     if not path.exists():
         return {"exists": False, "path": str(path)}
     text = path.read_text(encoding="utf-8", errors="replace")
@@ -121,6 +121,12 @@ def parse_warmup_log(path: Path, *, max_seq_len: int) -> dict[str, Any]:
     per_device_batch_size = int(env.get("PER_DEVICE_BATCH_SIZE", "0") or 0)
     grad_accum_steps = int(env.get("GRAD_ACCUM_STEPS", "0") or 0)
     observed_max_seq_len = int(env.get("MAX_SEQ_LEN", str(max_seq_len)) or max_seq_len)
+    save_every_steps = int(env.get("SAVE_EVERY_STEPS", "0") or 0)
+    output_dir_value = env.get("OUTPUT_DIR", "")
+    output_dir = Path(output_dir_value) if output_dir_value else None
+    if output_dir is not None and not output_dir.is_absolute():
+        output_dir = root / output_dir
+    snapshot_dirs = sorted(output_dir.glob("checkpoint-*")) if output_dir is not None and output_dir.exists() else []
     token_step = per_device_batch_size * grad_accum_steps * observed_max_seq_len
     latest = steps[-1] if steps else None
     first = steps[0] if steps else None
@@ -145,6 +151,10 @@ def parse_warmup_log(path: Path, *, max_seq_len: int) -> dict[str, Any]:
         "effective_token_presentations": (latest["step"] * token_step) if latest else None,
         "target_token_presentations": (max_steps * token_step) if max_steps and token_step else None,
         "step_observations": len(steps),
+        "output_dir": str(output_dir) if output_dir is not None else "",
+        "save_every_steps": save_every_steps,
+        "snapshot_count": len(snapshot_dirs),
+        "latest_snapshot": str(snapshot_dirs[-1]) if snapshot_dirs else "",
     }
 
 
@@ -223,6 +233,9 @@ def render_markdown(summary: dict[str, Any]) -> str:
             fmt(latest.get("ce")),
             fmt(warmup.get("effective_token_presentations")),
             fmt(warmup.get("target_token_presentations")),
+            fmt(warmup.get("save_every_steps")),
+            fmt(warmup.get("snapshot_count")),
+            display_path(warmup.get("latest_snapshot"), root),
             seconds_to_hours(warmup.get("eta_seconds")),
         ]
     ]
@@ -253,7 +266,19 @@ def render_markdown(summary: dict[str, Any]) -> str:
             f"Job tables: `{', '.join(display_path(table, root) for table in summary['job_tables'])}`.",
             "## Stage-2 Warm-Up",
             md_table(
-                ["log", "step", "max steps", "progress", "latest CE", "effective tokens", "target tokens", "ETA"],
+                [
+                    "log",
+                    "step",
+                    "max steps",
+                    "progress",
+                    "latest CE",
+                    "effective tokens",
+                    "target tokens",
+                    "save every",
+                    "snapshots",
+                    "latest snapshot",
+                    "ETA",
+                ],
                 warmup_rows,
             ),
             "## Downstream Jobs",
@@ -293,7 +318,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     all_job_ids = sorted(set(warmup_job_ids + [row.get("job_id", "") for row in rows if row.get("job_id")]))
     squeue = collect_squeue(all_job_ids)
     warmup_log = infer_log_path(root, warmup_job_ids, args.warmup_log)
-    warmup = parse_warmup_log(warmup_log, max_seq_len=args.max_seq_len)
+    warmup = parse_warmup_log(warmup_log, root=root, max_seq_len=args.max_seq_len)
     return {
         "schema": "bitdistill-job-monitor-v1",
         "date": DATE,

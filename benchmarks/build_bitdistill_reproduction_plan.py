@@ -55,7 +55,8 @@ def build_matrix(args: argparse.Namespace) -> dict[str, Any]:
             "distill_layer": "-",
             "command": (
                 f"MODEL={args.model} STAGE=continued_pretrain METHOD=bitdistill SCALE_MODE=tensor "
-                f"MAX_STEPS={args.continued_pretrain_steps} OUTPUT_DIR={warmup_dir} "
+                f"MAX_STEPS={args.continued_pretrain_steps} SAVE_EVERY_STEPS={args.continued_pretrain_save_every_steps} "
+                f"OUTPUT_DIR={warmup_dir} "
                 "sbatch slurm_bitdistill_glue.sh"
             ),
         }
@@ -185,6 +186,7 @@ def main() -> None:
     parser.add_argument("--candidate-score", choices=["mean", "sum"], default="mean")
     parser.add_argument("--max-steps", type=int, default=1000)
     parser.add_argument("--continued-pretrain-steps", type=int, default=5000)
+    parser.add_argument("--continued-pretrain-save-every-steps", type=int, default=1000)
     parser.add_argument("--sweep-task", default="mnli", choices=TASKS)
     parser.add_argument("--layer-sweep", type=int, nargs="+", default=[-1, -2, -4, -8])
     parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/bitdistill_reproduction_plan_2026-05-14.json"))

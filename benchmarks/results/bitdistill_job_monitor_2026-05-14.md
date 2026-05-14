@@ -4,9 +4,9 @@ Job tables: `benchmark_results/bitdistill_longwarmup_downstream_20260514_163342.
 
 ## Stage-2 Warm-Up
 
-| log | step | max steps | progress | latest CE | effective tokens | target tokens | ETA |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| logs/bitdistill-glue-9894.out | 3710 | 20000 | 0.185500 | 4.377702 | 30392320 | 163840000 | 8.24h |
+| log | step | max steps | progress | latest CE | effective tokens | target tokens | save every | snapshots | latest snapshot | ETA |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| logs/bitdistill-glue-9894.out | 3900 | 20000 | 0.195000 | 4.475124 | 31948800 | 163840000 | 0 | 0 | - | 8.14h |
 
 ## Downstream Jobs
 

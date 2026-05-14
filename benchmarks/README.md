@@ -405,6 +405,9 @@ artifacts.
 For future long Stage-2 warm-ups, set `SAVE_EVERY_STEPS=1000` or another
 interval when submitting `slurm_bitdistill_glue.sh`. This writes restartable
 `checkpoint-<step>/custom_state_dict.pt` snapshots under the run directory.
+The GLUE matrix submitter now does this for Stage-2 by default through
+`CONTINUED_PRETRAIN_SAVE_EVERY_STEPS=1000`; set it explicitly to a different
+positive interval for longer jobs.
 
 To consolidate the inputs required before the remaining open claims can advance:
 
