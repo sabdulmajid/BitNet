@@ -106,8 +106,8 @@
       "label": "bitdistill_paired_predictions_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_paired_predictions_2026-05-14.md",
-      "sha256": "34d5789bb4659ed27c49bd16a8e3e6a20ee69eccd203d99b825c219680aac26f",
-      "size_bytes": 10936
+      "sha256": "c8203b38e2a0eac6d82b2ab656d39f002a3851b175c2f726c348c52c767f9a1c",
+      "size_bytes": 11315
     },
     {
       "exists": true,
@@ -2058,8 +2058,8 @@
         "status": "pending"
       },
       "path": "benchmark_results/bitdistill_paired_predictions_2026-05-14.json",
-      "sha256": "6bc698c10ac9651700326f33ec400e825395fb0b6d4e674741b8ffd6cf2f796b",
-      "size_bytes": 62769
+      "sha256": "1b9b1bb38c59810f2f6e59a55366d161768bfa6c7ad10395635450e33e289aee",
+      "size_bytes": 67074
     },
     {
       "exists": true,

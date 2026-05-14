@@ -14,6 +14,11 @@ from typing import Any
 
 DATE = datetime.now(timezone.utc).date().isoformat()
 TASKS = ["mnli", "qnli", "sst2"]
+EXPECTED_EVAL_EXAMPLES = {
+    "mnli": 9815,
+    "qnli": 5463,
+    "sst2": 872,
+}
 Z_95 = 1.959963984540054
 
 
@@ -96,13 +101,17 @@ def read_predictions(path: Path) -> tuple[list[dict[str, Any]], list[str]]:
     return rows, errors
 
 
-def metric_accuracy(run_directory: Path) -> float | None:
+def metric_summary(run_directory: Path) -> dict[str, Any]:
     metrics = read_json(run_directory / "metrics.json")
     eval_metrics = metrics.get("eval", {}) if isinstance(metrics.get("eval"), dict) else {}
     value = eval_metrics.get("accuracy")
+    examples = eval_metrics.get("eval_examples")
+    example_count = int(examples) if isinstance(examples, (int, float)) and examples > 0 else None
     if isinstance(value, (int, float)) and math.isfinite(float(value)):
-        return float(value)
-    return None
+        accuracy = float(value)
+    else:
+        accuracy = None
+    return {"accuracy": accuracy, "examples": example_count}
 
 
 def paired_ci(differences: list[float], z: float = Z_95) -> list[float] | None:
@@ -154,6 +163,7 @@ def exact_mcnemar_pvalue(candidate_wins: int, reference_wins: int) -> float:
 
 
 def compare_predictions(args: argparse.Namespace, spec: ComparisonSpec) -> dict[str, Any]:
+    expected_examples = EXPECTED_EVAL_EXAMPLES[spec.task]
     reference_dir = run_dir(getattr(args, spec.reference.root_attr), args.model, spec.reference, spec.task)
     candidate_dir = run_dir(getattr(args, spec.candidate.root_attr), args.model, spec.candidate, spec.task)
     reference_path = reference_dir / "eval_predictions.jsonl"
@@ -166,6 +176,10 @@ def compare_predictions(args: argparse.Namespace, spec: ComparisonSpec) -> dict[
 
     if not missing and len(reference_rows) != len(candidate_rows):
         errors.append(f"prediction row count mismatch: reference={len(reference_rows)}, candidate={len(candidate_rows)}")
+    if not missing and len(reference_rows) != expected_examples:
+        errors.append(f"reference prediction rows={len(reference_rows)} expected={expected_examples}")
+    if not missing and len(candidate_rows) != expected_examples:
+        errors.append(f"candidate prediction rows={len(candidate_rows)} expected={expected_examples}")
     if errors and not missing:
         status = "fail"
 
@@ -202,13 +216,26 @@ def compare_predictions(args: argparse.Namespace, spec: ComparisonSpec) -> dict[
     reference_accuracy = reference_correct / matched if matched else None
     candidate_accuracy = candidate_correct / matched if matched else None
     delta = (candidate_accuracy - reference_accuracy) if reference_accuracy is not None and candidate_accuracy is not None else None
-    reference_metric_accuracy = metric_accuracy(reference_dir)
-    candidate_metric_accuracy = metric_accuracy(candidate_dir)
-    if reference_accuracy is not None and reference_metric_accuracy is not None and abs(reference_accuracy - reference_metric_accuracy) > 1e-12:
-        errors.append(f"reference prediction accuracy {reference_accuracy} disagrees with metrics {reference_metric_accuracy}")
-        status = "fail"
-    if candidate_accuracy is not None and candidate_metric_accuracy is not None and abs(candidate_accuracy - candidate_metric_accuracy) > 1e-12:
-        errors.append(f"candidate prediction accuracy {candidate_accuracy} disagrees with metrics {candidate_metric_accuracy}")
+    reference_metrics = metric_summary(reference_dir)
+    candidate_metrics = metric_summary(candidate_dir)
+    reference_metric_accuracy = reference_metrics["accuracy"]
+    candidate_metric_accuracy = candidate_metrics["accuracy"]
+    reference_metric_examples = reference_metrics["examples"]
+    candidate_metric_examples = candidate_metrics["examples"]
+    if not missing:
+        if reference_metric_accuracy is None:
+            errors.append("missing reference metric accuracy")
+        elif reference_accuracy is not None and abs(reference_accuracy - reference_metric_accuracy) > 1e-12:
+            errors.append(f"reference prediction accuracy {reference_accuracy} disagrees with metrics {reference_metric_accuracy}")
+        if candidate_metric_accuracy is None:
+            errors.append("missing candidate metric accuracy")
+        elif candidate_accuracy is not None and abs(candidate_accuracy - candidate_metric_accuracy) > 1e-12:
+            errors.append(f"candidate prediction accuracy {candidate_accuracy} disagrees with metrics {candidate_metric_accuracy}")
+        if reference_metric_examples != expected_examples:
+            errors.append(f"reference metric eval_examples={reference_metric_examples} expected={expected_examples}")
+        if candidate_metric_examples != expected_examples:
+            errors.append(f"candidate metric eval_examples={candidate_metric_examples} expected={expected_examples}")
+    if errors and not missing:
         status = "fail"
 
     return {
@@ -224,6 +251,7 @@ def compare_predictions(args: argparse.Namespace, spec: ComparisonSpec) -> dict[
         "candidate_dir": str(candidate_dir),
         "reference_predictions": str(reference_path),
         "candidate_predictions": str(candidate_path),
+        "expected_examples": expected_examples,
         "matched": matched,
         "reference_accuracy": reference_accuracy,
         "candidate_accuracy": candidate_accuracy,
@@ -236,6 +264,8 @@ def compare_predictions(args: argparse.Namespace, spec: ComparisonSpec) -> dict[
         "mcnemar_exact_p": exact_mcnemar_pvalue(candidate_wins, reference_wins) if matched else None,
         "reference_metric_accuracy": reference_metric_accuracy,
         "candidate_metric_accuracy": candidate_metric_accuracy,
+        "reference_metric_examples": reference_metric_examples,
+        "candidate_metric_examples": candidate_metric_examples,
     }
 
 
@@ -280,9 +310,11 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "rows": rows,
         "notes": [
             "Delta is candidate accuracy minus reference accuracy on matched eval examples.",
+            "Rows pass only when both prediction traces cover the full expected task validation split.",
             "The paired 95% interval is a normal interval over per-example paired correctness differences.",
             "McNemar p-values use an exact two-sided binomial test over discordant pairs.",
         ],
+        "expected_eval_examples": {task: EXPECTED_EVAL_EXAMPLES[task] for task in args.tasks},
     }
 
 
@@ -315,6 +347,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
             row["label"],
             row["status"],
             fmt(row["matched"]),
+            fmt(row["expected_examples"]),
             fmt(row["reference_accuracy"]),
             fmt(row["candidate_accuracy"]),
             fmt(row["candidate_minus_reference"]),
@@ -332,6 +365,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
             f"Overall status: `{summary['status']}`.",
             f"Rows complete: `{summary['complete']}` / `{summary['total']}`. Pending: `{summary['pending']}`. Failed: `{summary['failed']}`.",
             "This report is designed to become the main statistical comparison once long-warmup jobs write `eval_predictions.jsonl`.",
+            f"Full-evaluation contract: `{summary['expected_eval_examples']}` examples. Partial prediction traces cannot pass.",
             "Delta is candidate minus reference on the same eval indices; positive means the candidate is better.",
             md_table(
                 [
@@ -339,6 +373,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
                     "comparison",
                     "status",
                     "matched n",
+                    "expected n",
                     "reference acc",
                     "candidate acc",
                     "delta",
