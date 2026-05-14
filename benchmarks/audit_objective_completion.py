@@ -13,11 +13,12 @@ import json
 import math
 import re
 import warnings
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
-DATE = "2026-05-13"
+DATE = datetime.now(timezone.utc).date().isoformat()
 EXPECTED_LM_EVAL_SAMPLES = 22382
 EXPECTED_RSS_CONTEXTS = [512, 2048, 8192, 32768]
 SELECTED_METRICS = {
@@ -519,8 +520,8 @@ def build_audit(root: Path) -> dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
-    parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/objective_completion_audit_2026-05-13.json"))
-    parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/objective_completion_audit_2026-05-13.md"))
+    parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/objective_completion_audit_{DATE}.json"))
+    parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/objective_completion_audit_{DATE}.md"))
     args = parser.parse_args()
 
     root = args.repo_root.resolve()

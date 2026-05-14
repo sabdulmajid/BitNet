@@ -265,10 +265,10 @@ python benchmarks/audit_objective_completion.py
 ```
 
 The current report is
-`benchmarks/results/objective_completion_audit_2026-05-13.md`. It is expected
-to report `Objective achieved: False` until row-scale `I2_SR` is an active
-runtime contract or explicitly scoped as downstream, and until TL2/MoE claims
-are either benchmarked or removed from the product scope.
+`benchmarks/results/objective_completion_audit_2026-05-14.md`. It is expected
+to report `Objective achieved: False` until the remaining TL2 row-scale and
+MoE/Kimi claims are either backed by quality-valid runtime artifacts or removed
+from the product scope.
 
 To classify the current publication/product scope from artifacts:
 
