@@ -304,6 +304,11 @@ The gate reports whether the paper-style tensor candidate and the row-scale
 candidate are complete and whether each is within the configured FP16-SFT
 accuracy gap. Missing long-warm-up outputs are treated as pending failures.
 
+For the active Slurm pipeline, queue `slurm_bitdistill_postprocess.sh` with an
+`afterany` dependency on the downstream jobs. It refreshes the monitor,
+reproduction gate, variant summary, and objective audit from the materialized
+artifacts.
+
 To consolidate the inputs required before the remaining open claims can advance:
 
 ```bash

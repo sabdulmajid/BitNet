@@ -206,6 +206,8 @@ python benchmarks/gate_bitdistill_reproduction.py \
   --output-json benchmark_results/bitdistill_reproduction_gate_2026-05-14.json \
   --output-md benchmarks/results/bitdistill_reproduction_gate_2026-05-14.md
 
+sbatch --dependency=afterany:<downstream-job-ids> slurm_bitdistill_postprocess.sh
+
 python benchmarks/build_qwen_side_by_side.py \
   --output-md benchmarks/results/qwen_side_by_side_2026-05-05.md
 ```
