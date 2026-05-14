@@ -17,9 +17,9 @@ Artifacts: `131`. Missing: `0`.
 | bitdistill_loss_scale_report | tracked_report | yes | 6846 | 65816a5d56a5 |  |
 | bitdistill_cpu_gate_report | tracked_report | yes | 4007 | fe558c83ae1f |  |
 | bitdistill_i2sr_gate_report | tracked_report | yes | 3227 | cbba7847c611 |  |
-| bitdistill_job_monitor_report | tracked_report | yes | 5755 | b501c22f71c0 |  |
-| bitdistill_dependency_graph_report | tracked_report | yes | 5927 | 8cef4df81fd6 |  |
-| bitdistill_smoke_contract_report | tracked_report | yes | 1255 | f6330f61bd4b |  |
+| bitdistill_job_monitor_report | tracked_report | yes | 5755 | 6ae799cc72d0 |  |
+| bitdistill_dependency_graph_report | tracked_report | yes | 5927 | 2ead40f8ca46 |  |
+| bitdistill_smoke_contract_report | tracked_report | yes | 2115 | ccd8a0706d19 |  |
 | bitdistill_variant_summary_report | tracked_report | yes | 8218 | 3d5020654821 |  |
 | bitdistill_causal_longwarmup_report | tracked_report | yes | 3592 | cd7036ae78d9 |  |
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
@@ -118,9 +118,9 @@ Artifacts: `131`. Missing: `0`.
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 10456 | 8b57426d097d | present=13/24, paper_complete=False, paper_passed=False, row_complete=False, row_passed=False |
 | bitdistill_cpu_gate_json | bitdistill_cpu_gate_json | yes | 5949 | bf57042d5030 | passed=False, input=False, critical=0/21, blockers=1 |
 | bitdistill_i2sr_gate_json | bitdistill_i2sr_gate_json | yes | 4976 | 956d783c5645 | passed=False, complete=0/6, tasks=['mnli', 'qnli', 'sst2'], scales=['tensor', 'row'], blockers=4 |
-| bitdistill_job_monitor_json | bitdistill_job_monitor_json | yes | 34315 | 4e8aac1606d7 | warmup=5850/20000, progress=0.2925, ce=4.05736, snapshots=0, warnings=1, downstream=17 |
-| bitdistill_dependency_graph_json | bitdistill_dependency_graph_json | yes | 13935 | fe70f4d437ad | ready=True, checks=4, failed=0, active=17/17, warmup=5850/20000, warnings=2, blockers=0 |
-| bitdistill_smoke_contract_json | bitdistill_smoke_contract_json | yes | 14962 | 94955c90fd86 | passed=True, checks=14, failed=0, continued=bitlinear15/subln4, task=bitlinear15/subln4 |
+| bitdistill_job_monitor_json | bitdistill_job_monitor_json | yes | 34314 | 223b261e6c44 | warmup=6280/20000, progress=0.314, ce=4.469, snapshots=0, warnings=1, downstream=17 |
+| bitdistill_dependency_graph_json | bitdistill_dependency_graph_json | yes | 13934 | 312f76a80a09 | ready=True, checks=4, failed=0, active=17/17, warmup=6280/20000, warnings=2, blockers=0 |
+| bitdistill_smoke_contract_json | bitdistill_smoke_contract_json | yes | 21541 | 0282d0999936 | passed=True, checks=24, failed=0, continued=bitlinear15/subln4, task=bitlinear15/subln4 |
 | bitdistill_variant_summary_json | bitdistill_variant_summary_json | yes | 18545 | ab26e5610a5a | rows=21/21, tasks=['mnli', 'qnli', 'sst2'] |
 | bitdistill_causal_longwarmup_json | bitdistill_causal_summary_json | yes | 11519 | a229947af0e5 | passed=False, rows=6/12, verdicts=0/3, tasks=['mnli', 'qnli', 'sst2'] |
 | bitdistill_loss_scale_json | bitdistill_loss_scale_json | yes | 22028 | 785e1591ed56 | rows=11/28, gamma=100000, projected_attn_ce=[837.539, 13035.1] |

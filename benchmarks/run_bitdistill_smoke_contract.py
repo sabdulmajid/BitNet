@@ -13,6 +13,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import torch
+
 
 DATE = datetime.now(timezone.utc).date().isoformat()
 
@@ -42,6 +44,47 @@ def read_json(path: Path) -> dict[str, Any]:
 
 def finite(value: Any) -> bool:
     return isinstance(value, (int, float)) and math.isfinite(float(value))
+
+
+def inspect_ternary_state(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {"exists": False}
+    state = torch.load(path, map_location="cpu", weights_only=True)
+    if not isinstance(state, dict):
+        return {"exists": True, "valid": False, "error": "not a state dict"}
+    code_keys = sorted(key for key in state if key.endswith(".ternary_weight"))
+    scale_keys = sorted(key for key in state if key.endswith(".weight_scale"))
+    invalid_code_keys: list[str] = []
+    missing_scales: list[str] = []
+    tensor_scale_keys = 0
+    row_scale_keys = 0
+    for key in code_keys:
+        tensor = state[key]
+        if not isinstance(tensor, torch.Tensor):
+            invalid_code_keys.append(key)
+            continue
+        invalid_values = tensor[~torch.isin(tensor, torch.tensor([-1, 0, 1], dtype=tensor.dtype))]
+        if invalid_values.numel() > 0:
+            invalid_code_keys.append(key)
+        prefix = key[: -len(".ternary_weight")]
+        scale = state.get(f"{prefix}.weight_scale")
+        if not isinstance(scale, torch.Tensor):
+            missing_scales.append(prefix)
+            continue
+        if tuple(scale.shape) == (1,):
+            tensor_scale_keys += 1
+        elif scale.ndim == 2 and scale.shape[0] == tensor.shape[0] and scale.shape[1] == 1:
+            row_scale_keys += 1
+    return {
+        "exists": True,
+        "valid": not invalid_code_keys and not missing_scales and len(code_keys) == len(scale_keys),
+        "code_keys": len(code_keys),
+        "scale_keys": len(scale_keys),
+        "tensor_scale_keys": tensor_scale_keys,
+        "row_scale_keys": row_scale_keys,
+        "invalid_code_keys": invalid_code_keys,
+        "missing_scales": missing_scales,
+    }
 
 
 def add_check(checks: list[dict[str, Any]], name: str, passed: bool, evidence: str, blocker: str = "") -> None:
@@ -134,10 +177,39 @@ def main() -> None:
             "--output-dir",
             str(work_dir / "task_sft"),
         ],
+        "task_sft_row": [
+            py,
+            "train_bitdistill.py",
+            "--smoke-test",
+            "--stage",
+            "task_sft",
+            "--method",
+            "bitdistill",
+            "--scale-mode",
+            "row",
+            "--max-steps",
+            "2",
+            "--device",
+            "cpu",
+            "--per-device-batch-size",
+            "1",
+            "--eval-batch-size",
+            "1",
+            "--max-seq-len",
+            "32",
+            "--log-every-steps",
+            "1",
+            "--output-dir",
+            str(work_dir / "task_sft_row"),
+        ],
     }
     runs = {name: run_command(command, cwd=repo_root) for name, command in commands.items()}
     continued = read_json(work_dir / "continued_pretrain" / "metrics.json")
     task = read_json(work_dir / "task_sft" / "metrics.json")
+    row_task = read_json(work_dir / "task_sft_row" / "metrics.json")
+    continued_ternary = inspect_ternary_state(work_dir / "continued_pretrain" / "ternary_state_dict.pt")
+    task_ternary = inspect_ternary_state(work_dir / "task_sft" / "ternary_state_dict.pt")
+    row_task_ternary = inspect_ternary_state(work_dir / "task_sft_row" / "ternary_state_dict.pt")
 
     checks: list[dict[str, Any]] = []
     for name, run in runs.items():
@@ -155,6 +227,13 @@ def main() -> None:
         "BitNet preparation did not run",
     )
     add_check(checks, "continued-pretrain CE is finite", finite(continued_last.get("ce")), f"ce={continued_last.get('ce')}", "non-finite CE")
+    add_check(
+        checks,
+        "continued-pretrain ternary export is valid",
+        continued_ternary.get("valid") is True and continued_ternary.get("code_keys") == continued_prep.get("bitlinear_replaced"),
+        f"codes={continued_ternary.get('code_keys')}, scales={continued_ternary.get('scale_keys')}, bitlinear={continued_prep.get('bitlinear_replaced')}",
+        "invalid ternary_state_dict export",
+    )
 
     task_prep = task.get("preparation", {}) if isinstance(task.get("preparation"), dict) else {}
     task_last = task.get("last", {}) if isinstance(task.get("last"), dict) else {}
@@ -171,6 +250,40 @@ def main() -> None:
     add_check(checks, "task-sft logits KD is finite", finite(task_last.get("weighted_logit_kd")), f"weighted_logit_kd={task_last.get('weighted_logit_kd')}", "non-finite logits KD")
     add_check(checks, "task-sft attention KD is finite", finite(task_last.get("weighted_attention_kd")), f"weighted_attention_kd={task_last.get('weighted_attention_kd')}", "non-finite attention KD")
     add_check(checks, "task-sft eval accuracy is finite", finite(task_eval.get("accuracy")), f"accuracy={task_eval.get('accuracy')}", "non-finite accuracy")
+    add_check(
+        checks,
+        "task-sft tensor-scale ternary export is valid",
+        task_ternary.get("valid") is True
+        and task_ternary.get("code_keys") == task_prep.get("bitlinear_replaced")
+        and task_ternary.get("tensor_scale_keys") == task_ternary.get("code_keys"),
+        f"codes={task_ternary.get('code_keys')}, tensor_scales={task_ternary.get('tensor_scale_keys')}, row_scales={task_ternary.get('row_scale_keys')}",
+        "invalid tensor-scale ternary export",
+    )
+
+    row_task_prep = row_task.get("preparation", {}) if isinstance(row_task.get("preparation"), dict) else {}
+    row_task_last = row_task.get("last", {}) if isinstance(row_task.get("last"), dict) else {}
+    row_task_eval = row_task.get("eval", {}) if isinstance(row_task.get("eval"), dict) else {}
+    add_check(checks, "row task-sft writes metrics", bool(row_task), str(work_dir / "task_sft_row" / "metrics.json"), "missing metrics")
+    add_check(checks, "row task-sft takes two steps", row_task.get("steps") == 2, f"steps={row_task.get('steps')}", "unexpected step count")
+    add_check(
+        checks,
+        "row task-sft uses BitLinear and SubLN",
+        int(row_task_prep.get("bitlinear_replaced", 0)) > 0 and int(row_task_prep.get("subln_inserted", 0)) > 0,
+        f"bitlinear={row_task_prep.get('bitlinear_replaced')}, subln={row_task_prep.get('subln_inserted')}",
+        "BitNet preparation did not run",
+    )
+    add_check(checks, "row task-sft logits KD is finite", finite(row_task_last.get("weighted_logit_kd")), f"weighted_logit_kd={row_task_last.get('weighted_logit_kd')}", "non-finite logits KD")
+    add_check(checks, "row task-sft attention KD is finite", finite(row_task_last.get("weighted_attention_kd")), f"weighted_attention_kd={row_task_last.get('weighted_attention_kd')}", "non-finite attention KD")
+    add_check(checks, "row task-sft eval accuracy is finite", finite(row_task_eval.get("accuracy")), f"accuracy={row_task_eval.get('accuracy')}", "non-finite accuracy")
+    add_check(
+        checks,
+        "row task-sft row-scale ternary export is valid",
+        row_task_ternary.get("valid") is True
+        and row_task_ternary.get("code_keys") == row_task_prep.get("bitlinear_replaced")
+        and row_task_ternary.get("row_scale_keys") == row_task_ternary.get("code_keys"),
+        f"codes={row_task_ternary.get('code_keys')}, tensor_scales={row_task_ternary.get('tensor_scale_keys')}, row_scales={row_task_ternary.get('row_scale_keys')}",
+        "invalid row-scale ternary export",
+    )
 
     result = {
         "schema": "bitdistill-smoke-contract-v1",
@@ -183,6 +296,10 @@ def main() -> None:
         "runs": runs,
         "continued_pretrain_metrics": continued,
         "task_sft_metrics": task,
+        "task_sft_row_metrics": row_task,
+        "continued_pretrain_ternary": continued_ternary,
+        "task_sft_ternary": task_ternary,
+        "task_sft_row_ternary": row_task_ternary,
     }
 
     args.output_json.parent.mkdir(parents=True, exist_ok=True)
