@@ -45,6 +45,24 @@ RUN_SPECS = [
         "{task}/bitdistill-longwarmup-row-layer-8",
         "paper_hparam_row_candidate",
     ),
+    RunSpec(
+        "BitDistill longwarmup tensor layer -8 paper gamma lr1e-5",
+        "paper_hparam_lr1_root",
+        "{task}/bitdistill-longwarmup-tensor-layer-8",
+        "paper_hparam_search",
+    ),
+    RunSpec(
+        "BitDistill longwarmup tensor layer -8 paper gamma lr5e-5",
+        "paper_hparam_lr5_root",
+        "{task}/bitdistill-longwarmup-tensor-layer-8",
+        "paper_hparam_search",
+    ),
+    RunSpec(
+        "BitDistill longwarmup tensor layer -8 paper gamma headinit",
+        "paper_hparam_headinit_root",
+        "{task}/bitdistill-longwarmup-tensor-layer-8",
+        "paper_hparam_search",
+    ),
 ]
 
 
@@ -137,12 +155,24 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
             )
 
     paper_rows = [row for row in rows if row["family"] == "paper_hparam_candidate"]
+    paper_search_rows = [row for row in rows if row["family"] in {"paper_hparam_candidate", "paper_hparam_search"}]
     tensor_gamma100_rows = [row for row in rows if row["family"] == "longwarmup_gamma100"]
     row_scale_rows = [row for row in rows if row["family"] == "row_scale_candidate"]
     paper_row_rows = [row for row in rows if row["family"] == "paper_hparam_row_candidate"]
     paper_complete = all(row["exists"] and row["accuracy"] is not None for row in paper_rows)
+    paper_search_complete = all(row["exists"] and row["accuracy"] is not None for row in paper_search_rows)
     row_complete = all(row["exists"] and row["accuracy"] is not None for row in row_scale_rows)
     paper_passed = paper_complete and all(row["passes_fp_gap"] for row in paper_rows)
+    paper_search_best: dict[str, dict[str, Any]] = {}
+    for task in args.tasks:
+        task_rows = [row for row in paper_search_rows if row["task"] == task and row["accuracy"] is not None]
+        if task_rows:
+            paper_search_best[task] = max(task_rows, key=lambda row: float(row["accuracy"]))
+    paper_search_passed = (
+        paper_search_complete
+        and len(paper_search_best) == len(args.tasks)
+        and all(row["passes_fp_gap"] for row in paper_search_best.values())
+    )
     row_passed = row_complete and all(row["passes_fp_gap"] for row in row_scale_rows)
 
     comparisons = []
@@ -211,8 +241,14 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "longwarmup_root": str(args.longwarmup_root),
         "paper_hparam_root": str(args.paper_hparam_root),
         "paper_hparam_row_root": str(args.paper_hparam_row_root),
+        "paper_hparam_lr1_root": str(args.paper_hparam_lr1_root),
+        "paper_hparam_lr5_root": str(args.paper_hparam_lr5_root),
+        "paper_hparam_headinit_root": str(args.paper_hparam_headinit_root),
         "paper_style_tensor_complete": paper_complete,
         "paper_style_tensor_passed": paper_passed,
+        "paper_search_tensor_complete": paper_search_complete,
+        "paper_search_tensor_passed": paper_search_passed,
+        "paper_search_best_by_task": paper_search_best,
         "row_scale_complete": row_complete,
         "row_scale_passed": row_passed,
         "rows": rows,
@@ -284,6 +320,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
             "Confidence intervals: accuracy uses Wilson 95% intervals; this aggregate gate uses unpaired normal delta intervals. The paired-prediction audit is the authoritative example-level comparison when `eval_predictions.jsonl` exists.",
             f"Strict paper-hyperparameter tensor candidate complete: `{summary['paper_style_tensor_complete']}`.",
             f"Strict paper-hyperparameter tensor candidate passed: `{summary['paper_style_tensor_passed']}`.",
+            f"Paper tensor LR/headinit search complete: `{summary['paper_search_tensor_complete']}`.",
+            f"Paper tensor LR/headinit search passed: `{summary['paper_search_tensor_passed']}`.",
             f"Row-scale candidate complete: `{summary['row_scale_complete']}`.",
             f"Row-scale candidate passed: `{summary['row_scale_passed']}`.",
             "## Runs",
@@ -319,6 +357,9 @@ def main() -> None:
     parser.add_argument("--longwarmup-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup"))
     parser.add_argument("--paper-hparam-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma"))
     parser.add_argument("--paper-hparam-row-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row"))
+    parser.add_argument("--paper-hparam-lr1-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr1e-5"))
+    parser.add_argument("--paper-hparam-lr5-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr5e-5"))
+    parser.add_argument("--paper-hparam-headinit-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-headinit"))
     parser.add_argument("--model", default="Qwen/Qwen2.5-0.5B")
     parser.add_argument("--tasks", nargs="+", choices=TASKS, default=TASKS)
     parser.add_argument("--max-fp-gap", type=float, default=0.01)

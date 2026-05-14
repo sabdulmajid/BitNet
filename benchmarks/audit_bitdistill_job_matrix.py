@@ -139,6 +139,42 @@ def expected_rows(model_slug: str, warmup_state: str) -> list[dict[str, Any]]:
                     "warmup_state": warmup_state,
                 }
             )
+    for lr, root in (
+        (1e-5, "checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr1e-5"),
+        (5e-5, "checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr5e-5"),
+    ):
+        for task in TASKS:
+            rows.append(
+                {
+                    "family": f"seqcls_paper_gamma100000_tensor_lr{lr:g}",
+                    "task": task,
+                    "task_format": "sequence_classification",
+                    "scale": "tensor",
+                    "attention_kd_weight": 100000.0,
+                    "lr": lr,
+                    "output_root": f"{root}/{model_slug}/{task}",
+                    "teacher_root": f"checkpoints/bitdistill-glue-seqcls/{model_slug}/{task}",
+                    "exclude_linear_regex": "score|classifier",
+                    "init_output_head_from_teacher": "0",
+                    "warmup_state": warmup_state,
+                }
+            )
+    for task in TASKS:
+        rows.append(
+            {
+                "family": "seqcls_paper_gamma100000_tensor_headinit",
+                "task": task,
+                "task_format": "sequence_classification",
+                "scale": "tensor",
+                "attention_kd_weight": 100000.0,
+                "lr": 2e-5,
+                "output_root": f"checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-headinit/{model_slug}/{task}",
+                "teacher_root": f"checkpoints/bitdistill-glue-seqcls/{model_slug}/{task}",
+                "exclude_linear_regex": "score|classifier",
+                "init_output_head_from_teacher": "1",
+                "warmup_state": warmup_state,
+            }
+        )
     for gamma, root in (
         (1000.0, "checkpoints/bitdistill-glue-seqcls-longwarmup-gamma1k"),
         (10000.0, "checkpoints/bitdistill-glue-seqcls-longwarmup-gamma10k"),
@@ -199,11 +235,13 @@ def row_matches_expected(row: dict[str, Any], expected: dict[str, Any]) -> bool:
     output_dir = str(row.get("output_dir", ""))
     teacher = str(row.get("teacher", ""))
     actual_gamma = as_float(row.get("attention_kd_weight"))
+    actual_lr = as_float(row.get("lr"))
     return (
         row.get("task") == expected["task"]
         and inferred_task_format(row) == expected["task_format"]
         and row.get("scale") == expected["scale"]
         and actual_gamma == expected["attention_kd_weight"]
+        and ("lr" not in expected or actual_lr == expected["lr"])
         and output_dir.startswith(str(expected["output_root"]))
         and teacher.startswith(str(expected["teacher_root"]))
         and inferred_exclude_regex(row) == expected["exclude_linear_regex"]

@@ -67,6 +67,9 @@ python benchmarks/summarize_bitdistill_variants.py \
     checkpoints/bitdistill-glue-seqcls-longwarmup-headinit \
     checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma \
     checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row \
+    checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr1e-5 \
+    checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr5e-5 \
+    checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-headinit \
     checkpoints/bitdistill-glue-seqcls-longwarmup-gamma1k \
     checkpoints/bitdistill-glue-seqcls-longwarmup-gamma10k \
     checkpoints/bitdistill-glue-seqcls-longwarmup-layer-sweep \
@@ -98,6 +101,11 @@ python benchmarks/run_tiny_qwen2moe_fixture.py \
   --skip-existing \
   --output-json "benchmark_results/tiny_qwen2moe_fixture_${DATE}.json" \
   --output-md "benchmarks/results/tiny_qwen2moe_fixture_${DATE}.md"
+
+python benchmarks/run_tiny_qwen2moe_expert_scaling.py \
+  --skip-existing \
+  --output-json "benchmark_results/tiny_qwen2moe_expert_scaling_${DATE}.json" \
+  --output-md "benchmarks/results/tiny_qwen2moe_expert_scaling_${DATE}.md"
 
 python benchmarks/audit_moe_support.py \
   --output-json "benchmark_results/moe_support_audit_${DATE}.json" \

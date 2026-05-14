@@ -2,9 +2,9 @@
 
 Overall status: `pass`.
 
-Postprocess job: `9977`.
+Postprocess job: `9996`.
 
-Expected producer jobs: `34`.
+Expected producer jobs: `40`.
 
 Missing dependencies: `[]`.
 
@@ -13,9 +13,9 @@ Missing dependencies: `[]`.
 | check | status | evidence | blocker |
 | --- | --- | --- | --- |
 | monitor JSON exists | pass | /mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/bitdistill_job_monitor_2026-05-14.json |  |
-| postprocess job is discoverable | pass | name=bitdistill-postprocess, matches=1 |  |
-| expected producer jobs are active | pass | downstream=29, extra=5, total=34 |  |
-| postprocess depends on every active producer | pass | expected=34, dependency_ids=34, missing=[] |  |
+| postprocess job is discoverable | pass | name=bitdistill-postprocess, matches=2 |  |
+| expected producer jobs are active | pass | downstream=38, extra=2, total=40 |  |
+| postprocess depends on every active producer | pass | expected=40, dependency_ids=41, missing=[] |  |
 
 ## Extra Producer Jobs
 
@@ -23,10 +23,7 @@ Missing dependencies: `[]`.
 | --- | --- | --- | --- |
 | 9949 | bitdistill-i2sr | PENDING | (Dependency) |
 | 9967 | bitdistill-cpu-bench | PENDING | (Dependency) |
-| 9985 | bitdistill-predtrace | PENDING | (Resources) |
-| 9986 | bitdistill-predtrace | PENDING | (Priority) |
-| 9984 | bitdistill-predtrace | RUNNING | ece-nebula10 |
 
 ## Dependency Text
 
-`afterany:9956(unfulfilled),afterany:9957(unfulfilled),afterany:9958(unfulfilled),afterany:9959(unfulfilled),afterany:9960(unfulfilled),afterany:9961(unfulfilled),afterany:9962(unfulfilled),afterany:9963(unfulfilled),afterany:9964(unfulfilled),afterany:9965(unfulfilled),afterany:9966(unfulfilled),afterany:9967(unfulfilled),afterany:9943(unfulfilled),afterany:9944(unfulfilled),afterany:9945(unfulfilled),afterany:9946(unfulfilled),afterany:9947(unfulfilled),afterany:9948(unfulfilled),afterany:9949(unfulfilled),afterany:9971(unfulfilled),afterany:9972(unfulfilled),afterany:9973(unfulfilled),afterany:9974(unfulfilled),afterany:9975(unfulfilled),afterany:9976(unfulfilled),afterany:9978(unfulfilled),afterany:9979(unfulfilled),afterany:9980(unfulfilled),afterany:9981(unfulfilled),afterany:9982(unfulfilled),afterany:9983(unfulfilled),afterany:9984(unfulfilled),afterany:9985(unfulfilled),afterany:9986(unfulfilled)`
+`afterok:9894(unfulfilled),afterok:9943(unfulfilled),afterok:9944(unfulfilled),afterok:9945(unfulfilled),afterok:9946(unfulfilled),afterok:9947(unfulfilled),afterok:9948(unfulfilled),afterok:9949(unfulfilled),afterok:9956(unfulfilled),afterok:9957(unfulfilled),afterok:9958(unfulfilled),afterok:9959(unfulfilled),afterok:9960(unfulfilled),afterok:9961(unfulfilled),afterok:9962(unfulfilled),afterok:9963(unfulfilled),afterok:9964(unfulfilled),afterok:9965(unfulfilled),afterok:9966(unfulfilled),afterok:9967(unfulfilled),afterok:9971(unfulfilled),afterok:9972(unfulfilled),afterok:9973(unfulfilled),afterok:9974(unfulfilled),afterok:9975(unfulfilled),afterok:9976(unfulfilled),afterok:9978(unfulfilled),afterok:9979(unfulfilled),afterok:9980(unfulfilled),afterok:9981(unfulfilled),afterok:9982(unfulfilled),afterok:9983(unfulfilled),afterok:9987(unfulfilled),afterok:9988(unfulfilled),afterok:9989(unfulfilled),afterok:9990(unfulfilled),afterok:9991(unfulfilled),afterok:9992(unfulfilled),afterok:9993(unfulfilled),afterok:9994(unfulfilled),afterok:9995(unfulfilled)`

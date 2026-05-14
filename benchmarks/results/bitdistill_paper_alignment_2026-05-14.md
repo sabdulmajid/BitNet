@@ -12,8 +12,8 @@ Verdict: local code contains the major BitDistill mechanisms, but the completed 
 | Stage-1 SubLN | SubLN before attention output projection and FFN down projection | Implemented | matched | Implemented as RMSNorm wrappers around Qwen `o_proj` and `down_proj`. |
 | Stage-2 warm-up | 10B-token continued pretraining | active target 163840000 token presentations | partial | Current target is 0.016384 of the paper token budget. |
 | Stage-3 logits KD | temperature 5, lambda 10 | temperature 5, weight 10, no tau^2 scaling by default | matched | First completed wave used tau^2; current code and pending runs use paper-style scaling. |
-| Stage-3 attention KD | single-layer Q/K/V relation KD, gamma 1e5 for classification | single-layer L2-normalized Q/K/V relation KD implemented; completed runs gamma 100; long-warmup gamma 1e3/1e4/1e5, paper-gamma row/tensor, and MNLI layer-sweep branches pending | pending | The gamma sweep is intentional because local loss-scale probes show the paper gamma can dominate CE. |
-| Hyperparameter search | greedy search over learning rate and epochs | fixed 1000-step downstream schedule plus selected diagnostics | partial | A strict reproduction needs at least a small LR/epoch search after the long warm-up. |
+| Stage-3 attention KD | single-layer Q/K/V relation KD, gamma 1e5 for classification | single-layer L2-normalized Q/K/V relation KD implemented; completed runs gamma 100; long-warmup gamma 1e3/1e4/1e5, paper-gamma row/tensor, LR search, headinit, and MNLI layer-sweep branches pending | pending | The gamma sweep is intentional because local loss-scale probes show the paper gamma can dominate CE. |
+| Hyperparameter search | greedy search over learning rate and epochs | fixed 1000-step downstream schedule plus queued LR 1e-5/2e-5/5e-5 and output-head initialization diagnostics | pending | The local search is intentionally narrow; a strict paper reproduction still needs epoch/budget search if the queued LR candidates do not close the gap. |
 | Hardware/resources | 8x AMD MI300X training, CPU throughput with 16 threads | single-GPU Slurm jobs; Xeon CPU runtime for local inference | partial | Resource gap affects training budget and wall-clock, not the mathematical objective. |
 
 ## Warm-Up Budget
@@ -23,9 +23,9 @@ Verdict: local code contains the major BitDistill mechanisms, but the completed 
 | paper warm-up tokens | 10000000000 |
 | active target tokens | 163840000 |
 | active target / paper | 0.016384 |
-| active effective tokens | 74792960 |
-| active effective / paper | 0.007479 |
-| latest step | 9130 |
+| active effective tokens | 81592320 |
+| active effective / paper | 0.008159 |
+| latest step | 9960 |
 | max steps | 20000 |
 
 ## Current Accuracy Matrix
@@ -41,6 +41,9 @@ Verdict: local code contains the major BitDistill mechanisms, but the completed 
 | mnli | BitDistill longwarmup row gamma100 | novelty_pending | false | - | 0.807641 | - |
 | mnli | BitDistill longwarmup tensor paper gamma | paper_candidate | false | - | 0.807641 | - |
 | mnli | BitDistill longwarmup row paper gamma | paper_row_candidate | false | - | 0.807641 | - |
+| mnli | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | false | - | 0.807641 | - |
+| mnli | BitDistill longwarmup tensor paper gamma lr5e-5 | paper_lr_search_pending | false | - | 0.807641 | - |
+| mnli | BitDistill longwarmup tensor paper gamma headinit | paper_headinit_pending | false | - | 0.807641 | - |
 | mnli | BitDistill longwarmup tensor gamma1k | mnli_gamma_sweep_pending | false | - | 0.807641 | - |
 | mnli | BitDistill longwarmup tensor gamma10k | mnli_gamma_sweep_pending | false | - | 0.807641 | - |
 | mnli | BitDistill longwarmup tensor layer -1 | mnli_layer_sweep_pending | false | - | 0.807641 | - |
@@ -55,6 +58,9 @@ Verdict: local code contains the major BitDistill mechanisms, but the completed 
 | qnli | BitDistill longwarmup row gamma100 | novelty_pending | false | - | 0.898957 | - |
 | qnli | BitDistill longwarmup tensor paper gamma | paper_candidate | false | - | 0.898957 | - |
 | qnli | BitDistill longwarmup row paper gamma | paper_row_candidate | false | - | 0.898957 | - |
+| qnli | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | false | - | 0.898957 | - |
+| qnli | BitDistill longwarmup tensor paper gamma lr5e-5 | paper_lr_search_pending | false | - | 0.898957 | - |
+| qnli | BitDistill longwarmup tensor paper gamma headinit | paper_headinit_pending | false | - | 0.898957 | - |
 | sst2 | FP16-SFT | baseline | true | 0.925459 | 0.925459 | 0.000000 |
 | sst2 | BitNet-SFT | baseline | true | 0.770642 | 0.925459 | 0.154817 |
 | sst2 | BitDistill short tensor gamma100 | diagnostic | true | 0.815367 | 0.925459 | 0.110092 |
@@ -64,6 +70,9 @@ Verdict: local code contains the major BitDistill mechanisms, but the completed 
 | sst2 | BitDistill longwarmup row gamma100 | novelty_pending | false | - | 0.925459 | - |
 | sst2 | BitDistill longwarmup tensor paper gamma | paper_candidate | false | - | 0.925459 | - |
 | sst2 | BitDistill longwarmup row paper gamma | paper_row_candidate | false | - | 0.925459 | - |
+| sst2 | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | false | - | 0.925459 | - |
+| sst2 | BitDistill longwarmup tensor paper gamma lr5e-5 | paper_lr_search_pending | false | - | 0.925459 | - |
+| sst2 | BitDistill longwarmup tensor paper gamma headinit | paper_headinit_pending | false | - | 0.925459 | - |
 
 ## Code Feature Checks
 
