@@ -39,6 +39,7 @@ class ComparisonSpec:
 
 
 FP16 = RunRef("FP16-SFT", "baseline_prediction_root", "{task}/fp16_sft-tensor-layer-1")
+BITNET = RunRef("BitNet-SFT", "baseline_prediction_root", "{task}/bitnet_sft-tensor-layer-1")
 LONG_TENSOR = RunRef("BitDistill gamma100 tensor", "longwarmup_root", "{task}/bitdistill-longwarmup-tensor-layer-8")
 LONG_ROW = RunRef("BitDistill gamma100 row", "longwarmup_root", "{task}/bitdistill-longwarmup-row-layer-8")
 PAPER_TENSOR = RunRef("BitDistill paper-gamma tensor", "paper_hparam_root", "{task}/bitdistill-longwarmup-tensor-layer-8")
@@ -274,6 +275,7 @@ def comparison_specs(tasks: list[str]) -> list[ComparisonSpec]:
     for task in tasks:
         specs.extend(
             [
+                ComparisonSpec("BitNet-SFT minus FP16-SFT", task, FP16, BITNET, "baseline_vs_fp"),
                 ComparisonSpec("gamma100 row minus tensor", task, LONG_TENSOR, LONG_ROW, "row_vs_tensor"),
                 ComparisonSpec("paper-gamma row minus tensor", task, PAPER_TENSOR, PAPER_ROW, "row_vs_tensor"),
                 ComparisonSpec("gamma100 tensor minus FP16-SFT", task, FP16, LONG_TENSOR, "bitdistill_vs_fp"),

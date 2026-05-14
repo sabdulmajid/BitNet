@@ -10,10 +10,10 @@ Artifacts: `155`. Missing: `0`.
 | progress_audit | tracked_report | yes | 25612 | 74e3b96847bf |  |
 | active_goal_audit | tracked_report | yes | 10765 | 255dacfeae0a |  |
 | objective_completion_audit | tracked_report | yes | 5645 | 56fb299814a5 |  |
-| product_scope_gate | tracked_report | yes | 4920 | 3481ebccbf86 |  |
+| product_scope_gate | tracked_report | yes | 4920 | 75ba9de09c44 |  |
 | bitdistill_reproduction_status | tracked_report | yes | 8481 | 3f0e6a6abc2f |  |
 | bitdistill_reproduction_gate_report | tracked_report | yes | 11734 | 8d6585641fa7 |  |
-| bitdistill_paired_predictions_report | tracked_report | yes | 11315 | c8203b38e2a0 |  |
+| bitdistill_paired_predictions_report | tracked_report | yes | 11743 | 261c0d5aec8f |  |
 | bitdistill_paper_alignment_report | tracked_report | yes | 9029 | 07da6093ca08 |  |
 | bitdistill_loss_scale_report | tracked_report | yes | 6846 | 65816a5d56a5 |  |
 | bitdistill_cpu_gate_report | tracked_report | yes | 7081 | faf3c415d03e |  |
@@ -126,9 +126,9 @@ Artifacts: `155`. Missing: `0`.
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
 | benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 5488 | 493439c9cbbf | passed=True, checks=33, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 15953 | a07ee58dabe1 | achieved=False, status=not_complete, complete=7/9, open=2 |
-| product_scope_gate_json | product_scope_gate_json | yes | 5771 | a499600873ad | scope=research_mvp_only, supported=4, unsupported=5 |
+| product_scope_gate_json | product_scope_gate_json | yes | 5771 | 45198875b1fc | scope=research_mvp_only, supported=4, unsupported=5 |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 26085 | 9f3a8d24ee11 | present=13/36, examples=13, full_eval=13, ci95=13, paper_complete=False, paper_passed=False, row_complete=False, row_passed=False, confidence=0.95 |
-| bitdistill_paired_predictions_json | bitdistill_paired_predictions_json | yes | 67074 | 1b9b1bb38c59 | status=pending, complete=0/36, pending=36, failed=0 |
+| bitdistill_paired_predictions_json | bitdistill_paired_predictions_json | yes | 71373 | 73d16b5d8b2e | status=pending, complete=3/39, pending=36, failed=0 |
 | bitdistill_cpu_gate_json | bitdistill_cpu_gate_json | yes | 9426 | 081ccc64117c | passed=False, input=False, critical=0/33, full_quality=0, sample_n=None, blockers=1 |
 | bitdistill_i2sr_gate_json | bitdistill_i2sr_gate_json | yes | 5831 | 5392dccf358b | passed=False, complete=0/6, tasks=['mnli', 'qnli', 'sst2'], scales=['tensor', 'row'], blockers=4 |
 | bitdistill_job_monitor_json | bitdistill_job_monitor_json | yes | 78015 | 513cb855de3e | warmup=13280/20000, progress=0.664, ce=4.10041, snapshots=0, warnings=1, downstream=38 |
