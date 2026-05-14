@@ -61,6 +61,19 @@ python benchmarks/gate_bitdistill_i2sr_export.py \
   --output-json "benchmark_results/bitdistill_i2sr_export_gate_${DATE}.json" \
   --output-md "benchmarks/results/bitdistill_i2sr_export_gate_${DATE}.md"
 
+python benchmarks/run_tiny_qwen2moe_fixture.py \
+  --skip-existing \
+  --output-json "benchmark_results/tiny_qwen2moe_fixture_${DATE}.json" \
+  --output-md "benchmarks/results/tiny_qwen2moe_fixture_${DATE}.md"
+
+python benchmarks/audit_moe_support.py \
+  --output-json "benchmark_results/moe_support_audit_${DATE}.json" \
+  --output-md "benchmarks/results/moe_support_audit_${DATE}.md"
+
+python benchmarks/audit_unblock_requirements.py \
+  --output-json "benchmark_results/unblock_requirements_${DATE}.json" \
+  --output-md "benchmarks/results/unblock_requirements_${DATE}.md"
+
 python benchmarks/audit_objective_completion.py \
   --output-json "benchmark_results/objective_completion_audit_${DATE}.json" \
   --output-md "benchmarks/results/objective_completion_audit_${DATE}.md"
