@@ -56,6 +56,11 @@ python benchmarks/gate_bitdistill_cpu_benchmark.py \
   --output-json "benchmark_results/bitdistill_glue_cpu_gate_${DATE}.json" \
   --output-md "benchmarks/results/bitdistill_glue_cpu_gate_${DATE}.md"
 
+python benchmarks/gate_bitdistill_i2sr_export.py \
+  --results-dir "benchmark_results/bitdistill-causal-longwarmup-i2sr-${DATE}" \
+  --output-json "benchmark_results/bitdistill_i2sr_export_gate_${DATE}.json" \
+  --output-md "benchmarks/results/bitdistill_i2sr_export_gate_${DATE}.md"
+
 python benchmarks/audit_objective_completion.py \
   --output-json "benchmark_results/objective_completion_audit_${DATE}.json" \
   --output-md "benchmarks/results/objective_completion_audit_${DATE}.md"
