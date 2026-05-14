@@ -198,6 +198,10 @@ python benchmarks/audit_objective_completion.py \
   --output-json benchmark_results/objective_completion_audit_2026-05-14.json \
   --output-md benchmarks/results/objective_completion_audit_2026-05-14.md
 
+python benchmarks/monitor_bitdistill_jobs.py \
+  --output-json benchmark_results/bitdistill_job_monitor_2026-05-14.json \
+  --output-md benchmarks/results/bitdistill_job_monitor_2026-05-14.md
+
 python benchmarks/build_qwen_side_by_side.py \
   --output-md benchmarks/results/qwen_side_by_side_2026-05-05.md
 ```
@@ -213,6 +217,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 
 - [Qwen side-by-side summary](benchmarks/results/qwen_side_by_side_2026-05-05.md)
 - [BitDistill reproduction status](benchmarks/results/bitdistill_reproduction_status_2026-05-14.md)
+- [BitDistill active job monitor](benchmarks/results/bitdistill_job_monitor_2026-05-14.md)
 - [BitDistill GLUE3 primary summary](benchmarks/results/bitdistill_seqcls_glue3_primary_summary_2026-05-14.md)
 - [BitDistill MNLI diagnostic variants](benchmarks/results/bitdistill_seqcls_mnli_diagnostic_variant_summary_2026-05-14.md)
 - [Objective completion audit](benchmarks/results/objective_completion_audit_2026-05-14.md)

@@ -281,6 +281,18 @@ The current scope gate is
 supported dense-Qwen negative result plus row-scale recovery path from
 unsupported one-click, TL2, default-runtime, and MoE/Kimi claims.
 
+To monitor the active BitDistill long-warm-up and dependent downstream jobs
+without relying on memory or chat history:
+
+```bash
+python benchmarks/monitor_bitdistill_jobs.py
+```
+
+The monitor reads the latest
+`benchmark_results/bitdistill_longwarmup_downstream_*.tsv`, parses the warm-up
+log, queries `squeue` when available, and reports whether downstream metrics
+have materialized.
+
 To consolidate the inputs required before the remaining open claims can advance:
 
 ```bash
