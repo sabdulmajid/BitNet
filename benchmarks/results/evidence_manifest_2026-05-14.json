@@ -1,5 +1,5 @@
 {
-  "artifact_count": 131,
+  "artifact_count": 133,
   "entries": [
     {
       "exists": true,
@@ -142,7 +142,7 @@
       "label": "bitdistill_job_monitor_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_job_monitor_2026-05-14.md",
-      "sha256": "11c90e6692fb7809c307f4756bdecab2133f320589b1093b30af719a3eaa0028",
+      "sha256": "192d469efa8585d3f5e34a22e745a11624529a7a1856e958c0131875e279b5f0",
       "size_bytes": 5755
     },
     {
@@ -151,8 +151,17 @@
       "label": "bitdistill_dependency_graph_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_dependency_graph_2026-05-14.md",
-      "sha256": "ace5898203ed702726dbdc0d0aca41970836fc13741cd363a8c68886db95302d",
+      "sha256": "e76a277f0c209fd8793b0e99a10d606b2770af3595e47efd35fc63a456248488",
       "size_bytes": 5927
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_job_matrix_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_job_matrix_audit_2026-05-14.md",
+      "sha256": "498637cc93ce7f378a64429c833d7b32bbc025facff3392a6eae3500ec05fbeb",
+      "size_bytes": 3663
     },
     {
       "exists": true,
@@ -214,7 +223,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-14.md",
-      "sha256": "1e4e6a7f85a5703188d3d402e4da159839605710f7c2356046882ea514ffbec0",
+      "sha256": "2e12936d544f4b800cd3a7bf57ff7820e092135af57c5abd1cfff787ac8d1c36",
       "size_bytes": 2937
     },
     {
@@ -1877,7 +1886,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-14.json",
-      "sha256": "51a759feed1b84dbea5c530f5c657c6ce075244f4fef2f7f7d8462061629399e",
+      "sha256": "a73452affc6369e86d0883ee95a0c39b75ba076c35b91e76bb31a49555f772fc",
       "size_bytes": 5488
     },
     {
@@ -1989,19 +1998,19 @@
         "downstream_states": [
           "PENDING"
         ],
-        "warmup_latest_ce": 4.151071,
+        "warmup_latest_ce": 4.327857,
         "warmup_max_steps": 20000,
-        "warmup_progress": 0.327,
+        "warmup_progress": 0.34,
         "warmup_save_every_steps": 0,
         "warmup_snapshots": 0,
-        "warmup_step": 6540,
+        "warmup_step": 6800,
         "warmup_warnings": [
           "Stage-2 warm-up is running without intermediate snapshots; if the job fails, progress before final save is not recoverable."
         ]
       },
       "path": "benchmark_results/bitdistill_job_monitor_2026-05-14.json",
-      "sha256": "53c1174057ae9c80fb4aab772e1594beaf08f303b8893a975d0880a54d8ec1a7",
-      "size_bytes": 34315
+      "sha256": "cbb0776ed0b9cb090e53e0eb4441792a9028d69a47db394304449cd2652e1a85",
+      "size_bytes": 34314
     },
     {
       "exists": true,
@@ -2016,15 +2025,34 @@
         "raw_rows": 29,
         "ready": true,
         "warmup_max_steps": 20000,
-        "warmup_step": 6540,
+        "warmup_step": 6820,
         "warnings": [
           "11 output directories appear in multiple historical submission tables; audit uses the latest row per output directory.",
           "Warm-up final state is expectedly absent until Stage-2 finishes; downstream jobs are correctly dependency-blocked."
         ]
       },
       "path": "benchmark_results/bitdistill_dependency_graph_2026-05-14.json",
-      "sha256": "b137608e994df1edd0d91cf64d0e20abe76c00ebb1d14beab779acfe1a1e298e",
+      "sha256": "d2146558727ede06b52244e915e0efaaf65502f9a1f4ae1c95b8b98cffb19bf7",
       "size_bytes": 13934
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_job_matrix_json",
+      "label": "bitdistill_job_matrix_json",
+      "metrics": {
+        "blockers": [],
+        "configured_rows": 17,
+        "expected_rows": 17,
+        "inferred_rows": 11,
+        "job_states": {
+          "PENDING": 17
+        },
+        "observed_rows": 17,
+        "passed": true
+      },
+      "path": "benchmark_results/bitdistill_job_matrix_audit_2026-05-14.json",
+      "sha256": "d3214529e7626abeffb99d413468e59158abfe82e2ce1711f7514521cc1b9ca5",
+      "size_bytes": 21240
     },
     {
       "exists": true,
