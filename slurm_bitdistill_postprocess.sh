@@ -53,3 +53,14 @@ python benchmarks/gate_bitdistill_cpu_benchmark.py \
 python benchmarks/audit_objective_completion.py \
   --output-json "benchmark_results/objective_completion_audit_${DATE}.json" \
   --output-md "benchmarks/results/objective_completion_audit_${DATE}.md"
+
+python benchmarks/audit_product_scope.py \
+  --output-json "benchmark_results/product_scope_gate_${DATE}.json" \
+  --output-md "benchmarks/results/product_scope_gate_${DATE}.md"
+
+python benchmarks/build_qwen_side_by_side.py \
+  --output-md "benchmarks/results/qwen_side_by_side_${DATE}.md"
+
+python benchmarks/build_evidence_manifest.py \
+  --output-json "benchmarks/results/evidence_manifest_${DATE}.json" \
+  --output-md "benchmarks/results/evidence_manifest_${DATE}.md"

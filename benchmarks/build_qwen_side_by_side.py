@@ -76,6 +76,9 @@ OBJECTIVE_AUDIT = "benchmark_results/objective_completion_audit_2026-05-13.json"
 PRODUCT_SCOPE_GATE = "benchmark_results/product_scope_gate_2026-05-13.json"
 I2SR_PROMOTION_AUDIT = "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json"
 MOE_PACKING_CONTRACT = "benchmark_results/moe_packing_contract_2026-05-13.json"
+LATEST_OBJECTIVE_AUDIT = "benchmark_results/objective_completion_audit_*.json"
+LATEST_PRODUCT_SCOPE_GATE = "benchmark_results/product_scope_gate_*.json"
+LATEST_MOE_PACKING_CONTRACT = "benchmark_results/moe_packing_contract_*.json"
 
 PAIRED_DELTA_REPORTS = [
     ("QAT row-scale minus FP", "benchmarks/results/paired_row_densehead_minus_fp_2026-05-13.md"),
@@ -95,6 +98,11 @@ def read_json(path: Path) -> dict[str, Any] | None:
     if not path.exists():
         return None
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def latest_json(pattern: str, fallback: str) -> Path:
+    paths = sorted(Path.cwd().glob(pattern))
+    return paths[-1] if paths else Path(fallback)
 
 
 def fmt(value: Any, digits: int = 3) -> str:
@@ -256,10 +264,13 @@ def build_headline_table() -> str:
 
 
 def build_reviewer_gate_table() -> str:
-    objective = read_json(Path(OBJECTIVE_AUDIT)) or {}
-    scope = read_json(Path(PRODUCT_SCOPE_GATE)) or {}
+    objective_path = latest_json(LATEST_OBJECTIVE_AUDIT, OBJECTIVE_AUDIT)
+    scope_path = latest_json(LATEST_PRODUCT_SCOPE_GATE, PRODUCT_SCOPE_GATE)
+    moe_path = latest_json(LATEST_MOE_PACKING_CONTRACT, MOE_PACKING_CONTRACT)
+    objective = read_json(objective_path) or {}
+    scope = read_json(scope_path) or {}
     i2sr = read_json(Path(I2SR_PROMOTION_AUDIT)) or {}
-    moe = read_json(Path(MOE_PACKING_CONTRACT)) or {}
+    moe = read_json(moe_path) or {}
     moe_verdict = moe.get("verdict", {}) if isinstance(moe.get("verdict"), dict) else {}
     rows = [
         [

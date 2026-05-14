@@ -7,15 +7,21 @@ import argparse
 import json
 import math
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
-DATE = "2026-05-13"
+DATE = datetime.now(timezone.utc).date().isoformat()
 
 
 def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def latest_json_path(root: Path, pattern: str, fallback: str) -> Path:
+    paths = sorted(root.glob(pattern))
+    return paths[-1] if paths else root / fallback
 
 
 def finite_number(value: Any) -> bool:
@@ -114,12 +120,18 @@ def build_gate(root: Path) -> dict[str, Any]:
     tl2_artifact = find_row(tl2_avx, "qwen05b_qat_tl2") or {}
     tl2_ppl = tl2_artifact.get("perplexity", {}).get("ppl")
 
-    moe = read_json(root / "benchmark_results/moe_support_audit_2026-05-05.json")
+    moe = read_json(latest_json_path(root, "benchmark_results/moe_support_audit_*.json", "benchmark_results/moe_support_audit_2026-05-05.json"))
     kimi_artifacts = moe.get("local_kimi_artifacts", [])
     kimi_source_matches = moe.get("kimi_source_matches", [])
     moe_gates = moe.get("productization_gates", [])
     moe_failed_gates = [gate.get("name") for gate in moe_gates if isinstance(gate, dict) and not gate.get("passed")]
-    moe_tl2 = read_json(root / "benchmark_results/moe_tl2_runtime_contract_2026-05-13.json")
+    moe_tl2 = read_json(
+        latest_json_path(
+            root,
+            "benchmark_results/moe_tl2_runtime_contract_*.json",
+            "benchmark_results/moe_tl2_runtime_contract_2026-05-13.json",
+        )
+    )
     moe_tl2_byte_probe = moe_tl2.get("byte_size_probe", {})
 
     claims: list[dict[str, Any]] = []
