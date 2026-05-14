@@ -82,7 +82,15 @@ def parse_int(pattern: str, text: str) -> int | None:
         return None
 
 
-def make_tiny_model(model_dir: Path, tokenizer_model: str, *, seed: int, force: bool) -> dict[str, Any]:
+def make_tiny_model(
+    model_dir: Path,
+    tokenizer_model: str,
+    *,
+    seed: int,
+    force: bool,
+    num_experts: int = 2,
+    num_experts_per_tok: int = 1,
+) -> dict[str, Any]:
     config_path = model_dir / "config.json"
     model_path = model_dir / "model.safetensors"
     if config_path.exists() and model_path.exists() and not force:
@@ -115,8 +123,8 @@ def make_tiny_model(model_dir: Path, tokenizer_model: str, *, seed: int, force: 
         num_key_value_heads=2,
         max_position_embeddings=256,
         decoder_sparse_step=1,
-        num_experts=2,
-        num_experts_per_tok=1,
+        num_experts=num_experts,
+        num_experts_per_tok=num_experts_per_tok,
         mlp_only_layers=[],
         qkv_bias=True,
         tie_word_embeddings=False,
@@ -240,11 +248,20 @@ def main() -> None:
     parser.add_argument("--rss-tokens", type=int, default=1)
     parser.add_argument("--threads", type=int, default=4)
     parser.add_argument("--seed", type=int, default=20260514)
+    parser.add_argument("--num-experts", type=int, default=2)
+    parser.add_argument("--num-experts-per-tok", type=int, default=1)
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--skip-existing", action="store_true")
     args = parser.parse_args()
 
-    hf_model = make_tiny_model(args.model_dir, args.tokenizer_model, seed=args.seed, force=args.force)
+    hf_model = make_tiny_model(
+        args.model_dir,
+        args.tokenizer_model,
+        seed=args.seed,
+        force=args.force,
+        num_experts=args.num_experts,
+        num_experts_per_tok=args.num_experts_per_tok,
+    )
 
     convert_stdout = args.out_dir / "convert.stdout"
     convert_stderr = args.out_dir / "convert.stderr"

@@ -84,6 +84,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "moe_packing_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_packing_contract_2026-05-14.md"},
     {"label": "moe_tl2_runtime_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_tl2_runtime_contract_2026-05-14.md"},
     {"label": "tiny_qwen2moe_fixture_report", "kind": "tracked_report", "path": f"benchmarks/results/tiny_qwen2moe_fixture_{DATE}.md"},
+    {"label": "tiny_qwen2moe_expert_scaling_report", "kind": "tracked_report", "path": f"benchmarks/results/tiny_qwen2moe_expert_scaling_{DATE}.md"},
     {"label": "unblock_requirements_report", "kind": "tracked_report", "path": f"benchmarks/results/unblock_requirements_{DATE}.md"},
     {"label": "i2sr_combined_patch", "kind": "tracked_report", "path": "patches/llama-i2sr-row-scale-qtype.patch"},
     {"label": "i2sr_root_runtime_patch", "kind": "tracked_report", "path": "patches/bitnet-i2sr-root-runtime.patch"},
@@ -173,6 +174,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "moe_packing_contract_json", "kind": "moe_packing_contract_json", "path": "benchmark_results/moe_packing_contract_2026-05-14.json"},
     {"label": "moe_tl2_runtime_contract_json", "kind": "moe_tl2_runtime_contract_json", "path": "benchmark_results/moe_tl2_runtime_contract_2026-05-14.json"},
     {"label": "tiny_qwen2moe_fixture_json", "kind": "tiny_qwen2moe_fixture_json", "path": f"benchmark_results/tiny_qwen2moe_fixture_{DATE}.json"},
+    {"label": "tiny_qwen2moe_expert_scaling_json", "kind": "tiny_qwen2moe_expert_scaling_json", "path": f"benchmark_results/tiny_qwen2moe_expert_scaling_{DATE}.json"},
     {"label": "unblock_requirements_json", "kind": "unblock_requirements_json", "path": f"benchmark_results/unblock_requirements_{DATE}.json"},
     {"label": "tl2_generic_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json"},
     {"label": "tl2_avx512_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json"},
@@ -799,6 +801,22 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "max_rss_mib": rss.get("max_rss_mib"),
             "gates": gates,
         }
+    if kind == "tiny_qwen2moe_expert_scaling_json":
+        rows = data.get("rows", []) if isinstance(data.get("rows"), list) else []
+        passed_rows = [row for row in rows if isinstance(row, dict) and row.get("passed")]
+        decode_values = [
+            row.get("runtime", {}).get("decode_tok_s")
+            for row in rows
+            if isinstance(row, dict) and isinstance(row.get("runtime"), dict)
+        ]
+        finite_decode = [float(value) for value in decode_values if isinstance(value, (int, float)) and math.isfinite(float(value))]
+        return {
+            "passed": data.get("passed"),
+            "rows": len(rows),
+            "passed_rows": len(passed_rows),
+            "min_decode_tok_s": min(finite_decode) if finite_decode else None,
+            "max_decode_tok_s": max(finite_decode) if finite_decode else None,
+        }
     if kind == "math_json":
         aggregate = data.get("aggregate", {})
         mean_abs = aggregate.get("mean_abs_ternary_repo_formula", {})
@@ -1126,6 +1144,12 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"file={fmt_metric(metrics.get('gguf_mib'))} MiB, "
                 f"decode={fmt_metric(metrics.get('decode_tok_s'))} tok/s, "
                 f"rss={fmt_metric(metrics.get('max_rss_mib'))} MiB"
+            )
+        elif entry["kind"] == "tiny_qwen2moe_expert_scaling_json":
+            summary = (
+                f"passed={metrics.get('passed', '-')}, "
+                f"rows={metrics.get('passed_rows', '-')}/{metrics.get('rows', '-')}, "
+                f"decode=[{fmt_metric(metrics.get('min_decode_tok_s'))}, {fmt_metric(metrics.get('max_decode_tok_s'))}] tok/s"
             )
         elif entry["kind"] == "math_json":
             summary = f"trials={metrics.get('trials', '-')}, rel_error={fmt_metric(metrics.get('relative_output_fro_error_mean'))}"

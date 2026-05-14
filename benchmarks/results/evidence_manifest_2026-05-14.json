@@ -1,5 +1,5 @@
 {
-  "artifact_count": 141,
+  "artifact_count": 143,
   "entries": [
     {
       "exists": true,
@@ -70,8 +70,8 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-14.md",
-      "sha256": "006610af74cf67c55f469867e232b0fa37ff25f716deefe8797db445802cb965",
-      "size_bytes": 5125
+      "sha256": "4631a2d780c648d7730390176ac952314be2727b7907e6fc3e3e0bccda23b298",
+      "size_bytes": 5333
     },
     {
       "exists": true,
@@ -79,8 +79,8 @@
       "label": "product_scope_gate",
       "metrics": {},
       "path": "benchmarks/results/product_scope_gate_2026-05-14.md",
-      "sha256": "7b288cbb99adaa6d66f5ef1a90b728b1d88bab227a62c6bf1bba47d4fa59f072",
-      "size_bytes": 4004
+      "sha256": "9f2f57b0f7a262898d8b354e296a0a79569f61cae582c9c93f944214b3e0c154",
+      "size_bytes": 4076
     },
     {
       "exists": true,
@@ -259,7 +259,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-14.md",
-      "sha256": "ec425c1448674676207bd70547874ff689d0d5c6106f76bf8c70e6b39c827234",
+      "sha256": "38cdade137361210828fa41adba984e84ca2eca7a78386bc2cb9ecc7c29659a3",
       "size_bytes": 2937
     },
     {
@@ -439,8 +439,8 @@
       "label": "moe_report",
       "metrics": {},
       "path": "benchmarks/results/moe_support_audit_2026-05-14.md",
-      "sha256": "416f90d5985f3c41a560329d3ba729588a541a7fea335de0555ec09dff48bd00",
-      "size_bytes": 4847
+      "sha256": "6a32cb960a5660e32defedc9046d11af0e74bd154bf9a53e833e66c9e97df401",
+      "size_bytes": 5020
     },
     {
       "exists": true,
@@ -468,6 +468,15 @@
       "path": "benchmarks/results/tiny_qwen2moe_fixture_2026-05-14.md",
       "sha256": "1ad4c2961f423bd50682694bd6ee4d9219260205d2acf5276a30381ed0facd40",
       "size_bytes": 1097
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "tiny_qwen2moe_expert_scaling_report",
+      "metrics": {},
+      "path": "benchmarks/results/tiny_qwen2moe_expert_scaling_2026-05-14.md",
+      "sha256": "fce193aa66e61dcd296a46564c5a071622ea871241077e800a537b8b0977ea62",
+      "size_bytes": 1026
     },
     {
       "exists": true,
@@ -1922,7 +1931,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-14.json",
-      "sha256": "3afd786cb3ef567ec5dc4190c7376270fe66b2c616093939a180500d340cf44b",
+      "sha256": "17be18d56ed5b2ebb1e228387c57e108ea3050b93fff5c1afb1802d6619c7a41",
       "size_bytes": 5488
     },
     {
@@ -1940,8 +1949,8 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-14.json",
-      "sha256": "b69b714367a4059f30931249544f5e1c306b4bd59afd02311dee211b7762634a",
-      "size_bytes": 15218
+      "sha256": "55538ac6d47725ed87dd212f947ce93f417b50326065f112823a136f63953006",
+      "size_bytes": 15446
     },
     {
       "exists": true,
@@ -1954,8 +1963,8 @@
         "unsupported_claim_count": 4
       },
       "path": "benchmark_results/product_scope_gate_2026-05-14.json",
-      "sha256": "f7cf3f7a11499d0d6adcf33cb0a6a08ff61f08fcc5317a66facbe5fdce4363c5",
-      "size_bytes": 4759
+      "sha256": "4d0cb4d1046fa08001bfe7d440ca72894b506e8d29a9c70d419199b701b3fe4d",
+      "size_bytes": 4831
     },
     {
       "exists": true,
@@ -2280,15 +2289,15 @@
           "local Kimi model/eval artifacts exist",
           "MoE quality and locality benchmarks exist"
         ],
-        "gates": 7,
+        "gates": 8,
         "kimi_source_matches": 0,
         "local_kimi_artifacts": 0,
         "present_checks": 6,
         "tiny_qwen2moe_passed": true
       },
       "path": "benchmark_results/moe_support_audit_2026-05-14.json",
-      "sha256": "03e744bf4cab261574f34a005c33261a5e34224b2f0509cbd489e9568db6e2b0",
-      "size_bytes": 15462
+      "sha256": "229b033869e5d31ced6add9c2db08a4d5013fda2b343a84d9749a8180ec302d9",
+      "size_bytes": 31948
     },
     {
       "exists": true,
@@ -2358,6 +2367,21 @@
       "path": "benchmark_results/tiny_qwen2moe_fixture_2026-05-14.json",
       "sha256": "025b905b3fa8bd0a9b069dac093bdf86a41e5e6db93b988ed971faa5f695befb",
       "size_bytes": 3480
+    },
+    {
+      "exists": true,
+      "kind": "tiny_qwen2moe_expert_scaling_json",
+      "label": "tiny_qwen2moe_expert_scaling_json",
+      "metrics": {
+        "max_decode_tok_s": 595.88,
+        "min_decode_tok_s": 545.06,
+        "passed": true,
+        "passed_rows": 4,
+        "rows": 4
+      },
+      "path": "benchmark_results/tiny_qwen2moe_expert_scaling_2026-05-14.json",
+      "sha256": "a2f81a1e5203329c72317a55403b8f4cdd1e43c786b661e9953dfb88a863f3d7",
+      "size_bytes": 15370
     },
     {
       "exists": true,

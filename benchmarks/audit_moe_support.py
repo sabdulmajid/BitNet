@@ -166,6 +166,14 @@ def build_report(data: dict[str, Any]) -> str:
         if fixture
         else "Tiny Qwen2MoE FP16 runtime fixture artifact is missing."
     )
+    scaling = data.get("tiny_qwen2moe_expert_scaling") or {}
+    scaling_rows = scaling.get("rows", []) if isinstance(scaling.get("rows"), list) else []
+    scaling_note = (
+        "Tiny Qwen2MoE expert-scaling probe: "
+        f"passed={scaling.get('passed')}; rows={len(scaling_rows)}."
+        if scaling
+        else "Tiny Qwen2MoE expert-scaling probe artifact is missing."
+    )
     verdict = (
         "Generic MoE infrastructure is present: GGUF metadata has expert counts, "
         "Qwen2MoE is registered in the vendored llama.cpp converter, expert "
@@ -203,7 +211,7 @@ def build_report(data: dict[str, Any]) -> str:
             "## Productization Gates",
             md_table(["gate", "status", "evidence", "blocker"], gate_rows),
             "## Negative Checks",
-            "\n".join([kimi_note, artifact_note, contract_note, tl2_note, fixture_note]),
+            "\n".join([kimi_note, artifact_note, contract_note, tl2_note, fixture_note, scaling_note]),
             "## Verdict",
             verdict,
             "## Required Plan",
@@ -220,6 +228,7 @@ def build_productization_gates(
     moe_packing_contract: dict[str, Any],
     moe_tl2_runtime_contract: dict[str, Any],
     tiny_qwen2moe_fixture: dict[str, Any],
+    tiny_qwen2moe_expert_scaling: dict[str, Any],
 ) -> list[dict[str, Any]]:
     check_by_label = {check["label"]: check for check in checks}
     generic_runtime = check_by_label.get("Runtime sparse expert execution", {}).get("status") == "present"
@@ -243,6 +252,8 @@ def build_productization_gates(
     fixture_passed = bool(tiny_qwen2moe_fixture.get("passed"))
     fixture_smoke = tiny_qwen2moe_fixture.get("smoke", {}) if isinstance(tiny_qwen2moe_fixture.get("smoke"), dict) else {}
     fixture_rss = tiny_qwen2moe_fixture.get("rss", {}) if isinstance(tiny_qwen2moe_fixture.get("rss"), dict) else {}
+    scaling_rows = tiny_qwen2moe_expert_scaling.get("rows", []) if isinstance(tiny_qwen2moe_expert_scaling.get("rows"), list) else []
+    scaling_passed = bool(tiny_qwen2moe_expert_scaling.get("passed")) and len(scaling_rows) >= 4
 
     return [
         make_gate(
@@ -288,6 +299,12 @@ def build_productization_gates(
             "The generic Qwen2MoE converter/runtime path needs at least a minimal executable GGUF fixture before real MoE benchmarking.",
         ),
         make_gate(
+            "synthetic Qwen2MoE expert-scaling CPU probe passes",
+            scaling_passed,
+            f"passed={tiny_qwen2moe_expert_scaling.get('passed')}; rows={len(scaling_rows)}",
+            "A synthetic expert-count/top-k runtime probe is needed before interpreting real MoE throughput.",
+        ),
+        make_gate(
             "local Kimi model/eval artifacts exist",
             bool(kimi_artifacts),
             f"kimi_artifacts={len(kimi_artifacts)}",
@@ -296,8 +313,8 @@ def build_productization_gates(
         make_gate(
             "MoE quality and locality benchmarks exist",
             False,
-            "quality_runs=0; throughput_runs=0; expert_locality_runs=0",
-            "No benchmark measures router accuracy, expert selection locality, sparse expert throughput, or quality degradation.",
+            f"quality_runs=0; trained_throughput_runs=0; synthetic_expert_scaling_rows={len(scaling_rows)}",
+            "No trained MoE benchmark measures router accuracy, expert selection locality, sparse expert throughput, or quality degradation.",
         ),
     ]
 
@@ -361,6 +378,9 @@ def main() -> None:
     tiny_qwen2moe_fixture = read_json(
         latest_artifact(root, "benchmark_results/tiny_qwen2moe_fixture_*.json", "benchmark_results/tiny_qwen2moe_fixture_2026-05-14.json")
     )
+    tiny_qwen2moe_expert_scaling = read_json(
+        latest_artifact(root, "benchmark_results/tiny_qwen2moe_expert_scaling_*.json", "benchmark_results/tiny_qwen2moe_expert_scaling_2026-05-14.json")
+    )
     data: dict[str, Any] = {
         "schema": "bitnet-moe-support-audit-v1",
         "date": DATE,
@@ -373,12 +393,14 @@ def main() -> None:
             moe_packing_contract,
             moe_tl2_runtime_contract,
             tiny_qwen2moe_fixture,
+            tiny_qwen2moe_expert_scaling,
         ),
         "kimi_source_matches": kimi_source_matches,
         "local_kimi_artifacts": local_kimi_results,
         "moe_packing_contract": moe_packing_contract,
         "moe_tl2_runtime_contract": moe_tl2_runtime_contract,
         "tiny_qwen2moe_fixture": tiny_qwen2moe_fixture,
+        "tiny_qwen2moe_expert_scaling": tiny_qwen2moe_expert_scaling,
     }
     report = build_report(data)
     args.output_md.parent.mkdir(parents=True, exist_ok=True)

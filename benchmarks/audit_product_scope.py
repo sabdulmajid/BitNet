@@ -153,6 +153,8 @@ def build_gate(root: Path) -> dict[str, Any]:
     tiny_qwen2moe = moe.get("tiny_qwen2moe_fixture", {}) if isinstance(moe.get("tiny_qwen2moe_fixture"), dict) else {}
     tiny_qwen2moe_smoke = tiny_qwen2moe.get("smoke", {}) if isinstance(tiny_qwen2moe.get("smoke"), dict) else {}
     tiny_qwen2moe_rss = tiny_qwen2moe.get("rss", {}) if isinstance(tiny_qwen2moe.get("rss"), dict) else {}
+    tiny_qwen2moe_scaling = moe.get("tiny_qwen2moe_expert_scaling", {}) if isinstance(moe.get("tiny_qwen2moe_expert_scaling"), dict) else {}
+    tiny_qwen2moe_scaling_rows = tiny_qwen2moe_scaling.get("rows", []) if isinstance(tiny_qwen2moe_scaling.get("rows"), list) else []
     moe_tl2 = read_json(
         latest_json_path(
             root,
@@ -238,12 +240,13 @@ def build_gate(root: Path) -> dict[str, Any]:
             f"Kimi artifacts={len(kimi_artifacts)}; Kimi source matches={len(kimi_source_matches)}; "
             f"tiny Qwen2MoE FP16 fixture passed={tiny_qwen2moe.get('passed')}; "
             f"fixture arch={tiny_qwen2moe_smoke.get('architecture')}; fixture RSS MiB={tiny_qwen2moe_rss.get('max_rss_mib')}; "
+            f"synthetic expert scaling passed={tiny_qwen2moe_scaling.get('passed')}; scaling rows={len(tiny_qwen2moe_scaling_rows)}; "
             f"failed MoE gates={len(moe_failed_gates)}/{len(moe_gates)}; "
             f"TL2 MoE runtime ready={moe_tl2.get('tl2_moe_runtime_ready')}; "
             f"TL2 expert byte underreport={moe_tl2_byte_probe.get('underreport_bytes')}"
         ),
         "Treat as separate research milestone.",
-        "No Kimi-specific mapping, trained Qwen2MoE/Kimi quality artifact, ternary MoE runtime artifact, TL2 3D expert runtime support, router distillation, quality benchmark, or expert-locality benchmark exists; the tiny Qwen2MoE fixture only proves FP16 converter/runtime plumbing.",
+        "No Kimi-specific mapping, trained Qwen2MoE/Kimi quality artifact, ternary MoE runtime artifact, TL2 3D expert runtime support, router distillation, quality benchmark, or trained expert-locality benchmark exists; the tiny Qwen2MoE fixtures only prove synthetic FP16 converter/runtime plumbing.",
     )
 
     supported = [claim for claim in claims if claim["status"] in {"supported", "supported_with_patch"}]

@@ -417,6 +417,8 @@ def audit_moe(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -
     productization_gates = moe.get("productization_gates", [])
     failed_gates = [gate for gate in productization_gates if isinstance(gate, dict) and not gate.get("passed")]
     tiny_qwen2moe = moe.get("tiny_qwen2moe_fixture", {}) if isinstance(moe.get("tiny_qwen2moe_fixture"), dict) else {}
+    tiny_qwen2moe_scaling = moe.get("tiny_qwen2moe_expert_scaling", {}) if isinstance(moe.get("tiny_qwen2moe_expert_scaling"), dict) else {}
+    tiny_qwen2moe_scaling_rows = tiny_qwen2moe_scaling.get("rows", []) if isinstance(tiny_qwen2moe_scaling.get("rows"), list) else []
     metrics["moe"] = {
         "path": str(moe_path.relative_to(root)) if moe_path.is_relative_to(root) else str(moe_path),
         "present_generic_checks": len(present_checks),
@@ -425,6 +427,8 @@ def audit_moe(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -
         "local_kimi_artifact_count": len(local_kimi),
         "kimi_source_match_count": len(source_kimi),
         "tiny_qwen2moe_fixture_passed": tiny_qwen2moe.get("passed"),
+        "tiny_qwen2moe_expert_scaling_passed": tiny_qwen2moe_scaling.get("passed"),
+        "tiny_qwen2moe_expert_scaling_rows": len(tiny_qwen2moe_scaling_rows),
     }
     add_row(
         rows,
@@ -433,9 +437,10 @@ def audit_moe(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -
         (
             f"generic MoE checks present={len(present_checks)}; productization gates failed={len(failed_gates)}/{len(productization_gates)}; "
             f"Kimi artifacts={len(local_kimi)}; Kimi source matches={len(source_kimi)}; "
-            f"tiny Qwen2MoE FP16 fixture passed={tiny_qwen2moe.get('passed')}"
+            f"tiny Qwen2MoE FP16 fixture passed={tiny_qwen2moe.get('passed')}; "
+            f"synthetic expert scaling passed={tiny_qwen2moe_scaling.get('passed')}; scaling rows={len(tiny_qwen2moe_scaling_rows)}"
         ),
-        "A tiny random Qwen2MoE FP16 GGUF fixture now validates generic converter/runtime plumbing, but no validated Kimi-specific mapping, trained Qwen2MoE/Kimi quality artifact, ternary MoE runtime artifact, TL2 MoE runtime support, router distillation, MoE quality run, throughput run, or expert-locality benchmark exists.",
+        "A tiny random Qwen2MoE FP16 GGUF fixture and synthetic expert-scaling probe now validate generic converter/runtime plumbing and routed shape execution, but no validated Kimi-specific mapping, trained Qwen2MoE/Kimi quality artifact, ternary MoE runtime artifact, TL2 MoE runtime support, router distillation, MoE quality run, trained throughput run, or trained expert-locality benchmark exists.",
     )
 
 
