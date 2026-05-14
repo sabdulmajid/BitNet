@@ -46,7 +46,7 @@ python benchmarks/summarize_bitdistill_variants.py \
   --output-md "benchmarks/results/bitdistill_variant_summary_${DATE}.md"
 
 python benchmarks/gate_bitdistill_cpu_benchmark.py \
-  --input-json "benchmark_results/bitdistill_glue_cpu_${DATE}.json" \
+  --input-json "benchmark_results/bitdistill_glue_cpu_latest.json" \
   --output-json "benchmark_results/bitdistill_glue_cpu_gate_${DATE}.json" \
   --output-md "benchmarks/results/bitdistill_glue_cpu_gate_${DATE}.md"
 

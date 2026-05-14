@@ -350,7 +350,9 @@ sequence-classification checkpoints, not a packed `I2_SR`/llama.cpp inference
 claim.
 For the active long-warm-up chain, `slurm_bitdistill_cpu_benchmark.sh` runs the
 same benchmark after all downstream jobs finish and includes the strict
-`papergamma` family.
+`papergamma` family. It also refreshes
+`benchmark_results/bitdistill_glue_cpu_latest.json` so postprocess can gate the
+artifact without depending on a UTC date boundary.
 
 To gate the CPU task-runtime artifact before citing it:
 

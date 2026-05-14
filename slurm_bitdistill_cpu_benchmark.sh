@@ -24,6 +24,12 @@ MAX_EVAL_SAMPLES="${MAX_EVAL_SAMPLES:-64}"
 BATCH_SIZE="${BATCH_SIZE:-8}"
 MODEL_DTYPE="${MODEL_DTYPE:-fp32}"
 CHILD_TIMEOUT_SECONDS="${CHILD_TIMEOUT_SECONDS:-900}"
+OUTPUT_JSON="benchmark_results/bitdistill_glue_cpu_${DATE}.json"
+OUTPUT_MD="benchmarks/results/bitdistill_glue_cpu_${DATE}.md"
+LATEST_JSON="benchmark_results/bitdistill_glue_cpu_latest.json"
+LATEST_MD="benchmarks/results/bitdistill_glue_cpu_latest.md"
+
+rm -f "$LATEST_JSON" "$LATEST_MD"
 
 python benchmarks/benchmark_bitdistill_glue_cpu.py \
   --tasks mnli qnli sst2 \
@@ -41,5 +47,8 @@ python benchmarks/benchmark_bitdistill_glue_cpu.py \
   --max-eval-samples "$MAX_EVAL_SAMPLES" \
   --model-dtype "$MODEL_DTYPE" \
   --child-timeout-seconds "$CHILD_TIMEOUT_SECONDS" \
-  --output-json "benchmark_results/bitdistill_glue_cpu_${DATE}.json" \
-  --output-md "benchmarks/results/bitdistill_glue_cpu_${DATE}.md"
+  --output-json "$OUTPUT_JSON" \
+  --output-md "$OUTPUT_MD"
+
+cp "$OUTPUT_JSON" "$LATEST_JSON"
+cp "$OUTPUT_MD" "$LATEST_MD"
