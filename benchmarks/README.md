@@ -304,6 +304,23 @@ The gate reports whether the paper-style tensor candidate and the row-scale
 candidate are complete and whether each is within the configured FP16-SFT
 accuracy gap. Missing long-warm-up outputs are treated as pending failures.
 
+To measure PyTorch CPU task runtime for saved GLUE sequence-classification
+checkpoints:
+
+```bash
+python benchmarks/benchmark_bitdistill_glue_cpu.py \
+  --tasks mnli qnli sst2 \
+  --runs short:fp16_sft-tensor-layer-1 short:bitnet_sft-tensor-layer-1 short:bitdistill-tensor-layer-1 short:bitdistill-row-layer-1 \
+  --max-eval-samples 128 \
+  --threads 12
+```
+
+This benchmark reconstructs the saved checkpoint in an isolated child process,
+including SubLN and `BitLinear` modules when present. It reports CPU accuracy,
+examples/sec, batch latency, and RSS. It is a task-runtime probe for the
+sequence-classification checkpoints, not a packed `I2_SR`/llama.cpp inference
+claim.
+
 For the active Slurm pipeline, queue `slurm_bitdistill_postprocess.sh` with an
 `afterany` dependency on the downstream jobs. It refreshes the monitor,
 reproduction gate, variant summary, and objective audit from the materialized
