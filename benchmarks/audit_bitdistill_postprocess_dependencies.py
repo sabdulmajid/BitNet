@@ -206,7 +206,7 @@ def main() -> None:
     parser.add_argument("--monitor-json", type=Path, default=Path(f"benchmark_results/bitdistill_job_monitor_{DATE}.json"))
     parser.add_argument("--postprocess-job-name", default="bitdistill-postprocess")
     parser.add_argument("--postprocess-job-id", default="")
-    parser.add_argument("--extra-job-names", nargs="+", default=["bitdistill-i2sr", "bitdistill-cpu-bench"])
+    parser.add_argument("--extra-job-names", nargs="+", default=["bitdistill-i2sr", "bitdistill-cpu-bench", "bitdistill-predtrace"])
     parser.add_argument("--user", default=os.environ.get("USER", ""))
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_postprocess_dependency_audit_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/bitdistill_postprocess_dependency_audit_{DATE}.md"))

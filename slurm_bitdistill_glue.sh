@@ -57,6 +57,7 @@ ATTENTION_TEMPERATURE="${ATTENTION_TEMPERATURE:-1.0}"
 INIT_OUTPUT_HEAD_FROM_TEACHER="${INIT_OUTPUT_HEAD_FROM_TEACHER:-0}"
 MAX_TRAIN_SAMPLES="${MAX_TRAIN_SAMPLES:-0}"
 MAX_EVAL_SAMPLES="${MAX_EVAL_SAMPLES:-0}"
+SAVE_MODEL_ARTIFACTS="${SAVE_MODEL_ARTIFACTS:-1}"
 OUTPUT_ROOT="${OUTPUT_ROOT:-checkpoints/bitdistill-glue}"
 MODEL_SLUG="${MODEL//\//-}"
 OUTPUT_DIR="${OUTPUT_DIR:-$OUTPUT_ROOT/${MODEL_SLUG}/${TASK_NAME}/${METHOD}-${SCALE_MODE}-layer${DISTILL_LAYER}}"
@@ -83,6 +84,7 @@ echo "LOGIT_KD_WEIGHT=$LOGIT_KD_WEIGHT ATTENTION_KD_WEIGHT=$ATTENTION_KD_WEIGHT 
 echo "INIT_OUTPUT_HEAD_FROM_TEACHER=$INIT_OUTPUT_HEAD_FROM_TEACHER"
 echo "MAX_SEQ_LEN=$MAX_SEQ_LEN MAX_STEPS=$MAX_STEPS PER_DEVICE_BATCH_SIZE=$PER_DEVICE_BATCH_SIZE GRAD_ACCUM_STEPS=$GRAD_ACCUM_STEPS LR=$LR"
 echo "SAVE_EVERY_STEPS=$SAVE_EVERY_STEPS"
+echo "SAVE_MODEL_ARTIFACTS=$SAVE_MODEL_ARTIFACTS"
 echo "OUTPUT_DIR=$OUTPUT_DIR"
 
 TEACHER_ARGS=()
@@ -98,6 +100,11 @@ fi
 OUTPUT_HEAD_ARGS=(--no-init-output-head-from-teacher)
 if [ "$INIT_OUTPUT_HEAD_FROM_TEACHER" = "1" ]; then
   OUTPUT_HEAD_ARGS=(--init-output-head-from-teacher)
+fi
+
+SAVE_MODEL_ARGS=(--save-model-artifacts)
+if [ "$SAVE_MODEL_ARTIFACTS" = "0" ]; then
+  SAVE_MODEL_ARGS=(--no-save-model-artifacts)
 fi
 
 python train_bitdistill.py \
@@ -140,6 +147,7 @@ python train_bitdistill.py \
   --model-dtype bf16 \
   --master-weight-dtype fp32 \
   --gradient-checkpointing \
+  "${SAVE_MODEL_ARGS[@]}" \
   --output-dir "$OUTPUT_DIR" \
   --log-every-steps 10 \
   --save-every-steps "$SAVE_EVERY_STEPS"

@@ -13,7 +13,7 @@ Artifacts: `141`. Missing: `0`.
 | product_scope_gate | tracked_report | yes | 4004 | 7b288cbb99ad |  |
 | bitdistill_reproduction_status | tracked_report | yes | 8481 | 3f0e6a6abc2f |  |
 | bitdistill_reproduction_gate_report | tracked_report | yes | 8117 | 2eb2ba34bafc |  |
-| bitdistill_paired_predictions_report | tracked_report | yes | 6613 | d0f2d0b2c1f9 |  |
+| bitdistill_paired_predictions_report | tracked_report | yes | 6733 | 3fb082763c08 |  |
 | bitdistill_paper_alignment_report | tracked_report | yes | 6577 | 29774399df40 |  |
 | bitdistill_loss_scale_report | tracked_report | yes | 6846 | 65816a5d56a5 |  |
 | bitdistill_cpu_gate_report | tracked_report | yes | 4007 | fe558c83ae1f |  |
@@ -121,7 +121,7 @@ Artifacts: `141`. Missing: `0`.
 | objective_completion_audit_json | objective_completion_audit_json | yes | 15218 | b69b714367a4 | achieved=False, status=not_complete, complete=7/9, open=2 |
 | product_scope_gate_json | product_scope_gate_json | yes | 4759 | f7cf3f7a1149 | scope=research_mvp_only, supported=4, unsupported=4 |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 18095 | 5c6831a47726 | present=13/27, examples=13, ci95=13, paper_complete=False, paper_passed=False, row_complete=False, row_passed=False, confidence=0.95 |
-| bitdistill_paired_predictions_json | bitdistill_paired_predictions_json | yes | 33025 | 133f0a122aee | status=pending, complete=0/18, pending=18, failed=0 |
+| bitdistill_paired_predictions_json | bitdistill_paired_predictions_json | yes | 33337 | 20d66e9aa5e5 | status=pending, complete=0/18, pending=18, failed=0 |
 | bitdistill_cpu_gate_json | bitdistill_cpu_gate_json | yes | 5949 | bf57042d5030 | passed=False, input=False, critical=0/21, blockers=1 |
 | bitdistill_i2sr_gate_json | bitdistill_i2sr_gate_json | yes | 5345 | 6224d3e866c2 | passed=False, complete=0/6, tasks=['mnli', 'qnli', 'sst2'], scales=['tensor', 'row'], blockers=4 |
 | bitdistill_job_monitor_json | bitdistill_job_monitor_json | yes | 60124 | be6eeb9a2457 | warmup=9130/20000, progress=0.4565, ce=4.24093, snapshots=0, warnings=1, downstream=29 |

@@ -33,7 +33,7 @@ class ComparisonSpec:
     family: str
 
 
-FP16 = RunRef("FP16-SFT", "baseline_root", "{task}/fp16_sft-tensor-layer-1")
+FP16 = RunRef("FP16-SFT", "baseline_prediction_root", "{task}/fp16_sft-tensor-layer-1")
 LONG_TENSOR = RunRef("BitDistill gamma100 tensor", "longwarmup_root", "{task}/bitdistill-longwarmup-tensor-layer-8")
 LONG_ROW = RunRef("BitDistill gamma100 row", "longwarmup_root", "{task}/bitdistill-longwarmup-row-layer-8")
 PAPER_TENSOR = RunRef("BitDistill paper-gamma tensor", "paper_hparam_root", "{task}/bitdistill-longwarmup-tensor-layer-8")
@@ -348,6 +348,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--baseline-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls"))
+    parser.add_argument("--baseline-prediction-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-predtrace"))
     parser.add_argument("--longwarmup-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup"))
     parser.add_argument("--paper-hparam-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma"))
     parser.add_argument("--paper-hparam-row-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row"))

@@ -1030,14 +1030,15 @@ def save_outputs(model: nn.Module, tokenizer: Any, args: argparse.Namespace, met
         return
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    if hasattr(model, "save_pretrained"):
-        model.save_pretrained(output_dir)
-    if tokenizer is not None and hasattr(tokenizer, "save_pretrained"):
-        tokenizer.save_pretrained(output_dir)
-    torch.save(model.state_dict(), output_dir / "custom_state_dict.pt")
-    bitlinear_count = sum(1 for module in model.modules() if isinstance(module, BitLinear))
-    if bitlinear_count:
-        torch.save(build_ternary_state_dict(model, model.state_dict()), output_dir / "ternary_state_dict.pt")
+    if args.save_model_artifacts:
+        if hasattr(model, "save_pretrained"):
+            model.save_pretrained(output_dir)
+        if tokenizer is not None and hasattr(tokenizer, "save_pretrained"):
+            tokenizer.save_pretrained(output_dir)
+        torch.save(model.state_dict(), output_dir / "custom_state_dict.pt")
+        bitlinear_count = sum(1 for module in model.modules() if isinstance(module, BitLinear))
+        if bitlinear_count:
+            torch.save(build_ternary_state_dict(model, model.state_dict()), output_dir / "ternary_state_dict.pt")
     (output_dir / "metrics.json").write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
@@ -1430,6 +1431,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--device", default="")
     parser.add_argument("--log-every-steps", type=int, default=10)
     parser.add_argument("--save-every-steps", type=int, default=0)
+    parser.add_argument("--save-model-artifacts", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--seed", type=int, default=1234)
     parser.add_argument("--smoke-test", action="store_true")
     args = parser.parse_args()
