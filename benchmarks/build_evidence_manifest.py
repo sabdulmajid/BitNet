@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import math
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -26,19 +27,29 @@ SELECTED_LM_EVAL_METRICS = {
 
 
 CATASTROPHIC_PPL_THRESHOLD = 1.0e4
+DATE = datetime.now(timezone.utc).date().isoformat()
 
 
 ARTIFACTS: list[dict[str, str]] = [
     # Tracked reports.
     {"label": "README", "kind": "tracked_report", "path": "README.md"},
-    {"label": "side_by_side_report", "kind": "tracked_report", "path": "benchmarks/results/qwen_side_by_side_2026-05-05.md"},
+    {"label": "side_by_side_report", "kind": "tracked_report", "path": "benchmarks/results/qwen_side_by_side_2026-05-14.md"},
     {"label": "paired_row_minus_fp_report", "kind": "tracked_report", "path": "benchmarks/results/paired_row_densehead_minus_fp_2026-05-13.md"},
     {"label": "paired_row_minus_ptq_report", "kind": "tracked_report", "path": "benchmarks/results/paired_row_densehead_minus_ptq_2026-05-13.md"},
     {"label": "publishable_claims", "kind": "tracked_report", "path": "benchmarks/results/publishable_claims_2026-05-05.md"},
     {"label": "progress_audit", "kind": "tracked_report", "path": "benchmarks/results/progress_audit_2026-05-05.md"},
     {"label": "active_goal_audit", "kind": "tracked_report", "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md"},
-    {"label": "objective_completion_audit", "kind": "tracked_report", "path": "benchmarks/results/objective_completion_audit_2026-05-13.md"},
-    {"label": "product_scope_gate", "kind": "tracked_report", "path": "benchmarks/results/product_scope_gate_2026-05-13.md"},
+    {"label": "objective_completion_audit", "kind": "tracked_report", "path": "benchmarks/results/objective_completion_audit_2026-05-14.md"},
+    {"label": "product_scope_gate", "kind": "tracked_report", "path": "benchmarks/results/product_scope_gate_2026-05-14.md"},
+    {"label": "bitdistill_reproduction_status", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_reproduction_status_2026-05-14.md"},
+    {"label": "bitdistill_reproduction_gate_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_reproduction_gate_2026-05-14.md"},
+    {"label": "bitdistill_paper_alignment_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_paper_alignment_2026-05-14.md"},
+    {"label": "bitdistill_loss_scale_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_loss_scale_audit_2026-05-14.md"},
+    {"label": "bitdistill_cpu_gate_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_glue_cpu_gate_2026-05-14.md"},
+    {"label": "bitdistill_i2sr_gate_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_i2sr_export_gate_2026-05-14.md"},
+    {"label": "bitdistill_job_monitor_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_job_monitor_2026-05-14.md"},
+    {"label": "bitdistill_glue3_summary_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_seqcls_glue3_primary_summary_2026-05-14.md"},
+    {"label": "bitdistill_mnli_diagnostic_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_seqcls_mnli_diagnostic_variant_summary_2026-05-14.md"},
     {"label": "i2sr_submodule_promotion_audit", "kind": "tracked_report", "path": "benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md"},
     {"label": "benchmark_coverage_gate_report", "kind": "tracked_report", "path": "benchmarks/results/benchmark_coverage_gate_2026-05-13.md"},
     {"label": "direct_static_ternary_gguf_report", "kind": "tracked_report", "path": "benchmarks/results/direct_static_ternary_gguf_2026-05-13.md"},
@@ -59,10 +70,11 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "i2s_packing_layout_verify_report", "kind": "tracked_report", "path": "benchmarks/results/i2s_packing_layout_verify_2026-05-13.md"},
     {"label": "i2sr_rss_report", "kind": "tracked_report", "path": "benchmarks/results/i2sr_rss_2026-05-13.md"},
     {"label": "artifact_prune_application_report", "kind": "tracked_report", "path": "benchmarks/results/artifact_prune_application_2026-05-13.md"},
-    {"label": "moe_report", "kind": "tracked_report", "path": "benchmarks/results/moe_support_audit_2026-05-05.md"},
-    {"label": "moe_packing_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_packing_contract_2026-05-13.md"},
-    {"label": "moe_tl2_runtime_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_tl2_runtime_contract_2026-05-13.md"},
-    {"label": "unblock_requirements_report", "kind": "tracked_report", "path": "benchmarks/results/unblock_requirements_2026-05-13.md"},
+    {"label": "moe_report", "kind": "tracked_report", "path": "benchmarks/results/moe_support_audit_2026-05-14.md"},
+    {"label": "moe_packing_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_packing_contract_2026-05-14.md"},
+    {"label": "moe_tl2_runtime_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_tl2_runtime_contract_2026-05-14.md"},
+    {"label": "tiny_qwen2moe_fixture_report", "kind": "tracked_report", "path": "benchmarks/results/tiny_qwen2moe_fixture_2026-05-14.md"},
+    {"label": "unblock_requirements_report", "kind": "tracked_report", "path": "benchmarks/results/unblock_requirements_2026-05-14.md"},
     {"label": "i2sr_combined_patch", "kind": "tracked_report", "path": "patches/llama-i2sr-row-scale-qtype.patch"},
     {"label": "i2sr_root_runtime_patch", "kind": "tracked_report", "path": "patches/bitnet-i2sr-root-runtime.patch"},
     {"label": "i2sr_submodule_patch", "kind": "tracked_report", "path": "patches/llama-i2sr-row-scale-qtype.submodule.patch"},
@@ -129,13 +141,19 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "i2sr_promotion_handoff_json", "kind": "i2sr_promotion_handoff_json", "path": "benchmark_results/i2sr_promotion_handoff_2026-05-13.json"},
     {"label": "i2s_packing_layout_verify_json", "kind": "packing_verify_json", "path": "benchmark_results/i2s-packing-layout-verify-2026-05-13/summary.json"},
     {"label": "benchmark_coverage_gate_json", "kind": "benchmark_coverage_gate_json", "path": "benchmark_results/benchmark_coverage_gate_2026-05-13.json"},
-    {"label": "objective_completion_audit_json", "kind": "objective_completion_audit_json", "path": "benchmark_results/objective_completion_audit_2026-05-13.json"},
-    {"label": "product_scope_gate_json", "kind": "product_scope_gate_json", "path": "benchmark_results/product_scope_gate_2026-05-13.json"},
+    {"label": "objective_completion_audit_json", "kind": "objective_completion_audit_json", "path": "benchmark_results/objective_completion_audit_2026-05-14.json"},
+    {"label": "product_scope_gate_json", "kind": "product_scope_gate_json", "path": "benchmark_results/product_scope_gate_2026-05-14.json"},
+    {"label": "bitdistill_reproduction_gate_json", "kind": "bitdistill_reproduction_gate_json", "path": "benchmark_results/bitdistill_reproduction_gate_2026-05-14.json"},
+    {"label": "bitdistill_cpu_gate_json", "kind": "bitdistill_cpu_gate_json", "path": "benchmark_results/bitdistill_glue_cpu_gate_2026-05-14.json"},
+    {"label": "bitdistill_i2sr_gate_json", "kind": "bitdistill_i2sr_gate_json", "path": "benchmark_results/bitdistill_i2sr_export_gate_2026-05-14.json"},
+    {"label": "bitdistill_job_monitor_json", "kind": "bitdistill_job_monitor_json", "path": "benchmark_results/bitdistill_job_monitor_2026-05-14.json"},
+    {"label": "bitdistill_loss_scale_json", "kind": "bitdistill_loss_scale_json", "path": "benchmark_results/bitdistill_loss_scale_audit_2026-05-14.json"},
     {"label": "i2sr_submodule_promotion_audit_json", "kind": "i2sr_submodule_promotion_audit_json", "path": "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json"},
-    {"label": "moe_support_json", "kind": "moe_support_json", "path": "benchmark_results/moe_support_audit_2026-05-05.json"},
-    {"label": "moe_packing_contract_json", "kind": "moe_packing_contract_json", "path": "benchmark_results/moe_packing_contract_2026-05-13.json"},
-    {"label": "moe_tl2_runtime_contract_json", "kind": "moe_tl2_runtime_contract_json", "path": "benchmark_results/moe_tl2_runtime_contract_2026-05-13.json"},
-    {"label": "unblock_requirements_json", "kind": "unblock_requirements_json", "path": "benchmark_results/unblock_requirements_2026-05-13.json"},
+    {"label": "moe_support_json", "kind": "moe_support_json", "path": "benchmark_results/moe_support_audit_2026-05-14.json"},
+    {"label": "moe_packing_contract_json", "kind": "moe_packing_contract_json", "path": "benchmark_results/moe_packing_contract_2026-05-14.json"},
+    {"label": "moe_tl2_runtime_contract_json", "kind": "moe_tl2_runtime_contract_json", "path": "benchmark_results/moe_tl2_runtime_contract_2026-05-14.json"},
+    {"label": "tiny_qwen2moe_fixture_json", "kind": "tiny_qwen2moe_fixture_json", "path": "benchmark_results/tiny_qwen2moe_fixture_2026-05-14.json"},
+    {"label": "unblock_requirements_json", "kind": "unblock_requirements_json", "path": "benchmark_results/unblock_requirements_2026-05-14.json"},
     {"label": "tl2_generic_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json"},
     {"label": "tl2_avx512_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json"},
     {"label": "ptq_math", "kind": "math_json", "path": "benchmark_results/math_viability_gaussian_10trial_2026-05-05.json"},
@@ -439,6 +457,75 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "unsupported_claim_count": data.get("unsupported_claim_count"),
             "publishable_angle": data.get("publishable_angle"),
         }
+    if kind == "bitdistill_reproduction_gate_json":
+        rows = data.get("rows", [])
+        present = [row for row in rows if isinstance(row, dict) and row.get("exists")]
+        return {
+            "tasks": data.get("tasks", []),
+            "rows": len(rows) if isinstance(rows, list) else None,
+            "present_rows": len(present),
+            "paper_style_tensor_complete": data.get("paper_style_tensor_complete"),
+            "paper_style_tensor_passed": data.get("paper_style_tensor_passed"),
+            "row_scale_complete": data.get("row_scale_complete"),
+            "row_scale_passed": data.get("row_scale_passed"),
+            "max_fp_gap": data.get("max_fp_gap"),
+        }
+    if kind == "bitdistill_cpu_gate_json":
+        critical = data.get("critical", [])
+        complete = [row for row in critical if isinstance(row, dict) and row.get("complete")]
+        return {
+            "passed": data.get("passed"),
+            "input_exists": data.get("input_exists"),
+            "rows": len(data.get("rows", [])) if isinstance(data.get("rows"), list) else None,
+            "critical": len(critical) if isinstance(critical, list) else None,
+            "critical_complete": len(complete),
+            "blockers": data.get("blockers", []),
+        }
+    if kind == "bitdistill_i2sr_gate_json":
+        rows = data.get("rows", [])
+        complete = [row for row in rows if isinstance(row, dict) and row.get("complete")]
+        blockers = {
+            blocker
+            for row in rows
+            if isinstance(row, dict)
+            for blocker in row.get("blockers", [])
+            if isinstance(blocker, str)
+        }
+        return {
+            "passed": data.get("passed"),
+            "rows": len(rows) if isinstance(rows, list) else None,
+            "complete": len(complete),
+            "tasks": data.get("tasks", []),
+            "scales": data.get("scales", []),
+            "blockers": sorted(blockers),
+        }
+    if kind == "bitdistill_job_monitor_json":
+        warmup = data.get("warmup", {}) if isinstance(data.get("warmup"), dict) else {}
+        latest = warmup.get("latest_step", {}) if isinstance(warmup.get("latest_step"), dict) else {}
+        downstream = data.get("downstream", [])
+        states = {
+            row.get("job_status", {}).get("state")
+            for row in downstream
+            if isinstance(row, dict) and isinstance(row.get("job_status"), dict)
+        }
+        return {
+            "warmup_step": latest.get("step"),
+            "warmup_max_steps": warmup.get("max_steps"),
+            "warmup_progress": warmup.get("progress"),
+            "warmup_latest_ce": latest.get("ce"),
+            "warmup_save_every_steps": warmup.get("save_every_steps"),
+            "warmup_snapshots": warmup.get("snapshot_count"),
+            "downstream_jobs": len(downstream) if isinstance(downstream, list) else None,
+            "downstream_states": sorted(str(state) for state in states if state),
+        }
+    if kind == "bitdistill_loss_scale_json":
+        return {
+            "rows": len(data.get("rows", [])) if isinstance(data.get("rows"), list) else None,
+            "materialized_rows": data.get("materialized_rows"),
+            "paper_gamma": data.get("paper_classification_attention_gamma"),
+            "projected_attention_to_ce_min": data.get("projected_paper_attention_to_ce_min"),
+            "projected_attention_to_ce_max": data.get("projected_paper_attention_to_ce_max"),
+        }
     if kind == "i2sr_submodule_promotion_audit_json":
         return {
             "promotion_ready": data.get("promotion_ready"),
@@ -462,6 +549,7 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
         gates = data.get("productization_gates", [])
         failed = [gate.get("name") for gate in gates if isinstance(gate, dict) and not gate.get("passed")]
         checks = data.get("checks", [])
+        tiny = data.get("tiny_qwen2moe_fixture", {}) if isinstance(data.get("tiny_qwen2moe_fixture"), dict) else {}
         return {
             "checks": len(checks) if isinstance(checks, list) else None,
             "present_checks": sum(1 for check in checks if isinstance(check, dict) and check.get("status") == "present"),
@@ -469,6 +557,7 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "failed_gates": failed,
             "kimi_source_matches": len(data.get("kimi_source_matches", [])),
             "local_kimi_artifacts": len(data.get("local_kimi_artifacts", [])),
+            "tiny_qwen2moe_passed": tiny.get("passed"),
         }
     if kind == "moe_packing_contract_json":
         verdict = data.get("verdict", {})
@@ -508,6 +597,23 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "objective_status": data.get("objective_status"),
             "candidate_fork_reachable": fork.get("reachable") if isinstance(fork, dict) else None,
             "missing": [item.get("name") for item in missing],
+        }
+    if kind == "tiny_qwen2moe_fixture_json":
+        smoke = data.get("smoke", {}) if isinstance(data.get("smoke"), dict) else {}
+        rss = data.get("rss", {}) if isinstance(data.get("rss"), dict) else {}
+        gates = data.get("gates", {}) if isinstance(data.get("gates"), dict) else {}
+        return {
+            "passed": data.get("passed"),
+            "gguf_mib": data.get("gguf_mib"),
+            "architecture": smoke.get("architecture"),
+            "expert_count": smoke.get("expert_count"),
+            "expert_used_count": smoke.get("expert_used_count"),
+            "model_params_m": smoke.get("model_params_m"),
+            "cpu_buffer_mib": smoke.get("cpu_buffer_mib"),
+            "prompt_eval_tok_s": smoke.get("prompt_eval_tok_s"),
+            "decode_tok_s": smoke.get("decode_tok_s"),
+            "max_rss_mib": rss.get("max_rss_mib"),
+            "gates": gates,
         }
     if kind == "math_json":
         aggregate = data.get("aggregate", {})
@@ -655,6 +761,43 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"supported={metrics.get('supported_claim_count', '-')}, "
                 f"unsupported={metrics.get('unsupported_claim_count', '-')}"
             )
+        elif entry["kind"] == "bitdistill_reproduction_gate_json":
+            summary = (
+                f"present={metrics.get('present_rows', '-')}/{metrics.get('rows', '-')}, "
+                f"paper_complete={metrics.get('paper_style_tensor_complete', '-')}, "
+                f"paper_passed={metrics.get('paper_style_tensor_passed', '-')}, "
+                f"row_complete={metrics.get('row_scale_complete', '-')}, "
+                f"row_passed={metrics.get('row_scale_passed', '-')}"
+            )
+        elif entry["kind"] == "bitdistill_cpu_gate_json":
+            summary = (
+                f"passed={metrics.get('passed', '-')}, "
+                f"input={metrics.get('input_exists', '-')}, "
+                f"critical={metrics.get('critical_complete', '-')}/{metrics.get('critical', '-')}, "
+                f"blockers={len(metrics.get('blockers', []))}"
+            )
+        elif entry["kind"] == "bitdistill_i2sr_gate_json":
+            summary = (
+                f"passed={metrics.get('passed', '-')}, "
+                f"complete={metrics.get('complete', '-')}/{metrics.get('rows', '-')}, "
+                f"tasks={metrics.get('tasks', '-')}, scales={metrics.get('scales', '-')}, "
+                f"blockers={len(metrics.get('blockers', []))}"
+            )
+        elif entry["kind"] == "bitdistill_job_monitor_json":
+            summary = (
+                f"warmup={metrics.get('warmup_step', '-')}/{metrics.get('warmup_max_steps', '-')}, "
+                f"progress={fmt_metric(metrics.get('warmup_progress'))}, "
+                f"ce={fmt_metric(metrics.get('warmup_latest_ce'))}, "
+                f"snapshots={metrics.get('warmup_snapshots', '-')}, "
+                f"downstream={metrics.get('downstream_jobs', '-')}"
+            )
+        elif entry["kind"] == "bitdistill_loss_scale_json":
+            summary = (
+                f"rows={metrics.get('materialized_rows', '-')}/{metrics.get('rows', '-')}, "
+                f"gamma={fmt_metric(metrics.get('paper_gamma'))}, "
+                f"projected_attn_ce=[{fmt_metric(metrics.get('projected_attention_to_ce_min'))}, "
+                f"{fmt_metric(metrics.get('projected_attention_to_ce_max'))}]"
+            )
         elif entry["kind"] == "i2sr_submodule_promotion_audit_json":
             summary = (
                 f"ready={metrics.get('promotion_ready', '-')}, "
@@ -677,7 +820,8 @@ def build_report(manifest: dict[str, Any]) -> str:
             summary = (
                 f"present={metrics.get('present_checks', '-')}/{metrics.get('checks', '-')}, "
                 f"gates={metrics.get('gates', '-')}, failed={len(metrics.get('failed_gates', []))}, "
-                f"kimi_artifacts={metrics.get('local_kimi_artifacts', '-')}"
+                f"kimi_artifacts={metrics.get('local_kimi_artifacts', '-')}, "
+                f"tiny_qwen2moe={metrics.get('tiny_qwen2moe_passed', '-')}"
             )
         elif entry["kind"] == "moe_packing_contract_json":
             summary = (
@@ -703,6 +847,15 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"can_continue={metrics.get('can_continue_productively_without_input', '-')}, "
                 f"fork_reachable={metrics.get('candidate_fork_reachable', '-')}"
             )
+        elif entry["kind"] == "tiny_qwen2moe_fixture_json":
+            summary = (
+                f"passed={metrics.get('passed', '-')}, "
+                f"arch={metrics.get('architecture', '-')}, "
+                f"experts={metrics.get('expert_used_count', '-')}/{metrics.get('expert_count', '-')}, "
+                f"file={fmt_metric(metrics.get('gguf_mib'))} MiB, "
+                f"decode={fmt_metric(metrics.get('decode_tok_s'))} tok/s, "
+                f"rss={fmt_metric(metrics.get('max_rss_mib'))} MiB"
+            )
         elif entry["kind"] == "math_json":
             summary = f"trials={metrics.get('trials', '-')}, rel_error={fmt_metric(metrics.get('relative_output_fro_error_mean'))}"
         rows.append(
@@ -716,7 +869,7 @@ def build_report(manifest: dict[str, Any]) -> str:
             ]
         )
     lines = [
-        "# Evidence Manifest, 2026-05-13",
+        f"# Evidence Manifest, {DATE}",
         f"Artifacts: `{manifest['artifact_count']}`. Missing: `{manifest['missing_count']}`.",
         "| label | kind | exists | size bytes | sha256 prefix | parsed summary |",
         "| --- | --- | --- | ---: | --- | --- |",

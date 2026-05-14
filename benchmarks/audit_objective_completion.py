@@ -440,10 +440,16 @@ def audit_moe(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -
 
 
 def audit_publishability(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -> None:
-    manifest = read_json(root / "benchmarks/results/evidence_manifest_2026-05-13.json")
+    manifest_path = latest_artifact(
+        root,
+        "benchmarks/results/evidence_manifest_*.json",
+        "benchmarks/results/evidence_manifest_2026-05-13.json",
+    )
+    manifest = read_json(manifest_path)
     coverage = read_json(root / "benchmark_results/benchmark_coverage_gate_2026-05-13.json")
     prune = read_json(root / "benchmarks/results/artifact_prune_plan_2026-05-13.json")
     metrics["meta"] = {
+        "manifest_path": str(manifest_path.relative_to(root)) if manifest_path.is_relative_to(root) else str(manifest_path),
         "manifest_artifacts": manifest.get("artifact_count"),
         "manifest_missing": manifest.get("missing_count"),
         "coverage_passed": coverage.get("passed"),

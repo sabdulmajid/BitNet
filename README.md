@@ -283,7 +283,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [MoE support audit](benchmarks/results/moe_support_audit_2026-05-14.md)
 - [Tiny Qwen2MoE runtime fixture](benchmarks/results/tiny_qwen2moe_fixture_2026-05-14.md)
 - [Unblock requirements audit](benchmarks/results/unblock_requirements_2026-05-14.md)
-- [Evidence manifest](benchmarks/results/evidence_manifest_2026-05-13.md)
+- [Evidence manifest](benchmarks/results/evidence_manifest_2026-05-14.md)
 
 ## Product Direction
 
