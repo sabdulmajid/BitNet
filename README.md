@@ -245,7 +245,7 @@ MAX_EVAL_SAMPLES=512 sbatch --dependency=afterany:<downstream-job-ids> \
   slurm_bitdistill_cpu_benchmark.sh
 
 python benchmarks/build_qwen_side_by_side.py \
-  --output-md benchmarks/results/qwen_side_by_side_2026-05-05.md
+  --output-md benchmarks/results/qwen_side_by_side_2026-05-14.md
 ```
 
 Build smoke used for the active runtime:
@@ -257,16 +257,17 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 
 ## Primary Reports
 
-- [Qwen side-by-side summary](benchmarks/results/qwen_side_by_side_2026-05-05.md)
+- [Qwen side-by-side summary](benchmarks/results/qwen_side_by_side_2026-05-14.md)
 - [BitDistill reproduction status](benchmarks/results/bitdistill_reproduction_status_2026-05-14.md)
 - [BitDistill active job monitor](benchmarks/results/bitdistill_job_monitor_2026-05-14.md)
 - [BitDistill reproduction gate](benchmarks/results/bitdistill_reproduction_gate_2026-05-14.md)
 - [BitDistill paper alignment audit](benchmarks/results/bitdistill_paper_alignment_2026-05-14.md)
 - [BitDistill loss-scale audit](benchmarks/results/bitdistill_loss_scale_audit_2026-05-14.md)
+- [BitDistill GLUE CPU gate](benchmarks/results/bitdistill_glue_cpu_gate_2026-05-14.md)
 - [BitDistill GLUE3 primary summary](benchmarks/results/bitdistill_seqcls_glue3_primary_summary_2026-05-14.md)
 - [BitDistill MNLI diagnostic variants](benchmarks/results/bitdistill_seqcls_mnli_diagnostic_variant_summary_2026-05-14.md)
 - [Objective completion audit](benchmarks/results/objective_completion_audit_2026-05-14.md)
-- [Product scope gate](benchmarks/results/product_scope_gate_2026-05-13.md)
+- [Product scope gate](benchmarks/results/product_scope_gate_2026-05-14.md)
 - [I2_SR submodule promotion audit](benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md)
 - [Row-scale qtype productization gate](benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md)
 - [Direct packed GGUF support audit](benchmarks/results/direct_packed_gguf_support_2026-05-13.md)
