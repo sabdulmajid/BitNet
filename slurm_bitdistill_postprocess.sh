@@ -104,6 +104,10 @@ python benchmarks/audit_product_scope.py \
   --output-json "benchmark_results/product_scope_gate_${DATE}.json" \
   --output-md "benchmarks/results/product_scope_gate_${DATE}.md"
 
+python benchmarks/audit_bitdistill_active_goal.py \
+  --output-json "benchmark_results/bitdistill_active_goal_audit_${DATE}.json" \
+  --output-md "benchmarks/results/bitdistill_active_goal_audit_${DATE}.md"
+
 python benchmarks/build_qwen_side_by_side.py \
   --output-md "benchmarks/results/qwen_side_by_side_${DATE}.md"
 

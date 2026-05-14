@@ -268,6 +268,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill reproduction status](benchmarks/results/bitdistill_reproduction_status_2026-05-14.md)
 - [BitDistill active job monitor](benchmarks/results/bitdistill_job_monitor_2026-05-14.md)
 - [BitDistill dependency graph audit](benchmarks/results/bitdistill_dependency_graph_2026-05-14.md)
+- [BitDistill active goal audit](benchmarks/results/bitdistill_active_goal_audit_2026-05-14.md)
 - [BitDistill reproduction gate](benchmarks/results/bitdistill_reproduction_gate_2026-05-14.md)
 - [BitDistill paper alignment audit](benchmarks/results/bitdistill_paper_alignment_2026-05-14.md)
 - [BitDistill loss-scale audit](benchmarks/results/bitdistill_loss_scale_audit_2026-05-14.md)

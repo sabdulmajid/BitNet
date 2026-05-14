@@ -35,5 +35,5 @@ Overall status: **PASS**.
 | row-scale I2_S CPU row is finite | pass | ppl=38.8832, prefill=218.172685, decode=18.973629 |  |
 | row-scale I2_SR CPU row is finite | pass | ppl=38.8477, prefill=211.668328, decode=19.065496 |  |
 | fixed I2_SR RSS has four context rows | pass | contexts=[512, 2048, 8192, 32768] |  |
-| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-14.json, artifacts=133, missing=0, missing_labels=[] |  |
+| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-14.json, artifacts=135, missing=0, missing_labels=[] |  |
 | productization gate passes for stable I2_SR | pass | passed=True, failed=0, stable_quality=True, layout=True |  |
