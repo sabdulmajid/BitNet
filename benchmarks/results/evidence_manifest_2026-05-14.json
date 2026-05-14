@@ -1,5 +1,5 @@
 {
-  "artifact_count": 129,
+  "artifact_count": 131,
   "entries": [
     {
       "exists": true,
@@ -157,6 +157,15 @@
     {
       "exists": true,
       "kind": "tracked_report",
+      "label": "bitdistill_smoke_contract_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_smoke_contract_2026-05-14.md",
+      "sha256": "f6330f61bd4b6fe9c3f8e8df2486f0f2b76389631dfceecf4055be7b36329824",
+      "size_bytes": 1255
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
       "label": "bitdistill_variant_summary_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_variant_summary_2026-05-14.md",
@@ -205,7 +214,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-14.md",
-      "sha256": "cdc41009abfef3a598906afcc86a3dc68dc3faec4903c9fbc7fd1d80f57c72b0",
+      "sha256": "1e4e6a7f85a5703188d3d402e4da159839605710f7c2356046882ea514ffbec0",
       "size_bytes": 2937
     },
     {
@@ -1868,7 +1877,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-14.json",
-      "sha256": "5dbfd0a87dd4270d26333d0742a19dd0e5da8e8ccb5456b90242bf78c4ca49dd",
+      "sha256": "51a759feed1b84dbea5c530f5c657c6ce075244f4fef2f7f7d8462061629399e",
       "size_bytes": 5488
     },
     {
@@ -2016,6 +2025,24 @@
       "path": "benchmark_results/bitdistill_dependency_graph_2026-05-14.json",
       "sha256": "fe70f4d437add867fe48f06473fe27ffa768df30750526c5965eb357801029b0",
       "size_bytes": 13935
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_smoke_contract_json",
+      "label": "bitdistill_smoke_contract_json",
+      "metrics": {
+        "check_count": 14,
+        "checks": 14,
+        "continued_bitlinear": 15,
+        "continued_subln": 4,
+        "failed_count": 0,
+        "passed": true,
+        "task_bitlinear": 15,
+        "task_subln": 4
+      },
+      "path": "benchmark_results/bitdistill_smoke_contract_2026-05-14.json",
+      "sha256": "94955c90fd86015485b46a81196710fb65e751061444fe329ffeedc2ea6d0d66",
+      "size_bytes": 14962
     },
     {
       "exists": true,
