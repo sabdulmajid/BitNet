@@ -56,6 +56,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "bitdistill_afterany_postprocess_dependency_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_afterany_postprocess_dependency_{DATE}.md"},
     {"label": "bitdistill_warmup_health_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_warmup_health_{DATE}.md"},
     {"label": "bitdistill_warmup_finalizer_submission_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_warmup_finalizer_submission_{DATE}.md"},
+    {"label": "bitdistill_producer_script_audit_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_producer_script_audit_{DATE}.md"},
     {"label": "bitdistill_job_matrix_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_job_matrix_audit_{DATE}.md"},
     {"label": "bitdistill_active_goal_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_active_goal_audit_{DATE}.md"},
     {"label": "bitdistill_smoke_contract_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_smoke_contract_{DATE}.md"},
@@ -172,6 +173,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "bitdistill_afterany_postprocess_dependency_json", "kind": "bitdistill_postprocess_dependency_json", "path": f"benchmark_results/bitdistill_afterany_postprocess_dependency_{DATE}.json"},
     {"label": "bitdistill_warmup_health_json", "kind": "bitdistill_warmup_health_json", "path": f"benchmark_results/bitdistill_warmup_health_{DATE}.json"},
     {"label": "bitdistill_warmup_finalizer_submission_json", "kind": "bitdistill_warmup_finalizer_submission_json", "path": f"benchmark_results/bitdistill_warmup_finalizer_submission_{DATE}.json"},
+    {"label": "bitdistill_producer_script_audit_json", "kind": "bitdistill_producer_script_audit_json", "path": f"benchmark_results/bitdistill_producer_script_audit_{DATE}.json"},
     {"label": "bitdistill_job_matrix_json", "kind": "bitdistill_job_matrix_json", "path": f"benchmark_results/bitdistill_job_matrix_audit_{DATE}.json"},
     {"label": "bitdistill_active_goal_json", "kind": "bitdistill_active_goal_json", "path": f"benchmark_results/bitdistill_active_goal_audit_{DATE}.json"},
     {"label": "bitdistill_smoke_contract_json", "kind": "bitdistill_smoke_contract_json", "path": f"benchmark_results/bitdistill_smoke_contract_{DATE}.json"},
@@ -657,6 +659,23 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "snapshot_count": data.get("snapshot_count"),
             "final_state_exists": data.get("final_state_exists"),
         }
+    if kind == "bitdistill_producer_script_audit_json":
+        checks = data.get("checks", [])
+        failed = [check for check in checks if isinstance(check, dict) and not check.get("passed")]
+        cpu_job = data.get("cpu_job", {}) if isinstance(data.get("cpu_job"), dict) else {}
+        i2sr_job = data.get("i2sr_job", {}) if isinstance(data.get("i2sr_job"), dict) else {}
+        strict_post = data.get("strict_postprocess_job", {}) if isinstance(data.get("strict_postprocess_job"), dict) else {}
+        any_post = data.get("afterany_postprocess_job", {}) if isinstance(data.get("afterany_postprocess_job"), dict) else {}
+        return {
+            "passed": data.get("passed"),
+            "checks": len(checks) if isinstance(checks, list) else None,
+            "failed": len(failed) if isinstance(checks, list) else None,
+            "downstream_jobs": len(data.get("downstream_job_ids", [])) if isinstance(data.get("downstream_job_ids"), list) else None,
+            "cpu_job": cpu_job.get("job_id"),
+            "i2sr_job": i2sr_job.get("job_id"),
+            "strict_postprocess_job": strict_post.get("job_id"),
+            "afterany_postprocess_job": any_post.get("job_id"),
+        }
     if kind == "bitdistill_job_matrix_json":
         return {
             "passed": data.get("passed"),
@@ -1099,6 +1118,14 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"ce={fmt_metric(metrics.get('latest_ce'))}, "
                 f"sec_step={fmt_metric(metrics.get('seconds_per_step'))}, "
                 f"snapshots={metrics.get('snapshot_count', '-')}"
+            )
+        elif entry["kind"] == "bitdistill_producer_script_audit_json":
+            summary = (
+                f"passed={metrics.get('passed', '-')}, "
+                f"checks={metrics.get('checks', '-')}, failed={metrics.get('failed', '-')}, "
+                f"downstream={metrics.get('downstream_jobs', '-')}, "
+                f"cpu={metrics.get('cpu_job', '-')}, i2sr={metrics.get('i2sr_job', '-')}, "
+                f"post={metrics.get('strict_postprocess_job', '-')}/{metrics.get('afterany_postprocess_job', '-')}"
             )
         elif entry["kind"] == "bitdistill_job_matrix_json":
             summary = (

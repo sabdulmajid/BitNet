@@ -346,8 +346,17 @@ def parse_runs(values: list[str]) -> list[tuple[str, str]]:
             family, run = value.split(":", 1)
         else:
             family, run = "short", value
-        if family not in {"short", "longwarmup", "papergamma", "papergamma_row"}:
-            raise ValueError(f"run family must be short, longwarmup, papergamma, or papergamma_row: {value}")
+        valid_families = {
+            "short",
+            "longwarmup",
+            "papergamma",
+            "papergamma_row",
+            "papergamma_lr1",
+            "papergamma_lr5",
+            "papergamma_headinit",
+        }
+        if family not in valid_families:
+            raise ValueError(f"run family must be one of {sorted(valid_families)}: {value}")
         parsed.append((family, run))
     return parsed
 

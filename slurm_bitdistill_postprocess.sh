@@ -147,6 +147,8 @@ python benchmarks/build_evidence_manifest.py \
   --allow-missing-label bitdistill_afterany_postprocess_dependency_json \
   --allow-missing-label bitdistill_warmup_finalizer_submission_report \
   --allow-missing-label bitdistill_warmup_finalizer_submission_json \
+  --allow-missing-label bitdistill_producer_script_audit_report \
+  --allow-missing-label bitdistill_producer_script_audit_json \
   --output-json "benchmarks/results/evidence_manifest_${DATE}.json" \
   --output-md "benchmarks/results/evidence_manifest_${DATE}.md"
 
@@ -166,5 +168,7 @@ python benchmarks/build_evidence_manifest.py \
   --allow-missing-label bitdistill_afterany_postprocess_dependency_json \
   --allow-missing-label bitdistill_warmup_finalizer_submission_report \
   --allow-missing-label bitdistill_warmup_finalizer_submission_json \
+  --allow-missing-label bitdistill_producer_script_audit_report \
+  --allow-missing-label bitdistill_producer_script_audit_json \
   --output-json "benchmarks/results/evidence_manifest_${DATE}.json" \
   --output-md "benchmarks/results/evidence_manifest_${DATE}.md"

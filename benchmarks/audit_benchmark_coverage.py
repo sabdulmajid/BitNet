@@ -179,6 +179,8 @@ def manifest_missing_is_only_self_coverage(manifest: dict[str, Any]) -> bool:
         "benchmark_coverage_gate_json",
         "bitdistill_postprocess_dependency_report",
         "bitdistill_postprocess_dependency_json",
+        "bitdistill_producer_script_audit_report",
+        "bitdistill_producer_script_audit_json",
     }
     return set(missing) <= optional_preflight
 
