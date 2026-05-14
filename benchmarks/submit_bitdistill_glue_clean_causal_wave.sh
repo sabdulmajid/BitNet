@@ -1,5 +1,5 @@
 #!/bin/bash
-# Submit a clean causal-LM GLUE BitDistill wave using single-token labels.
+# Submit a clean GLUE BitDistill wave.
 #
 # This intentionally reuses an existing Stage-2 BitDistill continued-pretraining
 # checkpoint.  It is the preferred launcher after the first word-label wave
@@ -53,7 +53,8 @@ common_sbatch_args() {
 }
 
 mkdir -p benchmark_results
-JOB_TABLE="benchmark_results/bitdistill_glue_clean_causal_jobs_$(date -u +%Y%m%d_%H%M%S).tsv"
+JOB_KIND="${JOB_KIND:-bitdistill_glue_${TASK_FORMAT}_jobs}"
+JOB_TABLE="benchmark_results/${JOB_KIND}_$(date -u +%Y%m%d_%H%M%S).tsv"
 printf "phase\ttask\tmethod\tscale\tlayer\tjob_id\tdependency\toutput_dir\n" > "$JOB_TABLE"
 
 submit_job() {
