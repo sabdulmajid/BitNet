@@ -102,6 +102,21 @@ def expected_rows(model_slug: str, warmup_state: str) -> list[dict[str, Any]]:
                     "output_root": f"checkpoints/bitdistill-glue-seqcls-longwarmup/{model_slug}/{task}",
                     "teacher_root": f"checkpoints/bitdistill-glue-seqcls/{model_slug}/{task}",
                     "exclude_linear_regex": "score|classifier",
+                    "init_output_head_from_teacher": "0",
+                    "warmup_state": warmup_state,
+                }
+            )
+            rows.append(
+                {
+                    "family": "seqcls_gamma100_headinit",
+                    "task": task,
+                    "task_format": "sequence_classification",
+                    "scale": scale,
+                    "attention_kd_weight": 100.0,
+                    "output_root": f"checkpoints/bitdistill-glue-seqcls-longwarmup-headinit/{model_slug}/{task}",
+                    "teacher_root": f"checkpoints/bitdistill-glue-seqcls/{model_slug}/{task}",
+                    "exclude_linear_regex": "score|classifier",
+                    "init_output_head_from_teacher": "1",
                     "warmup_state": warmup_state,
                 }
             )
@@ -116,6 +131,7 @@ def expected_rows(model_slug: str, warmup_state: str) -> list[dict[str, Any]]:
                 "output_root": f"checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/{model_slug}/{task}",
                 "teacher_root": f"checkpoints/bitdistill-glue-seqcls/{model_slug}/{task}",
                 "exclude_linear_regex": "score|classifier",
+                "init_output_head_from_teacher": "0",
                 "warmup_state": warmup_state,
             }
         )
@@ -133,6 +149,7 @@ def expected_rows(model_slug: str, warmup_state: str) -> list[dict[str, Any]]:
                 "output_root": f"{root}/{model_slug}/mnli",
                 "teacher_root": f"checkpoints/bitdistill-glue-seqcls/{model_slug}/mnli",
                 "exclude_linear_regex": "score|classifier",
+                "init_output_head_from_teacher": "0",
                 "warmup_state": warmup_state,
             }
         )
@@ -148,6 +165,7 @@ def expected_rows(model_slug: str, warmup_state: str) -> list[dict[str, Any]]:
                     "output_root": f"checkpoints/bitdistill-glue-causal-longwarmup-densehead/{model_slug}/{task}",
                     "teacher_root": f"checkpoints/bitdistill-glue/{model_slug}/{task}",
                     "exclude_linear_regex": "lm_head",
+                    "init_output_head_from_teacher": "0",
                     "warmup_state": warmup_state,
                 }
             )
@@ -166,6 +184,7 @@ def row_matches_expected(row: dict[str, Any], expected: dict[str, Any]) -> bool:
         and output_dir.startswith(str(expected["output_root"]))
         and teacher.startswith(str(expected["teacher_root"]))
         and inferred_exclude_regex(row) == expected["exclude_linear_regex"]
+        and str(row.get("init_output_head_from_teacher") or "0") == str(expected["init_output_head_from_teacher"])
         and normalize_path_text(row.get("warmup_state")) == normalize_path_text(expected["warmup_state"])
     )
 
@@ -246,6 +265,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                 "teacher": match.get("teacher") if match else None,
                 "teacher_metrics_exists": teacher_ok,
                 "inferred_fields": inferred_field_names(match) if match else [],
+                "head_init": str(match.get("init_output_head_from_teacher") or "0") if match else None,
                 "job_state": status,
                 "issues": issues,
                 "passed": not issues,
@@ -320,6 +340,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
             row["task_format"],
             row["scale"],
             fmt(row["attention_kd_weight"]),
+            fmt(row["head_init"]),
             fmt(row["job_id"]),
             fmt(row["job_state"]),
             fmt(row["teacher_metrics_exists"]),
@@ -346,6 +367,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 "format",
                 "scale",
                 "attention gamma",
+                "head init",
                 "job",
                 "state",
                 "teacher metrics",

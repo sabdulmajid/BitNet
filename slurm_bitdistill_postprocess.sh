@@ -60,6 +60,7 @@ python benchmarks/summarize_bitdistill_variants.py \
     checkpoints/bitdistill-glue-seqcls-paperlogit \
     checkpoints/bitdistill-glue-seqcls-ablate \
     checkpoints/bitdistill-glue-seqcls-longwarmup \
+    checkpoints/bitdistill-glue-seqcls-longwarmup-headinit \
     checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma \
     checkpoints/bitdistill-glue-seqcls-longwarmup-gamma1k \
     checkpoints/bitdistill-glue-seqcls-longwarmup-gamma10k \

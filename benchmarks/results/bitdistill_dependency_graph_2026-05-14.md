@@ -6,15 +6,15 @@ Ready for downstream release: `True`.
 
 | log | job | step | max steps | progress | expected state exists | expected state |
 | --- | --- | --- | --- | --- | --- | --- |
-| logs/bitdistill-glue-9894.out | 9894 | 7250 | 20000 | 0.362500 | false | checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/custom_state_dict.pt |
+| logs/bitdistill-glue-9894.out | 9894 | 7720 | 20000 | 0.386000 | false | checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/custom_state_dict.pt |
 
 ## Checks
 
 | check | status | evidence | blocker |
 | --- | --- | --- | --- |
 | warm-up log exposes final output directory | pass | log=logs/bitdistill-glue-9894.out, expected_state=checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/custom_state_dict.pt |  |
-| active downstream jobs point at warm-up final state | pass | active_rows=17, mismatches=0 |  |
-| active downstream jobs have FP16 teacher metrics | pass | active_rows=17, missing=0 |  |
+| active downstream jobs point at warm-up final state | pass | active_rows=23, mismatches=0 |  |
+| active downstream jobs have FP16 teacher metrics | pass | active_rows=23, missing=0 |  |
 | active downstream jobs depend on the running warm-up job | pass | warmup_job=9894, bad=0 |  |
 
 ## Warnings
@@ -32,7 +32,7 @@ Ready for downstream release: `True`.
 
 ## Submission Rows
 
-Raw rows: `40`. Deduped rows: `17`. Active rows: `17`.
+Raw rows: `46`. Deduped rows: `23`. Active rows: `23`.
 
 | job | state | task | format | scale | layer | teacher metrics | warmup match | output dir |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -53,6 +53,12 @@ Raw rows: `40`. Deduped rows: `17`. Active rows: `17`.
 | 9946 | PENDING | qnli | causal_lm | row | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-row-layer-8 |
 | 9947 | PENDING | sst2 | causal_lm | tensor | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8 |
 | 9948 | PENDING | sst2 | causal_lm | row | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8 |
+| 9971 | PENDING | mnli | sequence_classification | tensor | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup-headinit/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8 |
+| 9972 | PENDING | mnli | sequence_classification | row | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup-headinit/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8 |
+| 9973 | PENDING | qnli | sequence_classification | tensor | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup-headinit/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8 |
+| 9974 | PENDING | qnli | sequence_classification | row | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup-headinit/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-row-layer-8 |
+| 9975 | PENDING | sst2 | sequence_classification | tensor | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup-headinit/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8 |
+| 9976 | PENDING | sst2 | sequence_classification | row | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup-headinit/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8 |
 
 ## Duplicate Historical Output Dirs
 
