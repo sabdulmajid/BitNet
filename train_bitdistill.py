@@ -84,6 +84,8 @@ class StepMetrics:
     ce: float = 0.0
     logit_kd: float = 0.0
     attention_kd: float = 0.0
+    weighted_logit_kd: float = 0.0
+    weighted_attention_kd: float = 0.0
     lr: float = 0.0
 
 
@@ -805,12 +807,28 @@ def load_optional_state_dict(model: nn.Module, args: argparse.Namespace) -> dict
     state = torch.load(path, map_location="cpu", weights_only=True)
     if not isinstance(state, dict):
         raise TypeError(f"{path} did not contain a state dict")
-    incompatible = model.load_state_dict(state, strict=False)
+    model_state = model.state_dict()
+    compatible_state: dict[str, torch.Tensor] = {}
+    skipped_shape_mismatches: dict[str, dict[str, list[int]]] = {}
+    for key, tensor in state.items():
+        target = model_state.get(key)
+        if target is None:
+            compatible_state[key] = tensor
+            continue
+        if tuple(tensor.shape) != tuple(target.shape):
+            skipped_shape_mismatches[key] = {
+                "checkpoint": list(tensor.shape),
+                "model": list(target.shape),
+            }
+            continue
+        compatible_state[key] = tensor
+    incompatible = model.load_state_dict(compatible_state, strict=False)
     return {
         "loaded": True,
         "path": str(path),
         "missing_keys": sorted(incompatible.missing_keys),
         "unexpected_keys": sorted(incompatible.unexpected_keys),
+        "skipped_shape_mismatches": skipped_shape_mismatches,
     }
 
 
@@ -927,12 +945,16 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                     split_heads=args.attention_split_heads,
                     temperature=args.attention_temperature,
                 )
-                loss = ce + args.logit_kd_weight * logit_kd + args.attention_kd_weight * attention_kd
+                weighted_logit_kd = args.logit_kd_weight * logit_kd
+                weighted_attention_kd = args.attention_kd_weight * attention_kd
+                loss = ce + weighted_logit_kd + weighted_attention_kd
             else:
                 student_outputs = student(**batch)
                 ce = student_outputs.loss
                 logit_kd = student_outputs.logits.new_zeros(())
                 attention_kd = student_outputs.logits.new_zeros(())
+                weighted_logit_kd = student_outputs.logits.new_zeros(())
+                weighted_attention_kd = student_outputs.logits.new_zeros(())
                 loss = ce
 
             (loss / args.grad_accum_steps).backward()
@@ -950,12 +972,16 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                 ce=float(ce.detach().cpu()),
                 logit_kd=float(logit_kd.detach().cpu()),
                 attention_kd=float(attention_kd.detach().cpu()),
+                weighted_logit_kd=float(weighted_logit_kd.detach().cpu()),
+                weighted_attention_kd=float(weighted_attention_kd.detach().cpu()),
                 lr=lr,
             )
             if step == 1 or step % args.log_every_steps == 0:
                 print(
                     f"step={step} loss={last.loss:.6f} ce={last.ce:.6f} "
                     f"logit_kd={last.logit_kd:.6f} attention_kd={last.attention_kd:.6f} "
+                    f"weighted_logit_kd={last.weighted_logit_kd:.6f} "
+                    f"weighted_attention_kd={last.weighted_attention_kd:.6f} "
                     f"lr={lr:.3e} elapsed={time.time() - start:.1f}s",
                     flush=True,
                 )
@@ -980,6 +1006,12 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
         "state_load": state_load,
         "distill_layer": args.distill_layer,
         "attention_split_heads": args.attention_split_heads,
+        "loss_weights": {
+            "logit_kd_weight": args.logit_kd_weight,
+            "attention_kd_weight": args.attention_kd_weight,
+            "logit_temperature": args.logit_temperature,
+            "attention_temperature": args.attention_temperature,
+        },
         "elapsed_seconds": time.time() - start,
     }
     print(json.dumps(metrics, indent=2, sort_keys=True), flush=True)
@@ -1031,7 +1063,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--logit-temperature", type=float, default=5.0)
     parser.add_argument("--logit-kd-weight", type=float, default=10.0)
     parser.add_argument("--attention-temperature", type=float, default=1.0)
-    parser.add_argument("--attention-kd-weight", type=float, default=1.0e-5)
+    parser.add_argument("--attention-kd-weight", type=float, default=100.0)
     parser.add_argument("--attention-split-heads", type=int, default=8)
     parser.add_argument("--distill-layer", type=int, default=-1)
     parser.add_argument("--gradient-checkpointing", action=argparse.BooleanOptionalAction, default=True)
