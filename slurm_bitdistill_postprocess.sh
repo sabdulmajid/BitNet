@@ -30,6 +30,7 @@ python benchmarks/summarize_bitdistill_variants.py \
     checkpoints/bitdistill-glue-seqcls-paperlogit \
     checkpoints/bitdistill-glue-seqcls-ablate \
     checkpoints/bitdistill-glue-seqcls-longwarmup \
+    checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma \
   --title "BitDistill Variant Summary, ${DATE}" \
   --output-json "benchmark_results/bitdistill_variant_summary_${DATE}.json" \
   --output-md "benchmarks/results/bitdistill_variant_summary_${DATE}.md"

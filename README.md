@@ -88,8 +88,12 @@ therefore be read as a failure boundary for direct or short-warm-up retrofit,
 not as a disproof of BitDistill.
 
 Active follow-ups are probing teacher-head initialization, attention-layer
-selection, paper-style logits KL scaling, CE-only ablations, and a longer
-warm-up pilot. Until those gates close, the public claim remains conservative:
+selection, paper-style logits KL scaling, CE-only ablations, a longer
+warm-up pilot, and a strict paper-hyperparameter branch with classification
+attention KD weight `1e5`. The earlier completed and queued BitDistill runs use
+attention KD weight `100`; those are useful diagnostics but are not a strict
+match to the paper's reported classification setting. Until those gates close,
+the public claim remains conservative:
 **BitDistill is the right class of method, but this fork has not yet reproduced
 paper-level task quality.**
 

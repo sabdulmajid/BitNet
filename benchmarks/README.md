@@ -139,6 +139,11 @@ runs use `--logit-kd-temperature-scale none`, matching the paper equations.
 Teacher-head initialization, attention-layer sweep, CE-only ablation, and
 longer warm-up jobs are tracked in
 `benchmarks/results/bitdistill_reproduction_status_2026-05-14.md`.
+The completed and initially queued downstream BitDistill jobs use
+`ATTENTION_KD_WEIGHT=100`; the paper text reports `gamma=1e5` for
+classification. A separate long-warm-up `papergamma` branch uses that stricter
+hyperparameter, and the reproduction gate treats that branch as the paper
+candidate.
 
 The corrected MNLI diagnostic wave plus attention-layer sweep improved the best
 short-budget BitDistill result to `0.535711` against FP16-SFT `0.807641`.
@@ -303,6 +308,8 @@ python benchmarks/gate_bitdistill_reproduction.py
 The gate reports whether the paper-style tensor candidate and the row-scale
 candidate are complete and whether each is within the configured FP16-SFT
 accuracy gap. Missing long-warm-up outputs are treated as pending failures.
+The strict tensor candidate is read from
+`checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma` by default.
 
 To measure PyTorch CPU task runtime for saved GLUE sequence-classification
 checkpoints:

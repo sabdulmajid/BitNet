@@ -29,8 +29,14 @@ RUN_SPECS = [
     RunSpec("BitDistill short tensor layer -1", "baseline_root", "{task}/bitdistill-tensor-layer-1", "short"),
     RunSpec("BitDistill short row layer -1", "baseline_root", "{task}/bitdistill-row-layer-1", "short"),
     RunSpec("BitDistill short tensor layer -8", "baseline_root", "{task}/bitdistill-tensor-layer-8", "short"),
-    RunSpec("BitDistill longwarmup tensor layer -8", "longwarmup_root", "{task}/bitdistill-longwarmup-tensor-layer-8", "paper_style_candidate"),
+    RunSpec("BitDistill longwarmup tensor layer -8 gamma100", "longwarmup_root", "{task}/bitdistill-longwarmup-tensor-layer-8", "longwarmup_gamma100"),
     RunSpec("BitDistill longwarmup row layer -8", "longwarmup_root", "{task}/bitdistill-longwarmup-row-layer-8", "row_scale_candidate"),
+    RunSpec(
+        "BitDistill longwarmup tensor layer -8 paper gamma",
+        "paper_hparam_root",
+        "{task}/bitdistill-longwarmup-tensor-layer-8",
+        "paper_hparam_candidate",
+    ),
 ]
 
 
@@ -81,7 +87,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                 }
             )
 
-    paper_rows = [row for row in rows if row["family"] == "paper_style_candidate"]
+    paper_rows = [row for row in rows if row["family"] == "paper_hparam_candidate"]
     row_scale_rows = [row for row in rows if row["family"] == "row_scale_candidate"]
     paper_complete = all(row["exists"] and row["accuracy"] is not None for row in paper_rows)
     row_complete = all(row["exists"] and row["accuracy"] is not None for row in row_scale_rows)
@@ -112,6 +118,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "max_fp_gap": args.max_fp_gap,
         "baseline_root": str(args.baseline_root),
         "longwarmup_root": str(args.longwarmup_root),
+        "paper_hparam_root": str(args.paper_hparam_root),
         "paper_style_tensor_complete": paper_complete,
         "paper_style_tensor_passed": paper_passed,
         "row_scale_complete": row_complete,
@@ -166,8 +173,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
             f"# BitDistill Reproduction Gate, {summary['date']}",
             f"Model: `{summary['model']}`.",
             f"Threshold: absolute FP16-SFT gap <= `{summary['max_fp_gap']}` accuracy.",
-            f"Paper-style tensor candidate complete: `{summary['paper_style_tensor_complete']}`.",
-            f"Paper-style tensor candidate passed: `{summary['paper_style_tensor_passed']}`.",
+            f"Strict paper-hyperparameter tensor candidate complete: `{summary['paper_style_tensor_complete']}`.",
+            f"Strict paper-hyperparameter tensor candidate passed: `{summary['paper_style_tensor_passed']}`.",
             f"Row-scale candidate complete: `{summary['row_scale_complete']}`.",
             f"Row-scale candidate passed: `{summary['row_scale_passed']}`.",
             "## Runs",
@@ -185,6 +192,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--baseline-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls"))
     parser.add_argument("--longwarmup-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup"))
+    parser.add_argument("--paper-hparam-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma"))
     parser.add_argument("--model", default="Qwen/Qwen2.5-0.5B")
     parser.add_argument("--tasks", nargs="+", choices=TASKS, default=TASKS)
     parser.add_argument("--max-fp-gap", type=float, default=0.01)
