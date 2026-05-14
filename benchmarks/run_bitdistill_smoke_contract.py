@@ -116,6 +116,8 @@ def build_report(result: dict[str, Any]) -> str:
         f"Overall status: `{'pass' if result['passed'] else 'fail'}`.",
         f"Work dir: `{result['work_dir']}`.",
         "",
+        "GGUF export checks use a smoke-only synthetic tokenizer stub. They validate packed tensor emission, row-scale `I2_SR` metadata, and SubLN key mapping; they do not validate text generation quality.",
+        "",
         "| check | status | evidence | blocker |",
         "| --- | --- | --- | --- |",
     ]
@@ -163,6 +165,29 @@ def main() -> None:
             "1",
             "--output-dir",
             str(work_dir / "continued_pretrain"),
+        ],
+        "continued_pretrain_row": [
+            py,
+            "train_bitdistill.py",
+            "--smoke-test",
+            "--stage",
+            "continued_pretrain",
+            "--method",
+            "bitdistill",
+            "--scale-mode",
+            "row",
+            "--max-steps",
+            "2",
+            "--device",
+            "cpu",
+            "--per-device-batch-size",
+            "1",
+            "--max-seq-len",
+            "32",
+            "--log-every-steps",
+            "1",
+            "--output-dir",
+            str(work_dir / "continued_pretrain_row"),
         ],
         "task_sft": [
             py,
@@ -215,11 +240,63 @@ def main() -> None:
     }
     runs = {name: run_command(command, cwd=repo_root) for name, command in commands.items()}
     continued = read_json(work_dir / "continued_pretrain" / "metrics.json")
+    continued_row = read_json(work_dir / "continued_pretrain_row" / "metrics.json")
     task = read_json(work_dir / "task_sft" / "metrics.json")
     row_task = read_json(work_dir / "task_sft_row" / "metrics.json")
     continued_ternary = inspect_ternary_state(work_dir / "continued_pretrain" / "ternary_state_dict.pt")
+    continued_row_ternary = inspect_ternary_state(work_dir / "continued_pretrain_row" / "ternary_state_dict.pt")
     task_ternary = inspect_ternary_state(work_dir / "task_sft" / "ternary_state_dict.pt")
     row_task_ternary = inspect_ternary_state(work_dir / "task_sft_row" / "ternary_state_dict.pt")
+
+    export_commands = {
+        "continued_pretrain_i2s_export": [
+            py,
+            "benchmarks/convert_static_ternary_to_i2s_gguf.py",
+            "--checkpoint-dir",
+            str(work_dir / "continued_pretrain"),
+            "--ternary-state",
+            str(work_dir / "continued_pretrain" / "ternary_state_dict.pt"),
+            "--outfile",
+            str(work_dir / "continued_pretrain_i2s_smoke.gguf"),
+            "--converter",
+            "3rdparty/llama.cpp/convert_hf_to_gguf.py",
+            "--gguf-arch",
+            "bitnet-25",
+            "--bitdistill-subln",
+            "--synthetic-vocab-for-smoke",
+            "--validate-codes",
+            "--expect-ternary-keys",
+            str(continued_ternary.get("code_keys", 0)),
+            "--summary-json",
+            str(work_dir / "continued_pretrain_i2s_smoke.json"),
+        ],
+        "continued_pretrain_row_i2sr_export": [
+            py,
+            "benchmarks/convert_static_ternary_to_i2s_gguf.py",
+            "--checkpoint-dir",
+            str(work_dir / "continued_pretrain_row"),
+            "--ternary-state",
+            str(work_dir / "continued_pretrain_row" / "ternary_state_dict.pt"),
+            "--outfile",
+            str(work_dir / "continued_pretrain_row_i2sr_smoke.gguf"),
+            "--converter",
+            "3rdparty/llama.cpp/convert_hf_to_gguf.py",
+            "--gguf-arch",
+            "bitnet-25",
+            "--bitdistill-subln",
+            "--synthetic-vocab-for-smoke",
+            "--validate-codes",
+            "--row-scale-qtype",
+            "i2_sr",
+            "--expect-ternary-keys",
+            str(continued_row_ternary.get("code_keys", 0)),
+            "--summary-json",
+            str(work_dir / "continued_pretrain_row_i2sr_smoke.json"),
+        ],
+    }
+    export_runs = {name: run_command(command, cwd=repo_root) for name, command in export_commands.items()}
+    continued_i2s_export = read_json(work_dir / "continued_pretrain_i2s_smoke.json")
+    continued_row_i2sr_export = read_json(work_dir / "continued_pretrain_row_i2sr_smoke.json")
 
     checks: list[dict[str, Any]] = []
     train_source = (repo_root / "train_bitdistill.py").read_text(encoding="utf-8", errors="replace")
@@ -251,6 +328,49 @@ def main() -> None:
         continued_ternary.get("valid") is True and continued_ternary.get("code_keys") == continued_prep.get("bitlinear_replaced"),
         f"codes={continued_ternary.get('code_keys')}, scales={continued_ternary.get('scale_keys')}, bitlinear={continued_prep.get('bitlinear_replaced')}",
         "invalid ternary_state_dict export",
+    )
+    continued_row_prep = continued_row.get("preparation", {}) if isinstance(continued_row.get("preparation"), dict) else {}
+    continued_row_last = continued_row.get("last", {}) if isinstance(continued_row.get("last"), dict) else {}
+    add_check(checks, "row continued-pretrain writes metrics", bool(continued_row), str(work_dir / "continued_pretrain_row" / "metrics.json"), "missing metrics")
+    add_check(checks, "row continued-pretrain takes two steps", continued_row.get("steps") == 2, f"steps={continued_row.get('steps')}", "unexpected step count")
+    add_check(
+        checks,
+        "row continued-pretrain uses BitLinear and SubLN",
+        int(continued_row_prep.get("bitlinear_replaced", 0)) > 0 and int(continued_row_prep.get("subln_inserted", 0)) > 0,
+        f"bitlinear={continued_row_prep.get('bitlinear_replaced')}, subln={continued_row_prep.get('subln_inserted')}",
+        "BitNet preparation did not run",
+    )
+    add_check(checks, "row continued-pretrain CE is finite", finite(continued_row_last.get("ce")), f"ce={continued_row_last.get('ce')}", "non-finite CE")
+    add_check(
+        checks,
+        "row continued-pretrain ternary export is valid",
+        continued_row_ternary.get("valid") is True
+        and continued_row_ternary.get("code_keys") == continued_row_prep.get("bitlinear_replaced")
+        and continued_row_ternary.get("row_scale_keys") == continued_row_ternary.get("code_keys"),
+        f"codes={continued_row_ternary.get('code_keys')}, tensor_scales={continued_row_ternary.get('tensor_scale_keys')}, row_scales={continued_row_ternary.get('row_scale_keys')}",
+        "invalid row-scale ternary_state_dict export",
+    )
+
+    for name, run in export_runs.items():
+        add_check(checks, f"{name} command exits zero", run["returncode"] == 0, f"returncode={run['returncode']}", "GGUF export command failed")
+    add_check(
+        checks,
+        "continued-pretrain tensor GGUF export maps SubLN",
+        (work_dir / "continued_pretrain_i2s_smoke.gguf").exists()
+        and continued_i2s_export.get("bitdistill_subln") is True
+        and continued_i2s_export.get("ternary_i2s_packed", 0) > 0,
+        f"packed={continued_i2s_export.get('ternary_i2s_packed')}, outfile={continued_i2s_export.get('outfile')}",
+        "tensor-scale BitDistill GGUF export did not produce a packed file",
+    )
+    add_check(
+        checks,
+        "row continued-pretrain I2_SR GGUF export maps SubLN and row scales",
+        (work_dir / "continued_pretrain_row_i2sr_smoke.gguf").exists()
+        and continued_row_i2sr_export.get("bitdistill_subln") is True
+        and continued_row_i2sr_export.get("row_scale_qtype") == "i2_sr"
+        and continued_row_i2sr_export.get("row_scale_i2s_packed", 0) > 0,
+        f"row_packed={continued_row_i2sr_export.get('row_scale_i2s_packed')}, outfile={continued_row_i2sr_export.get('outfile')}",
+        "row-scale BitDistill I2_SR GGUF export did not produce a packed file",
     )
 
     task_prep = task.get("preparation", {}) if isinstance(task.get("preparation"), dict) else {}
@@ -328,12 +448,17 @@ def main() -> None:
         "failed": [check["name"] for check in checks if not check["passed"]],
         "checks": checks,
         "runs": runs,
+        "export_runs": export_runs,
         "continued_pretrain_metrics": continued,
+        "continued_pretrain_row_metrics": continued_row,
         "task_sft_metrics": task,
         "task_sft_row_metrics": row_task,
         "continued_pretrain_ternary": continued_ternary,
+        "continued_pretrain_row_ternary": continued_row_ternary,
         "task_sft_ternary": task_ternary,
         "task_sft_row_ternary": row_task_ternary,
+        "continued_pretrain_i2s_export": continued_i2s_export,
+        "continued_pretrain_row_i2sr_export": continued_row_i2sr_export,
     }
 
     args.output_json.parent.mkdir(parents=True, exist_ok=True)

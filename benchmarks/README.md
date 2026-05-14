@@ -108,6 +108,18 @@ It is separate from the older generic `train_distill.py` path and implements:
   attention-relation distillation.
 - Sequence-classification and causal prompt-scoring GLUE formats.
 - Tensor-scale and row-scale ternary `BitLinear` students.
+- Tensor-scale `I2_S` and row-scale `I2_SR` GGUF export smoke checks for a
+  tiny causal-LM BitDistill checkpoint, including SubLN key remapping.
+
+Run the implementation/export contract before trusting any queued benchmark
+wave:
+
+```bash
+python benchmarks/run_bitdistill_smoke_contract.py
+```
+
+The GGUF export checks use a smoke-only synthetic tokenizer stub. They validate
+packing, metadata, and key mapping; they do not validate generation quality.
 
 Primary GLUE3 sequence-classification wave:
 

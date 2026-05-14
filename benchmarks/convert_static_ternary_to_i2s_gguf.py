@@ -179,6 +179,26 @@ def make_i2s_model_class(
     class StaticTernaryI2SModel(base_cls):  # type: ignore[misc, valid-type]
         model_arch = getattr(args, "_model_arch_override", None) or base_cls.model_arch
 
+        def set_vocab(self):  # type: ignore[no-untyped-def]
+            if args.synthetic_vocab_for_smoke:
+                vocab_size = int(self.hparams.get("vocab_size", 0) or 0)
+                if vocab_size <= 0:
+                    raise ValueError("synthetic smoke vocab requires config.json vocab_size > 0")
+                self.gguf_writer.add_tokenizer_model("gpt2")
+                self.gguf_writer.add_tokenizer_pre("default")
+                self.gguf_writer.add_token_list([f"<tok{i}>".encode("utf-8") for i in range(vocab_size)])
+                self.gguf_writer.add_token_types([int(gguf.TokenType.NORMAL)] * vocab_size)
+                if "bos_token_id" in self.hparams:
+                    self.gguf_writer.add_bos_token_id(int(self.hparams["bos_token_id"]))
+                if "eos_token_id" in self.hparams:
+                    self.gguf_writer.add_eos_token_id(int(self.hparams["eos_token_id"]))
+                if "pad_token_id" in self.hparams and self.hparams["pad_token_id"] is not None:
+                    self.gguf_writer.add_pad_token_id(int(self.hparams["pad_token_id"]))
+                summary["synthetic_vocab_for_smoke"] = True
+                summary["synthetic_vocab_size"] = vocab_size
+                return
+            super().set_vocab()
+
         def prepare_tensors(self):  # type: ignore[no-untyped-def]
             ternary_packed = 0
             copied_tensors = 0
@@ -284,6 +304,14 @@ def main() -> None:
         help="Map SubLNLinear wrapper keys to llama.cpp BitNet attn_sub_norm/ffn_sub_norm tensors.",
     )
     parser.add_argument(
+        "--synthetic-vocab-for-smoke",
+        action="store_true",
+        help=(
+            "Use a repo-local built-in tokenizer stub sized to config.json vocab_size. "
+            "This is only for tiny smoke checkpoints whose synthetic tokenizer is not deployable."
+        ),
+    )
+    parser.add_argument(
         "--row-scale-prototype",
         action="store_true",
         help="Allow row-scale checkpoints using the experimental per-output-row I2_S layout.",
@@ -347,6 +375,7 @@ def main() -> None:
         "row_scale_qtype": args.row_scale_qtype,
         "gguf_arch": args.gguf_arch,
         "bitdistill_subln": bool(args.bitdistill_subln),
+        "synthetic_vocab_for_smoke": bool(args.synthetic_vocab_for_smoke),
     }
 
     model_cls = make_i2s_model_class(base_cls, state, converter, args, summary, i2_s_dtype, i2_sr_dtype)

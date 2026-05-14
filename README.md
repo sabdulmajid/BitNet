@@ -35,6 +35,8 @@ Added work in this fork includes:
 - Direct static-ternary GGUF export for dense Qwen checkpoints.
 - A stable row-scale `I2_SR` llama.cpp qtype/file type for preserving row-wise
   ternary scales in packed CPU inference.
+- A BitDistill smoke contract that now validates PyTorch QAT, tensor-scale
+  `I2_S` GGUF export, row-scale `I2_SR` GGUF export, and SubLN key remapping.
 - MoE/Kimi feasibility audits that separate generic routing support from real
   Kimi/MoE benchmark evidence.
 - A tiny random Qwen2MoE FP16 GGUF runtime fixture proving generic converter
@@ -67,6 +69,12 @@ This fork now implements the key BitDistill components for Qwen-style models:
 SubLN insertion, Stage-2 continued pretraining, Stage-3 CE + logits KL +
 Q/K/V attention-relation distillation, attention-layer sweep support, and both
 paper-style tensor-scale and experimental row-scale ternary students.
+
+The implementation smoke gate currently passes `37/37` checks, including
+tensor-scale GGUF export and row-scale `I2_SR` GGUF export for a tiny
+causal-LM BitDistill checkpoint. Those export checks use a smoke-only synthetic
+tokenizer stub, so they prove tensor packing and metadata wiring, not text
+generation quality.
 
 Current completed Qwen2.5-0.5B GLUE sequence-classification results:
 

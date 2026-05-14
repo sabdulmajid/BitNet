@@ -437,8 +437,10 @@ def make_tiny_qwen_config(args: argparse.Namespace, *, task: bool):
 
     return Qwen2Config(
         vocab_size=257,
-        hidden_size=64,
-        intermediate_size=128,
+        # Keep the smoke model small but compatible with the active x86 I2_S/I2_SR
+        # packer, which requires each logical row width to be divisible by 128.
+        hidden_size=128,
+        intermediate_size=256,
         num_hidden_layers=2,
         num_attention_heads=4,
         num_key_value_heads=2,
