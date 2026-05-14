@@ -94,6 +94,11 @@ Current completed Qwen2.5-0.5B GLUE sequence-classification results:
 | QNLI | `0.898957` | `0.596925` | `0.596925` | `0.618525` |
 | SST2 | `0.925459` | `0.770642` | `0.815367` | `0.808486` |
 
+The paired prediction audit now covers BitNet-SFT versus FP16-SFT on the full
+GLUE validation splits. BitNet-SFT trails FP16-SFT by `31.89` accuracy points
+on MNLI, `29.95` on QNLI, and `14.79` on SST2, with paired confidence
+intervals and exact McNemar tests recorded in the evidence bundle.
+
 These runs do **not** reproduce the paper target of being within 0.5-1.0
 accuracy point of FP16-SFT. They are also now labeled as a short-budget
 diagnostic rather than a fully paper-faithful reproduction, because the first
