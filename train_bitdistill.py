@@ -697,27 +697,36 @@ def trim_supervised(input_ids: list[int], labels: list[int], max_seq_len: int) -
     return input_ids, labels
 
 
-def score_causal_label(
-    model: nn.Module,
+def encode_causal_label_candidate(
     tokenizer: Any,
     *,
     prompt: str,
     label_text: str,
-    device: torch.device,
     max_seq_len: int,
-) -> float:
+) -> dict[str, list[int]]:
     prompt_ids = tokenizer(prompt, add_special_tokens=False)["input_ids"] if tokenizer is not None else [3, 4, 5]
-    label_ids = tokenizer(label_text, add_special_tokens=False)["input_ids"] if tokenizer is not None else [6]
+    if tokenizer is not None:
+        label_ids = tokenizer(label_text, add_special_tokens=False)["input_ids"]
+    else:
+        label_ids = [6 + (sum(ord(char) for char in label_text) % 31)]
     input_ids = prompt_ids + label_ids
     labels = [-100] * len(prompt_ids) + label_ids
     input_ids, labels = trim_supervised(input_ids, labels, max_seq_len)
-    input_tensor = torch.tensor([input_ids], dtype=torch.long, device=device)
-    labels_tensor = torch.tensor([labels], dtype=torch.long, device=device)
-    attention_mask = torch.ones_like(input_tensor)
-    supervised = max(sum(1 for item in labels if item != -100), 1)
-    with torch.no_grad():
-        outputs = model(input_ids=input_tensor, attention_mask=attention_mask, labels=labels_tensor, use_cache=False)
-    return -float(outputs.loss.detach().cpu()) * float(supervised)
+    return {"input_ids": input_ids, "labels": labels}
+
+
+def causal_sequence_logps(logits: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
+    shift_logits = logits[:, :-1, :].float().contiguous()
+    shift_labels = labels[:, 1:].contiguous()
+    flat_loss = F.cross_entropy(
+        shift_logits.view(-1, shift_logits.shape[-1]),
+        shift_labels.view(-1),
+        reduction="none",
+        ignore_index=-100,
+    )
+    token_loss = flat_loss.view_as(shift_labels)
+    supervised = shift_labels.ne(-100)
+    return -(token_loss * supervised).sum(dim=1)
 
 
 def evaluate_causal_glue(
@@ -728,25 +737,45 @@ def evaluate_causal_glue(
     device: torch.device,
 ) -> dict[str, float]:
     model.eval()
-    correct = 0
-    total = 0
     labels = GLUE_LABEL_TEXTS[args.task_name]
+    candidates: list[dict[str, list[int]]] = []
+    gold: list[int] = []
     for row in rows:
         prompt = format_glue_prompt(args.task_name, row) if not args.smoke_test else "Sentence: synthetic\nSentiment:"
-        scores = [
-            score_causal_label(
-                model,
-                tokenizer,
-                prompt=prompt,
-                label_text=label_text,
-                device=device,
-                max_seq_len=args.max_seq_len,
+        gold.append(int(row["label"]))
+        for label_text in labels:
+            candidates.append(
+                encode_causal_label_candidate(
+                    tokenizer,
+                    prompt=prompt,
+                    label_text=label_text,
+                    max_seq_len=args.max_seq_len,
+                )
             )
-            for label_text in labels
-        ]
-        pred = max(range(len(scores)), key=lambda index: scores[index])
-        correct += int(pred == int(row["label"]))
-        total += 1
+    pad_id = 0
+    if tokenizer is not None:
+        pad_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
+        if pad_id is None:
+            pad_id = 0
+    loader = DataLoader(
+        CausalGlueDataset(candidates),
+        batch_size=args.eval_batch_size,
+        shuffle=False,
+        collate_fn=lambda batch: collate_causal_lm(batch, pad_token_id=int(pad_id)),
+    )
+    scores: list[float] = []
+    with torch.no_grad():
+        for batch in loader:
+            batch = move_batch(batch, device)
+            outputs = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], use_cache=False)
+            scores.extend(float(value) for value in causal_sequence_logps(outputs.logits, batch["labels"]).detach().cpu())
+    correct = 0
+    label_count = len(labels)
+    for index, true_label in enumerate(gold):
+        row_scores = scores[index * label_count : (index + 1) * label_count]
+        pred = max(range(label_count), key=lambda label_index: row_scores[label_index])
+        correct += int(pred == true_label)
+    total = len(gold)
     model.train()
     return {"accuracy": correct / total if total else 0.0, "eval_examples": float(total)}
 
