@@ -188,15 +188,15 @@ def build_gate(root: Path) -> dict[str, Any]:
     bitdistill_i2sr_passed = bool(bitdistill_i2sr.get("passed"))
     add_claim(
         claims,
-        "BitDistill task-specific packed I2_SR runtime support",
+        "BitDistill task-specific packed ternary runtime support",
         "supported" if bitdistill_i2sr_passed else "unsupported",
         (
-            f"causal I2_SR gate passed={bitdistill_i2sr.get('passed')}; "
+            f"causal packed-ternary gate passed={bitdistill_i2sr.get('passed')}; "
             f"complete rows={bitdistill_i2sr_complete}/{bitdistill_i2sr_expected}; "
             f"gate={display_path(bitdistill_i2sr_path, root)}"
         ),
-        "Only causal prompt-scoring BitDistill checkpoints can use this packed path; sequence-classification heads remain PyTorch-only unless runtime support is added.",
-        "; ".join(bitdistill_i2sr_blockers) if bitdistill_i2sr_blockers else "Causal BitDistill I2_SR export and CPU benchmark artifacts are missing or incomplete.",
+        "Only causal prompt-scoring BitDistill checkpoints can use this packed path; tensor baselines use I2_S, row-scale novelty runs use I2_SR, and sequence-classification heads remain PyTorch-only unless runtime support is added.",
+        "; ".join(bitdistill_i2sr_blockers) if bitdistill_i2sr_blockers else "Causal BitDistill packed export and CPU benchmark artifacts are missing or incomplete.",
     )
     default_runtime_supported = bool(active_gate.get("passed")) and bool(promotion_audit.get("promotion_ready"))
     add_claim(

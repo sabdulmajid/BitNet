@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Gate BitDistill causal-LM I2_SR export and CPU benchmark artifacts.
+"""Gate BitDistill causal-LM packed ternary export and CPU benchmark artifacts.
 
 This is intentionally separate from the GLUE sequence-classification gate.
 Sequence-classification heads are evaluated in PyTorch in this fork; packed
-llama.cpp I2_SR export is currently valid for causal-LM checkpoints.
+llama.cpp export is currently valid for causal-LM checkpoints. Tensor-scale
+paper baselines should emit scalar `I2_S`; row-scale novelty runs should emit
+stable row-scale `I2_SR`.
 """
 
 from __future__ import annotations
@@ -24,7 +26,7 @@ def model_slug(model: str) -> str:
 
 
 def safe_read_json(path: Path) -> Any:
-    if not path.exists():
+    if not path.exists() or not path.is_file():
         return None
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -56,7 +58,8 @@ def collect_row(args: argparse.Namespace, *, task: str, scale: str) -> dict[str,
         blockers.append(f"missing export summary {args.results_dir / 'export_summary.json'}")
     exports = index_by_name(export_summary.get("exports", []) if isinstance(export_summary.get("exports"), list) else [])
     export = exports.get(name)
-    outfile = Path(str(export.get("outfile", ""))) if export else None
+    outfile_text = str(export.get("outfile") or "") if export else ""
+    outfile = Path(outfile_text) if outfile_text else None
     exported = bool(export and export.get("exists") and outfile and outfile.exists())
     if not export:
         blockers.append("missing export row")
@@ -66,6 +69,28 @@ def collect_row(args: argparse.Namespace, *, task: str, scale: str) -> dict[str,
         blockers.append("exported GGUF file is missing")
     if export and not finite_positive(export.get("ternary_keys")):
         blockers.append("ternary key count missing or zero")
+    summary_json_text = str(export.get("summary_json") or "") if export else ""
+    summary_json = Path(summary_json_text) if summary_json_text else None
+    export_details = safe_read_json(summary_json) if summary_json else None
+    if export and not isinstance(export_details, dict):
+        blockers.append("missing converter summary json")
+        export_details = {}
+    if isinstance(export_details, dict) and export_details:
+        row_scale_qtype = export_details.get("row_scale_qtype")
+        row_packed = export_details.get("row_scale_i2s_packed")
+        tensor_packed = export_details.get("ternary_i2s_packed")
+        if scale == "tensor":
+            if row_scale_qtype is not None:
+                blockers.append(f"tensor baseline incorrectly used row_scale_qtype={row_scale_qtype!r}")
+            if row_packed not in (0, None):
+                blockers.append("tensor baseline packed row-scale tensors")
+            if not finite_positive(tensor_packed):
+                blockers.append("tensor baseline did not pack scalar I2_S tensors")
+        elif scale == "row":
+            if row_scale_qtype != "i2_sr":
+                blockers.append("row baseline did not request stable I2_SR qtype")
+            if not finite_positive(row_packed):
+                blockers.append("row baseline did not pack row-scale I2_SR tensors")
 
     suite_summary = safe_read_json(args.results_dir / "gguf_suite" / "summary.json")
     suite_row: dict[str, Any] = {}
@@ -124,9 +149,11 @@ def collect_row(args: argparse.Namespace, *, task: str, scale: str) -> dict[str,
     return {
         "task": task,
         "scale": scale,
+        "export_qtype": export.get("export_qtype") if export else ("i2_sr" if scale == "row" else "i2_s"),
         "name": name,
         "exported": exported,
         "ternary_keys": export.get("ternary_keys") if export else None,
+        "converter_ftype": export_details.get("output_ftype_name") if isinstance(export_details, dict) else None,
         "outfile": str(outfile) if outfile else None,
         "file_mib": suite_row.get("file_mib") or (outfile.stat().st_size / (1024**2) if outfile and outfile.exists() else None),
         "ppl": ppl.get("ppl"),
@@ -159,9 +186,11 @@ def render_markdown(summary: dict[str, Any]) -> str:
         [
             row["task"],
             row["scale"],
+            fmt(row["export_qtype"]),
             fmt(row["complete"]),
             fmt(row["exported"]),
             fmt(row["ternary_keys"]),
+            fmt(row["converter_ftype"]),
             fmt(row["file_mib"]),
             fmt(row["ppl"]),
             fmt(row["prefill_tok_s"]),
@@ -172,17 +201,20 @@ def render_markdown(summary: dict[str, Any]) -> str:
         for row in summary["rows"]
     ]
     sections = [
-        f"# BitDistill Causal I2_SR Export Gate, {summary['date']}",
+        f"# BitDistill Causal Packed-Ternary Export Gate, {summary['date']}",
         f"Results dir: `{summary['results_dir']}`.",
         f"Passed: `{fmt(summary['passed'])}`.",
-        "This gate validates packed causal-LM I2_SR artifacts only; it does not validate sequence-classification heads.",
+        "This gate validates packed causal-LM ternary artifacts only; it does not validate sequence-classification heads.",
+        "Expected format split: tensor-scale paper baselines use scalar `I2_S`; row-scale novelty runs use stable `I2_SR`.",
         md_table(
             [
                 "task",
                 "scale",
+                "qtype",
                 "complete",
                 "exported",
                 "ternary keys",
+                "ftype",
                 "file MiB",
                 "PPL",
                 "prefill tok/s",

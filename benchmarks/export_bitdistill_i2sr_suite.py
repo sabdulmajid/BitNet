@@ -100,7 +100,8 @@ def main() -> None:
             checkpoint_dir = args.root / slug / task / run_name
             ternary_state = checkpoint_dir / "ternary_state_dict.pt"
             name = f"{slug}_{task}_{run_name}"
-            outfile = args.out_model_dir / slug / task / f"{name}_bitnet25_i2sr.gguf"
+            export_qtype = "i2_sr" if scale == "row" else "i2_s"
+            outfile = args.out_model_dir / slug / task / f"{name}_bitnet25_{export_qtype}.gguf"
             summary_json = args.results_dir / "exports" / f"{name}.json"
 
             if not ternary_state.exists():
@@ -108,6 +109,7 @@ def main() -> None:
                     "name": name,
                     "task": task,
                     "scale": scale,
+                    "export_qtype": export_qtype,
                     "checkpoint_dir": str(checkpoint_dir),
                     "exists": False,
                     "error": f"missing {ternary_state}",
@@ -123,6 +125,7 @@ def main() -> None:
                     "name": name,
                     "task": task,
                     "scale": scale,
+                    "export_qtype": export_qtype,
                     "checkpoint_dir": str(checkpoint_dir),
                     "exists": True,
                     "architecture": architecture,
@@ -152,22 +155,23 @@ def main() -> None:
                 "--gguf-arch",
                 "bitnet-25",
                 "--bitdistill-subln",
-                "--row-scale-qtype",
-                "i2_sr",
                 "--validate-codes",
                 "--expect-ternary-keys",
                 str(ternary_keys),
                 "--summary-json",
                 str(summary_json),
             ]
+            if scale == "row":
+                command.extend(["--row-scale-qtype", "i2_sr"])
             outfile.parent.mkdir(parents=True, exist_ok=True)
             run_command(command, output=outfile, skip_existing=args.skip_existing)
             manifest.append(
                 {
                     "name": name,
-                    "kind": f"bitdistill_{scale}_bitnet25_i2sr",
+                    "kind": f"bitdistill_{scale}_bitnet25_{export_qtype}",
                     "task": task,
                     "scale": scale,
+                    "export_qtype": export_qtype,
                     "path": str(outfile),
                 }
             )
@@ -176,6 +180,7 @@ def main() -> None:
                     "name": name,
                     "task": task,
                     "scale": scale,
+                    "export_qtype": export_qtype,
                     "checkpoint_dir": str(checkpoint_dir),
                     "ternary_keys": ternary_keys,
                     "outfile": str(outfile),

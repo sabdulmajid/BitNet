@@ -351,6 +351,8 @@ def main() -> None:
 
     model_cls = make_i2s_model_class(base_cls, state, converter, args, summary, i2_s_dtype, i2_sr_dtype)
     output_ftype = mostly_i2_sr_ftype if args.row_scale_qtype == "i2_sr" else mostly_i2_s_ftype
+    summary["output_ftype"] = int(output_ftype)
+    summary["output_ftype_name"] = getattr(output_ftype, "name", str(output_ftype))
     args.outfile.parent.mkdir(parents=True, exist_ok=True)
     with torch.inference_mode():
         model = model_cls(
