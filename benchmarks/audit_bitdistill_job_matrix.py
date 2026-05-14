@@ -121,20 +121,24 @@ def expected_rows(model_slug: str, warmup_state: str) -> list[dict[str, Any]]:
                 }
             )
     for task in TASKS:
-        rows.append(
-            {
-                "family": "seqcls_paper_gamma100000",
-                "task": task,
-                "task_format": "sequence_classification",
-                "scale": "tensor",
-                "attention_kd_weight": 100000.0,
-                "output_root": f"checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/{model_slug}/{task}",
-                "teacher_root": f"checkpoints/bitdistill-glue-seqcls/{model_slug}/{task}",
-                "exclude_linear_regex": "score|classifier",
-                "init_output_head_from_teacher": "0",
-                "warmup_state": warmup_state,
-            }
-        )
+        for scale, root in (
+            ("tensor", "checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma"),
+            ("row", "checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row"),
+        ):
+            rows.append(
+                {
+                    "family": f"seqcls_paper_gamma100000_{scale}",
+                    "task": task,
+                    "task_format": "sequence_classification",
+                    "scale": scale,
+                    "attention_kd_weight": 100000.0,
+                    "output_root": f"{root}/{model_slug}/{task}",
+                    "teacher_root": f"checkpoints/bitdistill-glue-seqcls/{model_slug}/{task}",
+                    "exclude_linear_regex": "score|classifier",
+                    "init_output_head_from_teacher": "0",
+                    "warmup_state": warmup_state,
+                }
+            )
     for gamma, root in (
         (1000.0, "checkpoints/bitdistill-glue-seqcls-longwarmup-gamma1k"),
         (10000.0, "checkpoints/bitdistill-glue-seqcls-longwarmup-gamma10k"),

@@ -61,6 +61,7 @@ def code_features(root: Path) -> dict[str, bool]:
         "row_scale_mode": "--scale-mode" in train and "row" in train,
         "longwarmup_submitter": "WARMUP_STATE" in submit and "INIT_STATE_DICT" in submit,
         "strict_paper_gamma_gate": "paper_hparam_candidate" in gate and "paper_hparam_root" in gate,
+        "strict_paper_gamma_row_gate": "paper_hparam_row_candidate" in gate and "paper_hparam_row_root" in gate,
     }
 
 
@@ -75,6 +76,7 @@ def run_matrix(args: argparse.Namespace) -> list[dict[str, Any]]:
         ("BitDistill longwarmup tensor gamma100", args.longwarmup_root, "bitdistill-longwarmup-tensor-layer-8", "diagnostic_pending", None),
         ("BitDistill longwarmup row gamma100", args.longwarmup_root, "bitdistill-longwarmup-row-layer-8", "novelty_pending", None),
         ("BitDistill longwarmup tensor paper gamma", args.paper_hparam_root, "bitdistill-longwarmup-tensor-layer-8", "paper_candidate", None),
+        ("BitDistill longwarmup row paper gamma", args.paper_hparam_row_root, "bitdistill-longwarmup-row-layer-8", "paper_row_candidate", None),
         ("BitDistill longwarmup tensor gamma1k", args.gamma1k_root, "bitdistill-longwarmup-tensor-layer-8", "mnli_gamma_sweep_pending", {"mnli"}),
         ("BitDistill longwarmup tensor gamma10k", args.gamma10k_root, "bitdistill-longwarmup-tensor-layer-8", "mnli_gamma_sweep_pending", {"mnli"}),
         ("BitDistill longwarmup tensor layer -1", args.layer_sweep_root, "bitdistill-longwarmup-tensor-layer-1", "mnli_layer_sweep_pending", {"mnli"}),
@@ -171,7 +173,7 @@ def alignment_rows(features: dict[str, bool], warmup: dict[str, Any]) -> list[di
         {
             "dimension": "Stage-3 attention KD",
             "paper": "single-layer Q/K/V relation KD, gamma 1e5 for classification",
-            "local": "single-layer L2-normalized Q/K/V relation KD implemented; completed runs gamma 100; long-warmup gamma 1e3/1e4/1e5 and MNLI layer-sweep branches pending",
+            "local": "single-layer L2-normalized Q/K/V relation KD implemented; completed runs gamma 100; long-warmup gamma 1e3/1e4/1e5, paper-gamma row/tensor, and MNLI layer-sweep branches pending",
             "status": "pending",
             "note": "The gamma sweep is intentional because local loss-scale probes show the paper gamma can dominate CE.",
         },
@@ -285,6 +287,7 @@ def main() -> None:
     parser.add_argument("--baseline-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls"))
     parser.add_argument("--longwarmup-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup"))
     parser.add_argument("--paper-hparam-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma"))
+    parser.add_argument("--paper-hparam-row-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row"))
     parser.add_argument("--gamma1k-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-gamma1k"))
     parser.add_argument("--gamma10k-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-gamma10k"))
     parser.add_argument("--layer-sweep-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-layer-sweep"))

@@ -39,6 +39,12 @@ RUN_SPECS = [
         "{task}/bitdistill-longwarmup-tensor-layer-8",
         "paper_hparam_candidate",
     ),
+    RunSpec(
+        "BitDistill longwarmup row layer -8 paper gamma",
+        "paper_hparam_row_root",
+        "{task}/bitdistill-longwarmup-row-layer-8",
+        "paper_hparam_row_candidate",
+    ),
 ]
 
 
@@ -131,7 +137,9 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
             )
 
     paper_rows = [row for row in rows if row["family"] == "paper_hparam_candidate"]
+    tensor_gamma100_rows = [row for row in rows if row["family"] == "longwarmup_gamma100"]
     row_scale_rows = [row for row in rows if row["family"] == "row_scale_candidate"]
+    paper_row_rows = [row for row in rows if row["family"] == "paper_hparam_row_candidate"]
     paper_complete = all(row["exists"] and row["accuracy"] is not None for row in paper_rows)
     row_complete = all(row["exists"] and row["accuracy"] is not None for row in row_scale_rows)
     paper_passed = paper_complete and all(row["passes_fp_gap"] for row in paper_rows)
@@ -139,7 +147,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
 
     comparisons = []
     for task in args.tasks:
-        tensor = next(row for row in paper_rows if row["task"] == task)
+        tensor = next(row for row in tensor_gamma100_rows if row["task"] == task)
         row_scale = next(row for row in row_scale_rows if row["task"] == task)
         delta = None
         delta_ci95 = None
@@ -160,6 +168,31 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                 "tensor_examples": tensor["examples"],
                 "row_accuracy": row_scale["accuracy"],
                 "row_examples": row_scale["examples"],
+                "comparison": "gamma100_row_minus_tensor",
+            }
+        )
+        paper_tensor = next(row for row in paper_rows if row["task"] == task)
+        paper_row = next(row for row in paper_row_rows if row["task"] == task)
+        paper_delta = None
+        paper_delta_ci95 = None
+        if paper_tensor["accuracy"] is not None and paper_row["accuracy"] is not None:
+            paper_delta = paper_row["accuracy"] - paper_tensor["accuracy"]
+            paper_delta_ci95 = difference_ci(
+                paper_row["accuracy"],
+                paper_row["examples"],
+                paper_tensor["accuracy"],
+                paper_tensor["examples"],
+            )
+        comparisons.append(
+            {
+                "task": task,
+                "row_minus_tensor": paper_delta,
+                "row_minus_tensor_ci95": paper_delta_ci95,
+                "tensor_accuracy": paper_tensor["accuracy"],
+                "tensor_examples": paper_tensor["examples"],
+                "row_accuracy": paper_row["accuracy"],
+                "row_examples": paper_row["examples"],
+                "comparison": "paper_gamma_row_minus_tensor",
             }
         )
 
@@ -177,6 +210,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "baseline_root": str(args.baseline_root),
         "longwarmup_root": str(args.longwarmup_root),
         "paper_hparam_root": str(args.paper_hparam_root),
+        "paper_hparam_row_root": str(args.paper_hparam_row_root),
         "paper_style_tensor_complete": paper_complete,
         "paper_style_tensor_passed": paper_passed,
         "row_scale_complete": row_complete,
@@ -232,6 +266,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
     comparison_rows = [
         [
             row["task"],
+            row.get("comparison", "-"),
             fmt(row["tensor_accuracy"]),
             fmt(row["tensor_examples"]),
             fmt(row["row_accuracy"]),
@@ -270,7 +305,10 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 rows,
             ),
             "## Row-Scale Comparison",
-            md_table(["task", "tensor", "tensor n", "row", "row n", "row-tensor", "row-tensor 95% CI"], comparison_rows),
+            md_table(
+                ["task", "comparison", "tensor", "tensor n", "row", "row n", "row-tensor", "row-tensor 95% CI"],
+                comparison_rows,
+            ),
         ]
     ) + "\n"
 
@@ -280,6 +318,7 @@ def main() -> None:
     parser.add_argument("--baseline-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls"))
     parser.add_argument("--longwarmup-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup"))
     parser.add_argument("--paper-hparam-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma"))
+    parser.add_argument("--paper-hparam-row-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row"))
     parser.add_argument("--model", default="Qwen/Qwen2.5-0.5B")
     parser.add_argument("--tasks", nargs="+", choices=TASKS, default=TASKS)
     parser.add_argument("--max-fp-gap", type=float, default=0.01)

@@ -42,6 +42,16 @@ def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def read_jsonl(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    rows: list[dict[str, Any]] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            rows.append(json.loads(line))
+    return rows
+
+
 def finite(value: Any) -> bool:
     return isinstance(value, (int, float)) and math.isfinite(float(value))
 
@@ -246,6 +256,7 @@ def main() -> None:
     task_prep = task.get("preparation", {}) if isinstance(task.get("preparation"), dict) else {}
     task_last = task.get("last", {}) if isinstance(task.get("last"), dict) else {}
     task_eval = task.get("eval", {}) if isinstance(task.get("eval"), dict) else {}
+    task_predictions = read_jsonl(work_dir / "task_sft" / "eval_predictions.jsonl")
     add_check(checks, "task-sft writes metrics", bool(task), str(work_dir / "task_sft" / "metrics.json"), "missing metrics")
     add_check(checks, "task-sft takes two steps", task.get("steps") == 2, f"steps={task.get('steps')}", "unexpected step count")
     add_check(
@@ -260,6 +271,13 @@ def main() -> None:
     add_check(checks, "task-sft eval accuracy is finite", finite(task_eval.get("accuracy")), f"accuracy={task_eval.get('accuracy')}", "non-finite accuracy")
     add_check(
         checks,
+        "task-sft writes per-example predictions",
+        len(task_predictions) == int(task_eval.get("eval_examples", -1)),
+        f"predictions={len(task_predictions)}, eval_examples={task_eval.get('eval_examples')}",
+        "missing or incomplete eval_predictions.jsonl",
+    )
+    add_check(
+        checks,
         "task-sft tensor-scale ternary export is valid",
         task_ternary.get("valid") is True
         and task_ternary.get("code_keys") == task_prep.get("bitlinear_replaced")
@@ -271,6 +289,7 @@ def main() -> None:
     row_task_prep = row_task.get("preparation", {}) if isinstance(row_task.get("preparation"), dict) else {}
     row_task_last = row_task.get("last", {}) if isinstance(row_task.get("last"), dict) else {}
     row_task_eval = row_task.get("eval", {}) if isinstance(row_task.get("eval"), dict) else {}
+    row_task_predictions = read_jsonl(work_dir / "task_sft_row" / "eval_predictions.jsonl")
     add_check(checks, "row task-sft writes metrics", bool(row_task), str(work_dir / "task_sft_row" / "metrics.json"), "missing metrics")
     add_check(checks, "row task-sft takes two steps", row_task.get("steps") == 2, f"steps={row_task.get('steps')}", "unexpected step count")
     add_check(
@@ -283,6 +302,13 @@ def main() -> None:
     add_check(checks, "row task-sft logits KD is finite", finite(row_task_last.get("weighted_logit_kd")), f"weighted_logit_kd={row_task_last.get('weighted_logit_kd')}", "non-finite logits KD")
     add_check(checks, "row task-sft attention KD is finite", finite(row_task_last.get("weighted_attention_kd")), f"weighted_attention_kd={row_task_last.get('weighted_attention_kd')}", "non-finite attention KD")
     add_check(checks, "row task-sft eval accuracy is finite", finite(row_task_eval.get("accuracy")), f"accuracy={row_task_eval.get('accuracy')}", "non-finite accuracy")
+    add_check(
+        checks,
+        "row task-sft writes per-example predictions",
+        len(row_task_predictions) == int(row_task_eval.get("eval_examples", -1)),
+        f"predictions={len(row_task_predictions)}, eval_examples={row_task_eval.get('eval_examples')}",
+        "missing or incomplete eval_predictions.jsonl",
+    )
     add_check(
         checks,
         "row task-sft row-scale ternary export is valid",

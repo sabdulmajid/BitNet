@@ -753,11 +753,12 @@ def load_causal_models(args: argparse.Namespace) -> tuple[nn.Module | None, nn.M
     return None, student, tokenizer, build_text_loader(args, tokenizer)
 
 
-def evaluate_accuracy(model: nn.Module, loader: DataLoader, device: torch.device) -> dict[str, float]:
+def evaluate_accuracy(model: nn.Module, loader: DataLoader, device: torch.device, prediction_path: Path | None = None) -> dict[str, float]:
     model.eval()
     correct = 0
     total = 0
     loss_total = 0.0
+    predictions_jsonl: list[dict[str, Any]] = []
     with torch.no_grad():
         for batch in loader:
             batch = move_batch(batch, device)
@@ -766,13 +767,31 @@ def evaluate_accuracy(model: nn.Module, loader: DataLoader, device: torch.device
             labels = batch["labels"]
             loss_total += float(outputs.loss.detach().cpu()) * int(labels.numel())
             predictions = logits.argmax(dim=-1)
-            correct += int((predictions == labels).sum().detach().cpu())
-            total += int(labels.numel())
+            labels_cpu = labels.detach().cpu().tolist()
+            predictions_cpu = predictions.detach().cpu().tolist()
+            scores_cpu = logits.float().detach().cpu().tolist()
+            for label, prediction, scores in zip(labels_cpu, predictions_cpu, scores_cpu):
+                is_correct = int(prediction) == int(label)
+                predictions_jsonl.append(
+                    {
+                        "index": total,
+                        "label": int(label),
+                        "prediction": int(prediction),
+                        "correct": is_correct,
+                        "scores": [float(score) for score in scores],
+                    }
+                )
+                correct += int(is_correct)
+                total += 1
     model.train()
+    if prediction_path is not None:
+        write_jsonl(prediction_path, predictions_jsonl)
     return {
         "accuracy": correct / total if total else 0.0,
         "eval_loss": loss_total / total if total else float("nan"),
         "eval_examples": float(total),
+        "prediction_path": str(prediction_path) if prediction_path is not None else "",
+        "prediction_schema": "bitdistill-glue-predictions-v1" if prediction_path is not None else "",
     }
 
 
@@ -850,12 +869,20 @@ def collate_prompt_batch(batch: list[dict[str, torch.Tensor]], *, pad_token_id: 
     return {"input_ids": input_ids, "attention_mask": attention_mask, "labels": labels}
 
 
+def write_jsonl(path: Path, records: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as handle:
+        for record in records:
+            handle.write(json.dumps(record, sort_keys=True) + "\n")
+
+
 def evaluate_causal_glue(
     model: nn.Module,
     tokenizer: Any,
     rows: list[dict[str, Any]],
     args: argparse.Namespace,
     device: torch.device,
+    prediction_path: Path | None = None,
 ) -> dict[str, float]:
     model.eval()
     labels = glue_label_texts(args.task_name, args.label_scheme)
@@ -893,6 +920,7 @@ def evaluate_causal_glue(
         label_index = torch.tensor(label_token_ids, dtype=torch.long, device=device)
         correct = 0
         total = 0
+        predictions_jsonl: list[dict[str, Any]] = []
         with torch.no_grad():
             for batch in loader:
                 batch = move_batch(batch, device)
@@ -901,13 +929,30 @@ def evaluate_causal_glue(
                 next_token_logits = outputs.logits[torch.arange(outputs.logits.shape[0], device=device), last_positions]
                 candidate_scores = F.log_softmax(next_token_logits.float(), dim=-1).index_select(dim=-1, index=label_index)
                 predictions = candidate_scores.argmax(dim=-1)
-                correct += int((predictions == batch["labels"]).sum().detach().cpu())
-                total += int(batch["labels"].numel())
+                labels_cpu = batch["labels"].detach().cpu().tolist()
+                predictions_cpu = predictions.detach().cpu().tolist()
+                scores_cpu = candidate_scores.detach().cpu().tolist()
+                for label, prediction, scores in zip(labels_cpu, predictions_cpu, scores_cpu):
+                    predictions_jsonl.append(
+                        {
+                            "index": total,
+                            "label": int(label),
+                            "prediction": int(prediction),
+                            "correct": int(prediction) == int(label),
+                            "scores": [float(score) for score in scores],
+                        }
+                    )
+                    total += 1
+                correct += sum(1 for row in predictions_jsonl[-len(labels_cpu) :] if row["correct"])
         model.train()
+        if prediction_path is not None:
+            write_jsonl(prediction_path, predictions_jsonl)
         return {
             "accuracy": correct / total if total else 0.0,
             "eval_examples": float(total),
             "causal_eval_mode": "single_forward_single_token_labels",
+            "prediction_path": str(prediction_path) if prediction_path is not None else "",
+            "prediction_schema": "bitdistill-glue-predictions-v1" if prediction_path is not None else "",
         }
 
     candidates: list[dict[str, list[int]]] = []
@@ -953,16 +998,30 @@ def evaluate_causal_glue(
         raise RuntimeError(f"scored {len(scores)} candidates but expected {len(candidates)}")
     correct = 0
     label_count = len(labels)
+    predictions_jsonl = []
     for index, true_label in enumerate(gold):
         row_scores = scores[index * label_count : (index + 1) * label_count]
         pred = max(range(label_count), key=lambda label_index: row_scores[label_index])
         correct += int(pred == true_label)
+        predictions_jsonl.append(
+            {
+                "index": index,
+                "label": int(true_label),
+                "prediction": int(pred),
+                "correct": int(pred == true_label),
+                "scores": [float(score) for score in row_scores],
+            }
+        )
     total = len(gold)
     model.train()
+    if prediction_path is not None:
+        write_jsonl(prediction_path, predictions_jsonl)
     return {
         "accuracy": correct / total if total else 0.0,
         "eval_examples": float(total),
         "causal_eval_mode": "candidate_sequence",
+        "prediction_path": str(prediction_path) if prediction_path is not None else "",
+        "prediction_schema": "bitdistill-glue-predictions-v1" if prediction_path is not None else "",
     }
 
 
@@ -980,6 +1039,12 @@ def save_outputs(model: nn.Module, tokenizer: Any, args: argparse.Namespace, met
     if bitlinear_count:
         torch.save(build_ternary_state_dict(model, model.state_dict()), output_dir / "ternary_state_dict.pt")
     (output_dir / "metrics.json").write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def eval_prediction_path(args: argparse.Namespace) -> Path | None:
+    if not args.save_eval_predictions or not args.output_dir:
+        return None
+    return Path(args.output_dir) / "eval_predictions.jsonl"
 
 
 def save_training_snapshot(
@@ -1256,11 +1321,11 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                 break
 
     if args.task_format == "causal_lm":
-        eval_metrics = evaluate_causal_glue(student, tokenizer, eval_rows, args, device)
+        eval_metrics = evaluate_causal_glue(student, tokenizer, eval_rows, args, device, prediction_path=eval_prediction_path(args))
     else:
         if eval_loader is None:
             raise RuntimeError("sequence classification evaluation loader missing")
-        eval_metrics = evaluate_accuracy(student, eval_loader, device)
+        eval_metrics = evaluate_accuracy(student, eval_loader, device, prediction_path=eval_prediction_path(args))
     metrics = {
         "stage": args.stage,
         "method": args.method,
@@ -1325,6 +1390,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--num-train-samples", type=int, default=20000)
     parser.add_argument("--max-train-samples", type=int, default=0)
     parser.add_argument("--max-eval-samples", type=int, default=0)
+    parser.add_argument("--save-eval-predictions", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--max-packed-blocks", type=int, default=0)
     parser.add_argument("--tokenizer-batch-size", type=int, default=128)
     parser.add_argument("--max-seq-len", type=int, default=512)

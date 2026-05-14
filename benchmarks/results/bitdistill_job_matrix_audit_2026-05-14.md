@@ -6,9 +6,9 @@ Monitor JSON: `benchmark_results/bitdistill_job_monitor_2026-05-14.json`.
 
 Warm-up state: `/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/custom_state_dict.pt`.
 
-Observed rows: `26`. Expected rows: `26`. Configured rows: `26`.
+Observed rows: `29`. Expected rows: `29`. Configured rows: `29`.
 
-Job states: `{'PENDING': 26}`.
+Job states: `{'PENDING': 29}`.
 
 Rows with fields inferred from submitter defaults: `0`.
 
@@ -17,10 +17,10 @@ Rows with fields inferred from submitter defaults: `0`.
 | check | status | evidence | blocker |
 | --- | --- | --- | --- |
 | monitor json exists | pass | benchmark_results/bitdistill_job_monitor_2026-05-14.json |  |
-| active row count matches design | pass | rows=26, expected=26 |  |
+| active row count matches design | pass | rows=29, expected=29 |  |
 | output directories are unique | pass | duplicates=[] |  |
-| all expected experiment rows are present and configured | pass | configured=26/26 |  |
-| warm-up progress is finite | pass | step=8590/20000 |  |
+| all expected experiment rows are present and configured | pass | configured=29/29 |  |
+| warm-up progress is finite | pass | step=9130/20000 |  |
 
 ## Expected Matrix
 
@@ -38,9 +38,12 @@ Rows with fields inferred from submitter defaults: `0`.
 | seqcls_gamma100_headinit | sst2 | sequence_classification | tensor | 100.000000 | 1 | 9975 | PENDING | true | none | none |
 | seqcls_gamma100 | sst2 | sequence_classification | row | 100.000000 | 0 | 9961 | PENDING | true | none | none |
 | seqcls_gamma100_headinit | sst2 | sequence_classification | row | 100.000000 | 1 | 9976 | PENDING | true | none | none |
-| seqcls_paper_gamma100000 | mnli | sequence_classification | tensor | 100000.000000 | 0 | 9962 | PENDING | true | none | none |
-| seqcls_paper_gamma100000 | qnli | sequence_classification | tensor | 100000.000000 | 0 | 9963 | PENDING | true | none | none |
-| seqcls_paper_gamma100000 | sst2 | sequence_classification | tensor | 100000.000000 | 0 | 9964 | PENDING | true | none | none |
+| seqcls_paper_gamma100000_tensor | mnli | sequence_classification | tensor | 100000.000000 | 0 | 9962 | PENDING | true | none | none |
+| seqcls_paper_gamma100000_row | mnli | sequence_classification | row | 100000.000000 | 0 | 9981 | PENDING | true | none | none |
+| seqcls_paper_gamma100000_tensor | qnli | sequence_classification | tensor | 100000.000000 | 0 | 9963 | PENDING | true | none | none |
+| seqcls_paper_gamma100000_row | qnli | sequence_classification | row | 100000.000000 | 0 | 9982 | PENDING | true | none | none |
+| seqcls_paper_gamma100000_tensor | sst2 | sequence_classification | tensor | 100000.000000 | 0 | 9964 | PENDING | true | none | none |
+| seqcls_paper_gamma100000_row | sst2 | sequence_classification | row | 100000.000000 | 0 | 9983 | PENDING | true | none | none |
 | mnli_gamma1000 | mnli | sequence_classification | tensor | 1000.000000 | 0 | 9965 | PENDING | true | none | none |
 | mnli_gamma10000 | mnli | sequence_classification | tensor | 10000.000000 | 0 | 9966 | PENDING | true | none | none |
 | mnli_layer_sweep_-1 | mnli | sequence_classification | tensor | 100.000000 | 0 | 9978 | PENDING | true | none | none |
