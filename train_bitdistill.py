@@ -396,10 +396,21 @@ def attention_relation_distillation_loss(
     return torch.stack(losses).mean()
 
 
-def logits_kd_loss(student_logits: torch.Tensor, teacher_logits: torch.Tensor, *, temperature: float) -> torch.Tensor:
+def logits_kd_loss(
+    student_logits: torch.Tensor,
+    teacher_logits: torch.Tensor,
+    *,
+    temperature: float,
+    temperature_scale: str,
+) -> torch.Tensor:
     s_log_prob = F.log_softmax(student_logits.float() / temperature, dim=-1)
     t_prob = F.softmax(teacher_logits.float() / temperature, dim=-1)
-    return F.kl_div(s_log_prob, t_prob, reduction="batchmean", log_target=False) * (temperature**2)
+    loss = F.kl_div(s_log_prob, t_prob, reduction="batchmean", log_target=False)
+    if temperature_scale == "square":
+        return loss * (temperature**2)
+    if temperature_scale == "none":
+        return loss
+    raise ValueError(f"unsupported temperature_scale={temperature_scale}")
 
 
 def causal_logits_kd_loss(
@@ -408,11 +419,17 @@ def causal_logits_kd_loss(
     labels: torch.Tensor,
     *,
     temperature: float,
+    temperature_scale: str,
 ) -> torch.Tensor:
     mask = labels.ne(-100)
     if not bool(mask.any()):
         return student_logits.new_zeros(())
-    return logits_kd_loss(student_logits[mask], teacher_logits[mask], temperature=temperature)
+    return logits_kd_loss(
+        student_logits[mask],
+        teacher_logits[mask],
+        temperature=temperature,
+        temperature_scale=temperature_scale,
+    )
 
 
 def make_tiny_qwen_config(args: argparse.Namespace, *, task: bool):
@@ -1128,9 +1145,15 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                         teacher_outputs.logits,
                         batch["labels"],
                         temperature=args.logit_temperature,
+                        temperature_scale=args.logit_kd_temperature_scale,
                     )
                 else:
-                    logit_kd = logits_kd_loss(student_outputs.logits, teacher_outputs.logits, temperature=args.logit_temperature)
+                    logit_kd = logits_kd_loss(
+                        student_outputs.logits,
+                        teacher_outputs.logits,
+                        temperature=args.logit_temperature,
+                        temperature_scale=args.logit_kd_temperature_scale,
+                    )
                 if need_attention_kd:
                     attention_kd = attention_relation_distillation_loss(
                         student_qkv,
@@ -1224,6 +1247,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
             "logit_kd_weight": args.logit_kd_weight,
             "attention_kd_weight": args.attention_kd_weight,
             "logit_temperature": args.logit_temperature,
+            "logit_kd_temperature_scale": args.logit_kd_temperature_scale,
             "attention_temperature": args.attention_temperature,
         },
         "elapsed_seconds": time.time() - start,
@@ -1278,6 +1302,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--exclude-linear-regex", default="score|classifier")
     parser.add_argument("--logit-temperature", type=float, default=5.0)
     parser.add_argument("--logit-kd-weight", type=float, default=10.0)
+    parser.add_argument("--logit-kd-temperature-scale", choices=["none", "square"], default="none")
     parser.add_argument("--attention-temperature", type=float, default=1.0)
     parser.add_argument("--attention-kd-weight", type=float, default=100.0)
     parser.add_argument("--attention-split-heads", type=int, default=8)

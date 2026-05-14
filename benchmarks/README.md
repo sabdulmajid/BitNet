@@ -122,7 +122,9 @@ python benchmarks/summarize_bitdistill_glue.py \
 ```
 
 Current status: Qwen2.5-0.5B short-budget BitDistill does not reproduce the
-paper-level target. Completed GLUE3 sequence-classification accuracy is:
+paper-level target. The first completed GLUE3 sequence-classification wave used
+the older tau-squared KD convention and is now treated as a diagnostic rather
+than a paper-faithful logits-KL reproduction. Its accuracy is:
 
 | task | FP16-SFT | BitNet-SFT | BitDistill tensor | BitDistill row |
 | --- | ---: | ---: | ---: | ---: |
@@ -132,7 +134,8 @@ paper-level target. Completed GLUE3 sequence-classification accuracy is:
 
 The known reproduction gap is training budget and search, not a contradiction
 of the paper. The completed Stage-2 warm-up is 40.96M effective token
-presentations, while the paper reports 10B continued-pretraining tokens.
+presentations, while the paper reports 10B continued-pretraining tokens. New
+runs use `--logit-kd-temperature-scale none`, matching the paper equations.
 Teacher-head initialization, attention-layer sweep, CE-only ablation, and
 longer warm-up jobs are tracked in
 `benchmarks/results/bitdistill_reproduction_status_2026-05-14.md`.

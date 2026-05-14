@@ -66,7 +66,7 @@ SubLN insertion, Stage-2 continued pretraining, Stage-3 CE + logits KL +
 Q/K/V attention-relation distillation, attention-layer sweep support, and both
 paper-style tensor-scale and experimental row-scale ternary students.
 
-Current Qwen2.5-0.5B GLUE sequence-classification results:
+Current completed Qwen2.5-0.5B GLUE sequence-classification results:
 
 | task | FP16-SFT | BitNet-SFT | BitDistill tensor | BitDistill row |
 | --- | ---: | ---: | ---: | ---: |
@@ -75,16 +75,23 @@ Current Qwen2.5-0.5B GLUE sequence-classification results:
 | SST2 | `0.925459` | `0.770642` | `0.815367` | `0.808486` |
 
 These runs do **not** reproduce the paper target of being within 0.5-1.0
-accuracy point of FP16-SFT. The strongest known reason is training budget:
+accuracy point of FP16-SFT. They are also now labeled as a short-budget
+diagnostic rather than a fully paper-faithful reproduction, because the first
+completed wave used the common KD convention of multiplying logits KL by
+`temperature**2`; the BitDistill equations do not include that multiplier.
+The code now defaults new BitDistill runs to paper-style logits KL scaling.
+
+The strongest remaining known gap is training budget:
 the completed Stage-2 warm-up used `40.96M` effective token presentations,
 while the paper reports `10B` continued-pretraining tokens. The result should
 therefore be read as a failure boundary for direct or short-warm-up retrofit,
 not as a disproof of BitDistill.
 
 Active follow-ups are probing teacher-head initialization, attention-layer
-selection, CE-only ablations, and a longer warm-up pilot. Until those gates
-close, the public claim remains conservative: **BitDistill is the right class
-of method, but this fork has not yet reproduced paper-level task quality.**
+selection, paper-style logits KL scaling, CE-only ablations, and a longer
+warm-up pilot. Until those gates close, the public claim remains conservative:
+**BitDistill is the right class of method, but this fork has not yet reproduced
+paper-level task quality.**
 
 ## Key Dense-Qwen Results
 

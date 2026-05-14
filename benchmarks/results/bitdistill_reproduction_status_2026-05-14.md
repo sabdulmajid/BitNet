@@ -12,9 +12,16 @@ MNLI, QNLI, or SST2.
 This is **not** a disproof of the BitDistill paper. The main known gap is
 training budget: the paper reports a 10B-token continued-pretraining warm-up,
 while the current completed warm-up has 40.96M effective token presentations.
-That is about 244x smaller. The current result is therefore evidence about the
-failure boundary of direct or short-warm-up ternary retrofit, not evidence that
-paper-faithful BitDistill cannot work.
+That is about 244x smaller. A second paper-faithfulness issue was also found:
+the first completed GLUE3 wave used the common KD convention of multiplying
+logits KL by `temperature**2`, but the BitDistill equations provided in the
+paper do not include that multiplier. The code now exposes
+`--logit-kd-temperature-scale {none,square}` and defaults to paper-style
+`none` for new runs.
+
+The current result is therefore evidence about the failure boundary of direct
+or short-warm-up ternary retrofit, not evidence that paper-faithful BitDistill
+cannot work.
 
 ## Implemented Components
 
@@ -32,6 +39,8 @@ The local reproduction code now includes:
 - Optional sequence-classification output-head initialization from the FP16
   teacher, added after the first negative GLUE3 wave.
 - Attention layer sweep and CE-only ablation launchers.
+- Paper-style logits KL without a tau-squared multiplier, with the older
+  tau-squared convention still available as an explicit compatibility option.
 
 ## Primary Sequence-Classification GLUE3 Results
 
@@ -49,6 +58,8 @@ Training setting:
 - `max_seq_len=512`
 - `lr=2e-5`
 - BitDistill weights: logits KL `10.0`, attention relation KD `100.0`
+- Logits KL scaling: legacy `temperature**2` convention in this completed wave;
+  paper-style `none` reruns are queued separately
 - Warm-up state:
   `checkpoints/bitdistill-glue/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor/custom_state_dict.pt`
 
@@ -83,6 +94,8 @@ The largest experimental differences are:
 - Hardware: current jobs are one-GPU constrained; the paper reports 8x MI300X.
 - Search: current runs use a fixed 1000-step downstream setting; the paper
   uses learning-rate and epoch selection.
+- Logits KD scaling: first completed wave used tau-squared scaling; paper-style
+  no-tau-squared reruns are now queued.
 - Backbone: current primary run uses Qwen2.5-0.5B; the paper reports Qwen3
   0.6B/1.7B/4B and additional backbones.
 - Task head handling: first sequence-classification wave trained a new head
@@ -94,6 +107,8 @@ Queued or running diagnostics at report time:
 
 - MNLI teacher-head initialization probe:
   BitNet-SFT, BitDistill tensor, BitDistill row.
+- MNLI paper-style logits-KL rerun:
+  tensor and row, with and without teacher-head initialization.
 - MNLI attention-layer sweep:
   layers `-2`, `-4`, `-8`.
 - MNLI CE-only ablation with and without teacher-head initialization.
@@ -121,4 +136,3 @@ The publishable opportunity remains:
   inference,
 - and a boundary study separating task-specific BitDistill success from
   general-LM and MoE/Kimi failure modes.
-

@@ -90,6 +90,7 @@ def discover_rows(args: argparse.Namespace) -> list[dict[str, Any]]:
                         "weighted_logit_kd": last.get("weighted_logit_kd"),
                         "weighted_attention_kd": last.get("weighted_attention_kd"),
                         "logit_kd_weight": loss_weights.get("logit_kd_weight"),
+                        "logit_kd_temperature_scale": loss_weights.get("logit_kd_temperature_scale"),
                         "attention_kd_weight": loss_weights.get("attention_kd_weight"),
                         "metrics_path": str(path),
                     }
@@ -117,6 +118,7 @@ def render_markdown(args: argparse.Namespace, rows: list[dict[str, Any]]) -> str
             fmt(row["shape_mismatches"]),
             fmt(row["ce"]),
             fmt(row["weighted_logit_kd"]),
+            row.get("logit_kd_temperature_scale") or "-",
             fmt(row["weighted_attention_kd"]),
             row["metrics_path"],
         ]
@@ -147,6 +149,7 @@ def render_markdown(args: argparse.Namespace, rows: list[dict[str, Any]]) -> str
                     "shape mismatches",
                     "last CE",
                     "last wLogitKD",
+                    "logit temp scale",
                     "last wAttnKD",
                     "metrics path",
                 ],
