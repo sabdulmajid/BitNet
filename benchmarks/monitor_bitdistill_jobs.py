@@ -188,6 +188,16 @@ def fmt(value: Any) -> str:
     return str(value)
 
 
+def display_path(value: Any, root: Path) -> str:
+    if not value:
+        return "-"
+    path = Path(str(value))
+    try:
+        return str(path.relative_to(root))
+    except ValueError:
+        return str(path)
+
+
 def seconds_to_hours(value: Any) -> str:
     if not isinstance(value, (int, float)):
         return "-"
@@ -201,11 +211,12 @@ def md_table(headers: list[str], rows: list[list[str]]) -> str:
 
 
 def render_markdown(summary: dict[str, Any]) -> str:
+    root = Path(summary.get("repo_root", ".")).resolve()
     warmup = summary["warmup"]
     latest = warmup.get("latest_step") or {}
     warmup_rows = [
         [
-            warmup.get("path", "-"),
+            display_path(warmup.get("path"), root),
             fmt(latest.get("step")),
             fmt(warmup.get("max_steps")),
             fmt(warmup.get("progress")),
@@ -230,14 +241,14 @@ def render_markdown(summary: dict[str, Any]) -> str:
             row.get("job_status", {}).get("node_or_reason", "-"),
             fmt(row.get("metrics_exists")),
             fmt(row.get("accuracy")),
-            row.get("metrics_path", "-"),
+            display_path(row.get("metrics_path"), root),
         ]
         for row in summary["downstream"]
     ]
     return "\n\n".join(
         [
             f"# BitDistill Job Monitor, {summary['date']}",
-            f"Job tables: `{', '.join(summary['job_tables'])}`.",
+            f"Job tables: `{', '.join(display_path(table, root) for table in summary['job_tables'])}`.",
             "## Stage-2 Warm-Up",
             md_table(
                 ["log", "step", "max steps", "progress", "latest CE", "effective tokens", "target tokens", "ETA"],
@@ -282,6 +293,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     return {
         "schema": "bitdistill-job-monitor-v1",
         "date": DATE,
+        "repo_root": str(root),
         "job_table": str(tables[-1]) if tables else "",
         "job_tables": [str(table) for table in tables],
         "warmup_job_ids": warmup_job_ids,
