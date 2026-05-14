@@ -1,5 +1,5 @@
 {
-  "artifact_count": 139,
+  "artifact_count": 141,
   "entries": [
     {
       "exists": true,
@@ -97,8 +97,17 @@
       "label": "bitdistill_reproduction_gate_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_reproduction_gate_2026-05-14.md",
-      "sha256": "161707dbf7e7885b8e08493c17407072d553d467e05c17243879f552a286069b",
-      "size_bytes": 8058
+      "sha256": "2eb2ba34bafcb53716c85fb590851cc6a12e46da0bb58b0e028a79d0d2ccadfd",
+      "size_bytes": 8117
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_paired_predictions_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_paired_predictions_2026-05-14.md",
+      "sha256": "d0f2d0b2c1f94346480b014007ed9edd3974dda94297b10fcb4ee230302f1d6a",
+      "size_bytes": 6613
     },
     {
       "exists": true,
@@ -250,7 +259,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-14.md",
-      "sha256": "0cf6ccfba59240a31c0c0ff5e07458e5b765b0f4fbbd853adce96c409411cf06",
+      "sha256": "ec425c1448674676207bd70547874ff689d0d5c6106f76bf8c70e6b39c827234",
       "size_bytes": 2937
     },
     {
@@ -1913,7 +1922,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-14.json",
-      "sha256": "f298be9b749ab1a6798b183d05cdda8f9c5a9d147966779917f06d5cfb205b2a",
+      "sha256": "3afd786cb3ef567ec5dc4190c7376270fe66b2c616093939a180500d340cf44b",
       "size_bytes": 5488
     },
     {
@@ -1970,8 +1979,23 @@
         ]
       },
       "path": "benchmark_results/bitdistill_reproduction_gate_2026-05-14.json",
-      "sha256": "fee7c15c75a9a6e473184132aa345ac7f691cd1488c5f71bdb83105dcea3fb63",
-      "size_bytes": 18072
+      "sha256": "5c6831a47726f02aa38aa5f8ba2ff733a9ffab46642c4cc90a40c309fe7ed060",
+      "size_bytes": 18095
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_paired_predictions_json",
+      "label": "bitdistill_paired_predictions_json",
+      "metrics": {
+        "complete": 0,
+        "failed": 0,
+        "pending": 18,
+        "rows": 18,
+        "status": "pending"
+      },
+      "path": "benchmark_results/bitdistill_paired_predictions_2026-05-14.json",
+      "sha256": "133f0a122aeeb25f1ddda0cecf85552e8e0dfb870125ca1378096a9422a44e18",
+      "size_bytes": 33025
     },
     {
       "exists": true,

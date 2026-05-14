@@ -4,7 +4,7 @@ Model: `Qwen/Qwen2.5-0.5B`.
 
 Threshold: absolute FP16-SFT gap <= `0.01` accuracy.
 
-Confidence intervals: accuracy uses Wilson 95% intervals; deltas use aggregate unpaired 95% normal intervals because per-example predictions are not saved by this gate.
+Confidence intervals: accuracy uses Wilson 95% intervals; this aggregate gate uses unpaired normal delta intervals. The paired-prediction audit is the authoritative example-level comparison when `eval_predictions.jsonl` exists.
 
 Strict paper-hyperparameter tensor candidate complete: `False`.
 

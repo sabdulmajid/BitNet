@@ -205,7 +205,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "confidence": {
             "level": 0.95,
             "accuracy_interval": "Wilson score interval from aggregate accuracy and eval_examples",
-            "difference_interval": "Unpaired normal approximation from aggregate accuracies; use saved predictions for paired bootstrap or McNemar tests.",
+            "difference_interval": "Unpaired normal approximation from aggregate accuracies; paired prediction deltas are audited separately when eval_predictions.jsonl exists.",
         },
         "baseline_root": str(args.baseline_root),
         "longwarmup_root": str(args.longwarmup_root),
@@ -281,7 +281,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
             f"# BitDistill Reproduction Gate, {summary['date']}",
             f"Model: `{summary['model']}`.",
             f"Threshold: absolute FP16-SFT gap <= `{summary['max_fp_gap']}` accuracy.",
-            "Confidence intervals: accuracy uses Wilson 95% intervals; deltas use aggregate unpaired 95% normal intervals because per-example predictions are not saved by this gate.",
+            "Confidence intervals: accuracy uses Wilson 95% intervals; this aggregate gate uses unpaired normal delta intervals. The paired-prediction audit is the authoritative example-level comparison when `eval_predictions.jsonl` exists.",
             f"Strict paper-hyperparameter tensor candidate complete: `{summary['paper_style_tensor_complete']}`.",
             f"Strict paper-hyperparameter tensor candidate passed: `{summary['paper_style_tensor_passed']}`.",
             f"Row-scale candidate complete: `{summary['row_scale_complete']}`.",
