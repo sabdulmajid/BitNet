@@ -56,6 +56,18 @@ def load_architecture(checkpoint_dir: Path) -> str:
     return str(architectures[0])
 
 
+def normalize_bitdistill_subln_name(name: str) -> str:
+    """Map this repo's SubLNLinear wrapper keys to llama.cpp BitNet tensor names."""
+    return (
+        name.replace(".self_attn.o_proj.proj.", ".self_attn.o_proj.")
+        .replace(".self_attn.o_proj.proj", ".self_attn.o_proj")
+        .replace(".mlp.down_proj.proj.", ".mlp.down_proj.")
+        .replace(".mlp.down_proj.proj", ".mlp.down_proj")
+        .replace(".self_attn.o_proj.subln.weight", ".self_attn.attn_sub_norm.weight")
+        .replace(".mlp.down_proj.subln.weight", ".mlp.ffn_sub_norm.weight")
+    )
+
+
 def validate_ternary_codes(key: str, tensor: torch.Tensor) -> None:
     values = torch.unique(tensor.cpu())
     allowed = torch.tensor([-1, 0, 1], dtype=values.dtype)
@@ -165,7 +177,7 @@ def make_i2s_model_class(
     gguf = converter.gguf
 
     class StaticTernaryI2SModel(base_cls):  # type: ignore[misc, valid-type]
-        model_arch = base_cls.model_arch
+        model_arch = getattr(args, "_model_arch_override", None) or base_cls.model_arch
 
         def prepare_tensors(self):  # type: ignore[no-untyped-def]
             ternary_packed = 0
@@ -186,7 +198,8 @@ def make_i2s_model_class(
                         raise KeyError(f"missing scale tensor for {key}: {scale_key}")
                     if args.validate_codes:
                         validate_ternary_codes(key, tensor)
-                    new_name = self.map_tensor_name(f"{prefix}.weight")
+                    mapped_prefix = normalize_bitdistill_subln_name(prefix) if args.bitdistill_subln else prefix
+                    new_name = self.map_tensor_name(f"{mapped_prefix}.weight")
                     scale = state[scale_key]
                     is_output = args.keep_output_f16 and new_name == self.format_tensor_name(gguf.MODEL_TENSOR.OUTPUT)
                     if scale.numel() != 1 and not (args.row_scale_prototype or args.row_scale_qtype == "i2_sr"):
@@ -218,7 +231,8 @@ def make_i2s_model_class(
                         packed_bytes += int(packed.nbytes)
                     continue
 
-                new_name = self.map_tensor_name(key)
+                mapped_key = normalize_bitdistill_subln_name(key) if args.bitdistill_subln else key
+                new_name = self.map_tensor_name(mapped_key)
                 if torch.is_floating_point(tensor):
                     if tensor.ndim <= 1 or new_name.endswith("_norm.weight"):
                         data = tensor.to(dtype=torch.float32).squeeze().numpy()
@@ -259,6 +273,17 @@ def main() -> None:
     parser.add_argument("--validate-codes", action="store_true")
     parser.add_argument("--keep-output-f16", action="store_true", default=True)
     parser.add_argument(
+        "--gguf-arch",
+        choices=["source", "bitnet-25"],
+        default="source",
+        help="Override the emitted GGUF architecture. Use bitnet-25 for Qwen BitDistill checkpoints with SubLN.",
+    )
+    parser.add_argument(
+        "--bitdistill-subln",
+        action="store_true",
+        help="Map SubLNLinear wrapper keys to llama.cpp BitNet attn_sub_norm/ffn_sub_norm tensors.",
+    )
+    parser.add_argument(
         "--row-scale-prototype",
         action="store_true",
         help="Allow row-scale checkpoints using the experimental per-output-row I2_S layout.",
@@ -288,6 +313,12 @@ def main() -> None:
     ) = get_gguf_i2s_types(converter.gguf, row_scale_qtype=args.row_scale_qtype)
     architecture = load_architecture(args.checkpoint_dir)
     base_cls = converter.Model.from_model_architecture(architecture)
+    if args.gguf_arch == "bitnet-25":
+        args._model_arch_override = converter.gguf.MODEL_ARCH.BITNET_25
+        if not args.bitdistill_subln:
+            raise SystemExit("--gguf-arch bitnet-25 requires --bitdistill-subln for this repo's SubLN wrapper keys")
+    else:
+        args._model_arch_override = None
     state = torch.load(ternary_state, map_location="cpu", weights_only=True)
     if not isinstance(state, dict):
         raise TypeError(f"expected a flat state dict in {ternary_state}")
@@ -314,6 +345,8 @@ def main() -> None:
         ],
         "row_scale_prototype": bool(args.row_scale_prototype),
         "row_scale_qtype": args.row_scale_qtype,
+        "gguf_arch": args.gguf_arch,
+        "bitdistill_subln": bool(args.bitdistill_subln),
     }
 
     model_cls = make_i2s_model_class(base_cls, state, converter, args, summary, i2_s_dtype, i2_sr_dtype)
