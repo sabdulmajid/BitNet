@@ -682,7 +682,7 @@ def load_task_models(args: argparse.Namespace) -> tuple[nn.Module | None, nn.Mod
     student = AutoModelForSequenceClassification.from_pretrained(args.student_model, **model_kwargs)
     student.config.pad_token_id = tokenizer.pad_token_id
     teacher = None
-    if args.method == "bitdistill":
+    if args.method == "bitdistill" or args.init_output_head_from_teacher:
         teacher_model = args.teacher_model or args.student_model
         teacher = AutoModelForSequenceClassification.from_pretrained(teacher_model, **model_kwargs)
         teacher.config.pad_token_id = tokenizer.pad_token_id
@@ -1077,6 +1077,8 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
         prep = {"subln_inserted": 0, "bitlinear_replaced": 0}
     state_load = load_optional_state_dict(student, args)
     output_head_init = maybe_copy_output_head(student, teacher, args)
+    if args.method != "bitdistill":
+        teacher = None
     if args.gradient_checkpointing and hasattr(student, "gradient_checkpointing_enable"):
         student.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     if teacher is not None:
