@@ -27,7 +27,7 @@ def find_metrics(root: Path, model: str, task: str, method: str, scale: str) -> 
 
 def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     rows: list[dict[str, Any]] = []
-    for task in TASKS:
+    for task in args.tasks:
         specs = [
             ("fp16_sft", "fp16_sft", "tensor"),
             ("bitnet_sft", "bitnet_sft", "tensor"),
@@ -53,7 +53,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
             )
 
     verdicts: list[dict[str, Any]] = []
-    for task in TASKS:
+    for task in args.tasks:
         fp = next((row for row in rows if row["task"] == task and row["label"] == "fp16_sft"), {})
         bd = next((row for row in rows if row["task"] == task and row["label"] == "bitdistill_tensor"), {})
         row = next((item for item in rows if item["task"] == task and item["label"] == "bitdistill_row"), {})
@@ -82,6 +82,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "schema": "bitdistill-glue-summary-v1",
         "root": str(args.root),
         "model": args.model,
+        "tasks": args.tasks,
         "max_fp_gap": args.max_fp_gap,
         "rows": rows,
         "verdicts": verdicts,
@@ -142,6 +143,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path("checkpoints/bitdistill-glue"))
     parser.add_argument("--model", default="Qwen/Qwen2.5-0.5B")
+    parser.add_argument("--tasks", nargs="+", default=TASKS, choices=TASKS)
     parser.add_argument("--max-fp-gap", type=float, default=0.01)
     parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/bitdistill_glue_summary_2026-05-14.json"))
     parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/bitdistill_glue_summary_2026-05-14.md"))
