@@ -351,8 +351,8 @@ def render_markdown(result: dict[str, Any]) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
-    parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/product_scope_gate_2026-05-13.json"))
-    parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/product_scope_gate_2026-05-13.md"))
+    parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/product_scope_gate_{DATE}.json"))
+    parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/product_scope_gate_{DATE}.md"))
     args = parser.parse_args()
 
     root = args.repo_root.resolve()
