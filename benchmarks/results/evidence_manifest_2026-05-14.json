@@ -1,5 +1,5 @@
 {
-  "artifact_count": 143,
+  "artifact_count": 145,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "0cc843c71da68c0e951381504452b0f24410715e1e9dccfd61be9ed0b58b431a",
-      "size_bytes": 16892
+      "sha256": "b060dca5fbfe979d3f5617868ef7135987696eff2f690379aa8f381023dbc2d3",
+      "size_bytes": 17168
     },
     {
       "exists": true,
@@ -70,8 +70,8 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-14.md",
-      "sha256": "4631a2d780c648d7730390176ac952314be2727b7907e6fc3e3e0bccda23b298",
-      "size_bytes": 5333
+      "sha256": "9490eeee979bca21ec900f13e6f06cae52755c0d51bdd0014a9bed7162885429",
+      "size_bytes": 5645
     },
     {
       "exists": true,
@@ -259,7 +259,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-14.md",
-      "sha256": "38cdade137361210828fa41adba984e84ca2eca7a78386bc2cb9ecc7c29659a3",
+      "sha256": "2aabd7c1cd8d4a85eb390b7c98cab65937339f00d9e88c2e0dabe0be4d1c5493",
       "size_bytes": 2937
     },
     {
@@ -441,6 +441,15 @@
       "path": "benchmarks/results/moe_support_audit_2026-05-14.md",
       "sha256": "6a32cb960a5660e32defedc9046d11af0e74bd154bf9a53e833e66c9e97df401",
       "size_bytes": 5020
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "kimi_config_feasibility_report",
+      "metrics": {},
+      "path": "benchmarks/results/kimi_config_feasibility_2026-05-14.md",
+      "sha256": "ad11a910f6e8fec40b0b78cc14c7ad0aaba37ee2055eb45d264ea4513a5f0050",
+      "size_bytes": 1999
     },
     {
       "exists": true,
@@ -1931,7 +1940,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-14.json",
-      "sha256": "17be18d56ed5b2ebb1e228387c57e108ea3050b93fff5c1afb1802d6619c7a41",
+      "sha256": "8756ab888df5edac14d78dc0d178f97cac7bf82c02fdc6f044b5c1fe4dff8f0c",
       "size_bytes": 5488
     },
     {
@@ -1949,8 +1958,8 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-14.json",
-      "sha256": "55538ac6d47725ed87dd212f947ce93f417b50326065f112823a136f63953006",
-      "size_bytes": 15446
+      "sha256": "5097a7ef7fff52eecb0b2f3d98f1d42b9caf0f8813006443f7b64b27a7305713",
+      "size_bytes": 15953
     },
     {
       "exists": true,
@@ -2298,6 +2307,31 @@
       "path": "benchmark_results/moe_support_audit_2026-05-14.json",
       "sha256": "229b033869e5d31ced6add9c2db08a4d5013fda2b343a84d9749a8180ec302d9",
       "size_bytes": 31948
+    },
+    {
+      "exists": true,
+      "kind": "kimi_config_feasibility_json",
+      "label": "kimi_config_feasibility_json",
+      "metrics": {
+        "architectures": [
+          "DeepseekV3ForCausalLM"
+        ],
+        "experts_per_token": 8,
+        "layers": 61,
+        "model_type": "kimi_k2",
+        "passed": false,
+        "required_features": 6,
+        "routed_experts": 384,
+        "unsupported_features": [
+          "Kimi/DeepSeekV3 architecture loader",
+          "MLA/Q-LoRA attention metadata",
+          "Shared expert path",
+          "Block-FP8 source checkpoint import"
+        ]
+      },
+      "path": "benchmark_results/kimi_config_feasibility_2026-05-14.json",
+      "sha256": "699af0926c1461519c6ec2d623cf74a0c930b62ea13fd9c7ea3369864e54b34b",
+      "size_bytes": 4382
     },
     {
       "exists": true,

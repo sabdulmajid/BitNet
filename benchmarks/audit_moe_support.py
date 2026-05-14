@@ -94,6 +94,8 @@ def local_artifacts(root: Path) -> list[str]:
         return artifacts
     for path in root.rglob("*"):
         normalized = path.name.lower()
+        if "kimi_config_feasibility" in normalized:
+            continue
         if "kimi" in normalized:
             artifacts.append(str(path))
     return sorted(artifacts)

@@ -411,6 +411,12 @@ def audit_moe(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -
         "benchmark_results/moe_support_audit_2026-05-05.json",
     )
     moe = read_json(moe_path)
+    kimi_config_path = latest_artifact(
+        root,
+        "benchmark_results/kimi_config_feasibility_*.json",
+        "benchmark_results/kimi_config_feasibility_2026-05-14.json",
+    )
+    kimi_config = read_json(kimi_config_path) if kimi_config_path.exists() else {}
     local_kimi = moe.get("local_kimi_artifacts", [])
     source_kimi = moe.get("kimi_source_matches", [])
     present_checks = [check for check in moe.get("checks", []) if check.get("status") == "present"]
@@ -421,11 +427,14 @@ def audit_moe(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -
     tiny_qwen2moe_scaling_rows = tiny_qwen2moe_scaling.get("rows", []) if isinstance(tiny_qwen2moe_scaling.get("rows"), list) else []
     metrics["moe"] = {
         "path": str(moe_path.relative_to(root)) if moe_path.is_relative_to(root) else str(moe_path),
+        "kimi_config_path": str(kimi_config_path.relative_to(root)) if kimi_config_path.exists() and kimi_config_path.is_relative_to(root) else str(kimi_config_path),
         "present_generic_checks": len(present_checks),
         "productization_gate_count": len(productization_gates),
         "failed_productization_gate_count": len(failed_gates),
         "local_kimi_artifact_count": len(local_kimi),
         "kimi_source_match_count": len(source_kimi),
+        "kimi_config_passed": kimi_config.get("passed"),
+        "kimi_config_unsupported": kimi_config.get("unsupported_features", []),
         "tiny_qwen2moe_fixture_passed": tiny_qwen2moe.get("passed"),
         "tiny_qwen2moe_expert_scaling_passed": tiny_qwen2moe_scaling.get("passed"),
         "tiny_qwen2moe_expert_scaling_rows": len(tiny_qwen2moe_scaling_rows),
@@ -437,10 +446,11 @@ def audit_moe(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -
         (
             f"generic MoE checks present={len(present_checks)}; productization gates failed={len(failed_gates)}/{len(productization_gates)}; "
             f"Kimi artifacts={len(local_kimi)}; Kimi source matches={len(source_kimi)}; "
+            f"Kimi config supported={kimi_config.get('passed')}; config gaps={len(kimi_config.get('unsupported_features', []))}; "
             f"tiny Qwen2MoE FP16 fixture passed={tiny_qwen2moe.get('passed')}; "
             f"synthetic expert scaling passed={tiny_qwen2moe_scaling.get('passed')}; scaling rows={len(tiny_qwen2moe_scaling_rows)}"
         ),
-        "A tiny random Qwen2MoE FP16 GGUF fixture and synthetic expert-scaling probe now validate generic converter/runtime plumbing and routed shape execution, but no validated Kimi-specific mapping, trained Qwen2MoE/Kimi quality artifact, ternary MoE runtime artifact, TL2 MoE runtime support, router distillation, MoE quality run, trained throughput run, or trained expert-locality benchmark exists.",
+        "The Kimi config audit shows missing direct Kimi/DeepSeekV3 loading, MLA conversion metadata, shared-expert mapping, and block-FP8 import. A tiny random Qwen2MoE FP16 GGUF fixture and synthetic expert-scaling probe validate generic converter/runtime plumbing and routed shape execution, but no validated Kimi-specific mapping, trained Qwen2MoE/Kimi quality artifact, ternary MoE runtime artifact, TL2 MoE runtime support, router distillation, MoE quality run, trained throughput run, or trained expert-locality benchmark exists.",
     )
 
 

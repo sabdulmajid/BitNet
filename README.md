@@ -55,7 +55,7 @@ with the active `i2sr-row-scale-runtime` branch.
 | Stable CPU row-scale packed inference exists for dense Qwen | **Yes, for the audited path** | `I2_SR` productization gate passes `9/9`; Xeon I2_SR PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
 | BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B short-budget GLUE3 sequence-classification runs remain 11.0-30.2 accuracy points below FP16-SFT. |
 | TL2 is ready for the best row-scale checkpoint | **No** | Runtime contract gate fails: current TL2 one-scale error is `1.904230` relative output RMS; exact fp16 row scales would be `0.000197` with only `1.230469` MiB of scales, but converter/runtime/kernel metadata do not carry them. |
-| Kimi/MoE retrofit is proven | **No** | A tiny random Qwen2MoE FP16 fixture now passes converter/runtime smoke, but there is no Kimi mapping, trained MoE artifact, router distillation, ternary MoE quality, throughput, or expert-locality benchmark. |
+| Kimi/MoE retrofit is proven | **No** | A tiny random Qwen2MoE FP16 fixture now passes converter/runtime smoke. A Kimi-K2 config audit shows the real target needs Kimi/DeepSeekV3 loading, MLA metadata conversion, shared-expert mapping, block-FP8 import, and MoE-aware I2_SR validation before quality or speed claims are defensible. |
 
 ## BitDistill Reproduction Status
 
@@ -185,6 +185,9 @@ It does not make blind PTQ viable.
 - No completed local run yet reproduces BitDistill paper-level GLUE quality.
 - No packed `I2_SR` path currently runs the sequence-classification GLUE heads.
 - No evidence validates Kimi or a trained MoE model in this ternary runtime.
+- The Kimi-K2 config path is specifically blocked on Kimi/DeepSeekV3 mapping,
+  MLA/Q-LoRA attention metadata, shared experts, FP8 block import, and trained
+  MoE quality/locality benchmarks.
 - TL2 remains an engineering probe for row-scale Qwen, not a supported product
   path for the strongest checkpoint.
 

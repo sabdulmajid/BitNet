@@ -111,6 +111,10 @@ python benchmarks/audit_moe_support.py \
   --output-json "benchmark_results/moe_support_audit_${DATE}.json" \
   --output-md "benchmarks/results/moe_support_audit_${DATE}.md"
 
+python benchmarks/audit_kimi_config_feasibility.py \
+  --output-json "benchmark_results/kimi_config_feasibility_${DATE}.json" \
+  --output-md "benchmarks/results/kimi_config_feasibility_${DATE}.md"
+
 python benchmarks/audit_unblock_requirements.py \
   --output-json "benchmark_results/unblock_requirements_${DATE}.json" \
   --output-md "benchmarks/results/unblock_requirements_${DATE}.md"

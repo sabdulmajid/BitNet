@@ -81,6 +81,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "i2sr_rss_report", "kind": "tracked_report", "path": "benchmarks/results/i2sr_rss_2026-05-13.md"},
     {"label": "artifact_prune_application_report", "kind": "tracked_report", "path": "benchmarks/results/artifact_prune_application_2026-05-13.md"},
     {"label": "moe_report", "kind": "tracked_report", "path": f"benchmarks/results/moe_support_audit_{DATE}.md"},
+    {"label": "kimi_config_feasibility_report", "kind": "tracked_report", "path": f"benchmarks/results/kimi_config_feasibility_{DATE}.md"},
     {"label": "moe_packing_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_packing_contract_2026-05-14.md"},
     {"label": "moe_tl2_runtime_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_tl2_runtime_contract_2026-05-14.md"},
     {"label": "tiny_qwen2moe_fixture_report", "kind": "tracked_report", "path": f"benchmarks/results/tiny_qwen2moe_fixture_{DATE}.md"},
@@ -171,6 +172,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "bitdistill_loss_scale_json", "kind": "bitdistill_loss_scale_json", "path": f"benchmark_results/bitdistill_loss_scale_audit_{DATE}.json"},
     {"label": "i2sr_submodule_promotion_audit_json", "kind": "i2sr_submodule_promotion_audit_json", "path": "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json"},
     {"label": "moe_support_json", "kind": "moe_support_json", "path": f"benchmark_results/moe_support_audit_{DATE}.json"},
+    {"label": "kimi_config_feasibility_json", "kind": "kimi_config_feasibility_json", "path": f"benchmark_results/kimi_config_feasibility_{DATE}.json"},
     {"label": "moe_packing_contract_json", "kind": "moe_packing_contract_json", "path": "benchmark_results/moe_packing_contract_2026-05-14.json"},
     {"label": "moe_tl2_runtime_contract_json", "kind": "moe_tl2_runtime_contract_json", "path": "benchmark_results/moe_tl2_runtime_contract_2026-05-14.json"},
     {"label": "tiny_qwen2moe_fixture_json", "kind": "tiny_qwen2moe_fixture_json", "path": f"benchmark_results/tiny_qwen2moe_fixture_{DATE}.json"},
@@ -745,6 +747,20 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "local_kimi_artifacts": len(data.get("local_kimi_artifacts", [])),
             "tiny_qwen2moe_passed": tiny.get("passed"),
         }
+    if kind == "kimi_config_feasibility_json":
+        architecture = data.get("architecture", {}) if isinstance(data.get("architecture"), dict) else {}
+        features = data.get("features", []) if isinstance(data.get("features"), list) else []
+        unsupported = data.get("unsupported_features", [])
+        return {
+            "passed": data.get("passed"),
+            "model_type": architecture.get("model_type"),
+            "architectures": architecture.get("architectures"),
+            "layers": architecture.get("num_hidden_layers"),
+            "routed_experts": architecture.get("n_routed_experts"),
+            "experts_per_token": architecture.get("num_experts_per_tok"),
+            "required_features": len(features),
+            "unsupported_features": unsupported if isinstance(unsupported, list) else [],
+        }
     if kind == "moe_packing_contract_json":
         verdict = data.get("verdict", {})
         checks = data.get("checks", [])
@@ -1111,6 +1127,12 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"gates={metrics.get('gates', '-')}, failed={len(metrics.get('failed_gates', []))}, "
                 f"kimi_artifacts={metrics.get('local_kimi_artifacts', '-')}, "
                 f"tiny_qwen2moe={metrics.get('tiny_qwen2moe_passed', '-')}"
+            )
+        elif entry["kind"] == "kimi_config_feasibility_json":
+            summary = (
+                f"passed={metrics.get('passed', '-')}, model={metrics.get('model_type', '-')}, "
+                f"experts={metrics.get('routed_experts', '-')}, topk={metrics.get('experts_per_token', '-')}, "
+                f"unsupported={len(metrics.get('unsupported_features', []))}/{metrics.get('required_features', '-')}"
             )
         elif entry["kind"] == "moe_packing_contract_json":
             summary = (
