@@ -1102,13 +1102,27 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
             if args.method == "bitdistill":
                 if teacher is None:
                     raise RuntimeError("BitDistill task stage requires a teacher model")
-                with torch.no_grad():
-                    with capture_qkv(teacher, layer_index=args.distill_layer) as teacher_qkv:
-                        teacher_outputs = teacher(**batch)
-                with capture_qkv(student, layer_index=args.distill_layer) as student_qkv:
+                need_logit_kd = args.logit_kd_weight != 0.0
+                need_attention_kd = args.attention_kd_weight != 0.0
+                if need_attention_kd:
+                    with torch.no_grad():
+                        with capture_qkv(teacher, layer_index=args.distill_layer) as teacher_qkv:
+                            teacher_outputs = teacher(**batch)
+                    with capture_qkv(student, layer_index=args.distill_layer) as student_qkv:
+                        student_outputs = student(**batch)
+                else:
+                    teacher_qkv = {}
                     student_outputs = student(**batch)
+                    teacher_outputs = None
+                    if need_logit_kd:
+                        with torch.no_grad():
+                            teacher_outputs = teacher(**batch)
                 ce = student_outputs.loss
-                if args.task_format == "causal_lm":
+                if need_logit_kd and teacher_outputs is None:
+                    raise RuntimeError("teacher outputs missing for logits distillation")
+                if not need_logit_kd:
+                    logit_kd = student_outputs.logits.new_zeros(())
+                elif args.task_format == "causal_lm":
                     logit_kd = causal_logits_kd_loss(
                         student_outputs.logits,
                         teacher_outputs.logits,
@@ -1117,13 +1131,16 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                     )
                 else:
                     logit_kd = logits_kd_loss(student_outputs.logits, teacher_outputs.logits, temperature=args.logit_temperature)
-                attention_kd = attention_relation_distillation_loss(
-                    student_qkv,
-                    teacher_qkv,
-                    batch["attention_mask"],
-                    split_heads=args.attention_split_heads,
-                    temperature=args.attention_temperature,
-                )
+                if need_attention_kd:
+                    attention_kd = attention_relation_distillation_loss(
+                        student_qkv,
+                        teacher_qkv,
+                        batch["attention_mask"],
+                        split_heads=args.attention_split_heads,
+                        temperature=args.attention_temperature,
+                    )
+                else:
+                    attention_kd = student_outputs.logits.new_zeros(())
                 weighted_logit_kd = args.logit_kd_weight * logit_kd
                 weighted_attention_kd = args.attention_kd_weight * attention_kd
                 loss = ce + weighted_logit_kd + weighted_attention_kd
