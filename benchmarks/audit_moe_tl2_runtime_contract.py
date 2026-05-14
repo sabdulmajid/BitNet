@@ -11,11 +11,12 @@ from __future__ import annotations
 import argparse
 import json
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
-DATE = "2026-05-13"
+DATE = datetime.now(timezone.utc).date().isoformat()
 SYNTHETIC_SHAPE = {"experts": 4, "out": 256, "in": 384}
 
 
@@ -73,8 +74,9 @@ def build_audit(root: Path) -> dict[str, Any]:
     mul_mat_id = slice_between(ggml, "static void ggml_compute_forward_mul_mat_id(", "// ggml_compute_forward_out_prod")
     quantize_loop = slice_between(llama, "// quantize only 2D and 3D tensors (experts)", "LLAMA_LOG_INFO(\"%s: model size")
 
-    converter_2d_unpack = "M, K = w.shape" in preprocess_tl2
+    converter_has_legacy_2d_unpack = "M, K = w.shape" in preprocess_tl2
     converter_has_ndim_branch = "w.ndim" in preprocess_tl2 or "len(w.shape)" in preprocess_tl2
+    converter_has_3d_branch = "w.ndim == 3" in preprocess_tl2
     nbytes_uses_ne2 = "tensor->ne[2]" in ggml_nbytes or "ne[2]" in ggml_nbytes
     nbytes_uses_ne3 = "tensor->ne[3]" in ggml_nbytes or "ne[3]" in ggml_nbytes
     mul_mat_has_tl2_lut = "GGML_BITNET_X86_TL2" in mul_mat and "ggml_bitnet_can_mul_mat" in mul_mat and "ggml_qgemm_lut" in mul_mat
@@ -93,12 +95,13 @@ def build_audit(root: Path) -> dict[str, Any]:
     checks = [
         make_check(
             "TL2 Python preprocessor accepts explicit 3D expert tensors",
-            not converter_2d_unpack and converter_has_ndim_branch,
+            converter_has_ndim_branch and converter_has_3d_branch,
             (
                 f"preprocess_weights_tl2_line={first_line(converter, 'def preprocess_weights_tl2')}; "
-                f"uses_M_K_unpack={converter_2d_unpack}; has_ndim_branch={converter_has_ndim_branch}"
+                f"legacy_2d_unpack_present={converter_has_legacy_2d_unpack}; "
+                f"has_ndim_branch={converter_has_ndim_branch}; has_3d_branch={converter_has_3d_branch}"
             ),
-            "`preprocess_weights_tl2` still unpacks `M, K = w.shape`, so [experts, out, in] tensors fail before packing.",
+            "`preprocess_weights_tl2` still lacks an explicit [experts, out, in] branch.",
         ),
         make_check(
             "TL2 ggml_nbytes accounts for expert dimension",
@@ -161,7 +164,6 @@ def build_audit(root: Path) -> dict[str, Any]:
         "tl2_moe_runtime_ready": not blockers,
         "blockers": blockers,
         "required_next_steps": [
-            "Add an explicit TL2 3D tensor preprocessor contract for [experts, out, in] instead of relying on a 2D unpack.",
             "Change the TL2 byte-size/stride contract so GGUF loading allocates all expert planes.",
             "Route ggml_mul_mat_id for TL2 through expert-aware BitNet LUT kernels, not generic F32 vec-dot fallback.",
             "Define per-expert tensor-scale or row/group-scale metadata semantics before quality benchmarking.",
@@ -226,8 +228,8 @@ def render_markdown(result: dict[str, Any]) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
-    parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/moe_tl2_runtime_contract_2026-05-13.json"))
-    parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/moe_tl2_runtime_contract_2026-05-13.md"))
+    parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/moe_tl2_runtime_contract_{DATE}.json"))
+    parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/moe_tl2_runtime_contract_{DATE}.md"))
     args = parser.parse_args()
 
     root = args.repo_root.resolve()

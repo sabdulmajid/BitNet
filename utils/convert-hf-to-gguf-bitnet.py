@@ -633,8 +633,19 @@ def preprocess_weights_tl2(
     from configparser import ConfigParser
     config = ConfigParser()
 
-    M, K = w.shape
-    weight = w
+    if w.ndim == 2:
+        M, K = w.shape
+        weight = w
+    elif w.ndim == 3:
+        # llama.cpp represents merged MoE expert weights as
+        # [experts, out_features, in_features].  TL2 packing is row-oriented, so
+        # pack every expert row contiguously while preserving the original GGUF
+        # raw_shape at the call site.
+        experts, rows, K = w.shape
+        M = experts * rows
+        weight = w.reshape(M, K)
+    else:
+        raise ValueError(f"TL2 preprocessing expects a 2D matrix or merged 3D expert tensor, got shape {w.shape}")
     weight = np.where(np.abs(weight) < 1e-6, 0, weight).astype(np.float32)
     weight = np.sign(weight)
     weight_num = np.prod(weight.shape)

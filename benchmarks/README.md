@@ -344,9 +344,10 @@ python benchmarks/audit_moe_packing_contract.py
 ```
 
 The current report is
-`benchmarks/results/moe_packing_contract_2026-05-13.md`. It shows that TL2
-still rejects `[experts, out, in]` tensors, while direct `I2_S`/`I2_SR` synthetic
-packing and the 2D dense control pack successfully.
+`benchmarks/results/moe_packing_contract_2026-05-14.md`. It shows that the TL2,
+direct `I2_S`, and direct `I2_SR` synthetic 3D packing contracts now accept
+merged `[experts, out, in]` tensors. This is still only a packing contract until
+runtime and real-checkpoint validation exist.
 
 To verify the deeper TL2 runtime contract for MoE expert tensors:
 
@@ -355,7 +356,7 @@ python benchmarks/audit_moe_tl2_runtime_contract.py
 ```
 
 The current report is
-`benchmarks/results/moe_tl2_runtime_contract_2026-05-13.md`. It checks the
+`benchmarks/results/moe_tl2_runtime_contract_2026-05-14.md`. It checks the
 Python TL2 preprocessor, the active `ggml_nbytes` TL2 size contract, and whether
 `ggml_mul_mat_id` routes TL2 expert matmuls through the BitNet LUT path.
 

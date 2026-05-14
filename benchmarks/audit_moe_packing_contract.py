@@ -12,7 +12,10 @@ import argparse
 import hashlib
 import importlib.util
 import json
+import os
 import sys
+import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 from types import ModuleType
 from typing import Any
@@ -21,7 +24,7 @@ import numpy as np
 import torch
 
 
-DATE = "2026-05-13"
+DATE = datetime.now(timezone.utc).date().isoformat()
 
 
 def load_module(path: Path, name: str, extra_path: Path | None = None) -> ModuleType:
@@ -152,41 +155,65 @@ def build_audit(root: Path) -> dict[str, Any]:
         "direct_i2s_writer_for_moe_contract",
     )
 
-    i2s_expert = (torch.arange(2 * 4 * 128, dtype=torch.int16).reshape(2, 4, 128) % 3 - 1).to(torch.int8)
+    i2s_expert = (torch.arange(4 * 8 * 384, dtype=torch.int16).reshape(4, 8, 384) % 3 - 1).to(torch.int8)
     tl2_expert = i2s_expert.to(torch.float32).numpy()
     i2s_expert_scalar = torch.tensor([0.75], dtype=torch.float32)
-    i2s_expert_row_scale = torch.linspace(0.25, 0.95, steps=8, dtype=torch.float32).reshape(2, 4)
-    i2s_dense_control = (torch.arange(4 * 128, dtype=torch.int16).reshape(4, 128) % 3 - 1).to(torch.int8)
+    i2s_expert_row_scale = torch.linspace(0.25, 0.95, steps=32, dtype=torch.float32).reshape(4, 8)
+    i2s_dense_control = (torch.arange(32 * 384, dtype=torch.int16).reshape(32, 384) % 3 - 1).to(torch.int8)
 
-    checks = [
-        call_contract("tl2_merged_3d_expert", bitnet_converter.preprocess_weights_tl2, tl2_expert),
-        call_contract(
-            "i2s_merged_3d_expert_codes",
-            direct_writer.pack_i2_s_codes_x86_act,
-            i2s_expert,
-            expected=expected_i2s_x86_act(i2s_expert),
-        ),
-        call_contract(
-            "i2s_merged_3d_expert_scalar",
-            direct_writer.pack_i2_s_scalar,
-            i2s_expert,
-            i2s_expert_scalar,
-            expected=expected_i2s_scalar(i2s_expert, i2s_expert_scalar),
-        ),
-        call_contract(
-            "i2sr_merged_3d_expert_row_scale",
-            direct_writer.pack_i2_s_row_prototype,
-            i2s_expert,
-            i2s_expert_row_scale,
-            expected=expected_i2sr_row_scale(i2s_expert, i2s_expert_row_scale),
-        ),
-        call_contract(
-            "i2s_2d_dense_control",
-            direct_writer.pack_i2_s_codes_x86_act,
-            i2s_dense_control,
-            expected=expected_i2s_x86_act(i2s_dense_control),
-        ),
-    ]
+    with tempfile.TemporaryDirectory() as tmp:
+        kernel_config = Path(tmp) / "kernel_config.ini"
+        kernel_config.write_text(
+            "\n".join(
+                [
+                    "[synthetic_moe_32x384]",
+                    "m = 32",
+                    "k = 384",
+                    "bm = 32",
+                    "bk = 96",
+                    "bmm = 32",
+                    "",
+                ]
+            ),
+            encoding="utf-8",
+        )
+        old_kernel_config = os.environ.get("BITNET_KERNEL_CONFIG")
+        os.environ["BITNET_KERNEL_CONFIG"] = str(kernel_config)
+        try:
+            checks = [
+                call_contract("tl2_merged_3d_expert", bitnet_converter.preprocess_weights_tl2, tl2_expert),
+                call_contract(
+                    "i2s_merged_3d_expert_codes",
+                    direct_writer.pack_i2_s_codes_x86_act,
+                    i2s_expert,
+                    expected=expected_i2s_x86_act(i2s_expert),
+                ),
+                call_contract(
+                    "i2s_merged_3d_expert_scalar",
+                    direct_writer.pack_i2_s_scalar,
+                    i2s_expert,
+                    i2s_expert_scalar,
+                    expected=expected_i2s_scalar(i2s_expert, i2s_expert_scalar),
+                ),
+                call_contract(
+                    "i2sr_merged_3d_expert_row_scale",
+                    direct_writer.pack_i2_s_row_prototype,
+                    i2s_expert,
+                    i2s_expert_row_scale,
+                    expected=expected_i2sr_row_scale(i2s_expert, i2s_expert_row_scale),
+                ),
+                call_contract(
+                    "i2s_2d_dense_control",
+                    direct_writer.pack_i2_s_codes_x86_act,
+                    i2s_dense_control,
+                    expected=expected_i2s_x86_act(i2s_dense_control),
+                ),
+            ]
+        finally:
+            if old_kernel_config is None:
+                os.environ.pop("BITNET_KERNEL_CONFIG", None)
+            else:
+                os.environ["BITNET_KERNEL_CONFIG"] = old_kernel_config
 
     tl2_3d = next(item for item in checks if item["label"] == "tl2_merged_3d_expert")
     i2s_3d_codes = next(item for item in checks if item["label"] == "i2s_merged_3d_expert_codes")
@@ -231,17 +258,18 @@ def build_audit(root: Path) -> dict[str, Any]:
         "schema": "bitnet-moe-packing-contract-v1",
         "date": DATE,
         "synthetic_shapes": {
-            "merged_expert": [2, 4, 128],
-            "dense_control": [4, 128],
+            "merged_expert": [4, 8, 384],
+            "dense_control": [32, 384],
         },
         "synthetic_payload": "nonzero deterministic ternary pattern with byte-exact independent packing oracle",
         "checks": checks,
         "verdict": verdict,
         "blockers": blockers,
         "required_next_steps": [
-            "Define and implement a 3D expert tensor layout for TL2 instead of flattening expert identity away.",
-            "Add TL2 per-expert or per-expert-row scale metadata semantics.",
-            "Add full GGUF byte-layout regression tests for merged expert tensors after a real MoE checkpoint exists.",
+            "Fix TL2 runtime byte-size and stride semantics for tensors whose raw shape includes an expert dimension.",
+            "Route TL2 `ggml_mul_mat_id` through an expert-aware BitNet LUT kernel.",
+            "Add TL2 per-expert or per-expert-row scale metadata semantics before quality claims.",
+            "Add full GGUF byte-layout regression tests with a real MoE checkpoint.",
             "Then run Kimi/Qwen2MoE quality, throughput, RSS, and expert-locality benchmarks.",
         ],
     }
@@ -300,8 +328,8 @@ def render_markdown(result: dict[str, Any]) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
-    parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/moe_packing_contract_2026-05-13.json"))
-    parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/moe_packing_contract_2026-05-13.md"))
+    parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/moe_packing_contract_{DATE}.json"))
+    parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/moe_packing_contract_{DATE}.md"))
     args = parser.parse_args()
 
     root = args.repo_root.resolve()

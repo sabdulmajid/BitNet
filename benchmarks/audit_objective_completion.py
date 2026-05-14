@@ -432,7 +432,7 @@ def audit_moe(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -
             f"generic MoE checks present={len(present_checks)}; productization gates failed={len(failed_gates)}/{len(productization_gates)}; "
             f"Kimi artifacts={len(local_kimi)}; Kimi source matches={len(source_kimi)}"
         ),
-        "No validated Kimi-specific mapping, real Qwen2MoE/Kimi conversion artifact, TL2 3D expert packing support, router distillation, MoE quality run, throughput run, or expert-locality benchmark exists. Direct I2_S/I2_SR 3D packing is only a synthetic contract until a real MoE GGUF/runtime artifact exists.",
+        "No validated Kimi-specific mapping, real Qwen2MoE/Kimi conversion artifact, TL2 MoE runtime support, router distillation, MoE quality run, throughput run, or expert-locality benchmark exists. Direct I2_S/I2_SR and TL2 3D packing are synthetic contracts until a real MoE GGUF/runtime artifact exists.",
     )
 
 

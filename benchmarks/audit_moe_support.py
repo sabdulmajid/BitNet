@@ -74,6 +74,11 @@ def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def latest_artifact(root: Path, pattern: str, fallback: str) -> Path:
+    matches = sorted(root.glob(pattern))
+    return matches[-1] if matches else root / fallback
+
+
 def make_gate(name: str, passed: bool, evidence: str, blocker: str = "") -> dict[str, Any]:
     return {
         "name": name,
@@ -207,7 +212,7 @@ def build_productization_gates(
 
     bitnet_converter = root / "utils/convert-hf-to-gguf-bitnet.py"
     direct_i2sr_writer = root / "benchmarks/convert_static_ternary_to_i2s_gguf.py"
-    tl2_is_2d = file_contains(bitnet_converter, ("def preprocess_weights_tl2", "M, K = w.shape"))
+    tl2_has_legacy_2d_branch = file_contains(bitnet_converter, ("def preprocess_weights_tl2", "M, K = w.shape"))
     direct_i2sr_is_2d = file_contains(direct_i2sr_writer, ("codes.ndim != 2", "I2_S packing expects a 2D weight matrix"))
     bitnet_qwen2moe = file_contains(bitnet_converter, ('@Model.register("Qwen2MoeForCausalLM")',))
     bitnet_kimi = file_contains(bitnet_converter, ("Kimi",))
@@ -238,11 +243,11 @@ def build_productization_gates(
             contract_tl2_3d and runtime_ready,
             (
                 f"contract_available={contract_available}; contract_tl2_3d={contract_tl2_3d}; "
-                f"preprocess_weights_tl2_uses_2d_unpack={tl2_is_2d}; runtime_ready={runtime_ready}; "
+                f"preprocess_weights_tl2_has_legacy_2d_branch={tl2_has_legacy_2d_branch}; runtime_ready={runtime_ready}; "
                 f"runtime_blockers={len(runtime_blockers)}; "
                 f"tl2_expert_byte_underreport={byte_probe.get('underreport_bytes')}"
             ),
-            "`preprocess_weights_tl2` rejects 3D tensors, and the active TL2 runtime contract also under-sizes and misroutes merged expert tensors.",
+            "The TL2 converter accepts the synthetic 3D packing contract, but the active TL2 runtime still under-sizes and misroutes merged expert tensors.",
         ),
         make_gate(
             "direct I2_SR writer is validated for merged 3D expert tensors",
@@ -318,8 +323,12 @@ def main() -> None:
     check_results = [run_check(check) for check in checks]
     kimi_source_matches = search_tree(root, "Kimi")
     local_kimi_results = local_artifacts(root / "benchmark_results")
-    moe_packing_contract = read_json(root / "benchmark_results/moe_packing_contract_2026-05-13.json")
-    moe_tl2_runtime_contract = read_json(root / "benchmark_results/moe_tl2_runtime_contract_2026-05-13.json")
+    moe_packing_contract = read_json(
+        latest_artifact(root, "benchmark_results/moe_packing_contract_*.json", "benchmark_results/moe_packing_contract_2026-05-13.json")
+    )
+    moe_tl2_runtime_contract = read_json(
+        latest_artifact(root, "benchmark_results/moe_tl2_runtime_contract_*.json", "benchmark_results/moe_tl2_runtime_contract_2026-05-13.json")
+    )
     data: dict[str, Any] = {
         "schema": "bitnet-moe-support-audit-v1",
         "date": DATE,
