@@ -41,6 +41,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
             last = data.get("last", {}) if isinstance(data.get("last"), dict) else {}
             loss_weights = data.get("loss_weights", {}) if isinstance(data.get("loss_weights"), dict) else {}
             state_load = data.get("state_load", {}) if isinstance(data.get("state_load"), dict) else {}
+            output_head_init = data.get("output_head_init", {}) if isinstance(data.get("output_head_init"), dict) else {}
             rows.append(
                 {
                     "task": task,
@@ -64,6 +65,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                     "logit_kd_weight": loss_weights.get("logit_kd_weight"),
                     "attention_kd_weight": loss_weights.get("attention_kd_weight"),
                     "state_loaded": state_load.get("loaded"),
+                    "output_head_copied": output_head_init.get("copied"),
                     "skipped_shape_mismatches": len(state_load.get("skipped_shape_mismatches", {}))
                     if isinstance(state_load.get("skipped_shape_mismatches", {}), dict)
                     else None,
@@ -144,6 +146,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
             row.get("candidate_score") or "-",
             row.get("causal_eval_mode") or "-",
             row.get("exclude_linear_regex") or "-",
+            fmt(row["output_head_copied"]),
             fmt(row["ce"]),
             fmt(row["weighted_logit_kd"]),
             fmt(row["weighted_attention_kd"]),
@@ -184,6 +187,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
                     "score",
                     "eval mode",
                     "excluded linears",
+                    "head init",
                     "last CE",
                     "last wLogitKD",
                     "last wAttnKD",

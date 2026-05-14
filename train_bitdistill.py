@@ -244,6 +244,37 @@ def freeze(model: nn.Module) -> None:
         parameter.requires_grad_(False)
 
 
+def maybe_copy_output_head(student: nn.Module, teacher: nn.Module | None, args: argparse.Namespace) -> dict[str, Any]:
+    if teacher is None or not args.init_output_head_from_teacher:
+        return {"copied": False}
+    copied: list[str] = []
+    skipped: dict[str, str] = {}
+    for name in ("score", "classifier"):
+        student_head = getattr(student, name, None)
+        teacher_head = getattr(teacher, name, None)
+        if student_head is None and teacher_head is None:
+            continue
+        if student_head is None or teacher_head is None:
+            skipped[name] = "missing_on_one_model"
+            continue
+        student_state = student_head.state_dict()
+        teacher_state = teacher_head.state_dict()
+        if student_state.keys() != teacher_state.keys():
+            skipped[name] = "state_keys_differ"
+            continue
+        mismatched = [
+            key
+            for key in student_state
+            if tuple(student_state[key].shape) != tuple(teacher_state[key].shape)
+        ]
+        if mismatched:
+            skipped[name] = "shape_mismatch:" + ",".join(mismatched)
+            continue
+        student_head.load_state_dict({key: tensor.detach().clone() for key, tensor in teacher_state.items()})
+        copied.append(name)
+    return {"copied": bool(copied), "heads": copied, "skipped": skipped}
+
+
 def unwrap_projection(module: nn.Module) -> nn.Module:
     return module.proj if isinstance(module, SubLNLinear) else module
 
@@ -1045,6 +1076,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
     else:
         prep = {"subln_inserted": 0, "bitlinear_replaced": 0}
     state_load = load_optional_state_dict(student, args)
+    output_head_init = maybe_copy_output_head(student, teacher, args)
     if args.gradient_checkpointing and hasattr(student, "gradient_checkpointing_enable"):
         student.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     if teacher is not None:
@@ -1155,6 +1187,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
         "eval": eval_metrics,
         "preparation": prep,
         "state_load": state_load,
+        "output_head_init": output_head_init,
         "distill_layer": args.distill_layer,
         "attention_split_heads": args.attention_split_heads,
         "training_budget": {
@@ -1230,6 +1263,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--attention-kd-weight", type=float, default=100.0)
     parser.add_argument("--attention-split-heads", type=int, default=8)
     parser.add_argument("--distill-layer", type=int, default=-1)
+    parser.add_argument("--init-output-head-from-teacher", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--gradient-checkpointing", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--trust-remote-code", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--dataloader-num-workers", type=int, default=0)
