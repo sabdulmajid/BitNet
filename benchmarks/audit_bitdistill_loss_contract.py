@@ -126,6 +126,26 @@ def summarize_live_control(controlled_curve: dict[str, Any]) -> dict[str, Any]:
                     "latest_weighted_attention_kd": latest.get("weighted_attention_kd"),
                     "latest_weighted_attention_to_ce": latest_ratio,
                     "max_weighted_attention_to_ce": max_ratio,
+                    "median_weighted_attention_to_ce": (
+                        live.get("weighted_attention_to_ce_summary", {}).get("p50")
+                        if isinstance(live.get("weighted_attention_to_ce_summary"), dict)
+                        else None
+                    ),
+                    "p95_weighted_attention_to_ce": (
+                        live.get("weighted_attention_to_ce_summary", {}).get("p95")
+                        if isinstance(live.get("weighted_attention_to_ce_summary"), dict)
+                        else None
+                    ),
+                    "median_ce_attention_equalizing_gamma": (
+                        live.get("ce_attention_equalizing_gamma_summary", {}).get("p50")
+                        if isinstance(live.get("ce_attention_equalizing_gamma_summary"), dict)
+                        else None
+                    ),
+                    "p95_ce_attention_equalizing_gamma": (
+                        live.get("ce_attention_equalizing_gamma_summary", {}).get("p95")
+                        if isinstance(live.get("ce_attention_equalizing_gamma_summary"), dict)
+                        else None
+                    ),
                     "parsed_steps": live.get("parsed_steps"),
                 }
             )
@@ -171,6 +191,10 @@ def render_markdown(result: dict[str, Any]) -> str:
             row.get("latest_weighted_attention_kd"),
             row.get("latest_weighted_attention_to_ce"),
             row.get("max_weighted_attention_to_ce"),
+            row.get("median_weighted_attention_to_ce"),
+            row.get("p95_weighted_attention_to_ce"),
+            row.get("median_ce_attention_equalizing_gamma"),
+            row.get("p95_ce_attention_equalizing_gamma"),
             row.get("parsed_steps"),
         ]
         for row in result["live"]["live_rows"]
@@ -195,6 +219,10 @@ def render_markdown(result: dict[str, Any]) -> str:
                     "weighted attention KD",
                     "weighted attention / CE",
                     "max weighted attention / CE",
+                    "median weighted attention / CE",
+                    "p95 weighted attention / CE",
+                    "median CE/attention gamma",
+                    "p95 CE/attention gamma",
                     "parsed steps",
                 ],
                 live_rows,
@@ -203,6 +231,7 @@ def render_markdown(result: dict[str, Any]) -> str:
             (
                 f"The risk threshold is weighted-attention/CE >= `{ATTENTION_CE_RISK_THRESHOLD:.1f}`. "
                 f"The max observed ratio is `{fmt(result['live']['max_observed_weighted_attention_to_ce'])}`. "
+                "The CE/attention gamma columns estimate the attention weight that would put raw attention KD on the same scale as CE for the observed live steps. "
                 "If final BitDistill quality remains weak, the first follow-up is loss-normalization and gradient-balance telemetry, not another broad model/task sweep."
             ),
         ]

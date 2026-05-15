@@ -51,13 +51,17 @@
         "job_id": "10068",
         "label": "20k-warmup downstream control",
         "state": "RUNNING",
-        "latest_step": 1670,
-        "latest_ce": 1.4375,
-        "latest_attention_kd": 0.011914,
-        "latest_weighted_attention_kd": 1191.376953,
-        "latest_weighted_attention_to_ce": 828.7839673043478,
+        "latest_step": 1860,
+        "latest_ce": 0.644531,
+        "latest_attention_kd": 0.016696,
+        "latest_weighted_attention_kd": 1669.633057,
+        "latest_weighted_attention_to_ce": 2590.4619901913175,
         "max_weighted_attention_to_ce": 16326.870292845022,
-        "parsed_steps": 168
+        "median_weighted_attention_to_ce": 1874.689599044776,
+        "p95_weighted_attention_to_ce": 5307.021379683844,
+        "median_ce_attention_equalizing_gamma": 53.341231020075405,
+        "p95_ce_attention_equalizing_gamma": 113.0755188315544,
+        "parsed_steps": 187
       }
     ],
     "max_observed_weighted_attention_to_ce": 16326.870292845022,

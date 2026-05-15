@@ -34,6 +34,30 @@ DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date()
 LOG_VALUE_RE = re.compile(r"([a-zA-Z_]+)=([-+0-9.eE]+)")
 
 
+def summarize_values(values: list[float]) -> dict[str, float | None]:
+    finite_values = sorted(value for value in values if isinstance(value, (int, float)))
+    if not finite_values:
+        return {"min": None, "p05": None, "p50": None, "p95": None, "max": None, "mean": None}
+
+    def percentile(probability: float) -> float:
+        if len(finite_values) == 1:
+            return finite_values[0]
+        position = probability * (len(finite_values) - 1)
+        lower = int(position)
+        upper = min(lower + 1, len(finite_values) - 1)
+        fraction = position - lower
+        return finite_values[lower] * (1.0 - fraction) + finite_values[upper] * fraction
+
+    return {
+        "min": finite_values[0],
+        "p05": percentile(0.05),
+        "p50": percentile(0.50),
+        "p95": percentile(0.95),
+        "max": finite_values[-1],
+        "mean": sum(finite_values) / len(finite_values),
+    }
+
+
 def parse_live_log(job_id: str, logs_dir: Path) -> dict[str, Any]:
     if not job_id:
         return {"exists": False}
@@ -42,6 +66,7 @@ def parse_live_log(job_id: str, logs_dir: Path) -> dict[str, Any]:
         return {"exists": False, "path": str(path)}
     latest: dict[str, float] = {}
     ratios: list[float] = []
+    equalizing_gammas: list[float] = []
     parsed_steps = 0
     for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
         if not line.startswith("step="):
@@ -57,9 +82,12 @@ def parse_live_log(job_id: str, logs_dir: Path) -> dict[str, Any]:
         parsed_steps += 1
         latest = values
         ce = values.get("ce")
+        attention = values.get("attention_kd")
         weighted_attention = values.get("weighted_attention_kd")
         if ce not in (None, 0.0) and weighted_attention is not None:
             ratios.append(weighted_attention / ce)
+        if ce not in (None, 0.0) and attention not in (None, 0.0):
+            equalizing_gammas.append(ce / attention)
     latest_ce = latest.get("ce")
     latest_weighted_attention = latest.get("weighted_attention_kd")
     return {
@@ -75,6 +103,8 @@ def parse_live_log(job_id: str, logs_dir: Path) -> dict[str, Any]:
         ),
         "max_weighted_attention_to_ce": max(ratios) if ratios else None,
         "min_weighted_attention_to_ce": min(ratios) if ratios else None,
+        "weighted_attention_to_ce_summary": summarize_values(ratios),
+        "ce_attention_equalizing_gamma_summary": summarize_values(equalizing_gammas),
     }
 
 
@@ -239,6 +269,10 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 live.get("latest_step"),
                 live.get("latest_weighted_attention_to_ce"),
                 live.get("max_weighted_attention_to_ce"),
+                (live.get("weighted_attention_to_ce_summary") or {}).get("p50"),
+                (live.get("weighted_attention_to_ce_summary") or {}).get("p95"),
+                (live.get("ce_attention_equalizing_gamma_summary") or {}).get("p50"),
+                (live.get("ce_attention_equalizing_gamma_summary") or {}).get("p95"),
                 last["ce"],
                 last["logit_kd"],
                 last["weighted_logit_kd"],
@@ -290,6 +324,10 @@ def render_markdown(summary: dict[str, Any]) -> str:
                     "live step",
                     "live attn/CE",
                     "live max attn/CE",
+                    "live median attn/CE",
+                    "live p95 attn/CE",
+                    "median CE/attn gamma",
+                    "p95 CE/attn gamma",
                     "final CE",
                     "final logit KD",
                     "final weighted logit KD",

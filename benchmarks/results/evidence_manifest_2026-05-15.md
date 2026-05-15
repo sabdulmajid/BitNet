@@ -20,7 +20,7 @@ Artifacts: `215`. Missing: `0`.
 | bitdistill_stage2_curve_report | tracked_report | yes | 4180 | de98a4baca66 |  |
 | bitdistill_stage2_curve_submission_report | tracked_report | yes | 1512 | 77354c56b3ed |  |
 | bitdistill_controlled_postprocess_submission_report | tracked_report | yes | 710 | 8e1b74096b71 |  |
-| bitdistill_controlled_curve_report | tracked_report | yes | 2356 | e55b1242188d |  |
+| bitdistill_controlled_curve_report | tracked_report | yes | 2550 | e812f828468b |  |
 | bitdistill_reproduction_gate_report | tracked_report | yes | 12908 | fa3178597d19 |  |
 | bitdistill_paired_predictions_report | tracked_report | yes | 8123 | c9107324629d |  |
 | bitdistill_task_formulation_report | tracked_report | yes | 11647 | cb03c36274ba |  |
@@ -32,7 +32,7 @@ Artifacts: `215`. Missing: `0`.
 | subln_activation_variance_report | tracked_report | yes | 2293 | 75e6c8b54d42 |  |
 | bitdistill_paper_alignment_report | tracked_report | yes | 10494 | a5d8df51bcf4 |  |
 | bitdistill_loss_scale_report | tracked_report | yes | 8733 | 628d0414fc13 |  |
-| bitdistill_loss_contract_report | tracked_report | yes | 1914 | ff172fd5c56b |  |
+| bitdistill_loss_contract_report | tracked_report | yes | 2254 | 8dd7e6c00c06 |  |
 | ternary_flip_dynamics_report | tracked_report | yes | 2765 | d27aad9fe625 |  |
 | bitdistill_telemetry_coverage_report | tracked_report | yes | 2986 | 94048bf25c04 |  |
 | qwen3_paper_alignment_report | tracked_report | yes | 4031 | ba25ba86a4cf |  |
@@ -163,10 +163,10 @@ Artifacts: `215`. Missing: `0`.
 | bitdistill_stage2_curve_json | generic_json | yes | 19229 | 42f4a99e3a68 |  |
 | bitdistill_stage2_curve_submission_json | generic_json | yes | 2131 | ae9d0a82341e |  |
 | bitdistill_controlled_postprocess_submission_json | generic_json | yes | 341 | 0eece5b559b7 |  |
-| bitdistill_controlled_curve_json | generic_json | yes | 7442 | e3dc0f53a5c1 |  |
+| bitdistill_controlled_curve_json | generic_json | yes | 7999 | d217536f2da6 |  |
 | bitdistill_root_cause_audit_json | generic_json | yes | 8206 | 7eb5698ce541 |  |
 | bitdistill_telemetry_coverage_json | generic_json | yes | 3805 | d5972de78a36 |  |
-| bitdistill_loss_contract_json | generic_json | yes | 2261 | 50ef6f9b286a |  |
+| bitdistill_loss_contract_json | generic_json | yes | 2517 | 08be7bfd5e37 |  |
 | ternary_flip_dynamics_json | generic_json | yes | 12345 | 616addec33ef |  |
 | qwen3_paper_alignment_json | generic_json | yes | 22176 | 160b2cc6d926 |  |
 | qwen3_postprocess_submission_json | generic_json | yes | 405 | aefafcfc80ef |  |

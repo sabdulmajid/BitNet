@@ -72,24 +72,40 @@
         "weighted_logit_kd": null
       },
       "live_log": {
+        "ce_attention_equalizing_gamma_summary": {
+          "max": 158.22148999437437,
+          "mean": 58.65825058802942,
+          "min": 6.124884707618521,
+          "p05": 18.84320612208293,
+          "p50": 53.341231020075405,
+          "p95": 113.0755188315544
+        },
         "exists": true,
         "latest": {
-          "attention_kd": 0.011914,
-          "ce": 1.4375,
-          "elapsed": 1351.5,
-          "logit_kd": 0.063636,
-          "loss": 1193.450806,
-          "lr": 1.891e-05,
-          "step": 1670.0,
-          "weighted_attention_kd": 1191.376953,
-          "weighted_logit_kd": 0.636361
+          "attention_kd": 0.016696,
+          "ce": 0.644531,
+          "elapsed": 1505.0,
+          "logit_kd": 0.034918,
+          "loss": 1670.626709,
+          "lr": 1.863e-05,
+          "step": 1860.0,
+          "weighted_attention_kd": 1669.633057,
+          "weighted_logit_kd": 0.349181
         },
-        "latest_step": 1670,
-        "latest_weighted_attention_to_ce": 828.7839673043478,
+        "latest_step": 1860,
+        "latest_weighted_attention_to_ce": 2590.4619901913175,
         "max_weighted_attention_to_ce": 16326.870292845022,
         "min_weighted_attention_to_ce": 632.0040304761906,
-        "parsed_steps": 168,
-        "path": "logs/bitdistill-glue-10068.out"
+        "parsed_steps": 187,
+        "path": "logs/bitdistill-glue-10068.out",
+        "weighted_attention_to_ce_summary": {
+          "max": 16326.870292845022,
+          "mean": 2262.935676439046,
+          "min": 632.0040304761906,
+          "p05": 884.4094716248151,
+          "p50": 1874.689599044776,
+          "p95": 5307.021379683844
+        }
       },
       "metric_accuracy": null,
       "metric_eval_examples": null,
@@ -121,7 +137,7 @@
       "predictions_exists": false,
       "predictions_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
       "squeue": {
-        "elapsed": "24:06",
+        "elapsed": "26:31",
         "job_id": "10068",
         "reason": "ece-nebula12",
         "state": "RUNNING"
