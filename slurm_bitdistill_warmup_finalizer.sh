@@ -15,6 +15,7 @@ cd "${SLURM_SUBMIT_DIR:-$PWD}"
 mkdir -p logs benchmark_results benchmarks/results
 
 DATE="$(date -u +%F)"
+export BITNET_REPORT_DATE="${DATE}"
 
 python benchmarks/run_bitdistill_warmup_finalizer.py \
   --date "${DATE}" \

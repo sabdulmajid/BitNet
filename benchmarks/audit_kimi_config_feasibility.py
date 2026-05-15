@@ -11,6 +11,7 @@ checkpoint handling before a ternary CPU runtime claim would be meaningful.
 
 from __future__ import annotations
 
+import os
 import argparse
 import json
 import urllib.request
@@ -19,7 +20,7 @@ from pathlib import Path
 from typing import Any
 
 
-DATE = datetime.now(timezone.utc).date().isoformat()
+DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 DEFAULT_CONFIG_URL = "https://huggingface.co/moonshotai/Kimi-K2-Instruct/raw/main/config.json"
 
 

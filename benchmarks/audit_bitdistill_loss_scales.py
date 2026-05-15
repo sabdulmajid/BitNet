@@ -8,6 +8,7 @@ scale difference explicit from saved metrics instead of relying on prose.
 
 from __future__ import annotations
 
+import os
 import argparse
 import json
 import math
@@ -16,7 +17,7 @@ from pathlib import Path
 from typing import Any
 
 
-DATE = datetime.now(timezone.utc).date().isoformat()
+DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 TASKS = ["mnli", "qnli", "sst2"]
 PAPER_CLASSIFICATION_ATTENTION_GAMMA = 100_000.0
 

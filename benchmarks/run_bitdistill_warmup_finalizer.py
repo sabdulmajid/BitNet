@@ -11,13 +11,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
-DATE = datetime.now(timezone.utc).date().isoformat()
+DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 
 
 def command_specs(date: str) -> list[tuple[str, list[str], list[str]]]:
@@ -117,8 +118,10 @@ def command_specs(date: str) -> list[tuple[str, list[str], list[str]]]:
     ]
 
 
-def run_command(command: list[str]) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(command, check=False, capture_output=True, text=True)
+def run_command(command: list[str], *, date: str) -> subprocess.CompletedProcess[str]:
+    env = os.environ.copy()
+    env["BITNET_REPORT_DATE"] = date
+    return subprocess.run(command, check=False, capture_output=True, text=True, env=env)
 
 
 def tail(text: str, max_lines: int = 20) -> str:
@@ -183,7 +186,7 @@ def main() -> None:
     root = args.repo_root.resolve()
     steps: list[dict[str, Any]] = []
     for label, command, outputs in command_specs(args.date):
-        proc = run_command(command)
+        proc = run_command(command, date=args.date)
         steps.append(
             {
                 "label": label,

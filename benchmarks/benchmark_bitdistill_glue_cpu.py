@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Any
 
 
-DATE = datetime.now(timezone.utc).date().isoformat()
+DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 TASKS = ["mnli", "qnli", "sst2"]
 DEFAULT_RUNS = [
     ("short", "fp16_sft-tensor-layer-1"),

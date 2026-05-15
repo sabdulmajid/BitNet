@@ -24,7 +24,7 @@ import numpy as np
 import torch
 
 
-DATE = datetime.now(timezone.utc).date().isoformat()
+DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 
 
 def load_module(path: Path, name: str, extra_path: Path | None = None) -> ModuleType:

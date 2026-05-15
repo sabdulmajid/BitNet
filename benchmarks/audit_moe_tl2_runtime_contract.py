@@ -8,6 +8,7 @@ needed by llama.cpp-style merged expert tensors with shape [experts, out, in].
 
 from __future__ import annotations
 
+import os
 import argparse
 import json
 import re
@@ -16,7 +17,7 @@ from pathlib import Path
 from typing import Any
 
 
-DATE = datetime.now(timezone.utc).date().isoformat()
+DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 SYNTHETIC_SHAPE = {"experts": 4, "out": 256, "in": 384}
 
 

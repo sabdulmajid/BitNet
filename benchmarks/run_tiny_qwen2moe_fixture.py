@@ -9,6 +9,7 @@ support, ternary MoE support, router quality, or useful task accuracy.
 
 from __future__ import annotations
 
+import os
 import argparse
 import json
 import re
@@ -22,7 +23,7 @@ import torch
 from transformers import AutoTokenizer, Qwen2MoeConfig, Qwen2MoeForCausalLM
 
 
-DATE = datetime.now(timezone.utc).date().isoformat()
+DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 
 
 def run_command(command: list[str], *, stdout_path: Path, stderr_path: Path, skip_existing: bool = False) -> dict[str, Any]:

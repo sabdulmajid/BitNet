@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Any
 
 
-DATE = datetime.now(timezone.utc).date().isoformat()
+DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 ACTIVE_STATES = {"PENDING", "RUNNING", "CONFIGURING", "COMPLETING"}
 CPU_FAMILIES = [
     "short",

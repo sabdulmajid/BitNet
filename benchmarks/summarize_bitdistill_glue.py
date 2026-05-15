@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import os
 import argparse
 import json
 from datetime import datetime, timezone
@@ -12,7 +13,7 @@ from typing import Any
 
 TASKS = ["mnli", "qnli", "sst2"]
 METHOD_ORDER = ["fp16_sft", "bitnet_sft", "bitdistill_tensor", "bitdistill_row"]
-DATE = datetime.now(timezone.utc).date().isoformat()
+DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 
 
 def read_json(path: Path) -> dict[str, Any]:

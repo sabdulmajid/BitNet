@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import os
 import argparse
 import json
 import math
@@ -12,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 
-DATE = datetime.now(timezone.utc).date().isoformat()
+DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 
 
 def read_json(path: Path) -> dict[str, Any]:

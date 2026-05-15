@@ -8,6 +8,7 @@ expert counts and active experts per token, and records throughput/RSS deltas.
 
 from __future__ import annotations
 
+import os
 import argparse
 import json
 from datetime import datetime, timezone
@@ -17,7 +18,7 @@ from typing import Any
 from run_tiny_qwen2moe_fixture import make_tiny_model, parse_rss, run_command, summarize_output
 
 
-DATE = datetime.now(timezone.utc).date().isoformat()
+DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 
 
 def run_variant(args: argparse.Namespace, *, num_experts: int, used_experts: int) -> dict[str, Any]:

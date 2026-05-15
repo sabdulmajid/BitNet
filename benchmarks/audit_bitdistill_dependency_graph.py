@@ -7,6 +7,7 @@ miswired downstream jobs before a long Stage-2 warm-up releases them.
 
 from __future__ import annotations
 
+import os
 import argparse
 import csv
 import json
@@ -18,7 +19,7 @@ from pathlib import Path
 from typing import Any
 
 
-DATE = datetime.now(timezone.utc).date().isoformat()
+DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 ENV_RE = re.compile(r"(?P<key>[A-Z_]+)=(?P<value>[^ ]+)")
 STEP_RE = re.compile(r"step=(?P<step>\d+) ce=(?P<ce>[-+0-9.eE]+) lr=(?P<lr>[-+0-9.eE]+) elapsed=(?P<elapsed>[-+0-9.eE]+)s")
 DEPENDENCY_RE = re.compile(r"after[a-z]*:(\d+)")

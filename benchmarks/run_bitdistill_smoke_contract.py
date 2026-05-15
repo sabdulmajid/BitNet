@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import os
 import argparse
 import json
 import math
@@ -16,7 +17,7 @@ from typing import Any
 import torch
 
 
-DATE = datetime.now(timezone.utc).date().isoformat()
+DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 
 
 def run_command(command: list[str], *, cwd: Path, timeout: int = 180) -> dict[str, Any]:
