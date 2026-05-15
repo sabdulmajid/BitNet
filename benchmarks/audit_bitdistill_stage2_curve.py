@@ -32,6 +32,7 @@ class RunSpec:
     family: str
     metrics_path: str
     note: str = ""
+    warmup_token_presentations: int | None = None
 
 
 RUNS = [
@@ -82,6 +83,27 @@ RUNS = [
         "retrofit_variant",
         "checkpoints/bitdistill-glue-seqcls-rowwarmup-gamma100/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/metrics.json",
         "Row-scale downstream variant loaded from the row-scale Stage-2 checkpoint.",
+    ),
+    RunSpec(
+        "Controlled recovery, 5k warm-up",
+        "controlled_curve",
+        "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-5kwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json",
+        "Queued fixed-recipe control: tensor scale, layer -1, gamma 100000, head init, 10000 downstream steps.",
+        40_960_000,
+    ),
+    RunSpec(
+        "Controlled recovery, 20k warm-up",
+        "controlled_curve",
+        "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json",
+        "Queued fixed-recipe control: tensor scale, layer -1, gamma 100000, head init, 10000 downstream steps.",
+        163_840_000,
+    ),
+    RunSpec(
+        "Controlled recovery, 40k warm-up",
+        "controlled_curve",
+        "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json",
+        "Queued fixed-recipe control: tensor scale, layer -1, gamma 100000, head init, 10000 downstream steps.",
+        327_680_000,
     ),
 ]
 
@@ -155,6 +177,9 @@ def summarize_run(root: Path, spec: RunSpec) -> dict[str, Any]:
     warmup_path = None if spec.family in {"reference", "ce_only"} else warmup_metrics_path(metrics)
     warmup = read_json(root / warmup_path) if warmup_path is not None and not warmup_path.is_absolute() else read_json(warmup_path) if warmup_path is not None else {}
     warmup_tokens, token_source = infer_warmup_tokens(warmup)
+    if warmup_tokens is None and spec.warmup_token_presentations is not None:
+        warmup_tokens = float(spec.warmup_token_presentations)
+        token_source = "expected_from_submission"
     has_kd = spec.family in {"bitdistill_tensor", "retrofit_variant"}
     accuracy = finite(nested(metrics, "eval", "accuracy"))
     ce = finite(nested(metrics, "last", "ce"))

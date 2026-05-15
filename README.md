@@ -129,6 +129,9 @@ with the larger row only `1.6384%` of the paper's reported `10B` warm-up budget.
 The existing rows also change attention-loss normalization details, so they
 support a budget-sensitivity hypothesis but are not a clean proof that token
 budget alone explains the remaining BitDistill gap.
+Queued controlled recovery rows now hold the Stage-3 recipe fixed across
+`40.96M`, `163.84M`, and `327.68M` Stage-2 token presentations; those rows are
+pending and have no quality claim until their paired MNLI audits complete.
 
 ### Xeon CPU Runtime
 
@@ -279,6 +282,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Qwen side-by-side summary](benchmarks/results/qwen_side_by_side_2026-05-15.md)
 - [BitDistill reproduction gap analysis](benchmarks/results/bitdistill_reproduction_gap_analysis_2026-05-15.md)
 - [BitDistill Stage-2 budget curve audit](benchmarks/results/bitdistill_stage2_curve_2026-05-15.md)
+- [BitDistill Stage-2 curve submission](benchmarks/results/bitdistill_stage2_curve_submission_2026-05-15.md)
 - [BitNet-SFT baseline audit](benchmarks/results/bitnet_sft_baseline_audit_2026-05-15.md)
 - [BitNet-SFT recipe alignment audit](benchmarks/results/bitnet_sft_recipe_alignment_2026-05-15.md)
 - [BitNet-SFT mechanics audit](benchmarks/results/bitnet_sft_mechanics_audit_2026-05-15.md)

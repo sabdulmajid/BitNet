@@ -1,0 +1,56 @@
+{
+  "schema": "bitdistill-stage2-curve-submission-v1",
+  "date": "2026-05-15",
+  "model": "Qwen/Qwen2.5-0.5B",
+  "task": "mnli",
+  "purpose": "fixed-recipe Stage-2 budget controls for BitDistill recovery",
+  "jobs": [
+    {
+      "job_id": "10069",
+      "label": "5k-warmup downstream control",
+      "dependency": "afterany:10067",
+      "partition": "midcard",
+      "init_state_dict": "checkpoints/bitdistill-glue/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor/custom_state_dict.pt",
+      "output_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-5kwarmup-steps10000-lr2em5-papergamma-headinit",
+      "max_steps": 10000,
+      "stage2_token_presentations": 40960000
+    },
+    {
+      "job_id": "10070",
+      "label": "40k Stage-2 warm-up",
+      "dependency": "none",
+      "partition": "dualcard",
+      "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-40k",
+      "max_steps": 40000,
+      "stage2_token_presentations": 327680000,
+      "save_every_steps": 10000
+    },
+    {
+      "job_id": "10071",
+      "label": "40k-warmup downstream control",
+      "dependency": "afterok:10070",
+      "partition": "midcard",
+      "init_state_dict": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-40k/custom_state_dict.pt",
+      "output_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit",
+      "max_steps": 10000,
+      "stage2_token_presentations": 327680000
+    }
+  ],
+  "fixed_recipe": {
+    "task_format": "sequence_classification",
+    "scale_mode": "tensor",
+    "use_subln": true,
+    "exclude_linear_regex": "score|classifier",
+    "distill_layer": -1,
+    "attention_split_heads": 8,
+    "attention_kd_weight": 100000,
+    "logit_kd_weight": 10,
+    "logit_temperature": 5.0,
+    "attention_temperature": 1.0,
+    "init_output_head_from_teacher": true,
+    "downstream_steps": 10000,
+    "lr": 0.00002,
+    "per_device_batch_size": 4,
+    "grad_accum_steps": 4
+  }
+}

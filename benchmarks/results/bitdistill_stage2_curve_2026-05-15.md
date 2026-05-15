@@ -26,6 +26,9 @@ This is not a controlled proof that Stage-2 tokens alone explain the gap. It doe
 | BitDistill tensor 20k paper-gamma | bitdistill_tensor | 0.630260 | -0.177891 | 163840000.000000 | 0.016384 | recorded | tensor | 100000.000000 | sum | 4318.596751 | Same tensor warm-up family with gamma=100000 under the local normalization. |
 | BitDistill row downstream, tensor warm-up | retrofit_variant | 0.653591 | -0.154559 | 163840000.000000 | 0.016384 | recorded | row | 100.000000 | sum | 8.201130 | Row-scale downstream retrofit variant loaded from the tensor Stage-2 checkpoint. |
 | BitDistill row downstream, row warm-up | retrofit_variant | 0.627713 | -0.180438 | 163840000.000000 | 0.016384 | recorded | row | 100.000000 | sum | 8.372711 | Row-scale downstream variant loaded from the row-scale Stage-2 checkpoint. |
+| Controlled recovery, 5k warm-up | controlled_curve | - | - | 40960000.000000 | 0.004096 | expected_from_submission | - | - |  | - | Queued fixed-recipe control: tensor scale, layer -1, gamma 100000, head init, 10000 downstream steps. |
+| Controlled recovery, 20k warm-up | controlled_curve | - | - | 163840000.000000 | 0.016384 | expected_from_submission | - | - |  | - | Queued fixed-recipe control: tensor scale, layer -1, gamma 100000, head init, 10000 downstream steps. |
+| Controlled recovery, 40k warm-up | controlled_curve | - | - | 327680000.000000 | 0.032768 | expected_from_submission | - | - |  | - | Queued fixed-recipe control: tensor scale, layer -1, gamma 100000, head init, 10000 downstream steps. |
 
 ## Confounders
 
