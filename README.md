@@ -58,7 +58,7 @@ with the active `i2sr-row-scale-runtime` branch.
 | Arbitrary FP16/BF16 to ternary conversion is lossless | **No** | Qwen2.5-1.5B naive PTQ collapses from ten-task mean `0.644169` to `0.348671`; WikiText PPL jumps from `13.901` to `3,813,121.803`. |
 | Distillation/QAT can recover useful signal | **Yes, partially** | Best row-scale dense-Qwen run reaches ten-task mean `0.499459`, well above naive PTQ but below FP. |
 | Stable CPU row-scale packed inference exists for dense Qwen | **Yes, for the audited path** | `I2_SR` productization gate passes `9/9`; Xeon I2_SR PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
-| BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B gamma=100 and strict paper-gamma tensor GLUE3 sequence-classification runs improve over BitNet-SFT but remain 5.8-17.7 accuracy points below FP16-SFT; strict paper-gamma row is also complete and remains 8.8-19.0 points below FP16-SFT. LR/head-init search, clean row-warmup, paired traces, and full CPU-quality gates remain open. |
+| BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B gamma=100, strict paper-gamma tensor, strict paper-gamma row, LR=`1e-5`/`5e-5`, and strict paper-gamma head-init GLUE3 sequence-classification runs are complete. They improve over BitNet-SFT but still miss FP16-SFT by `0.058486-0.203260` absolute accuracy depending on task/run. Clean row-warmup, full-budget/backbone-scale search, paired traces beyond the current audit, and full CPU-quality gates remain open. |
 | TL2 is ready for the best row-scale checkpoint | **No** | Runtime contract gate fails: current TL2 one-scale error is `1.904230` relative output RMS; exact fp16 row scales would be `0.000197` with only `1.230469` MiB of scales, but converter/runtime/kernel metadata do not carry them. |
 | Kimi/MoE retrofit is proven | **No** | Tiny random Qwen2MoE FP16 and ternary `I2_SR` fixtures now pass converter/runtime smoke; the ternary fixture packs 3 merged row-scale expert tensors, runs routed CPU inference, and records `419.29` decode tok/s at `142.48` MiB RSS. A Kimi-K2 config audit still shows the real target needs Kimi/DeepSeekV3 loading, MLA metadata conversion, shared-expert mapping, block-FP8 import, and trained MoE quality/locality benchmarks before product claims are defensible. |
 
@@ -137,14 +137,24 @@ also negative:
 | QNLI | `0.759656` | `0.757459` | `-0.002197` | `0.141497` |
 | SST2 | `0.841743` | `0.846330` | `+0.004587` | `0.079128` |
 
-The LR=`5e-5` branch is partially complete. It improves over strict
-paper-gamma on MNLI/QNLI, but still misses the FP16 target by wide margins:
+The LR=`5e-5` branch is complete. It improves over strict paper-gamma on
+MNLI/QNLI, regresses on SST2, and still misses the FP16 target by wide
+margins:
 
 | task | paper gamma | paper gamma LR=`5e-5` | LR delta | FP gap at LR=`5e-5` |
 | --- | ---: | ---: | ---: | ---: |
 | MNLI | `0.630260` | `0.642384` | `+0.012124` | `0.165257` |
 | QNLI | `0.759656` | `0.790957` | `+0.031301` | `0.107999` |
-| SST2 | `0.841743` | pending | pending | pending |
+| SST2 | `0.841743` | `0.836009` | `-0.005734` | `0.089450` |
+
+Strict paper-gamma teacher-head initialization is also complete and does not
+close the gap:
+
+| task | paper gamma | paper gamma head-init | head-init delta | FP gap after head-init |
+| --- | ---: | ---: | ---: | ---: |
+| MNLI | `0.630260` | `0.627815` | `-0.002445` | `0.179827` |
+| QNLI | `0.759656` | `0.762951` | `+0.003295` | `0.136006` |
+| SST2 | `0.841743` | `0.834862` | `-0.006881` | `0.090596` |
 
 Paper-gamma row-scale results are now complete and do not rescue the
 strict paper coefficient:
@@ -167,13 +177,13 @@ on MNLI, `29.95` on QNLI, and `14.79` on SST2, with paired confidence
 intervals and exact McNemar tests recorded in the evidence bundle.
 
 These runs do **not** reproduce the paper target of being within 0.5-1.0
-accuracy point of FP16-SFT. They are also now labeled as a short-budget
-diagnostic rather than a fully paper-faithful reproduction, because the first
-completed wave used the common KD convention of multiplying logits KL by
-`temperature**2`; the BitDistill equations do not include that multiplier.
-The completed wave also used a legacy Q/K/V mean for attention relation KD;
-the current code defaults new jobs to the paper-style Q/K/V sum and records
-that setting in each metrics file.
+accuracy point of FP16-SFT. The early completed wave is labeled as a
+short-budget diagnostic because it used the common KD convention of multiplying
+logits KL by `temperature**2`; the BitDistill equations do not include that
+multiplier. It also used a legacy Q/K/V mean for attention relation KD. The
+strict paper-gamma, LR-search, head-init, gamma-sweep, and layer-sweep branches
+now use paper-style logits scaling plus Q/K/V sum and record those settings in
+each metrics file.
 
 The strongest remaining known gap is still training budget:
 the first completed Stage-2 diagnostic used `40.96M` effective token
@@ -200,10 +210,9 @@ attention-layer sweep result, layer `-1`, reaches `0.645950`, which is a
 small improvement over tensor gamma=100 but still `0.161691` behind FP16-SFT.
 The next layer-sweep points are worse: layer `-2` reaches `0.642894` and
 layer `-4` reaches `0.640754`. Paper-gamma row is worse than tensor on MNLI
-and essentially tied on QNLI, so it is not the missing fix. The LR=`1e-5`
-paper-gamma search is complete on GLUE3 and also below target; LR=`5e-5`
-MNLI/QNLI are now complete and still below target, while LR=`5e-5` SST2,
-paper-gamma head-init, and clean row-warmup branches remain running or queued.
+and essentially tied on QNLI, so it is not the missing fix. The LR=`1e-5`,
+LR=`5e-5`, and strict paper-gamma head-init searches are complete on GLUE3 and
+also below target. Clean row-warmup branches remain running or queued.
 No paper-level GLUE success claim will be made until full-validation
 candidates close the FP16 gap.
 
@@ -219,12 +228,13 @@ the strict `Qwen2ForSequenceClassification` branch.
 
 Those causal checkpoints also export through the packed runtime path on the
 Xeon: tensor-scale checkpoints emit `MOSTLY_I2_S`, row-scale checkpoints emit
-`MOSTLY_I2_SR`, and the local isolated export gate passes `6/6` rows with
-`168` packed ternary tensors each. Runtime throughput is about `517-520`
-prefill tok/s and `38.6-39.0` decode tok/s at roughly `0.70` GiB max RSS, but
-WikiText PPL is catastrophic (`155,846-347,660`). Treat this as proof that the
-format/runtime path works and that task-specific causal BitDistill does not
-preserve general language-model quality in this configuration.
+`MOSTLY_I2_SR`, and the active packed export/runtime gate passes `6/6` rows
+with `168` packed ternary tensors each. Runtime throughput is about
+`1175-1260` prefill tok/s and `93.8-105.4` decode tok/s at about `0.70` GiB
+max RSS, but WikiText PPL is catastrophic (`155,846-347,660`). Treat this as
+proof that the format/runtime path works and that task-specific causal
+BitDistill does not preserve general language-model quality in this
+configuration.
 
 A separate PyTorch CPU sequence-classification slice now passes as a scoped
 runtime artifact on the Xeon: 15/15 rows across MNLI/QNLI/SST2 for FP16-SFT,
@@ -235,15 +245,16 @@ memory-heavy and slower than FP16-SFT in this setup, which reinforces that the
 product path must use packed GGUF kernels rather than Python-level BitLinear
 execution.
 
-Active follow-ups are now focused on the remaining LR/head-init search,
-clean row-scale warm-up, paired prediction traces, and the full CPU/I2_SR
-producer gates. Completed diagnostics already show that gamma=100 teacher-head
-initialization, the MNLI layer sweep, strict paper-gamma row, and the completed
-paper-gamma LR=`1e-5` GLUE3 probe are not enough to recover paper-level
-accuracy. The partial LR=`5e-5` branch improves MNLI/QNLI versus strict
-paper-gamma but remains more than `0.10` absolute accuracy behind FP16-SFT on
-both tasks. The completed MNLI gamma probes at `1e3` and `1e4` also support the
-relation-loss scale audit: the paper's `1e5`
+Active follow-ups are now focused on clean row-scale warm-up, paired prediction
+traces for the strongest candidates, full CPU/I2_SR producer gates, and a
+decision on whether to spend the much larger compute needed for Qwen3/full
+budget reproduction. Completed diagnostics already show that gamma=100
+teacher-head initialization, strict paper-gamma head-init, the MNLI layer
+sweep, strict paper-gamma row, and the completed paper-gamma LR=`1e-5` /
+LR=`5e-5` GLUE3 probes are not enough to recover paper-level accuracy. The
+best LR=`5e-5` task improvement is QNLI, but it remains `0.107999` absolute
+accuracy behind FP16-SFT. The completed MNLI gamma probes at `1e3` and `1e4`
+also support the relation-loss scale audit: the paper's `1e5`
 coefficient can dominate CE by orders of magnitude under this local
 normalization.
 The earlier completed BitDistill runs use attention KD weight `100`; those are
@@ -268,10 +279,10 @@ llama.cpp / `I2_SR` exports today because the runtime path does not implement a
 Qwen sequence-classification head. The stable `I2_SR` exporter is valid for
 causal-LM BitDistill checkpoints; packed task inference requires either
 causal prompt-scoring checkpoints or new classifier-head support in the
-runtime. A causal prompt-scoring long-warmup branch is queued under
-`checkpoints/bitdistill-glue-causal-longwarmup-densehead` to test that
-exportable path without conflating it with the sequence-classification
-reproduction gate.
+runtime. The causal prompt-scoring long-warmup branch under
+`checkpoints/bitdistill-glue-causal-longwarmup-densehead` has completed and is
+used only as an export/runtime diagnostic; it is not conflated with the
+sequence-classification reproduction gate.
 
 ## Key Dense-Qwen Results
 
@@ -361,9 +372,9 @@ It does not make blind PTQ viable.
 
 The active public reports use `BITNET_REPORT_DATE=2026-05-15`. They are
 generated from checked-in scripts plus raw artifacts under `benchmark_results/`.
-Paper-gamma SST2 row, LR-search, and clean row-warmup jobs are still running
-or queued, so these commands intentionally produce partial or pending gates
-rather than success claims.
+Clean row-warmup, full CPU runtime, and full `I2_SR` producer jobs are still
+running or queued, so these commands intentionally produce partial or pending
+gates rather than success claims.
 
 ```bash
 export BITNET_REPORT_DATE=2026-05-15

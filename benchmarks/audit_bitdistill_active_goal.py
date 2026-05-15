@@ -109,8 +109,16 @@ def audit_reproduction(
     pending = matrix_passed and configured == expected and inferred_rows == 0
     strict_complete = reproduction.get("paper_style_tensor_complete") is True
     strict_passed = reproduction.get("paper_style_tensor_passed") is True
+    search_complete = reproduction.get("paper_search_tensor_complete") is True
+    search_passed = reproduction.get("paper_search_tensor_passed") is True
     complete = strict_complete and strict_passed
     status = "complete" if complete else ("partial" if strict_complete else ("pending" if pending else "partial"))
+    if search_complete:
+        search_state = "LR/head-init search is complete"
+        search_result = "passed" if search_passed else "did not pass"
+    else:
+        search_state = "LR/head-init search remains incomplete"
+        search_result = "pending"
     metrics["paper_reproduction"] = {
         "fp16_tasks": baseline_tasks,
         "bitnet_tasks": bitnet_tasks,
@@ -120,6 +128,8 @@ def audit_reproduction(
         "row_scale_rows": len(row_scale),
         "paper_style_tensor_complete": reproduction.get("paper_style_tensor_complete"),
         "paper_style_tensor_passed": reproduction.get("paper_style_tensor_passed"),
+        "paper_search_tensor_complete": reproduction.get("paper_search_tensor_complete"),
+        "paper_search_tensor_passed": reproduction.get("paper_search_tensor_passed"),
         "job_matrix_passed": matrix_passed,
         "configured_rows": configured,
         "expected_rows": expected,
@@ -137,9 +147,15 @@ def audit_reproduction(
             f"gamma100 rows={len(gamma100)}/3; strict paper rows={len(paper)}/3; "
             f"paper row rows={len(paper_row)}/3; "
             f"matrix={configured}/{expected}, inferred={inferred_rows}; "
-            f"warm-up={step}/{max_steps}"
+            f"warm-up={step}/{max_steps}; {search_state}, {search_result}"
         ),
-        "Gamma=100, strict paper-gamma tensor, and strict paper-gamma row BitDistill are complete and below the FP16-gap target; LR-search, head-init, and full-budget candidates remain pending.",
+        (
+            "Gamma=100, strict paper-gamma tensor, strict paper-gamma row, and LR/head-init "
+            "BitDistill searches are complete and below the FP16-gap target; clean row-warmup "
+            "and full-budget candidates remain pending."
+            if search_complete
+            else "Gamma=100, strict paper-gamma tensor, and strict paper-gamma row BitDistill are complete and below the FP16-gap target; LR-search, head-init, and full-budget candidates remain pending."
+        ),
     )
 
 
@@ -255,18 +271,25 @@ def audit_publishability(
     scope = product.get("scope_status")
     alignment_rows = paper_alignment.get("alignment", []) if isinstance(paper_alignment.get("alignment"), list) else []
     partial = [row.get("dimension") for row in alignment_rows if isinstance(row, dict) and row.get("status") in {"partial", "pending"}]
+    lr_headinit_complete = metrics.get("paper_reproduction", {}).get("paper_search_tensor_complete") is True
+    quality_blocker = (
+        "Strict tensor LR/head-init searches are complete and negative; remaining quality claims need clean row-warmup/full-budget evidence and full CPU-quality gates."
+        if lr_headinit_complete
+        else "Publishable quality claims must wait for strict paper-hyperparameter BitDistill results and full CPU-quality gates; current support is implementation/provenance plus dense-Qwen I2_SR evidence."
+    )
     metrics["publication_scope"] = {
         "scope_status": scope,
         "supported_claim_count": supported,
         "unsupported_claim_count": unsupported,
         "paper_alignment_partial_or_pending": partial,
+        "lr_headinit_search_complete": lr_headinit_complete,
     }
     add_row(
         rows,
         "Define publishable scope: independent reproduction, open training implementation, row-scale I2_SR extension, boundary study, and MoE/Kimi limits",
         "partial",
         f"product scope={scope}; supported={supported}; unsupported={unsupported}; paper gaps={partial}",
-        "Publishable quality claims must wait for strict paper-hyperparameter BitDistill results and full CPU-quality gates; current support is implementation/provenance plus dense-Qwen I2_SR evidence.",
+        quality_blocker,
     )
 
 

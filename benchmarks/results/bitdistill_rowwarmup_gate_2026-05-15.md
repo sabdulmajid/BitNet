@@ -35,7 +35,7 @@ Any row-warmup family passed: `False`.
 | sst2 | tensor-warmup tensor gamma100 | tensor_warmup_gamma100 | true | 0.866972 | 872 | 872 | pass | [0.842814, 0.887911] | 0.925459 | 0.058486 | [0.029991, 0.086981] | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/metrics.json |
 | sst2 | tensor-warmup row gamma100 | tensor_warmup_row_gamma100 | true | 0.854358 | 872 | 872 | pass | [0.829391, 0.876217] | 0.925459 | 0.071101 | [0.041911, 0.100291] | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8/metrics.json |
 | sst2 | tensor-warmup tensor paper gamma | tensor_warmup_papergamma | true | 0.841743 | 872 | 872 | pass | [0.816026, 0.864462] | 0.925459 | 0.083716 | [0.053870, 0.113561] | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/metrics.json |
-| sst2 | tensor-warmup row paper gamma | tensor_warmup_row_papergamma | false | - | - | 872 | fail_or_pending | - | 0.925459 | - | - | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8/metrics.json |
+| sst2 | tensor-warmup row paper gamma | tensor_warmup_row_papergamma | true | 0.837156 | 872 | 872 | pass | [0.811180, 0.860174] | 0.925459 | 0.088303 | [0.058228, 0.118377] | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8/metrics.json |
 | sst2 | row-warmup row gamma100 | row_warmup_gamma100 | false | - | - | 872 | fail_or_pending | - | 0.925459 | - | - | fail_or_pending | checkpoints/bitdistill-glue-seqcls-rowwarmup-gamma100/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8/metrics.json |
 | sst2 | row-warmup row paper gamma | row_warmup_papergamma | false | - | - | 872 | fail_or_pending | - | 0.925459 | - | - | fail_or_pending | checkpoints/bitdistill-glue-seqcls-rowwarmup-papergamma/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8/metrics.json |
 
@@ -54,4 +54,4 @@ Any row-warmup family passed: `False`.
 | sst2 | row_warmup_gamma100_minus_tensor_warmup_tensor_gamma100 | - | - | 0.866972 | 872 | - | - |
 | sst2 | row_warmup_gamma100_minus_tensor_warmup_row_gamma100 | - | - | 0.854358 | 872 | - | - |
 | sst2 | row_warmup_papergamma_minus_tensor_warmup_tensor_papergamma | - | - | 0.841743 | 872 | - | - |
-| sst2 | row_warmup_papergamma_minus_tensor_warmup_row_papergamma | - | - | - | - | - | - |
+| sst2 | row_warmup_papergamma_minus_tensor_warmup_row_papergamma | - | - | 0.837156 | 872 | - | - |

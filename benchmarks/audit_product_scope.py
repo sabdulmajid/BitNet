@@ -106,11 +106,13 @@ def build_gate(root: Path) -> dict[str, Any]:
     i2sr_prefill = i2sr.get("bench", {}).get("prefill", {}).get("tok_s")
     i2sr_decode = i2sr.get("bench", {}).get("decode", {}).get("tok_s")
     i2sr_file_mib = i2sr.get("file_mib")
-    bitdistill_i2sr_path = latest_json_path(
-        root,
-        "benchmark_results/bitdistill_i2sr_export_gate_*.json",
-        "benchmark_results/bitdistill_i2sr_export_gate_2026-05-14.json",
-    )
+    bitdistill_i2sr_path = root / f"benchmark_results/bitdistill_i2sr_export_gate_{DATE}.json"
+    if not bitdistill_i2sr_path.exists():
+        bitdistill_i2sr_path = latest_json_path(
+            root,
+            "benchmark_results/bitdistill_i2sr_export_gate_20*.json",
+            "benchmark_results/bitdistill_i2sr_export_gate_2026-05-14.json",
+        )
     bitdistill_i2sr = read_json(bitdistill_i2sr_path) if bitdistill_i2sr_path.exists() else {}
     bitdistill_i2sr_rows = bitdistill_i2sr.get("rows", []) if isinstance(bitdistill_i2sr.get("rows"), list) else []
     bitdistill_i2sr_complete = sum(1 for row in bitdistill_i2sr_rows if isinstance(row, dict) and row.get("complete"))
@@ -254,6 +256,8 @@ def build_gate(root: Path) -> dict[str, Any]:
         (
             f"paper tensor complete={bitdistill_reproduction.get('paper_style_tensor_complete')}; "
             f"passed={bitdistill_reproduction.get('paper_style_tensor_passed')}; "
+            f"LR/headinit complete={bitdistill_reproduction.get('paper_search_tensor_complete')}; "
+            f"LR/headinit passed={bitdistill_reproduction.get('paper_search_tensor_passed')}; "
             f"gamma100 full rows={bitdistill_gamma100_full_rows}/{len(bitdistill_gamma100_rows)}; "
             f"gamma100 gap-pass rows={bitdistill_gamma100_passed_rows}/{len(bitdistill_gamma100_rows)}; "
             f"strict paper full rows={bitdistill_paper_full_rows}/{len(bitdistill_paper_rows)}; "
@@ -265,7 +269,7 @@ def build_gate(root: Path) -> dict[str, Any]:
             f"full-quality={bitdistill_cpu_full_quality}/{len(bitdistill_cpu_critical)})"
         ),
         "Claim only after MNLI/QNLI/SST2 full-validation BitDistill rows are within the configured FP16 gap and paired traces/CPU gates are complete.",
-        "Gamma=100, strict paper-gamma tensor, and strict paper-gamma row runs are complete but below the FP16-gap gate; LR/head-init search, paired-trace coverage, and CPU full-quality rows are still missing or incomplete.",
+        "Gamma=100, strict paper-gamma tensor, strict paper-gamma row, and LR/head-init runs are complete but below the FP16-gap gate; paired-trace coverage and CPU full-quality rows are still missing or incomplete.",
     )
     bitdistill_i2sr_passed = bool(bitdistill_i2sr.get("passed"))
     add_claim(
@@ -345,7 +349,7 @@ def build_gate(root: Path) -> dict[str, Any]:
         "recommendation": {
             "product": "CPU-first dense-Qwen retrofit evaluator with stable I2_SR runtime support; keep BitDistill quality claims behind the full GLUE reproduction, paired-trace, and CPU full-quality gates.",
             "paper": "Scope as a negative PTQ result plus measured QAT/row-scale/runtime recovery path; add BitDistill reproduction claims only if the full-validation long-warmup gates pass. Do not claim arbitrary or MoE support.",
-            "next_engineering_gate": "Finish the LR/head-init search, paired-trace, and CPU-quality dependency chain, then validate row-scale I2_SR export/CPU evidence and keep MoE/Kimi as a separate milestone.",
+            "next_engineering_gate": "Finish paired-trace coverage, the CPU-quality dependency chain, and clean row-warmup comparisons; keep MoE/Kimi as a separate milestone.",
         },
     }
 

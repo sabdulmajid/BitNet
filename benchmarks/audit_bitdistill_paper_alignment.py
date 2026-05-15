@@ -93,14 +93,14 @@ def run_matrix(args: argparse.Namespace) -> list[dict[str, Any]]:
         ("BitDistill longwarmup row gamma100", args.longwarmup_root, "bitdistill-longwarmup-row-layer-8", "novelty_gamma100", None),
         ("BitDistill longwarmup tensor paper gamma", args.paper_hparam_root, "bitdistill-longwarmup-tensor-layer-8", "paper_candidate", None),
         ("BitDistill longwarmup row paper gamma", args.paper_hparam_row_root, "bitdistill-longwarmup-row-layer-8", "paper_row_candidate", None),
-        ("BitDistill longwarmup tensor paper gamma lr1e-5", args.paper_hparam_lr1_root, "bitdistill-longwarmup-tensor-layer-8", "paper_lr_search_pending", None),
-        ("BitDistill longwarmup tensor paper gamma lr5e-5", args.paper_hparam_lr5_root, "bitdistill-longwarmup-tensor-layer-8", "paper_lr_search_pending", None),
-        ("BitDistill longwarmup tensor paper gamma headinit", args.paper_hparam_headinit_root, "bitdistill-longwarmup-tensor-layer-8", "paper_headinit_pending", None),
-        ("BitDistill longwarmup tensor gamma1k", args.gamma1k_root, "bitdistill-longwarmup-tensor-layer-8", "mnli_gamma_sweep_pending", {"mnli"}),
-        ("BitDistill longwarmup tensor gamma10k", args.gamma10k_root, "bitdistill-longwarmup-tensor-layer-8", "mnli_gamma_sweep_pending", {"mnli"}),
-        ("BitDistill longwarmup tensor layer -1", args.layer_sweep_root, "bitdistill-longwarmup-tensor-layer-1", "mnli_layer_sweep_pending", {"mnli"}),
-        ("BitDistill longwarmup tensor layer -2", args.layer_sweep_root, "bitdistill-longwarmup-tensor-layer-2", "mnli_layer_sweep_pending", {"mnli"}),
-        ("BitDistill longwarmup tensor layer -4", args.layer_sweep_root, "bitdistill-longwarmup-tensor-layer-4", "mnli_layer_sweep_pending", {"mnli"}),
+        ("BitDistill longwarmup tensor paper gamma lr1e-5", args.paper_hparam_lr1_root, "bitdistill-longwarmup-tensor-layer-8", "paper_lr_search", None),
+        ("BitDistill longwarmup tensor paper gamma lr5e-5", args.paper_hparam_lr5_root, "bitdistill-longwarmup-tensor-layer-8", "paper_lr_search", None),
+        ("BitDistill longwarmup tensor paper gamma headinit", args.paper_hparam_headinit_root, "bitdistill-longwarmup-tensor-layer-8", "paper_headinit_search", None),
+        ("BitDistill longwarmup tensor gamma1k", args.gamma1k_root, "bitdistill-longwarmup-tensor-layer-8", "mnli_gamma_sweep", {"mnli"}),
+        ("BitDistill longwarmup tensor gamma10k", args.gamma10k_root, "bitdistill-longwarmup-tensor-layer-8", "mnli_gamma_sweep", {"mnli"}),
+        ("BitDistill longwarmup tensor layer -1", args.layer_sweep_root, "bitdistill-longwarmup-tensor-layer-1", "mnli_layer_sweep", {"mnli"}),
+        ("BitDistill longwarmup tensor layer -2", args.layer_sweep_root, "bitdistill-longwarmup-tensor-layer-2", "mnli_layer_sweep", {"mnli"}),
+        ("BitDistill longwarmup tensor layer -4", args.layer_sweep_root, "bitdistill-longwarmup-tensor-layer-4", "mnli_layer_sweep", {"mnli"}),
     ]
     fp_by_task = {
         task: metric_summary(metric_path(args.baseline_root, args.model, task, "fp16_sft-tensor-layer-1"), task)
@@ -193,21 +193,21 @@ def alignment_rows(features: dict[str, bool], warmup: dict[str, Any]) -> list[di
             "paper": "temperature 5, lambda 10",
             "local": "temperature 5, weight 10, no tau^2 scaling by default",
             "status": "matched" if features["logits_kd"] and features["paper_logit_temperature_scale_default"] else "partial",
-            "note": "First completed wave used tau^2; current code and pending runs use paper-style scaling.",
+            "note": "First completed wave used tau^2; current completed strict branches use paper-style scaling.",
         },
         {
             "dimension": "Stage-3 attention KD",
             "paper": "single-layer Q/K/V relation KD, gamma 1e5 for classification",
-            "local": "single-layer L2-normalized Q/K/V relation KD implemented with paper-style Q/K/V sum by default; completed runs include gamma 100 on GLUE3 plus MNLI tensor probes at gamma 1e3/1e4/1e5; paper-gamma row, LR search, headinit, and MNLI layer-sweep branches remain tracked separately",
-            "status": "pending" if features["attention_qkv_sum_default"] else "partial",
-            "note": "The gamma sweep is intentional because local loss-scale probes show the paper gamma can dominate CE; queued jobs use the corrected paper-style Q/K/V reduction through the default.",
+            "local": "single-layer L2-normalized Q/K/V relation KD implemented with paper-style Q/K/V sum by default; completed runs include gamma 100, gamma 1e3/1e4/1e5 MNLI probes, strict paper-gamma tensor/row, LR search, head-init, and MNLI layer sweep",
+            "status": "matched" if features["attention_qkv_sum_default"] else "partial",
+            "note": "The implementation is present; the completed strict local quality result remains below the FP16-gap target.",
         },
         {
             "dimension": "Hyperparameter search",
             "paper": "greedy search over learning rate and epochs",
-            "local": "fixed 1000-step downstream schedule plus queued LR 1e-5/2e-5/5e-5 and output-head initialization diagnostics",
-            "status": "pending",
-            "note": "The local search is intentionally narrow; a strict paper reproduction still needs epoch/budget search if the queued LR candidates do not close the gap.",
+            "local": "fixed 1000-step downstream schedule plus completed LR 1e-5/2e-5/5e-5 and output-head initialization diagnostics",
+            "status": "partial",
+            "note": "The local search is intentionally narrow and did not close the gap; a strict paper reproduction still needs epoch/budget/backbone-scale search.",
         },
         {
             "dimension": "Hardware/resources",
@@ -271,7 +271,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
     return "\n\n".join(
         [
             f"# BitDistill Paper Alignment Audit, {summary['date']}",
-            "Verdict: local code contains the major BitDistill mechanisms, but the completed results are not a strict paper reproduction. The strict paper-hyperparameter branch is tracked separately.",
+            "Verdict: local code contains the major BitDistill mechanisms, but the completed results are not a successful paper reproduction. The strict paper-hyperparameter branches are complete under the local budget and remain negative.",
             f"Full-evaluation contract: `{summary['expected_eval_examples']}` examples. Accuracy rows expose whether each metric is full validation or partial.",
             "## Alignment",
             md_table(["dimension", "paper", "local", "status", "note"], alignment),
@@ -299,9 +299,9 @@ def render_markdown(summary: dict[str, Any]) -> str:
             "## Interpretation",
             "\n".join(
                 [
-                    "- The completed gamma=100 long-warmup GLUE result is a valid negative reproduction-boundary result.",
-                    "- It is not a disproof of BitDistill because full hyperparameter search, backbone scale, and 10B-token warm-up are not paper-matched yet.",
-                    "- The publishable angle remains independent reproduction plus a row-scale CPU-runtime extension if the remaining row/search branches close the quality gap; otherwise the publishable angle becomes a resource-sensitivity and boundary study.",
+                    "- The completed gamma=100 and strict paper-gamma local GLUE results are valid negative reproduction-boundary results.",
+                    "- This is not a disproof of BitDistill because full epoch search, Qwen3 scale, and 10B-token warm-up are not paper-matched.",
+                    "- The publishable angle is independent implementation plus row-scale CPU-runtime extension, with the current quality evidence supporting a resource-sensitivity and boundary study rather than a paper-level accuracy claim.",
                 ]
             ),
         ]

@@ -14,19 +14,19 @@ Pending rows: `0`.
 
 Tensor warm-up progress: `20000` / `20000` (`1.000000`).
 
-Row warm-up progress: `11000` / `20000` (`0.550000`).
+Row warm-up progress: `13490` / `20000` (`0.674500`).
 
-Runtime gates: row-scale complete=`True`, row-warmup complete=`False`, I2_SR=`False`, local I2_SR=`True`, CPU=`False`, scoped CPU=`True`.
+Runtime gates: row-scale complete=`True`, row-warmup complete=`False`, I2_SR=`True`, local I2_SR=`True`, CPU=`False`, scoped CPU=`True`.
 
 ## Prompt-To-Artifact Checklist
 
 | requirement | status | evidence | remaining gap |
 | --- | --- | --- | --- |
-| Reproduce BitDistill GLUE3 baseline on Qwen2.5-0.5B with FP16-SFT, BitNet-SFT, and BitDistill | partial | FP16 tasks=['mnli', 'qnli', 'sst2']; BitNet tasks=['mnli', 'qnli', 'sst2']; gamma100 rows=3/3; strict paper rows=3/3; paper row rows=3/3; matrix=38/38, inferred=0; warm-up=20000/20000 | Gamma=100, strict paper-gamma tensor, and strict paper-gamma row BitDistill are complete and below the FP16-gap target; LR-search, head-init, and full-budget candidates remain pending. |
+| Reproduce BitDistill GLUE3 baseline on Qwen2.5-0.5B with FP16-SFT, BitNet-SFT, and BitDistill | partial | FP16 tasks=['mnli', 'qnli', 'sst2']; BitNet tasks=['mnli', 'qnli', 'sst2']; gamma100 rows=3/3; strict paper rows=3/3; paper row rows=3/3; matrix=38/38, inferred=0; warm-up=20000/20000; LR/head-init search is complete, did not pass | Gamma=100, strict paper-gamma tensor, strict paper-gamma row, and LR/head-init BitDistill searches are complete and below the FP16-gap target; clean row-warmup and full-budget candidates remain pending. |
 | Implement SubLN, Stage-2 CE, Stage-3 CE+logits KL+attention-relation KD, and layer selection | complete | smoke=True, smoke checks=40, failed features=[] |  |
 | Compare paper-style per-tensor BitDistill against row-scale BitDistill | partial | tensor-warmup row gate complete=True, passed=False; row-warmup gate complete=False, passed=False | Gamma=100 and paper-gamma tensor-warmup row comparisons are complete but do not pass the FP16-gap gate; row-warmup comparisons remain pending. |
-| Export row-scale checkpoints through I2_SR and benchmark CPU speed, memory/RSS, and task quality on Xeon | partial | I2_SR gate=False (0/6 rows); local isolated I2_SR=True (6/6 rows); CPU gate=False (0/33 critical rows); scoped CPU slice=True (15/15 critical rows) | Local causal export/runtime and the scoped PyTorch CPU slice have passed, but the queued full CPU/product gate is still pending. |
-| Define publishable scope: independent reproduction, open training implementation, row-scale I2_SR extension, boundary study, and MoE/Kimi limits | partial | product scope=research_mvp_only; supported=5; unsupported=4; paper gaps=['Backbone', 'Baselines', 'Stage-2 warm-up', 'Stage-3 attention KD', 'Hyperparameter search', 'Hardware/resources'] | Publishable quality claims must wait for strict paper-hyperparameter BitDistill results and full CPU-quality gates; current support is implementation/provenance plus dense-Qwen I2_SR evidence. |
+| Export row-scale checkpoints through I2_SR and benchmark CPU speed, memory/RSS, and task quality on Xeon | partial | I2_SR gate=True (6/6 rows); local isolated I2_SR=True (6/6 rows); CPU gate=False (0/33 critical rows); scoped CPU slice=True (15/15 critical rows) | Local causal export/runtime and the scoped PyTorch CPU slice have passed, but the queued full CPU/product gate is still pending. |
+| Define publishable scope: independent reproduction, open training implementation, row-scale I2_SR extension, boundary study, and MoE/Kimi limits | partial | product scope=research_mvp_only; supported=5; unsupported=4; paper gaps=['Backbone', 'Baselines', 'Stage-2 warm-up', 'Hyperparameter search', 'Hardware/resources'] | Strict tensor LR/head-init searches are complete and negative; remaining quality claims need clean row-warmup/full-budget evidence and full CPU-quality gates. |
 
 ## Open Requirements
 
