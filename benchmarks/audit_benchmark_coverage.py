@@ -493,10 +493,11 @@ def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
     seqcls = data.get("sequence_classification", {}) if isinstance(data.get("sequence_classification"), dict) else {}
     causal = data.get("causal_runtime", {}) if isinstance(data.get("causal_runtime"), dict) else {}
     export = data.get("causal_export_summary", {}) if isinstance(data.get("causal_export_summary"), dict) else {}
+    smoke = data.get("seqcls_sidecar_smoke", {}) if isinstance(data.get("seqcls_sidecar_smoke"), dict) else {}
     add_check(
         checks,
-        "Sequence-classification runtime gap is explicitly blocked",
-        data.get("status") == "blocked_by_classifier_runtime"
+        "Sequence-classification runtime gap is narrowed but not closed",
+        data.get("status") in {"blocked_by_classifier_runtime", "sidecar_prototype_available_native_runtime_blocked"}
         and data.get("same_artifact_quality_cpu_ready") is False
         and seqcls.get("sequence_classification", 0) > 0
         and seqcls.get("causal_export_compatible") == 0
@@ -508,6 +509,19 @@ def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
             f"causal_exportable={causal.get('causal_export_compatible')}, exports={export.get('exported')}"
         ),
         "quality path and packed runtime path were not cleanly separated",
+    )
+    add_check(
+        checks,
+        "Sequence-classification I2_SR sidecar smoke passes",
+        smoke.get("passed") is True
+        and smoke.get("runtime_returncode") == 0
+        and smoke.get("finite_logits") is True
+        and smoke.get("head_shape") == [3, 896],
+        (
+            f"status={smoke.get('status')}, returncode={smoke.get('runtime_returncode')}, "
+            f"head_shape={smoke.get('head_shape')}, finite_logits={smoke.get('finite_logits')}"
+        ),
+        "the sidecar prototype did not load the packed backbone and produce finite classifier logits",
     )
 
 

@@ -1,5 +1,5 @@
 {
-  "artifact_count": 217,
+  "artifact_count": 219,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "742ae66a0f74ffbde500ac1eafc9c0c29cf05c8fad82d2f6e6167add50f2f856",
-      "size_bytes": 20701
+      "sha256": "192a77bace1467365dc27ced9fd692b95f0807724f7fb08b87c882f2884ba0e6",
+      "size_bytes": 21279
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "research_redirect_report",
       "metrics": {},
       "path": "benchmarks/results/research_redirect_2026-05-15.md",
-      "sha256": "063a0ac7901ff7c543482a7726b86f3b8f1517f04ee3ce85c07c534e28969e98",
-      "size_bytes": 8843
+      "sha256": "90ea3e8c21743e1620caf08422f9f074a1a351f3e49f66d44025f05fac2524f8",
+      "size_bytes": 9441
     },
     {
       "exists": true,
@@ -295,8 +295,17 @@
       "label": "seqcls_runtime_gap_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_runtime_gap_2026-05-15.md",
-      "sha256": "2d2a5e5095ce774800f80af23143bf0c030b36e5a7c677bb3294bd283e0b636f",
-      "size_bytes": 1832
+      "sha256": "74aef7a01a41a19f17bac7c5f802b574712e8a5298d28171cd67987d29aa737a",
+      "size_bytes": 2437
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "seqcls_backbone_i2sr_smoke_report",
+      "metrics": {},
+      "path": "benchmarks/results/seqcls_backbone_i2sr_smoke_2026-05-15.md",
+      "sha256": "0d0e518c2c581e047bec1e871f57402c085489220960e33808de97204c207576",
+      "size_bytes": 1655
     },
     {
       "exists": true,
@@ -583,8 +592,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "f6f4f315def441bda343fc0c3c1e1368ebff8800b547aaa6d20dbc5b474f9a09",
-      "size_bytes": 7135
+      "sha256": "83001f62ba70e7d1adbcb282b4a43267d4b33e3fdd4b8d5e713d3ed391c0d80c",
+      "size_bytes": 7313
     },
     {
       "exists": true,
@@ -2268,13 +2277,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 60,
+        "check_count": 61,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "a3e012715a083e4218a9aa662d06f7ae5a989bfd99312652346c5f766704fc62",
-      "size_bytes": 11765
+      "sha256": "4a9b359862a1a6bfa778e3179d5524ee5c15968ac3ab86d55418566259c38aee",
+      "size_bytes": 12020
     },
     {
       "exists": true,
@@ -2404,8 +2413,17 @@
       "label": "seqcls_runtime_gap_json",
       "metrics": {},
       "path": "benchmark_results/seqcls_runtime_gap_2026-05-15.json",
-      "sha256": "7378f29c8cc3d9c4ec679ac12975a39a170cfc6402fb7f05fd6221ea0ee5f7b5",
-      "size_bytes": 11569
+      "sha256": "5bbcf82fed90bdf8d85a44af87d48b72855130829b0481e68493e8b2caad48c1",
+      "size_bytes": 12129
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "seqcls_backbone_i2sr_smoke_json",
+      "metrics": {},
+      "path": "benchmark_results/seqcls_backbone_i2sr_smoke_2026-05-15.json",
+      "sha256": "2b67d26c1701dc6774cea78eb130e5edfedacb6d849073ba7448f8b3cc75ef1f",
+      "size_bytes": 22652
     },
     {
       "exists": true,

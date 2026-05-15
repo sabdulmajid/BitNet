@@ -4,8 +4,9 @@ This audit separates the best GLUE quality path from the packed CPU runtime path
 
 | field | value |
 | --- | --- |
-| status | blocked_by_classifier_runtime |
+| status | sidecar_prototype_available_native_runtime_blocked |
 | same artifact quality+CPU ready | false |
+| sidecar prototype smoke | prototype_smoke_passed |
 | seqcls configs | 15 |
 | seqcls causal-export compatible | 0 |
 | causal runtime configs | 6 |
@@ -19,7 +20,21 @@ This audit separates the best GLUE quality path from the packed CPU runtime path
 | --- | --- |
 | Qwen2ForSequenceClassification | 15 |
 
-These checkpoints are the strict GLUE reproduction artifacts. They use `Qwen2ForSequenceClassification`; current packed I2_SR export rejects them because the runtime path is causal-LM only.
+These checkpoints are the strict GLUE reproduction artifacts. They use `Qwen2ForSequenceClassification`. The standard causal export path still does not implement a native sequence-classification head, but the sidecar smoke below shows that a packed decoder backbone plus dense score-head sidecar is now loadable.
+
+## Sidecar Prototype
+
+| field | value |
+| --- | --- |
+| status | prototype_smoke_passed |
+| checkpoint accuracy | 0.653591 |
+| checkpoint eval examples | 9815.000000 |
+| GGUF MiB | 352.606689 |
+| head bytes | 11030 |
+| runtime return code | 0 |
+| embedding shape | [896] |
+| head shape | [3, 896] |
+| finite logits | true |
 
 ## Causal Runtime Path
 
@@ -33,6 +48,7 @@ These checkpoints are export-compatible with the current GGUF/I2_SR path, but th
 
 | item | status |
 | --- | --- |
+| Backbone GGUF + dense head sidecar smoke | prototype implemented |
 | GGUF writer persists classifier/score head tensors and label metadata | not implemented |
 | llama.cpp pools the last non-padding token for Qwen sequence classification | not implemented |
 | CPU evaluator reports GLUE accuracy from the packed classifier artifact | not implemented |
@@ -40,4 +56,4 @@ These checkpoints are export-compatible with the current GGUF/I2_SR path, but th
 
 ## Interpretation
 
-The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. It does not yet have one task model that simultaneously proves GLUE quality and packed CPU deployment. The product path must either implement packed sequence-classification inference or make causal prompt scoring the primary task formulation.
+The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. It now also has a prototype sequence-classification backbone smoke through I2_SR plus an external dense head sidecar. It still does not have native packed sequence-classification inference or full GLUE CPU accuracy/RSS/throughput on that deployed artifact.

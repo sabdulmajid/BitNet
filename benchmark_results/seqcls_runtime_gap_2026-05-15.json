@@ -279,6 +279,25 @@
   },
   "same_artifact_quality_cpu_ready": false,
   "schema": "seqcls_runtime_gap.v1",
+  "seqcls_sidecar_smoke": {
+    "checkpoint_accuracy": 0.6535914416709119,
+    "checkpoint_eval_examples": 9815.0,
+    "classifier_head_size_bytes": 11030,
+    "embedding_shape": [
+      896
+    ],
+    "exists": true,
+    "finite_logits": true,
+    "gguf_size_mib": 352.606689453125,
+    "head_shape": [
+      3,
+      896
+    ],
+    "passed": true,
+    "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/seqcls_backbone_i2sr_smoke_2026-05-15.json",
+    "runtime_returncode": 0,
+    "status": "prototype_smoke_passed"
+  },
   "sequence_classification": {
     "architectures": {
       "Qwen2ForSequenceClassification": 15
@@ -295,5 +314,5 @@
     ],
     "ternary_checkpoints": 12
   },
-  "status": "blocked_by_classifier_runtime"
+  "status": "sidecar_prototype_available_native_runtime_blocked"
 }

@@ -206,9 +206,18 @@ def make_i2s_model_class(
             row_scale_rejected = 0
             row_scale_packed = 0
             packed_bytes = 0
+            classifier_tensors: dict[str, np.ndarray] = {}
 
             for key, tensor in state.items():
                 if key.endswith(".weight_scale"):
+                    continue
+                if key in {"score.weight", "score.bias", "classifier.weight", "classifier.bias"}:
+                    if args.classifier_head_npz is None:
+                        raise ValueError(
+                            f"{key} is a sequence-classification head tensor; pass "
+                            "--classifier-head-npz to export it as a sidecar"
+                        )
+                    classifier_tensors[key.replace(".", "_")] = tensor.to(dtype=torch.float32).cpu().numpy()
                     continue
 
                 if key.endswith(".ternary_weight"):
@@ -266,11 +275,17 @@ def make_i2s_model_class(
                 self.gguf_writer.add_tensor(new_name, data, raw_dtype=raw_dtype)
                 copied_tensors += 1
 
+            if classifier_tensors:
+                args.classifier_head_npz.parent.mkdir(parents=True, exist_ok=True)
+                np.savez(args.classifier_head_npz, **classifier_tensors)
+
             summary.update(
                 {
                     "ternary_i2s_packed": ternary_packed,
                     "row_scale_i2s_packed": row_scale_packed,
                     "copied_tensors": copied_tensors,
+                    "classifier_head_sidecar": str(args.classifier_head_npz) if classifier_tensors else None,
+                    "classifier_head_tensors": sorted(classifier_tensors),
                     "output_f16_tensors": output_f16,
                     "row_scale_rejected": row_scale_rejected,
                     "packed_i2s_bytes": packed_bytes,
@@ -290,6 +305,23 @@ def main() -> None:
     parser.add_argument("--converter", type=Path, default=Path("3rdparty/llama.cpp/convert_hf_to_gguf.py"))
     parser.add_argument("--expect-ternary-keys", type=int, default=None)
     parser.add_argument("--summary-json", type=Path, default=None)
+    parser.add_argument(
+        "--source-architecture-alias",
+        default=None,
+        help=(
+            "Use this Hugging Face architecture name when selecting the llama.cpp converter class. "
+            "This is useful for Qwen2ForSequenceClassification backbones that share the Qwen2ForCausalLM decoder."
+        ),
+    )
+    parser.add_argument(
+        "--classifier-head-npz",
+        type=Path,
+        default=None,
+        help=(
+            "Export sequence-classification head tensors such as score.weight to an NPZ sidecar instead of GGUF. "
+            "The current llama.cpp path can then run the packed backbone in embedding/last-pooling mode while an external evaluator applies the dense head."
+        ),
+    )
     parser.add_argument("--validate-codes", action="store_true")
     parser.add_argument("--keep-output-f16", action="store_true", default=True)
     parser.add_argument(
@@ -340,7 +372,8 @@ def main() -> None:
         has_native_i2sr_constants,
     ) = get_gguf_i2s_types(converter.gguf, row_scale_qtype=args.row_scale_qtype)
     architecture = load_architecture(args.checkpoint_dir)
-    base_cls = converter.Model.from_model_architecture(architecture)
+    converter_architecture = args.source_architecture_alias or architecture
+    base_cls = converter.Model.from_model_architecture(converter_architecture)
     if args.gguf_arch == "bitnet-25":
         args._model_arch_override = converter.gguf.MODEL_ARCH.BITNET_25
         if not args.bitdistill_subln:
@@ -355,6 +388,7 @@ def main() -> None:
         "checkpoint_dir": str(args.checkpoint_dir),
         "ternary_state": str(ternary_state),
         "architecture": architecture,
+        "converter_architecture": converter_architecture,
         "outfile": str(args.outfile),
         "converter": str(args.converter),
         "format_scope": "scalar-scale I2_S by default; row-scale only with --row-scale-prototype or --row-scale-qtype=i2_sr",
@@ -376,6 +410,7 @@ def main() -> None:
         "gguf_arch": args.gguf_arch,
         "bitdistill_subln": bool(args.bitdistill_subln),
         "synthetic_vocab_for_smoke": bool(args.synthetic_vocab_for_smoke),
+        "classifier_head_npz": str(args.classifier_head_npz) if args.classifier_head_npz is not None else None,
     }
 
     model_cls = make_i2s_model_class(base_cls, state, converter, args, summary, i2_s_dtype, i2_sr_dtype)

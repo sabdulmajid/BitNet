@@ -91,6 +91,30 @@ def load_causal_quality_summary(path: Path) -> dict[str, Any]:
     }
 
 
+def load_sidecar_smoke(path: Path) -> dict[str, Any]:
+    data = read_json(path)
+    files = data.get("files", {}) if isinstance(data.get("files"), dict) else {}
+    gguf = files.get("gguf", {}) if isinstance(files.get("gguf"), dict) else {}
+    head = files.get("classifier_head", {}) if isinstance(files.get("classifier_head"), dict) else {}
+    runtime = data.get("runtime_smoke", {}) if isinstance(data.get("runtime_smoke"), dict) else {}
+    logits = data.get("classifier_head_application", {}) if isinstance(data.get("classifier_head_application"), dict) else {}
+    checkpoint = data.get("checkpoint", {}) if isinstance(data.get("checkpoint"), dict) else {}
+    return {
+        "path": str(path),
+        "exists": path.exists(),
+        "status": data.get("status"),
+        "passed": data.get("status") == "prototype_smoke_passed",
+        "checkpoint_accuracy": checkpoint.get("accuracy"),
+        "checkpoint_eval_examples": checkpoint.get("eval_examples"),
+        "gguf_size_mib": gguf.get("size_mib"),
+        "classifier_head_size_bytes": head.get("size_bytes"),
+        "runtime_returncode": runtime.get("returncode"),
+        "embedding_shape": logits.get("embedding_shape"),
+        "head_shape": logits.get("weight_shape"),
+        "finite_logits": logits.get("finite_logits"),
+    }
+
+
 def fmt(value: Any) -> str:
     if value is None:
         return "-"
@@ -125,9 +149,11 @@ def summarize_records(records: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def render_markdown(result: dict[str, Any]) -> str:
+    smoke = result["seqcls_sidecar_smoke"]
     headline_rows = [
         ["status", result["status"]],
         ["same artifact quality+CPU ready", result["same_artifact_quality_cpu_ready"]],
+        ["sidecar prototype smoke", smoke["status"]],
         ["seqcls configs", result["sequence_classification"]["configs"]],
         ["seqcls causal-export compatible", result["sequence_classification"]["causal_export_compatible"]],
         ["causal runtime configs", result["causal_runtime"]["configs"]],
@@ -146,8 +172,24 @@ def render_markdown(result: dict[str, Any]) -> str:
             md_table(["architecture", "count"], seq_arch_rows),
             (
                 "These checkpoints are the strict GLUE reproduction artifacts. They use "
-                "`Qwen2ForSequenceClassification`; current packed I2_SR export rejects them "
-                "because the runtime path is causal-LM only."
+                "`Qwen2ForSequenceClassification`. The standard causal export path still does "
+                "not implement a native sequence-classification head, but the sidecar smoke below "
+                "shows that a packed decoder backbone plus dense score-head sidecar is now loadable."
+            ),
+            "## Sidecar Prototype",
+            md_table(
+                ["field", "value"],
+                [
+                    ["status", smoke["status"]],
+                    ["checkpoint accuracy", smoke["checkpoint_accuracy"]],
+                    ["checkpoint eval examples", smoke["checkpoint_eval_examples"]],
+                    ["GGUF MiB", smoke["gguf_size_mib"]],
+                    ["head bytes", smoke["classifier_head_size_bytes"]],
+                    ["runtime return code", smoke["runtime_returncode"]],
+                    ["embedding shape", smoke["embedding_shape"]],
+                    ["head shape", smoke["head_shape"]],
+                    ["finite logits", smoke["finite_logits"]],
+                ],
             ),
             "## Causal Runtime Path",
             md_table(["architecture", "count"], causal_arch_rows),
@@ -159,6 +201,7 @@ def render_markdown(result: dict[str, Any]) -> str:
             md_table(
                 ["item", "status"],
                 [
+                    ["Backbone GGUF + dense head sidecar smoke", "prototype implemented"],
                     ["GGUF writer persists classifier/score head tensors and label metadata", "not implemented"],
                     ["llama.cpp pools the last non-padding token for Qwen sequence classification", "not implemented"],
                     ["CPU evaluator reports GLUE accuracy from the packed classifier artifact", "not implemented"],
@@ -168,8 +211,9 @@ def render_markdown(result: dict[str, Any]) -> str:
             "## Interpretation",
             (
                 "The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. "
-                "It does not yet have one task model that simultaneously proves GLUE quality and packed CPU deployment. "
-                "The product path must either implement packed sequence-classification inference or make causal prompt scoring the primary task formulation."
+                "It now also has a prototype sequence-classification backbone smoke through I2_SR plus an external "
+                "dense head sidecar. It still does not have native packed sequence-classification inference or full "
+                "GLUE CPU accuracy/RSS/throughput on that deployed artifact."
             ),
         ]
     )
@@ -191,6 +235,11 @@ def main() -> None:
         type=Path,
         default=Path("benchmark_results/bitdistill_causal_longwarmup_densehead_summary_2026-05-15.json"),
     )
+    parser.add_argument(
+        "--seqcls-sidecar-smoke",
+        type=Path,
+        default=Path(f"benchmark_results/seqcls_backbone_i2sr_smoke_{DATE}.json"),
+    )
     parser.add_argument("--llama-cpp", type=Path, default=Path("3rdparty/llama.cpp"))
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/seqcls_runtime_gap_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/seqcls_runtime_gap_{DATE}.md"))
@@ -207,20 +256,28 @@ def main() -> None:
     causal_summary = summarize_records(causal_records)
     export_summary = load_causal_export_summary(root / args.causal_export_summary)
     causal_quality = load_causal_quality_summary(root / args.causal_quality_summary)
+    sidecar_smoke = load_sidecar_smoke(root / args.seqcls_sidecar_smoke)
     same_artifact_ready = (
         seqcls_summary["causal_export_compatible"] > 0
         and export_summary["exported"] > 0
         and causal_quality["passed"]
     )
+    if same_artifact_ready:
+        status = "ready"
+    elif sidecar_smoke["passed"]:
+        status = "sidecar_prototype_available_native_runtime_blocked"
+    else:
+        status = "blocked_by_classifier_runtime"
     result = {
         "schema": "seqcls_runtime_gap.v1",
         "date": DATE,
-        "status": "blocked_by_classifier_runtime" if not same_artifact_ready else "ready",
+        "status": status,
         "same_artifact_quality_cpu_ready": same_artifact_ready,
         "sequence_classification": seqcls_summary,
         "causal_runtime": causal_summary,
         "causal_export_summary": export_summary,
         "causal_quality_summary": causal_quality,
+        "seqcls_sidecar_smoke": sidecar_smoke,
         "exporter_rejects_non_causal": "architecture.endswith(\"ForCausalLM\")"
         in (root / "benchmarks/export_bitdistill_i2sr_suite.py").read_text(encoding="utf-8"),
         "llama_cpp": {
