@@ -34,6 +34,7 @@ DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date()
 ARTIFACTS: list[dict[str, str]] = [
     # Tracked reports.
     {"label": "README", "kind": "tracked_report", "path": "README.md"},
+    {"label": "research_redirect_report", "kind": "tracked_report", "path": f"benchmarks/results/research_redirect_{DATE}.md"},
     {"label": "side_by_side_report", "kind": "tracked_report", "path": f"benchmarks/results/qwen_side_by_side_{DATE}.md"},
     {"label": "paired_row_minus_fp_report", "kind": "tracked_report", "path": "benchmarks/results/paired_row_densehead_minus_fp_2026-05-13.md"},
     {"label": "paired_row_minus_ptq_report", "kind": "tracked_report", "path": "benchmarks/results/paired_row_densehead_minus_ptq_2026-05-13.md"},

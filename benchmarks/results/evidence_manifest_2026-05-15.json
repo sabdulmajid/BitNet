@@ -1,5 +1,5 @@
 {
-  "artifact_count": 178,
+  "artifact_count": 179,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,17 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "e03a1696c70e25c6118ddc6680bb7ddaa247160904b6d277605931507d492221",
-      "size_bytes": 35833
+      "sha256": "9f8114bda55e36904c0df98a7fa1ec62580a9f11c38af39e8ca809dc97abf3d5",
+      "size_bytes": 13107
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "research_redirect_report",
+      "metrics": {},
+      "path": "benchmarks/results/research_redirect_2026-05-15.md",
+      "sha256": "cf0df465b5748554dd75b8455c47e52f1e98dc7059adba1ab990de4593ba0814",
+      "size_bytes": 5500
     },
     {
       "exists": true,
