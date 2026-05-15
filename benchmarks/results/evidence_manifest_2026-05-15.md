@@ -13,10 +13,10 @@ Artifacts: `161`. Missing: `0`.
 | product_scope_gate | tracked_report | yes | 4581 | 9cf38615e781 |  |
 | bitdistill_reproduction_status | tracked_report | yes | 8481 | 3f0e6a6abc2f |  |
 | bitdistill_reproduction_gate_report | tracked_report | yes | 11867 | 5b5953ace640 |  |
-| bitdistill_paired_predictions_report | tracked_report | yes | 11743 | 496f2fcf1e77 |  |
+| bitdistill_paired_predictions_report | tracked_report | yes | 11396 | 61afa4965420 |  |
 | bitdistill_task_formulation_report | tracked_report | yes | 11410 | 9f8347f27de6 |  |
-| bitdistill_paper_alignment_report | tracked_report | yes | 9183 | 335d357459bb |  |
-| bitdistill_loss_scale_report | tracked_report | yes | 7608 | f3c9f871bb96 |  |
+| bitdistill_paper_alignment_report | tracked_report | yes | 9213 | 6cbed2c55ffc |  |
+| bitdistill_loss_scale_report | tracked_report | yes | 7725 | 8c410a434b31 |  |
 | bitdistill_cpu_gate_report | tracked_report | yes | 7445 | 652745d24866 |  |
 | bitdistill_i2sr_gate_report | tracked_report | yes | 3711 | 107e45e1a8f4 |  |
 | bitdistill_i2sr_local_gate_report | tracked_report | yes | 2121 | b0d32985ce03 |  |
@@ -30,7 +30,7 @@ Artifacts: `161`. Missing: `0`.
 | bitdistill_warmup_finalizer_submission_report | tracked_report | yes | 404 | 59326eeddacf |  |
 | bitdistill_producer_script_audit_report | tracked_report | yes | 2630 | 87aec6b9697d |  |
 | bitdistill_job_matrix_report | tracked_report | yes | 6305 | 5ec798924379 |  |
-| bitdistill_active_goal_report | tracked_report | yes | 3656 | 28959db7fe03 |  |
+| bitdistill_active_goal_report | tracked_report | yes | 3656 | c597a33d13ef |  |
 | bitdistill_snapshot_integrity_report | tracked_report | yes | 1505 | b0efd19ca2e3 |  |
 | bitdistill_smoke_contract_report | tracked_report | yes | 3955 | f7dc1484ffc2 |  |
 | bitdistill_variant_summary_report | tracked_report | yes | 8539 | 88f91af709aa |  |
@@ -131,7 +131,7 @@ Artifacts: `161`. Missing: `0`.
 | objective_completion_audit_json | objective_completion_audit_json | yes | 15953 | 40f642b567e7 | achieved=False, status=not_complete, complete=7/9, open=2 |
 | product_scope_gate_json | product_scope_gate_json | yes | 5432 | 789a0d09ed73 | scope=research_mvp_only, supported=5, unsupported=4 |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 26489 | 3671732f375d | present=15/36, examples=15, full_eval=15, ci95=15, paper_complete=False, paper_passed=False, row_complete=False, row_passed=False, confidence=0.95 |
-| bitdistill_paired_predictions_json | bitdistill_paired_predictions_json | yes | 71373 | b36f73fea34c | status=pending, complete=3/39, pending=36, failed=0 |
+| bitdistill_paired_predictions_json | bitdistill_paired_predictions_json | yes | 70661 | d3bbd6576607 | status=pending, complete=6/39, pending=33, failed=0 |
 | bitdistill_task_formulation_json | bitdistill_task_formulation_json | yes | 27882 | cd3d154014ac | seq_full=6, causal_rows=17, pending_paper=8, rows=45 |
 | bitdistill_cpu_gate_json | bitdistill_cpu_gate_json | yes | 9566 | 916b3c88ed5a | passed=False, input=False, critical=0/33, full_quality=0, sample_n=None, blockers=1 |
 | bitdistill_i2sr_gate_json | bitdistill_i2sr_gate_json | yes | 5831 | 2d00cedb4e48 | passed=False, complete=0/6, tasks=['mnli', 'qnli', 'sst2'], scales=['tensor', 'row'], blockers=4 |
@@ -151,7 +151,7 @@ Artifacts: `161`. Missing: `0`.
 | bitdistill_smoke_contract_json | bitdistill_smoke_contract_json | yes | 37146 | 8c552c1d616a | passed=True, checks=40, failed=0, continued=bitlinear15/subln4, task=bitlinear15/subln4 |
 | bitdistill_variant_summary_json | bitdistill_variant_summary_json | yes | 19963 | 16c37e2313be | rows=21/21, tasks=['mnli', 'qnli', 'sst2'] |
 | bitdistill_causal_longwarmup_json | bitdistill_causal_summary_json | yes | 12528 | 9b3d9952a87b | passed=False, rows=12/12, verdicts=0/3, tasks=['mnli', 'qnli', 'sst2'] |
-| bitdistill_loss_scale_json | bitdistill_loss_scale_json | yes | 24932 | 998ad66f5518 | rows=11/28, gamma=100000, projected_attn_ce=[2118.27, 15779.8] |
+| bitdistill_loss_scale_json | bitdistill_loss_scale_json | yes | 25161 | 217611df350c | rows=13/28, gamma=100000, projected_attn_ce=[2118.27, 15779.8] |
 | i2sr_submodule_promotion_audit_json | i2sr_submodule_promotion_audit_json | yes | 2889 | 6dea55655cb3 | ready=True, active=True, patch_applies=False, submodule=106eac0c8, blockers=0 |
 | moe_support_json | moe_support_json | yes | 31948 | 389d4b1becca | present=6/6, gates=8, failed=3, kimi_artifacts=0, tiny_qwen2moe=True |
 | kimi_config_feasibility_json | kimi_config_feasibility_json | yes | 4382 | ee0f52fb22e9 | passed=False, model=kimi_k2, experts=384, topk=8, unsupported=4/6 |

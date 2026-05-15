@@ -106,8 +106,8 @@
       "label": "bitdistill_paired_predictions_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_paired_predictions_2026-05-15.md",
-      "sha256": "496f2fcf1e77d34ace5eebbef582d7b939469699eead4dc6f0175d8b44275959",
-      "size_bytes": 11743
+      "sha256": "61afa49654205542edaf6198c7bca65426a69a80dd53a321ce76bc5914816bf2",
+      "size_bytes": 11396
     },
     {
       "exists": true,
@@ -124,8 +124,8 @@
       "label": "bitdistill_paper_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_paper_alignment_2026-05-15.md",
-      "sha256": "335d357459bbbe31d0afc1eac6d7b143ef66199e9613b738fc1c3e14b500ffe8",
-      "size_bytes": 9183
+      "sha256": "6cbed2c55ffc3f5787c34078f3551059ebfbc4f765ab4096e14fb3025226c4c8",
+      "size_bytes": 9213
     },
     {
       "exists": true,
@@ -133,8 +133,8 @@
       "label": "bitdistill_loss_scale_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_loss_scale_audit_2026-05-15.md",
-      "sha256": "f3c9f871bb9693091247936365e19aaec6aeccf5dad0b5ef45920fd5cc42cbf5",
-      "size_bytes": 7608
+      "sha256": "8c410a434b31dfd7c78b2569b59512a1e142624408badbc5a7206941316327ce",
+      "size_bytes": 7725
     },
     {
       "exists": true,
@@ -259,7 +259,7 @@
       "label": "bitdistill_active_goal_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_active_goal_audit_2026-05-15.md",
-      "sha256": "28959db7fe0361761d3d5a361b5dd19808ef964b767a18ecf167567e0ee13fef",
+      "sha256": "c597a33d13effb383797c06f5b0061ccb0dab12edb1ea7f5e18511b9c0973d14",
       "size_bytes": 3656
     },
     {
@@ -2078,15 +2078,15 @@
       "kind": "bitdistill_paired_predictions_json",
       "label": "bitdistill_paired_predictions_json",
       "metrics": {
-        "complete": 3,
+        "complete": 6,
         "failed": 0,
-        "pending": 36,
+        "pending": 33,
         "rows": 39,
         "status": "pending"
       },
       "path": "benchmark_results/bitdistill_paired_predictions_2026-05-15.json",
-      "sha256": "b36f73fea34cf0aa606c5e011443ec6620d0183c38004f239b401793c7427854",
-      "size_bytes": 71373
+      "sha256": "d3bbd65766070545fc9545892b9ba06fe5c5c4ae2522b9cf5941c8c2d5566dc3",
+      "size_bytes": 70661
     },
     {
       "exists": true,
@@ -2491,15 +2491,15 @@
       "kind": "bitdistill_loss_scale_json",
       "label": "bitdistill_loss_scale_json",
       "metrics": {
-        "materialized_rows": 11,
+        "materialized_rows": 13,
         "paper_gamma": 100000.0,
         "projected_attention_to_ce_max": 15779.832789772436,
         "projected_attention_to_ce_min": 2118.2653550131104,
         "rows": 28
       },
       "path": "benchmark_results/bitdistill_loss_scale_audit_2026-05-15.json",
-      "sha256": "998ad66f551813ede266c0644ca68422eefb5ba36593a5c67ddbf3762d6bff3a",
-      "size_bytes": 24932
+      "sha256": "217611df350cca5e0f4af98293f0905f0ff6ad85f548094e0e7ab60d7c360762",
+      "size_bytes": 25161
     },
     {
       "exists": true,

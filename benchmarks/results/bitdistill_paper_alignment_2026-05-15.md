@@ -39,8 +39,8 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | mnli | BitDistill short tensor gamma100 | diagnostic | true | 0.525217 | 9815 | 9815 | true | 0.807641 | true | 0.282425 |
 | mnli | BitDistill short row gamma100 | diagnostic | true | 0.516556 | 9815 | 9815 | true | 0.807641 | true | 0.291085 |
 | mnli | BitDistill short tensor layer -8 | diagnostic | true | 0.535711 | 9815 | 9815 | true | 0.807641 | true | 0.271931 |
-| mnli | BitDistill longwarmup tensor gamma100 | diagnostic_pending | false | - | - | 9815 | false | 0.807641 | true | - |
-| mnli | BitDistill longwarmup row gamma100 | novelty_pending | false | - | - | 9815 | false | 0.807641 | true | - |
+| mnli | BitDistill longwarmup tensor gamma100 | diagnostic_pending | true | 0.641671 | 9815 | 9815 | true | 0.807641 | true | 0.165970 |
+| mnli | BitDistill longwarmup row gamma100 | novelty_pending | true | 0.653591 | 9815 | 9815 | true | 0.807641 | true | 0.154050 |
 | mnli | BitDistill longwarmup tensor paper gamma | paper_candidate | false | - | - | 9815 | false | 0.807641 | true | - |
 | mnli | BitDistill longwarmup row paper gamma | paper_row_candidate | false | - | - | 9815 | false | 0.807641 | true | - |
 | mnli | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | false | - | - | 9815 | false | 0.807641 | true | - |
