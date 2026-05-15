@@ -314,12 +314,53 @@ def child_command(args: argparse.Namespace, task: str, family: str, run: str, ou
     ]
 
 
+def build_parent_summary(args: argparse.Namespace, rows: list[dict[str, Any]], hardware: dict[str, Any]) -> dict[str, Any]:
+    scheduled_rows = len(args.tasks) * len(args.runs)
+    terminal_rows = len(rows)
+    complete_rows = sum(1 for row in rows if row.get("status") == "complete")
+    failed_rows = sum(1 for row in rows if row.get("status") in {"failed", "timeout", "missing"})
+    return {
+        "schema": "bitdistill-glue-cpu-benchmark-v1",
+        "date": DATE,
+        "model": args.model,
+        "short_root": str(args.short_root),
+        "longwarmup_root": str(args.longwarmup_root),
+        "paper_hparam_root": str(args.paper_hparam_root),
+        "paper_hparam_row_root": str(args.paper_hparam_row_root),
+        "tasks": args.tasks,
+        "max_eval_samples": args.max_eval_samples,
+        "threads": args.threads,
+        "batch_size": args.batch_size,
+        "model_dtype": args.model_dtype,
+        "child_timeout_seconds": args.child_timeout_seconds,
+        "hardware": hardware,
+        "note": "PyTorch CPU sequence-classification runtime; not packed I2_SR/llama.cpp inference.",
+        "progress": {
+            "scheduled_rows": scheduled_rows,
+            "terminal_rows": terminal_rows,
+            "complete_rows": complete_rows,
+            "failed_rows": failed_rows,
+            "finished": terminal_rows == scheduled_rows,
+        },
+        "rows": rows,
+    }
+
+
+def write_parent_summary(args: argparse.Namespace, summary: dict[str, Any]) -> None:
+    write_json(args.output_json, summary)
+    markdown = render_markdown(summary)
+    args.output_md.parent.mkdir(parents=True, exist_ok=True)
+    args.output_md.write_text(markdown, encoding="utf-8")
+
+
 def run_parent(args: argparse.Namespace) -> dict[str, Any]:
     rows: list[dict[str, Any]] = []
     tmp_dir = args.tmp_dir
     tmp_dir.mkdir(parents=True, exist_ok=True)
     scheduled = [(task, family, run) for task in args.tasks for family, run in args.runs]
     total_runs = len(scheduled)
+    hardware = cpu_environment(args.threads)
+    write_parent_summary(args, build_parent_summary(args, rows, hardware))
     for index, (task, family, run) in enumerate(scheduled, start=1):
         checkpoint_dir = checkpoint_dir_for(args, task, family, run)
         metrics_path = checkpoint_dir / "metrics.json"
@@ -338,6 +379,7 @@ def run_parent(args: argparse.Namespace) -> dict[str, Any]:
                 }
             )
             print(f"[{index}/{total_runs}] status=missing metrics={metrics_path}", flush=True)
+            write_parent_summary(args, build_parent_summary(args, rows, hardware))
             continue
         output = tmp_dir / f"{task}_{family}_{run.replace('/', '_')}.json"
         command = child_command(args, task, family, run, output)
@@ -366,6 +408,7 @@ def run_parent(args: argparse.Namespace) -> dict[str, Any]:
                 }
             )
             print(f"[{index}/{total_runs}] status=timeout seconds={args.child_timeout_seconds}", flush=True)
+            write_parent_summary(args, build_parent_summary(args, rows, hardware))
             continue
         if completed.returncode != 0:
             rows.append(
@@ -381,6 +424,7 @@ def run_parent(args: argparse.Namespace) -> dict[str, Any]:
                 }
             )
             print(f"[{index}/{total_runs}] status=failed returncode={completed.returncode}", flush=True)
+            write_parent_summary(args, build_parent_summary(args, rows, hardware))
             continue
         row = read_json(output)
         row.update({"family": family, "status": "complete"})
@@ -390,24 +434,8 @@ def run_parent(args: argparse.Namespace) -> dict[str, Any]:
             f"examples_per_second={row.get('examples_per_second')} maxrss_mib={row.get('maxrss_mib')}",
             flush=True,
         )
-    return {
-        "schema": "bitdistill-glue-cpu-benchmark-v1",
-        "date": DATE,
-        "model": args.model,
-        "short_root": str(args.short_root),
-        "longwarmup_root": str(args.longwarmup_root),
-        "paper_hparam_root": str(args.paper_hparam_root),
-        "paper_hparam_row_root": str(args.paper_hparam_row_root),
-        "tasks": args.tasks,
-        "max_eval_samples": args.max_eval_samples,
-        "threads": args.threads,
-        "batch_size": args.batch_size,
-        "model_dtype": args.model_dtype,
-        "child_timeout_seconds": args.child_timeout_seconds,
-        "hardware": cpu_environment(args.threads),
-        "note": "PyTorch CPU sequence-classification runtime; not packed I2_SR/llama.cpp inference.",
-        "rows": rows,
-    }
+        write_parent_summary(args, build_parent_summary(args, rows, hardware))
+    return build_parent_summary(args, rows, hardware)
 
 
 def parse_runs(values: list[str]) -> list[tuple[str, str]]:
@@ -442,6 +470,7 @@ def md_table(headers: list[str], rows: list[list[str]]) -> str:
 def render_markdown(summary: dict[str, Any]) -> str:
     hardware = summary.get("hardware", {}) if isinstance(summary.get("hardware"), dict) else {}
     isa = hardware.get("isa_flags", {}) if isinstance(hardware.get("isa_flags"), dict) else {}
+    progress = summary.get("progress", {}) if isinstance(summary.get("progress"), dict) else {}
     hardware_rows = [
         ["CPU model", str(hardware.get("cpu_model") or "-")],
         ["OS logical CPUs", fmt(hardware.get("logical_cpus_os"))],
@@ -476,6 +505,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
             f"# BitDistill GLUE CPU Benchmark, {summary['date']}",
             f"Model: `{summary['model']}`.",
             f"Threads: `{summary['threads']}`. Batch size: `{summary['batch_size']}`. Max eval samples: `{summary['max_eval_samples']}`. Dtype: `{summary['model_dtype']}`. Child timeout: `{summary['child_timeout_seconds']}` seconds.",
+            f"Progress: `{progress.get('terminal_rows', len(summary['rows']))}` / `{progress.get('scheduled_rows', len(summary['rows']))}` terminal rows; complete rows `{progress.get('complete_rows', '-')}`; failed/timeout/missing rows `{progress.get('failed_rows', '-')}`.",
             "This is PyTorch CPU sequence-classification runtime, not packed `I2_SR`/llama.cpp inference. The `accuracy` column is measured on the sampled CPU subset when `max_eval_samples > 0`; full task quality is the stored full validation metric.",
             "## Hardware",
             md_table(["field", "value"], hardware_rows),
