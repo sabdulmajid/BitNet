@@ -123,6 +123,13 @@ first `10000`-step row improves again. This does not prove BitDistill; it proves
 that the short-budget BitNet-SFT baseline was not a sufficient reproduction
 budget.
 
+Stage-2 warm-up evidence is still diagnostic rather than decisive. The completed
+Qwen2.5-0.5B tensor rows cover about `40.96M` and `163.84M` token presentations,
+with the larger row only `1.6384%` of the paper's reported `10B` warm-up budget.
+The existing rows also change attention-loss normalization details, so they
+support a budget-sensitivity hypothesis but are not a clean proof that token
+budget alone explains the remaining BitDistill gap.
+
 ### Xeon CPU Runtime
 
 Fixed-excerpt llama.cpp CPU runs on Intel Xeon Silver 4116, portable AVX2 build.
@@ -251,6 +258,7 @@ export BITNET_REPORT_DATE=2026-05-15
 
 python benchmarks/audit_bitnet_sft_budget_sweep.py
 python benchmarks/audit_bitnet_sft_mechanics.py
+python benchmarks/audit_bitdistill_stage2_curve.py
 python benchmarks/audit_benchmark_coverage.py
 python benchmarks/audit_product_scope.py
 python benchmarks/build_evidence_manifest.py \
@@ -270,6 +278,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Research redirect and next plan](benchmarks/results/research_redirect_2026-05-15.md)
 - [Qwen side-by-side summary](benchmarks/results/qwen_side_by_side_2026-05-15.md)
 - [BitDistill reproduction gap analysis](benchmarks/results/bitdistill_reproduction_gap_analysis_2026-05-15.md)
+- [BitDistill Stage-2 budget curve audit](benchmarks/results/bitdistill_stage2_curve_2026-05-15.md)
 - [BitNet-SFT baseline audit](benchmarks/results/bitnet_sft_baseline_audit_2026-05-15.md)
 - [BitNet-SFT recipe alignment audit](benchmarks/results/bitnet_sft_recipe_alignment_2026-05-15.md)
 - [BitNet-SFT mechanics audit](benchmarks/results/bitnet_sft_mechanics_audit_2026-05-15.md)
