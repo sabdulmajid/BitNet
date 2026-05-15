@@ -821,6 +821,53 @@ def audit_benchmark_matrix(root: Path, checks: list[dict[str, Any]]) -> None:
     )
 
 
+def audit_research_redirect_claims(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/research_redirect_claims_{DATE}.json"
+    if not path.exists():
+        add_check(checks, "Research redirect claim gate exists", False, str(path.relative_to(root)), "missing redirect claim gate")
+        return
+    data = read_json(path)
+    claims = data.get("claims", []) if isinstance(data.get("claims"), list) else []
+    by_name = {claim.get("name"): claim for claim in claims if isinstance(claim, dict)}
+    required = {
+        "Blind arbitrary FP/BF16-to-ternary PTQ retrofit",
+        "QAT/distillation recovery over blind PTQ",
+        "Paper-level BitDistill reproduction",
+        "Row-scale I2_SR runtime semantics",
+        "TL2 row-scale runtime readiness",
+        "Native packed sequence-classification deployment",
+        "Kimi/MoE product support",
+    }
+    supported = {name for name, claim in by_name.items() if claim.get("supported") is True}
+    add_check(
+        checks,
+        "Research redirect claim gate passes",
+        data.get("passed") is True and data.get("status") == "claim_guardrail_passed",
+        f"status={data.get('status')}, supported={data.get('supported_guardrail_count')}/{data.get('claim_count')}",
+        "redirect claim gate failed",
+    )
+    add_check(
+        checks,
+        "Research redirect gate covers required claims",
+        required <= supported,
+        f"missing={sorted(required - supported)}",
+        "one or more required redirect claims is missing or unsupported",
+    )
+    blocked_statuses = {
+        by_name.get("Paper-level BitDistill reproduction", {}).get("status"),
+        by_name.get("TL2 row-scale runtime readiness", {}).get("status"),
+        by_name.get("Native packed sequence-classification deployment", {}).get("status"),
+        by_name.get("Kimi/MoE product support", {}).get("status"),
+    }
+    add_check(
+        checks,
+        "Research redirect gate blocks overclaims",
+        {"not_proven", "blocked", "prototype_only"} <= blocked_statuses,
+        f"blocked_statuses={sorted(str(item) for item in blocked_statuses)}",
+        "paper reproduction, TL2, native classifier, or Kimi/MoE overclaim is not blocked",
+    )
+
+
 def manifest_missing_is_only_self_coverage(manifest: dict[str, Any]) -> bool:
     missing = manifest.get("missing", [])
     if not isinstance(missing, list):
@@ -932,6 +979,7 @@ def main() -> None:
     audit_cpu_tradeoff_frontier(root, checks)
     audit_cpu_speed_uncertainty(root, checks)
     audit_benchmark_matrix(root, checks)
+    audit_research_redirect_claims(root, checks)
     manifest_path = args.manifest_path.resolve() if args.manifest_path is not None else None
     audit_rss_and_gates(root, checks, manifest_path)
 

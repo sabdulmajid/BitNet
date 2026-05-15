@@ -72,6 +72,9 @@ Overall status: **PASS**.
 | Benchmark matrix audit has at least ten complete quality benchmarks | pass | passed=True, quality_benchmark_count=12 |  |
 | Benchmark matrix audit has Xeon runtime and RSS evidence | pass | finite_rows=5, rss_contexts=[512, 2048, 8192, 32768] |  |
 | Benchmark matrix audit keeps TL2 row-scale excluded | pass | tl2_ready=False, failed=9 |  |
+| Research redirect claim gate passes | pass | status=claim_guardrail_passed, supported=7/7 |  |
+| Research redirect gate covers required claims | pass | missing=[] |  |
+| Research redirect gate blocks overclaims | pass | blocked_statuses=['blocked', 'not_proven', 'prototype_only'] |  |
 | fixed I2_SR RSS has four context rows | pass | contexts=[512, 2048, 8192, 32768] |  |
-| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=238, missing=0, missing_labels=[] |  |
+| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=240, missing=0, missing_labels=[] |  |
 | productization gate passes for stable I2_SR | pass | passed=True, failed=0, stable_quality=True, layout=True |  |

@@ -35,6 +35,7 @@ ARTIFACTS: list[dict[str, str]] = [
     # Tracked reports.
     {"label": "README", "kind": "tracked_report", "path": "README.md"},
     {"label": "research_redirect_report", "kind": "tracked_report", "path": f"benchmarks/results/research_redirect_{DATE}.md"},
+    {"label": "research_redirect_claims_report", "kind": "tracked_report", "path": f"benchmarks/results/research_redirect_claims_{DATE}.md"},
     {"label": "side_by_side_report", "kind": "tracked_report", "path": f"benchmarks/results/qwen_side_by_side_{DATE}.md"},
     {"label": "benchmark_matrix_audit_report", "kind": "tracked_report", "path": f"benchmarks/results/benchmark_matrix_audit_{DATE}.md"},
     {"label": "paired_row_minus_fp_report", "kind": "tracked_report", "path": "benchmarks/results/paired_row_densehead_minus_fp_2026-05-13.md"},
@@ -275,6 +276,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "tl2_generic_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json"},
     {"label": "tl2_avx512_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json"},
     {"label": "ptq_math", "kind": "math_json", "path": "benchmark_results/math_viability_gaussian_10trial_2026-05-05.json"},
+    {"label": "research_redirect_claims_json", "kind": "generic_json", "path": f"benchmark_results/research_redirect_claims_{DATE}.json"},
 ]
 
 

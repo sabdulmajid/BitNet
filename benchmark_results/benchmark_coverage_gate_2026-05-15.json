@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 71,
+  "check_count": 74,
   "failed": [],
   "checks": [
     {
@@ -414,6 +414,24 @@
       "blocker": ""
     },
     {
+      "name": "Research redirect claim gate passes",
+      "passed": true,
+      "evidence": "status=claim_guardrail_passed, supported=7/7",
+      "blocker": ""
+    },
+    {
+      "name": "Research redirect gate covers required claims",
+      "passed": true,
+      "evidence": "missing=[]",
+      "blocker": ""
+    },
+    {
+      "name": "Research redirect gate blocks overclaims",
+      "passed": true,
+      "evidence": "blocked_statuses=['blocked', 'not_proven', 'prototype_only']",
+      "blocker": ""
+    },
+    {
       "name": "fixed I2_SR RSS has four context rows",
       "passed": true,
       "evidence": "contexts=[512, 2048, 8192, 32768]",
@@ -422,7 +440,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=238, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=240, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

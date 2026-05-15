@@ -1,0 +1,73 @@
+{
+  "schema": "research_redirect_claim_gate.v1",
+  "date": "2026-05-15",
+  "status": "claim_guardrail_passed",
+  "passed": true,
+  "missing_guardrails": [],
+  "claims": [
+    {
+      "name": "Blind arbitrary FP/BF16-to-ternary PTQ retrofit",
+      "status": "rejected_for_tested_dense_qwen",
+      "supported": true,
+      "public_label": "Do not claim a universal converter.",
+      "evidence": "FP mean=0.644169 over 10 tasks; PTQ mean=0.348671 over 10 tasks; delta=-0.295498; WikiText PPL ratio=2.743e+05.",
+      "next_gate": ""
+    },
+    {
+      "name": "QAT/distillation recovery over blind PTQ",
+      "status": "partially_supported",
+      "supported": true,
+      "public_label": "Claim partial recovery only, not FP-quality recovery.",
+      "evidence": "row-scale mean=0.499459 over 10 tasks; recovery over PTQ=0.150788; delta vs FP=-0.144710; row WikiText PPL=38.580065.",
+      "next_gate": ""
+    },
+    {
+      "name": "Paper-level BitDistill reproduction",
+      "status": "not_proven",
+      "supported": true,
+      "public_label": "Keep labeled as paper-inspired until full controlled rows close the FP gap.",
+      "evidence": "controlled rows complete=1/3; passed FP recovery=0; best controlled accuracy=0.691187; best paired delta vs FP=-0.116964.",
+      "next_gate": ""
+    },
+    {
+      "name": "Row-scale I2_SR runtime semantics",
+      "status": "supported_as_retrofit_variant",
+      "supported": true,
+      "public_label": "Claim runtime/scale-contract viability, not a Q4 quality/storage win.",
+      "evidence": "I2_SR/Q4 prefill=2.298818x; decode=1.190617x; file=1.288133x; PPL=3.032323x.",
+      "next_gate": ""
+    },
+    {
+      "name": "TL2 row-scale runtime readiness",
+      "status": "blocked",
+      "supported": true,
+      "public_label": "Use I2_SR until TL2 has explicit row/group-scale metadata and kernels.",
+      "evidence": "runtime_ready=false; current row-scale error=1.904230; exact row-scale design error=0.000197; finite TL2 quality=false.",
+      "next_gate": ""
+    },
+    {
+      "name": "Native packed sequence-classification deployment",
+      "status": "prototype_only",
+      "supported": true,
+      "public_label": "Implement native classifier head metadata/runtime before product claims.",
+      "evidence": "same artifact ready=false; sidecar examples=128; sidecar accuracy=0.609375; agreement=0.914062.",
+      "next_gate": ""
+    },
+    {
+      "name": "Kimi/MoE product support",
+      "status": "not_proven",
+      "supported": true,
+      "public_label": "Keep MoE/Kimi in future work until trained quality, routing locality, and runtime are measured.",
+      "evidence": "Kimi config supported=false; local Kimi artifacts=0; failed MoE gates=3/9.",
+      "next_gate": ""
+    }
+  ],
+  "safe_public_summary": [
+    "Blind PTQ-to-ternary is rejected for the tested dense-Qwen setup.",
+    "QAT/distillation is a partial recovery path, not an FP-quality result yet.",
+    "Row-scale I2_SR is a runtime-semantics contribution for compatible dense causal artifacts.",
+    "Paper-level BitDistill, native packed classifier deployment, TL2 row-scale, and Kimi/MoE remain gated."
+  ],
+  "claim_count": 7,
+  "supported_guardrail_count": 7
+}

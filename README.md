@@ -373,6 +373,7 @@ python benchmarks/audit_bitnet_sft_mechanics.py
 python benchmarks/audit_bitdistill_telemetry_coverage.py
 python benchmarks/audit_bitdistill_stage2_curve.py
 python benchmarks/audit_bitdistill_root_cause.py
+python benchmarks/audit_research_redirect_claims.py
 python benchmarks/audit_seqcls_i2sr_arch_contract.py
 python benchmarks/audit_seqcls_runtime_gap.py
 python benchmarks/audit_benchmark_matrix.py
@@ -394,6 +395,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 ## Primary Reports
 
 - [Research redirect and next plan](benchmarks/results/research_redirect_2026-05-15.md)
+- [Research redirect claim gate](benchmarks/results/research_redirect_claims_2026-05-15.md)
 - [Qwen side-by-side summary](benchmarks/results/qwen_side_by_side_2026-05-15.md)
 - [Benchmark matrix audit](benchmarks/results/benchmark_matrix_audit_2026-05-15.md)
 - [BitDistill reproduction gap analysis](benchmarks/results/bitdistill_reproduction_gap_analysis_2026-05-15.md)

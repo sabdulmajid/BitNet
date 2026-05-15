@@ -1,5 +1,5 @@
 {
-  "artifact_count": 238,
+  "artifact_count": 240,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "77acd547e643c0dbf901dff3c7cb0cfd6dc588dc19d4fd87f41025827895839b",
-      "size_bytes": 25339
+      "sha256": "1efb3257b34fe9b9e9296de03b2db055dbe619cfeda2894db05270597c761df1",
+      "size_bytes": 25483
     },
     {
       "exists": true,
@@ -18,6 +18,15 @@
       "path": "benchmarks/results/research_redirect_2026-05-15.md",
       "sha256": "f3ffc42da781191d35ed0ca889f422d46a00b2c0c69a36f15de95bd9b8b647da",
       "size_bytes": 11367
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "research_redirect_claims_report",
+      "metrics": {},
+      "path": "benchmarks/results/research_redirect_claims_2026-05-15.md",
+      "sha256": "cc68503abb16917f5982c7a7762db82ed3303c8637585c34558fdb6b672a0bfe",
+      "size_bytes": 2392
     },
     {
       "exists": true,
@@ -88,7 +97,7 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-15.md",
-      "sha256": "974cdf8e2ec6c53eb6aaed2d4151f046d57c930c183ecc36546ee9196c30c1d9",
+      "sha256": "f2690751f9047cc2a625125bce5b20fc0e7b026f8214f7245ca922eb0051f380",
       "size_bytes": 5646
     },
     {
@@ -673,8 +682,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "e20f0be92cf653b660b00f6adfe027bee8aeee5a9038e3790ac1b34135cd0a7d",
-      "size_bytes": 9309
+      "sha256": "b1b49d2d82b703efab99f553d967c81876723d00303d7d5f56c9acacf61a64e1",
+      "size_bytes": 9597
     },
     {
       "exists": true,
@@ -2388,13 +2397,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 71,
+        "check_count": 74,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "36eba5363fbe7cea7c4ec1d9fd592ab181818b91e61d26e30e1e247a487aa77c",
-      "size_bytes": 14786
+      "sha256": "8477481c59ec830aed99711ff4cc7f3d4e6964ff6a1afe101dff879a868bd341",
+      "size_bytes": 15305
     },
     {
       "exists": true,
@@ -2411,7 +2420,7 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-15.json",
-      "sha256": "e00bd32173edeb87d7ccad970add46932261482cfc9f6b7e7b1690298b09a317",
+      "sha256": "e90d1e00e17a17f7b26238fd77dadf405e1a7a9b8d83c9ef51ec54d03180dec4",
       "size_bytes": 16035
     },
     {
@@ -3520,6 +3529,15 @@
       "path": "benchmark_results/math_viability_gaussian_10trial_2026-05-05.json",
       "sha256": "8cedd88658e01d98c85d214273efa19c3b48bb4319727b70cd8bf651f99dce88",
       "size_bytes": 14010
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "research_redirect_claims_json",
+      "metrics": {},
+      "path": "benchmark_results/research_redirect_claims_2026-05-15.json",
+      "sha256": "b8bf4310a19da40d8cbb00cd2b6157229ac58e8956eceeb0e05620e1706f693c",
+      "size_bytes": 3205
     }
   ],
   "missing": [],
