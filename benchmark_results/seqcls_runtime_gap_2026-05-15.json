@@ -36,7 +36,7 @@
   "date": "2026-05-15",
   "exporter_rejects_non_causal": true,
   "llama_cpp": {
-    "clean": false,
+    "clean": true,
     "origin": "https://github.com/sabdulmajid/llama.cpp.git",
     "path": "3rdparty/llama.cpp"
   },
@@ -308,7 +308,7 @@
     "accuracy": 0.578125,
     "agreement_with_saved_pytorch_predictions": 0.921875,
     "examples": 64,
-    "examples_per_second": 0.7149700901754824,
+    "examples_per_second": 0.7073031997563006,
     "exists": true,
     "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/seqcls_i2sr_sidecar_cpu_mnli_64_2026-05-15.json",
     "status": "quality_mismatch",

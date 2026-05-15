@@ -1,5 +1,5 @@
 {
-  "artifact_count": 225,
+  "artifact_count": 226,
   "entries": [
     {
       "exists": true,
@@ -79,7 +79,7 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-15.md",
-      "sha256": "a178bb7794dd1840ed71ea5a9d8b1a0d076baba4b16ebbfc8bc3c1e0ca60f041",
+      "sha256": "6dba75d3ea5fec6d8b114a9264985f2f4461ae36252bd4534f81393da79710b8",
       "size_bytes": 5646
     },
     {
@@ -295,8 +295,8 @@
       "label": "seqcls_runtime_gap_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_runtime_gap_2026-05-15.md",
-      "sha256": "ba06514afe62cc62272096e1c08d89fc01940b19f28bc0a35dbb24209c85214c",
-      "size_bytes": 3949
+      "sha256": "2cfacc631ff43808532303c4049e2c47e941ce89ec9ebaa4281a94edba16d34b",
+      "size_bytes": 3948
     },
     {
       "exists": true,
@@ -304,8 +304,17 @@
       "label": "seqcls_backbone_i2sr_smoke_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_backbone_i2sr_smoke_2026-05-15.md",
-      "sha256": "11ed5f36cc2c8029175a30b85cc061594f8bab1100669e90c929a147c6237543",
+      "sha256": "0bf9e87708219836b53d4a8f54a495f727fc2af5bee41f2c03badb112a8262fd",
       "size_bytes": 1655
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "seqcls_backbone_i2sr_qwen_conversion_json",
+      "metrics": {},
+      "path": "benchmark_results/seqcls_longwarmup_backbone_i2sr_qwen_smoke_2026-05-15.json",
+      "sha256": "2456fe0b65fadf1a3ff3712b54c76ac49e0329ac91f44650741cd437b3761f57",
+      "size_bytes": 2134
     },
     {
       "exists": true,
@@ -313,7 +322,7 @@
       "label": "seqcls_i2sr_sidecar_cpu_mnli64_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_i2sr_sidecar_cpu_mnli_64_2026-05-15.md",
-      "sha256": "33795867ed9220043ac7aea3396f509226779ad51f875bfd2744546274725ea9",
+      "sha256": "281968b6fc9e60ecd9d8e61a7ca003bf111d05ee6003f32efb741f0c38e7493f",
       "size_bytes": 920
     },
     {
@@ -619,7 +628,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "9ee3a6449c62593ab3da0eb97ecc9c7c852d86fcdc8db5e35a779f84aed7a9bb",
+      "sha256": "416e803d798f9141ba3dd71db7604f695b8282b5d58f12562283dd5096c45f18",
       "size_bytes": 8226
     },
     {
@@ -2309,7 +2318,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "ac1ba21486eb4af0b9768c67b0ff5c8dab5471c6d847ed52e49933d05bdd844a",
+      "sha256": "26ed0915b3e1eb02f89b85dbb97e723ce6f4f62264b7dfc3992234472279d0b2",
       "size_bytes": 13164
     },
     {
@@ -2327,7 +2336,7 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-15.json",
-      "sha256": "ce3d8e376f6934362bce8eb30f0e808853a5f571da156113f05b3341ea10ef1a",
+      "sha256": "1dae88f97be463d1f98c9edca9099ea502c984f43561b87e350f2f64d0741d53",
       "size_bytes": 16035
     },
     {
@@ -2440,8 +2449,8 @@
       "label": "seqcls_runtime_gap_json",
       "metrics": {},
       "path": "benchmark_results/seqcls_runtime_gap_2026-05-15.json",
-      "sha256": "b5ab8c1942d76c2cabacda597eae314cacde5c48ed650c03b23fa7b700bb193b",
-      "size_bytes": 13547
+      "sha256": "cacca1ce9e9dfab4c73eecb06ece2e9628d09e7eb5dfe8c0d6697791030683d2",
+      "size_bytes": 13546
     },
     {
       "exists": true,
@@ -2449,8 +2458,8 @@
       "label": "seqcls_backbone_i2sr_smoke_json",
       "metrics": {},
       "path": "benchmark_results/seqcls_backbone_i2sr_smoke_2026-05-15.json",
-      "sha256": "713bf68c36c94863c37bf46c3bc8c6dc9606aa8943ea67c4a564e7154d702450",
-      "size_bytes": 22650
+      "sha256": "5851d3f13f36521571fe2b377b1cfe3588186c43614685fbe74581ea00814d40",
+      "size_bytes": 22648
     },
     {
       "exists": true,
@@ -2458,7 +2467,7 @@
       "label": "seqcls_i2sr_sidecar_cpu_mnli64_json",
       "metrics": {},
       "path": "benchmark_results/seqcls_i2sr_sidecar_cpu_mnli_64_2026-05-15.json",
-      "sha256": "dd1f65aafd3137ad006e0e8d552a837ee0da2f9211a00b6b432c1952e2781a8b",
+      "sha256": "3f115cc452c8cbab8774e838b1941ece53aa581d4312ebd8c89c04733673ba39",
       "size_bytes": 4155
     },
     {
@@ -2467,7 +2476,7 @@
       "label": "seqcls_i2sr_hidden_contract_json",
       "metrics": {},
       "path": "benchmark_results/seqcls_i2sr_hidden_contract_2026-05-15.json",
-      "sha256": "55a2c06bd199859be028ae36b1f4a0734885aa64a24ff5e11b22b56e168683cf",
+      "sha256": "c1823be4844368d20ec06bfc445b3ce11af7f6f342cdca08e66f1df679e3a0e8",
       "size_bytes": 4861
     },
     {

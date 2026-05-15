@@ -126,7 +126,7 @@
       "-c",
       "128"
     ],
-    "elapsed_seconds": 1.4918284169398248,
+    "elapsed_seconds": 1.4769741899799556,
     "embedding": [
       -0.5110574,
       -0.1297612,
@@ -1027,17 +1027,17 @@
     ],
     "parse_error": "",
     "perf": {
-      "load_time_ms": 1281.77,
+      "load_time_ms": 1269.56,
       "model_ftype_line": "llm_load_print_meta: model ftype      = I2_SR - 2 bpw ternary row-scale",
-      "prompt_eval_ms": 78.72,
+      "prompt_eval_ms": 75.98,
       "prompt_eval_tokens": 18,
-      "prompt_eval_tokens_per_second": 228.66,
+      "prompt_eval_tokens_per_second": 236.9,
       "system_info": "system_info: n_threads = 24 (n_threads_batch = 24) / 24 | AVX = 1 | AVX_VNNI = 0 | AVX2 = 1 | AVX512 = 0 | AVX512_VBMI = 0 | AVX512_VNNI = 0 | AVX512_BF16 = 0 | FMA = 1 | NEON = 0 | SVE = 0 | ARM_FMA = 0 | F16C = 1 | FP16_VA = 0 | RISCV_VECT = 0 | WASM_SIMD = 0 | BLAS = 0 | SSE3 = 1 | SSSE3 = 1 | VSX = 0 | MATMUL_INT8 = 0 | LLAMAFILE = 1 | ",
-      "total_time_ms": 102.65
+      "total_time_ms": 98.67
     },
     "returncode": 0,
     "stderr_bytes": 9391,
-    "stderr_tail": "llama_new_context_with_model: graph nodes  = 943\nllama_new_context_with_model: graph splits = 1\ncommon_init_from_params: warming up the model with an empty run - please wait ... (--no-warmup to disable)\n\nsystem_info: n_threads = 24 (n_threads_batch = 24) / 24 | AVX = 1 | AVX_VNNI = 0 | AVX2 = 1 | AVX512 = 0 | AVX512_VBMI = 0 | AVX512_VNNI = 0 | AVX512_BF16 = 0 | FMA = 1 | NEON = 0 | SVE = 0 | ARM_FMA = 0 | F16C = 1 | FP16_VA = 0 | RISCV_VECT = 0 | WASM_SIMD = 0 | BLAS = 0 | SSE3 = 1 | SSSE3 = 1 | VSX = 0 | MATMUL_INT8 = 0 | LLAMAFILE = 1 | \nmain: last token in the prompt is not SEP\nmain: 'tokenizer.ggml.add_eos_token' should be set to 'true' in the GGUF header\nbatch_decode: n_tokens = 18, n_seq = 1\nllama_perf_context_print:        load time =    1281.77 ms\nllama_perf_context_print: prompt eval time =      78.72 ms /    18 tokens (    4.37 ms per token,   228.66 tokens per second)\nllama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)\nllama_perf_context_print:       total time =     102.65 ms /    19 tokens",
+    "stderr_tail": "llama_new_context_with_model: graph nodes  = 943\nllama_new_context_with_model: graph splits = 1\ncommon_init_from_params: warming up the model with an empty run - please wait ... (--no-warmup to disable)\n\nsystem_info: n_threads = 24 (n_threads_batch = 24) / 24 | AVX = 1 | AVX_VNNI = 0 | AVX2 = 1 | AVX512 = 0 | AVX512_VBMI = 0 | AVX512_VNNI = 0 | AVX512_BF16 = 0 | FMA = 1 | NEON = 0 | SVE = 0 | ARM_FMA = 0 | F16C = 1 | FP16_VA = 0 | RISCV_VECT = 0 | WASM_SIMD = 0 | BLAS = 0 | SSE3 = 1 | SSSE3 = 1 | VSX = 0 | MATMUL_INT8 = 0 | LLAMAFILE = 1 | \nmain: last token in the prompt is not SEP\nmain: 'tokenizer.ggml.add_eos_token' should be set to 'true' in the GGUF header\nbatch_decode: n_tokens = 18, n_seq = 1\nllama_perf_context_print:        load time =    1269.56 ms\nllama_perf_context_print: prompt eval time =      75.98 ms /    18 tokens (    4.22 ms per token,   236.90 tokens per second)\nllama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)\nllama_perf_context_print:       total time =      98.67 ms /    19 tokens",
     "stdout_bytes": 9550
   },
   "schema": "seqcls_backbone_i2sr_smoke.v1",

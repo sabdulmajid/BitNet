@@ -15,7 +15,7 @@ This audit separates the best GLUE quality path from the packed CPU runtime path
 | causal runtime configs | 6 |
 | causal GGUF exports | 6 |
 | llama.cpp fork remote | https://github.com/sabdulmajid/llama.cpp.git |
-| llama.cpp worktree clean | false |
+| llama.cpp worktree clean | true |
 
 ## Sequence-Classification Quality Path
 
@@ -42,7 +42,7 @@ These checkpoints are the strict GLUE reproduction artifacts. They use `Qwen2For
 | sampled examples | 64 |
 | sampled accuracy | 0.578125 |
 | agreement with saved PyTorch predictions | 0.921875 |
-| sampled examples/sec | 0.714970 |
+| sampled examples/sec | 0.707303 |
 | token IDs match | true |
 | hidden relative RMS | 0.108662 |
 | hidden cosine | 0.994091 |

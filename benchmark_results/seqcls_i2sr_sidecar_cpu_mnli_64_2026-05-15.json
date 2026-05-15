@@ -27,11 +27,11 @@
   "max_samples": 64,
   "runtime": {
     "batches": 64,
-    "examples_per_second": 0.7149700901754824,
-    "prompt_eval_ms": 9203.59,
+    "examples_per_second": 0.7073031997563006,
+    "prompt_eval_ms": 9674.88,
     "prompt_eval_tokens": 2474,
-    "prompt_eval_tokens_per_second_aggregate": 268.80814986325987,
-    "wall_seconds": 89.51423406298272
+    "prompt_eval_tokens_per_second_aggregate": 255.71376595885428,
+    "wall_seconds": 90.48453339678235
   },
   "sample_predictions": [
     {

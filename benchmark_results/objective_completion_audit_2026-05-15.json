@@ -61,7 +61,7 @@
     {
       "requirement": "Produce side-by-side comparison, evidence manifest, prune plan, and honest novelty/product verdict",
       "status": "complete",
-      "evidence": "manifest artifacts=225, missing=0; coverage=True checks=64; publishable ledger scopes negative result plus recovery path",
+      "evidence": "manifest artifacts=226, missing=0; coverage=True checks=64; publishable ledger scopes negative result plus recovery path",
       "remaining_gap": ""
     }
   ],
@@ -366,7 +366,7 @@
     "meta": {
       "manifest_path": "benchmarks/results/evidence_manifest_2026-05-15.json",
       "coverage_path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "manifest_artifacts": 225,
+      "manifest_artifacts": 226,
       "manifest_missing": 0,
       "coverage_passed": true,
       "coverage_checks": 64,

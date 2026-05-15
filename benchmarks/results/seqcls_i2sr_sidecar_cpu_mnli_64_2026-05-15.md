@@ -13,9 +13,9 @@ This benchmark evaluates the packed I2_SR decoder backbone with the dense classi
 | agreement with saved PyTorch predictions | 0.921875 |
 | label agreement with saved trace | 1.000000 |
 | batch size | 1 |
-| wall seconds | 89.514234 |
-| examples/sec | 0.714970 |
-| tokens/sec aggregate | 268.808150 |
+| wall seconds | 90.484533 |
+| examples/sec | 0.707303 |
+| tokens/sec aggregate | 255.713766 |
 
 ## Interpretation
 

@@ -67,6 +67,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "ternary_flip_dynamics_report", "kind": "tracked_report", "path": f"benchmarks/results/ternary_flip_dynamics_{DATE}.md"},
     {"label": "seqcls_runtime_gap_report", "kind": "tracked_report", "path": f"benchmarks/results/seqcls_runtime_gap_{DATE}.md"},
     {"label": "seqcls_backbone_i2sr_smoke_report", "kind": "tracked_report", "path": f"benchmarks/results/seqcls_backbone_i2sr_smoke_{DATE}.md"},
+    {"label": "seqcls_backbone_i2sr_qwen_conversion_json", "kind": "generic_json", "path": f"benchmark_results/seqcls_longwarmup_backbone_i2sr_qwen_smoke_{DATE}.json"},
     {"label": "seqcls_i2sr_sidecar_cpu_mnli64_report", "kind": "tracked_report", "path": f"benchmarks/results/seqcls_i2sr_sidecar_cpu_mnli_64_{DATE}.md"},
     {"label": "seqcls_i2sr_hidden_contract_report", "kind": "tracked_report", "path": f"benchmarks/results/seqcls_i2sr_hidden_contract_{DATE}.md"},
     {"label": "seqcls_i2sr_arch_contract_report", "kind": "tracked_report", "path": f"benchmarks/results/seqcls_i2sr_arch_contract_{DATE}.md"},

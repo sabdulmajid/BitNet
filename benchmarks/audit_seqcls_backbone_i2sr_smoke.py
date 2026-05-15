@@ -23,13 +23,13 @@ DEFAULT_CHECKPOINT = Path(
 )
 DEFAULT_GGUF = Path(
     "models/seqcls-backbone-i2sr/"
-    "Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet25_i2_sr.gguf"
+    "Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr.gguf"
 )
 DEFAULT_HEAD = Path(
     "models/seqcls-backbone-i2sr/"
     "Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_score_head.npz"
 )
-DEFAULT_CONVERSION_SUMMARY = Path("benchmark_results/seqcls_longwarmup_backbone_i2sr_smoke_2026-05-15.json")
+DEFAULT_CONVERSION_SUMMARY = Path("benchmark_results/seqcls_longwarmup_backbone_i2sr_qwen_smoke_2026-05-15.json")
 DEFAULT_PROMPT = "Premise: A person is riding a bicycle. Hypothesis: Someone is outdoors."
 
 

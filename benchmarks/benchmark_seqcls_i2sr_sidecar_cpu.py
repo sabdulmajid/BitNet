@@ -43,7 +43,7 @@ DEFAULT_CHECKPOINT = Path(
 )
 DEFAULT_GGUF = Path(
     "models/seqcls-backbone-i2sr/"
-    "Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet25_i2_sr.gguf"
+    "Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr.gguf"
 )
 DEFAULT_HEAD = Path(
     "models/seqcls-backbone-i2sr/"
