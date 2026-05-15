@@ -318,65 +318,78 @@ def run_parent(args: argparse.Namespace) -> dict[str, Any]:
     rows: list[dict[str, Any]] = []
     tmp_dir = args.tmp_dir
     tmp_dir.mkdir(parents=True, exist_ok=True)
-    for task in args.tasks:
-        for family, run in args.runs:
-            checkpoint_dir = checkpoint_dir_for(args, task, family, run)
-            metrics_path = checkpoint_dir / "metrics.json"
-            if not metrics_path.exists():
-                rows.append(
-                    {
-                        "task": task,
-                        "run": run,
-                        "family": family,
-                        "checkpoint_dir": str(checkpoint_dir),
-                        "status": "missing",
-                    }
-                )
-                continue
-            output = tmp_dir / f"{task}_{family}_{run.replace('/', '_')}.json"
-            command = child_command(args, task, family, run, output)
-            env = os.environ.copy()
-            env.setdefault("TOKENIZERS_PARALLELISM", "false")
-            try:
-                completed = subprocess.run(
-                    command,
-                    cwd=Path.cwd(),
-                    env=env,
-                    capture_output=True,
-                    text=True,
-                    timeout=args.child_timeout_seconds if args.child_timeout_seconds > 0 else None,
-                )
-            except subprocess.TimeoutExpired as exc:
-                rows.append(
-                    {
-                        "task": task,
-                        "run": run,
-                        "family": family,
-                        "checkpoint_dir": str(checkpoint_dir),
-                        "status": "timeout",
-                        "timeout_seconds": args.child_timeout_seconds,
-                        "stderr_tail": (exc.stderr or "")[-4000:] if isinstance(exc.stderr, str) else "",
-                        "stdout_tail": (exc.stdout or "")[-1000:] if isinstance(exc.stdout, str) else "",
-                    }
-                )
-                continue
-            if completed.returncode != 0:
-                rows.append(
-                    {
-                        "task": task,
-                        "run": run,
-                        "family": family,
-                        "checkpoint_dir": str(checkpoint_dir),
-                        "status": "failed",
-                        "returncode": completed.returncode,
-                        "stderr_tail": completed.stderr[-4000:],
-                        "stdout_tail": completed.stdout[-1000:],
-                    }
-                )
-                continue
-            row = read_json(output)
-            row.update({"family": family, "status": "complete"})
-            rows.append(row)
+    scheduled = [(task, family, run) for task in args.tasks for family, run in args.runs]
+    total_runs = len(scheduled)
+    for index, (task, family, run) in enumerate(scheduled, start=1):
+        checkpoint_dir = checkpoint_dir_for(args, task, family, run)
+        metrics_path = checkpoint_dir / "metrics.json"
+        print(
+            f"[{index}/{total_runs}] task={task} family={family} run={run} checkpoint={checkpoint_dir}",
+            flush=True,
+        )
+        if not metrics_path.exists():
+            rows.append(
+                {
+                    "task": task,
+                    "run": run,
+                    "family": family,
+                    "checkpoint_dir": str(checkpoint_dir),
+                    "status": "missing",
+                }
+            )
+            print(f"[{index}/{total_runs}] status=missing metrics={metrics_path}", flush=True)
+            continue
+        output = tmp_dir / f"{task}_{family}_{run.replace('/', '_')}.json"
+        command = child_command(args, task, family, run, output)
+        env = os.environ.copy()
+        env.setdefault("TOKENIZERS_PARALLELISM", "false")
+        try:
+            completed = subprocess.run(
+                command,
+                cwd=Path.cwd(),
+                env=env,
+                capture_output=True,
+                text=True,
+                timeout=args.child_timeout_seconds if args.child_timeout_seconds > 0 else None,
+            )
+        except subprocess.TimeoutExpired as exc:
+            rows.append(
+                {
+                    "task": task,
+                    "run": run,
+                    "family": family,
+                    "checkpoint_dir": str(checkpoint_dir),
+                    "status": "timeout",
+                    "timeout_seconds": args.child_timeout_seconds,
+                    "stderr_tail": (exc.stderr or "")[-4000:] if isinstance(exc.stderr, str) else "",
+                    "stdout_tail": (exc.stdout or "")[-1000:] if isinstance(exc.stdout, str) else "",
+                }
+            )
+            print(f"[{index}/{total_runs}] status=timeout seconds={args.child_timeout_seconds}", flush=True)
+            continue
+        if completed.returncode != 0:
+            rows.append(
+                {
+                    "task": task,
+                    "run": run,
+                    "family": family,
+                    "checkpoint_dir": str(checkpoint_dir),
+                    "status": "failed",
+                    "returncode": completed.returncode,
+                    "stderr_tail": completed.stderr[-4000:],
+                    "stdout_tail": completed.stdout[-1000:],
+                }
+            )
+            print(f"[{index}/{total_runs}] status=failed returncode={completed.returncode}", flush=True)
+            continue
+        row = read_json(output)
+        row.update({"family": family, "status": "complete"})
+        rows.append(row)
+        print(
+            f"[{index}/{total_runs}] status=complete examples={row.get('eval_examples')} "
+            f"examples_per_second={row.get('examples_per_second')} maxrss_mib={row.get('maxrss_mib')}",
+            flush=True,
+        )
     return {
         "schema": "bitdistill-glue-cpu-benchmark-v1",
         "date": DATE,
