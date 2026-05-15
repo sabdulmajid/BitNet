@@ -244,85 +244,42 @@ It does not make blind PTQ viable.
 
 ## Reproducing The Current Gates
 
-The main reports are generated from checked-in benchmark artifacts:
+The active public reports use `BITNET_REPORT_DATE=2026-05-15`. They are
+generated from checked-in scripts plus raw artifacts under `benchmark_results/`.
+The long BitDistill jobs are still running, so these commands intentionally
+produce pending gates rather than success claims.
 
 ```bash
-python benchmarks/audit_i2sr_submodule_promotion.py \
-  --check-remote-write \
-  --candidate-fork-url https://github.com/sabdulmajid/llama.cpp.git \
-  --output-json benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json \
-  --output-md benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md
+export BITNET_REPORT_DATE=2026-05-15
 
-python benchmarks/audit_product_scope.py \
-  --output-json benchmark_results/product_scope_gate_2026-05-13.json \
-  --output-md benchmarks/results/product_scope_gate_2026-05-13.md
-
-python benchmarks/audit_objective_completion.py \
-  --output-json benchmark_results/objective_completion_audit_2026-05-14.json \
-  --output-md benchmarks/results/objective_completion_audit_2026-05-14.md
+python benchmarks/monitor_bitdistill_jobs.py
 
 python benchmarks/monitor_bitdistill_jobs.py \
-  --output-json benchmark_results/bitdistill_job_monitor_2026-05-14.json \
-  --output-md benchmarks/results/bitdistill_job_monitor_2026-05-14.md
+  --job-table benchmark_results/bitdistill_rowwarmup_downstream_gamma100_20260515.tsv \
+  --warmup-log logs/bitdistill-glue-10028.out \
+  --output-json benchmark_results/bitdistill_row_warmup_monitor_2026-05-15.json \
+  --output-md benchmarks/results/bitdistill_row_warmup_monitor_2026-05-15.md
 
-python benchmarks/gate_bitdistill_reproduction.py \
-  --output-json benchmark_results/bitdistill_reproduction_gate_2026-05-14.json \
-  --output-md benchmarks/results/bitdistill_reproduction_gate_2026-05-14.md
+python benchmarks/audit_bitdistill_warmup_health.py
 
-python benchmarks/audit_bitdistill_task_formulation.py \
-  --output-json benchmark_results/bitdistill_task_formulation_audit_2026-05-14.json \
-  --output-md benchmarks/results/bitdistill_task_formulation_audit_2026-05-14.md
+python benchmarks/audit_bitdistill_warmup_health.py \
+  --monitor-json benchmark_results/bitdistill_row_warmup_monitor_2026-05-15.json \
+  --log-path logs/bitdistill-glue-10028.out \
+  --output-json benchmark_results/bitdistill_row_warmup_health_2026-05-15.json \
+  --output-md benchmarks/results/bitdistill_row_warmup_health_2026-05-15.md
 
-python benchmarks/audit_bitdistill_paired_predictions.py \
-  --output-json benchmark_results/bitdistill_paired_predictions_2026-05-14.json \
-  --output-md benchmarks/results/bitdistill_paired_predictions_2026-05-14.md
-
-python benchmarks/audit_bitdistill_paper_alignment.py \
-  --output-json benchmark_results/bitdistill_paper_alignment_2026-05-14.json \
-  --output-md benchmarks/results/bitdistill_paper_alignment_2026-05-14.md
-
-python benchmarks/audit_bitdistill_loss_scales.py \
-  --output-json benchmark_results/bitdistill_loss_scale_audit_2026-05-14.json \
-  --output-md benchmarks/results/bitdistill_loss_scale_audit_2026-05-14.md
-
-python benchmarks/benchmark_bitdistill_glue_cpu.py \
-  --tasks mnli qnli sst2 \
-  --runs short:fp16_sft-tensor-layer-1 short:bitnet_sft-tensor-layer-1 short:bitdistill-tensor-layer-1 short:bitdistill-row-layer-1 \
-  --max-eval-samples 128 \
-  --threads 12 \
-  --output-json benchmark_results/bitdistill_glue_cpu_2026-05-14.json \
-  --output-md benchmarks/results/bitdistill_glue_cpu_2026-05-14.md
-
-python benchmarks/gate_bitdistill_cpu_benchmark.py \
-  --input-json benchmark_results/bitdistill_glue_cpu_latest.json \
-  --output-json benchmark_results/bitdistill_glue_cpu_gate_2026-05-14.json \
-  --output-md benchmarks/results/bitdistill_glue_cpu_gate_2026-05-14.md
-
-python benchmarks/gate_bitdistill_i2sr_export.py \
-  --results-dir benchmark_results/bitdistill-causal-longwarmup-i2sr-2026-05-14 \
-  --output-json benchmark_results/bitdistill_i2sr_export_gate_2026-05-14.json \
-  --output-md benchmarks/results/bitdistill_i2sr_export_gate_2026-05-14.md
-
-python benchmarks/submit_bitdistill_afterany_postprocess.py
-
-python benchmarks/submit_bitdistill_warmup_finalizer.py
-
-python benchmarks/audit_bitdistill_postprocess_dependencies.py \
-  --postprocess-job-name bitdistill-postprocess-any \
-  --postprocess-job-id <afterany-job-id> \
-  --output-json benchmark_results/bitdistill_afterany_postprocess_dependency_2026-05-14.json \
-  --output-md benchmarks/results/bitdistill_afterany_postprocess_dependency_2026-05-14.md
-
-MAX_EVAL_SAMPLES=512 sbatch --dependency=afterany:<downstream-job-ids> \
-  slurm_bitdistill_cpu_benchmark.sh
-
-python benchmarks/build_qwen_side_by_side.py \
-  --output-md benchmarks/results/qwen_side_by_side_2026-05-14.md
-
-python benchmarks/run_tiny_qwen2moe_fixture.py --skip-existing
+python benchmarks/gate_bitdistill_reproduction.py
+python benchmarks/gate_bitdistill_rowwarmup.py
+python benchmarks/audit_bitdistill_paper_alignment.py
+python benchmarks/audit_bitdistill_task_formulation.py
+python benchmarks/gate_bitdistill_i2sr_export.py
+python benchmarks/gate_bitdistill_cpu_benchmark.py
+python benchmarks/audit_tl2_row_scale_runtime_contract.py
+python benchmarks/audit_product_scope.py
+python benchmarks/audit_bitdistill_active_goal.py
 ```
 
-Build smoke used for the active runtime:
+Build smoke used for the active `I2_SR` runtime:
 
 ```bash
 cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexity llama-quantize -j 12
@@ -331,31 +288,29 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 
 ## Primary Reports
 
-- [Qwen side-by-side summary](benchmarks/results/qwen_side_by_side_2026-05-14.md)
-- [BitDistill reproduction status](benchmarks/results/bitdistill_reproduction_status_2026-05-14.md)
-- [BitDistill active job monitor](benchmarks/results/bitdistill_job_monitor_2026-05-14.md)
-- [BitDistill dependency graph audit](benchmarks/results/bitdistill_dependency_graph_2026-05-14.md)
-- [BitDistill warm-up health audit](benchmarks/results/bitdistill_warmup_health_2026-05-14.md)
-- [BitDistill active goal audit](benchmarks/results/bitdistill_active_goal_audit_2026-05-14.md)
-- [BitDistill reproduction gate](benchmarks/results/bitdistill_reproduction_gate_2026-05-14.md)
-- [BitDistill paper alignment audit](benchmarks/results/bitdistill_paper_alignment_2026-05-14.md)
-- [BitDistill loss-scale audit](benchmarks/results/bitdistill_loss_scale_audit_2026-05-14.md)
-- [BitDistill GLUE CPU gate](benchmarks/results/bitdistill_glue_cpu_gate_2026-05-14.md)
-- [BitDistill causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_2026-05-14.md)
-- [BitDistill GLUE3 primary summary](benchmarks/results/bitdistill_seqcls_glue3_primary_summary_2026-05-14.md)
-- [BitDistill MNLI diagnostic variants](benchmarks/results/bitdistill_seqcls_mnli_diagnostic_variant_summary_2026-05-14.md)
-- [Objective completion audit](benchmarks/results/objective_completion_audit_2026-05-14.md)
-- [Product scope gate](benchmarks/results/product_scope_gate_2026-05-14.md)
-- [Benchmark coverage gate](benchmarks/results/benchmark_coverage_gate_2026-05-14.md)
+- [Qwen side-by-side summary](benchmarks/results/qwen_side_by_side_2026-05-15.md)
+- [BitDistill active goal audit](benchmarks/results/bitdistill_active_goal_audit_2026-05-15.md)
+- [BitDistill active job monitor](benchmarks/results/bitdistill_job_monitor_2026-05-15.md)
+- [BitDistill warm-up health audit](benchmarks/results/bitdistill_warmup_health_2026-05-15.md)
+- [BitDistill row-warmup monitor](benchmarks/results/bitdistill_row_warmup_monitor_2026-05-15.md)
+- [BitDistill row-warmup health audit](benchmarks/results/bitdistill_row_warmup_health_2026-05-15.md)
+- [BitDistill reproduction gate](benchmarks/results/bitdistill_reproduction_gate_2026-05-15.md)
+- [BitDistill row-warmup gate](benchmarks/results/bitdistill_rowwarmup_gate_2026-05-15.md)
+- [BitDistill paper alignment audit](benchmarks/results/bitdistill_paper_alignment_2026-05-15.md)
+- [BitDistill task formulation audit](benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md)
+- [BitDistill GLUE CPU gate](benchmarks/results/bitdistill_glue_cpu_gate_2026-05-15.md)
+- [BitDistill causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_2026-05-15.md)
+- [BitDistill producer script audit](benchmarks/results/bitdistill_producer_script_audit_2026-05-15.md)
+- [Objective completion audit](benchmarks/results/objective_completion_audit_2026-05-15.md)
+- [Product scope gate](benchmarks/results/product_scope_gate_2026-05-15.md)
 - [I2_SR submodule promotion audit](benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md)
 - [Row-scale qtype productization gate](benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md)
 - [Direct packed GGUF support audit](benchmarks/results/direct_packed_gguf_support_2026-05-13.md)
 - [TL2 row-scale design audit](benchmarks/results/tl2_row_scale_design_2026-05-13.md)
-- [TL2 row-scale runtime contract](benchmarks/results/tl2_row_scale_runtime_contract_2026-05-14.md)
+- [TL2 row-scale runtime contract](benchmarks/results/tl2_row_scale_runtime_contract_2026-05-15.md)
 - [MoE support audit](benchmarks/results/moe_support_audit_2026-05-14.md)
 - [Tiny Qwen2MoE runtime fixture](benchmarks/results/tiny_qwen2moe_fixture_2026-05-14.md)
 - [Unblock requirements audit](benchmarks/results/unblock_requirements_2026-05-14.md)
-- [Evidence manifest](benchmarks/results/evidence_manifest_2026-05-14.md)
 
 ## Product Direction
 

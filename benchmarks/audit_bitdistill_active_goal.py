@@ -163,11 +163,21 @@ def audit_novelty_and_runtime(
     rows: list[dict[str, Any]],
     metrics: dict[str, Any],
     reproduction: dict[str, Any],
+    rowwarmup: dict[str, Any],
     i2sr: dict[str, Any],
     cpu: dict[str, Any],
 ) -> None:
     row_complete = reproduction.get("row_scale_complete") is True
     row_passed = reproduction.get("row_scale_passed") is True
+    rowwarmup_families = rowwarmup.get("family_status", {}) if isinstance(rowwarmup.get("family_status"), dict) else {}
+    rowwarmup_complete = any(
+        isinstance(status, dict) and status.get("complete") is True
+        for status in rowwarmup_families.values()
+    )
+    rowwarmup_passed = any(
+        isinstance(status, dict) and status.get("passed") is True
+        for status in rowwarmup_families.values()
+    )
     i2sr_passed = i2sr.get("passed") is True
     cpu_passed = cpu.get("passed") is True
     i2sr_rows = i2sr.get("rows", []) if isinstance(i2sr.get("rows"), list) else []
@@ -177,6 +187,9 @@ def audit_novelty_and_runtime(
     metrics["row_scale_runtime"] = {
         "row_scale_complete": row_complete,
         "row_scale_passed": row_passed,
+        "row_warmup_complete": rowwarmup_complete,
+        "row_warmup_passed": rowwarmup_passed,
+        "row_warmup_families": rowwarmup_families,
         "i2sr_passed": i2sr_passed,
         "i2sr_complete": i2sr_complete,
         "i2sr_expected": len(i2sr_rows),
@@ -188,9 +201,12 @@ def audit_novelty_and_runtime(
     add_row(
         rows,
         "Compare paper-style per-tensor BitDistill against row-scale BitDistill",
-        "complete" if row_complete and row_passed else "pending",
-        f"row-scale gate complete={row_complete}, passed={row_passed}",
-        "Row-scale and tensor long-warmup metrics must finish before the novelty comparison is known.",
+        "complete" if (row_complete and row_passed) or rowwarmup_passed else "pending",
+        (
+            f"tensor-warmup row gate complete={row_complete}, passed={row_passed}; "
+            f"row-warmup gate complete={rowwarmup_complete}, passed={rowwarmup_passed}"
+        ),
+        "Tensor and row long-warmup metrics must finish before the novelty comparison is known.",
     )
     add_row(
         rows,
@@ -232,6 +248,8 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
     reproduction = read_json(root / args.reproduction_json)
     matrix = read_json(root / args.matrix_json)
     monitor = read_json(root / args.monitor_json)
+    row_monitor = read_json(root / args.row_monitor_json)
+    rowwarmup = read_json(root / args.rowwarmup_json)
     smoke = read_json(root / args.smoke_json)
     paper_alignment = read_json(root / args.paper_alignment_json)
     i2sr = read_json(root / args.i2sr_json)
@@ -241,8 +259,14 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
     rows: list[dict[str, Any]] = []
     metrics: dict[str, Any] = {}
     audit_reproduction(rows, metrics, reproduction, matrix, monitor)
+    row_step, row_max_steps, row_progress = latest_step(row_monitor)
+    metrics["row_warmup"] = {
+        "warmup_step": row_step,
+        "warmup_max_steps": row_max_steps,
+        "warmup_progress": row_progress,
+    }
     audit_components(rows, metrics, smoke, paper_alignment)
-    audit_novelty_and_runtime(rows, metrics, reproduction, i2sr, cpu)
+    audit_novelty_and_runtime(rows, metrics, reproduction, rowwarmup, i2sr, cpu)
     audit_publishability(rows, metrics, product, paper_alignment)
     complete_count = sum(1 for row in rows if row["status"] == "complete")
     pending_count = sum(1 for row in rows if row["status"] == "pending")
@@ -261,6 +285,8 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
             "reproduction_json": rel(root / args.reproduction_json, root),
             "matrix_json": rel(root / args.matrix_json, root),
             "monitor_json": rel(root / args.monitor_json, root),
+            "row_monitor_json": rel(root / args.row_monitor_json, root),
+            "rowwarmup_json": rel(root / args.rowwarmup_json, root),
             "smoke_json": rel(root / args.smoke_json, root),
             "paper_alignment_json": rel(root / args.paper_alignment_json, root),
             "i2sr_json": rel(root / args.i2sr_json, root),
@@ -297,6 +323,7 @@ def render_markdown(result: dict[str, Any]) -> str:
     open_rows = [[requirement] for requirement in result["open_requirements"]] or [["none"]]
     metrics = result["metrics"]
     warmup = metrics.get("paper_reproduction", {})
+    row_warmup = metrics.get("row_warmup", {})
     runtime = metrics.get("row_scale_runtime", {})
     return "\n\n".join(
         [
@@ -308,11 +335,16 @@ def render_markdown(result: dict[str, Any]) -> str:
             f"Complete rows: `{result['complete_count']}` / `{result['check_count']}`.",
             f"Pending rows: `{result['pending_count']}`.",
             (
-                f"Warm-up progress: `{fmt(warmup.get('warmup_step'))}` / `{fmt(warmup.get('warmup_max_steps'))}` "
+                f"Tensor warm-up progress: `{fmt(warmup.get('warmup_step'))}` / `{fmt(warmup.get('warmup_max_steps'))}` "
                 f"(`{fmt(warmup.get('warmup_progress'))}`)."
             ),
             (
+                f"Row warm-up progress: `{fmt(row_warmup.get('warmup_step'))}` / `{fmt(row_warmup.get('warmup_max_steps'))}` "
+                f"(`{fmt(row_warmup.get('warmup_progress'))}`)."
+            ),
+            (
                 f"Runtime gates: row-scale complete=`{runtime.get('row_scale_complete')}`, "
+                f"row-warmup complete=`{runtime.get('row_warmup_complete')}`, "
                 f"I2_SR=`{runtime.get('i2sr_passed')}`, CPU=`{runtime.get('cpu_passed')}`."
             ),
             "## Prompt-To-Artifact Checklist",
@@ -331,6 +363,8 @@ def main() -> None:
     parser.add_argument("--reproduction-json", type=Path, default=Path(f"benchmark_results/bitdistill_reproduction_gate_{DATE}.json"))
     parser.add_argument("--matrix-json", type=Path, default=Path(f"benchmark_results/bitdistill_job_matrix_audit_{DATE}.json"))
     parser.add_argument("--monitor-json", type=Path, default=Path(f"benchmark_results/bitdistill_job_monitor_{DATE}.json"))
+    parser.add_argument("--row-monitor-json", type=Path, default=Path(f"benchmark_results/bitdistill_row_warmup_monitor_{DATE}.json"))
+    parser.add_argument("--rowwarmup-json", type=Path, default=Path(f"benchmark_results/bitdistill_rowwarmup_gate_{DATE}.json"))
     parser.add_argument("--smoke-json", type=Path, default=Path(f"benchmark_results/bitdistill_smoke_contract_{DATE}.json"))
     parser.add_argument("--paper-alignment-json", type=Path, default=Path(f"benchmark_results/bitdistill_paper_alignment_{DATE}.json"))
     parser.add_argument("--i2sr-json", type=Path, default=Path(f"benchmark_results/bitdistill_i2sr_export_gate_{DATE}.json"))

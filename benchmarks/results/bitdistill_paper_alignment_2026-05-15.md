@@ -25,9 +25,9 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | paper warm-up tokens | 10000000000 |
 | active target tokens | 163840000 |
 | active target / paper | 0.016384 |
-| active effective tokens | 140410880 |
-| active effective / paper | 0.014041 |
-| latest step | 17140 |
+| active effective tokens | 142704640 |
+| active effective / paper | 0.014270 |
+| latest step | 17420 |
 | max steps | 20000 |
 
 ## Current Accuracy Matrix
