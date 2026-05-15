@@ -1,5 +1,5 @@
 {
-  "artifact_count": 230,
+  "artifact_count": 232,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "bda75045f1641f0b7f05dc8c2edbff1f92a82acf8ebed5868afaba8eb19ae94e",
-      "size_bytes": 23701
+      "sha256": "9ed3717686525f73cc6ae9eebbacacc20a83b45fb016bef814e27e636b2c48a6",
+      "size_bytes": 23809
     },
     {
       "exists": true,
@@ -81,6 +81,15 @@
       "path": "benchmarks/results/objective_completion_audit_2026-05-15.md",
       "sha256": "09864034f806f447349877a3a9939b650600d7d915b82b0c248aeadef62db5c7",
       "size_bytes": 5646
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "original_benchmark_objective_audit",
+      "metrics": {},
+      "path": "benchmarks/results/original_benchmark_objective_audit_2026-05-15.md",
+      "sha256": "edc2879253fe55e13590c5a15fd1ffc39daa965f6d99ad3378c99611ebc2218c",
+      "size_bytes": 3247
     },
     {
       "exists": true,
@@ -646,8 +655,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "45d4ffcaa14ab3003d708b95fab835fb67c0a10c210222da10324fd02d21a4a3",
-      "size_bytes": 8226
+      "sha256": "7c98ca22c6d2f369a41caafc2759e77570f456ddc9647837cc9cde09d6627669",
+      "size_bytes": 8697
     },
     {
       "exists": true,
@@ -2331,13 +2340,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 64,
+        "check_count": 66,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "c3ee443cabd2039c07e2d46bc6dff5946e21420af15f041270b4699d9c23ead8",
-      "size_bytes": 13164
+      "sha256": "cc95e90bd1d9b13fe36a433025bc941318247298d051be47c0579ecc746f736b",
+      "size_bytes": 13789
     },
     {
       "exists": true,
@@ -2356,6 +2365,15 @@
       "path": "benchmark_results/objective_completion_audit_2026-05-15.json",
       "sha256": "6ff998029bc6ab0a062409ea837c91f2fcdc24e1b25b5666017c689b00b72643",
       "size_bytes": 16035
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "original_benchmark_objective_audit_json",
+      "metrics": {},
+      "path": "benchmark_results/original_benchmark_objective_audit_2026-05-15.json",
+      "sha256": "a22d867782df3ecc40d41b373d4d4a92dbf7ba028beb3db1ca75a1350c5b00d6",
+      "size_bytes": 3838
     },
     {
       "exists": true,

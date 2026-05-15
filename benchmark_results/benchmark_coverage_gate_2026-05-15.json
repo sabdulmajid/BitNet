@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 64,
+  "check_count": 66,
   "failed": [],
   "checks": [
     {
@@ -270,6 +270,18 @@
       "blocker": ""
     },
     {
+      "name": "Original benchmark objective audit maps all six requested deliverables",
+      "passed": true,
+      "evidence": "completion=5/6, status=partial",
+      "blocker": ""
+    },
+    {
+      "name": "Original benchmark objective audit keeps TL2 row-scale blocker explicit",
+      "passed": true,
+      "evidence": "partial_rows=1, partial=5. Convert repaired checkpoints into GGUF/TL2/I2_S and run CPU inference Dense GGUF and row-scale I2_SR/I2_S CPU inference exist, but TL2 is not quality-preserving for learned row-scale checkpoints until row/group-scale metadata and kernels",
+      "blocker": ""
+    },
+    {
       "name": "Ternary flip-dynamics audit has nonzero saved-snapshot flips",
       "passed": true,
       "evidence": "status=pass, pairs=2, min_flip=0.06454656755885871, max_flip=0.1659562863332169",
@@ -380,7 +392,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=230, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=232, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

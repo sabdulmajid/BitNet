@@ -1,8 +1,8 @@
 # Evidence Manifest, 2026-05-15
-Artifacts: `230`. Missing: `0`.
+Artifacts: `232`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 23701 | bda75045f164 |  |
+| README | tracked_report | yes | 23809 | 9ed371768652 |  |
 | research_redirect_report | tracked_report | yes | 10525 | 3424c9ee5449 |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
@@ -11,6 +11,7 @@ Artifacts: `230`. Missing: `0`.
 | progress_audit | tracked_report | yes | 25612 | 74e3b96847bf |  |
 | active_goal_audit | tracked_report | yes | 10765 | 255dacfeae0a |  |
 | objective_completion_audit | tracked_report | yes | 5646 | 09864034f806 |  |
+| original_benchmark_objective_audit | tracked_report | yes | 3247 | edc2879253fe |  |
 | product_scope_gate | tracked_report | yes | 4919 | 274554bfc124 |  |
 | bitdistill_reproduction_status | tracked_report | yes | 8481 | 3f0e6a6abc2f |  |
 | bitdistill_reproduction_gap_analysis | tracked_report | yes | 7625 | e6aa07a2211f |  |
@@ -73,7 +74,7 @@ Artifacts: `230`. Missing: `0`.
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 1824 | 5d992b3c9a1c |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 8226 | 45d4ffcaa14a |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 8697 | 7c98ca22c6d2 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2569 | 51da6738be9d |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -163,8 +164,9 @@ Artifacts: `230`. Missing: `0`.
 | row_scale_qtype_i2sr_promotion_rehearsal_json | row_scale_qtype_gate_json | yes | 3897 | 6ffc161b446b | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 13164 | c3ee443cabd2 | passed=True, checks=64, failed=0 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 13789 | cc95e90bd1d9 | passed=True, checks=66, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | 6ff998029bc6 | achieved=False, status=not_complete, complete=7/9, open=2 |
+| original_benchmark_objective_audit_json | generic_json | yes | 3838 | a22d867782df |  |
 | product_scope_gate_json | product_scope_gate_json | yes | 5770 | d0101b25bd20 | scope=research_mvp_only, supported=5, unsupported=4 |
 | bitdistill_recovery_submission_json | generic_json | yes | 1186 | d473cba8d7f2 |  |
 | bitdistill_recovery_audit_json | generic_json | yes | 3252 | 5d04cd9280ec |  |

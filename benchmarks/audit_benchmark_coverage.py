@@ -462,6 +462,44 @@ def audit_bitdistill_loss_contract(root: Path, checks: list[dict[str, Any]]) -> 
     )
 
 
+def audit_original_benchmark_objective(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/original_benchmark_objective_audit_{DATE}.json"
+    if not path.exists():
+        add_check(
+            checks,
+            "Original benchmark objective audit exists",
+            False,
+            str(path.relative_to(root)),
+            "missing original six-item objective audit",
+        )
+        return
+    data = read_json(path)
+    rows = data.get("rows", []) if isinstance(data.get("rows"), list) else []
+    partial_rows = [
+        row
+        for row in rows
+        if isinstance(row, dict) and row.get("status") != "complete"
+    ]
+    partial_text = " ".join(str(row.get("item", "")) + " " + str(row.get("gap", "")) for row in partial_rows)
+    add_check(
+        checks,
+        "Original benchmark objective audit maps all six requested deliverables",
+        data.get("check_count") == 6 and len(rows) == 6,
+        f"completion={data.get('complete_count')}/{data.get('check_count')}, status={data.get('completion_status')}",
+        "audit should map each explicit item in the original six-item benchmark objective",
+    )
+    add_check(
+        checks,
+        "Original benchmark objective audit keeps TL2 row-scale blocker explicit",
+        data.get("complete_count") == 5
+        and len(partial_rows) == 1
+        and "TL2" in partial_text
+        and "row-scale" in partial_text,
+        f"partial_rows={len(partial_rows)}, partial={partial_text[:240]}",
+        "the only incomplete original objective item should be quality-preserving TL2 row-scale support",
+    )
+
+
 def audit_ternary_flip_dynamics(root: Path, checks: list[dict[str, Any]]) -> None:
     path = root / f"benchmark_results/ternary_flip_dynamics_{DATE}.json"
     if not path.exists():
@@ -821,6 +859,7 @@ def main() -> None:
     audit_bitdistill_root_cause(root, checks)
     audit_bitdistill_telemetry_coverage(root, checks)
     audit_bitdistill_loss_contract(root, checks)
+    audit_original_benchmark_objective(root, checks)
     audit_ternary_flip_dynamics(root, checks)
     audit_seqcls_runtime_gap(root, checks)
     audit_qwen3_paper_alignment(root, checks)

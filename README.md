@@ -398,6 +398,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [CPU tradeoff frontier audit](benchmarks/results/cpu_tradeoff_frontier_2026-05-15.md)
 - [CPU speed uncertainty audit](benchmarks/results/cpu_speed_uncertainty_2026-05-15.md)
 - [Benchmark coverage gate](benchmarks/results/benchmark_coverage_gate_2026-05-15.md)
+- [Original benchmark objective audit](benchmarks/results/original_benchmark_objective_audit_2026-05-15.md)
 - [Product scope gate](benchmarks/results/product_scope_gate_2026-05-15.md)
 - [Evidence manifest](benchmarks/results/evidence_manifest_2026-05-15.md)
 - [TL2 row-scale runtime contract](benchmarks/results/tl2_row_scale_runtime_contract_2026-05-15.md)

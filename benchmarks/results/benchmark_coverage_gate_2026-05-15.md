@@ -48,6 +48,8 @@ Overall status: **PASS**.
 | BitDistill telemetry coverage audit keeps advanced causality claims blocked | pass | missing=['Q/K/V relation KD split', 'activation int8 saturation rate', 'gradient norm by loss component', 'scale trajectory per layer', 'ternary flip rate per step/layer'] |  |
 | BitDistill loss-contract static checks pass | pass | passed=True, checks=6, status=loss_normalization_risk |  |
 | BitDistill loss-contract records paper-gamma dominance risk | pass | status=loss_normalization_risk, max_attn_ce=37819.64134227373 |  |
+| Original benchmark objective audit maps all six requested deliverables | pass | completion=5/6, status=partial |  |
+| Original benchmark objective audit keeps TL2 row-scale blocker explicit | pass | partial_rows=1, partial=5. Convert repaired checkpoints into GGUF/TL2/I2_S and run CPU inference Dense GGUF and row-scale I2_SR/I2_S CPU inference exist, but TL2 is not quality-preserving for learned row-scale checkpoints until row/group-scale metadata and kernels |  |
 | Ternary flip-dynamics audit has nonzero saved-snapshot flips | pass | status=pass, pairs=2, min_flip=0.06454656755885871, max_flip=0.1659562863332169 |  |
 | Sequence-classification runtime gap is narrowed but not closed | pass | status=sidecar_qwen_contract_available_native_head_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6 |  |
 | Sequence-classification I2_SR sidecar smoke passes | pass | status=prototype_smoke_passed, returncode=0, head_shape=[3, 896], finite_logits=True |  |
@@ -66,5 +68,5 @@ Overall status: **PASS**.
 | CPU speed uncertainty audit has I2_SR-vs-Q4 intervals | pass | prefill_ci=[2.2578672451091255, 2.34051098794489], decode_ci=[1.1861079640891115, 1.1951428201115284] |  |
 | I2_SR-vs-Q4 speedup intervals stay above 1 | pass | prefill_ci=[2.2578672451091255, 2.34051098794489], decode_ci=[1.1861079640891115, 1.1951428201115284] |  |
 | fixed I2_SR RSS has four context rows | pass | contexts=[512, 2048, 8192, 32768] |  |
-| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=230, missing=0, missing_labels=[] |  |
+| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=232, missing=0, missing_labels=[] |  |
 | productization gate passes for stable I2_SR | pass | passed=True, failed=0, stable_quality=True, layout=True |  |
