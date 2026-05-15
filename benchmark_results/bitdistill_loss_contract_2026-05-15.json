@@ -51,20 +51,20 @@
         "job_id": "10068",
         "label": "20k-warmup downstream control",
         "state": "RUNNING",
-        "latest_step": 5690,
-        "latest_ce": 0.507812,
-        "latest_attention_kd": 0.012662,
-        "latest_weighted_attention_kd": 1266.200806,
-        "latest_weighted_attention_to_ce": 2493.4440422833645,
-        "max_weighted_attention_to_ce": 16326.870292845022,
-        "median_weighted_attention_to_ce": 1763.4311599535981,
-        "p95_weighted_attention_to_ce": 5519.8407411866065,
-        "median_ce_attention_equalizing_gamma": 56.707738107260006,
-        "p95_ce_attention_equalizing_gamma": 121.08296080725704,
-        "parsed_steps": 570
+        "latest_step": 7480,
+        "latest_ce": 0.449219,
+        "latest_attention_kd": 0.010841,
+        "latest_weighted_attention_kd": 1084.130859,
+        "latest_weighted_attention_to_ce": 2413.3682212907293,
+        "max_weighted_attention_to_ce": 37819.64134227373,
+        "median_weighted_attention_to_ce": 1762.6969334339624,
+        "p95_weighted_attention_to_ce": 6028.384039314291,
+        "median_ce_attention_equalizing_gamma": 56.73254778379119,
+        "p95_ce_attention_equalizing_gamma": 126.57280761417152,
+        "parsed_steps": 749
       }
     ],
-    "max_observed_weighted_attention_to_ce": 16326.870292845022,
+    "max_observed_weighted_attention_to_ce": 37819.64134227373,
     "risk": true
   }
 }

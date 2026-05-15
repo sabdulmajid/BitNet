@@ -19,8 +19,8 @@ This audit is not a quality result. It checks whether the local implementation a
 
 | job | label | state | step | CE | attention KD | weighted attention KD | weighted attention / CE | max weighted attention / CE | median weighted attention / CE | p95 weighted attention / CE | median CE/attention gamma | p95 CE/attention gamma | parsed steps |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 10068 | 20k-warmup downstream control | RUNNING | 5690 | 0.507812 | 0.012662 | 1266.200806 | 2493.444042 | 16326.870293 | 1763.431160 | 5519.840741 | 56.707738 | 121.082961 | 570 |
+| 10068 | 20k-warmup downstream control | RUNNING | 7480 | 0.449219 | 0.010841 | 1084.130859 | 2413.368221 | 37819.641342 | 1762.696933 | 6028.384039 | 56.732548 | 126.572808 | 749 |
 
 ## Interpretation
 
-The risk threshold is weighted-attention/CE >= `100.0`. The max observed ratio is `16326.870293`. The CE/attention gamma columns estimate the attention weight that would put raw attention KD on the same scale as CE for the observed live steps. If final BitDistill quality remains weak, the first follow-up is loss-normalization and gradient-balance telemetry, not another broad model/task sweep.
+The risk threshold is weighted-attention/CE >= `100.0`. The max observed ratio is `37819.641342`. The CE/attention gamma columns estimate the attention weight that would put raw attention KD on the same scale as CE for the observed live steps. If final BitDistill quality remains weak, the first follow-up is loss-normalization and gradient-balance telemetry, not another broad model/task sweep.

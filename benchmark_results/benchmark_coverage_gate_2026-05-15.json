@@ -266,7 +266,7 @@
     {
       "name": "BitDistill loss-contract records paper-gamma dominance risk",
       "passed": true,
-      "evidence": "status=loss_normalization_risk, max_attn_ce=16326.870292845022",
+      "evidence": "status=loss_normalization_risk, max_attn_ce=37819.64134227373",
       "blocker": ""
     },
     {

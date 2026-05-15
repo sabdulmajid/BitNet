@@ -73,38 +73,38 @@
       },
       "live_log": {
         "ce_attention_equalizing_gamma_summary": {
-          "max": 187.35011990407673,
-          "mean": 61.11530605162691,
-          "min": 6.124884707618521,
-          "p05": 18.11640668978845,
-          "p50": 56.707738107260006,
-          "p95": 121.08296080725704
+          "max": 214.87603305785126,
+          "mean": 62.275538926867796,
+          "min": 2.6441235459286,
+          "p05": 16.594345205775824,
+          "p50": 56.73254778379119,
+          "p95": 126.57280761417152
         },
         "exists": true,
         "latest": {
-          "attention_kd": 0.012662,
-          "ce": 0.507812,
-          "elapsed": 4603.7,
-          "logit_kd": 0.02814,
-          "loss": 1266.98999,
-          "lr": 9.185e-06,
-          "step": 5690.0,
-          "weighted_attention_kd": 1266.200806,
-          "weighted_logit_kd": 0.281396
+          "attention_kd": 0.010841,
+          "ce": 0.449219,
+          "elapsed": 6051.1,
+          "logit_kd": 0.015607,
+          "loss": 1084.736084,
+          "lr": 4.728e-06,
+          "step": 7480.0,
+          "weighted_attention_kd": 1084.130859,
+          "weighted_logit_kd": 0.156066
         },
-        "latest_step": 5690,
-        "latest_weighted_attention_to_ce": 2493.4440422833645,
-        "max_weighted_attention_to_ce": 16326.870292845022,
-        "min_weighted_attention_to_ce": 533.7512278857143,
-        "parsed_steps": 570,
+        "latest_step": 7480,
+        "latest_weighted_attention_to_ce": 2413.3682212907293,
+        "max_weighted_attention_to_ce": 37819.64134227373,
+        "min_weighted_attention_to_ce": 465.370568,
+        "parsed_steps": 749,
         "path": "logs/bitdistill-glue-10068.out",
         "weighted_attention_to_ce_summary": {
-          "max": 16326.870292845022,
-          "mean": 2299.6335071991166,
-          "min": 533.7512278857143,
-          "p05": 825.8912647821762,
-          "p50": 1763.4311599535981,
-          "p95": 5519.8407411866065
+          "max": 37819.64134227373,
+          "mean": 2380.0681696468937,
+          "min": 465.370568,
+          "p05": 790.0811369492558,
+          "p50": 1762.6969334339624,
+          "p95": 6028.384039314291
         }
       },
       "metric_accuracy": null,
@@ -137,7 +137,7 @@
       "predictions_exists": false,
       "predictions_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
       "squeue": {
-        "elapsed": "1:18:19",
+        "elapsed": "1:42:23",
         "job_id": "10068",
         "reason": "ece-nebula12",
         "state": "RUNNING"
