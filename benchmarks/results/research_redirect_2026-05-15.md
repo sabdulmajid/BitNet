@@ -24,7 +24,7 @@ result.
 | QAT/distillation recovers signal | proven partially | Best row-scale dense-Qwen ten-task mean `0.499459`; paired recovery over naive PTQ `+0.150788` with 95% CI `[+0.053427, +0.248149]`. |
 | Row-scale semantics matter | proven for current best row-scale checkpoint | TL2 one-scale relative output RMS error `1.904230`; exact FP16 row scales `0.000197` with only `1.230469 MiB` scale overhead. |
 | Packed row-scale CPU runtime is feasible | proven for dense causal artifact | `I2_SR` Xeon result: PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, file `1211.3 MiB`. |
-| Paper-level BitDistill is reproduced | not proven | FP16-SFT MNLI is close to paper (`0.807641` vs `0.799100`), but BitNet-SFT is weak (`0.487621` default; best completed budget row `0.542435` vs paper `0.608000`). |
+| Paper-level BitDistill is reproduced | not proven | FP16-SFT MNLI is close to paper (`0.807641` vs `0.799100`), but BitNet-SFT remains below anchor (`0.487621` default; best completed budget row `0.564646` vs paper `0.608000`). |
 | Kimi/MoE works | not proven | Tiny Qwen2MoE fixtures prove routing/packing smoke only; no Kimi mapping or trained MoE quality exists. |
 
 ## The Narrow Blocker
@@ -40,7 +40,7 @@ BitNet-SFT does not match the paper's BitNet-SFT anchor.
 | --- | ---: | ---: |
 | FP16-SFT | `0.807641` | `0.799100` |
 | BitNet-SFT default | `0.487621` | `0.608000` |
-| BitNet-SFT best completed budget row | `0.542435` | `0.608000` |
+| BitNet-SFT best completed budget row | `0.564646` | `0.608000` |
 
 This means the next work should not be broad ablation expansion. It should
 explain why BitNet-SFT is low before claiming anything about BitDistill.
@@ -54,9 +54,9 @@ Completed controls rule out several simple causes:
 - Current SubLN-only insertion worsens MNLI to `0.350280`, so SubLN placement,
   initialization, or timing is not aligned enough to explain the paper result.
 - A 1000-step LR sweep improved the best short row to `0.523892`.
-- The first 3000-step row improves further to `0.542435`, with `48,000`
-  optimizer examples, or `0.122230` MNLI epochs, but it still misses the paper
-  anchor by `0.065565`.
+- The completed 3000-step rows improve further to `0.564646`, with `48,000`
+  optimizer examples, or `0.122230` MNLI epochs, but the best row still misses
+  the paper anchor by `0.043354`.
 
 ## Canonical Next Matrix
 

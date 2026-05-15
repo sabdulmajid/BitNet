@@ -3,7 +3,7 @@ Verdict: the source-level implementation is mechanically plausible, but the loca
 
 - Default BitNet-SFT MNLI: `0.487621`.
 - Paper BitNet-SFT MNLI anchor: `0.608000`.
-- Best completed budget-sweep row: `0.542435`.
+- Best completed budget-sweep row: `0.564646`.
 
 | check | status | evidence | risk |
 | --- | --- | --- | --- |
@@ -13,7 +13,7 @@ Verdict: the source-level implementation is mechanically plausible, but the loca
 | SubLN is inserted before attention output and FFN down projections | pass | add_subln_to_qwen_blocks wraps o_proj and down_proj with RMSNorm before projection. | The local SubLN-only control worsens MNLI, so placement/timing/init still need recipe audit. |
 | BitLinear replacement happens after SubLN insertion | pass | prepare_bitnet_student inserts SubLN first, then replaces nested nn.Linear projections. | This is mechanically coherent, but may not match the paper's exact initialization/training timing. |
 | Default BitNet-SFT reaches paper anchor | fail | default=0.487621, paper=0.608000, gap=0.120379 | Primary blocker: BitDistill recovery cannot be interpreted until this baseline is explained. |
-| Best completed budget row reaches paper anchor | fail | best_completed=0.542435, steps=3000, lr=5e-6 | Longer 3000/10000-step rows are needed to distinguish undertraining from equation mismatch. |
+| Best completed budget row reaches paper anchor | fail | best_completed=0.564646, steps=3000, lr=1e-5 | Longer 3000/10000-step rows are needed to distinguish undertraining from equation mismatch. |
 | Activation quantization explains the gap | fail | weights_only=0.493734, W1.58A8=0.487621 | A8 removal improves only slightly, so the problem is mostly ternary training/recipe. |
 | SubLN-only local control explains the gap | fail | subln_only=0.350280, default=0.487621 | SubLN likely requires exact paper timing/budget or current insertion differs in a material way. |
 
