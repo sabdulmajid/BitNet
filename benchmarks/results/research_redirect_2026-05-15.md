@@ -69,6 +69,14 @@ Completed controls rule out several simple causes:
   delta is `-0.179215`, 95% CI `[-0.189580, -0.168851]`, McNemar
   `p=3.438389e-240`.
 
+Telemetry coverage is deliberately scoped. The current script and saved metrics
+record CE, logits KD, attention KD, weighted KD terms, final ternary code
+fractions, and offline SubLN perturbation. They do not yet record
+per-component gradient norms, ternary flip rates, per-layer scale trajectories,
+activation int8 saturation, or Q/K/V-split attention losses. Therefore the
+current evidence supports loss-scale and static-mechanics triage, but it does
+not yet prove which objective term dominates the update direction.
+
 ## Canonical Next Matrix
 
 Keep the next wave narrow now that the BitNet-SFT anchor is cleared.
@@ -127,8 +135,10 @@ The plausible contribution is:
    next BitDistill run.
 3. If BitDistill remains weak, audit loss normalization, SubLN placement/timing,
    dense-head treatment, optimizer schedule, and ternary code/scale dynamics.
-4. Keep Qwen3/Qwen2.5 paper-alignment jobs labeled as partial until full
+4. Add opt-in gradient-component, flip-rate, scale-trajectory, activation
+   saturation, and Q/K/V-split telemetry after the active queued jobs finish.
+5. Keep Qwen3/Qwen2.5 paper-alignment jobs labeled as partial until full
    validation rows close the FP16 gap.
-5. Keep row-scale `I2_SR` as a separate systems contribution.
-6. Move real Kimi/MoE claims to future work until trained quality and routing
+6. Keep row-scale `I2_SR` as a separate systems contribution.
+7. Move real Kimi/MoE claims to future work until trained quality and routing
    locality are measured.

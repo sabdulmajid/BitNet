@@ -396,6 +396,44 @@ def audit_bitdistill_root_cause(root: Path, checks: list[dict[str, Any]]) -> Non
     )
 
 
+def audit_bitdistill_telemetry_coverage(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/bitdistill_telemetry_coverage_{DATE}.json"
+    if not path.exists():
+        add_check(checks, "BitDistill telemetry coverage audit exists", False, str(path.relative_to(root)), "missing telemetry audit")
+        return
+    data = read_json(path)
+    measured = data.get("measured", []) if isinstance(data.get("measured"), list) else []
+    missing = data.get("missing", []) if isinstance(data.get("missing"), list) else []
+    missing_names = {
+        str(row.get("telemetry", ""))
+        for row in missing
+        if isinstance(row, dict)
+    }
+    required_missing = {
+        "gradient norm by loss component",
+        "ternary flip rate per step/layer",
+        "scale trajectory per layer",
+        "activation int8 saturation rate",
+        "Q/K/V relation KD split",
+    }
+    add_check(
+        checks,
+        "BitDistill telemetry coverage audit measures current loss diagnostics",
+        data.get("status") == "partial_observability"
+        and data.get("measured_count") == data.get("measured_expected")
+        and data.get("measured_count", 0) >= 5,
+        f"status={data.get('status')}, measured={data.get('measured_count')}/{data.get('measured_expected')}",
+        "telemetry audit should pass current loss/static diagnostics",
+    )
+    add_check(
+        checks,
+        "BitDistill telemetry coverage audit keeps advanced causality claims blocked",
+        required_missing.issubset(missing_names),
+        f"missing={sorted(missing_names)}",
+        "telemetry audit must explicitly block update-direction claims until advanced diagnostics are logged",
+    )
+
+
 def find_row(summary: dict[str, Any], name: str) -> dict[str, Any] | None:
     for row in summary.get("rows", []):
         if row.get("name") == name:
@@ -579,6 +617,7 @@ def main() -> None:
     audit_bitnet_sft_mechanics(root, checks)
     audit_subln_activation_variance(root, checks)
     audit_bitdistill_root_cause(root, checks)
+    audit_bitdistill_telemetry_coverage(root, checks)
     audit_cpu_rows(root, checks)
     audit_cpu_tradeoff_frontier(root, checks)
     audit_cpu_speed_uncertainty(root, checks)

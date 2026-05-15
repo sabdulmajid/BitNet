@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 53,
+  "check_count": 55,
   "failed": [],
   "checks": [
     {
@@ -246,6 +246,18 @@
       "blocker": ""
     },
     {
+      "name": "BitDistill telemetry coverage audit measures current loss diagnostics",
+      "passed": true,
+      "evidence": "status=partial_observability, measured=5/5",
+      "blocker": ""
+    },
+    {
+      "name": "BitDistill telemetry coverage audit keeps advanced causality claims blocked",
+      "passed": true,
+      "evidence": "missing=['Q/K/V relation KD split', 'activation int8 saturation rate', 'gradient norm by loss component', 'scale trajectory per layer', 'ternary flip rate per step/layer']",
+      "blocker": ""
+    },
+    {
       "name": "FP F16 CPU row is finite",
       "passed": true,
       "evidence": "ppl=12.2808, prefill=114.468162, decode=5.555998",
@@ -314,7 +326,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=203, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=205, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

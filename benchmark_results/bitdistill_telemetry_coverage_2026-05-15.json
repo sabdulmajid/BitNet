@@ -1,0 +1,80 @@
+{
+  "date": "2026-05-15",
+  "measured": [
+    {
+      "evidence": "StepMetrics fields present and 22 materialized BitDistill rows record CE, logit KD, attention KD, and weighted KD terms.",
+      "passed": true,
+      "status": "measured",
+      "supports": "Loss-scale sanity checks and finite-run triage.",
+      "telemetry": "raw task loss components"
+    },
+    {
+      "evidence": "Projected paper-gamma attention/CE range is 890.466502 to 1.578e+04.",
+      "passed": true,
+      "status": "measured",
+      "supports": "The claim that gamma comparison is normalization-sensitive.",
+      "telemetry": "paper-gamma loss magnitude projection"
+    },
+    {
+      "evidence": "5 Stage-2 audit rows include weighted KD/CE ratios.",
+      "passed": true,
+      "status": "measured_when_rows_exist",
+      "supports": "Controlled-run interpretation after queued rows finish.",
+      "telemetry": "weighted KD-to-CE ratios on Stage-2 rows"
+    },
+    {
+      "evidence": "code fractions={'-1': 0.33324317512931406, '0': 0.33317633827964027, '1': 0.33358048659104567}; entropy=1.584962.",
+      "passed": true,
+      "status": "measured_offline",
+      "supports": "Static export/mechanics checks, not step-by-step training dynamics.",
+      "telemetry": "final checkpoint ternary code distribution"
+    },
+    {
+      "evidence": "inserted=48; logit relative RMS=0.768044; cosine=0.698252.",
+      "passed": true,
+      "status": "measured_offline",
+      "supports": "The claim that untrained SubLN surgery is not identity-preserving locally.",
+      "telemetry": "SubLN activation/logit perturbation"
+    }
+  ],
+  "measured_count": 5,
+  "measured_expected": 5,
+  "missing": [
+    {
+      "evidence": "The script clips total gradients, but does not log separate CE, logits-KD, and attention-KD gradient norms.",
+      "risk": "Cannot prove which objective term dominates the update direction.",
+      "status": "missing",
+      "telemetry": "gradient norm by loss component"
+    },
+    {
+      "evidence": "Final ternary code fractions are audited, but consecutive-step code transitions are not recorded.",
+      "risk": "Cannot tell whether continued pretraining is moving codes or only tuning dense residual/head parameters.",
+      "status": "missing",
+      "telemetry": "ternary flip rate per step/layer"
+    },
+    {
+      "evidence": "Final scale histograms exist; per-step tensor/row scale drift is not logged.",
+      "risk": "Cannot directly verify whether Stage-2 learns BitNet-like scale semantics over time.",
+      "status": "missing",
+      "telemetry": "scale trajectory per layer"
+    },
+    {
+      "evidence": "A8 code path is audited statically; runtime saturation statistics are not recorded.",
+      "risk": "Cannot rule out activation clipping/saturation as a hidden quality limiter.",
+      "status": "missing",
+      "telemetry": "activation int8 saturation rate"
+    },
+    {
+      "evidence": "The saved metric records aggregate attention KD, not separate Q, K, and V relation losses.",
+      "risk": "Cannot identify which attention relation term is failing or dominating.",
+      "status": "missing",
+      "telemetry": "Q/K/V relation KD split"
+    }
+  ],
+  "missing_count": 5,
+  "safe_next_step": "Do not modify the active training script while queued jobs are pending. After those jobs finish, add opt-in telemetry flags before launching the next sweep.",
+  "schema": "bitdistill-telemetry-coverage-v1",
+  "status": "partial_observability",
+  "training_source": "train_bitdistill.py",
+  "verdict": "Existing telemetry is sufficient for loss-scale and static-mechanics triage, but not sufficient to prove update-direction causality. Stronger BitDistill root-cause claims require gradient-component, flip-rate, scale-trajectory, and activation-saturation instrumentation."
+}

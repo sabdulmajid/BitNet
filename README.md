@@ -133,6 +133,13 @@ Queued controlled recovery rows now hold the Stage-3 recipe fixed across
 `40.96M`, `163.84M`, and `327.68M` Stage-2 token presentations; those rows are
 pending and have no quality claim until their paired MNLI audits complete.
 
+Loss-component telemetry is now sufficient for finite-run and normalization
+triage: CE, logits KD, attention KD, and weighted KD terms are logged for
+materialized BitDistill rows. It is not yet sufficient for stronger causal
+claims about update direction, because per-component gradient norms, ternary
+flip rates, scale trajectories, activation int8 saturation, and Q/K/V-split
+attention losses are not yet logged.
+
 The current root-cause ledger is generated in
 [`benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md`](benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md).
 
@@ -264,6 +271,7 @@ export BITNET_REPORT_DATE=2026-05-15
 
 python benchmarks/audit_bitnet_sft_budget_sweep.py
 python benchmarks/audit_bitnet_sft_mechanics.py
+python benchmarks/audit_bitdistill_telemetry_coverage.py
 python benchmarks/audit_bitdistill_stage2_curve.py
 python benchmarks/audit_benchmark_coverage.py
 python benchmarks/audit_product_scope.py
@@ -287,6 +295,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill Stage-2 budget curve audit](benchmarks/results/bitdistill_stage2_curve_2026-05-15.md)
 - [BitDistill Stage-2 curve submission](benchmarks/results/bitdistill_stage2_curve_submission_2026-05-15.md)
 - [BitDistill controlled curve audit](benchmarks/results/bitdistill_controlled_curve_2026-05-15.md)
+- [BitDistill telemetry coverage audit](benchmarks/results/bitdistill_telemetry_coverage_2026-05-15.md)
 - [BitNet-SFT baseline audit](benchmarks/results/bitnet_sft_baseline_audit_2026-05-15.md)
 - [BitNet-SFT recipe alignment audit](benchmarks/results/bitnet_sft_recipe_alignment_2026-05-15.md)
 - [BitNet-SFT mechanics audit](benchmarks/results/bitnet_sft_mechanics_audit_2026-05-15.md)
