@@ -24,7 +24,7 @@ result.
 | QAT/distillation recovers signal | proven partially | Best row-scale dense-Qwen ten-task mean `0.499459`; paired recovery over naive PTQ `+0.150788` with 95% CI `[+0.053427, +0.248149]`. |
 | Row-scale semantics matter | proven for current best row-scale checkpoint | TL2 one-scale relative output RMS error `1.904230`; exact FP16 row scales `0.000197` with only `1.230469 MiB` scale overhead. |
 | Packed row-scale CPU runtime is feasible | proven for dense causal artifact | `I2_SR` Xeon result: PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, file `1211.3 MiB`. |
-| Sequence-classification packed path is possible | prototype only; hidden-contract mismatch | MNLI long-warmup row-scale checkpoint (`0.653591` PyTorch accuracy) exports as a `352.6 MiB` `I2_SR` backbone plus `10.8 KiB` dense head sidecar and produces finite CPU logits. A 64-example sidecar CPU probe reaches only `0.343750` accuracy and `0.296875` agreement with saved PyTorch predictions; token IDs match for an audited MNLI sample, but hidden relative RMS is `7.834796` and hidden cosine is `0.029207`. |
+| Sequence-classification packed path is possible | prototype only; hidden-contract mismatch | MNLI long-warmup row-scale checkpoint (`0.653591` PyTorch accuracy) exports as a `352.6 MiB` `I2_SR` backbone plus `10.8 KiB` dense head sidecar and produces finite CPU logits. A 64-example sidecar CPU probe reaches only `0.359375` accuracy and `0.343750` agreement with saved PyTorch predictions; token IDs match for an audited MNLI sample, but hidden relative RMS is `7.812774` and hidden cosine is `0.012303`. |
 | Paper-level BitDistill is reproduced | not proven | FP16-SFT MNLI is close to paper (`0.807641` vs `0.799100`), and BitNet-SFT now clears its paper anchor (`0.628935` vs `0.608000`) after more budget. This is not yet BitDistill or FP16-level recovery. |
 | Kimi/MoE works | not proven | Tiny Qwen2MoE fixtures prove routing/packing smoke only; no Kimi mapping or trained MoE quality exists. |
 
@@ -145,11 +145,14 @@ sidecar and produces finite CPU logits, but the sampled sidecar CPU quality
 probe disagrees with the saved PyTorch classifier. The hidden-contract audit
 rules out tokenizer pair formatting for the first MNLI sample: HF IDs equal
 `llama-tokenize --no-bos` IDs, while llama.cpp embedding vs PyTorch pooled
-hidden has relative RMS `7.834796` and cosine `0.029207`. To close the product
-loop, align final hidden-state semantics and head execution in native packed
-sequence-classification inference, then run full GLUE accuracy/RSS/throughput on
-the same deployed artifact, or make causal prompt scoring the primary task
-formulation.
+hidden has relative RMS `7.812774` and cosine `0.012303`. A missing RoPE
+metadata bridge has been fixed (`rope_parameters.rope_theta` now exports to
+`bitnet-25.rope.freq_base = 1000000.0`), so the remaining mismatch is not
+explained by tokenizer pairing or missing RoPE frequency metadata. To close the
+product loop, align final hidden-state semantics and head execution in native
+packed sequence-classification inference, then run full GLUE
+accuracy/RSS/throughput on the same deployed artifact, or make causal prompt
+scoring the primary task formulation.
 
 ## Publishable Angle
 

@@ -7,15 +7,15 @@ This benchmark evaluates the packed I2_SR decoder backbone with the dense classi
 | status | quality_mismatch |
 | task | mnli |
 | examples | 64 |
-| accuracy | 0.343750 |
-| accuracy CI95 | [0.23923142078443355, 0.46596359790081815] |
+| accuracy | 0.359375 |
+| accuracy CI95 | [0.25288402291451745, 0.48179149390220904] |
 | stored PyTorch accuracy | 0.653591 |
-| agreement with saved PyTorch predictions | 0.296875 |
+| agreement with saved PyTorch predictions | 0.343750 |
 | label agreement with saved trace | 1.000000 |
 | batch size | 1 |
-| wall seconds | 90.783757 |
-| examples/sec | 0.704972 |
-| tokens/sec aggregate | 235.643285 |
+| wall seconds | 90.609232 |
+| examples/sec | 0.706330 |
+| tokens/sec aggregate | 242.153265 |
 
 ## Interpretation
 

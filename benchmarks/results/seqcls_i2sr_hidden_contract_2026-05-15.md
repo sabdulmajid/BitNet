@@ -10,11 +10,11 @@ This audit tests whether the current sidecar classifier failure is caused by tok
 | token count | 13 |
 | PyTorch prediction | 1 |
 | llama sidecar prediction | 0 |
-| hidden relative RMS | 7.834796 |
-| hidden cosine | 0.029207 |
+| hidden relative RMS | 7.812774 |
+| hidden cosine | 0.012303 |
 | PyTorch hidden norm | 26.537035 |
-| llama hidden norm | 206.988292 |
-| logit relative RMS | 3.864149 |
+| llama hidden norm | 205.949269 |
+| logit relative RMS | 7.270589 |
 
 ## Prompt
 
@@ -25,7 +25,7 @@ This audit tests whether the current sidecar classifier failure is caused by tok
 | source | logits |
 | --- | --- |
 | PyTorch model | [-0.51953125, 1.4375, 0.287109375] |
-| llama embedding + sidecar head | [2.182292938232422, -3.929462432861328, 0.17850446701049805] |
+| llama embedding + sidecar head | [3.6327290534973145, -9.06053352355957, -0.352215051651001] |
 | PyTorch hidden + sidecar head | [-0.5188282132148743, 1.441055178642273, 0.2875688076019287] |
 
 ## Interpretation

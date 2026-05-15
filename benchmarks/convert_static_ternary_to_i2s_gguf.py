@@ -179,6 +179,15 @@ def make_i2s_model_class(
     class StaticTernaryI2SModel(base_cls):  # type: ignore[misc, valid-type]
         model_arch = getattr(args, "_model_arch_override", None) or base_cls.model_arch
 
+        def set_gguf_parameters(self):  # type: ignore[no-untyped-def]
+            rope_parameters = self.hparams.get("rope_parameters")
+            if self.hparams.get("rope_theta") is None and isinstance(rope_parameters, dict):
+                rope_theta = rope_parameters.get("rope_theta")
+                if rope_theta is not None:
+                    self.hparams["rope_theta"] = rope_theta
+                    summary["rope_theta_from_rope_parameters"] = float(rope_theta)
+            super().set_gguf_parameters()
+
         def set_vocab(self):  # type: ignore[no-untyped-def]
             if args.synthetic_vocab_for_smoke:
                 vocab_size = int(self.hparams.get("vocab_size", 0) or 0)

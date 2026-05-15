@@ -27,11 +27,11 @@
   "max_samples": 64,
   "runtime": {
     "batches": 64,
-    "examples_per_second": 0.7049719281988454,
-    "prompt_eval_ms": 10498.92,
+    "examples_per_second": 0.7063297899005901,
+    "prompt_eval_ms": 10216.67,
     "prompt_eval_tokens": 2474,
-    "prompt_eval_tokens_per_second_aggregate": 235.6432852140982,
-    "wall_seconds": 90.78375668590888
+    "prompt_eval_tokens_per_second_aggregate": 242.15326520284984,
+    "wall_seconds": 90.60923228086904
   },
   "sample_predictions": [
     {
@@ -55,13 +55,13 @@
     {
       "index": 3,
       "label": 2,
-      "prediction": 1,
+      "prediction": 2,
       "saved_pytorch_prediction": 1
     },
     {
       "index": 4,
       "label": 2,
-      "prediction": 2,
+      "prediction": 0,
       "saved_pytorch_prediction": 2
     },
     {
@@ -91,7 +91,7 @@
     {
       "index": 9,
       "label": 1,
-      "prediction": 2,
+      "prediction": 0,
       "saved_pytorch_prediction": 1
     },
     {
@@ -103,31 +103,31 @@
     {
       "index": 11,
       "label": 2,
-      "prediction": 0,
+      "prediction": 1,
       "saved_pytorch_prediction": 2
     },
     {
       "index": 12,
       "label": 2,
-      "prediction": 0,
+      "prediction": 2,
       "saved_pytorch_prediction": 2
     },
     {
       "index": 13,
       "label": 0,
-      "prediction": 1,
+      "prediction": 0,
       "saved_pytorch_prediction": 0
     },
     {
       "index": 14,
       "label": 1,
-      "prediction": 0,
+      "prediction": 2,
       "saved_pytorch_prediction": 0
     },
     {
       "index": 15,
       "label": 0,
-      "prediction": 0,
+      "prediction": 2,
       "saved_pytorch_prediction": 2
     },
     {
@@ -158,13 +158,13 @@
   "schema": "seqcls_i2sr_sidecar_cpu.v1",
   "status": "quality_mismatch",
   "summary": {
-    "accuracy": 0.34375,
+    "accuracy": 0.359375,
     "accuracy_ci95_wilson": [
-      0.23923142078443355,
-      0.46596359790081815
+      0.25288402291451745,
+      0.48179149390220904
     ],
-    "agreement_with_saved_pytorch_predictions": 0.296875,
-    "correct": 22,
+    "agreement_with_saved_pytorch_predictions": 0.34375,
+    "correct": 23,
     "examples": 64,
     "label_agreement_with_saved_trace": 1.0,
     "saved_trace_predictions": 64

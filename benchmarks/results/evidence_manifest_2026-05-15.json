@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "21d6e0e14b24fd0c15a9ff75c6b4f3efc998ff28fd7117eaad61f38b4d43d71b",
-      "size_bytes": 22238
+      "sha256": "eabe33060bf03f18e4243f0724487d2daf30482c30b8767f7f0a278b1ef28852",
+      "size_bytes": 22470
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "research_redirect_report",
       "metrics": {},
       "path": "benchmarks/results/research_redirect_2026-05-15.md",
-      "sha256": "2a444496f1381cf24e010cb02629109685b52bb0828b8afae46fdfd4e05c86d6",
-      "size_bytes": 10220
+      "sha256": "30afe43b189b91df9ba7cde1e43366b369e2c10ae247e45a529b480803d39f14",
+      "size_bytes": 10452
     },
     {
       "exists": true,
@@ -295,7 +295,7 @@
       "label": "seqcls_runtime_gap_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_runtime_gap_2026-05-15.md",
-      "sha256": "9c079da2eeec5825e09109c9b5c577556d3902c896b89d476221924be4f2f84b",
+      "sha256": "384265479d1dedba679e44efa70cc81195f9159b099ca555e792b6b2ba3e245f",
       "size_bytes": 3277
     },
     {
@@ -304,8 +304,8 @@
       "label": "seqcls_backbone_i2sr_smoke_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_backbone_i2sr_smoke_2026-05-15.md",
-      "sha256": "0d0e518c2c581e047bec1e871f57402c085489220960e33808de97204c207576",
-      "size_bytes": 1655
+      "sha256": "627920ed4eda894e4e3ea7c2e6d5639af7bbdfa16eff8938bda3e54712dbb6d0",
+      "size_bytes": 1656
     },
     {
       "exists": true,
@@ -313,7 +313,7 @@
       "label": "seqcls_i2sr_sidecar_cpu_mnli64_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_i2sr_sidecar_cpu_mnli_64_2026-05-15.md",
-      "sha256": "34243853a892442802a56f3545155c40cca155f97972646af474b1e924a48eac",
+      "sha256": "5c2bc4405fffc40a0e8e55c81bd86a546d869103d47e0e96213ee57ac3c5fc06",
       "size_bytes": 923
     },
     {
@@ -322,8 +322,8 @@
       "label": "seqcls_i2sr_hidden_contract_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_i2sr_hidden_contract_2026-05-15.md",
-      "sha256": "ca7e883e215918469261e53154d779b9d3e56e0ad0f6a7c58fe96693f2365b0f",
-      "size_bytes": 1363
+      "sha256": "c35663e5fdbe3439e6b456dcac4e9e946391d7c6d13c6b643a4419e74838286c",
+      "size_bytes": 1362
     },
     {
       "exists": true,
@@ -610,8 +610,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "adea9dc9967a4a4278ef10aa0e6e817e8469ce4f52dc9554f5a4a3e88e7beef8",
-      "size_bytes": 7698
+      "sha256": "77eec731f0bde44453ae9afc924aafe4985a24bb215a1b6814e1b7b799a37627",
+      "size_bytes": 7699
     },
     {
       "exists": true,
@@ -2300,8 +2300,8 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "b5ed9cee064c676f9ff1adaef245bccd490f2bbf1bdbe36b5dc84764d58712ad",
-      "size_bytes": 12559
+      "sha256": "5dbfeb1a404700754086ec1a673deaa82cc424d788a81611154151ac61ff3036",
+      "size_bytes": 12560
     },
     {
       "exists": true,
@@ -2431,8 +2431,8 @@
       "label": "seqcls_runtime_gap_json",
       "metrics": {},
       "path": "benchmark_results/seqcls_runtime_gap_2026-05-15.json",
-      "sha256": "5dd44798f53d25166994da3350073369b416139cbdd1909713714bbf6cc77427",
-      "size_bytes": 13024
+      "sha256": "c9cf9ebce6d980d6b746793360fe0204d61f6137e48a28c02b6f3c5f1700cdaa",
+      "size_bytes": 13027
     },
     {
       "exists": true,
@@ -2440,8 +2440,8 @@
       "label": "seqcls_backbone_i2sr_smoke_json",
       "metrics": {},
       "path": "benchmark_results/seqcls_backbone_i2sr_smoke_2026-05-15.json",
-      "sha256": "2b67d26c1701dc6774cea78eb130e5edfedacb6d849073ba7448f8b3cc75ef1f",
-      "size_bytes": 22652
+      "sha256": "20d331180789f8ee7ef1dc84a52ea7bc782b8a09d4643e68b649ee7a5c054b5f",
+      "size_bytes": 22712
     },
     {
       "exists": true,
@@ -2449,8 +2449,8 @@
       "label": "seqcls_i2sr_sidecar_cpu_mnli64_json",
       "metrics": {},
       "path": "benchmark_results/seqcls_i2sr_sidecar_cpu_mnli_64_2026-05-15.json",
-      "sha256": "5216d7cb3afd8eb8d2f4dbf0375bbc651e11bc7f05914b8b035ce690a5afc60e",
-      "size_bytes": 4154
+      "sha256": "0b475487161950dd3c239885269172136ea76ea67bb1bbc47d28857422e28660",
+      "size_bytes": 4155
     },
     {
       "exists": true,
@@ -2458,7 +2458,7 @@
       "label": "seqcls_i2sr_hidden_contract_json",
       "metrics": {},
       "path": "benchmark_results/seqcls_i2sr_hidden_contract_2026-05-15.json",
-      "sha256": "4ca0de925e3928d8a611434f36c41ed879f9844ca1c280500ceec2e6f10ad087",
+      "sha256": "8efa05ebf520af2b59bf4f7767a6cca153bceb76d88462ef5993a96872fa19b8",
       "size_bytes": 4849
     },
     {

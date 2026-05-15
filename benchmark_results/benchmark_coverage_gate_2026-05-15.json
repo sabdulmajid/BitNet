@@ -290,13 +290,13 @@
     {
       "name": "Sequence-classification sidecar CPU quality mismatch is recorded",
       "passed": true,
-      "evidence": "status=quality_mismatch, examples=64, agreement=0.296875, accuracy=0.34375",
+      "evidence": "status=quality_mismatch, examples=64, agreement=0.34375, accuracy=0.359375",
       "blocker": ""
     },
     {
       "name": "Sequence-classification hidden contract mismatch is isolated",
       "passed": true,
-      "evidence": "status=hidden_contract_mismatch, token_match=True, hidden_rel_rms=7.8347962282051, hidden_cosine=0.029207017949426112, logit_rel_rms=3.8641490512153855",
+      "evidence": "status=hidden_contract_mismatch, token_match=True, hidden_rel_rms=7.812774193066907, hidden_cosine=0.012302589838196848, logit_rel_rms=7.270589052541309",
       "blocker": ""
     },
     {

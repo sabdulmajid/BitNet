@@ -16,10 +16,10 @@
     "stored_accuracy": 0.6535914416709119
   },
   "comparisons": {
-    "hidden_cosine": 0.029207017949426112,
-    "hidden_relative_rms": 7.8347962282051,
-    "llama_hidden_l2": 206.98829226332305,
-    "logit_relative_rms": 3.8641490512153855,
+    "hidden_cosine": 0.012302589838196848,
+    "hidden_relative_rms": 7.812774193066907,
+    "llama_hidden_l2": 205.94926904987386,
+    "logit_relative_rms": 7.270589052541309,
     "pytorch_hidden_l2": 26.53703466524006,
     "pytorch_logits_equal_sidecar_logits": true,
     "pytorch_logits_vs_sidecar_relative_rms": 0.0023488634895355923,
@@ -58,14 +58,14 @@
         "512"
       ],
       "returncode": 0,
-      "stderr_bytes": 9268,
-      "stderr_tail": "common_init_from_params: warming up the model with an empty run - please wait ... (--no-warmup to disable)\n\nsystem_info: n_threads = 24 (n_threads_batch = 24) / 24 | AVX = 1 | AVX_VNNI = 0 | AVX2 = 1 | AVX512 = 0 | AVX512_VBMI = 0 | AVX512_VNNI = 0 | AVX512_BF16 = 0 | FMA = 1 | NEON = 0 | SVE = 0 | ARM_FMA = 0 | F16C = 1 | FP16_VA = 0 | RISCV_VECT = 0 | WASM_SIMD = 0 | BLAS = 0 | SSE3 = 1 | SSSE3 = 1 | VSX = 0 | MATMUL_INT8 = 0 | LLAMAFILE = 1 | \nmain: last token in the prompt is not SEP\nmain: 'tokenizer.ggml.add_eos_token' should be set to 'true' in the GGUF header\nbatch_decode: n_tokens = 13, n_seq = 1\nllama_perf_context_print:        load time =    1132.42 ms\nllama_perf_context_print: prompt eval time =      69.06 ms /    13 tokens (    5.31 ms per token,   188.23 tokens per second)\nllama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)\nllama_perf_context_print:       total time =      89.92 ms /    14 tokens",
-      "stdout_bytes": 9667
+      "stderr_bytes": 9379,
+      "stderr_tail": "common_init_from_params: warming up the model with an empty run - please wait ... (--no-warmup to disable)\n\nsystem_info: n_threads = 24 (n_threads_batch = 24) / 24 | AVX = 1 | AVX_VNNI = 0 | AVX2 = 1 | AVX512 = 0 | AVX512_VBMI = 0 | AVX512_VNNI = 0 | AVX512_BF16 = 0 | FMA = 1 | NEON = 0 | SVE = 0 | ARM_FMA = 0 | F16C = 1 | FP16_VA = 0 | RISCV_VECT = 0 | WASM_SIMD = 0 | BLAS = 0 | SSE3 = 1 | SSSE3 = 1 | VSX = 0 | MATMUL_INT8 = 0 | LLAMAFILE = 1 | \nmain: last token in the prompt is not SEP\nmain: 'tokenizer.ggml.add_eos_token' should be set to 'true' in the GGUF header\nbatch_decode: n_tokens = 13, n_seq = 1\nllama_perf_context_print:        load time =    1139.82 ms\nllama_perf_context_print: prompt eval time =      82.15 ms /    13 tokens (    6.32 ms per token,   158.24 tokens per second)\nllama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)\nllama_perf_context_print:       total time =     103.24 ms /    14 tokens",
+      "stdout_bytes": 9661
     },
     "logits": [
-      2.182292938232422,
-      -3.929462432861328,
-      0.17850446701049805
+      3.6327290534973145,
+      -9.06053352355957,
+      -0.352215051651001
     ],
     "prediction": 0
   },
@@ -126,7 +126,7 @@
         "-m",
         "/mnt/slurm_nfs/a6abdulm/projects/BitNet/models/seqcls-backbone-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet25_i2_sr.gguf",
         "-f",
-        "/tmp/tmpj23iy71z",
+        "/tmp/tmp2y_pby0u",
         "--no-bos",
         "--ids",
         "--log-disable"

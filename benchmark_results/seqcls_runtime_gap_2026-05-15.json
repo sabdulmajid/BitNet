@@ -281,10 +281,10 @@
   "schema": "seqcls_runtime_gap.v1",
   "seqcls_hidden_contract": {
     "exists": true,
-    "hidden_cosine": 0.029207017949426112,
-    "hidden_relative_rms": 7.8347962282051,
-    "llama_hidden_l2": 206.98829226332305,
-    "logit_relative_rms": 3.8641490512153855,
+    "hidden_cosine": 0.012302589838196848,
+    "hidden_relative_rms": 7.812774193066907,
+    "llama_hidden_l2": 205.94926904987386,
+    "logit_relative_rms": 7.270589052541309,
     "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/seqcls_i2sr_hidden_contract_2026-05-15.json",
     "pytorch_hidden_l2": 26.53703466524006,
     "pytorch_logits_equal_sidecar_logits": true,
@@ -292,10 +292,10 @@
     "token_id_match": true
   },
   "seqcls_sidecar_cpu_benchmark": {
-    "accuracy": 0.34375,
-    "agreement_with_saved_pytorch_predictions": 0.296875,
+    "accuracy": 0.359375,
+    "agreement_with_saved_pytorch_predictions": 0.34375,
     "examples": 64,
-    "examples_per_second": 0.7049719281988454,
+    "examples_per_second": 0.7063297899005901,
     "exists": true,
     "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/seqcls_i2sr_sidecar_cpu_mnli_64_2026-05-15.json",
     "status": "quality_mismatch",
@@ -310,7 +310,7 @@
     ],
     "exists": true,
     "finite_logits": true,
-    "gguf_size_mib": 352.606689453125,
+    "gguf_size_mib": 352.60675048828125,
     "head_shape": [
       3,
       896

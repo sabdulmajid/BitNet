@@ -31,7 +31,7 @@ These checkpoints are the strict GLUE reproduction artifacts. They use `Qwen2For
 | status | prototype_smoke_passed |
 | checkpoint accuracy | 0.653591 |
 | checkpoint eval examples | 9815.000000 |
-| GGUF MiB | 352.606689 |
+| GGUF MiB | 352.606750 |
 | head bytes | 11030 |
 | runtime return code | 0 |
 | embedding shape | [896] |
@@ -39,13 +39,13 @@ These checkpoints are the strict GLUE reproduction artifacts. They use `Qwen2For
 | finite logits | true |
 | sampled CPU status | quality_mismatch |
 | sampled examples | 64 |
-| sampled accuracy | 0.343750 |
-| agreement with saved PyTorch predictions | 0.296875 |
-| sampled examples/sec | 0.704972 |
+| sampled accuracy | 0.359375 |
+| agreement with saved PyTorch predictions | 0.343750 |
+| sampled examples/sec | 0.706330 |
 | token IDs match | true |
-| hidden relative RMS | 7.834796 |
-| hidden cosine | 0.029207 |
-| logit relative RMS | 3.864149 |
+| hidden relative RMS | 7.812774 |
+| hidden cosine | 0.012303 |
+| logit relative RMS | 7.270589 |
 
 ## Causal Runtime Path
 

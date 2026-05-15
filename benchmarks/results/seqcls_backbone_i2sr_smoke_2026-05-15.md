@@ -7,7 +7,7 @@ This is a prototype bridge for the current product gap: a strict GLUE sequence-c
 | status | prototype_smoke_passed |
 | checkpoint accuracy | 0.653591 |
 | checkpoint eval examples | 9815.000000 |
-| GGUF MiB | 352.606689 |
+| GGUF MiB | 352.606750 |
 | head sidecar KiB | 10.771484 |
 | I2_SR tensors | 168 |
 | copied dense tensors | 170 |
@@ -16,7 +16,7 @@ This is a prototype bridge for the current product gap: a strict GLUE sequence-c
 | head shape | [3, 896] |
 | finite embedding | true |
 | finite logits | true |
-| prompt tok/s | 78.650000 |
+| prompt tok/s | 139.020000 |
 | predicted class for smoke prompt | 0 |
 
 ## Smoke Prompt
@@ -27,9 +27,9 @@ This is a prototype bridge for the current product gap: a strict GLUE sequence-c
 
 | class | logit | probability |
 | --- | --- | --- |
-| 0 | 4.660641 | 0.997954 |
-| 1 | -5.457586 | 0.000040 |
-| 2 | -1.549164 | 0.002006 |
+| 0 | 3.117530 | 0.983521 |
+| 1 | -3.164887 | 0.001838 |
+| 2 | -1.089805 | 0.014641 |
 
 ## Interpretation
 
