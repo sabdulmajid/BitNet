@@ -61,6 +61,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "bitdistill_producer_script_audit_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_producer_script_audit_{DATE}.md"},
     {"label": "bitdistill_job_matrix_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_job_matrix_audit_{DATE}.md"},
     {"label": "bitdistill_active_goal_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_active_goal_audit_{DATE}.md"},
+    {"label": "bitdistill_snapshot_integrity_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_snapshot_integrity_{DATE}.md"},
     {"label": "bitdistill_smoke_contract_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_smoke_contract_{DATE}.md"},
     {"label": "bitdistill_variant_summary_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_variant_summary_{DATE}.md"},
     {"label": "bitdistill_causal_longwarmup_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_causal_longwarmup_densehead_summary_{DATE}.md"},
@@ -89,11 +90,11 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "artifact_prune_application_report", "kind": "tracked_report", "path": "benchmarks/results/artifact_prune_application_2026-05-13.md"},
     {"label": "moe_report", "kind": "tracked_report", "path": f"benchmarks/results/moe_support_audit_{DATE}.md"},
     {"label": "kimi_config_feasibility_report", "kind": "tracked_report", "path": f"benchmarks/results/kimi_config_feasibility_{DATE}.md"},
-    {"label": "moe_packing_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_packing_contract_2026-05-14.md"},
-    {"label": "moe_tl2_runtime_contract_report", "kind": "tracked_report", "path": "benchmarks/results/moe_tl2_runtime_contract_2026-05-14.md"},
-    {"label": "tiny_qwen2moe_fixture_report", "kind": "tracked_report", "path": f"benchmarks/results/tiny_qwen2moe_fixture_{DATE}.md"},
-    {"label": "tiny_qwen2moe_expert_scaling_report", "kind": "tracked_report", "path": f"benchmarks/results/tiny_qwen2moe_expert_scaling_{DATE}.md"},
-    {"label": "unblock_requirements_report", "kind": "tracked_report", "path": f"benchmarks/results/unblock_requirements_{DATE}.md"},
+    {"label": "moe_packing_contract_report", "kind": "tracked_report", "path": f"benchmarks/results/moe_packing_contract_{DATE}.md"},
+    {"label": "moe_tl2_runtime_contract_report", "kind": "tracked_report", "path": f"benchmarks/results/moe_tl2_runtime_contract_{DATE}.md"},
+    {"label": "tiny_qwen2moe_fixture_report", "kind": "tracked_report", "path": "benchmarks/results/tiny_qwen2moe_fixture_2026-05-14.md"},
+    {"label": "tiny_qwen2moe_expert_scaling_report", "kind": "tracked_report", "path": "benchmarks/results/tiny_qwen2moe_expert_scaling_2026-05-14.md"},
+    {"label": "unblock_requirements_report", "kind": "tracked_report", "path": "benchmarks/results/unblock_requirements_2026-05-14.md"},
     {"label": "i2sr_combined_patch", "kind": "tracked_report", "path": "patches/llama-i2sr-row-scale-qtype.patch"},
     {"label": "i2sr_root_runtime_patch", "kind": "tracked_report", "path": "patches/bitnet-i2sr-root-runtime.patch"},
     {"label": "i2sr_submodule_patch", "kind": "tracked_report", "path": "patches/llama-i2sr-row-scale-qtype.submodule.patch"},
@@ -179,6 +180,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "bitdistill_producer_script_audit_json", "kind": "bitdistill_producer_script_audit_json", "path": f"benchmark_results/bitdistill_producer_script_audit_{DATE}.json"},
     {"label": "bitdistill_job_matrix_json", "kind": "bitdistill_job_matrix_json", "path": f"benchmark_results/bitdistill_job_matrix_audit_{DATE}.json"},
     {"label": "bitdistill_active_goal_json", "kind": "bitdistill_active_goal_json", "path": f"benchmark_results/bitdistill_active_goal_audit_{DATE}.json"},
+    {"label": "bitdistill_snapshot_integrity_json", "kind": "bitdistill_snapshot_integrity_json", "path": f"benchmark_results/bitdistill_snapshot_integrity_{DATE}.json"},
     {"label": "bitdistill_smoke_contract_json", "kind": "bitdistill_smoke_contract_json", "path": f"benchmark_results/bitdistill_smoke_contract_{DATE}.json"},
     {"label": "bitdistill_variant_summary_json", "kind": "bitdistill_variant_summary_json", "path": f"benchmark_results/bitdistill_variant_summary_{DATE}.json"},
     {"label": "bitdistill_causal_longwarmup_json", "kind": "bitdistill_causal_summary_json", "path": f"benchmark_results/bitdistill_causal_longwarmup_densehead_summary_{DATE}.json"},
@@ -186,11 +188,11 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "i2sr_submodule_promotion_audit_json", "kind": "i2sr_submodule_promotion_audit_json", "path": "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json"},
     {"label": "moe_support_json", "kind": "moe_support_json", "path": f"benchmark_results/moe_support_audit_{DATE}.json"},
     {"label": "kimi_config_feasibility_json", "kind": "kimi_config_feasibility_json", "path": f"benchmark_results/kimi_config_feasibility_{DATE}.json"},
-    {"label": "moe_packing_contract_json", "kind": "moe_packing_contract_json", "path": "benchmark_results/moe_packing_contract_2026-05-14.json"},
-    {"label": "moe_tl2_runtime_contract_json", "kind": "moe_tl2_runtime_contract_json", "path": "benchmark_results/moe_tl2_runtime_contract_2026-05-14.json"},
-    {"label": "tiny_qwen2moe_fixture_json", "kind": "tiny_qwen2moe_fixture_json", "path": f"benchmark_results/tiny_qwen2moe_fixture_{DATE}.json"},
-    {"label": "tiny_qwen2moe_expert_scaling_json", "kind": "tiny_qwen2moe_expert_scaling_json", "path": f"benchmark_results/tiny_qwen2moe_expert_scaling_{DATE}.json"},
-    {"label": "unblock_requirements_json", "kind": "unblock_requirements_json", "path": f"benchmark_results/unblock_requirements_{DATE}.json"},
+    {"label": "moe_packing_contract_json", "kind": "moe_packing_contract_json", "path": f"benchmark_results/moe_packing_contract_{DATE}.json"},
+    {"label": "moe_tl2_runtime_contract_json", "kind": "moe_tl2_runtime_contract_json", "path": f"benchmark_results/moe_tl2_runtime_contract_{DATE}.json"},
+    {"label": "tiny_qwen2moe_fixture_json", "kind": "tiny_qwen2moe_fixture_json", "path": "benchmark_results/tiny_qwen2moe_fixture_2026-05-14.json"},
+    {"label": "tiny_qwen2moe_expert_scaling_json", "kind": "tiny_qwen2moe_expert_scaling_json", "path": "benchmark_results/tiny_qwen2moe_expert_scaling_2026-05-14.json"},
+    {"label": "unblock_requirements_json", "kind": "unblock_requirements_json", "path": "benchmark_results/unblock_requirements_2026-05-14.json"},
     {"label": "tl2_generic_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json"},
     {"label": "tl2_avx512_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json"},
     {"label": "ptq_math", "kind": "math_json", "path": "benchmark_results/math_viability_gaussian_10trial_2026-05-05.json"},
@@ -718,6 +720,27 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "i2sr_passed": runtime.get("i2sr_passed") if isinstance(runtime, dict) else None,
             "cpu_passed": runtime.get("cpu_passed") if isinstance(runtime, dict) else None,
         }
+    if kind == "bitdistill_snapshot_integrity_json":
+        snapshots = data.get("snapshots", [])
+        snapshot_rows = [row for row in snapshots if isinstance(row, dict)]
+        passed_rows = [row for row in snapshot_rows if row.get("passed")]
+        first = snapshot_rows[0] if snapshot_rows else {}
+        metrics = first.get("metrics", {}) if isinstance(first.get("metrics"), dict) else {}
+        state = first.get("state", {}) if isinstance(first.get("state"), dict) else {}
+        return {
+            "passed": data.get("passed"),
+            "snapshot_count": data.get("snapshot_count"),
+            "passed_snapshots": len(passed_rows),
+            "step": metrics.get("step"),
+            "scale_mode": metrics.get("scale_mode"),
+            "ce": metrics.get("ce"),
+            "expected_ternary": metrics.get("bitlinear_replaced"),
+            "ternary_weight_count": state.get("ternary_weight_count"),
+            "weight_scale_count": state.get("weight_scale_count"),
+            "row_scale_count": state.get("row_scale_count"),
+            "tensor_scale_count": state.get("tensor_scale_count"),
+            "codes_valid": state.get("codes_valid"),
+        }
     if kind == "bitdistill_smoke_contract_json":
         checks = data.get("checks", [])
         failed = data.get("failed", [])
@@ -1171,6 +1194,16 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"warmup={metrics.get('warmup_step', '-')}/{metrics.get('warmup_max_steps', '-')}, "
                 f"row_complete={metrics.get('row_scale_complete', '-')}, "
                 f"i2sr={metrics.get('i2sr_passed', '-')}, cpu={metrics.get('cpu_passed', '-')}"
+            )
+        elif entry["kind"] == "bitdistill_snapshot_integrity_json":
+            summary = (
+                f"passed={metrics.get('passed', '-')}, "
+                f"snapshots={metrics.get('passed_snapshots', '-')}/{metrics.get('snapshot_count', '-')}, "
+                f"step={metrics.get('step', '-')}, scale={metrics.get('scale_mode', '-')}, "
+                f"ternary={metrics.get('ternary_weight_count', '-')}/{metrics.get('expected_ternary', '-')}, "
+                f"row_scales={metrics.get('row_scale_count', '-')}, "
+                f"tensor_scales={metrics.get('tensor_scale_count', '-')}, "
+                f"codes={metrics.get('codes_valid', '-')}"
             )
         elif entry["kind"] == "bitdistill_smoke_contract_json":
             summary = (

@@ -268,6 +268,10 @@ python benchmarks/audit_bitdistill_warmup_health.py \
   --output-json benchmark_results/bitdistill_row_warmup_health_2026-05-15.json \
   --output-md benchmarks/results/bitdistill_row_warmup_health_2026-05-15.md
 
+python benchmarks/audit_bitdistill_snapshot_integrity.py \
+  --monitor-json benchmark_results/bitdistill_row_warmup_monitor_2026-05-15.json \
+  --validate-codes
+
 python benchmarks/gate_bitdistill_reproduction.py
 python benchmarks/gate_bitdistill_rowwarmup.py
 python benchmarks/audit_bitdistill_paper_alignment.py
@@ -294,6 +298,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill warm-up health audit](benchmarks/results/bitdistill_warmup_health_2026-05-15.md)
 - [BitDistill row-warmup monitor](benchmarks/results/bitdistill_row_warmup_monitor_2026-05-15.md)
 - [BitDistill row-warmup health audit](benchmarks/results/bitdistill_row_warmup_health_2026-05-15.md)
+- [BitDistill snapshot integrity audit](benchmarks/results/bitdistill_snapshot_integrity_2026-05-15.md)
 - [BitDistill reproduction gate](benchmarks/results/bitdistill_reproduction_gate_2026-05-15.md)
 - [BitDistill row-warmup gate](benchmarks/results/bitdistill_rowwarmup_gate_2026-05-15.md)
 - [BitDistill paper alignment audit](benchmarks/results/bitdistill_paper_alignment_2026-05-15.md)
