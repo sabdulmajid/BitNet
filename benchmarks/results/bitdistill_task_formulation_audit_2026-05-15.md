@@ -6,7 +6,7 @@ Paper anchor source: BitDistill paper excerpt, Table 3 Qwen2.5-0.5B MNLI row.
 
 This audit prevents sequence-classification, causal prompt scoring, and paper table anchors from being mixed into one overbroad claim.
 
-Sequence-classification full baselines: `6`. Causal diagnostic rows materialized: `17`. Pending paper candidates: `8`.
+Sequence-classification full baselines: `6`. Causal diagnostic rows materialized: `17`. Pending paper candidates: `7`.
 
 ## Claim Controls
 
@@ -34,7 +34,7 @@ Sequence-classification full baselines: `6`. Causal diagnostic rows materialized
 | qnli | BitDistill short row | sequence_classification | diagnostic | true | 0.618525 | 5463 | true | - | - | checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/qnli/bitdistill-row-layer-1/metrics.json |
 | sst2 | BitDistill short row | sequence_classification | diagnostic | true | 0.808486 | 872 | true | - | - | checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/sst2/bitdistill-row-layer-1/metrics.json |
 | mnli | BitDistill longwarmup tensor gamma100 | sequence_classification | pending_candidate | true | 0.641671 | 9815 | true | 0.799800 | -0.158129 | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
-| qnli | BitDistill longwarmup tensor gamma100 | sequence_classification | pending_candidate | false | - | - | false | - | - | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
+| qnli | BitDistill longwarmup tensor gamma100 | sequence_classification | pending_candidate | true | 0.787846 | 5463 | true | - | - | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
 | sst2 | BitDistill longwarmup tensor gamma100 | sequence_classification | pending_candidate | false | - | - | false | - | - | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/metrics.json |
 | mnli | BitDistill longwarmup tensor paper gamma | sequence_classification | pending_paper_candidate | false | - | - | false | 0.799800 | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
 | qnli | BitDistill longwarmup tensor paper gamma | sequence_classification | pending_paper_candidate | false | - | - | false | - | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |

@@ -138,15 +138,15 @@ snapshots export `169/169` BitLinear weights with `169` row-scale sidecars.
 No paper-level GLUE success claim will be made until the full-validation
 downstream metrics exist.
 
-The first strict sequence-classification long-warmup pair has completed on
-MNLI. Tensor-scale gamma-100 BitDistill reaches `0.641671` and row-scale reaches
-`0.653591`, versus sequence-classification FP16-SFT `0.807641` and BitNet-SFT
-`0.487621`. This is a meaningful recovery over BitNet-SFT, but it is still
-`15.4-16.6` accuracy points behind FP16 and therefore fails the BitDistill
-paper-reproduction threshold. The row advantage on this completed MNLI pair is
-`+0.011921`, with a 95% interval that still crosses zero
-(`[-0.001444, 0.025285]`). QNLI and SST2 strict long-warmup jobs are still
-running or queued.
+The strict sequence-classification long-warmup branch has completed MNLI and
+QNLI. MNLI reaches `0.641671` tensor / `0.653591` row versus FP16-SFT
+`0.807641` and BitNet-SFT `0.487621`; QNLI reaches `0.787846` tensor /
+`0.796998` row versus FP16-SFT `0.898957` and BitNet-SFT `0.596925`. These are
+meaningful recoveries over BitNet-SFT, but they are still `10.2-16.6` accuracy
+points behind FP16 and therefore fail the BitDistill paper-reproduction
+threshold. Row-scale is directionally higher on both completed tasks
+(`+0.011921` MNLI, `+0.009152` QNLI), but the unpaired row-vs-tensor intervals
+still cross zero. SST2 strict long-warmup jobs are running.
 
 The first exportable causal-LM long-warmup downstream diagnostics have
 completed for MNLI, QNLI, and SST2. On full validation, MNLI reaches `0.615181`
