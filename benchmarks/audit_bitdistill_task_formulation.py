@@ -61,6 +61,8 @@ RUNS = [
     RunRef("Causal FP16-SFT letters", "checkpoints/bitdistill-glue-letters", "{task}/fp16_sft-tensor-layer-1", "causal_lm_letters", "diagnostic"),
     RunRef("Causal BitNet-SFT letters", "checkpoints/bitdistill-glue-letters", "{task}/bitnet_sft-tensor-layer-1", "causal_lm_letters", "diagnostic"),
     RunRef("Causal BitDistill short tensor letters", "checkpoints/bitdistill-glue-letters", "{task}/bitdistill-tensor-layer-1", "causal_lm_letters", "diagnostic"),
+    RunRef("Causal BitDistill longwarmup tensor letters", "checkpoints/bitdistill-glue-causal-longwarmup-densehead", "{task}/bitdistill-longwarmup-tensor-layer-8", "causal_lm_letters", "deployment_diagnostic"),
+    RunRef("Causal BitDistill longwarmup row letters", "checkpoints/bitdistill-glue-causal-longwarmup-densehead", "{task}/bitdistill-longwarmup-row-layer-8", "causal_lm_letters", "deployment_diagnostic"),
 ]
 
 

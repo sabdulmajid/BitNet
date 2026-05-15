@@ -138,6 +138,13 @@ snapshots export `169/169` BitLinear weights with `169` row-scale sidecars.
 No paper-level GLUE success claim will be made until the full-validation
 downstream metrics exist.
 
+The first exportable causal-LM long-warmup downstream diagnostic has completed
+for MNLI. With full `9,815`-example validation, tensor-scale BitDistill reaches
+`0.615181` and row-scale BitDistill reaches `0.608355`, versus the causal FP16
+baseline `0.829852` and causal BitNet-SFT `0.517983`. This is useful progress
+over the short diagnostic, but it is not a paper-level reproduction and it is
+not the strict `Qwen2ForSequenceClassification` branch.
+
 Active follow-ups are probing teacher-head initialization, attention-layer
 selection, paper-style logits KL scaling, CE-only ablations, a longer
 warm-up pilot, and a strict paper-hyperparameter branch with classification

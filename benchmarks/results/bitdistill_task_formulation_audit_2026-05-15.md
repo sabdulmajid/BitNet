@@ -6,7 +6,7 @@ Paper anchor source: BitDistill paper excerpt, Table 3 Qwen2.5-0.5B MNLI row.
 
 This audit prevents sequence-classification, causal prompt scoring, and paper table anchors from being mixed into one overbroad claim.
 
-Sequence-classification full baselines: `6`. Causal diagnostic rows materialized: `11`. Pending paper candidates: `9`.
+Sequence-classification full baselines: `6`. Causal diagnostic rows materialized: `13`. Pending paper candidates: `9`.
 
 ## Claim Controls
 
@@ -60,3 +60,9 @@ Sequence-classification full baselines: `6`. Causal diagnostic rows materialized
 | mnli | Causal BitDistill short tensor letters | causal_lm_letters | diagnostic | true | 0.510239 | 9815 | true | - | - | checkpoints/bitdistill-glue-letters/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-layer-1/metrics.json |
 | qnli | Causal BitDistill short tensor letters | causal_lm_letters | diagnostic | false | - | - | false | - | - | checkpoints/bitdistill-glue-letters/Qwen-Qwen2.5-0.5B/qnli/bitdistill-tensor-layer-1/metrics.json |
 | sst2 | Causal BitDistill short tensor letters | causal_lm_letters | diagnostic | false | - | - | false | - | - | checkpoints/bitdistill-glue-letters/Qwen-Qwen2.5-0.5B/sst2/bitdistill-tensor-layer-1/metrics.json |
+| mnli | Causal BitDistill longwarmup tensor letters | causal_lm_letters | deployment_diagnostic | true | 0.615181 | 9815 | true | - | - | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
+| qnli | Causal BitDistill longwarmup tensor letters | causal_lm_letters | deployment_diagnostic | false | - | - | false | - | - | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
+| sst2 | Causal BitDistill longwarmup tensor letters | causal_lm_letters | deployment_diagnostic | false | - | - | false | - | - | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/metrics.json |
+| mnli | Causal BitDistill longwarmup row letters | causal_lm_letters | deployment_diagnostic | true | 0.608355 | 9815 | true | - | - | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/metrics.json |
+| qnli | Causal BitDistill longwarmup row letters | causal_lm_letters | deployment_diagnostic | false | - | - | false | - | - | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-row-layer-8/metrics.json |
+| sst2 | Causal BitDistill longwarmup row letters | causal_lm_letters | deployment_diagnostic | false | - | - | false | - | - | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8/metrics.json |
