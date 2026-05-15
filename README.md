@@ -133,9 +133,14 @@ with the larger row only `1.6384%` of the paper's reported `10B` warm-up budget.
 The existing rows also change attention-loss normalization details, so they
 support a budget-sensitivity hypothesis but are not a clean proof that token
 budget alone explains the remaining BitDistill gap.
-Queued controlled recovery rows now hold the Stage-3 recipe fixed across
-`40.96M`, `163.84M`, and `327.68M` Stage-2 token presentations; those rows are
-pending and have no quality claim until their paired MNLI audits complete.
+Controlled recovery rows now hold the Stage-3 recipe fixed across `40.96M`,
+`163.84M`, and `327.68M` Stage-2 token presentations. The `163.84M` row has
+completed: MNLI accuracy `0.691187`, delta vs local FP16 `-0.116964`, paired
+95% CI `[-0.126110, -0.107817]`. That is a real improvement over the earlier
+short-budget BitDistill rows, but it is still far outside the paper-style
+success gate of matching FP16 within about `0.5-1.0` accuracy point. The `40.96M`
+and `327.68M` controlled rows are still in flight or pending, so the token-budget
+curve is not complete.
 
 Loss-component telemetry is now sufficient for finite-run and normalization
 triage: CE, logits KD, attention KD, and weighted KD terms are logged for
@@ -152,14 +157,14 @@ snapshots show code flip rate `0.165956` from step `1000` to `10000` and
 continued pretraining is actively moving the ternary codes, not merely
 repacking a fixed projection.
 
-The controlled Stage-2 recovery audit also parses live Slurm logs before final
-validation traces exist. Its current snapshot for the `163.84M`-token
-paper-gamma row records step `9000`, weighted-attention/CE ratio `1754.833486`,
-median weighted-attention/CE ratio `1759.870617`, p95 ratio `6286.935978`, and
-max observed ratio `37819.641342`. The same log implies a median raw
-CE/attention equalizing gamma of only `56.823222`. This is not a quality result;
-it is a loss-normalization warning that the paper's `gamma=100000` coefficient
-is numerically dominating CE under the local implementation.
+The controlled Stage-2 recovery audit also parses Slurm loss logs. The completed
+`163.84M`-token paper-gamma row ends at step `10000` with
+weighted-attention/CE ratio `5945.070866`, median ratio `1729.105844`, p95 ratio
+`6080.253825`, and max observed ratio `37819.641342`. The same log implies a
+median raw CE/attention equalizing gamma of only `57.831811`. This is a
+loss-normalization warning: the paper's `gamma=100000` coefficient is
+numerically dominating CE under the local implementation even when the final
+accuracy improves.
 
 The current root-cause ledger is generated in
 [`benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md`](benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md).

@@ -1,7 +1,7 @@
 {
   "all_complete": false,
   "all_passed_fp_recovery_gate": false,
-  "complete": 0,
+  "complete": 1,
   "date": "2026-05-15",
   "expected": 3,
   "passed_fp_recovery_gate": 0,
@@ -19,8 +19,30 @@
         "weighted_logit_kd": null
       },
       "live_log": {
-        "exists": false,
-        "path": "logs/bitdistill-glue-10069.out"
+        "ce_attention_equalizing_gamma_summary": {
+          "max": null,
+          "mean": null,
+          "min": null,
+          "p05": null,
+          "p50": null,
+          "p95": null
+        },
+        "exists": true,
+        "latest": {},
+        "latest_step": null,
+        "latest_weighted_attention_to_ce": null,
+        "max_weighted_attention_to_ce": null,
+        "min_weighted_attention_to_ce": null,
+        "parsed_steps": 0,
+        "path": "logs/bitdistill-glue-10069.out",
+        "weighted_attention_to_ce_summary": {
+          "max": null,
+          "mean": null,
+          "min": null,
+          "p05": null,
+          "p50": null,
+          "p95": null
+        }
       },
       "metric_accuracy": null,
       "metric_eval_examples": null,
@@ -52,10 +74,10 @@
       "predictions_exists": false,
       "predictions_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-5kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
       "squeue": {
-        "elapsed": "0:00",
+        "elapsed": "0:19",
         "job_id": "10069",
-        "reason": "(Resources)",
-        "state": "PENDING"
+        "reason": "ece-nebula12",
+        "state": "RUNNING"
       },
       "stage2_token_presentations": 40960000,
       "steps": null
@@ -65,85 +87,82 @@
       "job_id": "10068",
       "label": "20k-warmup downstream control",
       "last": {
-        "attention_kd": null,
-        "ce": null,
-        "logit_kd": null,
-        "weighted_attention_kd": null,
-        "weighted_logit_kd": null
+        "attention_kd": 0.0119017343968153,
+        "ce": 0.2001953125,
+        "logit_kd": 0.007469102740287781,
+        "weighted_attention_kd": 1190.1734619140625,
+        "weighted_logit_kd": 0.07469102740287781
       },
       "live_log": {
         "ce_attention_equalizing_gamma_summary": {
-          "max": 214.87603305785126,
-          "mean": 63.24458114764293,
+          "max": 215.23685620264789,
+          "mean": 64.52828800000663,
           "min": 2.6441235459286,
-          "p05": 15.906480778521637,
-          "p50": 56.82322157175803,
-          "p95": 129.67974740640506
+          "p05": 16.446392681405502,
+          "p50": 57.83181060353451,
+          "p95": 135.0864553314121
         },
         "exists": true,
         "latest": {
-          "attention_kd": 0.007266,
-          "ce": 0.414062,
-          "elapsed": 7280.8,
-          "logit_kd": 0.009272,
-          "loss": 727.116638,
-          "lr": 2.449e-06,
-          "step": 9000.0,
-          "weighted_attention_kd": 726.609863,
-          "weighted_logit_kd": 0.092724
+          "attention_kd": 0.011902,
+          "ce": 0.200195,
+          "elapsed": 8089.3,
+          "logit_kd": 0.007469,
+          "loss": 1190.448364,
+          "lr": 2e-06,
+          "step": 10000.0,
+          "weighted_attention_kd": 1190.173462,
+          "weighted_logit_kd": 0.074691
         },
-        "latest_step": 9000,
-        "latest_weighted_attention_to_ce": 1754.833486289493,
+        "latest_step": 10000,
+        "latest_weighted_attention_to_ce": 5945.070865905742,
         "max_weighted_attention_to_ce": 37819.64134227373,
-        "min_weighted_attention_to_ce": 465.370568,
-        "parsed_steps": 901,
+        "min_weighted_attention_to_ce": 464.61015608888886,
+        "parsed_steps": 1001,
         "path": "logs/bitdistill-glue-10068.out",
         "weighted_attention_to_ce_summary": {
           "max": 37819.64134227373,
-          "mean": 2386.459473217573,
-          "min": 465.370568,
-          "p05": 771.1359547826088,
-          "p50": 1759.87061697561,
-          "p95": 6286.935978374531
+          "mean": 2351.316960804237,
+          "min": 464.61015608888886,
+          "p05": 740.2868924444444,
+          "p50": 1729.1058444074413,
+          "p95": 6080.253825245992
         }
       },
-      "metric_accuracy": null,
-      "metric_eval_examples": null,
-      "metrics_exists": false,
+      "metric_accuracy": 0.6911869587366276,
+      "metric_eval_examples": 9815.0,
+      "metrics_exists": true,
       "metrics_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json",
       "output_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit",
       "paired": {
-        "both_correct": 0,
-        "both_wrong": 0,
-        "candidate_accuracy": null,
-        "candidate_wins": 0,
-        "delta_vs_reference": null,
-        "errors": [
-          "missing checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl"
+        "both_correct": 6242,
+        "both_wrong": 1341,
+        "candidate_accuracy": 0.6911869587366276,
+        "candidate_wins": 542,
+        "delta_vs_reference": -0.11696383087111561,
+        "errors": [],
+        "matched": 9815,
+        "mcnemar_exact_p": 1.5602697670618345e-136,
+        "missing": [],
+        "paired_ci95": [
+          -0.12611031622506103,
+          -0.10781734551717026
         ],
-        "matched": 0,
-        "mcnemar_exact_p": null,
-        "missing": [
-          "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl"
-        ],
-        "paired_ci95": null,
-        "reference_accuracy": null,
-        "reference_wins": 0,
-        "status": "pending"
+        "reference_accuracy": 0.8081507896077432,
+        "reference_wins": 1690,
+        "status": "pass"
       },
       "paper_stage2_fraction": 0.016384,
       "partition": "midcard",
       "passed_fp_recovery_gate": false,
-      "predictions_exists": false,
+      "predictions_exists": true,
       "predictions_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
       "squeue": {
-        "elapsed": "2:02:50",
         "job_id": "10068",
-        "reason": "ece-nebula12",
-        "state": "RUNNING"
+        "state": "not_in_squeue"
       },
       "stage2_token_presentations": 163840000,
-      "steps": null
+      "steps": 10000
     },
     {
       "dependency": "afterok:10070",

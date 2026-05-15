@@ -48,20 +48,36 @@
   "live": {
     "live_rows": [
       {
+        "job_id": "10069",
+        "label": "5k-warmup downstream control",
+        "state": "RUNNING",
+        "latest_step": null,
+        "latest_ce": null,
+        "latest_attention_kd": null,
+        "latest_weighted_attention_kd": null,
+        "latest_weighted_attention_to_ce": null,
+        "max_weighted_attention_to_ce": null,
+        "median_weighted_attention_to_ce": null,
+        "p95_weighted_attention_to_ce": null,
+        "median_ce_attention_equalizing_gamma": null,
+        "p95_ce_attention_equalizing_gamma": null,
+        "parsed_steps": 0
+      },
+      {
         "job_id": "10068",
         "label": "20k-warmup downstream control",
-        "state": "RUNNING",
-        "latest_step": 9000,
-        "latest_ce": 0.414062,
-        "latest_attention_kd": 0.007266,
-        "latest_weighted_attention_kd": 726.609863,
-        "latest_weighted_attention_to_ce": 1754.833486289493,
+        "state": "not_in_squeue",
+        "latest_step": 10000,
+        "latest_ce": 0.200195,
+        "latest_attention_kd": 0.011902,
+        "latest_weighted_attention_kd": 1190.173462,
+        "latest_weighted_attention_to_ce": 5945.070865905742,
         "max_weighted_attention_to_ce": 37819.64134227373,
-        "median_weighted_attention_to_ce": 1759.87061697561,
-        "p95_weighted_attention_to_ce": 6286.935978374531,
-        "median_ce_attention_equalizing_gamma": 56.82322157175803,
-        "p95_ce_attention_equalizing_gamma": 129.67974740640506,
-        "parsed_steps": 901
+        "median_weighted_attention_to_ce": 1729.1058444074413,
+        "p95_weighted_attention_to_ce": 6080.253825245992,
+        "median_ce_attention_equalizing_gamma": 57.83181060353451,
+        "p95_ce_attention_equalizing_gamma": 135.0864553314121,
+        "parsed_steps": 1001
       }
     ],
     "max_observed_weighted_attention_to_ce": 37819.64134227373,
