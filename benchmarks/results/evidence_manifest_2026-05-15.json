@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "c0628365b14d21bed56058c58e20baaabdeb433c3b4ea4671098b7a1f93517d7",
-      "size_bytes": 20354
+      "sha256": "80552d9fa3dbd46899d4e70da5b8d655be3d3a81f4e27f9448781e83a8e3e2e3",
+      "size_bytes": 20416
     },
     {
       "exists": true,
@@ -115,8 +115,8 @@
       "label": "bitdistill_task_formulation_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md",
-      "sha256": "f8d7631a8b1064049fb806f5535593c10bb35f59e8a21674451211e07ee98d63",
-      "size_bytes": 11364
+      "sha256": "7f17cd74c5967814c5a2c26e164f0e3dd2e821a6b8fdf26436d9360ffa687dc8",
+      "size_bytes": 11380
     },
     {
       "exists": true,
@@ -160,7 +160,7 @@
       "label": "bitdistill_job_monitor_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_job_monitor_2026-05-15.md",
-      "sha256": "dea0a66a832d3849643315151c4304addb5f3857d9076c64a1b32954910d0687",
+      "sha256": "7e8d597315a5c967ed3465e43e9b7e9e0c922ef2e8ce610820309c14fe9eea57",
       "size_bytes": 12789
     },
     {
@@ -250,7 +250,7 @@
       "label": "bitdistill_active_goal_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_active_goal_audit_2026-05-15.md",
-      "sha256": "fdb2cd892a6d8b060b24e4dea0351047b82f6e7ec323f0f7cc5c760049ebc68a",
+      "sha256": "9f84849223704fc25cd70d71156d765dd249e2f3f2c06c43a4f8b1895a64e623",
       "size_bytes": 3507
     },
     {
@@ -286,8 +286,8 @@
       "label": "bitdistill_causal_longwarmup_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_causal_longwarmup_densehead_summary_2026-05-15.md",
-      "sha256": "506e771f56a22540ffacb7daf76606222305148e87f31624cf4f625db659ae1f",
-      "size_bytes": 3856
+      "sha256": "0f97890c9a628bb4df4cf99fd025afa45b8d4d973dce35b40c603f28f860cdea",
+      "size_bytes": 4119
     },
     {
       "exists": true,
@@ -2084,15 +2084,15 @@
       "kind": "bitdistill_task_formulation_json",
       "label": "bitdistill_task_formulation_json",
       "metrics": {
-        "causal_rows_materialized": 13,
+        "causal_rows_materialized": 15,
         "paper_anchor_source": "BitDistill paper excerpt, Table 3 Qwen2.5-0.5B MNLI row.",
         "pending_paper_candidates": 9,
         "rows": 45,
         "sequence_baselines_full": 6
       },
       "path": "benchmark_results/bitdistill_task_formulation_audit_2026-05-15.json",
-      "sha256": "e891ee1308b2c84b2b886ec36ac6257ec7e041993899141ae2f2841e3a05799e",
-      "size_bytes": 27736
+      "sha256": "d6940674126fb543805c37a3ec27ef6ac18a6abdd6ed0244afff07fcecbf03f8",
+      "size_bytes": 27783
     },
     {
       "exists": true,
@@ -2162,8 +2162,8 @@
         "warmup_warnings": []
       },
       "path": "benchmark_results/bitdistill_job_monitor_2026-05-15.json",
-      "sha256": "13e14a7c138a46451f27dca0018a65dcf8ba27a9963128603cf30701722d604f",
-      "size_bytes": 77272
+      "sha256": "06f5fc2afb98d3d775a0eb239a4f702a798b61ef7c96573f6be60d2bb711d911",
+      "size_bytes": 76925
     },
     {
       "exists": true,
@@ -2359,7 +2359,7 @@
         "warmup_step": 20000
       },
       "path": "benchmark_results/bitdistill_active_goal_audit_2026-05-15.json",
-      "sha256": "a8fc6ea32b03c211104865b4eef6ccdb04bb41eed82bc8a0083b811bb129a83c",
+      "sha256": "ce08f216b429155685abe7f19d2ca0798e16af4887173cfaf7694b546e001f12",
       "size_bytes": 5441
     },
     {
@@ -2439,7 +2439,7 @@
       "kind": "bitdistill_causal_summary_json",
       "label": "bitdistill_causal_longwarmup_json",
       "metrics": {
-        "materialized_rows": 8,
+        "materialized_rows": 10,
         "passed": false,
         "passed_verdicts": 0,
         "rows": 12,
@@ -2451,8 +2451,8 @@
         "verdicts": 3
       },
       "path": "benchmark_results/bitdistill_causal_longwarmup_densehead_summary_2026-05-15.json",
-      "sha256": "354a88fe71ee14e2a253bf32b5dd21663ae2ccf10b4fd2012444ade68c5e98e0",
-      "size_bytes": 11856
+      "sha256": "b6c2f6427b18f5edc3714d0cca21eb5ded82aee538387e90b2abd19f27d6c3dc",
+      "size_bytes": 12191
     },
     {
       "exists": true,

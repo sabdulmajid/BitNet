@@ -16,8 +16,8 @@ Overall threshold pass: `False` with max FP gap `0.01`.
 | mnli | bitdistill_row | yes | 0.608355 | 9815.000000 | 1000.000000 | causal_lm | letters | mean | single_forward_single_token_labels | lm_head | false | 0.654137 | 0.060663 | none | 1.106820 | 100.000000 | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/metrics.json |
 | qnli | fp16_sft | yes | 0.900970 | 5463.000000 | 1000.000000 | causal_lm | - | - | - | - | - | 0.309719 | - | - | - | - | checkpoints/bitdistill-glue/Qwen-Qwen2.5-0.5B/qnli/fp16_sft-tensor-layer-1/metrics.json |
 | qnli | bitnet_sft | yes | 0.614681 | 5463.000000 | 1000.000000 | causal_lm | - | - | - | - | - | 0.126270 | - | - | - | - | checkpoints/bitdistill-glue/Qwen-Qwen2.5-0.5B/qnli/bitnet_sft-tensor-layer-1/metrics.json |
-| qnli | bitdistill_tensor | no | - | - | - | - | - | - | - | - | - | - | - | - | - | - | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
-| qnli | bitdistill_row | no | - | - | - | - | - | - | - | - | - | - | - | - | - | - | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-row-layer-8/metrics.json |
+| qnli | bitdistill_tensor | yes | 0.765697 | 5463.000000 | 1000.000000 | causal_lm | letters | mean | single_forward_single_token_labels | lm_head | false | 0.358421 | 0.032653 | none | 1.226281 | 100.000000 | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
+| qnli | bitdistill_row | yes | 0.770822 | 5463.000000 | 1000.000000 | causal_lm | letters | mean | single_forward_single_token_labels | lm_head | false | 0.600795 | 0.030709 | none | 1.247302 | 100.000000 | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-row-layer-8/metrics.json |
 | sst2 | fp16_sft | yes | 0.939220 | 872.000000 | 1000.000000 | causal_lm | - | - | - | - | - | 0.073379 | 0.000000 | - | 0.000000 | 0.000010 | checkpoints/bitdistill-glue/Qwen-Qwen2.5-0.5B/sst2/fp16_sft-tensor-layer-1/metrics.json |
 | sst2 | bitnet_sft | yes | 0.831422 | 872.000000 | 1000.000000 | causal_lm | - | - | - | - | - | 0.604714 | 0.000000 | - | 0.000000 | 0.000010 | checkpoints/bitdistill-glue/Qwen-Qwen2.5-0.5B/sst2/bitnet_sft-tensor-layer-1/metrics.json |
 | sst2 | bitdistill_tensor | no | - | - | - | - | - | - | - | - | - | - | - | - | - | - | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/metrics.json |
@@ -28,5 +28,5 @@ Overall threshold pass: `False` with max FP gap `0.01`.
 | task | FP16 | BitNet-SFT | BitDistill | FP-BitNet | FP-BitDistill | row-tensor | status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | mnli | 0.829852 | 0.517983 | 0.615181 | 0.311870 | 0.214671 | -0.006826 | fail |
-| qnli | 0.900970 | 0.614681 | - | 0.286290 | - | - | fail |
+| qnli | 0.900970 | 0.614681 | 0.765697 | 0.286290 | 0.135274 | 0.005125 | fail |
 | sst2 | 0.939220 | 0.831422 | - | 0.107798 | - | - | fail |

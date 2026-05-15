@@ -14,7 +14,7 @@ Pending rows: `3`.
 
 Tensor warm-up progress: `20000` / `20000` (`1.000000`).
 
-Row warm-up progress: `4050` / `20000` (`0.202500`).
+Row warm-up progress: `4610` / `20000` (`0.230500`).
 
 Runtime gates: row-scale complete=`False`, row-warmup complete=`False`, I2_SR=`False`, CPU=`False`.
 
