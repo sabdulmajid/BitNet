@@ -230,6 +230,40 @@ def audit_bitdistill_paired_baselines(root: Path, checks: list[dict[str, Any]]) 
     )
 
 
+def audit_bitnet_sft_budget_paired(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/bitnet_sft_budget_paired_{DATE}.json"
+    if not path.exists():
+        add_check(checks, "BitNet-SFT budget paired audit exists", False, str(path.relative_to(root)), "missing paired audit")
+        return
+    data = read_json(path)
+    best = data.get("best", {}) if isinstance(data.get("best"), dict) else {}
+    complete = data.get("complete")
+    total = data.get("total")
+    ci = best.get("paired_ci95")
+    pvalue = best.get("mcnemar_exact_p")
+    add_check(
+        checks,
+        "BitNet-SFT budget paired audit has completed full-MNLI rows",
+        isinstance(complete, int)
+        and isinstance(total, int)
+        and complete >= 1
+        and total >= complete
+        and best.get("matched") == BITDISTILL_GLUE_EXPECTED["mnli"],
+        f"complete={complete}/{total}, best_matched={best.get('matched')}, path={path.relative_to(root)}",
+        "no full-validation paired BitNet-SFT budget row is available",
+    )
+    add_check(
+        checks,
+        "BitNet-SFT best budget row has paired CI and McNemar test",
+        isinstance(ci, list)
+        and len(ci) == 2
+        and isinstance(pvalue, (int, float))
+        and isinstance(best.get("delta_vs_reference"), (int, float)),
+        f"delta={best.get('delta_vs_reference')}, ci={ci}, mcnemar={pvalue}",
+        "best budget row lacks paired statistical evidence",
+    )
+
+
 def find_row(summary: dict[str, Any], name: str) -> dict[str, Any] | None:
     for row in summary.get("rows", []):
         if row.get("name") == name:
@@ -349,6 +383,7 @@ def main() -> None:
     audit_lm_eval(root, checks)
     audit_paired_reports(root, checks)
     audit_bitdistill_paired_baselines(root, checks)
+    audit_bitnet_sft_budget_paired(root, checks)
     audit_cpu_rows(root, checks)
     manifest_path = args.manifest_path.resolve() if args.manifest_path is not None else None
     audit_rss_and_gates(root, checks, manifest_path)

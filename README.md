@@ -106,6 +106,9 @@ Current BitNet-SFT controls:
 - Best completed budget row: `0.628935` at `10000` steps, `2e-5`, exceeding
   the paper BitNet-SFT anchor by `0.020935` but still `0.178706` below the
   local FP16-SFT row.
+- Paired prediction audit against the FP16 trace gives candidate minus FP16
+  `-0.179215`, 95% CI `[-0.189580, -0.168851]`, McNemar
+  `p=3.438389e-240`.
 
 The completed `3000`-step sweep improves over the best `1000`-step row, and the
 first `10000`-step row improves again. This does not prove BitDistill; it proves
@@ -253,6 +256,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitNet-SFT baseline audit](benchmarks/results/bitnet_sft_baseline_audit_2026-05-15.md)
 - [BitNet-SFT recipe alignment audit](benchmarks/results/bitnet_sft_recipe_alignment_2026-05-15.md)
 - [BitNet-SFT budget sweep audit](benchmarks/results/bitnet_sft_budget_sweep_2026-05-15.md)
+- [BitNet-SFT budget paired audit](benchmarks/results/bitnet_sft_budget_paired_2026-05-15.md)
 - [BitDistill paper alignment audit](benchmarks/results/bitdistill_paper_alignment_2026-05-15.md)
 - [Task formulation audit](benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md)
 - [Causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_2026-05-15.md)

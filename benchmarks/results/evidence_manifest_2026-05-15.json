@@ -1,5 +1,5 @@
 {
-  "artifact_count": 181,
+  "artifact_count": 183,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "d02729b3f3cdece2041076a88d0765b28f72f039571f9a9b7eea021cedddfd98",
-      "size_bytes": 13468
+      "sha256": "7151c5bb0c140b10c455c44e91357eb8113b4419274d314e441101c1c1889395",
+      "size_bytes": 13715
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "research_redirect_report",
       "metrics": {},
       "path": "benchmarks/results/research_redirect_2026-05-15.md",
-      "sha256": "44d158949cec17ab87c87b75d86adf5ae0b98173edcfbd84264b17bced0b8468",
-      "size_bytes": 5924
+      "sha256": "681add900bdb8322b950e2387d62d784e01b5036b28d5a302dd73e007590f081",
+      "size_bytes": 6085
     },
     {
       "exists": true,
@@ -162,6 +162,15 @@
       "path": "benchmarks/results/bitnet_sft_budget_sweep_2026-05-15.md",
       "sha256": "7922b908e05d8cef2e5fbee857088e08d9f98356d81cdad6d0274f93b0e33873",
       "size_bytes": 2513
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitnet_sft_budget_paired_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitnet_sft_budget_paired_2026-05-15.md",
+      "sha256": "9c3eb547f8cc2379ad80ee144fe06ba66f505e6f46bc5633a4a89948e9da56cc",
+      "size_bytes": 1914
     },
     {
       "exists": true,
@@ -421,8 +430,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "193c2deaa2fa552a943bd2094fb022261e9b52fa3310e38ededae82a68876f4e",
-      "size_bytes": 3438
+      "sha256": "04dd177c5913c70f5d601227e313db6e848c87f8a262390ed8d8c152c788b659",
+      "size_bytes": 3795
     },
     {
       "exists": true,
@@ -2106,13 +2115,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 38,
+        "check_count": 40,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "d6d56628721a75cd234b9e93c56cb4704ced17eaff41124f721a3b98b93b7aed",
-      "size_bytes": 6374
+      "sha256": "bd106e1938477e997dc0fd2c20226b5f8776406307340503cc3715ba5a89f8e8",
+      "size_bytes": 6885
     },
     {
       "exists": true,
@@ -2198,6 +2207,15 @@
       "path": "benchmark_results/bitnet_sft_budget_sweep_2026-05-15.json",
       "sha256": "1d9f6722f15ab643ca512c3a99749cf4317f03bfe7e6b79d19171388076f29e2",
       "size_bytes": 21065
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "bitnet_sft_budget_paired_json",
+      "metrics": {},
+      "path": "benchmark_results/bitnet_sft_budget_paired_2026-05-15.json",
+      "sha256": "df413564bddbb34a9da04e41f0242a2ec8907a2e170e709b73e18453a9613e97",
+      "size_bytes": 9077
     },
     {
       "exists": true,
