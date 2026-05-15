@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
@@ -30,6 +31,51 @@ from audit_bitdistill_recovery_run import (
 
 
 DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
+LOG_VALUE_RE = re.compile(r"([a-zA-Z_]+)=([-+0-9.eE]+)")
+
+
+def parse_live_log(job_id: str, logs_dir: Path) -> dict[str, Any]:
+    if not job_id:
+        return {"exists": False}
+    path = logs_dir / f"bitdistill-glue-{job_id}.out"
+    if not path.exists():
+        return {"exists": False, "path": str(path)}
+    latest: dict[str, float] = {}
+    ratios: list[float] = []
+    parsed_steps = 0
+    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        if not line.startswith("step="):
+            continue
+        values: dict[str, float] = {}
+        for key, raw in LOG_VALUE_RE.findall(line):
+            try:
+                values[key] = float(raw)
+            except ValueError:
+                continue
+        if "step" not in values:
+            continue
+        parsed_steps += 1
+        latest = values
+        ce = values.get("ce")
+        weighted_attention = values.get("weighted_attention_kd")
+        if ce not in (None, 0.0) and weighted_attention is not None:
+            ratios.append(weighted_attention / ce)
+    latest_ce = latest.get("ce")
+    latest_weighted_attention = latest.get("weighted_attention_kd")
+    return {
+        "exists": True,
+        "path": str(path),
+        "parsed_steps": parsed_steps,
+        "latest": latest,
+        "latest_step": int(latest["step"]) if "step" in latest else None,
+        "latest_weighted_attention_to_ce": (
+            latest_weighted_attention / latest_ce
+            if latest_ce not in (None, 0.0) and latest_weighted_attention is not None
+            else None
+        ),
+        "max_weighted_attention_to_ce": max(ratios) if ratios else None,
+        "min_weighted_attention_to_ce": min(ratios) if ratios else None,
+    }
 
 
 def squeue_state(job_id: str) -> dict[str, str]:
@@ -66,6 +112,7 @@ def summarize_job(job: dict[str, Any], reference_predictions: Path) -> dict[str,
     eval_metrics = metrics.get("eval", {}) if isinstance(metrics.get("eval"), dict) else {}
     last = metrics.get("last", {}) if isinstance(metrics.get("last"), dict) else {}
     paired = compare(reference_predictions, predictions_path)
+    live_log = parse_live_log(str(job.get("job_id", "")), Path("logs"))
     metric_accuracy = finite(eval_metrics.get("accuracy"))
     metric_examples = finite(eval_metrics.get("eval_examples"))
     if paired["status"] == "pass" and metric_accuracy is not None:
@@ -106,6 +153,7 @@ def summarize_job(job: dict[str, Any], reference_predictions: Path) -> dict[str,
             "attention_kd": finite(last.get("attention_kd")),
             "weighted_attention_kd": finite(last.get("weighted_attention_kd")),
         },
+        "live_log": live_log,
         "paired": paired,
         "squeue": squeue_state(str(job.get("job_id", ""))),
         "passed_fp_recovery_gate": passed_gate,
@@ -182,15 +230,25 @@ def render_markdown(summary: dict[str, Any]) -> str:
     loss_rows = []
     for row in summary["rows"]:
         last = row["last"]
+        live = row["live_log"]
+        live_last = live.get("latest", {}) if isinstance(live.get("latest"), dict) else {}
         loss_rows.append(
             [
                 row["job_id"],
                 row["label"],
+                live.get("latest_step"),
+                live.get("latest_weighted_attention_to_ce"),
+                live.get("max_weighted_attention_to_ce"),
                 last["ce"],
                 last["logit_kd"],
                 last["weighted_logit_kd"],
                 last["attention_kd"],
                 last["weighted_attention_kd"],
+                finite(live_last.get("ce")),
+                finite(live_last.get("logit_kd")),
+                finite(live_last.get("weighted_logit_kd")),
+                finite(live_last.get("attention_kd")),
+                finite(live_last.get("weighted_attention_kd")),
             ]
         )
     return "\n\n".join(
@@ -226,7 +284,23 @@ def render_markdown(summary: dict[str, Any]) -> str:
             ),
             "## Loss Components",
             md_table(
-                ["job", "label", "CE", "logit KD", "weighted logit KD", "attention KD", "weighted attention KD"],
+                [
+                    "job",
+                    "label",
+                    "live step",
+                    "live attn/CE",
+                    "live max attn/CE",
+                    "final CE",
+                    "final logit KD",
+                    "final weighted logit KD",
+                    "final attention KD",
+                    "final weighted attention KD",
+                    "live CE",
+                    "live logit KD",
+                    "live weighted logit KD",
+                    "live attention KD",
+                    "live weighted attention KD",
+                ],
                 loss_rows,
             ),
             "## Interpretation",

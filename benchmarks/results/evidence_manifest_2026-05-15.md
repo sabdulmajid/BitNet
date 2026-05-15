@@ -20,7 +20,7 @@ Artifacts: `211`. Missing: `0`.
 | bitdistill_stage2_curve_report | tracked_report | yes | 4180 | de98a4baca66 |  |
 | bitdistill_stage2_curve_submission_report | tracked_report | yes | 1512 | 77354c56b3ed |  |
 | bitdistill_controlled_postprocess_submission_report | tracked_report | yes | 710 | 8e1b74096b71 |  |
-| bitdistill_controlled_curve_report | tracked_report | yes | 1975 | db49f49482c8 |  |
+| bitdistill_controlled_curve_report | tracked_report | yes | 2355 | 49e32567e5b8 |  |
 | bitdistill_reproduction_gate_report | tracked_report | yes | 12908 | fa3178597d19 |  |
 | bitdistill_paired_predictions_report | tracked_report | yes | 8123 | c9107324629d |  |
 | bitdistill_task_formulation_report | tracked_report | yes | 11647 | cb03c36274ba |  |
@@ -161,7 +161,7 @@ Artifacts: `211`. Missing: `0`.
 | bitdistill_stage2_curve_json | generic_json | yes | 19229 | 42f4a99e3a68 |  |
 | bitdistill_stage2_curve_submission_json | generic_json | yes | 2131 | ae9d0a82341e |  |
 | bitdistill_controlled_postprocess_submission_json | generic_json | yes | 341 | 0eece5b559b7 |  |
-| bitdistill_controlled_curve_json | generic_json | yes | 6571 | 4e18dccd5eb2 |  |
+| bitdistill_controlled_curve_json | generic_json | yes | 7436 | f36e6d8d5e75 |  |
 | bitdistill_root_cause_audit_json | generic_json | yes | 8206 | 7eb5698ce541 |  |
 | bitdistill_telemetry_coverage_json | generic_json | yes | 3805 | d5972de78a36 |  |
 | qwen3_paper_alignment_json | generic_json | yes | 22176 | d89033e7b8f6 |  |

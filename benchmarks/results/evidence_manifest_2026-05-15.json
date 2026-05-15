@@ -169,8 +169,8 @@
       "label": "bitdistill_controlled_curve_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_controlled_curve_2026-05-15.md",
-      "sha256": "db49f49482c8e46a172c1ce7163c3f7e278ebb8ce579309c7903617cff2bd44a",
-      "size_bytes": 1975
+      "sha256": "49e32567e5b8cf17624c878d7faf51e55c6db09225cf5fef2fbf4a1e980daa4e",
+      "size_bytes": 2355
     },
     {
       "exists": true,
@@ -2332,8 +2332,8 @@
       "label": "bitdistill_controlled_curve_json",
       "metrics": {},
       "path": "benchmark_results/bitdistill_controlled_curve_2026-05-15.json",
-      "sha256": "4e18dccd5eb20897435d80f0cfeb8ccfa5375724db4fd5712508ceebc190ab89",
-      "size_bytes": 6571
+      "sha256": "f36e6d8d5e75272a4be4adfd4702125ba612df58190dd26633986bfd19fcc7b8",
+      "size_bytes": 7436
     },
     {
       "exists": true,

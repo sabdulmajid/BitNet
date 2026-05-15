@@ -18,6 +18,10 @@
         "weighted_attention_kd": null,
         "weighted_logit_kd": null
       },
+      "live_log": {
+        "exists": false,
+        "path": "logs/bitdistill-glue-10069.out"
+      },
       "metric_accuracy": null,
       "metric_eval_examples": null,
       "metrics_exists": false,
@@ -50,7 +54,7 @@
       "squeue": {
         "elapsed": "0:00",
         "job_id": "10069",
-        "reason": "(Dependency)",
+        "reason": "(Resources)",
         "state": "PENDING"
       },
       "stage2_token_presentations": 40960000,
@@ -66,6 +70,26 @@
         "logit_kd": null,
         "weighted_attention_kd": null,
         "weighted_logit_kd": null
+      },
+      "live_log": {
+        "exists": true,
+        "latest": {
+          "attention_kd": 0.01617,
+          "ce": 0.898438,
+          "elapsed": 461.5,
+          "logit_kd": 0.066415,
+          "loss": 1618.564697,
+          "lr": 1.99e-05,
+          "step": 570.0,
+          "weighted_attention_kd": 1617.002075,
+          "weighted_logit_kd": 0.664152
+        },
+        "latest_step": 570,
+        "latest_weighted_attention_to_ce": 1799.792612289329,
+        "max_weighted_attention_to_ce": 5278.853516048964,
+        "min_weighted_attention_to_ce": 813.6714545230769,
+        "parsed_steps": 58,
+        "path": "logs/bitdistill-glue-10068.out"
       },
       "metric_accuracy": null,
       "metric_eval_examples": null,
@@ -97,10 +121,10 @@
       "predictions_exists": false,
       "predictions_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
       "squeue": {
-        "elapsed": "0:00",
+        "elapsed": "9:05",
         "job_id": "10068",
-        "reason": "(Dependency)",
-        "state": "PENDING"
+        "reason": "ece-nebula12",
+        "state": "RUNNING"
       },
       "stage2_token_presentations": 163840000,
       "steps": null
@@ -115,6 +139,10 @@
         "logit_kd": null,
         "weighted_attention_kd": null,
         "weighted_logit_kd": null
+      },
+      "live_log": {
+        "exists": false,
+        "path": "logs/bitdistill-glue-10071.out"
       },
       "metric_accuracy": null,
       "metric_eval_examples": null,

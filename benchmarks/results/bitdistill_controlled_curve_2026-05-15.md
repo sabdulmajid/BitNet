@@ -14,16 +14,16 @@ Pending: at least one controlled Stage-2 curve row lacks metrics or prediction t
 | job | label | state | Stage-2 tokens | paper fraction | metrics | predictions | accuracy | delta vs FP16 | paired CI95 | passes gate | errors |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 10069 | 5k-warmup downstream control | PENDING | 40960000 | 0.004096 | false | false | - | - | - | false | missing checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-5kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl |
-| 10068 | 20k-warmup downstream control | PENDING | 163840000 | 0.016384 | false | false | - | - | - | false | missing checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl |
+| 10068 | 20k-warmup downstream control | RUNNING | 163840000 | 0.016384 | false | false | - | - | - | false | missing checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl |
 | 10071 | 40k-warmup downstream control | PENDING | 327680000 | 0.032768 | false | false | - | - | - | false | missing checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl |
 
 ## Loss Components
 
-| job | label | CE | logit KD | weighted logit KD | attention KD | weighted attention KD |
-| --- | --- | --- | --- | --- | --- | --- |
-| 10069 | 5k-warmup downstream control | - | - | - | - | - |
-| 10068 | 20k-warmup downstream control | - | - | - | - | - |
-| 10071 | 40k-warmup downstream control | - | - | - | - | - |
+| job | label | live step | live attn/CE | live max attn/CE | final CE | final logit KD | final weighted logit KD | final attention KD | final weighted attention KD | live CE | live logit KD | live weighted logit KD | live attention KD | live weighted attention KD |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 10069 | 5k-warmup downstream control | - | - | - | - | - | - | - | - | - | - | - | - | - |
+| 10068 | 20k-warmup downstream control | 570 | 1799.792612 | 5278.853516 | - | - | - | - | - | 0.898438 | 0.066415 | 0.664152 | 0.016170 | 1617.002075 |
+| 10071 | 40k-warmup downstream control | - | - | - | - | - | - | - | - | - | - | - | - | - |
 
 ## Interpretation
 
