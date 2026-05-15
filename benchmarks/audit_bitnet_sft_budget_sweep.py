@@ -69,6 +69,16 @@ def md_table(headers: list[str], rows: list[list[Any]]) -> str:
     return "\n".join(out)
 
 
+def anchor_gap_text(anchor_minus_local: float | None) -> str:
+    if anchor_minus_local is None:
+        return "the paper-anchor gap is unknown"
+    if anchor_minus_local > 0:
+        return f"the remaining gap is `{fmt(anchor_minus_local)}`"
+    if anchor_minus_local < 0:
+        return f"the local row exceeds the anchor by `{fmt(abs(anchor_minus_local))}`"
+    return "the local row exactly matches the anchor"
+
+
 def safe_value(value: str) -> str:
     return value.replace("-", "m").replace("+", "").replace(".", "p")
 
@@ -211,8 +221,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
         verdict = (
             f"Best completed sweep row is accuracy `{fmt(best['accuracy'])}` at "
             f"steps=`{best['steps']}`, lr=`{best['lr']}`. The paper BitNet-SFT "
-            f"anchor remains `{fmt(summary['paper_anchor'])}`, so the remaining "
-            f"gap is `{fmt(best['paper_anchor_minus_local'])}`."
+            f"anchor remains `{fmt(summary['paper_anchor'])}`, so "
+            f"{anchor_gap_text(best['paper_anchor_minus_local'])}."
         )
     else:
         verdict = "No completed sweep rows are available yet; this report currently tracks submitted jobs and output paths."
@@ -251,11 +261,21 @@ def render_markdown(summary: dict[str, Any]) -> str:
     ]
     if len(trend_rows) >= 2:
         latest = summary["step_trend"][-1]
+        gap = latest["paper_anchor_minus_local"]
+        if gap is not None and gap <= 0:
+            anchor_sentence = (
+                "This clears the paper BitNet-SFT anchor for this baseline, but it "
+                "does not prove BitDistill or FP16-level recovery."
+            )
+        else:
+            anchor_sentence = (
+                "This is evidence for an undertraining/schedule component, but the "
+                f"row remains `{fmt(gap)}` below the paper BitNet-SFT anchor."
+            )
         trend_text = (
             "The best completed row at the largest completed step count is still improving "
             f"over the previous completed step bucket by `{fmt(latest['delta_vs_previous_step_best'])}`. "
-            "This is evidence for an undertraining/schedule component, but the row remains "
-            f"`{fmt(latest['paper_anchor_minus_local'])}` below the paper BitNet-SFT anchor."
+            f"{anchor_sentence}"
         )
     elif trend_rows:
         trend_text = "Only one completed step bucket exists, so no budget trend is established yet."

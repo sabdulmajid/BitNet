@@ -119,6 +119,17 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
 
     bitnet_acc = bitnet.get("accuracy")
     best_acc = best_sweep.get("accuracy")
+    if isinstance(best_acc, (int, float)):
+        best_budget_status = "pass" if best_acc >= PAPER_BITNET_SFT_MNLI else "fail"
+        best_budget_risk = (
+            "The BitNet-SFT baseline anchor is cleared; the next blocker is BitDistill/FP16-level recovery."
+            if best_acc >= PAPER_BITNET_SFT_MNLI
+            else "Pending 10000-step rows are needed to distinguish undertraining from equation mismatch."
+        )
+    else:
+        best_budget_status = "pending"
+        best_budget_risk = "No completed budget row is available yet."
+    budget_anchor_cleared = isinstance(best_acc, (int, float)) and best_acc >= PAPER_BITNET_SFT_MNLI
     checks = source_checks(train_distill, train_bitdistill)
     checks.extend(
         [
@@ -126,15 +137,13 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                 "check": "Default BitNet-SFT reaches paper anchor",
                 "status": "fail",
                 "evidence": f"default={fmt(bitnet_acc)}, paper={fmt(PAPER_BITNET_SFT_MNLI)}, gap={fmt(PAPER_BITNET_SFT_MNLI - bitnet_acc if isinstance(bitnet_acc, (int, float)) else None)}",
-                "risk": "Primary blocker: BitDistill recovery cannot be interpreted until this baseline is explained.",
+                "risk": "The short/default run is undertrained; use the budget sweep, not this row, for paper-anchor interpretation.",
             },
             {
                 "check": "Best completed budget row reaches paper anchor",
-                "status": "fail"
-                if isinstance(best_acc, (int, float)) and best_acc < PAPER_BITNET_SFT_MNLI
-                else "pending",
+                "status": best_budget_status,
                 "evidence": f"best_completed={fmt(best_acc)}, steps={best_sweep.get('steps', '-')}, lr={best_sweep.get('lr', '-')}",
-                "risk": "Pending 10000-step rows are needed to distinguish undertraining from equation mismatch.",
+                "risk": best_budget_risk,
             },
             {
                 "check": "Activation quantization explains the gap",
@@ -159,10 +168,13 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "default_bitnet_sft_accuracy": bitnet_acc,
         "best_completed_sweep_accuracy": best_acc,
         "checks": checks,
-        "verdict": "mechanically_plausible_but_not_recipe_matched",
+        "verdict": "bitnet_sft_anchor_cleared_bitdistill_pending"
+        if budget_anchor_cleared
+        else "mechanically_plausible_but_not_recipe_matched",
         "next": [
             "Finish the remaining pending budget rows, especially the 10000-step rows.",
-            "If the curve saturates low, audit BitLinear/SubLN equation parity against the paper implementation.",
+            "Use the cleared BitNet-SFT anchor as the controlled baseline for the next BitDistill/FP16-recovery run.",
+            "If BitDistill still saturates low, audit loss normalization, SubLN initialization, and attention-distillation parity against the paper implementation.",
             "Keep row-scale results separate from paper-reproduction labels.",
             "Do not broaden MoE/Kimi claims until dense BitNet-SFT is explained.",
         ],
@@ -174,9 +186,20 @@ def render_markdown(summary: dict[str, Any]) -> str:
         [row["check"], row["status"], row["evidence"], row["risk"]]
         for row in summary["checks"]
     ]
+    if summary["verdict"] == "bitnet_sft_anchor_cleared_bitdistill_pending":
+        verdict = (
+            "Verdict: the source-level BitNet-SFT implementation is mechanically plausible, "
+            "and the best completed budget row now clears the paper BitNet-SFT anchor. "
+            "Paper-level BitDistill/FP16 recovery is still not reproduced."
+        )
+    else:
+        verdict = (
+            "Verdict: the source-level implementation is mechanically plausible, but the local "
+            "BitNet-SFT accuracy is not recipe-matched to the paper anchor yet."
+        )
     lines = [
         f"# BitNet-SFT Recipe Alignment Audit, {summary['date']}",
-        "Verdict: the source-level implementation is mechanically plausible, but the local BitNet-SFT accuracy is not recipe-matched to the paper anchor yet.",
+        verdict,
         "",
         f"- Default BitNet-SFT MNLI: `{fmt(summary['default_bitnet_sft_accuracy'])}`.",
         f"- Paper BitNet-SFT MNLI anchor: `{fmt(summary['paper_bitnet_sft_mnli'])}`.",

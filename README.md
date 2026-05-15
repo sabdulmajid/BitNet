@@ -43,7 +43,7 @@ packed CPU path faithful to the trained checkpoint.
 | Arbitrary FP16/BF16 to ternary conversion is lossless | **No** | Qwen2.5-1.5B naive PTQ drops ten-task mean from `0.644169` to `0.348671`; WikiText PPL jumps from `13.901` to `3,813,121.803`. |
 | QAT/distillation recovers useful signal | **Yes, partially** | Best row-scale dense-Qwen run reaches ten-task mean `0.499459`, improving over naive PTQ by `+0.150788` paired mean accuracy. |
 | Row-scale packed CPU inference is viable for compatible dense causal artifacts | **Yes, for the audited path** | `I2_SR` row-scale Qwen2.5-1.5B Xeon run: PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, file `1211.3 MiB`. |
-| BitDistill paper-level GLUE reproduction is achieved | **No, not yet** | Local FP16-SFT MNLI is close to the paper anchor (`0.807641` vs `0.799100`), but local BitNet-SFT is still below the paper anchor (`0.487621` default; best completed budget row `0.574733` vs paper BitNet-SFT `0.608000`). |
+| BitDistill paper-level GLUE reproduction is achieved | **No, not yet** | Local FP16-SFT MNLI is close to the paper anchor (`0.807641` vs `0.799100`), and BitNet-SFT now clears its paper anchor (`0.628935` vs `0.608000`) after more budget. This is CE-only BitNet-SFT, not BitDistill or FP16-level recovery. |
 | Row-scale `I2_SR` is standard BitNet | **No** | It is a fork-specific retrofit variant for row-scale students, not the upstream per-tensor BitNet format. |
 | Kimi/MoE retrofit is proven | **No** | Tiny Qwen2MoE fixtures prove converter/runtime plumbing only. No Kimi-specific mapping, trained MoE quality, or real expert-locality benchmark is proven. |
 
@@ -88,13 +88,13 @@ full GLUE validation counts: MNLI `9815`, QNLI `5463`, SST2 `872`.
 | --- | ---: | ---: |
 | Qwen2.5-0.5B MNLI FP16-SFT | `0.807641` | `0.799100` |
 | Qwen2.5-0.5B MNLI BitNet-SFT default | `0.487621` | `0.608000` |
-| Qwen2.5-0.5B MNLI BitNet-SFT best completed budget row | `0.574733` | `0.608000` |
-| Qwen2.5-0.5B MNLI best current long-warmup row-scale diagnostic | `0.653591` | FP16 gap within `0.005-0.010` |
+| Qwen2.5-0.5B MNLI BitNet-SFT best completed budget row | `0.628935` | `0.608000` |
+| Qwen2.5-0.5B MNLI best current long-warmup row-scale diagnostic | `0.653591` | `retrofit-variant`; not a paper-reproduction row |
 
-The important failure is specific: FP16-SFT learns the task, but local
-BitNet-SFT is far below the paper's BitNet-SFT anchor. That means the next
-research question is not broad novelty; it is why the ternary baseline is so
-weak under the local recipe.
+The earlier BitNet-SFT failure was substantially a budget/schedule issue:
+`1000`- and `3000`-step rows were undertrained, while the first `10000`-step row
+clears the paper's BitNet-SFT anchor. The current blocker has shifted from
+baseline viability to BitDistill-style recovery toward the FP16 task model.
 
 Current BitNet-SFT controls:
 
@@ -103,13 +103,14 @@ Current BitNet-SFT controls:
 - Weights-only/no-A8 control: `0.493734`, only `+0.006113` over W1.58A8.
 - SubLN-only local control: `0.350280`, so current SubLN insertion by itself
   worsens the local baseline.
-- Best completed budget row: `0.574733` at `3000` steps, `2e-5`, still
-  `0.033267` below the paper BitNet-SFT anchor.
+- Best completed budget row: `0.628935` at `10000` steps, `2e-5`, exceeding
+  the paper BitNet-SFT anchor by `0.020935` but still `0.178706` below the
+  local FP16-SFT row.
 
-The completed `3000`-step sweep improves over the best `1000`-step row, so
-budget and schedule are helping. It does not close the anchor gap. The remaining
-`10000`-step rows are running or queued to separate undertraining from
-recipe/implementation mismatch.
+The completed `3000`-step sweep improves over the best `1000`-step row, and the
+first `10000`-step row improves again. This does not prove BitDistill; it proves
+that the short-budget BitNet-SFT baseline was not a sufficient reproduction
+budget.
 
 ### Xeon CPU Runtime
 
@@ -185,10 +186,10 @@ The next experiments are intentionally narrow:
 
 Decision rule:
 
-- If BitNet-SFT rises toward the paper anchor with more steps, the local result
-  is mostly undertraining/budget.
-- If BitNet-SFT saturates far below `0.608000`, the core implementation or
-  recipe is mismatched before BitDistill can be interpreted.
+- The first `10000`-step BitNet-SFT row clears the paper BitNet-SFT anchor, so
+  the short-run failure was mostly undertraining/budget.
+- The next interpretation gate is BitDistill/FP16 recovery, not the weaker
+  CE-only BitNet-SFT anchor.
 - Row-scale results should be reported as a separate runtime/retrofit
   contribution, not as a BitDistill reproduction.
 

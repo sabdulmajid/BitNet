@@ -24,26 +24,28 @@ result.
 | QAT/distillation recovers signal | proven partially | Best row-scale dense-Qwen ten-task mean `0.499459`; paired recovery over naive PTQ `+0.150788` with 95% CI `[+0.053427, +0.248149]`. |
 | Row-scale semantics matter | proven for current best row-scale checkpoint | TL2 one-scale relative output RMS error `1.904230`; exact FP16 row scales `0.000197` with only `1.230469 MiB` scale overhead. |
 | Packed row-scale CPU runtime is feasible | proven for dense causal artifact | `I2_SR` Xeon result: PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, file `1211.3 MiB`. |
-| Paper-level BitDistill is reproduced | not proven | FP16-SFT MNLI is close to paper (`0.807641` vs `0.799100`), but BitNet-SFT remains below anchor (`0.487621` default; best completed budget row `0.574733` vs paper `0.608000`). |
+| Paper-level BitDistill is reproduced | not proven | FP16-SFT MNLI is close to paper (`0.807641` vs `0.799100`), and BitNet-SFT now clears its paper anchor (`0.628935` vs `0.608000`) after more budget. This is not yet BitDistill or FP16-level recovery. |
 | Kimi/MoE works | not proven | Tiny Qwen2MoE fixtures prove routing/packing smoke only; no Kimi mapping or trained MoE quality exists. |
 
-## The Narrow Blocker
+## Baseline Status
 
-The key reproduction failure is now specific:
+The earlier reproduction failure was specific:
 
 ```text
 FP16-SFT learns MNLI locally.
-BitNet-SFT does not match the paper's BitNet-SFT anchor.
+Short-budget BitNet-SFT does not match the paper's BitNet-SFT anchor.
 ```
 
 | MNLI row | local | paper anchor |
 | --- | ---: | ---: |
 | FP16-SFT | `0.807641` | `0.799100` |
 | BitNet-SFT default | `0.487621` | `0.608000` |
-| BitNet-SFT best completed budget row | `0.574733` | `0.608000` |
+| BitNet-SFT best completed budget row | `0.628935` | `0.608000` |
 
-This means the next work should not be broad ablation expansion. It should
-explain why BitNet-SFT is low before claiming anything about BitDistill.
+The first `10000`-step BitNet-SFT row changes the interpretation: the weak
+baseline was substantially undertrained at the shorter budgets. The current
+blocker is now BitDistill recovery toward the FP16 task model, not whether the
+CE-only BitNet-SFT baseline can reach the paper's weaker BitNet-SFT anchor.
 
 Completed controls rule out several simple causes:
 
@@ -55,12 +57,14 @@ Completed controls rule out several simple causes:
   initialization, or timing is not aligned enough to explain the paper result.
 - A 1000-step LR sweep improved the best short row to `0.523892`.
 - The completed 3000-step sweep improves further to `0.574733`, with `48,000`
-  optimizer examples, or `0.122230` MNLI epochs, but the best row still misses
-  the paper anchor by `0.033267`.
+  optimizer examples, or `0.122230` MNLI epochs.
+- The first 10000-step row reaches `0.628935`, with `160,000` optimizer
+  examples, or `0.407434` MNLI epochs. It exceeds the paper BitNet-SFT anchor
+  by `0.020935`, but remains `0.178706` below the local FP16-SFT row.
 
 ## Canonical Next Matrix
 
-Keep the next wave narrow until the BitNet-SFT baseline is explained.
+Keep the next wave narrow now that the BitNet-SFT anchor is cleared.
 
 | axis | selected value |
 | --- | --- |
@@ -75,12 +79,9 @@ Keep the next wave narrow until the BitNet-SFT baseline is explained.
 
 Decision rule:
 
-- If longer BitNet-SFT rows move monotonically toward `0.608000`, the short
-  rows were mostly undertrained.
-- If the curve saturates below the paper anchor, investigate equation-level
-  recipe mismatch before running larger BitDistill jobs.
-- Row-scale should remain a separate `retrofit-variant`, not a
-  paper-reproduction row.
+- Finish the remaining `10000`-step LR row to check schedule robustness.
+- Move back to BitDistill only after the CE-only baseline curve is recorded.
+- Treat row-scale as a separate `retrofit-variant`, not a paper-reproduction row.
 
 ## Product Framing
 
@@ -114,12 +115,13 @@ The plausible contribution is:
 
 ## Immediate Actions
 
-1. Finish and ingest the BitNet-SFT `3000`/`10000` step budget curve.
-2. If the curve remains weak, audit BitLinear equations, SubLN placement/timing,
-   dense-head treatment, optimizer schedule, and ternary code/scale dynamics
-   before broader BitDistill sweeps.
-3. Keep Qwen3/Qwen2.5 paper-alignment jobs labeled as partial until full
+1. Finish and ingest the remaining `10000`-step BitNet-SFT LR row.
+2. Use the cleared CE-only BitNet-SFT anchor as the controlled baseline for the
+   next BitDistill run.
+3. If BitDistill remains weak, audit loss normalization, SubLN placement/timing,
+   dense-head treatment, optimizer schedule, and ternary code/scale dynamics.
+4. Keep Qwen3/Qwen2.5 paper-alignment jobs labeled as partial until full
    validation rows close the FP16 gap.
-4. Keep row-scale `I2_SR` as a separate systems contribution.
-5. Move real Kimi/MoE claims to future work until trained quality and routing
+5. Keep row-scale `I2_SR` as a separate systems contribution.
+6. Move real Kimi/MoE claims to future work until trained quality and routing
    locality are measured.
