@@ -259,8 +259,8 @@
       "label": "bitdistill_snapshot_integrity_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_snapshot_integrity_2026-05-15.md",
-      "sha256": "25a3ea989abcbcd8e0e48fa77009d961b36be7ff87dddc4a263f895052be3fd5",
-      "size_bytes": 532
+      "sha256": "d47883605e497303aaa3a657ea3222778b35955d4745bef26c96ba69ea65b6e2",
+      "size_bytes": 729
     },
     {
       "exists": true,
@@ -2360,7 +2360,7 @@
         "warmup_step": 18160
       },
       "path": "benchmark_results/bitdistill_active_goal_audit_2026-05-15.json",
-      "sha256": "d72091c6265ef4beab3bb946a9a36f413cd416164ce6608c3b14f2c9836ffbba",
+      "sha256": "d901fe3024973b2ab8c977b9265504cc8a98ceec62d2d0c459dd019b01ab694e",
       "size_bytes": 5442
     },
     {
@@ -2372,18 +2372,18 @@
         "codes_valid": true,
         "expected_ternary": 169,
         "passed": true,
-        "passed_snapshots": 1,
+        "passed_snapshots": 2,
         "row_scale_count": 169,
         "scale_mode": "row",
-        "snapshot_count": 1,
+        "snapshot_count": 2,
         "step": 1000,
         "tensor_scale_count": 0,
         "ternary_weight_count": 169,
         "weight_scale_count": 169
       },
       "path": "benchmark_results/bitdistill_snapshot_integrity_2026-05-15.json",
-      "sha256": "5bc2c51ee887a63db4506953c164e9646c12d3bbbc59cafc703f6422e48ab00c",
-      "size_bytes": 1127
+      "sha256": "bbd705cf04cbd2c7a92aa15630747def6923130f2dd14a7b375e66d4879f58ef",
+      "size_bytes": 2117
     },
     {
       "exists": true,

@@ -30,7 +30,7 @@ Artifacts: `159`. Missing: `0`.
 | bitdistill_producer_script_audit_report | tracked_report | yes | 2632 | 4778dbf8d7be |  |
 | bitdistill_job_matrix_report | tracked_report | yes | 6305 | 5ec798924379 |  |
 | bitdistill_active_goal_report | tracked_report | yes | 3507 | d921c96b7829 |  |
-| bitdistill_snapshot_integrity_report | tracked_report | yes | 532 | 25a3ea989abc |  |
+| bitdistill_snapshot_integrity_report | tracked_report | yes | 729 | d47883605e49 |  |
 | bitdistill_smoke_contract_report | tracked_report | yes | 3955 | f7dc1484ffc2 |  |
 | bitdistill_variant_summary_report | tracked_report | yes | 8539 | 88f91af709aa |  |
 | bitdistill_causal_longwarmup_report | tracked_report | yes | 3592 | dbb1897f668e |  |
@@ -144,8 +144,8 @@ Artifacts: `159`. Missing: `0`.
 | bitdistill_warmup_finalizer_submission_json | bitdistill_warmup_finalizer_submission_json | yes | 661 | b9006b1eab96 | submitted=True, job=10023, dep=afterany, warmup=1 |
 | bitdistill_producer_script_audit_json | bitdistill_producer_script_audit_json | yes | 5053 | 1e14ef86cad9 | passed=True, checks=14, failed=0, downstream=38, cpu=10025, i2sr=10024, post=10027/10026 |
 | bitdistill_job_matrix_json | bitdistill_job_matrix_json | yes | 43201 | 8266de50ae89 | passed=True, configured=38/38, observed=38, states={'PENDING': 38}, inferred_rows=0, blockers=0 |
-| bitdistill_active_goal_json | bitdistill_active_goal_json | yes | 5442 | d72091c6265e | achieved=False, status=partial, complete=1/5, pending=3, warmup=18160/20000, row_complete=False, i2sr=False, cpu=False |
-| bitdistill_snapshot_integrity_json | bitdistill_snapshot_integrity_json | yes | 1127 | 5bc2c51ee887 | passed=True, snapshots=1/1, step=1000, scale=row, ternary=169/169, row_scales=169, tensor_scales=0, codes=True |
+| bitdistill_active_goal_json | bitdistill_active_goal_json | yes | 5442 | d901fe302497 | achieved=False, status=partial, complete=1/5, pending=3, warmup=18160/20000, row_complete=False, i2sr=False, cpu=False |
+| bitdistill_snapshot_integrity_json | bitdistill_snapshot_integrity_json | yes | 2117 | bbd705cf04cb | passed=True, snapshots=2/2, step=1000, scale=row, ternary=169/169, row_scales=169, tensor_scales=0, codes=True |
 | bitdistill_smoke_contract_json | bitdistill_smoke_contract_json | yes | 37145 | 0feb44df8301 | passed=True, checks=40, failed=0, continued=bitlinear15/subln4, task=bitlinear15/subln4 |
 | bitdistill_variant_summary_json | bitdistill_variant_summary_json | yes | 19963 | 16c37e2313be | rows=21/21, tasks=['mnli', 'qnli', 'sst2'] |
 | bitdistill_causal_longwarmup_json | bitdistill_causal_summary_json | yes | 11519 | b2c0c451c391 | passed=False, rows=6/12, verdicts=0/3, tasks=['mnli', 'qnli', 'sst2'] |
