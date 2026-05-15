@@ -114,6 +114,9 @@ Current BitNet-SFT controls:
 - Best completed budget row: `0.628935` at `10000` steps, `2e-5`, exceeding
   the paper BitNet-SFT anchor by `0.020935` but still `0.178706` below the
   local FP16-SFT row.
+- The second completed `10000`-step row at `5e-5` reaches `0.607845`, nearly
+  exactly the paper BitNet-SFT anchor but below the `2e-5` row. The CE-only
+  baseline is therefore viable but schedule-sensitive.
 - Paired prediction audit against the FP16 trace gives candidate minus FP16
   `-0.179215`, 95% CI `[-0.189580, -0.168851]`, McNemar
   `p=3.438389e-240`.

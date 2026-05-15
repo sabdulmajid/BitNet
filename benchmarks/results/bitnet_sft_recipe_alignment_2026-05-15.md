@@ -18,8 +18,8 @@ Verdict: the source-level BitNet-SFT implementation is mechanically plausible, a
 | SubLN-only local control explains the gap | fail | subln_only=0.350280, default=0.487621 | SubLN likely requires exact paper timing/budget or current insertion differs in a material way. |
 
 ## Next Actions
-1. Finish the remaining pending budget rows, especially the 10000-step rows.
-2. Use the cleared BitNet-SFT anchor as the controlled baseline for the next BitDistill/FP16-recovery run.
+1. Use the completed 10000-step LR rows to quantify schedule sensitivity before interpreting BitDistill recovery.
+2. Use the best cleared BitNet-SFT anchor as the controlled baseline for the next BitDistill/FP16-recovery run.
 3. If BitDistill still saturates low, audit loss normalization, SubLN initialization, and attention-distillation parity against the paper implementation.
 4. Keep row-scale results separate from paper-reproduction labels.
 5. Do not broaden MoE/Kimi claims until dense BitNet-SFT is explained.

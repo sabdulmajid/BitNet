@@ -33,7 +33,7 @@ Overall status: **PASS**.
 | BitDistill paired audit has BitNet baseline rows | pass | rows=3, path=benchmark_results/bitdistill_paired_predictions_2026-05-15.json |  |
 | BitNet baseline paired rows cover full GLUE validation | pass | full_rows=3, matched=16150 |  |
 | BitNet baseline paired rows have paired statistics | pass | stats_rows=3 |  |
-| BitNet-SFT budget paired audit has completed full-MNLI rows | pass | complete=9/10, best_matched=9815, path=benchmark_results/bitnet_sft_budget_paired_2026-05-15.json |  |
+| BitNet-SFT budget paired audit has completed full-MNLI rows | pass | complete=10/10, best_matched=9815, path=benchmark_results/bitnet_sft_budget_paired_2026-05-15.json |  |
 | BitNet-SFT best budget row has paired CI and McNemar test | pass | delta=-0.17921548650025465, ci=[-0.18958024909015786, -0.16885072391035155], mcnemar=3.4383886495134495e-240 |  |
 | BitNet-SFT mechanics audit passes | pass | passed=True, verdict=basic_mechanics_pass_bitdistill_recovery_pending, path=benchmark_results/bitnet_sft_mechanics_audit_2026-05-15.json |  |
 | BitNet-SFT mechanics audit has exact projection replacement counts | pass | ternary=168, families={'down_proj': 24, 'gate_proj': 24, 'k_proj': 24, 'o_proj': 24, 'q_proj': 24, 'up_proj': 24, 'v_proj': 24} |  |

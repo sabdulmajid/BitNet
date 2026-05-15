@@ -182,7 +182,7 @@
     {
       "name": "BitNet-SFT budget paired audit has completed full-MNLI rows",
       "passed": true,
-      "evidence": "complete=9/10, best_matched=9815, path=benchmark_results/bitnet_sft_budget_paired_2026-05-15.json",
+      "evidence": "complete=10/10, best_matched=9815, path=benchmark_results/bitnet_sft_budget_paired_2026-05-15.json",
       "blocker": ""
     },
     {

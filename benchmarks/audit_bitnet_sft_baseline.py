@@ -437,8 +437,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
             "## Next Narrow Experiments",
             "\n".join(
                 [
-                    "1. Finish the pending 10000-step BitNet-SFT LR row and update the paired audit.",
-                    "2. Use the cleared BitNet-SFT budget row as the controlled CE-only baseline for BitDistill recovery.",
+                    "1. Treat the completed 10000-step LR rows as schedule-sensitivity evidence: lr=2e-5 is the best current CE-only row, while lr=5e-5 is the paper-anchor control.",
+                    "2. Use the best cleared BitNet-SFT budget row as the controlled CE-only baseline for BitDistill recovery.",
                     "3. Audit SubLN placement, initialization, and whether it should be enabled before or after continued pretraining.",
                     "4. Add activation variance, int8 saturation, ternary flip-rate, and loss-gradient telemetry to the Stage-3 loop.",
                     "5. Keep row-scale results labeled as a retrofit variant, not as a paper-reproduction result.",

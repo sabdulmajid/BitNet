@@ -3,7 +3,7 @@
 Best completed row is `0.628935` at steps=`10000`, lr=`2e-5`. It clears the paper BitNet-SFT anchor by `0.020935` but remains `-0.179215` below the paired FP16 reference.
 
 Reference prediction trace: `checkpoints/bitdistill-glue-seqcls-predtrace/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl`.
-Completed paired rows: `9/10`.
+Completed paired rows: `10/10`.
 
 | job | steps | lr | status | matched n | FP16 acc | candidate acc | candidate - FP16 | paired 95% CI | candidate - paper | candidate wins | FP16 wins | McNemar p |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -16,4 +16,4 @@ Completed paired rows: `9/10`.
 | 10064 | 3000 | 2e-5 | pass | 9815 | 0.808151 | 0.574733 | -0.233418 | [-0.244273, -0.222564] | -0.033267 | 599 | 2890 | 0.000000 |
 | 10065 | 3000 | 5e-5 | pass | 9815 | 0.808151 | 0.567397 | -0.240754 | [-0.251758, -0.229750] | -0.040603 | 621 | 2984 | 0.000000 |
 | 10066 | 10000 | 2e-5 | pass | 9815 | 0.808151 | 0.628935 | -0.179215 | [-0.189580, -0.168851] | 0.020935 | 625 | 2384 | 3.438389e-240 |
-| 10067 | 10000 | 5e-5 | pending | - | - | - | - | - | - | - | - | - |
+| 10067 | 10000 | 5e-5 | pass | 9815 | 0.808151 | 0.607845 | -0.200306 | [-0.210933, -0.189678] | -0.000155 | 630 | 2596 | 2.392886e-281 |

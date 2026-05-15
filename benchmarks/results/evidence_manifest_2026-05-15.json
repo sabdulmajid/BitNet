@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "ab31793303f58728d412fdacdfbe8aaa9486ebd355c1560b20e0c9c13d27980a",
-      "size_bytes": 18190
+      "sha256": "29516978f6c392fa392ccc311b0038cdce8c817b3c692c483aab20047c044491",
+      "size_bytes": 18398
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "research_redirect_report",
       "metrics": {},
       "path": "benchmarks/results/research_redirect_2026-05-15.md",
-      "sha256": "4cbf5778dcfb32d1483c215d403f532ee8064bcd38e0c792bac7ce411c517073",
-      "size_bytes": 7049
+      "sha256": "bf834e113a1bd8c8dce86b714bede8016b3900f3ff924dc20294e110c99a5968",
+      "size_bytes": 7273
     },
     {
       "exists": true,
@@ -115,8 +115,8 @@
       "label": "bitdistill_root_cause_audit_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md",
-      "sha256": "456eec35d737e1ac2d1d1eee8c01dcfc703e0f0e48a3ffb84cd2b541590f125f",
-      "size_bytes": 3590
+      "sha256": "1fbcdaa61c806c633c2259a9c3884fb83552af067868dc65e13cc7888f65dd20",
+      "size_bytes": 3591
     },
     {
       "exists": true,
@@ -205,8 +205,8 @@
       "label": "bitnet_sft_baseline_audit_report",
       "metrics": {},
       "path": "benchmarks/results/bitnet_sft_baseline_audit_2026-05-15.md",
-      "sha256": "d2e2602f224a1e01d16e8ee2ecca101c6bc1dc8efaadf06cc4721911aea34a72",
-      "size_bytes": 4801
+      "sha256": "4536cec960e47f803702d648c2330304d273ecf5ca2aaef4efb53b1d37521244",
+      "size_bytes": 4886
     },
     {
       "exists": true,
@@ -214,8 +214,8 @@
       "label": "bitnet_sft_recipe_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/bitnet_sft_recipe_alignment_2026-05-15.md",
-      "sha256": "69950837db6742e8ca59fbd8033de4df89bfc2cfc7a77b4d267d4d117f3b4849",
-      "size_bytes": 2883
+      "sha256": "427c8211509d82112e8d6eac27a93a31419845514b12ff17354e45687585b65b",
+      "size_bytes": 2925
     },
     {
       "exists": true,
@@ -232,8 +232,8 @@
       "label": "bitnet_sft_budget_sweep_report",
       "metrics": {},
       "path": "benchmarks/results/bitnet_sft_budget_sweep_2026-05-15.md",
-      "sha256": "7922b908e05d8cef2e5fbee857088e08d9f98356d81cdad6d0274f93b0e33873",
-      "size_bytes": 2513
+      "sha256": "0819f12ef64b873ff37d2a9512be922a3059f1531e5133784056d7271c732e61",
+      "size_bytes": 2552
     },
     {
       "exists": true,
@@ -241,8 +241,8 @@
       "label": "bitnet_sft_budget_paired_report",
       "metrics": {},
       "path": "benchmarks/results/bitnet_sft_budget_paired_2026-05-15.md",
-      "sha256": "9c3eb547f8cc2379ad80ee144fe06ba66f505e6f46bc5633a4a89948e9da56cc",
-      "size_bytes": 1914
+      "sha256": "ef5406fd4f69ff659d43eb56b430a69b62d3b1eece55c199782f3eed7d18fc78",
+      "size_bytes": 1983
     },
     {
       "exists": true,
@@ -556,8 +556,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "f7f536d1c3d8cda099a501d540b2698595f094eb4fd7ba51b0c79e62976d4c2a",
-      "size_bytes": 6549
+      "sha256": "ee0179f8a1a7fc2cd5fe6ba7637baea3f17a460f490743fd0132f15e6a8a1562",
+      "size_bytes": 6550
     },
     {
       "exists": true,
@@ -2246,8 +2246,8 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "f81af4f77ea576b5331cc9980ff441f85bb7f3e097003a1fb5bb7c1304b18153",
-      "size_bytes": 10871
+      "sha256": "c1e4c7cf09e2af845a3cd7f69085c40ba3312dc5ca43746c204ccd0b4ac2f2ef",
+      "size_bytes": 10872
     },
     {
       "exists": true,
@@ -2341,8 +2341,8 @@
       "label": "bitdistill_root_cause_audit_json",
       "metrics": {},
       "path": "benchmark_results/bitdistill_root_cause_audit_2026-05-15.json",
-      "sha256": "295e16a65756ff18666dcdeec1bfc81afc5928e37f432889bcdf0af4ea1f60e2",
-      "size_bytes": 8205
+      "sha256": "7eb5698ce5411438e484a6150a71873917bb91804f86d5253d744bcd21de1f0f",
+      "size_bytes": 8206
     },
     {
       "exists": true,
@@ -2412,8 +2412,8 @@
       "label": "bitnet_sft_recipe_alignment_json",
       "metrics": {},
       "path": "benchmark_results/bitnet_sft_recipe_alignment_2026-05-15.json",
-      "sha256": "2e2449074bb1a937964a0d2d02563f01232f05c09f91ad124dfccc329abb72b7",
-      "size_bytes": 3545
+      "sha256": "15a4a04515a379ddaa4ff4bffbb27d8603a58d78b2fbdd2f223e8a9a5528f9f5",
+      "size_bytes": 3587
     },
     {
       "exists": true,
@@ -2430,8 +2430,8 @@
       "label": "bitnet_sft_budget_sweep_json",
       "metrics": {},
       "path": "benchmark_results/bitnet_sft_budget_sweep_2026-05-15.json",
-      "sha256": "1d9f6722f15ab643ca512c3a99749cf4317f03bfe7e6b79d19171388076f29e2",
-      "size_bytes": 21065
+      "sha256": "a373df349fc6bce8a2eda49831ac7c5b24595a137bf31f60127919d54ec81ec7",
+      "size_bytes": 21549
     },
     {
       "exists": true,
@@ -2439,8 +2439,8 @@
       "label": "bitnet_sft_budget_paired_json",
       "metrics": {},
       "path": "benchmark_results/bitnet_sft_budget_paired_2026-05-15.json",
-      "sha256": "df413564bddbb34a9da04e41f0242a2ec8907a2e170e709b73e18453a9613e97",
-      "size_bytes": 9077
+      "sha256": "38559bf964527ecccf6fa9413011ba62d1b3a8e2c75fe17dd008fbfcd4d2b285",
+      "size_bytes": 9780
     },
     {
       "exists": true,

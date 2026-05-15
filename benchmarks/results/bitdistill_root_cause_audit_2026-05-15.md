@@ -26,7 +26,7 @@ The current evidence supports a negative PTQ result and a positive row-scale run
 
 | field | value |
 | --- | --- |
-| complete paired rows | 9 |
+| complete paired rows | 10 |
 | best accuracy | 0.628935 |
 | paper anchor | 0.608000 |
 | delta vs paper anchor | 0.020935 |

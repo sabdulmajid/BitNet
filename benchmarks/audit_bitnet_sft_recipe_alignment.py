@@ -172,8 +172,8 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         if budget_anchor_cleared
         else "mechanically_plausible_but_not_recipe_matched",
         "next": [
-            "Finish the remaining pending budget rows, especially the 10000-step rows.",
-            "Use the cleared BitNet-SFT anchor as the controlled baseline for the next BitDistill/FP16-recovery run.",
+            "Use the completed 10000-step LR rows to quantify schedule sensitivity before interpreting BitDistill recovery.",
+            "Use the best cleared BitNet-SFT anchor as the controlled baseline for the next BitDistill/FP16-recovery run.",
             "If BitDistill still saturates low, audit loss normalization, SubLN initialization, and attention-distillation parity against the paper implementation.",
             "Keep row-scale results separate from paper-reproduction labels.",
             "Do not broaden MoE/Kimi claims until dense BitNet-SFT is explained.",

@@ -2,8 +2,8 @@
 Artifacts: `211`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 18190 | ab31793303f5 |  |
-| research_redirect_report | tracked_report | yes | 7049 | 4cbf5778dcfb |  |
+| README | tracked_report | yes | 18398 | 29516978f6c3 |  |
+| research_redirect_report | tracked_report | yes | 7273 | bf834e113a1b |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
 | paired_row_minus_ptq_report | tracked_report | yes | 1332 | 20a5aee1eb99 |  |
@@ -14,7 +14,7 @@ Artifacts: `211`. Missing: `0`.
 | product_scope_gate | tracked_report | yes | 4919 | 274554bfc124 |  |
 | bitdistill_reproduction_status | tracked_report | yes | 8481 | 3f0e6a6abc2f |  |
 | bitdistill_reproduction_gap_analysis | tracked_report | yes | 7625 | e6aa07a2211f |  |
-| bitdistill_root_cause_audit_report | tracked_report | yes | 3590 | 456eec35d737 |  |
+| bitdistill_root_cause_audit_report | tracked_report | yes | 3591 | 1fbcdaa61c80 |  |
 | bitdistill_recovery_submission_report | tracked_report | yes | 1896 | 56e8811cce5e |  |
 | bitdistill_recovery_audit_report | tracked_report | yes | 1534 | 4bd7195806a9 |  |
 | bitdistill_stage2_curve_report | tracked_report | yes | 4180 | de98a4baca66 |  |
@@ -24,11 +24,11 @@ Artifacts: `211`. Missing: `0`.
 | bitdistill_reproduction_gate_report | tracked_report | yes | 12908 | fa3178597d19 |  |
 | bitdistill_paired_predictions_report | tracked_report | yes | 8123 | c9107324629d |  |
 | bitdistill_task_formulation_report | tracked_report | yes | 11647 | cb03c36274ba |  |
-| bitnet_sft_baseline_audit_report | tracked_report | yes | 4801 | d2e2602f224a |  |
-| bitnet_sft_recipe_alignment_report | tracked_report | yes | 2883 | 69950837db67 |  |
+| bitnet_sft_baseline_audit_report | tracked_report | yes | 4886 | 4536cec960e4 |  |
+| bitnet_sft_recipe_alignment_report | tracked_report | yes | 2925 | 427c8211509d |  |
 | bitnet_sft_mechanics_audit_report | tracked_report | yes | 4040 | 8d5e6bccb240 |  |
-| bitnet_sft_budget_sweep_report | tracked_report | yes | 2513 | 7922b908e05d |  |
-| bitnet_sft_budget_paired_report | tracked_report | yes | 1914 | 9c3eb547f8cc |  |
+| bitnet_sft_budget_sweep_report | tracked_report | yes | 2552 | 0819f12ef64b |  |
+| bitnet_sft_budget_paired_report | tracked_report | yes | 1983 | ef5406fd4f69 |  |
 | subln_activation_variance_report | tracked_report | yes | 2293 | 75e6c8b54d42 |  |
 | bitdistill_paper_alignment_report | tracked_report | yes | 10494 | a5d8df51bcf4 |  |
 | bitdistill_loss_scale_report | tracked_report | yes | 8733 | 628d0414fc13 |  |
@@ -63,7 +63,7 @@ Artifacts: `211`. Missing: `0`.
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 1824 | 5d992b3c9a1c |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 6549 | f7f536d1c3d8 |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 6550 | ee0179f8a1a7 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2569 | 51da6738be9d |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -153,7 +153,7 @@ Artifacts: `211`. Missing: `0`.
 | row_scale_qtype_i2sr_promotion_rehearsal_json | row_scale_qtype_gate_json | yes | 3897 | 6ffc161b446b | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 10871 | f81af4f77ea5 | passed=True, checks=56, failed=0 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 10872 | c1e4c7cf09e2 | passed=True, checks=56, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | a7a047c75a67 | achieved=False, status=not_complete, complete=7/9, open=2 |
 | product_scope_gate_json | product_scope_gate_json | yes | 5770 | d0101b25bd20 | scope=research_mvp_only, supported=5, unsupported=4 |
 | bitdistill_recovery_submission_json | generic_json | yes | 1186 | d473cba8d7f2 |  |
@@ -162,16 +162,16 @@ Artifacts: `211`. Missing: `0`.
 | bitdistill_stage2_curve_submission_json | generic_json | yes | 2131 | ae9d0a82341e |  |
 | bitdistill_controlled_postprocess_submission_json | generic_json | yes | 341 | 0eece5b559b7 |  |
 | bitdistill_controlled_curve_json | generic_json | yes | 6571 | 4e18dccd5eb2 |  |
-| bitdistill_root_cause_audit_json | generic_json | yes | 8205 | 295e16a65756 |  |
+| bitdistill_root_cause_audit_json | generic_json | yes | 8206 | 7eb5698ce541 |  |
 | bitdistill_telemetry_coverage_json | generic_json | yes | 3805 | d5972de78a36 |  |
 | qwen3_paper_alignment_json | generic_json | yes | 22176 | d89033e7b8f6 |  |
 | qwen3_postprocess_submission_json | generic_json | yes | 405 | aefafcfc80ef |  |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 32197 | c581499edff4 | present=34/36, examples=34, full_eval=34, ci95=34, paper_complete=True, paper_passed=False, row_complete=True, row_passed=False, confidence=0.95 |
 | bitnet_sft_baseline_audit_json | generic_json | yes | 48829 | 57c5584b4206 |  |
-| bitnet_sft_recipe_alignment_json | generic_json | yes | 3545 | 2e2449074bb1 |  |
+| bitnet_sft_recipe_alignment_json | generic_json | yes | 3587 | 15a4a04515a3 |  |
 | bitnet_sft_mechanics_audit_json | generic_json | yes | 76773 | 47c1fa293d7a |  |
-| bitnet_sft_budget_sweep_json | generic_json | yes | 21065 | 1d9f6722f15a |  |
-| bitnet_sft_budget_paired_json | generic_json | yes | 9077 | df413564bddb |  |
+| bitnet_sft_budget_sweep_json | generic_json | yes | 21549 | a373df349fc6 |  |
+| bitnet_sft_budget_paired_json | generic_json | yes | 9780 | 38559bf96452 |  |
 | subln_activation_variance_json | generic_json | yes | 16243 | 02e9fdf289c9 |  |
 | bitdistill_paired_predictions_json | bitdistill_paired_predictions_json | yes | 71851 | 4b50cdbc3d9b | status=pass, complete=44/44, pending=0, failed=0 |
 | bitdistill_task_formulation_json | bitdistill_task_formulation_json | yes | 28374 | c4e8328337c0 | seq_full=6, causal_rows=17, pending_paper=0, rows=45 |

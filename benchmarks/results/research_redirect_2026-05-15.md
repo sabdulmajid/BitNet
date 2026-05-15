@@ -65,6 +65,9 @@ Completed controls rule out several simple causes:
 - The first 10000-step row reaches `0.628935`, with `160,000` optimizer
   examples, or `0.407434` MNLI epochs. It exceeds the paper BitNet-SFT anchor
   by `0.020935`, but remains `0.178706` below the local FP16-SFT row.
+- The second 10000-step row at `lr=5e-5` reaches `0.607845`, effectively the
+  paper BitNet-SFT anchor but weaker than the `lr=2e-5` row. This confirms
+  that the BitNet-SFT baseline is budget-viable but schedule-sensitive.
 - Against the saved FP16 prediction trace, the paired candidate-minus-FP16
   delta is `-0.179215`, 95% CI `[-0.189580, -0.168851]`, McNemar
   `p=3.438389e-240`.
