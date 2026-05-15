@@ -67,6 +67,9 @@ Overall status: **PASS**.
 | CPU tradeoff frontier reports Q4-vs-I2_SR ratios | pass | q4_vs_i2sr={'decode_speedup': 1.19061682213809, 'file_ratio': 1.2881333039180543, 'ppl_ratio': 3.0323232796303237, 'prefill_speedup': 2.298817760610607, 'rss512_ratio': 1.2685742155747033} |  |
 | CPU speed uncertainty audit has I2_SR-vs-Q4 intervals | pass | prefill_ci=[2.2578672451091255, 2.34051098794489], decode_ci=[1.1861079640891115, 1.1951428201115284] |  |
 | I2_SR-vs-Q4 speedup intervals stay above 1 | pass | prefill_ci=[2.2578672451091255, 2.34051098794489], decode_ci=[1.1861079640891115, 1.1951428201115284] |  |
+| Benchmark matrix audit has at least ten complete quality benchmarks | pass | passed=True, quality_benchmark_count=12 |  |
+| Benchmark matrix audit has Xeon runtime and RSS evidence | pass | finite_rows=5, rss_contexts=[512, 2048, 8192, 32768] |  |
+| Benchmark matrix audit keeps TL2 row-scale excluded | pass | tl2_ready=False, failed=9 |  |
 | fixed I2_SR RSS has four context rows | pass | contexts=[512, 2048, 8192, 32768] |  |
-| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=232, missing=0, missing_labels=[] |  |
+| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=234, missing=0, missing_labels=[] |  |
 | productization gate passes for stable I2_SR | pass | passed=True, failed=0, stable_quality=True, layout=True |  |

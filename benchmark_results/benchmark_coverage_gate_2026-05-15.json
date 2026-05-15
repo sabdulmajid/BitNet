@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 66,
+  "check_count": 69,
   "failed": [],
   "checks": [
     {
@@ -384,6 +384,24 @@
       "blocker": ""
     },
     {
+      "name": "Benchmark matrix audit has at least ten complete quality benchmarks",
+      "passed": true,
+      "evidence": "passed=True, quality_benchmark_count=12",
+      "blocker": ""
+    },
+    {
+      "name": "Benchmark matrix audit has Xeon runtime and RSS evidence",
+      "passed": true,
+      "evidence": "finite_rows=5, rss_contexts=[512, 2048, 8192, 32768]",
+      "blocker": ""
+    },
+    {
+      "name": "Benchmark matrix audit keeps TL2 row-scale excluded",
+      "passed": true,
+      "evidence": "tl2_ready=False, failed=9",
+      "blocker": ""
+    },
+    {
       "name": "fixed I2_SR RSS has four context rows",
       "passed": true,
       "evidence": "contexts=[512, 2048, 8192, 32768]",
@@ -392,7 +410,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=232, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=234, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

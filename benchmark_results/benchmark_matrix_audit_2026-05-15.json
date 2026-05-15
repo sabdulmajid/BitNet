@@ -1,0 +1,367 @@
+{
+  "checks": [
+    {
+      "blocker": "",
+      "evidence": "complete=12/12; benchmarks=['WikiText perplexity', 'FineWeb heldout perplexity', 'arc_challenge', 'arc_easy', 'hellaswag', 'piqa', 'winogrande', 'boolq', 'copa', 'openbookqa', 'sciq', 'truthfulqa_mc1']",
+      "name": "At least ten distinct side-by-side quality benchmarks are complete",
+      "passed": true
+    },
+    {
+      "blocker": "",
+      "evidence": "complete=['WikiText perplexity', 'FineWeb heldout perplexity']",
+      "name": "Both perplexity benchmarks cover all six model families",
+      "passed": true
+    },
+    {
+      "blocker": "",
+      "evidence": "complete_tasks=10/10",
+      "name": "All ten lm-eval tasks cover all six model families",
+      "passed": true
+    },
+    {
+      "blocker": "",
+      "evidence": "sample_counts={'FP': 22382, 'naive PTQ': 22382, 'QAT hidden-MSE': 22382, 'QAT KL-only': 22382, 'QAT KL-only dense lm_head': 22382, 'QAT KL-only row dense lm_head': 22382}",
+      "name": "Each lm-eval model family has full logged sample count",
+      "passed": true
+    },
+    {
+      "blocker": "",
+      "evidence": "present=4/4",
+      "name": "Paired statistical reports exist for the key quality comparisons",
+      "passed": true
+    },
+    {
+      "blocker": "",
+      "evidence": "rows=5; labels=['FP F16', 'FP Q4_K_M', 'FP Q8_0', 'row I2_SR', 'row TQ2_0']",
+      "name": "Xeon CPU matrix has finite PPL, size, RSS, prefill, and decode rows",
+      "passed": true
+    },
+    {
+      "blocker": "",
+      "evidence": "contexts=[512, 2048, 8192, 32768]",
+      "name": "I2_SR RSS is measured at four context lengths",
+      "passed": true
+    },
+    {
+      "blocker": "",
+      "evidence": "ready=False; failed=9; path=benchmark_results/tl2_row_scale_runtime_contract_2026-05-15.json",
+      "name": "TL2 row-scale is explicitly excluded from success claims",
+      "passed": true
+    }
+  ],
+  "cpu_runtime": {
+    "finite_headline_rows": 5,
+    "frontier_path": "benchmark_results/cpu_tradeoff_frontier_2026-05-15.json",
+    "headline_labels": [
+      "FP F16",
+      "FP Q4_K_M",
+      "FP Q8_0",
+      "row I2_SR",
+      "row TQ2_0"
+    ],
+    "q4_vs_i2sr": {
+      "decode_speedup": 1.19061682213809,
+      "file_ratio": 1.2881333039180543,
+      "ppl_ratio": 3.0323232796303237,
+      "prefill_speedup": 2.298817760610607,
+      "rss512_ratio": 1.2685742155747033
+    },
+    "rss_contexts": [
+      512,
+      2048,
+      8192,
+      32768
+    ],
+    "rss_path": "benchmark_results/gguf-rss-qwen15b-i2sr-x86act-context-2026-05-13/summary.json"
+  },
+  "date": "2026-05-15",
+  "failed": [],
+  "paired_reports": [
+    "benchmarks/results/paired_row_densehead_minus_fp_2026-05-13.md",
+    "benchmarks/results/paired_row_densehead_minus_ptq_2026-05-13.md",
+    "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/paired_row_densehead_minus_tensor_densehead.md",
+    "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/paired_row_densehead_minus_klonly.md"
+  ],
+  "passed": true,
+  "quality_benchmark_count": 12,
+  "quality_benchmarks": [
+    {
+      "artifact_paths": {
+        "FP": "benchmark_results/quality-9735/qwen15b_fp_wikitext.json",
+        "QAT KL-only": "benchmark_results/quality-qwen15b-klonly-5000/qwen15b_ternary_wikitext.json",
+        "QAT KL-only dense lm_head": "benchmark_results/quality-qwen15b-klonly-notiehead-5000/qwen15b_ternary_wikitext.json",
+        "QAT KL-only row dense lm_head": "benchmark_results/quality-qwen15b-klonly-row-notiehead-5000/qwen15b_ternary_wikitext.json",
+        "QAT hidden-MSE": "benchmark_results/quality-9735/qwen15b_ternary_wikitext.json",
+        "naive PTQ": "benchmark_results/quality-ptq-qwen15b/qwen15b_naive_ptq_wikitext.json"
+      },
+      "benchmark": "WikiText perplexity",
+      "complete": true,
+      "metric": "perplexity",
+      "models": {
+        "FP": 13.901475466625362,
+        "QAT KL-only": 50.59538617072306,
+        "QAT KL-only dense lm_head": 43.37239951638826,
+        "QAT KL-only row dense lm_head": 38.58006540148406,
+        "QAT hidden-MSE": 86.41395750155097,
+        "naive PTQ": 3813121.80332679
+      }
+    },
+    {
+      "artifact_paths": {
+        "FP": "benchmark_results/quality-9735/qwen15b_fp_fineweb_heldout.json",
+        "QAT KL-only": "benchmark_results/quality-qwen15b-klonly-5000/qwen15b_ternary_fineweb_heldout.json",
+        "QAT KL-only dense lm_head": "benchmark_results/quality-qwen15b-klonly-notiehead-5000/qwen15b_ternary_fineweb_heldout.json",
+        "QAT KL-only row dense lm_head": "benchmark_results/quality-qwen15b-klonly-row-notiehead-5000/qwen15b_ternary_fineweb_heldout.json",
+        "QAT hidden-MSE": "benchmark_results/quality-9735/qwen15b_ternary_fineweb_heldout.json",
+        "naive PTQ": "benchmark_results/quality-ptq-qwen15b/qwen15b_naive_ptq_fineweb_heldout.json"
+      },
+      "benchmark": "FineWeb heldout perplexity",
+      "complete": true,
+      "metric": "perplexity",
+      "models": {
+        "FP": 10.268607541663883,
+        "QAT KL-only": 26.599041760368934,
+        "QAT KL-only dense lm_head": 22.75897534038801,
+        "QAT KL-only row dense lm_head": 21.333215852384445,
+        "QAT hidden-MSE": 40.39808536328532,
+        "naive PTQ": 9582923.269140046
+      }
+    },
+    {
+      "artifact_paths": {
+        "FP": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json",
+        "QAT KL-only": "benchmark_results/lm-eval-qwen15b-klonly-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only row dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT hidden-MSE": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_qat_ternary.json",
+        "naive PTQ": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json"
+      },
+      "benchmark": "arc_challenge",
+      "complete": true,
+      "metric": "acc_norm",
+      "models": {
+        "FP": 0.4496587030716723,
+        "QAT KL-only": 0.2713310580204778,
+        "QAT KL-only dense lm_head": 0.2636518771331058,
+        "QAT KL-only row dense lm_head": 0.2721843003412969,
+        "QAT hidden-MSE": 0.2636518771331058,
+        "naive PTQ": 0.2619453924914676
+      }
+    },
+    {
+      "artifact_paths": {
+        "FP": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json",
+        "QAT KL-only": "benchmark_results/lm-eval-qwen15b-klonly-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only row dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT hidden-MSE": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_qat_ternary.json",
+        "naive PTQ": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json"
+      },
+      "benchmark": "arc_easy",
+      "complete": true,
+      "metric": "acc_norm",
+      "models": {
+        "FP": 0.7196969696969697,
+        "QAT KL-only": 0.4831649831649832,
+        "QAT KL-only dense lm_head": 0.5008417508417509,
+        "QAT KL-only row dense lm_head": 0.5176767676767676,
+        "QAT hidden-MSE": 0.4781144781144781,
+        "naive PTQ": 0.2441077441077441
+      }
+    },
+    {
+      "artifact_paths": {
+        "FP": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json",
+        "QAT KL-only": "benchmark_results/lm-eval-qwen15b-klonly-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only row dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT hidden-MSE": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_qat_ternary.json",
+        "naive PTQ": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json"
+      },
+      "benchmark": "hellaswag",
+      "complete": true,
+      "metric": "acc_norm",
+      "models": {
+        "FP": 0.6779525990838479,
+        "QAT KL-only": 0.3777136028679546,
+        "QAT KL-only dense lm_head": 0.39075881298546106,
+        "QAT KL-only row dense lm_head": 0.41216889065923124,
+        "QAT hidden-MSE": 0.3623780123481378,
+        "naive PTQ": 0.26419040031866164
+      }
+    },
+    {
+      "artifact_paths": {
+        "FP": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json",
+        "QAT KL-only": "benchmark_results/lm-eval-qwen15b-klonly-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only row dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT hidden-MSE": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_qat_ternary.json",
+        "naive PTQ": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json"
+      },
+      "benchmark": "piqa",
+      "complete": true,
+      "metric": "acc_norm",
+      "models": {
+        "FP": 0.7578890097932536,
+        "QAT KL-only": 0.6371055495103374,
+        "QAT KL-only dense lm_head": 0.6474428726877041,
+        "QAT KL-only row dense lm_head": 0.6501632208922742,
+        "QAT hidden-MSE": 0.6218715995647442,
+        "naive PTQ": 0.5076169749727966
+      }
+    },
+    {
+      "artifact_paths": {
+        "FP": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json",
+        "QAT KL-only": "benchmark_results/lm-eval-qwen15b-klonly-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only row dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT hidden-MSE": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_qat_ternary.json",
+        "naive PTQ": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json"
+      },
+      "benchmark": "winogrande",
+      "complete": true,
+      "metric": "acc",
+      "models": {
+        "FP": 0.6377269139700079,
+        "QAT KL-only": 0.5209155485398579,
+        "QAT KL-only dense lm_head": 0.5232833464877664,
+        "QAT KL-only row dense lm_head": 0.5374901341752171,
+        "QAT hidden-MSE": 0.5232833464877664,
+        "naive PTQ": 0.4980268350434096
+      }
+    },
+    {
+      "artifact_paths": {
+        "FP": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json",
+        "QAT KL-only": "benchmark_results/lm-eval-qwen15b-klonly-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only row dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT hidden-MSE": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_qat_ternary.json",
+        "naive PTQ": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json"
+      },
+      "benchmark": "boolq",
+      "complete": true,
+      "metric": "acc",
+      "models": {
+        "FP": 0.7259938837920489,
+        "QAT KL-only": 0.5960244648318043,
+        "QAT KL-only dense lm_head": 0.5972477064220183,
+        "QAT KL-only row dense lm_head": 0.6051987767584098,
+        "QAT hidden-MSE": 0.5926605504587156,
+        "naive PTQ": 0.5055045871559632
+      }
+    },
+    {
+      "artifact_paths": {
+        "FP": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json",
+        "QAT KL-only": "benchmark_results/lm-eval-qwen15b-klonly-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only row dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT hidden-MSE": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_qat_ternary.json",
+        "naive PTQ": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json"
+      },
+      "benchmark": "copa",
+      "complete": true,
+      "metric": "acc",
+      "models": {
+        "FP": 0.83,
+        "QAT KL-only": 0.7,
+        "QAT KL-only dense lm_head": 0.68,
+        "QAT KL-only row dense lm_head": 0.69,
+        "QAT hidden-MSE": 0.64,
+        "naive PTQ": 0.51
+      }
+    },
+    {
+      "artifact_paths": {
+        "FP": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json",
+        "QAT KL-only": "benchmark_results/lm-eval-qwen15b-klonly-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only row dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT hidden-MSE": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_qat_ternary.json",
+        "naive PTQ": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json"
+      },
+      "benchmark": "openbookqa",
+      "complete": true,
+      "metric": "acc_norm",
+      "models": {
+        "FP": 0.404,
+        "QAT KL-only": 0.312,
+        "QAT KL-only dense lm_head": 0.308,
+        "QAT KL-only row dense lm_head": 0.316,
+        "QAT hidden-MSE": 0.312,
+        "naive PTQ": 0.276
+      }
+    },
+    {
+      "artifact_paths": {
+        "FP": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json",
+        "QAT KL-only": "benchmark_results/lm-eval-qwen15b-klonly-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only row dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT hidden-MSE": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_qat_ternary.json",
+        "naive PTQ": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json"
+      },
+      "benchmark": "sciq",
+      "complete": true,
+      "metric": "acc_norm",
+      "models": {
+        "FP": 0.934,
+        "QAT KL-only": 0.695,
+        "QAT KL-only dense lm_head": 0.7,
+        "QAT KL-only row dense lm_head": 0.733,
+        "QAT hidden-MSE": 0.613,
+        "naive PTQ": 0.199
+      }
+    },
+    {
+      "artifact_paths": {
+        "FP": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json",
+        "QAT KL-only": "benchmark_results/lm-eval-qwen15b-klonly-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT KL-only row dense lm_head": "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/qwen15b_qat_ternary.json",
+        "QAT hidden-MSE": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_qat_ternary.json",
+        "naive PTQ": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json"
+      },
+      "benchmark": "truthfulqa_mc1",
+      "complete": true,
+      "metric": "acc",
+      "models": {
+        "FP": 0.3047735618115055,
+        "QAT KL-only": 0.24112607099143207,
+        "QAT KL-only dense lm_head": 0.23255813953488372,
+        "QAT KL-only row dense lm_head": 0.2607099143206854,
+        "QAT hidden-MSE": 0.24112607099143207,
+        "naive PTQ": 0.22031823745410037
+      }
+    }
+  ],
+  "sample_counts": {
+    "FP": 22382,
+    "QAT KL-only": 22382,
+    "QAT KL-only dense lm_head": 22382,
+    "QAT KL-only row dense lm_head": 22382,
+    "QAT hidden-MSE": 22382,
+    "naive PTQ": 22382
+  },
+  "schema": "benchmark-matrix-audit-v1",
+  "tl2_status": {
+    "checks": 11,
+    "failed": [
+      "Existing TL2 one-scale error is below product threshold",
+      "TL2 converter accepts learned row/group scale metadata",
+      "TL2 converter no longer recomputes one scalar max scale",
+      "ggml TL2 storage accounts for row/group-scale sidecar",
+      "TL2 transform metadata is row/group-scale aware",
+      "Generated TL2 qgemm applies output-row or row-group scales",
+      "x86 TL2 matmul dispatch offsets scale metadata per output tile/row group",
+      "BitNet/Qwen TL2 loader exposes learned scale sidecars when required",
+      "Row-scale TL2 has quality and speed benchmark evidence"
+    ],
+    "path": "benchmark_results/tl2_row_scale_runtime_contract_2026-05-15.json",
+    "ready": false
+  },
+  "verdict": "The side-by-side dense-Qwen comparison has at least ten complete quality benchmarks plus finite Xeon runtime/RSS evidence. The full original objective remains partial only because TL2 row-scale support is explicitly blocked."
+}

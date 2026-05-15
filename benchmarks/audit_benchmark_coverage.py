@@ -757,6 +757,37 @@ def audit_cpu_speed_uncertainty(root: Path, checks: list[dict[str, Any]]) -> Non
     )
 
 
+def audit_benchmark_matrix(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/benchmark_matrix_audit_{DATE}.json"
+    if not path.exists():
+        add_check(checks, "Benchmark matrix audit exists", False, str(path.relative_to(root)), "missing benchmark matrix audit")
+        return
+    data = read_json(path)
+    cpu = data.get("cpu_runtime", {}) if isinstance(data.get("cpu_runtime"), dict) else {}
+    tl2 = data.get("tl2_status", {}) if isinstance(data.get("tl2_status"), dict) else {}
+    add_check(
+        checks,
+        "Benchmark matrix audit has at least ten complete quality benchmarks",
+        data.get("passed") is True and int(data.get("quality_benchmark_count") or 0) >= 10,
+        f"passed={data.get('passed')}, quality_benchmark_count={data.get('quality_benchmark_count')}",
+        "benchmark matrix has fewer than ten complete quality benchmarks",
+    )
+    add_check(
+        checks,
+        "Benchmark matrix audit has Xeon runtime and RSS evidence",
+        int(cpu.get("finite_headline_rows") or 0) >= 5 and cpu.get("rss_contexts") == EXPECTED_RSS_CONTEXTS,
+        f"finite_rows={cpu.get('finite_headline_rows')}, rss_contexts={cpu.get('rss_contexts')}",
+        "benchmark matrix lacks finite Xeon runtime or RSS context coverage",
+    )
+    add_check(
+        checks,
+        "Benchmark matrix audit keeps TL2 row-scale excluded",
+        tl2.get("ready") is False and len(tl2.get("failed", [])) > 0,
+        f"tl2_ready={tl2.get('ready')}, failed={len(tl2.get('failed', []))}",
+        "TL2 row-scale is not explicitly blocked in benchmark matrix",
+    )
+
+
 def manifest_missing_is_only_self_coverage(manifest: dict[str, Any]) -> bool:
     missing = manifest.get("missing", [])
     if not isinstance(missing, list):
@@ -866,6 +897,7 @@ def main() -> None:
     audit_cpu_rows(root, checks)
     audit_cpu_tradeoff_frontier(root, checks)
     audit_cpu_speed_uncertainty(root, checks)
+    audit_benchmark_matrix(root, checks)
     manifest_path = args.manifest_path.resolve() if args.manifest_path is not None else None
     audit_rss_and_gates(root, checks, manifest_path)
 
