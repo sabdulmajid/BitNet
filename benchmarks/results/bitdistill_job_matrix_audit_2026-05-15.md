@@ -26,7 +26,7 @@ Stored downstream scripts checked: `38`. Failures: `0`.
 | output directories are unique | pass | duplicates=[] |  |
 | all expected experiment rows are present and configured | pass | configured=38/38 |  |
 | downstream stored scripts include critical KD/export arguments | pass | checked=38, failures=0 |  |
-| warm-up progress is finite | pass | step=16690/20000 |  |
+| warm-up progress is finite | pass | step=17140/20000 |  |
 
 ## Expected Matrix
 
