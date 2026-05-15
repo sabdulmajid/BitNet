@@ -122,6 +122,9 @@ not the dominant cause of the gap. The SubLN-only BitNet-SFT control reaches
 baseline instead of explaining the paper-anchor gap. The unresolved narrow
 blockers are recipe alignment, exact SubLN placement/initialization/timing, and
 Stage-3 budget/LR/epoch search.
+The next active diagnostic is a focused BitNet-SFT MNLI LR/step-budget sweep
+that holds those mechanics fixed and tests whether the paper-anchor gap is a
+simple downstream schedule issue.
 
 Current completed Qwen2.5-0.5B GLUE sequence-classification short-budget
 diagnostics:
@@ -532,6 +535,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill reproduction gate](benchmarks/results/bitdistill_reproduction_gate_2026-05-15.md)
 - [BitDistill row-warmup gate](benchmarks/results/bitdistill_rowwarmup_gate_2026-05-15.md)
 - [BitNet-SFT baseline audit](benchmarks/results/bitnet_sft_baseline_audit_2026-05-15.md)
+- [BitNet-SFT budget sweep audit](benchmarks/results/bitnet_sft_budget_sweep_2026-05-15.md)
 - [BitDistill paper alignment audit](benchmarks/results/bitdistill_paper_alignment_2026-05-15.md)
 - [BitDistill task formulation audit](benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md)
 - [BitDistill GLUE CPU benchmark](benchmarks/results/bitdistill_glue_cpu_2026-05-15.md)
