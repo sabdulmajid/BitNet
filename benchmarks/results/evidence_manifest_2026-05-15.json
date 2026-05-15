@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "b6fef938f233bda5b07e4577e5b45aaf07ad67f5e34f7eb2bf6ea2fbb5a02854",
-      "size_bytes": 26527
+      "sha256": "e9e64b5ae24de832a72baa6a10e156599c79f51b3a73ce36ee3446b04176d66f",
+      "size_bytes": 27189
     },
     {
       "exists": true,
@@ -106,8 +106,8 @@
       "label": "bitdistill_reproduction_gate_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_reproduction_gate_2026-05-15.md",
-      "sha256": "0d6eb2028518703ccd634c22dcbf2ee927515f9e058aeed66db7b806155b8ec4",
-      "size_bytes": 12653
+      "sha256": "1c7df5a7bc6636a0081cf0de0e381e3e331729d575edba1ebc6acbb7e5866474",
+      "size_bytes": 12739
     },
     {
       "exists": true,
@@ -133,8 +133,8 @@
       "label": "bitdistill_paper_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_paper_alignment_2026-05-15.md",
-      "sha256": "729c5da68883edebf351bb974e29d9b1c11c084a2759c7b4bbd688e36797245b",
-      "size_bytes": 9708
+      "sha256": "4b2bef4e4e69ca7a4c85979b1017be885665c266980f66d65ce48f8e7f486e0e",
+      "size_bytes": 9738
     },
     {
       "exists": true,
@@ -178,7 +178,7 @@
       "label": "bitdistill_job_monitor_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_job_monitor_2026-05-15.md",
-      "sha256": "efef1e70c02224a8b356a73eacf2ad6d28e75d9270384fb73e907856df8e754a",
+      "sha256": "b9e1b8df2f4c2b0e36eff4f9ac5ff3c636d2796ce26abe6a941ff3716e7e4b5c",
       "size_bytes": 12789
     },
     {
@@ -295,8 +295,8 @@
       "label": "bitdistill_variant_summary_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_variant_summary_2026-05-15.md",
-      "sha256": "32dca4fcc52280e67afc1f2a67f40b24e5684426c13355b9a7b2ec10ffa48b60",
-      "size_bytes": 19611
+      "sha256": "0165d8f7ccc94369b6d309a8cc453a98ad61e9aeefed7224742102b95c443d10",
+      "size_bytes": 20509
     },
     {
       "exists": true,
@@ -2074,10 +2074,10 @@
         "max_fp_gap": 0.01,
         "paper_style_tensor_complete": true,
         "paper_style_tensor_passed": false,
-        "present_rows": 28,
-        "present_with_accuracy_ci95": 28,
-        "present_with_examples": 28,
-        "present_with_full_eval": 28,
+        "present_rows": 30,
+        "present_with_accuracy_ci95": 30,
+        "present_with_examples": 30,
+        "present_with_full_eval": 30,
         "row_scale_complete": true,
         "row_scale_passed": false,
         "rows": 36,
@@ -2088,8 +2088,8 @@
         ]
       },
       "path": "benchmark_results/bitdistill_reproduction_gate_2026-05-15.json",
-      "sha256": "067bbff0390160e962c6b9333b398726dc3010c7197e0f2df1a787ef60d115bb",
-      "size_bytes": 31287
+      "sha256": "9be1bd3c2bfcee8b0cc32891725278c90328ce060432f64ed73b09976e55704d",
+      "size_bytes": 31606
     },
     {
       "exists": true,
@@ -2212,8 +2212,8 @@
         "warmup_warnings": []
       },
       "path": "benchmark_results/bitdistill_job_monitor_2026-05-15.json",
-      "sha256": "a8879a51bee3c80fefebee56d87e41e65695ceecf68d726408ed3409d7c23465",
-      "size_bytes": 72070
+      "sha256": "52fb987b05baea84454df1ab52efd17c3c649921c6afcede3c94befbcfba5256",
+      "size_bytes": 71724
     },
     {
       "exists": true,
@@ -2459,7 +2459,7 @@
       "kind": "bitdistill_variant_summary_json",
       "label": "bitdistill_variant_summary_json",
       "metrics": {
-        "materialized_rows": 47,
+        "materialized_rows": 49,
         "roots": [
           "checkpoints/bitdistill-glue-seqcls",
           "checkpoints/bitdistill-glue-seqcls-paperlogit",
@@ -2475,7 +2475,7 @@
           "checkpoints/bitdistill-glue-seqcls-longwarmup-gamma10k",
           "checkpoints/bitdistill-glue-seqcls-longwarmup-layer-sweep"
         ],
-        "rows": 47,
+        "rows": 49,
         "tasks": [
           "mnli",
           "qnli",
@@ -2483,8 +2483,8 @@
         ]
       },
       "path": "benchmark_results/bitdistill_variant_summary_2026-05-15.json",
-      "sha256": "3a9044ad5c34a76bd51eeedc86317b439ee944fb92d1648fa5ce65917f5c3951",
-      "size_bytes": 44900
+      "sha256": "2ed88133cf89773fe2c7928d4ec902a8c9bcc9f7d8fd5d78b63582a14bb76300",
+      "size_bytes": 46861
     },
     {
       "exists": true,

@@ -137,6 +137,15 @@ also negative:
 | QNLI | `0.759656` | `0.757459` | `-0.002197` | `0.141497` |
 | SST2 | `0.841743` | `0.846330` | `+0.004587` | `0.079128` |
 
+The LR=`5e-5` branch is partially complete. It improves over strict
+paper-gamma on MNLI/QNLI, but still misses the FP16 target by wide margins:
+
+| task | paper gamma | paper gamma LR=`5e-5` | LR delta | FP gap at LR=`5e-5` |
+| --- | ---: | ---: | ---: | ---: |
+| MNLI | `0.630260` | `0.642384` | `+0.012124` | `0.165257` |
+| QNLI | `0.759656` | `0.790957` | `+0.031301` | `0.107999` |
+| SST2 | `0.841743` | pending | pending | pending |
+
 Paper-gamma row-scale results are now complete and do not rescue the
 strict paper coefficient:
 
@@ -192,7 +201,8 @@ small improvement over tensor gamma=100 but still `0.161691` behind FP16-SFT.
 The next layer-sweep points are worse: layer `-2` reaches `0.642894` and
 layer `-4` reaches `0.640754`. Paper-gamma row is worse than tensor on MNLI
 and essentially tied on QNLI, so it is not the missing fix. The LR=`1e-5`
-paper-gamma search is complete on GLUE3 and also below target; LR=`5e-5`,
+paper-gamma search is complete on GLUE3 and also below target; LR=`5e-5`
+MNLI/QNLI are now complete and still below target, while LR=`5e-5` SST2,
 paper-gamma head-init, and clean row-warmup branches remain running or queued.
 No paper-level GLUE success claim will be made until full-validation
 candidates close the FP16 gap.
@@ -230,7 +240,9 @@ clean row-scale warm-up, paired prediction traces, and the full CPU/I2_SR
 producer gates. Completed diagnostics already show that gamma=100 teacher-head
 initialization, the MNLI layer sweep, strict paper-gamma row, and the completed
 paper-gamma LR=`1e-5` GLUE3 probe are not enough to recover paper-level
-accuracy. The completed MNLI gamma probes at `1e3` and `1e4` also support the
+accuracy. The partial LR=`5e-5` branch improves MNLI/QNLI versus strict
+paper-gamma but remains more than `0.10` absolute accuracy behind FP16-SFT on
+both tasks. The completed MNLI gamma probes at `1e3` and `1e4` also support the
 relation-loss scale audit: the paper's `1e5`
 coefficient can dominate CE by orders of magnitude under this local
 normalization.
