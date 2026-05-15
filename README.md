@@ -139,12 +139,14 @@ No paper-level GLUE success claim will be made until the full-validation
 downstream metrics exist.
 
 The first exportable causal-LM long-warmup downstream diagnostics have
-completed for MNLI and QNLI. On full validation, MNLI reaches `0.615181`
+completed for MNLI, QNLI, and SST2. On full validation, MNLI reaches `0.615181`
 tensor / `0.608355` row versus causal FP16 `0.829852` and causal BitNet-SFT
 `0.517983`; QNLI reaches `0.765697` tensor / `0.770822` row versus causal
-FP16 `0.900970` and causal BitNet-SFT `0.614681`. This is useful recovery over
-BitNet-SFT, especially on QNLI, but it is not a paper-level reproduction and it
-is not the strict `Qwen2ForSequenceClassification` branch.
+FP16 `0.900970` and causal BitNet-SFT `0.614681`; SST2 reaches `0.833716`
+tensor / `0.840596` row versus causal FP16 `0.939220` and causal BitNet-SFT
+`0.831422`. This is useful recovery over BitNet-SFT on MNLI and QNLI, and a
+small recovery on SST2, but it is not a paper-level reproduction and it is not
+the strict `Qwen2ForSequenceClassification` branch.
 
 Active follow-ups are probing teacher-head initialization, attention-layer
 selection, paper-style logits KL scaling, CE-only ablations, a longer
