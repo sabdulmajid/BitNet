@@ -7,6 +7,7 @@ This audit separates the best GLUE quality path from the packed CPU runtime path
 | status | sidecar_prototype_available_native_runtime_blocked |
 | same artifact quality+CPU ready | false |
 | sidecar prototype smoke | prototype_smoke_passed |
+| sidecar sampled CPU quality | quality_mismatch |
 | seqcls configs | 15 |
 | seqcls causal-export compatible | 0 |
 | causal runtime configs | 6 |
@@ -35,6 +36,11 @@ These checkpoints are the strict GLUE reproduction artifacts. They use `Qwen2For
 | embedding shape | [896] |
 | head shape | [3, 896] |
 | finite logits | true |
+| sampled CPU status | quality_mismatch |
+| sampled examples | 64 |
+| sampled accuracy | 0.343750 |
+| agreement with saved PyTorch predictions | 0.296875 |
+| sampled examples/sec | 0.704972 |
 
 ## Causal Runtime Path
 
@@ -49,6 +55,7 @@ These checkpoints are export-compatible with the current GGUF/I2_SR path, but th
 | item | status |
 | --- | --- |
 | Backbone GGUF + dense head sidecar smoke | prototype implemented |
+| Sampled sidecar CPU quality agreement | failing |
 | GGUF writer persists classifier/score head tensors and label metadata | not implemented |
 | llama.cpp pools the last non-padding token for Qwen sequence classification | not implemented |
 | CPU evaluator reports GLUE accuracy from the packed classifier artifact | not implemented |
@@ -56,4 +63,4 @@ These checkpoints are export-compatible with the current GGUF/I2_SR path, but th
 
 ## Interpretation
 
-The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. It now also has a prototype sequence-classification backbone smoke through I2_SR plus an external dense head sidecar. It still does not have native packed sequence-classification inference or full GLUE CPU accuracy/RSS/throughput on that deployed artifact.
+The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. It now also has a prototype sequence-classification backbone smoke through I2_SR plus an external dense head sidecar. The sampled sidecar CPU quality probe currently disagrees with saved PyTorch predictions, so this is a runtime-contract mismatch, not a deployable classifier.

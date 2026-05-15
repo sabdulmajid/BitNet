@@ -115,6 +115,22 @@ def load_sidecar_smoke(path: Path) -> dict[str, Any]:
     }
 
 
+def load_sidecar_cpu_benchmark(path: Path) -> dict[str, Any]:
+    data = read_json(path)
+    summary = data.get("summary", {}) if isinstance(data.get("summary"), dict) else {}
+    runtime = data.get("runtime", {}) if isinstance(data.get("runtime"), dict) else {}
+    return {
+        "path": str(path),
+        "exists": path.exists(),
+        "status": data.get("status"),
+        "task": data.get("task"),
+        "examples": summary.get("examples"),
+        "accuracy": summary.get("accuracy"),
+        "agreement_with_saved_pytorch_predictions": summary.get("agreement_with_saved_pytorch_predictions"),
+        "examples_per_second": runtime.get("examples_per_second"),
+    }
+
+
 def fmt(value: Any) -> str:
     if value is None:
         return "-"
@@ -150,10 +166,12 @@ def summarize_records(records: list[dict[str, Any]]) -> dict[str, Any]:
 
 def render_markdown(result: dict[str, Any]) -> str:
     smoke = result["seqcls_sidecar_smoke"]
+    sidecar_cpu = result["seqcls_sidecar_cpu_benchmark"]
     headline_rows = [
         ["status", result["status"]],
         ["same artifact quality+CPU ready", result["same_artifact_quality_cpu_ready"]],
         ["sidecar prototype smoke", smoke["status"]],
+        ["sidecar sampled CPU quality", sidecar_cpu["status"]],
         ["seqcls configs", result["sequence_classification"]["configs"]],
         ["seqcls causal-export compatible", result["sequence_classification"]["causal_export_compatible"]],
         ["causal runtime configs", result["causal_runtime"]["configs"]],
@@ -189,6 +207,11 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["embedding shape", smoke["embedding_shape"]],
                     ["head shape", smoke["head_shape"]],
                     ["finite logits", smoke["finite_logits"]],
+                    ["sampled CPU status", sidecar_cpu["status"]],
+                    ["sampled examples", sidecar_cpu["examples"]],
+                    ["sampled accuracy", sidecar_cpu["accuracy"]],
+                    ["agreement with saved PyTorch predictions", sidecar_cpu["agreement_with_saved_pytorch_predictions"]],
+                    ["sampled examples/sec", sidecar_cpu["examples_per_second"]],
                 ],
             ),
             "## Causal Runtime Path",
@@ -202,6 +225,7 @@ def render_markdown(result: dict[str, Any]) -> str:
                 ["item", "status"],
                 [
                     ["Backbone GGUF + dense head sidecar smoke", "prototype implemented"],
+                    ["Sampled sidecar CPU quality agreement", "failing"],
                     ["GGUF writer persists classifier/score head tensors and label metadata", "not implemented"],
                     ["llama.cpp pools the last non-padding token for Qwen sequence classification", "not implemented"],
                     ["CPU evaluator reports GLUE accuracy from the packed classifier artifact", "not implemented"],
@@ -212,8 +236,8 @@ def render_markdown(result: dict[str, Any]) -> str:
             (
                 "The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. "
                 "It now also has a prototype sequence-classification backbone smoke through I2_SR plus an external "
-                "dense head sidecar. It still does not have native packed sequence-classification inference or full "
-                "GLUE CPU accuracy/RSS/throughput on that deployed artifact."
+                "dense head sidecar. The sampled sidecar CPU quality probe currently disagrees with saved PyTorch "
+                "predictions, so this is a runtime-contract mismatch, not a deployable classifier."
             ),
         ]
     )
@@ -240,6 +264,11 @@ def main() -> None:
         type=Path,
         default=Path(f"benchmark_results/seqcls_backbone_i2sr_smoke_{DATE}.json"),
     )
+    parser.add_argument(
+        "--seqcls-sidecar-cpu-benchmark",
+        type=Path,
+        default=Path(f"benchmark_results/seqcls_i2sr_sidecar_cpu_mnli_64_{DATE}.json"),
+    )
     parser.add_argument("--llama-cpp", type=Path, default=Path("3rdparty/llama.cpp"))
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/seqcls_runtime_gap_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/seqcls_runtime_gap_{DATE}.md"))
@@ -257,6 +286,7 @@ def main() -> None:
     export_summary = load_causal_export_summary(root / args.causal_export_summary)
     causal_quality = load_causal_quality_summary(root / args.causal_quality_summary)
     sidecar_smoke = load_sidecar_smoke(root / args.seqcls_sidecar_smoke)
+    sidecar_cpu = load_sidecar_cpu_benchmark(root / args.seqcls_sidecar_cpu_benchmark)
     same_artifact_ready = (
         seqcls_summary["causal_export_compatible"] > 0
         and export_summary["exported"] > 0
@@ -278,6 +308,7 @@ def main() -> None:
         "causal_export_summary": export_summary,
         "causal_quality_summary": causal_quality,
         "seqcls_sidecar_smoke": sidecar_smoke,
+        "seqcls_sidecar_cpu_benchmark": sidecar_cpu,
         "exporter_rejects_non_causal": "architecture.endswith(\"ForCausalLM\")"
         in (root / "benchmarks/export_bitdistill_i2sr_suite.py").read_text(encoding="utf-8"),
         "llama_cpp": {

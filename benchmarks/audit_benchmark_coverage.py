@@ -494,6 +494,11 @@ def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
     causal = data.get("causal_runtime", {}) if isinstance(data.get("causal_runtime"), dict) else {}
     export = data.get("causal_export_summary", {}) if isinstance(data.get("causal_export_summary"), dict) else {}
     smoke = data.get("seqcls_sidecar_smoke", {}) if isinstance(data.get("seqcls_sidecar_smoke"), dict) else {}
+    sidecar_cpu = (
+        data.get("seqcls_sidecar_cpu_benchmark", {})
+        if isinstance(data.get("seqcls_sidecar_cpu_benchmark"), dict)
+        else {}
+    )
     add_check(
         checks,
         "Sequence-classification runtime gap is narrowed but not closed",
@@ -522,6 +527,20 @@ def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
             f"head_shape={smoke.get('head_shape')}, finite_logits={smoke.get('finite_logits')}"
         ),
         "the sidecar prototype did not load the packed backbone and produce finite classifier logits",
+    )
+    add_check(
+        checks,
+        "Sequence-classification sidecar CPU quality mismatch is recorded",
+        sidecar_cpu.get("status") == "quality_mismatch"
+        and sidecar_cpu.get("examples", 0) >= 64
+        and isinstance(sidecar_cpu.get("agreement_with_saved_pytorch_predictions"), (int, float))
+        and sidecar_cpu.get("agreement_with_saved_pytorch_predictions") < 0.95,
+        (
+            f"status={sidecar_cpu.get('status')}, examples={sidecar_cpu.get('examples')}, "
+            f"agreement={sidecar_cpu.get('agreement_with_saved_pytorch_predictions')}, "
+            f"accuracy={sidecar_cpu.get('accuracy')}"
+        ),
+        "sampled sidecar CPU benchmark should make the runtime-contract mismatch explicit",
     )
 
 

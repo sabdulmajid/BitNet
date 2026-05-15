@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 61,
+  "check_count": 62,
   "failed": [],
   "checks": [
     {
@@ -288,6 +288,12 @@
       "blocker": ""
     },
     {
+      "name": "Sequence-classification sidecar CPU quality mismatch is recorded",
+      "passed": true,
+      "evidence": "status=quality_mismatch, examples=64, agreement=0.296875, accuracy=0.34375",
+      "blocker": ""
+    },
+    {
       "name": "Qwen3 paper-alignment audit tracks required GLUE rows",
       "passed": true,
       "evidence": "jobs=16, complete=0, ready=False",
@@ -362,7 +368,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=219, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=221, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

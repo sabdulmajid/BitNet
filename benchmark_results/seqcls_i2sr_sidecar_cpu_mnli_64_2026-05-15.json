@@ -1,0 +1,173 @@
+{
+  "artifacts": {
+    "bias_key": null,
+    "classifier_head": "models/seqcls-backbone-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_score_head.npz",
+    "embedding_binary": "build-portable-avx2/bin/llama-embedding",
+    "gguf": "models/seqcls-backbone-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet25_i2_sr.gguf",
+    "head_key": "score_weight",
+    "head_shape": [
+      3,
+      896
+    ]
+  },
+  "batch_size": 1,
+  "checkpoint": {
+    "path": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8",
+    "prediction_trace": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/eval_predictions.jsonl",
+    "stored_accuracy": 0.6535914416709119,
+    "stored_eval_examples": 9815.0
+  },
+  "date": "2026-05-15",
+  "limitations": [
+    "Classifier head is applied in Python from an NPZ sidecar.",
+    "This benchmark uses llama-embedding last-token pooling, not native llama.cpp sequence-classification code.",
+    "Prompt text is decoded from the Hugging Face tokenizer's exact pair input IDs to avoid separator guessing.",
+    "A low saved-prediction agreement is a blocking runtime-contract failure, not a model-quality result."
+  ],
+  "max_samples": 64,
+  "runtime": {
+    "batches": 64,
+    "examples_per_second": 0.7049719281988454,
+    "prompt_eval_ms": 10498.92,
+    "prompt_eval_tokens": 2474,
+    "prompt_eval_tokens_per_second_aggregate": 235.6432852140982,
+    "wall_seconds": 90.78375668590888
+  },
+  "sample_predictions": [
+    {
+      "index": 0,
+      "label": 1,
+      "prediction": 0,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 1,
+      "label": 2,
+      "prediction": 0,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 2,
+      "label": 0,
+      "prediction": 0,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 3,
+      "label": 2,
+      "prediction": 1,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 4,
+      "label": 2,
+      "prediction": 2,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 5,
+      "label": 2,
+      "prediction": 0,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 6,
+      "label": 2,
+      "prediction": 2,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 7,
+      "label": 1,
+      "prediction": 0,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 8,
+      "label": 2,
+      "prediction": 1,
+      "saved_pytorch_prediction": 0
+    },
+    {
+      "index": 9,
+      "label": 1,
+      "prediction": 2,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 10,
+      "label": 2,
+      "prediction": 0,
+      "saved_pytorch_prediction": 0
+    },
+    {
+      "index": 11,
+      "label": 2,
+      "prediction": 0,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 12,
+      "label": 2,
+      "prediction": 0,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 13,
+      "label": 0,
+      "prediction": 1,
+      "saved_pytorch_prediction": 0
+    },
+    {
+      "index": 14,
+      "label": 1,
+      "prediction": 0,
+      "saved_pytorch_prediction": 0
+    },
+    {
+      "index": 15,
+      "label": 0,
+      "prediction": 0,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 16,
+      "label": 0,
+      "prediction": 0,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 17,
+      "label": 0,
+      "prediction": 0,
+      "saved_pytorch_prediction": 0
+    },
+    {
+      "index": 18,
+      "label": 1,
+      "prediction": 0,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 19,
+      "label": 2,
+      "prediction": 1,
+      "saved_pytorch_prediction": 2
+    }
+  ],
+  "schema": "seqcls_i2sr_sidecar_cpu.v1",
+  "status": "quality_mismatch",
+  "summary": {
+    "accuracy": 0.34375,
+    "accuracy_ci95_wilson": [
+      0.23923142078443355,
+      0.46596359790081815
+    ],
+    "agreement_with_saved_pytorch_predictions": 0.296875,
+    "correct": 22,
+    "examples": 64,
+    "label_agreement_with_saved_trace": 1.0,
+    "saved_trace_predictions": 64
+  },
+  "task": "mnli"
+}

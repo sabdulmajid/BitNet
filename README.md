@@ -43,7 +43,7 @@ packed CPU path faithful to the trained checkpoint.
 | Arbitrary FP16/BF16 to ternary conversion is lossless | **No** | Qwen2.5-1.5B naive PTQ drops ten-task mean from `0.644169` to `0.348671`; WikiText PPL jumps from `13.901` to `3,813,121.803`. |
 | QAT/distillation recovers useful signal | **Yes, partially** | Best row-scale dense-Qwen run reaches ten-task mean `0.499459`, improving over naive PTQ by `+0.150788` paired mean accuracy. |
 | Row-scale packed CPU inference is viable for compatible dense causal artifacts | **Yes, for the audited path** | `I2_SR` row-scale Qwen2.5-1.5B Xeon run: PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, file `1211.3 MiB`. |
-| Sequence-classification checkpoint can enter the packed path | **Prototype only** | MNLI long-warmup row-scale seqcls checkpoint (`0.653591` PyTorch accuracy) exports as a `352.6 MiB` `I2_SR` backbone plus `10.8 KiB` dense score-head sidecar and produces finite CPU logits. Native GGUF classifier inference is not implemented. |
+| Sequence-classification checkpoint can enter the packed path | **Prototype only; quality mismatch** | MNLI long-warmup row-scale seqcls checkpoint (`0.653591` PyTorch accuracy) exports as a `352.6 MiB` `I2_SR` backbone plus `10.8 KiB` dense score-head sidecar and produces finite CPU logits, but the 64-example sidecar CPU probe gets only `0.343750` accuracy and `0.296875` agreement with saved PyTorch predictions. Native GGUF classifier inference is not implemented. |
 | BitDistill paper-level GLUE reproduction is achieved | **No, not yet** | Local FP16-SFT MNLI is close to the paper anchor (`0.807641` vs `0.799100`), and BitNet-SFT now clears its paper anchor (`0.628935` vs `0.608000`) after more budget. This is CE-only BitNet-SFT, not BitDistill or FP16-level recovery. |
 | Row-scale `I2_SR` is standard BitNet | **No** | It is a fork-specific retrofit variant for row-scale students, not the upstream per-tensor BitNet format. |
 | Kimi/MoE retrofit is proven | **No** | Tiny Qwen2MoE fixtures prove converter/runtime plumbing only. No Kimi-specific mapping, trained MoE quality, or real expert-locality benchmark is proven. |
@@ -250,8 +250,10 @@ A formal runtime-gap audit now marks the product gap as narrowed but not closed:
 `15` strict GLUE checkpoints use `Qwen2ForSequenceClassification`, `0` are
 native causal-export compatible, and one MNLI checkpoint has a sidecar
 prototype that loads a packed `I2_SR` backbone and applies a dense score head
-outside llama.cpp. Full GLUE accuracy, RSS, and throughput from a native packed
-classifier artifact are still blocked.
+outside llama.cpp. A sampled 64-example CPU sidecar benchmark is explicitly a
+quality mismatch (`0.343750` accuracy, `0.296875` agreement with saved PyTorch
+predictions), so the next runtime task is aligning tokenization, pooling, and
+head execution before running full GLUE accuracy/RSS/throughput.
 
 ## Canonical Next Matrix
 
@@ -364,6 +366,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Ternary flip dynamics audit](benchmarks/results/ternary_flip_dynamics_2026-05-15.md)
 - [Sequence-classification runtime gap audit](benchmarks/results/seqcls_runtime_gap_2026-05-15.md)
 - [Sequence-classification I2_SR backbone smoke](benchmarks/results/seqcls_backbone_i2sr_smoke_2026-05-15.md)
+- [Sequence-classification I2_SR sidecar CPU probe](benchmarks/results/seqcls_i2sr_sidecar_cpu_mnli_64_2026-05-15.md)
 - [Task formulation audit](benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md)
 - [Causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_2026-05-15.md)
 - [CPU tradeoff frontier audit](benchmarks/results/cpu_tradeoff_frontier_2026-05-15.md)
