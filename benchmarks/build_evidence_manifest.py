@@ -43,6 +43,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "objective_completion_audit", "kind": "tracked_report", "path": f"benchmarks/results/objective_completion_audit_{DATE}.md"},
     {"label": "product_scope_gate", "kind": "tracked_report", "path": f"benchmarks/results/product_scope_gate_{DATE}.md"},
     {"label": "bitdistill_reproduction_status", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_reproduction_status_2026-05-14.md"},
+    {"label": "bitdistill_reproduction_gap_analysis", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_reproduction_gap_analysis_{DATE}.md"},
     {"label": "bitdistill_reproduction_gate_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_reproduction_gate_{DATE}.md"},
     {"label": "bitdistill_paired_predictions_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_paired_predictions_{DATE}.md"},
     {"label": "bitdistill_task_formulation_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_task_formulation_audit_{DATE}.md"},

@@ -1,5 +1,5 @@
 {
-  "artifact_count": 161,
+  "artifact_count": 162,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "cba79f57c6048e0e320053ebf51971bfcb30496909b10e6443692e985e86baa5",
-      "size_bytes": 23021
+      "sha256": "97138a74092b9386a0611dc191f89418c8fd4b07ab9c32b55d6908c4478a4931",
+      "size_bytes": 23133
     },
     {
       "exists": true,
@@ -90,6 +90,15 @@
       "path": "benchmarks/results/bitdistill_reproduction_status_2026-05-14.md",
       "sha256": "3f0e6a6abc2fa6d76238607d6d32783b1b653fa629969ecf81cf4487ec99b09e",
       "size_bytes": 8481
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_reproduction_gap_analysis",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_reproduction_gap_analysis_2026-05-15.md",
+      "sha256": "84389a8af4bc381e7e055fcc4685393d7d0fa00bc8f54a6c634a26c369c03b31",
+      "size_bytes": 5088
     },
     {
       "exists": true,

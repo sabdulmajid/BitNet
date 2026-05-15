@@ -1,8 +1,8 @@
 # Evidence Manifest, 2026-05-15
-Artifacts: `161`. Missing: `0`.
+Artifacts: `162`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 23021 | cba79f57c604 |  |
+| README | tracked_report | yes | 23133 | 97138a74092b |  |
 | side_by_side_report | tracked_report | yes | 17207 | f3a17212cfe8 |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
 | paired_row_minus_ptq_report | tracked_report | yes | 1332 | 20a5aee1eb99 |  |
@@ -12,6 +12,7 @@ Artifacts: `161`. Missing: `0`.
 | objective_completion_audit | tracked_report | yes | 5645 | feb301cdfdf3 |  |
 | product_scope_gate | tracked_report | yes | 4782 | c50b460989da |  |
 | bitdistill_reproduction_status | tracked_report | yes | 8481 | 3f0e6a6abc2f |  |
+| bitdistill_reproduction_gap_analysis | tracked_report | yes | 5088 | 84389a8af4bc |  |
 | bitdistill_reproduction_gate_report | tracked_report | yes | 12285 | eecd5a418311 |  |
 | bitdistill_paired_predictions_report | tracked_report | yes | 9504 | 676b01335d32 |  |
 | bitdistill_task_formulation_report | tracked_report | yes | 11523 | a9673ae56024 |  |

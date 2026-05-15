@@ -355,6 +355,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Qwen side-by-side summary](benchmarks/results/qwen_side_by_side_2026-05-15.md)
 - [BitDistill active goal audit](benchmarks/results/bitdistill_active_goal_audit_2026-05-15.md)
 - [BitDistill active job monitor](benchmarks/results/bitdistill_job_monitor_2026-05-15.md)
+- [BitDistill reproduction gap analysis](benchmarks/results/bitdistill_reproduction_gap_analysis_2026-05-15.md)
 - [BitDistill warm-up health audit](benchmarks/results/bitdistill_warmup_health_2026-05-15.md)
 - [BitDistill row-warmup monitor](benchmarks/results/bitdistill_row_warmup_monitor_2026-05-15.md)
 - [BitDistill row-warmup health audit](benchmarks/results/bitdistill_row_warmup_health_2026-05-15.md)
