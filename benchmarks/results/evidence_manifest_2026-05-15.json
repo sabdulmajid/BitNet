@@ -1,5 +1,5 @@
 {
-  "artifact_count": 211,
+  "artifact_count": 213,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "3410f12bfc193a6764580b45c2bb02096f5871fa9f15d67fe37851a4a0cfd0dd",
-      "size_bytes": 19026
+      "sha256": "c389829e0c660f633d825af4f4ee3a7092321f1de155a59b4fc3cfe38a24c039",
+      "size_bytes": 19214
     },
     {
       "exists": true,
@@ -16,7 +16,7 @@
       "label": "research_redirect_report",
       "metrics": {},
       "path": "benchmarks/results/research_redirect_2026-05-15.md",
-      "sha256": "13c4f24f924324fdd0b20f8799552144893ea4e505304b827e6cb1abf9b41ba8",
+      "sha256": "bb2ed8cb9e5278bc71c46c8ccd35c4e632112f290c947353bf6178c3a29df2f4",
       "size_bytes": 7704
     },
     {
@@ -169,7 +169,7 @@
       "label": "bitdistill_controlled_curve_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_controlled_curve_2026-05-15.md",
-      "sha256": "49e32567e5b8cf17624c878d7faf51e55c6db09225cf5fef2fbf4a1e980daa4e",
+      "sha256": "94f31059af68d8923e6436c55e62a5976c267c056a95f581c34e14169080aa57",
       "size_bytes": 2355
     },
     {
@@ -270,6 +270,15 @@
       "path": "benchmarks/results/bitdistill_loss_scale_audit_2026-05-15.md",
       "sha256": "628d0414fc132a0fe0a97d958a83ef491b5672f8619762e70e6dca85cda4933c",
       "size_bytes": 8733
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_loss_contract_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_loss_contract_2026-05-15.md",
+      "sha256": "142942ba3f0aaa6decc4a038371796b7357cfb9516bef71387ba290c647d8a6f",
+      "size_bytes": 1911
     },
     {
       "exists": true,
@@ -556,8 +565,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "ee0179f8a1a7fc2cd5fe6ba7637baea3f17a460f490743fd0132f15e6a8a1562",
-      "size_bytes": 6550
+      "sha256": "02143abb00a27b3d9bd5488f2bf682bd89200b04aa84b19cb549b4568619ac95",
+      "size_bytes": 6802
     },
     {
       "exists": true,
@@ -2241,13 +2250,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 56,
+        "check_count": 58,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "c1e4c7cf09e2af845a3cd7f69085c40ba3312dc5ca43746c204ccd0b4ac2f2ef",
-      "size_bytes": 10872
+      "sha256": "5dac324463bee2dbb329735d57d74b8e4c7ed751612bd2e93f6983f8879de216",
+      "size_bytes": 11278
     },
     {
       "exists": true,
@@ -2332,8 +2341,8 @@
       "label": "bitdistill_controlled_curve_json",
       "metrics": {},
       "path": "benchmark_results/bitdistill_controlled_curve_2026-05-15.json",
-      "sha256": "f36e6d8d5e75272a4be4adfd4702125ba612df58190dd26633986bfd19fcc7b8",
-      "size_bytes": 7436
+      "sha256": "f6e19c53ea3a98582c42ab8c4dbc8fd6d4954bf996b7052e6427719bf295d73c",
+      "size_bytes": 7438
     },
     {
       "exists": true,
@@ -2352,6 +2361,15 @@
       "path": "benchmark_results/bitdistill_telemetry_coverage_2026-05-15.json",
       "sha256": "d5972de78a36d9474e8ab0ef24eb3b099b1284d1c572ba4e9f26a7fdc1ddcc16",
       "size_bytes": 3805
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "bitdistill_loss_contract_json",
+      "metrics": {},
+      "path": "benchmark_results/bitdistill_loss_contract_2026-05-15.json",
+      "sha256": "f09c1f9da51144ba111b36119232b2f0b8cc01f0532f1621d35409a55484d161",
+      "size_bytes": 2260
     },
     {
       "exists": true,

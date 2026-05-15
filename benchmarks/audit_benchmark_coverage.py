@@ -434,6 +434,33 @@ def audit_bitdistill_telemetry_coverage(root: Path, checks: list[dict[str, Any]]
     )
 
 
+def audit_bitdistill_loss_contract(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/bitdistill_loss_contract_{DATE}.json"
+    if not path.exists():
+        add_check(checks, "BitDistill loss-contract audit exists", False, str(path.relative_to(root)), "missing loss-contract audit")
+        return
+    data = read_json(path)
+    static_checks = data.get("checks", []) if isinstance(data.get("checks"), list) else []
+    live = data.get("live", {}) if isinstance(data.get("live"), dict) else {}
+    max_ratio = live.get("max_observed_weighted_attention_to_ce")
+    add_check(
+        checks,
+        "BitDistill loss-contract static checks pass",
+        data.get("passed") is True and len(static_checks) >= 6,
+        f"passed={data.get('passed')}, checks={len(static_checks)}, status={data.get('status')}",
+        "loss-contract source checks failed",
+    )
+    add_check(
+        checks,
+        "BitDistill loss-contract records paper-gamma dominance risk",
+        data.get("status") == "loss_normalization_risk"
+        and isinstance(max_ratio, (int, float))
+        and max_ratio >= 100.0,
+        f"status={data.get('status')}, max_attn_ce={max_ratio}",
+        "loss-contract audit should flag current paper-gamma loss-balance risk",
+    )
+
+
 def audit_qwen3_paper_alignment(root: Path, checks: list[dict[str, Any]]) -> None:
     path = root / f"benchmark_results/qwen3_paper_alignment_{DATE}.json"
     if not path.exists():
@@ -647,6 +674,7 @@ def main() -> None:
     audit_subln_activation_variance(root, checks)
     audit_bitdistill_root_cause(root, checks)
     audit_bitdistill_telemetry_coverage(root, checks)
+    audit_bitdistill_loss_contract(root, checks)
     audit_qwen3_paper_alignment(root, checks)
     audit_cpu_rows(root, checks)
     audit_cpu_tradeoff_frontier(root, checks)

@@ -1,0 +1,66 @@
+{
+  "schema": "bitdistill_loss_contract.v1",
+  "date": "2026-05-15",
+  "status": "loss_normalization_risk",
+  "passed": true,
+  "risk": true,
+  "risk_threshold_weighted_attention_to_ce": 100.0,
+  "source": "train_bitdistill.py",
+  "controlled_json": "benchmark_results/bitdistill_controlled_curve_2026-05-15.json",
+  "checks": [
+    {
+      "name": "SubLN wraps projection inputs before BitLinear replacement",
+      "passed": true,
+      "evidence": "first_line=309, second_line=311",
+      "blocker": ""
+    },
+    {
+      "name": "Attention relation KD uses batchmean KL",
+      "passed": true,
+      "evidence": "line=404, needle=F.kl_div(torch.log(student_rows), teacher_rows, reduction=\"batchmean\", log_target=False)",
+      "blocker": ""
+    },
+    {
+      "name": "Attention Q/K/V reduction defaults to sum",
+      "passed": true,
+      "evidence": "line=1443, needle=parser.add_argument(\"--attention-qkv-reduction\", choices=[\"sum\", \"mean\"], default=\"sum\")",
+      "blocker": ""
+    },
+    {
+      "name": "Logits KD temperature scaling defaults to none",
+      "passed": true,
+      "evidence": "line=1439, needle=parser.add_argument(\"--logit-kd-temperature-scale\", choices=[\"none\", \"square\"], default=\"none\")",
+      "blocker": ""
+    },
+    {
+      "name": "Stage-3 loss is direct weighted sum",
+      "passed": true,
+      "evidence": "line=1300, needle=loss = ce + weighted_logit_kd + weighted_attention_kd",
+      "blocker": ""
+    },
+    {
+      "name": "Attention weight default is local-safe, not paper gamma",
+      "passed": true,
+      "evidence": "line=1441, needle=parser.add_argument(\"--attention-kd-weight\", type=float, default=100.0)",
+      "blocker": ""
+    }
+  ],
+  "live": {
+    "live_rows": [
+      {
+        "job_id": "10068",
+        "label": "20k-warmup downstream control",
+        "state": "RUNNING",
+        "latest_step": 910,
+        "latest_ce": 0.890625,
+        "latest_attention_kd": 0.018013,
+        "latest_weighted_attention_kd": 1801.281372,
+        "latest_weighted_attention_to_ce": 2022.4913650526314,
+        "max_weighted_attention_to_ce": 6461.961603640245,
+        "parsed_steps": 92
+      }
+    ],
+    "max_observed_weighted_attention_to_ce": 6461.961603640245,
+    "risk": true
+  }
+}

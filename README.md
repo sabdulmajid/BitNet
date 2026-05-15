@@ -145,8 +145,8 @@ attention losses are not yet logged.
 
 The controlled Stage-2 recovery audit also parses live Slurm logs before final
 validation traces exist. Its current snapshot for the `163.84M`-token
-paper-gamma row records step `570`, weighted-attention/CE ratio `1799.792612`,
-and max observed weighted-attention/CE ratio `5278.853516`. This is not a
+paper-gamma row records step `910`, weighted-attention/CE ratio `2022.491365`,
+and max observed weighted-attention/CE ratio `6461.961604`. This is not a
 quality result; it is a loss-normalization warning that the paper's
 `gamma=100000` coefficient is numerically dominating CE under the local
 implementation.
@@ -342,6 +342,8 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitNet-SFT budget paired audit](benchmarks/results/bitnet_sft_budget_paired_2026-05-15.md)
 - [SubLN activation variance audit](benchmarks/results/subln_activation_variance_2026-05-15.md)
 - [BitDistill paper alignment audit](benchmarks/results/bitdistill_paper_alignment_2026-05-15.md)
+- [BitDistill loss-scale audit](benchmarks/results/bitdistill_loss_scale_audit_2026-05-15.md)
+- [BitDistill loss-contract audit](benchmarks/results/bitdistill_loss_contract_2026-05-15.md)
 - [Task formulation audit](benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md)
 - [Causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_2026-05-15.md)
 - [CPU tradeoff frontier audit](benchmarks/results/cpu_tradeoff_frontier_2026-05-15.md)

@@ -74,21 +74,21 @@
       "live_log": {
         "exists": true,
         "latest": {
-          "attention_kd": 0.01617,
-          "ce": 0.898438,
-          "elapsed": 461.5,
-          "logit_kd": 0.066415,
-          "loss": 1618.564697,
-          "lr": 1.99e-05,
-          "step": 570.0,
-          "weighted_attention_kd": 1617.002075,
-          "weighted_logit_kd": 0.664152
+          "attention_kd": 0.018013,
+          "ce": 0.890625,
+          "elapsed": 736.7,
+          "logit_kd": 0.036578,
+          "loss": 1802.53772,
+          "lr": 1.97e-05,
+          "step": 910.0,
+          "weighted_attention_kd": 1801.281372,
+          "weighted_logit_kd": 0.365781
         },
-        "latest_step": 570,
-        "latest_weighted_attention_to_ce": 1799.792612289329,
-        "max_weighted_attention_to_ce": 5278.853516048964,
+        "latest_step": 910,
+        "latest_weighted_attention_to_ce": 2022.4913650526314,
+        "max_weighted_attention_to_ce": 6461.961603640245,
         "min_weighted_attention_to_ce": 813.6714545230769,
-        "parsed_steps": 58,
+        "parsed_steps": 92,
         "path": "logs/bitdistill-glue-10068.out"
       },
       "metric_accuracy": null,
@@ -121,7 +121,7 @@
       "predictions_exists": false,
       "predictions_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
       "squeue": {
-        "elapsed": "9:05",
+        "elapsed": "13:51",
         "job_id": "10068",
         "reason": "ece-nebula12",
         "state": "RUNNING"
