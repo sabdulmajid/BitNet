@@ -1,5 +1,5 @@
 {
-  "artifact_count": 179,
+  "artifact_count": 181,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "9f8114bda55e36904c0df98a7fa1ec62580a9f11c38af39e8ca809dc97abf3d5",
-      "size_bytes": 13107
+      "sha256": "f8d0690e8c2259bc2eb010fc00f1d6a5d56cee14e22431462ff505602aeff2d7",
+      "size_bytes": 13207
     },
     {
       "exists": true,
@@ -144,6 +144,15 @@
       "path": "benchmarks/results/bitnet_sft_baseline_audit_2026-05-15.md",
       "sha256": "8a20e524884074f792c05d3c65098c7647d61a4c3a1be4385c924e1af5d1701e",
       "size_bytes": 4047
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitnet_sft_recipe_alignment_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitnet_sft_recipe_alignment_2026-05-15.md",
+      "sha256": "85a9cf7ec4095ae7c815cd17325a6938c49691443069fbd339779ebb2b512351",
+      "size_bytes": 2614
     },
     {
       "exists": true,
@@ -412,7 +421,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "fc0653c871846deee329a23f5ccb2a2685d4353dd7a690c413be9dfa6d32a7ca",
+      "sha256": "1aa361115f9c9de97484674d32288f56834f6582da164f64895b5691c6707e26",
       "size_bytes": 3438
     },
     {
@@ -2102,7 +2111,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "cc19b1edbf2b9b69ef099a6969494aa17a2a9c4e9a31efd6bc1aab5c1ad60324",
+      "sha256": "b6106468ed3cb257b0a49b120e154a7ca8356dda3cdc36a7ad3836d6daf8d046",
       "size_bytes": 6374
     },
     {
@@ -2171,6 +2180,15 @@
       "path": "benchmark_results/bitnet_sft_baseline_audit_2026-05-15.json",
       "sha256": "9e07c097db175e650fe22e64d7690c1521eb98d4e2768eb0a6213fb36cec233e",
       "size_bytes": 45902
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "bitnet_sft_recipe_alignment_json",
+      "metrics": {},
+      "path": "benchmark_results/bitnet_sft_recipe_alignment_2026-05-15.json",
+      "sha256": "4de58655515bed45b01d0dfc913f67798ff4e037f4a557e98dd9bfaf854f2ff1",
+      "size_bytes": 3339
     },
     {
       "exists": true,
