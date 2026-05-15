@@ -308,6 +308,7 @@ def comparison_specs(tasks: list[str]) -> list[ComparisonSpec]:
 
 def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     rows = [compare_predictions(args, spec) for spec in comparison_specs(args.tasks)]
+    baseline_consistency = baseline_consistency_rows(args)
     failed = [row for row in rows if row["status"] == "fail"]
     complete = [row for row in rows if row["status"] == "pass"]
     pending = [row for row in rows if row["status"] == "pending"]
@@ -323,14 +324,49 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "failed": len(failed),
         "total": len(rows),
         "rows": rows,
+        "baseline_consistency": baseline_consistency,
+        "baseline_prediction_root": str(args.baseline_prediction_root),
+        "primary_baseline_root": str(args.baseline_root),
         "notes": [
             "Delta is candidate accuracy minus reference accuracy on matched eval examples.",
             "Rows pass only when both prediction traces cover the full expected task validation split.",
+            "FP16/BitNet paired rows use the prediction-backfill baseline root, because the primary baseline runs did not save eval_predictions.jsonl.",
             "The paired 95% interval is a normal interval over per-example paired correctness differences.",
             "McNemar p-values use an exact two-sided binomial test over discordant pairs.",
         ],
         "expected_eval_examples": {task: EXPECTED_EVAL_EXAMPLES[task] for task in args.tasks},
     }
+
+
+def baseline_consistency_rows(args: argparse.Namespace) -> list[dict[str, Any]]:
+    refs = [FP16, BITNET]
+    rows: list[dict[str, Any]] = []
+    for task in args.tasks:
+        for ref in refs:
+            primary_dir = run_dir(args.baseline_root, args.model, ref, task)
+            prediction_dir = run_dir(args.baseline_prediction_root, args.model, ref, task)
+            primary = metric_summary(primary_dir)
+            prediction = metric_summary(prediction_dir)
+            primary_accuracy = primary["accuracy"]
+            prediction_accuracy = prediction["accuracy"]
+            rows.append(
+                {
+                    "task": task,
+                    "run": ref.label,
+                    "primary_accuracy": primary_accuracy,
+                    "prediction_accuracy": prediction_accuracy,
+                    "primary_examples": primary["examples"],
+                    "prediction_examples": prediction["examples"],
+                    "prediction_minus_primary": (
+                        prediction_accuracy - primary_accuracy
+                        if primary_accuracy is not None and prediction_accuracy is not None
+                        else None
+                    ),
+                    "primary_metrics": str(primary_dir / "metrics.json"),
+                    "prediction_metrics": str(prediction_dir / "metrics.json"),
+                }
+            )
+    return rows
 
 
 def fmt(value: Any) -> str:
@@ -374,6 +410,18 @@ def render_markdown(summary: dict[str, Any]) -> str:
         ]
         for row in summary["rows"]
     ]
+    consistency_rows = [
+        [
+            row["task"],
+            row["run"],
+            fmt(row["primary_accuracy"]),
+            fmt(row["prediction_accuracy"]),
+            fmt(row["prediction_minus_primary"]),
+            fmt(row["primary_examples"]),
+            fmt(row["prediction_examples"]),
+        ]
+        for row in summary["baseline_consistency"]
+    ]
     return "\n\n".join(
         [
             f"# BitDistill Paired Prediction Audit, {summary['date']}",
@@ -381,6 +429,21 @@ def render_markdown(summary: dict[str, Any]) -> str:
             f"Rows complete: `{summary['complete']}` / `{summary['total']}`. Pending: `{summary['pending']}`. Failed: `{summary['failed']}`.",
             "This report is designed to become the main statistical comparison once long-warmup jobs write `eval_predictions.jsonl`.",
             f"Full-evaluation contract: `{summary['expected_eval_examples']}` examples. Partial prediction traces cannot pass.",
+            f"Primary baseline root: `{summary['primary_baseline_root']}`.",
+            f"Prediction-backfill baseline root: `{summary['baseline_prediction_root']}`.",
+            "The baseline prediction-backfill reruns are not silently substituted for the primary headline metrics; their small accuracy deltas are reported below.",
+            md_table(
+                [
+                    "task",
+                    "run",
+                    "primary acc",
+                    "prediction acc",
+                    "prediction-primary",
+                    "primary n",
+                    "prediction n",
+                ],
+                consistency_rows,
+            ),
             "Delta is candidate minus reference on the same eval indices; positive means the candidate is better.",
             md_table(
                 [

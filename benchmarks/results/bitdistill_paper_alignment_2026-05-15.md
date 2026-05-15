@@ -48,7 +48,7 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | mnli | BitDistill longwarmup tensor paper gamma headinit | paper_headinit_pending | false | - | - | 9815 | false | 0.807641 | true | - |
 | mnli | BitDistill longwarmup tensor gamma1k | mnli_gamma_sweep_pending | true | 0.647275 | 9815 | 9815 | true | 0.807641 | true | 0.160367 |
 | mnli | BitDistill longwarmup tensor gamma10k | mnli_gamma_sweep_pending | true | 0.635354 | 9815 | 9815 | true | 0.807641 | true | 0.172287 |
-| mnli | BitDistill longwarmup tensor layer -1 | mnli_layer_sweep_pending | false | - | - | 9815 | false | 0.807641 | true | - |
+| mnli | BitDistill longwarmup tensor layer -1 | mnli_layer_sweep_pending | true | 0.645950 | 9815 | 9815 | true | 0.807641 | true | 0.161691 |
 | mnli | BitDistill longwarmup tensor layer -2 | mnli_layer_sweep_pending | false | - | - | 9815 | false | 0.807641 | true | - |
 | mnli | BitDistill longwarmup tensor layer -4 | mnli_layer_sweep_pending | false | - | - | 9815 | false | 0.807641 | true | - |
 | qnli | FP16-SFT | baseline | true | 0.898957 | 5463 | 5463 | true | 0.898957 | true | 0.000000 |

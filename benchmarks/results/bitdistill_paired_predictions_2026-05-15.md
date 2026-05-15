@@ -8,6 +8,21 @@ This report is designed to become the main statistical comparison once long-warm
 
 Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. Partial prediction traces cannot pass.
 
+Primary baseline root: `checkpoints/bitdistill-glue-seqcls`.
+
+Prediction-backfill baseline root: `checkpoints/bitdistill-glue-seqcls-predtrace`.
+
+The baseline prediction-backfill reruns are not silently substituted for the primary headline metrics; their small accuracy deltas are reported below.
+
+| task | run | primary acc | prediction acc | prediction-primary | primary n | prediction n |
+| --- | --- | --- | --- | --- | --- | --- |
+| mnli | FP16-SFT | 0.807641 | 0.808151 | 0.000509 | 9815 | 9815 |
+| mnli | BitNet-SFT | 0.487621 | 0.489251 | 0.001630 | 9815 | 9815 |
+| qnli | FP16-SFT | 0.898957 | 0.899506 | 0.000549 | 5463 | 5463 |
+| qnli | BitNet-SFT | 0.596925 | 0.600037 | 0.003112 | 5463 | 5463 |
+| sst2 | FP16-SFT | 0.925459 | 0.925459 | 0.000000 | 872 | 872 |
+| sst2 | BitNet-SFT | 0.770642 | 0.777523 | 0.006881 | 872 | 872 |
+
 Delta is candidate minus reference on the same eval indices; positive means the candidate is better.
 
 | task | comparison | status | matched n | expected n | reference acc | candidate acc | delta | paired 95% CI | candidate wins | reference wins | McNemar p | pending/error |

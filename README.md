@@ -162,10 +162,15 @@ but they still fail the BitDistill paper-reproduction threshold. Row-scale is
 higher than tensor on MNLI (`+0.011921`, paired 95% CI `[0.004958, 0.018883]`)
 and QNLI (`+0.009152`, paired 95% CI `[0.000093, 0.018212]`), but lower on
 SST2 (`-0.012615`, paired 95% CI `[-0.027678, 0.002448]`). The strict
-paper-gamma tensor branch is complete and negative; paper-gamma row,
-LR-search, head-initialization, layer-sweep, and clean row-warmup branches
-remain running or queued. No paper-level GLUE success claim will be made until
-full-validation candidates close the FP16 gap.
+paper-gamma tensor branch is complete and negative. Gamma=100 teacher-head
+initialization is also complete and mixed/negative overall: it improves QNLI
+row from `0.796998` to `0.800476`, leaves SST2 tensor unchanged at
+`0.866972`, and worsens MNLI row plus SST2 row. The first MNLI
+attention-layer sweep result, layer `-1`, reaches `0.645950`, which is a
+small improvement over tensor gamma=100 but still `0.161691` behind FP16-SFT.
+Paper-gamma row, LR-search, remaining layer-sweep, and clean row-warmup
+branches remain running or queued. No paper-level GLUE success claim will be
+made until full-validation candidates close the FP16 gap.
 
 The first exportable causal-LM long-warmup downstream diagnostics have
 completed for MNLI, QNLI, and SST2. On full validation, MNLI reaches `0.615181`
@@ -186,16 +191,17 @@ WikiText PPL is catastrophic (`155,846-347,660`). Treat this as proof that the
 format/runtime path works and that task-specific causal BitDistill does not
 preserve general language-model quality in this configuration.
 
-Active follow-ups are probing teacher-head initialization, attention-layer
-selection, paper-style logits KL scaling, CE-only ablations, a longer
-warm-up pilot, and a strict paper-hyperparameter branch with classification
-attention KD weight `1e5`. The active long-warmup queue also includes MNLI
+Active follow-ups are now focused on the remaining attention-layer sweep rows,
+paper-gamma row scaling, LR search, clean row-scale warm-up, and the full
+CPU/I2_SR producer gates. Completed diagnostics already show that gamma=100
+teacher-head initialization and the first layer-sweep point are not enough to
+recover paper-level accuracy. The active long-warmup queue also includes MNLI
 gamma probes at `1e3` and `1e4` because the local relation-loss scale audit
 showed the paper's `1e5` coefficient can dominate CE by orders of magnitude.
 The earlier completed BitDistill runs use attention KD weight `100`; those are
 useful diagnostics but are not a strict match to the paper's reported
-classification setting. Until those gates close, the public claim remains
-conservative:
+classification setting. Until the remaining gates close, the public claim
+remains conservative:
 **BitDistill is the right class of method, but this fork has not yet reproduced
 paper-level task quality.**
 
@@ -203,7 +209,8 @@ Focused MNLI diagnostics after fixing logits-KL scaling and sweeping the
 attention-distillation layer improved the best short-budget BitDistill result
 to `0.535711` versus FP16-SFT `0.807641`. CE-only ablations stay near
 `0.492-0.498`, so distillation helps, but the run is still far from
-reproduction-quality.
+reproduction-quality. With long-warmup, MNLI layer `-1` now reaches
+`0.645950`, still below the row-scale gamma=100 best of `0.653591`.
 
 Runtime boundary: the active paper-style GLUE reproduction uses
 `Qwen2ForSequenceClassification`. Those checkpoints can be evaluated on CPU
