@@ -45,6 +45,8 @@ Overall status: **PASS**.
 | row-scale I2_SR CPU row is finite | pass | ppl=38.8477, prefill=211.668328, decode=19.065496 |  |
 | CPU tradeoff frontier has headline rows | pass | labels=['FP F16', 'FP Q4_K_M', 'FP Q8_0', 'row I2_S', 'row I2_SR', 'row TQ2_0'] |  |
 | CPU tradeoff frontier reports Q4-vs-I2_SR ratios | pass | q4_vs_i2sr={'decode_speedup': 1.19061682213809, 'file_ratio': 1.2881333039180543, 'ppl_ratio': 3.0323232796303237, 'prefill_speedup': 2.298817760610607, 'rss512_ratio': 1.2685742155747033} |  |
+| CPU speed uncertainty audit has I2_SR-vs-Q4 intervals | pass | prefill_ci=[2.2578672451091255, 2.34051098794489], decode_ci=[1.1861079640891115, 1.1951428201115284] |  |
+| I2_SR-vs-Q4 speedup intervals stay above 1 | pass | prefill_ci=[2.2578672451091255, 2.34051098794489], decode_ci=[1.1861079640891115, 1.1951428201115284] |  |
 | fixed I2_SR RSS has four context rows | pass | contexts=[512, 2048, 8192, 32768] |  |
-| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=187, missing=0, missing_labels=[] |  |
+| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=189, missing=0, missing_labels=[] |  |
 | productization gate passes for stable I2_SR | pass | passed=True, failed=0, stable_quality=True, layout=True |  |

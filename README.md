@@ -142,6 +142,9 @@ Normalized against FP Q4_K_M on the same Xeon run, row-scale `I2_SR` is
 `1.288133x` the file size, `1.268574x` the RSS at context 512, `2.298818x` the
 prefill throughput, `1.190617x` the decode throughput, and `3.032323x` the PPL.
 This is a speed/runtime-semantics result, not a mature Q4 quality/storage win.
+Using the recorded `llama-bench` standard deviations across three repetitions,
+the Q4-normalized `I2_SR` speedup intervals remain above `1.0`: prefill
+`[2.257867, 2.340511]`, decode `[1.186108, 1.195143]`.
 
 ## What This Fork Adds
 
@@ -271,6 +274,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Task formulation audit](benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md)
 - [Causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_2026-05-15.md)
 - [CPU tradeoff frontier audit](benchmarks/results/cpu_tradeoff_frontier_2026-05-15.md)
+- [CPU speed uncertainty audit](benchmarks/results/cpu_speed_uncertainty_2026-05-15.md)
 - [Benchmark coverage gate](benchmarks/results/benchmark_coverage_gate_2026-05-15.md)
 - [Product scope gate](benchmarks/results/product_scope_gate_2026-05-15.md)
 - [Evidence manifest](benchmarks/results/evidence_manifest_2026-05-15.md)

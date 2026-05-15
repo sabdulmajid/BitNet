@@ -349,6 +349,40 @@ def audit_cpu_tradeoff_frontier(root: Path, checks: list[dict[str, Any]]) -> Non
     )
 
 
+def audit_cpu_speed_uncertainty(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/cpu_speed_uncertainty_{DATE}.json"
+    if not path.exists():
+        add_check(checks, "CPU speed uncertainty audit exists", False, str(path.relative_to(root)), "missing CPU speed uncertainty audit")
+        return
+    data = read_json(path)
+    i2sr = data.get("i2sr_vs_q4", {}) if isinstance(data.get("i2sr_vs_q4"), dict) else {}
+    decode_ci = i2sr.get("decode_speedup_ci95")
+    prefill_ci = i2sr.get("prefill_speedup_ci95")
+    add_check(
+        checks,
+        "CPU speed uncertainty audit has I2_SR-vs-Q4 intervals",
+        isinstance(decode_ci, list)
+        and len(decode_ci) == 2
+        and isinstance(prefill_ci, list)
+        and len(prefill_ci) == 2
+        and all(isinstance(value, (int, float)) for value in decode_ci + prefill_ci),
+        f"prefill_ci={prefill_ci}, decode_ci={decode_ci}",
+        "missing uncertainty intervals for I2_SR-vs-Q4 speedup",
+    )
+    add_check(
+        checks,
+        "I2_SR-vs-Q4 speedup intervals stay above 1",
+        isinstance(decode_ci, list)
+        and len(decode_ci) == 2
+        and isinstance(prefill_ci, list)
+        and len(prefill_ci) == 2
+        and min(decode_ci) > 1.0
+        and min(prefill_ci) > 1.0,
+        f"prefill_ci={prefill_ci}, decode_ci={decode_ci}",
+        "I2_SR speedup over Q4 is not robust under recorded benchmark uncertainty",
+    )
+
+
 def manifest_missing_is_only_self_coverage(manifest: dict[str, Any]) -> bool:
     missing = manifest.get("missing", [])
     if not isinstance(missing, list):
@@ -449,6 +483,7 @@ def main() -> None:
     audit_subln_activation_variance(root, checks)
     audit_cpu_rows(root, checks)
     audit_cpu_tradeoff_frontier(root, checks)
+    audit_cpu_speed_uncertainty(root, checks)
     manifest_path = args.manifest_path.resolve() if args.manifest_path is not None else None
     audit_rss_and_gates(root, checks, manifest_path)
 

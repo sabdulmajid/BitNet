@@ -1,5 +1,5 @@
 {
-  "artifact_count": 187,
+  "artifact_count": 189,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "eac98aea5a901a84e9f514b4601b55d1feac67011db1caf4cf5d20197ff0173b",
-      "size_bytes": 14461
+      "sha256": "98818803aa0f0de32fa340a2ae5d48642eb3473a6be3025ae931e861ab81021b",
+      "size_bytes": 14755
     },
     {
       "exists": true,
@@ -79,7 +79,7 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-15.md",
-      "sha256": "0c871e19f37206b653f7f8c6a29d2b1e3f240ad6595df6a2d419c92e3643b96b",
+      "sha256": "ea35b31e4ac69914b2d49741b21e67472d213776c91ce097467ff2962b532e03",
       "size_bytes": 5646
     },
     {
@@ -243,6 +243,15 @@
       "path": "benchmarks/results/cpu_tradeoff_frontier_2026-05-15.md",
       "sha256": "72d04ac5933093022002e6a1a6ddac428dbaa3a1adde1774f8db567344094251",
       "size_bytes": 1780
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "cpu_speed_uncertainty_report",
+      "metrics": {},
+      "path": "benchmarks/results/cpu_speed_uncertainty_2026-05-15.md",
+      "sha256": "17abf2e39d4e2b18edd804a0e2bc03dac71335b629d7ae5136c234fc2420c303",
+      "size_bytes": 1658
     },
     {
       "exists": true,
@@ -448,8 +457,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "ffef6296f3853f4844d673e1c9e69308497e23f13d18f4c45f1004003e7a2637",
-      "size_bytes": 4123
+      "sha256": "6a59cefffee6b7511da9174a4c2ed0f080aaa114d91f5ae54c6c637e59d46c50",
+      "size_bytes": 4513
     },
     {
       "exists": true,
@@ -2133,13 +2142,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 42,
+        "check_count": 44,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "b92acbf33a22b364c7d7cf12ce71fa8e26f969d34d1d24cc2812c33796b892e3",
-      "size_bytes": 7367
+      "sha256": "7337f995293f7013e3d21bd48627fdcd625a5f3a8251eef51edcff1e68b01d55",
+      "size_bytes": 7911
     },
     {
       "exists": true,
@@ -2156,7 +2165,7 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-15.json",
-      "sha256": "6f72dfc052ed4d80192b99858220be63887645ab23dcde47356e8e89a138573a",
+      "sha256": "870a1042e0a8ef5dc159c7503f19be382f678a548f08750a5a7f6e42f61dd755",
       "size_bytes": 16035
     },
     {
@@ -2318,6 +2327,15 @@
       "path": "benchmark_results/cpu_tradeoff_frontier_2026-05-15.json",
       "sha256": "792515abce6eff6c0521a6cddfb8243c7778d254fabfbcf793e9a3529f1045f2",
       "size_bytes": 7892
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "cpu_speed_uncertainty_json",
+      "metrics": {},
+      "path": "benchmark_results/cpu_speed_uncertainty_2026-05-15.json",
+      "sha256": "453b72295029533a651187c09e154012f19ac50584c39455e840e879a2a35b60",
+      "size_bytes": 7571
     },
     {
       "exists": true,
