@@ -2,7 +2,7 @@
 
 Best completed sweep row is accuracy `0.628935` at steps=`10000`, lr=`2e-5`. The paper BitNet-SFT anchor remains `0.608000`, so the local row exceeds the anchor by `0.020935`.
 
-Completed rows: `10/10`.
+Completed rows: `10/12`.
 
 Default BitNet-SFT MNLI baseline: `0.487621`.
 
@@ -28,6 +28,8 @@ The best completed row at the largest completed step count is still improving ov
 | 3000 | 1e-5 | true | 10063 | 0.564646 | 9.815e+03 | true | 0.077025 | 0.043354 | 48000 | 0.122230 | 1.218750 | true | 0 |
 | 3000 | 2e-5 | true | 10064 | 0.574733 | 9.815e+03 | true | 0.087112 | 0.033267 | 48000 | 0.122230 | 1.234375 | true | 0 |
 | 3000 | 5e-5 | true | 10065 | 0.567397 | 9.815e+03 | true | 0.079776 | 0.040603 | 48000 | 0.122230 | 1.132812 | true | 0 |
+| 10000 | 5e-6 | false |  | - | - | false | - | - | - | - | - | - | - |
+| 10000 | 1e-5 | false |  | - | - | false | - | - | - | - | - | - | - |
 | 10000 | 2e-5 | true | 10066 | 0.628935 | 9.815e+03 | true | 0.141314 | -0.020935 | 160000 | 0.407434 | 0.566406 | true | 0 |
 | 10000 | 5e-5 | true | 10067 | 0.607845 | 9.815e+03 | true | 0.120224 | 1.549e-04 | 160000 | 0.407434 | 0.554688 | true | 0 |
 

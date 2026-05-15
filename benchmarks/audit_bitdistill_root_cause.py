@@ -187,7 +187,10 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                 f"paper anchor delta={fmt(budget_best.get('delta_vs_paper_anchor'))}, "
                 f"FP paired delta={fmt(bitnet_best_delta_vs_fp)}."
             ),
-            "next_gate": "Finish the second 10k LR row and keep paired traces for schedule robustness.",
+            "next_gate": (
+                "Treat CE-only BitNet-SFT as budget-viable but schedule-sensitive; "
+                "use it as the baseline for BitDistill recovery, not as a success claim."
+            ),
         },
         {
             "claim": "BitDistill paper-level recovery has not been locally reproduced.",
@@ -297,10 +300,17 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
             "kimi_unsupported_features": kimi.get("unsupported_features", []),
         },
         "claims": claims,
+        "immediate_decision_gate": (
+            "Finish the fixed-recipe tensor-scale BitDistill Stage-2 curve. If "
+            "accuracy rises with warm-up budget, scale continued pretraining. If "
+            "it saturates far below FP16, prioritize loss normalization, SubLN "
+            "timing, optimizer schedule, and attention-distillation update balance."
+        ),
         "verdict": (
             "The current evidence supports a negative PTQ result and a positive "
-            "row-scale runtime-semantics result. It does not yet support a "
-            "paper-level BitDistill reproduction or Kimi/MoE product claim."
+            "row-scale runtime-semantics result. The CE-only BitNet-SFT baseline "
+            "is now budget-viable, but paper-level BitDistill recovery and Kimi/MoE "
+            "product claims remain unproven."
         ),
     }
 
@@ -320,6 +330,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
             summary["verdict"],
             "## Claim Ledger",
             md_table(["claim", "status", "evidence", "next gate"], claim_rows),
+            "## Immediate Decision Gate",
+            summary["immediate_decision_gate"],
             "## Quality Anchors",
             md_table(
                 ["row", "WikiText PPL", "ten-task mean", "delta vs FP", "tasks"],

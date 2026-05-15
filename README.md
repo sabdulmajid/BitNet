@@ -315,6 +315,19 @@ Decision rule:
 - Row-scale results should be reported as a separate runtime/retrofit
   contribution, not as a BitDistill reproduction.
 
+Immediate gate:
+
+```text
+Do the controlled tensor-scale BitDistill rows move monotonically toward the
+local FP16-SFT task model as Stage-2 tokens increase, or do they saturate far
+below FP16 despite a viable CE-only BitNet-SFT baseline?
+```
+
+That answer determines the next branch. A smooth token-budget curve justifies
+larger continued-pretraining runs. Saturation below FP16 shifts the work to
+loss-normalization, SubLN timing/initialization, optimizer schedule, and
+attention-distillation update-balance audits before any further runtime claims.
+
 ## Product Direction
 
 The credible product is not "convert any model to 1.58-bit." The credible
@@ -356,8 +369,10 @@ python benchmarks/audit_bitnet_sft_budget_sweep.py
 python benchmarks/audit_bitnet_sft_mechanics.py
 python benchmarks/audit_bitdistill_telemetry_coverage.py
 python benchmarks/audit_bitdistill_stage2_curve.py
+python benchmarks/audit_bitdistill_root_cause.py
 python benchmarks/audit_seqcls_i2sr_arch_contract.py
 python benchmarks/audit_seqcls_runtime_gap.py
+python benchmarks/audit_benchmark_matrix.py
 python benchmarks/audit_benchmark_coverage.py
 python benchmarks/audit_product_scope.py
 python benchmarks/build_evidence_manifest.py \
@@ -382,6 +397,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill Stage-2 curve submission](benchmarks/results/bitdistill_stage2_curve_submission_2026-05-15.md)
 - [BitDistill controlled curve audit](benchmarks/results/bitdistill_controlled_curve_2026-05-15.md)
 - [BitDistill telemetry coverage audit](benchmarks/results/bitdistill_telemetry_coverage_2026-05-15.md)
+- [BitDistill root-cause audit](benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md)
 - [Qwen3 paper-alignment audit](benchmarks/results/qwen3_paper_alignment_2026-05-15.md)
 - [BitNet-SFT baseline audit](benchmarks/results/bitnet_sft_baseline_audit_2026-05-15.md)
 - [BitNet-SFT recipe alignment audit](benchmarks/results/bitnet_sft_recipe_alignment_2026-05-15.md)

@@ -333,7 +333,7 @@ def main() -> int:
     parser.add_argument("--scale-mode", default="tensor")
     parser.add_argument("--output-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget"))
     parser.add_argument("--default-baseline-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-layer-1"))
-    parser.add_argument("--steps", nargs="+", type=int, default=[1000, 3000])
+    parser.add_argument("--steps", nargs="+", type=int, default=[1000, 3000, 10000])
     parser.add_argument("--lrs", nargs="+", default=["5e-6", "1e-5", "2e-5", "5e-5"])
     parser.add_argument("--job-table-glob", default="benchmark_results/bitnet_sft_budget_sweep_*.tsv")
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitnet_sft_budget_sweep_{DATE}.json"))

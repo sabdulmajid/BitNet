@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "38949eaabcedf348aeb7c70477e8098652bf56afa6d65c74e7d8522e5a61ab80",
-      "size_bytes": 24271
+      "sha256": "c207ec01aef6a7e98ea4e43dfd31d5d16868dc101c898774beae805a4b6bc4d3",
+      "size_bytes": 25008
     },
     {
       "exists": true,
@@ -133,8 +133,8 @@
       "label": "bitdistill_root_cause_audit_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md",
-      "sha256": "35ee632ae54b4bfa47ce9b5a06ab2150508b62863cb9129f9b6a53f975431013",
-      "size_bytes": 3901
+      "sha256": "a1023dbe165861795d73b8d0f78f9e23c5a00b9d9650e78315575b50f277760d",
+      "size_bytes": 4308
     },
     {
       "exists": true,
@@ -250,8 +250,8 @@
       "label": "bitnet_sft_budget_sweep_report",
       "metrics": {},
       "path": "benchmarks/results/bitnet_sft_budget_sweep_2026-05-15.md",
-      "sha256": "0819f12ef64b873ff37d2a9512be922a3059f1531e5133784056d7271c732e61",
-      "size_bytes": 2552
+      "sha256": "b1b5a8cea7ea99e733ea2a5b45001c1a372e7aa7ca61f94cd482a7a6eba24f48",
+      "size_bytes": 2696
     },
     {
       "exists": true,
@@ -2470,8 +2470,8 @@
       "label": "bitdistill_root_cause_audit_json",
       "metrics": {},
       "path": "benchmark_results/bitdistill_root_cause_audit_2026-05-15.json",
-      "sha256": "595617382d4cf61ffc4c4d47081c01e66b685513069ff99251744dc9c3ec39d0",
-      "size_bytes": 11474
+      "sha256": "58bb030b7926524a3cfc816964c7d13d702d8dc50948f151998bbaff4d228ca1",
+      "size_bytes": 11884
     },
     {
       "exists": true,
@@ -2640,8 +2640,8 @@
       "label": "bitnet_sft_budget_sweep_json",
       "metrics": {},
       "path": "benchmark_results/bitnet_sft_budget_sweep_2026-05-15.json",
-      "sha256": "a373df349fc6bce8a2eda49831ac7c5b24595a137bf31f60127919d54ec81ec7",
-      "size_bytes": 21549
+      "sha256": "998c69d626f78e186b1565dec1808406316b02576b142427f415c6a8b2afdfa4",
+      "size_bytes": 23309
     },
     {
       "exists": true,

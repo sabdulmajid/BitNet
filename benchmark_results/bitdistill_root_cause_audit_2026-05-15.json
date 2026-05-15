@@ -185,7 +185,7 @@
     {
       "claim": "The early weak BitNet-SFT baseline was not just broken mechanics.",
       "evidence": "mechanics passed=true; best 10k CE-only MNLI=0.628935, paper anchor delta=0.020935, FP paired delta=-0.179215.",
-      "next_gate": "Finish the second 10k LR row and keep paired traces for schedule robustness.",
+      "next_gate": "Treat CE-only BitNet-SFT as budget-viable but schedule-sensitive; use it as the baseline for BitDistill recovery, not as a success claim.",
       "status": "supported"
     },
     {
@@ -220,6 +220,7 @@
     }
   ],
   "date": "2026-05-15",
+  "immediate_decision_gate": "Finish the fixed-recipe tensor-scale BitDistill Stage-2 curve. If accuracy rises with warm-up budget, scale continued pretraining. If it saturates far below FP16, prioritize loss normalization, SubLN timing, optimizer schedule, and attention-distillation update balance.",
   "loss_scale": {
     "materialized_rows": 22,
     "projected_paper_attention_to_ce_max": 15779.832789772436,
@@ -236,7 +237,7 @@
     "moe_failed_productization_gates": 3,
     "moe_productization_gates": 9,
     "tl2_current_one_scale_error": 1.9042302114103853,
-    "tl2_failed_checks": 6,
+    "tl2_failed_checks": 9,
     "tl2_row_fp16_error": 0.00019744640689756221,
     "tl2_row_scale_runtime_ready": false
   },
@@ -264,5 +265,5 @@
     }
   },
   "schema": "bitdistill-root-cause-audit-v1",
-  "verdict": "The current evidence supports a negative PTQ result and a positive row-scale runtime-semantics result. It does not yet support a paper-level BitDistill reproduction or Kimi/MoE product claim."
+  "verdict": "The current evidence supports a negative PTQ result and a positive row-scale runtime-semantics result. The CE-only BitNet-SFT baseline is now budget-viable, but paper-level BitDistill recovery and Kimi/MoE product claims remain unproven."
 }
