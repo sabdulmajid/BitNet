@@ -42,7 +42,7 @@ Overall status: **PASS**.
 | SubLN activation-variance audit has finite logit drift | pass | inserted=48, rel_rms=0.7680435180664062, cosine=0.6982523202896118, path=benchmark_results/subln_activation_variance_2026-05-15.json |  |
 | SubLN audit confirms projection-input normalization | pass | subln_output_rms=[0.9996804222464561, 0.99930373330911] |  |
 | BitDistill root-cause audit has required claim statuses | pass | claims=7, mismatches={} |  |
-| BitDistill root-cause audit marks controlled recovery incomplete | pass | controlled=0/3, all=False |  |
+| BitDistill root-cause audit marks controlled recovery incomplete | pass | controlled=1/3, all=False |  |
 | BitDistill root-cause audit carries Q4-vs-I2_SR boundary ratios | pass | q4_vs_i2sr={'decode_speedup': 1.19061682213809, 'file_ratio': 1.2881333039180543, 'ppl_ratio': 3.0323232796303237, 'prefill_speedup': 2.298817760610607, 'rss512_ratio': 1.2685742155747033} |  |
 | BitDistill telemetry coverage audit measures current loss diagnostics | pass | status=partial_observability, measured=5/5 |  |
 | BitDistill telemetry coverage audit keeps advanced causality claims blocked | pass | missing=['Q/K/V relation KD split', 'activation int8 saturation rate', 'gradient norm by loss component', 'scale trajectory per layer', 'ternary flip rate per step/layer'] |  |

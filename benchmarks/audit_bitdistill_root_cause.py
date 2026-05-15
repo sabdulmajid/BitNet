@@ -7,7 +7,7 @@ in general; it records what the local evidence currently supports:
 * blind ternary PTQ fails for tested dense Qwen checkpoints,
 * basic BitLinear mechanics are not the obvious remaining blocker,
 * the weak early BitNet-SFT baseline was substantially budget-sensitive,
-* BitDistill recovery toward FP16 remains pending under controlled runs,
+* BitDistill recovery toward FP16 remains unresolved under controlled runs,
 * row-scale I2_SR is a separate runtime/retrofit contribution.
 """
 
@@ -138,6 +138,20 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     tensor_best = stage2_best.get("bitdistill_tensor", {}) if isinstance(stage2_best.get("bitdistill_tensor"), dict) else {}
     row_best = stage2_best.get("retrofit_variant", {}) if isinstance(stage2_best.get("retrofit_variant"), dict) else {}
     q4_vs_i2sr = runtime.get("q4_vs_i2sr", {}) if isinstance(runtime.get("q4_vs_i2sr"), dict) else {}
+    controlled_rows = controlled.get("rows", []) if isinstance(controlled.get("rows"), list) else []
+    controlled_completed_rows = [
+        row
+        for row in controlled_rows
+        if isinstance(row, dict)
+        and row.get("metrics_exists") is True
+        and row.get("predictions_exists") is True
+        and finite(row.get("metric_accuracy")) is not None
+    ]
+    controlled_best = max(
+        controlled_completed_rows,
+        key=lambda row: finite(row.get("metric_accuracy")) or float("-inf"),
+        default={},
+    )
 
     ptq_quality_delta = (
         ptq_mean - fp_mean
@@ -181,9 +195,11 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
             "evidence": (
                 f"best tensor BitDistill MNLI={fmt(tensor_best.get('accuracy'))} "
                 f"(delta vs FP {fmt(tensor_bitdistill_delta_vs_fp)}); "
-                f"controlled rows complete={controlled.get('complete', 0)}/{controlled.get('expected', 0)}."
+                f"controlled rows complete={controlled.get('complete', 0)}/{controlled.get('expected', 0)}, "
+                f"best controlled MNLI={fmt(controlled_best.get('metric_accuracy'))} "
+                f"(delta vs FP {fmt(nested(controlled_best, 'paired', 'delta_vs_reference'))})."
             ),
-            "next_gate": "Ingest fixed-recipe 5k/20k/40k Stage-2 rows when Slurm jobs finish.",
+            "next_gate": "Finish the fixed-recipe 5k/20k/40k Stage-2 curve and require a full-validation paired trace within the FP recovery gate.",
         },
         {
             "claim": "Loss normalization is a live reproduction risk.",
@@ -258,6 +274,8 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
             "controlled_complete": controlled.get("complete"),
             "controlled_expected": controlled.get("expected"),
             "controlled_all_complete": controlled.get("all_complete"),
+            "controlled_passed_fp_recovery_gate": controlled.get("passed_fp_recovery_gate"),
+            "controlled_best": controlled_best,
         },
         "loss_scale": {
             "materialized_rows": loss_scale.get("materialized_rows"),
@@ -334,6 +352,11 @@ def render_markdown(summary: dict[str, Any]) -> str:
                     ["best row retrofit delta vs FP", nested(bitdistill, "best_row_retrofit", "delta_vs_fp16")],
                     ["controlled rows complete", f"{bitdistill['controlled_complete']}/{bitdistill['controlled_expected']}"],
                     ["controlled all complete", bitdistill["controlled_all_complete"]],
+                    ["controlled rows passing FP gate", bitdistill["controlled_passed_fp_recovery_gate"]],
+                    ["best controlled job", nested(bitdistill, "controlled_best", "job_id")],
+                    ["best controlled MNLI", nested(bitdistill, "controlled_best", "metric_accuracy")],
+                    ["best controlled delta vs FP", nested(bitdistill, "controlled_best", "paired", "delta_vs_reference")],
+                    ["best controlled CI95", nested(bitdistill, "controlled_best", "paired", "paired_ci95")],
                 ],
             ),
             "## Runtime Boundary",

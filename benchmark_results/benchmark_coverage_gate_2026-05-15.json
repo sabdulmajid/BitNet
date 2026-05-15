@@ -236,7 +236,7 @@
     {
       "name": "BitDistill root-cause audit marks controlled recovery incomplete",
       "passed": true,
-      "evidence": "controlled=0/3, all=False",
+      "evidence": "controlled=1/3, all=False",
       "blocker": ""
     },
     {

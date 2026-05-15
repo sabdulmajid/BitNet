@@ -16,8 +16,8 @@
       "label": "research_redirect_report",
       "metrics": {},
       "path": "benchmarks/results/research_redirect_2026-05-15.md",
-      "sha256": "3d2c4e87df005d660a1627215b7d8492c90848473860ceb03dd63fc22032a508",
-      "size_bytes": 10777
+      "sha256": "3424c9ee5449e8315a032592a6f7cf5ef95285ffc67651082bb1ead508672b72",
+      "size_bytes": 10525
     },
     {
       "exists": true,
@@ -79,7 +79,7 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-15.md",
-      "sha256": "1e2d136318938b58bacb1d98699f8b7ae04202f408fdea0ff6909d825aa4a8b0",
+      "sha256": "a178bb7794dd1840ed71ea5a9d8b1a0d076baba4b16ebbfc8bc3c1e0ca60f041",
       "size_bytes": 5646
     },
     {
@@ -115,8 +115,8 @@
       "label": "bitdistill_root_cause_audit_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md",
-      "sha256": "1fbcdaa61c806c633c2259a9c3884fb83552af067868dc65e13cc7888f65dd20",
-      "size_bytes": 3591
+      "sha256": "35ee632ae54b4bfa47ce9b5a06ab2150508b62863cb9129f9b6a53f975431013",
+      "size_bytes": 3901
     },
     {
       "exists": true,
@@ -619,7 +619,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "e1fec9bdc8a525c5bfa327a10ff7763fe51a3ae29519c7320d635b3b901ba660",
+      "sha256": "9ee3a6449c62593ab3da0eb97ecc9c7c852d86fcdc8db5e35a779f84aed7a9bb",
       "size_bytes": 8226
     },
     {
@@ -2309,7 +2309,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "67fee95945982a43c1542e75b3608bbb7ad1631f62c4cc6c73cfa56c5e424488",
+      "sha256": "ac1ba21486eb4af0b9768c67b0ff5c8dab5471c6d847ed52e49933d05bdd844a",
       "size_bytes": 13164
     },
     {
@@ -2327,7 +2327,7 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-15.json",
-      "sha256": "a7a047c75a67620f751e16af21c137f08eb9e4bf152e421471014d6bdc541206",
+      "sha256": "ce3d8e376f6934362bce8eb30f0e808853a5f571da156113f05b3341ea10ef1a",
       "size_bytes": 16035
     },
     {
@@ -2404,8 +2404,8 @@
       "label": "bitdistill_root_cause_audit_json",
       "metrics": {},
       "path": "benchmark_results/bitdistill_root_cause_audit_2026-05-15.json",
-      "sha256": "7eb5698ce5411438e484a6150a71873917bb91804f86d5253d744bcd21de1f0f",
-      "size_bytes": 8206
+      "sha256": "d1a8d3ef4cfb7584f9a589534862d303a50cfbd3d72b6f64c2deb8cc4838d782",
+      "size_bytes": 11433
     },
     {
       "exists": true,

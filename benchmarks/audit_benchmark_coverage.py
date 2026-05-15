@@ -382,10 +382,11 @@ def audit_bitdistill_root_cause(root: Path, checks: list[dict[str, Any]]) -> Non
         checks,
         "BitDistill root-cause audit marks controlled recovery incomplete",
         controlled.get("controlled_all_complete") is False
-        and controlled.get("controlled_complete") == 0
+        and isinstance(controlled.get("controlled_complete"), int)
+        and 0 <= controlled.get("controlled_complete") < controlled.get("controlled_expected", 0)
         and controlled.get("controlled_expected") == 3,
         f"controlled={controlled.get('controlled_complete')}/{controlled.get('controlled_expected')}, all={controlled.get('controlled_all_complete')}",
-        "root-cause audit should not claim controlled BitDistill recovery before queued rows finish",
+        "root-cause audit should not claim controlled BitDistill recovery before all queued rows finish and pass",
     )
     add_check(
         checks,
