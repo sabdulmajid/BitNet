@@ -172,9 +172,9 @@ def alignment_rows(features: dict[str, bool], warmup: dict[str, Any]) -> list[di
         {
             "dimension": "Baselines",
             "paper": "FP16-SFT, BitNet-SFT, BitDistill",
-            "local": "FP16-SFT, BitNet-SFT, gamma=100 long-warmup BitDistill, strict paper-gamma, and clean row-warmup gamma=100 exist for GLUE3; clean row-warmup paper-gamma candidates are tracked separately",
+            "local": "FP16-SFT, BitNet-SFT, gamma=100 long-warmup BitDistill, strict paper-gamma, clean row-warmup gamma=100, and clean row-warmup paper-gamma exist for GLUE3",
             "status": "partial",
-            "note": "The completed gamma=100 and clean row-warmup branches improve over BitNet-SFT but remain below the FP16-gap target; strict paper-hyperparameter rows determine the strict reproduction gate.",
+            "note": "The completed gamma=100, strict paper-gamma, and clean row-warmup branches improve over BitNet-SFT but remain below the FP16-gap target.",
         },
         {
             "dimension": "Stage-1 SubLN",
@@ -301,7 +301,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
             "## Interpretation",
             "\n".join(
                 [
-                    "- The completed gamma=100, clean row-warmup gamma=100, and strict paper-gamma local GLUE results are valid negative reproduction-boundary results.",
+                    "- The completed gamma=100, strict paper-gamma, clean row-warmup gamma=100, and clean row-warmup paper-gamma local GLUE results are valid negative reproduction-boundary results.",
                     "- This is not a disproof of BitDistill because full epoch search, Qwen3 scale, and 10B-token warm-up are not paper-matched.",
                     "- The publishable angle is independent implementation plus row-scale CPU-runtime extension, with the current quality evidence supporting a resource-sensitivity and boundary study rather than a paper-level accuracy claim.",
                 ]

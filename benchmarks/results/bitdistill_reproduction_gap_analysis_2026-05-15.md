@@ -49,6 +49,15 @@ branch:
 | QNLI | `0.779791` | `0.119165` | `-0.017207` |
 | SST2 | `0.846330` | `0.079128` | `-0.008028` |
 
+The clean row-scale Stage-2 warm-up paper-gamma branch is complete as well.
+It remains far outside the paper target:
+
+| task | row-warmup row paper-gamma | FP gap | delta vs tensor-warmup row paper-gamma |
+| --- | ---: | ---: | ---: |
+| MNLI | `0.617830` | `0.189812` | `+0.000204` |
+| QNLI | `0.777046` | `0.121911` | `+0.016108` |
+| SST2 | `0.830275` | `0.095183` | `-0.006881` |
+
 ## What Went Wrong Locally
 
 | gap | local fact | implication |
@@ -84,7 +93,7 @@ has not recovered FP-level GLUE quality yet.
 | paper-gamma headinit | Test whether classifier-head transfer closes the gap. | complete on GLUE3 and negative overall |
 | layer sweep | Test whether the selected attention-distillation layer is wrong. | layer `-1`, `-2`, `-4`, and `-8` evidence complete; no layer closes the FP16 gap |
 | clean row warm-up gamma=100 | Test whether row-scale Stage-2 pretraining improves row downstream quality at the best completed local coefficient. | complete on GLUE3 and negative; no task closes the FP16 gap, and all three tasks trail the earlier tensor-warmup row branch |
-| clean row warm-up paper-gamma | Test whether row-scale Stage-2 pretraining helps under the literal paper attention coefficient. | running or queued |
+| clean row warm-up paper-gamma | Test whether row-scale Stage-2 pretraining helps under the literal paper attention coefficient. | complete on GLUE3 and negative; QNLI improves over tensor-warmup paper-gamma row but remains `0.121911` behind FP16 |
 | CPU/I2_SR producers | Test full runtime speed/RSS/quality gates for completed causal export candidates. | local causal I2_SR gate passes; scoped Xeon PyTorch CPU GLUE slice passes; full Xeon 512-sample PyTorch CPU gate passes `33/33` critical rows |
 
 ## Publishable Path

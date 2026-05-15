@@ -10,7 +10,7 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | --- | --- | --- | --- | --- |
 | Backbone | Qwen3 0.6B/1.7B/4B primary, plus Qwen2.5/Gemma robustness | Qwen2.5-0.5B | partial | Useful robustness-style target, but not the paper's primary Qwen3 scale ladder. |
 | Tasks | MNLI, QNLI, SST2 first for classification | MNLI, QNLI, SST2 | matched | Task set is aligned. |
-| Baselines | FP16-SFT, BitNet-SFT, BitDistill | FP16-SFT, BitNet-SFT, gamma=100 long-warmup BitDistill, strict paper-gamma, and clean row-warmup gamma=100 exist for GLUE3; clean row-warmup paper-gamma candidates are tracked separately | partial | The completed gamma=100 and clean row-warmup branches improve over BitNet-SFT but remain below the FP16-gap target; strict paper-hyperparameter rows determine the strict reproduction gate. |
+| Baselines | FP16-SFT, BitNet-SFT, BitDistill | FP16-SFT, BitNet-SFT, gamma=100 long-warmup BitDistill, strict paper-gamma, clean row-warmup gamma=100, and clean row-warmup paper-gamma exist for GLUE3 | partial | The completed gamma=100, strict paper-gamma, and clean row-warmup branches improve over BitNet-SFT but remain below the FP16-gap target. |
 | Stage-1 SubLN | SubLN before attention output projection and FFN down projection | Implemented | matched | Implemented as RMSNorm wrappers around Qwen `o_proj` and `down_proj`. |
 | Stage-2 warm-up | 10B-token continued pretraining | active target 163840000 token presentations | partial | Current target is 0.016384 of the paper token budget. |
 | Stage-3 logits KD | temperature 5, lambda 10 | temperature 5, weight 10, no tau^2 scaling by default | matched | First completed wave used tau^2; current completed strict branches use paper-style scaling. |
@@ -47,7 +47,7 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | mnli | BitDistill longwarmup tensor paper gamma lr5e-5 | paper_lr_search | true | 0.642384 | 9815 | 9815 | true | 0.807641 | true | 0.165257 |
 | mnli | BitDistill longwarmup tensor paper gamma headinit | paper_headinit_search | true | 0.627815 | 9815 | 9815 | true | 0.807641 | true | 0.179827 |
 | mnli | BitDistill row-warmup row gamma100 | row_warmup_gamma100 | true | 0.627713 | 9815 | 9815 | true | 0.807641 | true | 0.179929 |
-| mnli | BitDistill row-warmup row paper gamma | row_warmup_papergamma | false | - | - | 9815 | false | 0.807641 | true | - |
+| mnli | BitDistill row-warmup row paper gamma | row_warmup_papergamma | true | 0.617830 | 9815 | 9815 | true | 0.807641 | true | 0.189812 |
 | mnli | BitDistill longwarmup tensor gamma1k | mnli_gamma_sweep | true | 0.647275 | 9815 | 9815 | true | 0.807641 | true | 0.160367 |
 | mnli | BitDistill longwarmup tensor gamma10k | mnli_gamma_sweep | true | 0.635354 | 9815 | 9815 | true | 0.807641 | true | 0.172287 |
 | mnli | BitDistill longwarmup tensor layer -1 | mnli_layer_sweep | true | 0.645950 | 9815 | 9815 | true | 0.807641 | true | 0.161691 |
@@ -66,7 +66,7 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | qnli | BitDistill longwarmup tensor paper gamma lr5e-5 | paper_lr_search | true | 0.790957 | 5463 | 5463 | true | 0.898957 | true | 0.107999 |
 | qnli | BitDistill longwarmup tensor paper gamma headinit | paper_headinit_search | true | 0.762951 | 5463 | 5463 | true | 0.898957 | true | 0.136006 |
 | qnli | BitDistill row-warmup row gamma100 | row_warmup_gamma100 | true | 0.779791 | 5463 | 5463 | true | 0.898957 | true | 0.119165 |
-| qnli | BitDistill row-warmup row paper gamma | row_warmup_papergamma | false | - | - | 5463 | false | 0.898957 | true | - |
+| qnli | BitDistill row-warmup row paper gamma | row_warmup_papergamma | true | 0.777046 | 5463 | 5463 | true | 0.898957 | true | 0.121911 |
 | sst2 | FP16-SFT | baseline | true | 0.925459 | 872 | 872 | true | 0.925459 | true | 0.000000 |
 | sst2 | BitNet-SFT | baseline | true | 0.770642 | 872 | 872 | true | 0.925459 | true | 0.154817 |
 | sst2 | BitDistill short tensor gamma100 | diagnostic | true | 0.815367 | 872 | 872 | true | 0.925459 | true | 0.110092 |
@@ -80,7 +80,7 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | sst2 | BitDistill longwarmup tensor paper gamma lr5e-5 | paper_lr_search | true | 0.836009 | 872 | 872 | true | 0.925459 | true | 0.089450 |
 | sst2 | BitDistill longwarmup tensor paper gamma headinit | paper_headinit_search | true | 0.834862 | 872 | 872 | true | 0.925459 | true | 0.090596 |
 | sst2 | BitDistill row-warmup row gamma100 | row_warmup_gamma100 | true | 0.846330 | 872 | 872 | true | 0.925459 | true | 0.079128 |
-| sst2 | BitDistill row-warmup row paper gamma | row_warmup_papergamma | false | - | - | 872 | false | 0.925459 | true | - |
+| sst2 | BitDistill row-warmup row paper gamma | row_warmup_papergamma | true | 0.830275 | 872 | 872 | true | 0.925459 | true | 0.095183 |
 
 ## Code Feature Checks
 
@@ -104,6 +104,6 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 
 ## Interpretation
 
-- The completed gamma=100, clean row-warmup gamma=100, and strict paper-gamma local GLUE results are valid negative reproduction-boundary results.
+- The completed gamma=100, strict paper-gamma, clean row-warmup gamma=100, and clean row-warmup paper-gamma local GLUE results are valid negative reproduction-boundary results.
 - This is not a disproof of BitDistill because full epoch search, Qwen3 scale, and 10B-token warm-up are not paper-matched.
 - The publishable angle is independent implementation plus row-scale CPU-runtime extension, with the current quality evidence supporting a resource-sensitivity and boundary study rather than a paper-level accuracy claim.

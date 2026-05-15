@@ -163,6 +163,11 @@ def audit_reproduction(
         ),
         (
             "Gamma=100, strict paper-gamma tensor, strict paper-gamma row, LR/head-init, "
+            "clean row-warmup gamma=100, and clean row-warmup paper-gamma searches are complete "
+            "and below the FP16-gap target; full-budget and Qwen3/backbone-scale candidates remain pending."
+            if rowwarmup_gamma100_complete and rowwarmup_papergamma_complete
+            else
+            "Gamma=100, strict paper-gamma tensor, strict paper-gamma row, LR/head-init, "
             "and clean row-warmup gamma=100 searches are complete and below the FP16-gap target; "
             "clean row-warmup paper-gamma, full-budget, and Qwen3/backbone-scale candidates remain pending."
             if rowwarmup_gamma100_complete and not rowwarmup_papergamma_complete
@@ -221,6 +226,10 @@ def audit_novelty_and_runtime(
         isinstance(status, dict) and status.get("passed") is True
         for status in rowwarmup_families.values()
     )
+    rowwarmup_gamma100 = rowwarmup_families.get("row_warmup_gamma100", {})
+    rowwarmup_papergamma = rowwarmup_families.get("row_warmup_papergamma", {})
+    rowwarmup_gamma100_complete = isinstance(rowwarmup_gamma100, dict) and rowwarmup_gamma100.get("complete") is True
+    rowwarmup_papergamma_complete = isinstance(rowwarmup_papergamma, dict) and rowwarmup_papergamma.get("complete") is True
     i2sr_passed = i2sr.get("passed") is True
     i2sr_local_passed = i2sr_local.get("passed") is True
     cpu_passed = cpu.get("passed") is True
@@ -279,7 +288,11 @@ def audit_novelty_and_runtime(
         ),
         (
             "Gamma=100 and paper-gamma tensor-warmup row comparisons are complete and do not pass; "
-            "clean row-warmup gamma=100 is complete and also does not pass; clean row-warmup paper-gamma remains pending."
+            "clean row-warmup gamma=100 and clean row-warmup paper-gamma are complete and also do not pass."
+            if rowwarmup_gamma100_complete and rowwarmup_papergamma_complete and not rowwarmup_passed
+            else
+            "Gamma=100 and paper-gamma tensor-warmup row comparisons are complete and do not pass; "
+            "the clean row-warmup comparison family is incomplete and has not passed."
             if rowwarmup_complete and not rowwarmup_passed
             else "Gamma=100 and paper-gamma tensor-warmup row comparisons are complete but do not pass the FP16-gap gate; row-warmup comparisons remain pending."
         ),
@@ -319,8 +332,12 @@ def audit_publishability(
     xeon_cpu_complete = metrics.get("row_scale_runtime", {}).get("cpu_xeon_passed") is True
     rowwarmup_families = metrics.get("row_scale_runtime", {}).get("row_warmup_families", {})
     rowwarmup_gamma100 = rowwarmup_families.get("row_warmup_gamma100", {}) if isinstance(rowwarmup_families, dict) else {}
+    rowwarmup_papergamma = rowwarmup_families.get("row_warmup_papergamma", {}) if isinstance(rowwarmup_families, dict) else {}
     rowwarmup_gamma100_complete = isinstance(rowwarmup_gamma100, dict) and rowwarmup_gamma100.get("complete") is True
-    if lr_headinit_complete and xeon_cpu_complete and rowwarmup_gamma100_complete:
+    rowwarmup_papergamma_complete = isinstance(rowwarmup_papergamma, dict) and rowwarmup_papergamma.get("complete") is True
+    if lr_headinit_complete and xeon_cpu_complete and rowwarmup_gamma100_complete and rowwarmup_papergamma_complete:
+        quality_blocker = "Strict tensor LR/head-init, clean row-warmup gamma=100, and clean row-warmup paper-gamma searches are complete and negative; remaining quality claims need full-budget and Qwen3/backbone-scale evidence."
+    elif lr_headinit_complete and xeon_cpu_complete and rowwarmup_gamma100_complete:
         quality_blocker = "Strict tensor LR/head-init and clean row-warmup gamma=100 searches are complete and negative; remaining quality claims need paper-gamma row-warmup, full-budget, and Qwen3/backbone-scale evidence."
     elif lr_headinit_complete and xeon_cpu_complete:
         quality_blocker = "Strict tensor LR/head-init searches are complete and negative; remaining quality claims need clean row-warmup/full-budget evidence."

@@ -1,5 +1,5 @@
 {
-  "artifact_count": 172,
+  "artifact_count": 174,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "0eebcb9a607700373a8aec7e7202c6fe72d0fafcbe5f2b9556280d3aa01a2cca",
-      "size_bytes": 31734
+      "sha256": "345619f71cf85d85dfd3c892ce4d4814e6926fd52b5266781e8a00788bc99689",
+      "size_bytes": 32124
     },
     {
       "exists": true,
@@ -97,8 +97,8 @@
       "label": "bitdistill_reproduction_gap_analysis",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_reproduction_gap_analysis_2026-05-15.md",
-      "sha256": "9479625195e22ced0f490dbd1cae100e71fa3356088a43e7713d49f66163d8ac",
-      "size_bytes": 7144
+      "sha256": "e6aa07a2211f2a1f72b3e01b8237788634b58404d42ce7b4d022e885bea02c73",
+      "size_bytes": 7625
     },
     {
       "exists": true,
@@ -133,8 +133,8 @@
       "label": "bitdistill_paper_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_paper_alignment_2026-05-15.md",
-      "sha256": "6e09bc7a772129b7ec050116d79b3dc11f07022f2de1f7553a27f4e2536c8c2e",
-      "size_bytes": 10506
+      "sha256": "a5d8df51bcf45f31c87d15f7097c5bf97278329e3c7c96cf17dc78f940c6949e",
+      "size_bytes": 10494
     },
     {
       "exists": true,
@@ -304,8 +304,8 @@
       "label": "bitdistill_active_goal_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_active_goal_audit_2026-05-15.md",
-      "sha256": "786a8145facc9b40c53f19ffd754b90d541c11b4ae481abba4f07c91a99d1269",
-      "size_bytes": 4264
+      "sha256": "77102dd11fbb287183e01e0d345fdb5978aaa70de2ba36874397cb33d175c6e0",
+      "size_bytes": 4255
     },
     {
       "exists": true,
@@ -333,6 +333,15 @@
       "path": "benchmarks/results/bitdistill_variant_summary_2026-05-15.md",
       "sha256": "031f39143e4069fffb1d0ddfb6f4a13f986d768c10364836bb01ebdbd6c7a532",
       "size_bytes": 22310
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_rowwarmup_variant_summary_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_rowwarmup_variant_summary_2026-05-15.md",
+      "sha256": "e4726555d581a2b4f356e3daebb6e8f22e3526440afe9d2c995db99594ca1dbe",
+      "size_bytes": 3041
     },
     {
       "exists": true,
@@ -376,7 +385,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "560f99d35ff02c45fba7fa4191cc8641b78c23f42b0eed307c3800ab834bb0ad",
+      "sha256": "c940103998a2211aefc0529d5ef0b7a950fcda026875f894ec4b7c204d7b3e4d",
       "size_bytes": 3438
     },
     {
@@ -2066,7 +2075,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "cd99d62c15994935e391b4bbba212bc3ce32a4fd38604627f176b9406a46dae3",
+      "sha256": "f8b7cf113d509664d6fc7fb10606ef287c8d139374a1a139ef656a3db814892f",
       "size_bytes": 6374
     },
     {
@@ -2466,8 +2475,8 @@
         "warmup_step": 20000
       },
       "path": "benchmark_results/bitdistill_active_goal_audit_2026-05-15.json",
-      "sha256": "790c83a7d6be79005bcefcab2227c0c31306783d7a35ca26a080f9fbbe55effb",
-      "size_bytes": 6930
+      "sha256": "4b4d53475ee478693b0920bf92315312824020c974d43525e86ef68799fd9b06",
+      "size_bytes": 6919
     },
     {
       "exists": true,
@@ -2540,6 +2549,27 @@
       "path": "benchmark_results/bitdistill_variant_summary_2026-05-15.json",
       "sha256": "ffe843a3111c83e17795cf4523a170ba9d658ebb9a91db67da9f66abed31861d",
       "size_bytes": 50796
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_variant_summary_json",
+      "label": "bitdistill_rowwarmup_variant_summary_json",
+      "metrics": {
+        "materialized_rows": 6,
+        "roots": [
+          "checkpoints/bitdistill-glue-seqcls-rowwarmup-gamma100",
+          "checkpoints/bitdistill-glue-seqcls-rowwarmup-papergamma"
+        ],
+        "rows": 6,
+        "tasks": [
+          "mnli",
+          "qnli",
+          "sst2"
+        ]
+      },
+      "path": "benchmark_results/bitdistill_rowwarmup_variant_summary_2026-05-15.json",
+      "sha256": "d0955e51bac45668141cf880e873aa2c7e5b152ddf8b7d0027a651b70f1a26d3",
+      "size_bytes": 6057
     },
     {
       "exists": true,

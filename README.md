@@ -58,7 +58,7 @@ with the active `i2sr-row-scale-runtime` branch.
 | Arbitrary FP16/BF16 to ternary conversion is lossless | **No** | Qwen2.5-1.5B naive PTQ collapses from ten-task mean `0.644169` to `0.348671`; WikiText PPL jumps from `13.901` to `3,813,121.803`. |
 | Distillation/QAT can recover useful signal | **Yes, partially** | Best row-scale dense-Qwen run reaches ten-task mean `0.499459`, well above naive PTQ but below FP. |
 | Stable CPU row-scale packed inference exists for dense Qwen | **Yes, for the audited path** | `I2_SR` productization gate passes `9/9`; Xeon I2_SR PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
-| BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B gamma=100, strict paper-gamma tensor, strict paper-gamma row, LR=`1e-5`/`5e-5`, strict paper-gamma head-init, and clean row-warmup gamma=100 GLUE3 sequence-classification runs are complete with full paired prediction traces. They improve over BitNet-SFT but still miss FP16-SFT by `0.058486-0.203260` absolute accuracy depending on task/run. Clean row-warmup paper-gamma plus full-budget/backbone-scale search remain open; AMD and Xeon PyTorch CPU quality gates now pass. |
+| BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B gamma=100, strict paper-gamma tensor, strict paper-gamma row, LR=`1e-5`/`5e-5`, strict paper-gamma head-init, clean row-warmup gamma=100, and clean row-warmup paper-gamma GLUE3 sequence-classification runs are complete with full paired prediction traces. They improve over BitNet-SFT but still miss FP16-SFT by `0.058486-0.203260` absolute accuracy depending on task/run. Full-budget/backbone-scale search remains open; AMD and Xeon PyTorch CPU quality gates now pass. |
 | TL2 is ready for the best row-scale checkpoint | **No** | Runtime contract gate fails: current TL2 one-scale error is `1.904230` relative output RMS; exact fp16 row scales would be `0.000197` with only `1.230469` MiB of scales, but converter/runtime/kernel metadata do not carry them. |
 | Kimi/MoE retrofit is proven | **No** | Tiny random Qwen2MoE FP16 and ternary `I2_SR` fixtures now pass converter/runtime smoke; the ternary fixture packs 3 merged row-scale expert tensors, runs routed CPU inference, and records `419.29` decode tok/s at `142.48` MiB RSS. A Kimi-K2 config audit still shows the real target needs Kimi/DeepSeekV3 loading, MLA metadata conversion, shared-expert mapping, block-FP8 import, and trained MoE quality/locality benchmarks before product claims are defensible. |
 
@@ -130,8 +130,18 @@ gamma=100 downstream row-scale GLUE branch is complete and negative:
 | SST2 | `0.846330` | `0.925459` | `0.079128` | `-0.008028` |
 
 This rules out clean row-scale Stage-2 plus gamma=100 as the missing fix under
-the current budget. The clean row-warmup paper-gamma branch is still running
-or queued and remains the last local row-warmup comparison for this wave.
+the current budget. The clean row-warmup paper-gamma branch is also complete
+and negative:
+
+| task | clean row-warmup row paper-gamma | FP16-SFT | FP gap | delta vs tensor-warmup row paper-gamma |
+| --- | ---: | ---: | ---: | ---: |
+| MNLI | `0.617830` | `0.807641` | `0.189812` | `+0.000204` |
+| QNLI | `0.777046` | `0.898957` | `0.121911` | `+0.016108` |
+| SST2 | `0.830275` | `0.925459` | `0.095183` | `-0.006881` |
+
+The paper coefficient remains below target after clean row-scale Stage-2
+warm-up. QNLI improves over the earlier tensor-warmup paper-gamma row, but all
+three tasks are still far outside the one-point FP16 gap gate.
 
 The strict paper-gamma tensor branch (`attention_kd_weight=1e5`) is also
 complete on GLUE3:
@@ -227,10 +237,10 @@ small improvement over tensor gamma=100 but still `0.161691` behind FP16-SFT.
 The next layer-sweep points are worse: layer `-2` reaches `0.642894` and
 layer `-4` reaches `0.640754`. Paper-gamma row is worse than tensor on MNLI
 and essentially tied on QNLI, so it is not the missing fix. The LR=`1e-5`,
-LR=`5e-5`, strict paper-gamma head-init, and clean row-warmup gamma=100
-searches are complete on GLUE3 and also below target. Clean row-warmup
-paper-gamma remains running or queued. No paper-level GLUE success claim will
-be made until full-validation candidates close the FP16 gap.
+LR=`5e-5`, strict paper-gamma head-init, clean row-warmup gamma=100, and clean
+row-warmup paper-gamma searches are complete on GLUE3 and also below target.
+No paper-level GLUE success claim will be made until full-validation
+candidates close the FP16 gap.
 
 The first exportable causal-LM long-warmup downstream diagnostics have
 completed for MNLI, QNLI, and SST2. On full validation, MNLI reaches `0.615181`
@@ -390,12 +400,11 @@ It does not make blind PTQ viable.
 
 The active public reports use `BITNET_REPORT_DATE=2026-05-15`. They are
 generated from checked-in scripts plus raw artifacts under `benchmark_results/`.
-Clean row-warmup Stage-2 has completed. Its gamma=100 downstream GLUE branch
-is complete and negative, while its paper-gamma downstream branch is still
-running or queued. The active `I2_SR` export gate, AMD full CPU PyTorch gate,
-and Xeon full CPU PyTorch gate are complete. These commands therefore keep
-unfinished row-warmup paper-gamma quality claims partial rather than success
-claims.
+Clean row-warmup Stage-2 has completed. Its gamma=100 and paper-gamma
+downstream GLUE branches are complete and negative. The active `I2_SR` export
+gate, AMD full CPU PyTorch gate, and Xeon full CPU PyTorch gate are complete.
+These commands therefore keep full-budget/Qwen3 quality claims partial rather
+than success claims.
 
 ```bash
 export BITNET_REPORT_DATE=2026-05-15
