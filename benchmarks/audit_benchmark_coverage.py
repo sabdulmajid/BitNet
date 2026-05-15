@@ -461,6 +461,29 @@ def audit_bitdistill_loss_contract(root: Path, checks: list[dict[str, Any]]) -> 
     )
 
 
+def audit_ternary_flip_dynamics(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/ternary_flip_dynamics_{DATE}.json"
+    if not path.exists():
+        add_check(checks, "Ternary flip-dynamics audit exists", False, str(path.relative_to(root)), "missing flip-dynamics audit")
+        return
+    data = read_json(path)
+    pairs = data.get("pairs", []) if isinstance(data.get("pairs"), list) else []
+    max_flip = data.get("max_flip_rate")
+    min_flip = data.get("min_flip_rate")
+    add_check(
+        checks,
+        "Ternary flip-dynamics audit has nonzero saved-snapshot flips",
+        data.get("status") == "pass"
+        and len(pairs) >= 2
+        and isinstance(max_flip, (int, float))
+        and isinstance(min_flip, (int, float))
+        and max_flip > 0.0
+        and min_flip > 0.0,
+        f"status={data.get('status')}, pairs={len(pairs)}, min_flip={min_flip}, max_flip={max_flip}",
+        "saved Stage-2 snapshots did not show measurable ternary code movement",
+    )
+
+
 def audit_qwen3_paper_alignment(root: Path, checks: list[dict[str, Any]]) -> None:
     path = root / f"benchmark_results/qwen3_paper_alignment_{DATE}.json"
     if not path.exists():
@@ -675,6 +698,7 @@ def main() -> None:
     audit_bitdistill_root_cause(root, checks)
     audit_bitdistill_telemetry_coverage(root, checks)
     audit_bitdistill_loss_contract(root, checks)
+    audit_ternary_flip_dynamics(root, checks)
     audit_qwen3_paper_alignment(root, checks)
     audit_cpu_rows(root, checks)
     audit_cpu_tradeoff_frontier(root, checks)

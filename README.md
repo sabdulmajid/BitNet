@@ -140,8 +140,16 @@ Loss-component telemetry is now sufficient for finite-run and normalization
 triage: CE, logits KD, attention KD, and weighted KD terms are logged for
 materialized BitDistill rows. It is not yet sufficient for stronger causal
 claims about update direction, because per-component gradient norms, ternary
-flip rates, scale trajectories, activation int8 saturation, and Q/K/V-split
-attention losses are not yet logged.
+flip rates during active training, scale trajectories, activation int8
+saturation, and Q/K/V-split attention losses are not yet logged.
+
+Offline Stage-2 snapshot telemetry is now available for the existing
+Qwen2.5-0.5B row-scale warm-up. Across `493,961,216` ternary elements, saved
+snapshots show code flip rate `0.165956` from step `1000` to `10000` and
+`0.064547` from step `10000` to `20000`; the zero-code fraction rises from
+`0.320018` to `0.356683`. This supports the training-dynamics framing:
+continued pretraining is actively moving the ternary codes, not merely
+repacking a fixed projection.
 
 The controlled Stage-2 recovery audit also parses live Slurm logs before final
 validation traces exist. Its current snapshot for the `163.84M`-token
@@ -344,6 +352,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill paper alignment audit](benchmarks/results/bitdistill_paper_alignment_2026-05-15.md)
 - [BitDistill loss-scale audit](benchmarks/results/bitdistill_loss_scale_audit_2026-05-15.md)
 - [BitDistill loss-contract audit](benchmarks/results/bitdistill_loss_contract_2026-05-15.md)
+- [Ternary flip dynamics audit](benchmarks/results/ternary_flip_dynamics_2026-05-15.md)
 - [Task formulation audit](benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md)
 - [Causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_2026-05-15.md)
 - [CPU tradeoff frontier audit](benchmarks/results/cpu_tradeoff_frontier_2026-05-15.md)

@@ -75,10 +75,18 @@ Completed controls rule out several simple causes:
 Telemetry coverage is deliberately scoped. The current script and saved metrics
 record CE, logits KD, attention KD, weighted KD terms, final ternary code
 fractions, and offline SubLN perturbation. They do not yet record
-per-component gradient norms, ternary flip rates, per-layer scale trajectories,
-activation int8 saturation, or Q/K/V-split attention losses. Therefore the
-current evidence supports loss-scale and static-mechanics triage, but it does
-not yet prove which objective term dominates the update direction.
+per-component gradient norms, ternary flip rates during active training,
+per-layer scale trajectories, activation int8 saturation, or Q/K/V-split
+attention losses. Therefore the current evidence supports loss-scale and
+static-mechanics triage, but it does not yet prove which objective term
+dominates the update direction.
+
+An offline Stage-2 snapshot audit now measures ternary-code movement for the
+existing Qwen2.5-0.5B row-scale warm-up. Across `493,961,216` ternary elements,
+the code flip rate is `0.165956` from step `1000` to `10000` and `0.064547`
+from step `10000` to `20000`; the zero-code fraction rises from `0.320018` to
+`0.356683`. This is not live gradient telemetry, but it does show that warm-up
+continues to move the discrete ternary representation.
 
 The controlled Stage-2 recovery audit now parses live Slurm logs. The current
 `163.84M`-token paper-gamma row is only a running job, not a quality result,

@@ -1,5 +1,5 @@
 {
-  "artifact_count": 213,
+  "artifact_count": 215,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "ead548326e668ca0f97e796bd485b55f183c8d44c75499a14d30be7af4f08d16",
-      "size_bytes": 19589
+      "sha256": "b42ed1861b721b73de9f08a42fb291e3e82afdbf625b06e265dcf0a5cf2700e6",
+      "size_bytes": 20167
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "research_redirect_report",
       "metrics": {},
       "path": "benchmarks/results/research_redirect_2026-05-15.md",
-      "sha256": "bb2ed8cb9e5278bc71c46c8ccd35c4e632112f290c947353bf6178c3a29df2f4",
-      "size_bytes": 7704
+      "sha256": "5a4c7f45fa73b9cf66b6466a26a576a5cde97fb952cd7c160f86526eca4932bc",
+      "size_bytes": 8173
     },
     {
       "exists": true,
@@ -279,6 +279,15 @@
       "path": "benchmarks/results/bitdistill_loss_contract_2026-05-15.md",
       "sha256": "142942ba3f0aaa6decc4a038371796b7357cfb9516bef71387ba290c647d8a6f",
       "size_bytes": 1911
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "ternary_flip_dynamics_report",
+      "metrics": {},
+      "path": "benchmarks/results/ternary_flip_dynamics_2026-05-15.md",
+      "sha256": "d27aad9fe625e782c783041462cafac3af7913354ae449699b7268ac10660587",
+      "size_bytes": 2765
     },
     {
       "exists": true,
@@ -565,8 +574,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "02143abb00a27b3d9bd5488f2bf682bd89200b04aa84b19cb549b4568619ac95",
-      "size_bytes": 6802
+      "sha256": "3aea5f76aeef693a0104ce2bb3f159413c1ba6d38e1755115b5cb6ff0c23c54f",
+      "size_bytes": 6959
     },
     {
       "exists": true,
@@ -2250,13 +2259,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 58,
+        "check_count": 59,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "5dac324463bee2dbb329735d57d74b8e4c7ed751612bd2e93f6983f8879de216",
-      "size_bytes": 11278
+      "sha256": "fce1729368ee37100f2f0397f27543c406a876288327233e0c4f51e80f952c9c",
+      "size_bytes": 11512
     },
     {
       "exists": true,
@@ -2370,6 +2379,15 @@
       "path": "benchmark_results/bitdistill_loss_contract_2026-05-15.json",
       "sha256": "f09c1f9da51144ba111b36119232b2f0b8cc01f0532f1621d35409a55484d161",
       "size_bytes": 2260
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "ternary_flip_dynamics_json",
+      "metrics": {},
+      "path": "benchmark_results/ternary_flip_dynamics_2026-05-15.json",
+      "sha256": "616addec33ef13d08400d57ac7fb41467c65c3adc3ae622a41bedf047827811c",
+      "size_bytes": 12345
     },
     {
       "exists": true,

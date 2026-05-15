@@ -1,0 +1,406 @@
+{
+  "schema": "ternary_flip_dynamics.v1",
+  "date": "2026-05-15",
+  "status": "pass",
+  "snapshot_root": "checkpoints/bitdistill-glue-longwarmup-row/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-row-20k",
+  "steps": [
+    1000,
+    10000,
+    20000
+  ],
+  "snapshots": [
+    {
+      "step": 1000,
+      "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-longwarmup-row/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-row-20k/checkpoint-1000/ternary_state_dict.pt",
+      "tensor_count": 169,
+      "elements": 493961216,
+      "fractions": {
+        "-1": 0.33905035977561443,
+        "0": 0.32001813275963753,
+        "1": 0.340931507464748
+      },
+      "families": {
+        "down_proj": {
+          "elements": 104595456,
+          "fractions": {
+            "-1": 0.33955396685683936,
+            "0": 0.32095554896763395,
+            "1": 0.3394904841755267
+          }
+        },
+        "gate_proj": {
+          "elements": 104595456,
+          "fractions": {
+            "-1": 0.3407070475413387,
+            "0": 0.3174922149581718,
+            "1": 0.3418007375004895
+          }
+        },
+        "k_proj": {
+          "elements": 2752512,
+          "fractions": {
+            "-1": 0.33604685465494794,
+            "0": 0.3279030209495908,
+            "1": 0.33605012439546134
+          }
+        },
+        "lm_head": {
+          "elements": 136134656,
+          "fractions": {
+            "-1": 0.3379790888809386,
+            "0": 0.3181023647644873,
+            "1": 0.3439185463545741
+          }
+        },
+        "o_proj": {
+          "elements": 19267584,
+          "fractions": {
+            "-1": 0.33400295543021896,
+            "0": 0.33203311842315053,
+            "1": 0.3339639261466305
+          }
+        },
+        "q_proj": {
+          "elements": 19267584,
+          "fractions": {
+            "-1": 0.33503012105721197,
+            "0": 0.33005544441897855,
+            "1": 0.33491443452380953
+          }
+        },
+        "up_proj": {
+          "elements": 104595456,
+          "fractions": {
+            "-1": 0.3403082539264421,
+            "0": 0.31923246264158933,
+            "1": 0.3404592834319686
+          }
+        },
+        "v_proj": {
+          "elements": 2752512,
+          "fractions": {
+            "-1": 0.3286194574265253,
+            "0": 0.3427363804408482,
+            "1": 0.3286441621326265
+          }
+        }
+      }
+    },
+    {
+      "step": 10000,
+      "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-longwarmup-row/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-row-20k/checkpoint-10000/ternary_state_dict.pt",
+      "tensor_count": 169,
+      "elements": 493961216,
+      "fractions": {
+        "-1": 0.32669439173135406,
+        "0": 0.34588113695144845,
+        "1": 0.3274244713171975
+      },
+      "families": {
+        "down_proj": {
+          "elements": 104595456,
+          "fractions": {
+            "-1": 0.3388616232047404,
+            "0": 0.3223430279801065,
+            "1": 0.3387953488151531
+          }
+        },
+        "gate_proj": {
+          "elements": 104595456,
+          "fractions": {
+            "-1": 0.34004331889905426,
+            "0": 0.3188055798523408,
+            "1": 0.3411511012486049
+          }
+        },
+        "k_proj": {
+          "elements": 2752512,
+          "fractions": {
+            "-1": 0.3361820039295015,
+            "0": 0.32781982421875,
+            "1": 0.3359981718517485
+          }
+        },
+        "lm_head": {
+          "elements": 136134656,
+          "fractions": {
+            "-1": 0.2946199386583825,
+            "0": 0.40895079648197735,
+            "1": 0.29642926485964016
+          }
+        },
+        "o_proj": {
+          "elements": 19267584,
+          "fractions": {
+            "-1": 0.3331517848838754,
+            "0": 0.33379883020102574,
+            "1": 0.33304938491509883
+          }
+        },
+        "q_proj": {
+          "elements": 19267584,
+          "fractions": {
+            "-1": 0.335770016624814,
+            "0": 0.32853049972430376,
+            "1": 0.3356994836508822
+          }
+        },
+        "up_proj": {
+          "elements": 104595456,
+          "fractions": {
+            "-1": 0.3397963196412663,
+            "0": 0.3203168405327283,
+            "1": 0.3398868398260054
+          }
+        },
+        "v_proj": {
+          "elements": 2752512,
+          "fractions": {
+            "-1": 0.32733735584077384,
+            "0": 0.34541538783482145,
+            "1": 0.32724725632440477
+          }
+        }
+      }
+    },
+    {
+      "step": 20000,
+      "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-longwarmup-row/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-row-20k/checkpoint-20000/ternary_state_dict.pt",
+      "tensor_count": 169,
+      "elements": 493961216,
+      "fractions": {
+        "-1": 0.32180440053010156,
+        "0": 0.3566831105217783,
+        "1": 0.3215124889481202
+      },
+      "families": {
+        "down_proj": {
+          "elements": 104595456,
+          "fractions": {
+            "-1": 0.3386598171148085,
+            "0": 0.322751898514597,
+            "1": 0.33858828437059446
+          }
+        },
+        "gate_proj": {
+          "elements": 104595456,
+          "fractions": {
+            "-1": 0.3398514463190447,
+            "0": 0.31916321489147675,
+            "1": 0.34098533878947856
+          }
+        },
+        "k_proj": {
+          "elements": 2752512,
+          "fractions": {
+            "-1": 0.33628990536644343,
+            "0": 0.32769848051525297,
+            "1": 0.33601161411830355
+          }
+        },
+        "lm_head": {
+          "elements": 136134656,
+          "fractions": {
+            "-1": 0.2773085348671245,
+            "0": 0.44731515684000406,
+            "1": 0.2753763082928714
+          }
+        },
+        "o_proj": {
+          "elements": 19267584,
+          "fractions": {
+            "-1": 0.33294568743024555,
+            "0": 0.33422394836840985,
+            "1": 0.3328303642013446
+          }
+        },
+        "q_proj": {
+          "elements": 19267584,
+          "fractions": {
+            "-1": 0.3359388494167198,
+            "0": 0.3281963114835778,
+            "1": 0.3358648390997024
+          }
+        },
+        "up_proj": {
+          "elements": 104595456,
+          "fractions": {
+            "-1": 0.3396328039336623,
+            "0": 0.3206150370432918,
+            "1": 0.3397521590230459
+          }
+        },
+        "v_proj": {
+          "elements": 2752512,
+          "fractions": {
+            "-1": 0.3273072015671503,
+            "0": 0.3455083937872024,
+            "1": 0.3271844046456473
+          }
+        }
+      }
+    }
+  ],
+  "pairs": [
+    {
+      "from_step": 1000,
+      "to_step": 10000,
+      "shared_tensors": 169,
+      "total": {
+        "elements": 493961216,
+        "changed": 81975969,
+        "flip_rate": 0.1659562863332169,
+        "zero_to_nonzero_rate": 0.0628889677848716,
+        "nonzero_to_zero_rate": 0.08875197197668248,
+        "opposite_sign_rate": 0.014315346571662824
+      },
+      "families": {
+        "down_proj": {
+          "elements": 104595456,
+          "changed": 7063211,
+          "flip_rate": 0.06752885134895344,
+          "zero_to_nonzero_rate": 0.03306540391200168,
+          "nonzero_to_zero_rate": 0.03445288292447427,
+          "opposite_sign_rate": 1.0564512477482769e-05
+        },
+        "gate_proj": {
+          "elements": 104595456,
+          "changed": 7112376,
+          "flip_rate": 0.0679989004493656,
+          "zero_to_nonzero_rate": 0.033342108093108745,
+          "nonzero_to_zero_rate": 0.034655472987277766,
+          "opposite_sign_rate": 1.3193689790883458e-06
+        },
+        "k_proj": {
+          "elements": 2752512,
+          "changed": 238727,
+          "flip_rate": 0.08673059372674852,
+          "zero_to_nonzero_rate": 0.04334259033203125,
+          "nonzero_to_zero_rate": 0.04325939360119048,
+          "opposite_sign_rate": 0.00012860979352678572
+        },
+        "lm_head": {
+          "elements": 136134656,
+          "changed": 57331913,
+          "flip_rate": 0.42114120448506515,
+          "zero_to_nonzero_rate": 0.13921734227616514,
+          "nonzero_to_zero_rate": 0.23006577399365521,
+          "opposite_sign_rate": 0.05185808821524476
+        },
+        "o_proj": {
+          "elements": 19267584,
+          "changed": 1494842,
+          "flip_rate": 0.07758326108763818,
+          "zero_to_nonzero_rate": 0.03789629255022321,
+          "nonzero_to_zero_rate": 0.039662004328098424,
+          "opposite_sign_rate": 2.4964209316539115e-05
+        },
+        "q_proj": {
+          "elements": 19267584,
+          "changed": 1988307,
+          "flip_rate": 0.10319441192004146,
+          "zero_to_nonzero_rate": 0.052120390392485116,
+          "nonzero_to_zero_rate": 0.050595445697810375,
+          "opposite_sign_rate": 0.00047857582974596087
+        },
+        "up_proj": {
+          "elements": 104595456,
+          "changed": 6544945,
+          "flip_rate": 0.06257389422347372,
+          "zero_to_nonzero_rate": 0.03074456695327185,
+          "nonzero_to_zero_rate": 0.03182894484441083,
+          "opposite_sign_rate": 3.8242579104010023e-07
+        },
+        "v_proj": {
+          "elements": 2752512,
+          "changed": 201648,
+          "flip_rate": 0.07325962611607142,
+          "zero_to_nonzero_rate": 0.03525325230189732,
+          "nonzero_to_zero_rate": 0.03793225969587054,
+          "opposite_sign_rate": 7.411411830357142e-05
+        }
+      }
+    },
+    {
+      "from_step": 10000,
+      "to_step": 20000,
+      "shared_tensors": 169,
+      "total": {
+        "elements": 493961216,
+        "changed": 31883501,
+        "flip_rate": 0.06454656755885871,
+        "zero_to_nonzero_rate": 0.02681355857703614,
+        "nonzero_to_zero_rate": 0.037615532147366,
+        "opposite_sign_rate": 0.00011747683445657401
+      },
+      "families": {
+        "down_proj": {
+          "elements": 104595456,
+          "changed": 2819730,
+          "flip_rate": 0.026958436894237547,
+          "zero_to_nonzero_rate": 0.013274783179873512,
+          "nonzero_to_zero_rate": 0.013683653714364035,
+          "opposite_sign_rate": 0.0
+        },
+        "gate_proj": {
+          "elements": 104595456,
+          "changed": 2722677,
+          "flip_rate": 0.026030547636792176,
+          "zero_to_nonzero_rate": 0.012836456298828125,
+          "nonzero_to_zero_rate": 0.01319409133796405,
+          "opposite_sign_rate": 0.0
+        },
+        "k_proj": {
+          "elements": 2752512,
+          "changed": 70204,
+          "flip_rate": 0.02550542922247024,
+          "zero_to_nonzero_rate": 0.01281338646298363,
+          "nonzero_to_zero_rate": 0.012692042759486608,
+          "opposite_sign_rate": 0.0
+        },
+        "lm_head": {
+          "elements": 136134656,
+          "changed": 22471604,
+          "flip_rate": 0.16506894467783428,
+          "zero_to_nonzero_rate": 0.06313916127279155,
+          "nonzero_to_zero_rate": 0.10150352163081824,
+          "opposite_sign_rate": 0.0004262617742244855
+        },
+        "o_proj": {
+          "elements": 19267584,
+          "changed": 567221,
+          "flip_rate": 0.029439134662654125,
+          "zero_to_nonzero_rate": 0.01450700824763499,
+          "nonzero_to_zero_rate": 0.014932126415019132,
+          "opposite_sign_rate": 0.0
+        },
+        "q_proj": {
+          "elements": 19267584,
+          "changed": 627067,
+          "flip_rate": 0.03254518054780506,
+          "zero_to_nonzero_rate": 0.01643968439426552,
+          "nonzero_to_zero_rate": 0.01610549615353954,
+          "opposite_sign_rate": 0.0
+        },
+        "up_proj": {
+          "elements": 104595456,
+          "changed": 2531872,
+          "flip_rate": 0.02420632881030702,
+          "zero_to_nonzero_rate": 0.01195406614987175,
+          "nonzero_to_zero_rate": 0.012252262660435267,
+          "opposite_sign_rate": 0.0
+        },
+        "v_proj": {
+          "elements": 2752512,
+          "changed": 73126,
+          "flip_rate": 0.026567004975818452,
+          "zero_to_nonzero_rate": 0.01323699951171875,
+          "nonzero_to_zero_rate": 0.013330005464099702,
+          "opposite_sign_rate": 0.0
+        }
+      }
+    }
+  ],
+  "max_flip_rate": 0.1659562863332169,
+  "min_flip_rate": 0.06454656755885871
+}
