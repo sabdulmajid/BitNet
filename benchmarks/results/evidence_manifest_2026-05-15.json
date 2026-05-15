@@ -178,7 +178,7 @@
       "label": "bitdistill_job_monitor_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_job_monitor_2026-05-15.md",
-      "sha256": "9b83747f5024a8a90d883545dda1f57623672e007a2d3334a9b761f6658113d5",
+      "sha256": "74fd722392f53971e26bdfab8a2a66161096b7c0d5f1f056780f8cac4831c649",
       "size_bytes": 12789
     },
     {
@@ -268,7 +268,7 @@
       "label": "bitdistill_active_goal_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_active_goal_audit_2026-05-15.md",
-      "sha256": "d6cc9136ec04fad8f12b9277754c18176315213be12ff8e213ef1f334527d09f",
+      "sha256": "2e703df71d574d8b5bb49361dc53f8589c666404b4ddf3aa074fb763d4c58b0b",
       "size_bytes": 3859
     },
     {
@@ -2203,7 +2203,7 @@
         "warmup_warnings": []
       },
       "path": "benchmark_results/bitdistill_job_monitor_2026-05-15.json",
-      "sha256": "5cad4a853a9b457e4ac98da4c197038ccba8b28c06b9617ec8c8e79830e5764f",
+      "sha256": "5541c1f312750e3574dbca0afe1303b0cf54beb6e110a6e7858e0c943ca9852a",
       "size_bytes": 74151
     },
     {
@@ -2402,8 +2402,8 @@
         "warmup_step": 20000
       },
       "path": "benchmark_results/bitdistill_active_goal_audit_2026-05-15.json",
-      "sha256": "edeff88b08e507df99ce72a55e5c399e2927116915a93a54a6399a9cc3db08a4",
-      "size_bytes": 5899
+      "sha256": "ead1e332c03e4d45e73f933b60226a6bd2adcfd13f9f8baf087a6ff5d6aa48b3",
+      "size_bytes": 5898
     },
     {
       "exists": true,
