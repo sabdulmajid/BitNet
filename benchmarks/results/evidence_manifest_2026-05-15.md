@@ -17,7 +17,7 @@ Artifacts: `183`. Missing: `0`.
 | bitdistill_reproduction_gate_report | tracked_report | yes | 12908 | fa3178597d19 |  |
 | bitdistill_paired_predictions_report | tracked_report | yes | 8123 | c9107324629d |  |
 | bitdistill_task_formulation_report | tracked_report | yes | 11647 | cb03c36274ba |  |
-| bitnet_sft_baseline_audit_report | tracked_report | yes | 4047 | 8a20e5248840 |  |
+| bitnet_sft_baseline_audit_report | tracked_report | yes | 4801 | d2e2602f224a |  |
 | bitnet_sft_recipe_alignment_report | tracked_report | yes | 2883 | 69950837db67 |  |
 | bitnet_sft_budget_sweep_report | tracked_report | yes | 2513 | 7922b908e05d |  |
 | bitnet_sft_budget_paired_report | tracked_report | yes | 1914 | 9c3eb547f8cc |  |
@@ -143,7 +143,7 @@ Artifacts: `183`. Missing: `0`.
 | objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | 2f34419c0b0d | achieved=False, status=not_complete, complete=7/9, open=2 |
 | product_scope_gate_json | product_scope_gate_json | yes | 5770 | d0101b25bd20 | scope=research_mvp_only, supported=5, unsupported=4 |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 32197 | c581499edff4 | present=34/36, examples=34, full_eval=34, ci95=34, paper_complete=True, paper_passed=False, row_complete=True, row_passed=False, confidence=0.95 |
-| bitnet_sft_baseline_audit_json | generic_json | yes | 45902 | 9e07c097db17 |  |
+| bitnet_sft_baseline_audit_json | generic_json | yes | 48829 | 57c5584b4206 |  |
 | bitnet_sft_recipe_alignment_json | generic_json | yes | 3545 | 2e2449074bb1 |  |
 | bitnet_sft_budget_sweep_json | generic_json | yes | 21065 | 1d9f6722f15a |  |
 | bitnet_sft_budget_paired_json | generic_json | yes | 9077 | df413564bddb |  |

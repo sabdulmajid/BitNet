@@ -203,13 +203,22 @@ def add_fp_gaps(rows: list[dict[str, Any]]) -> None:
         row["fp16_gap"] = (fp_acc - acc) if isinstance(acc, (int, float)) else None
 
 
-def build_checks(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def build_checks(
+    rows: list[dict[str, Any]],
+    budget_sweep: dict[str, Any],
+    paired_budget: dict[str, Any],
+) -> list[dict[str, Any]]:
     by_name = {row["name"]: row for row in rows}
     fp = by_name.get("FP16-SFT", {})
     bitnet = by_name.get("BitNet-SFT", {})
     weights_only = by_name.get("BitNet-SFT weights-only", {})
     subln_bitnet = by_name.get("BitNet-SFT SubLN", {})
     bitnet_t = bitnet.get("ternary", {}) if isinstance(bitnet.get("ternary"), dict) else {}
+    best_budget = budget_sweep.get("best") if isinstance(budget_sweep.get("best"), dict) else {}
+    best_paired = paired_budget.get("best") if isinstance(paired_budget.get("best"), dict) else {}
+    best_budget_acc = finite_float(best_budget.get("accuracy"))
+    best_paired_delta = finite_float(best_paired.get("delta_vs_reference"))
+    best_paired_ci = best_paired.get("paired_ci95")
 
     checks: list[dict[str, Any]] = []
     fp_acc = fp.get("accuracy")
@@ -228,10 +237,32 @@ def build_checks(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     )
     checks.append(
         {
-            "check": "BitNet-SFT local baseline matches paper anchor",
+            "check": "Default 1000-step BitNet-SFT matches paper anchor",
             "status": "fail" if isinstance(bitnet_acc, float) and bitnet_acc < bitnet_paper - 0.05 else "pass",
             "evidence": f"local={fmt(bitnet_acc)}, paper_anchor={fmt(bitnet_paper)}, delta={fmt((bitnet_acc - bitnet_paper) if isinstance(bitnet_acc, float) else None)}",
-            "implication": "This is the primary reproduction blocker to explain before broadening sweeps.",
+            "implication": "The short/default run is undertrained and should not be used as the final BitNet-SFT anchor.",
+        }
+    )
+    checks.append(
+        {
+            "check": "Best completed budget BitNet-SFT matches paper anchor",
+            "status": "pass" if isinstance(best_budget_acc, float) and best_budget_acc >= bitnet_paper else "pending",
+            "evidence": (
+                f"best={fmt(best_budget_acc)}, paper_anchor={fmt(bitnet_paper)}, "
+                f"steps={best_budget.get('steps', '-')}, lr={best_budget.get('lr', '-')}"
+            ),
+            "implication": "The local blocker has shifted from BitNet-SFT viability to BitDistill/FP16-level recovery.",
+        }
+    )
+    checks.append(
+        {
+            "check": "Best completed budget BitNet-SFT is still below paired FP16",
+            "status": "fail" if isinstance(best_paired_delta, float) and best_paired_delta < -0.01 else "pass",
+            "evidence": (
+                f"candidate_minus_fp16={fmt(best_paired_delta)}, ci95={fmt_ci(best_paired_ci)}, "
+                f"mcnemar={fmt(best_paired.get('mcnemar_exact_p'))}"
+            ),
+            "implication": "Clearing the paper BitNet-SFT anchor is not enough; the BitDistill stage must recover the remaining FP16 gap.",
         }
     )
     checks.append(
@@ -284,10 +315,13 @@ def build_checks(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     )
     checks.append(
         {
-            "check": "Stage-3 budget is paper-matched",
-            "status": "warn",
-            "evidence": f"local steps={bitnet.get('steps')}, batch={nested(bitnet, 'training_budget', 'per_device_batch_size')}, grad_accum={nested(bitnet, 'training_budget', 'grad_accum_steps')}",
-            "implication": "The paper used greedy LR/epoch search and larger hardware batch; local 1000-step budget may undertrain BitNet-SFT.",
+            "check": "BitNet-SFT budget issue is explained",
+            "status": "pass" if isinstance(best_budget_acc, float) and best_budget_acc >= bitnet_paper else "warn",
+            "evidence": (
+                f"default_steps={bitnet.get('steps')}, default_acc={fmt(bitnet_acc)}, "
+                f"best_steps={best_budget.get('steps', '-')}, best_acc={fmt(best_budget_acc)}"
+            ),
+            "implication": "The next controlled comparison should use the best budget row, not the default 1000-step row.",
         }
     )
     return checks
@@ -299,8 +333,16 @@ def fmt(value: Any) -> str:
     if isinstance(value, bool):
         return "true" if value else "false"
     if isinstance(value, float):
+        if 0.0 < abs(value) < 0.0001:
+            return f"{value:.6e}"
         return f"{value:.6f}"
     return str(value)
+
+
+def fmt_ci(value: Any) -> str:
+    if not isinstance(value, list) or len(value) != 2:
+        return "-"
+    return f"[{fmt(float(value[0]))}, {fmt(float(value[1]))}]"
 
 
 def md_table(headers: list[str], rows: list[list[Any]]) -> str:
@@ -313,6 +355,8 @@ def md_table(headers: list[str], rows: list[list[Any]]) -> str:
 def render_markdown(summary: dict[str, Any]) -> str:
     rows = summary["checkpoints"]
     checks = summary["checks"]
+    best_budget = summary.get("best_budget_sweep") if isinstance(summary.get("best_budget_sweep"), dict) else {}
+    best_paired = summary.get("best_budget_paired") if isinstance(summary.get("best_budget_paired"), dict) else {}
     checkpoint_table = [
         [
             row["name"],
@@ -352,11 +396,18 @@ def render_markdown(summary: dict[str, Any]) -> str:
             f"# BitNet-SFT Baseline Audit, {summary['date']}",
             (
                 "Verdict: the local FP16-SFT MNLI baseline is close to the paper anchor, "
-                "but local BitNet-SFT is far below the paper's BitNet-SFT anchor. Static "
-                "checkpoint checks do not show a missing projection-export bug; the next "
-                "blockers are recipe alignment, SubLN interpretation, LR/epoch search, "
-                "and training-budget matching. The completed weights-only control shows "
-                "activation quantization is not the dominant cause of the gap."
+                "and the best completed BitNet-SFT budget row now clears the paper's "
+                "BitNet-SFT anchor. The original 1000-step default row was undertrained. "
+                "Static checkpoint checks do not show a missing projection-export bug; "
+                "the remaining reproduction blocker is BitDistill/FP16-level recovery, "
+                "especially SubLN and distillation-loss parity."
+            ),
+            (
+                "Best completed budget row: "
+                f"`{fmt(best_budget.get('accuracy'))}` at steps=`{best_budget.get('steps', '-')}`, "
+                f"lr=`{best_budget.get('lr', '-')}`. Paired candidate-minus-FP16 delta: "
+                f"`{fmt(best_paired.get('delta_vs_reference'))}` with CI "
+                f"`{fmt_ci(best_paired.get('paired_ci95'))}`."
             ),
             "## Accuracy And Mechanical Summary",
             md_table(
@@ -386,10 +437,11 @@ def render_markdown(summary: dict[str, Any]) -> str:
             "## Next Narrow Experiments",
             "\n".join(
                 [
-                    "1. Run a small LR/epoch budget sweep for BitNet-SFT before more BitDistill ablations.",
-                    "2. Audit SubLN placement, initialization, and whether it should be enabled before/after continued pretraining.",
-                    "3. Add activation variance, int8 saturation, ternary flip-rate, and loss-gradient telemetry to the Stage-3 loop.",
-                    "4. Keep row-scale results labeled as a retrofit variant, not as a paper-reproduction result.",
+                    "1. Finish the pending 10000-step BitNet-SFT LR row and update the paired audit.",
+                    "2. Use the cleared BitNet-SFT budget row as the controlled CE-only baseline for BitDistill recovery.",
+                    "3. Audit SubLN placement, initialization, and whether it should be enabled before or after continued pretraining.",
+                    "4. Add activation variance, int8 saturation, ternary flip-rate, and loss-gradient telemetry to the Stage-3 loop.",
+                    "5. Keep row-scale results labeled as a retrofit variant, not as a paper-reproduction result.",
                 ]
             ),
         ]
@@ -406,6 +458,8 @@ def main() -> int:
     parser.add_argument("--bitnet-subln-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-ablate/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-subln-tensor-layer-1"))
     parser.add_argument("--bitnet-headinit-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-teacherhead/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-headinit-tensor-layer-1"))
     parser.add_argument("--best-row-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8"))
+    parser.add_argument("--budget-sweep-json", type=Path, default=Path(f"benchmark_results/bitnet_sft_budget_sweep_{DATE}.json"))
+    parser.add_argument("--budget-paired-json", type=Path, default=Path(f"benchmark_results/bitnet_sft_budget_paired_{DATE}.json"))
     args = parser.parse_args()
 
     rows = [
@@ -417,13 +471,17 @@ def main() -> int:
         summarize_checkpoint("Best local row-scale BitDistill", args.best_row_root),
     ]
     add_fp_gaps(rows)
+    budget_sweep = read_json(args.budget_sweep_json)
+    paired_budget = read_json(args.budget_paired_json)
     summary = {
         "schema": "bitnet-sft-baseline-audit-v1",
         "date": DATE,
         "paper_anchor": PAPER_QWEN25_MNLI,
         "expected_qwen25_05b_ternary_projection_count": EXPECTED_QWEN25_05B_TERNARY,
         "checkpoints": rows,
-        "checks": build_checks(rows),
+        "best_budget_sweep": budget_sweep.get("best", {}),
+        "best_budget_paired": paired_budget.get("best", {}),
+        "checks": build_checks(rows, budget_sweep, paired_budget),
     }
     args.output_json.parent.mkdir(parents=True, exist_ok=True)
     args.output_md.parent.mkdir(parents=True, exist_ok=True)

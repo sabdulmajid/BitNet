@@ -142,8 +142,8 @@
       "label": "bitnet_sft_baseline_audit_report",
       "metrics": {},
       "path": "benchmarks/results/bitnet_sft_baseline_audit_2026-05-15.md",
-      "sha256": "8a20e524884074f792c05d3c65098c7647d61a4c3a1be4385c924e1af5d1701e",
-      "size_bytes": 4047
+      "sha256": "d2e2602f224a1e01d16e8ee2ecca101c6bc1dc8efaadf06cc4721911aea34a72",
+      "size_bytes": 4801
     },
     {
       "exists": true,
@@ -2187,8 +2187,8 @@
       "label": "bitnet_sft_baseline_audit_json",
       "metrics": {},
       "path": "benchmark_results/bitnet_sft_baseline_audit_2026-05-15.json",
-      "sha256": "9e07c097db175e650fe22e64d7690c1521eb98d4e2768eb0a6213fb36cec233e",
-      "size_bytes": 45902
+      "sha256": "57c5584b4206c84a9f6c3ccd630b5db7b7e4c69a9fc6d5e0154ed364390e621a",
+      "size_bytes": 48829
     },
     {
       "exists": true,
