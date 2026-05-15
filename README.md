@@ -258,9 +258,13 @@ llama.cpp embedding is not the PyTorch pooled hidden state (`7.812774` relative
 RMS, `0.012303` cosine). A missing RoPE metadata bridge has been fixed
 (`rope_parameters.rope_theta` now exports to `bitnet-25.rope.freq_base =
 1000000.0`), so the remaining mismatch is not explained by tokenizer pairing or
-missing RoPE frequency metadata. The next runtime task is fixing final
-hidden-state semantics and native head execution before running full GLUE
-accuracy/RSS/throughput.
+missing RoPE frequency metadata. The architecture-contract audit now identifies
+a deterministic graph mismatch: the PyTorch checkpoint is Qwen2 with
+`hidden_act = silu`, while the current `bitnet-25` runtime graph uses the
+ReLU-squared FFN path; the plain `bitnet` graph has SiLU but lacks the 72 Q/K/V
+projection-bias tensor slots present in this Qwen2 checkpoint. The next runtime
+task is implementing a Qwen-BitDistill packed graph with native head execution
+before running full GLUE accuracy/RSS/throughput.
 
 ## Canonical Next Matrix
 
@@ -337,6 +341,7 @@ python benchmarks/audit_bitnet_sft_budget_sweep.py
 python benchmarks/audit_bitnet_sft_mechanics.py
 python benchmarks/audit_bitdistill_telemetry_coverage.py
 python benchmarks/audit_bitdistill_stage2_curve.py
+python benchmarks/audit_seqcls_i2sr_arch_contract.py
 python benchmarks/audit_benchmark_coverage.py
 python benchmarks/audit_product_scope.py
 python benchmarks/build_evidence_manifest.py \
@@ -375,6 +380,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Sequence-classification I2_SR backbone smoke](benchmarks/results/seqcls_backbone_i2sr_smoke_2026-05-15.md)
 - [Sequence-classification I2_SR sidecar CPU probe](benchmarks/results/seqcls_i2sr_sidecar_cpu_mnli_64_2026-05-15.md)
 - [Sequence-classification I2_SR hidden-contract audit](benchmarks/results/seqcls_i2sr_hidden_contract_2026-05-15.md)
+- [Sequence-classification I2_SR architecture-contract audit](benchmarks/results/seqcls_i2sr_arch_contract_2026-05-15.md)
 - [Task formulation audit](benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md)
 - [Causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_2026-05-15.md)
 - [CPU tradeoff frontier audit](benchmarks/results/cpu_tradeoff_frontier_2026-05-15.md)

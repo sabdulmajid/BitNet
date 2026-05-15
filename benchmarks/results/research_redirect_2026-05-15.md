@@ -148,11 +148,15 @@ rules out tokenizer pair formatting for the first MNLI sample: HF IDs equal
 hidden has relative RMS `7.812774` and cosine `0.012303`. A missing RoPE
 metadata bridge has been fixed (`rope_parameters.rope_theta` now exports to
 `bitnet-25.rope.freq_base = 1000000.0`), so the remaining mismatch is not
-explained by tokenizer pairing or missing RoPE frequency metadata. To close the
-product loop, align final hidden-state semantics and head execution in native
-packed sequence-classification inference, then run full GLUE
-accuracy/RSS/throughput on the same deployed artifact, or make causal prompt
-scoring the primary task formulation.
+explained by tokenizer pairing or missing RoPE frequency metadata. The
+architecture-contract audit identifies a deterministic graph mismatch:
+the PyTorch checkpoint is Qwen2 with `hidden_act = silu`, while the current
+`bitnet-25` runtime graph uses the ReLU-squared FFN path. The plain `bitnet`
+graph has the SiLU path but lacks the 72 Q/K/V projection-bias tensor slots
+present in this Qwen2 checkpoint. To close the product loop, implement a
+Qwen-BitDistill packed graph with native sequence-classification head execution,
+then run full GLUE accuracy/RSS/throughput on the same deployed artifact, or
+make causal prompt scoring the primary task formulation.
 
 ## Publishable Angle
 

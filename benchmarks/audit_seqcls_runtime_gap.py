@@ -148,6 +148,24 @@ def load_hidden_contract(path: Path) -> dict[str, Any]:
     }
 
 
+def load_arch_contract(path: Path) -> dict[str, Any]:
+    data = read_json(path)
+    checks = data.get("checks", {}) if isinstance(data.get("checks"), dict) else {}
+    runtime = data.get("runtime_source", {}) if isinstance(data.get("runtime_source"), dict) else {}
+    biases = data.get("checkpoint_biases", {}) if isinstance(data.get("checkpoint_biases"), dict) else {}
+    config = data.get("checkpoint_config", {}) if isinstance(data.get("checkpoint_config"), dict) else {}
+    return {
+        "path": str(path),
+        "exists": path.exists(),
+        "status": data.get("status"),
+        "hidden_act": config.get("hidden_act"),
+        "bitnet25_ffn_activation": runtime.get("bitnet25_ffn_activation"),
+        "projection_bias_count": biases.get("projection_bias_count"),
+        "activation_mismatch": checks.get("activation_mismatch"),
+        "plain_bitnet_bias_contract_gap": checks.get("plain_bitnet_bias_contract_gap"),
+    }
+
+
 def fmt(value: Any) -> str:
     if value is None:
         return "-"
@@ -185,12 +203,14 @@ def render_markdown(result: dict[str, Any]) -> str:
     smoke = result["seqcls_sidecar_smoke"]
     sidecar_cpu = result["seqcls_sidecar_cpu_benchmark"]
     hidden_contract = result["seqcls_hidden_contract"]
+    arch_contract = result["seqcls_arch_contract"]
     headline_rows = [
         ["status", result["status"]],
         ["same artifact quality+CPU ready", result["same_artifact_quality_cpu_ready"]],
         ["sidecar prototype smoke", smoke["status"]],
         ["sidecar sampled CPU quality", sidecar_cpu["status"]],
         ["sidecar hidden contract", hidden_contract["status"]],
+        ["sidecar architecture contract", arch_contract["status"]],
         ["seqcls configs", result["sequence_classification"]["configs"]],
         ["seqcls causal-export compatible", result["sequence_classification"]["causal_export_compatible"]],
         ["causal runtime configs", result["causal_runtime"]["configs"]],
@@ -235,6 +255,9 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["hidden relative RMS", hidden_contract["hidden_relative_rms"]],
                     ["hidden cosine", hidden_contract["hidden_cosine"]],
                     ["logit relative RMS", hidden_contract["logit_relative_rms"]],
+                    ["checkpoint hidden_act", arch_contract["hidden_act"]],
+                    ["bitnet-25 FFN activation", arch_contract["bitnet25_ffn_activation"]],
+                    ["Q/K/V projection bias tensors", arch_contract["projection_bias_count"]],
                 ],
             ),
             "## Causal Runtime Path",
@@ -251,6 +274,8 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["Sampled sidecar CPU quality agreement", "failing"],
                     ["Tokenizer pair formatting parity", "passes for audited MNLI sample"],
                     ["PyTorch pooled hidden state matches llama.cpp embedding", "failing"],
+                    ["Packed graph matches Qwen2 SiLU/SwiGLU semantics", "failing"],
+                    ["Packed loader supports Qwen2 Q/K/V projection biases", "partial: bitnet-25 yes, plain bitnet no"],
                     ["GGUF writer persists classifier/score head tensors and label metadata", "not implemented"],
                     ["llama.cpp pools the last non-padding token for Qwen sequence classification", "not implemented"],
                     ["CPU evaluator reports GLUE accuracy from the packed classifier artifact", "not implemented"],
@@ -264,7 +289,10 @@ def render_markdown(result: dict[str, Any]) -> str:
                 "dense head sidecar. The sampled sidecar CPU quality probe currently disagrees with saved PyTorch "
                 "predictions. The hidden-contract audit narrows the issue: token IDs match for the first MNLI "
                 "sample, but the llama.cpp embedding has high relative RMS error and near-zero cosine versus the "
-                "PyTorch pooled hidden state. This is a runtime/model-state mismatch, not a deployable classifier."
+                "PyTorch pooled hidden state. The architecture-contract audit gives a concrete root cause to fix: "
+                "the current bitnet-25 graph uses ReLU-squared FFN while the Qwen2 checkpoint uses SiLU/SwiGLU; "
+                "the plain bitnet graph has SiLU but lacks the 72 Q/K/V bias tensor slots present in the checkpoint. "
+                "This is a runtime/model-state mismatch, not a deployable classifier."
             ),
         ]
     )
@@ -301,6 +329,11 @@ def main() -> None:
         type=Path,
         default=Path(f"benchmark_results/seqcls_i2sr_hidden_contract_{DATE}.json"),
     )
+    parser.add_argument(
+        "--seqcls-arch-contract",
+        type=Path,
+        default=Path(f"benchmark_results/seqcls_i2sr_arch_contract_{DATE}.json"),
+    )
     parser.add_argument("--llama-cpp", type=Path, default=Path("3rdparty/llama.cpp"))
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/seqcls_runtime_gap_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/seqcls_runtime_gap_{DATE}.md"))
@@ -320,6 +353,7 @@ def main() -> None:
     sidecar_smoke = load_sidecar_smoke(root / args.seqcls_sidecar_smoke)
     sidecar_cpu = load_sidecar_cpu_benchmark(root / args.seqcls_sidecar_cpu_benchmark)
     hidden_contract = load_hidden_contract(root / args.seqcls_hidden_contract)
+    arch_contract = load_arch_contract(root / args.seqcls_arch_contract)
     same_artifact_ready = (
         seqcls_summary["causal_export_compatible"] > 0
         and export_summary["exported"] > 0
@@ -343,6 +377,7 @@ def main() -> None:
         "seqcls_sidecar_smoke": sidecar_smoke,
         "seqcls_sidecar_cpu_benchmark": sidecar_cpu,
         "seqcls_hidden_contract": hidden_contract,
+        "seqcls_arch_contract": arch_contract,
         "exporter_rejects_non_causal": "architecture.endswith(\"ForCausalLM\")"
         in (root / "benchmarks/export_bitdistill_i2sr_suite.py").read_text(encoding="utf-8"),
         "llama_cpp": {

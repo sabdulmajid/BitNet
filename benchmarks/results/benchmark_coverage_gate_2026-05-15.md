@@ -53,6 +53,7 @@ Overall status: **PASS**.
 | Sequence-classification I2_SR sidecar smoke passes | pass | status=prototype_smoke_passed, returncode=0, head_shape=[3, 896], finite_logits=True |  |
 | Sequence-classification sidecar CPU quality mismatch is recorded | pass | status=quality_mismatch, examples=64, agreement=0.34375, accuracy=0.359375 |  |
 | Sequence-classification hidden contract mismatch is isolated | pass | status=hidden_contract_mismatch, token_match=True, hidden_rel_rms=7.812774193066907, hidden_cosine=0.012302589838196848, logit_rel_rms=7.270589052541309 |  |
+| Sequence-classification architecture contract mismatch is identified | pass | status=architecture_contract_mismatch, hidden_act=silu, bitnet25_activation=relu_sqr, projection_biases=72, checks={'activation_mismatch': True, 'bitnet25_has_bias_slots': True, 'plain_bitnet_bias_contract_gap': True, 'plain_bitnet_has_silu_graph': True} |  |
 | Qwen3 paper-alignment audit tracks required GLUE rows | pass | jobs=16, complete=0, ready=False |  |
 | FP F16 CPU row is finite | pass | ppl=12.2808, prefill=114.468162, decode=5.555998 |  |
 | FP Q8_0 CPU row is finite | pass | ppl=12.3056, prefill=124.864246, decode=10.131914 |  |
@@ -65,5 +66,5 @@ Overall status: **PASS**.
 | CPU speed uncertainty audit has I2_SR-vs-Q4 intervals | pass | prefill_ci=[2.2578672451091255, 2.34051098794489], decode_ci=[1.1861079640891115, 1.1951428201115284] |  |
 | I2_SR-vs-Q4 speedup intervals stay above 1 | pass | prefill_ci=[2.2578672451091255, 2.34051098794489], decode_ci=[1.1861079640891115, 1.1951428201115284] |  |
 | fixed I2_SR RSS has four context rows | pass | contexts=[512, 2048, 8192, 32768] |  |
-| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=223, missing=0, missing_labels=[] |  |
+| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=225, missing=0, missing_labels=[] |  |
 | productization gate passes for stable I2_SR | pass | passed=True, failed=0, stable_quality=True, layout=True |  |

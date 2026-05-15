@@ -564,6 +564,36 @@ def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
         ),
         "the sidecar failure is not narrowed to a hidden-state runtime-contract mismatch",
     )
+    arch_path = root / f"benchmark_results/seqcls_i2sr_arch_contract_{DATE}.json"
+    if not arch_path.exists():
+        add_check(
+            checks,
+            "Sequence-classification architecture contract mismatch is identified",
+            False,
+            str(arch_path.relative_to(root)),
+            "missing seqcls architecture-contract audit",
+        )
+        return
+    arch = read_json(arch_path)
+    arch_checks = arch.get("checks", {}) if isinstance(arch.get("checks"), dict) else {}
+    runtime = arch.get("runtime_source", {}) if isinstance(arch.get("runtime_source"), dict) else {}
+    biases = arch.get("checkpoint_biases", {}) if isinstance(arch.get("checkpoint_biases"), dict) else {}
+    add_check(
+        checks,
+        "Sequence-classification architecture contract mismatch is identified",
+        arch.get("status") == "architecture_contract_mismatch"
+        and arch_checks.get("activation_mismatch") is True
+        and arch_checks.get("plain_bitnet_has_silu_graph") is True
+        and arch_checks.get("plain_bitnet_bias_contract_gap") is True
+        and runtime.get("bitnet25_ffn_activation") == "relu_sqr"
+        and biases.get("projection_bias_count") == 72,
+        (
+            f"status={arch.get('status')}, hidden_act={arch.get('checkpoint_config', {}).get('hidden_act')}, "
+            f"bitnet25_activation={runtime.get('bitnet25_ffn_activation')}, "
+            f"projection_biases={biases.get('projection_bias_count')}, checks={arch_checks}"
+        ),
+        "the seqcls runtime gap lacks a concrete architecture-contract explanation",
+    )
 
 
 def audit_qwen3_paper_alignment(root: Path, checks: list[dict[str, Any]]) -> None:

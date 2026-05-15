@@ -279,6 +279,16 @@
   },
   "same_artifact_quality_cpu_ready": false,
   "schema": "seqcls_runtime_gap.v1",
+  "seqcls_arch_contract": {
+    "activation_mismatch": true,
+    "bitnet25_ffn_activation": "relu_sqr",
+    "exists": true,
+    "hidden_act": "silu",
+    "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/seqcls_i2sr_arch_contract_2026-05-15.json",
+    "plain_bitnet_bias_contract_gap": true,
+    "projection_bias_count": 72,
+    "status": "architecture_contract_mismatch"
+  },
   "seqcls_hidden_contract": {
     "exists": true,
     "hidden_cosine": 0.012302589838196848,

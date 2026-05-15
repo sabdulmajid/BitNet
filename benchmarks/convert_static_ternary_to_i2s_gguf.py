@@ -216,6 +216,10 @@ def make_i2s_model_class(
             row_scale_packed = 0
             packed_bytes = 0
             classifier_tensors: dict[str, np.ndarray] = {}
+            try:
+                output_tensor_name = self.format_tensor_name(gguf.MODEL_TENSOR.OUTPUT)
+            except ValueError:
+                output_tensor_name = None
 
             for key, tensor in state.items():
                 if key.endswith(".weight_scale"):
@@ -239,7 +243,7 @@ def make_i2s_model_class(
                     mapped_prefix = normalize_bitdistill_subln_name(prefix) if args.bitdistill_subln else prefix
                     new_name = self.map_tensor_name(f"{mapped_prefix}.weight")
                     scale = state[scale_key]
-                    is_output = args.keep_output_f16 and new_name == self.format_tensor_name(gguf.MODEL_TENSOR.OUTPUT)
+                    is_output = args.keep_output_f16 and output_tensor_name is not None and new_name == output_tensor_name
                     if scale.numel() != 1 and not (args.row_scale_prototype or args.row_scale_qtype == "i2_sr"):
                         row_scale_rejected += 1
                         raise ValueError(
@@ -386,7 +390,9 @@ def main() -> None:
     if args.gguf_arch == "bitnet-25":
         args._model_arch_override = converter.gguf.MODEL_ARCH.BITNET_25
         if not args.bitdistill_subln:
-            raise SystemExit("--gguf-arch bitnet-25 requires --bitdistill-subln for this repo's SubLN wrapper keys")
+            raise SystemExit(
+                "--gguf-arch bitnet-25 requires --bitdistill-subln for this repo's SubLN wrapper keys"
+            )
     else:
         args._model_arch_override = None
     state = torch.load(ternary_state, map_location="cpu", weights_only=True)

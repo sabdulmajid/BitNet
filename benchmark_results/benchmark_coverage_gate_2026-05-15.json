@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 63,
+  "check_count": 64,
   "failed": [],
   "checks": [
     {
@@ -300,6 +300,12 @@
       "blocker": ""
     },
     {
+      "name": "Sequence-classification architecture contract mismatch is identified",
+      "passed": true,
+      "evidence": "status=architecture_contract_mismatch, hidden_act=silu, bitnet25_activation=relu_sqr, projection_biases=72, checks={'activation_mismatch': True, 'bitnet25_has_bias_slots': True, 'plain_bitnet_bias_contract_gap': True, 'plain_bitnet_has_silu_graph': True}",
+      "blocker": ""
+    },
+    {
       "name": "Qwen3 paper-alignment audit tracks required GLUE rows",
       "passed": true,
       "evidence": "jobs=16, complete=0, ready=False",
@@ -374,7 +380,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=223, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=225, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

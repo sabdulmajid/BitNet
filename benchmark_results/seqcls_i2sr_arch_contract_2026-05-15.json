@@ -1,0 +1,102 @@
+{
+  "checkpoint": {
+    "path": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8",
+    "state_path": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/ternary_state_dict.pt"
+  },
+  "checkpoint_biases": {
+    "first_projection_biases": [
+      "model.layers.0.self_attn.q_proj.bias",
+      "model.layers.0.self_attn.k_proj.bias",
+      "model.layers.0.self_attn.v_proj.bias",
+      "model.layers.1.self_attn.q_proj.bias",
+      "model.layers.1.self_attn.k_proj.bias",
+      "model.layers.1.self_attn.v_proj.bias",
+      "model.layers.2.self_attn.q_proj.bias",
+      "model.layers.2.self_attn.k_proj.bias",
+      "model.layers.2.self_attn.v_proj.bias",
+      "model.layers.3.self_attn.q_proj.bias",
+      "model.layers.3.self_attn.k_proj.bias",
+      "model.layers.3.self_attn.v_proj.bias"
+    ],
+    "projection_bias_count": 72,
+    "projection_bias_families": {
+      "k_proj": 24,
+      "q_proj": 24,
+      "v_proj": 24
+    }
+  },
+  "checkpoint_config": {
+    "architectures": [
+      "Qwen2ForSequenceClassification"
+    ],
+    "hidden_act": "silu",
+    "hidden_size": 896,
+    "model_type": "qwen2",
+    "num_attention_heads": 14,
+    "num_hidden_layers": 24,
+    "num_key_value_heads": 2
+  },
+  "checks": {
+    "activation_mismatch": true,
+    "bitnet25_has_bias_slots": true,
+    "plain_bitnet_bias_contract_gap": true,
+    "plain_bitnet_has_silu_graph": true
+  },
+  "date": "2026-05-15",
+  "hidden_contract": {
+    "comparisons": {
+      "hidden_cosine": 0.012302589838196848,
+      "hidden_relative_rms": 7.812774193066907,
+      "llama_hidden_l2": 205.94926904987386,
+      "logit_relative_rms": 7.270589052541309,
+      "pytorch_hidden_l2": 26.53703466524006,
+      "pytorch_logits_equal_sidecar_logits": true,
+      "pytorch_logits_vs_sidecar_relative_rms": 0.0023488634895355923,
+      "token_id_match": true
+    },
+    "path": "benchmark_results/seqcls_i2sr_hidden_contract_2026-05-15.json",
+    "status": "hidden_contract_mismatch"
+  },
+  "interpretation": "The current sidecar mismatch is not just tokenizer metadata. The exported runtime graph is not the same architecture family as the PyTorch Qwen2 sequence-classification student: bitnet-25 uses ReLU-squared FFN while the checkpoint uses SiLU/SwiGLU. The plain bitnet graph has SiLU but lacks Q/K/V bias tensor slots needed by Qwen2. A dedicated Qwen-BitDistill packed graph is required before full GLUE runtime quality numbers are meaningful.",
+  "required_runtime_work": [
+    {
+      "requirement": "Qwen2/Qwen3 SiLU/SwiGLU FFN in packed graph",
+      "status": "missing in bitnet-25 graph"
+    },
+    {
+      "requirement": "Q/K/V projection-bias tensor slots",
+      "status": "present in bitnet-25 loader, missing in plain bitnet loader"
+    },
+    {
+      "requirement": "SubLN before attention output and FFN down projections",
+      "status": "present in bitnet-25 graph"
+    },
+    {
+      "requirement": "RoPE theta from rope_parameters",
+      "status": "fixed in converter"
+    },
+    {
+      "requirement": "row-scale I2_SR kernels",
+      "status": "present for dense matmuls"
+    },
+    {
+      "requirement": "native sequence-classification score head",
+      "status": "not implemented"
+    }
+  ],
+  "runtime_arch_under_audit": "bitnet-25",
+  "runtime_source": {
+    "bitnet25_dispatch_line": 16853,
+    "bitnet25_ffn_activation": "relu_sqr",
+    "bitnet25_loader_has_qkv_bias": true,
+    "bitnet25_loader_line": 8719,
+    "bitnet25_relu_sqr_line": 15503,
+    "bitnet_ffn_activation": "silu",
+    "bitnet_loader_has_qkv_bias": false,
+    "bitnet_loader_line": 8679,
+    "bitnet_silu_line": 15355,
+    "path": "3rdparty/llama.cpp/src/llama.cpp"
+  },
+  "schema": "seqcls_i2sr_arch_contract.v1",
+  "status": "architecture_contract_mismatch"
+}
