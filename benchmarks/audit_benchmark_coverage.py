@@ -345,6 +345,57 @@ def audit_subln_activation_variance(root: Path, checks: list[dict[str, Any]]) ->
     )
 
 
+def audit_bitdistill_root_cause(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/bitdistill_root_cause_audit_{DATE}.json"
+    if not path.exists():
+        add_check(checks, "BitDistill root-cause audit exists", False, str(path.relative_to(root)), "missing root-cause audit")
+        return
+    data = read_json(path)
+    claims = data.get("claims", []) if isinstance(data.get("claims"), list) else []
+    claim_status = {
+        str(claim.get("claim", "")): claim.get("status")
+        for claim in claims
+        if isinstance(claim, dict)
+    }
+    required_claims = {
+        "Blind ternary PTQ is not a viable universal retrofit for tested Qwen.": "supported_for_tested_setup",
+        "BitDistill paper-level recovery has not been locally reproduced.": "not_proven",
+        "Row-scale I2_SR is a runtime-semantics contribution, not a Q4 quality/storage win.": "supported",
+        "TL2 row-scale and real Kimi/MoE product claims remain open.": "not_proven",
+    }
+    missing_or_wrong = {
+        claim: {"expected": status, "actual": claim_status.get(claim)}
+        for claim, status in required_claims.items()
+        if claim_status.get(claim) != status
+    }
+    controlled = data.get("bitdistill", {}) if isinstance(data.get("bitdistill"), dict) else {}
+    runtime = data.get("runtime", {}) if isinstance(data.get("runtime"), dict) else {}
+    q4 = runtime.get("q4_vs_i2sr", {}) if isinstance(runtime.get("q4_vs_i2sr"), dict) else {}
+    add_check(
+        checks,
+        "BitDistill root-cause audit has required claim statuses",
+        not missing_or_wrong,
+        f"claims={len(claims)}, mismatches={missing_or_wrong}",
+        "root-cause claim ledger is missing or has unsafe statuses",
+    )
+    add_check(
+        checks,
+        "BitDistill root-cause audit marks controlled recovery incomplete",
+        controlled.get("controlled_all_complete") is False
+        and controlled.get("controlled_complete") == 0
+        and controlled.get("controlled_expected") == 3,
+        f"controlled={controlled.get('controlled_complete')}/{controlled.get('controlled_expected')}, all={controlled.get('controlled_all_complete')}",
+        "root-cause audit should not claim controlled BitDistill recovery before queued rows finish",
+    )
+    add_check(
+        checks,
+        "BitDistill root-cause audit carries Q4-vs-I2_SR boundary ratios",
+        all(isinstance(q4.get(key), (int, float)) for key in ["file_ratio", "rss512_ratio", "prefill_speedup", "decode_speedup", "ppl_ratio"]),
+        f"q4_vs_i2sr={q4}",
+        "root-cause audit is missing runtime boundary ratios",
+    )
+
+
 def find_row(summary: dict[str, Any], name: str) -> dict[str, Any] | None:
     for row in summary.get("rows", []):
         if row.get("name") == name:
@@ -527,6 +578,7 @@ def main() -> None:
     audit_bitnet_sft_budget_paired(root, checks)
     audit_bitnet_sft_mechanics(root, checks)
     audit_subln_activation_variance(root, checks)
+    audit_bitdistill_root_cause(root, checks)
     audit_cpu_rows(root, checks)
     audit_cpu_tradeoff_frontier(root, checks)
     audit_cpu_speed_uncertainty(root, checks)

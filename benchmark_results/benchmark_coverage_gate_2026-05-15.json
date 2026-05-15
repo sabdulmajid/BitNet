@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 50,
+  "check_count": 53,
   "failed": [],
   "checks": [
     {
@@ -225,6 +225,24 @@
       "name": "SubLN audit confirms projection-input normalization",
       "passed": true,
       "evidence": "subln_output_rms=[0.9996804222464561, 0.99930373330911]",
+      "blocker": ""
+    },
+    {
+      "name": "BitDistill root-cause audit has required claim statuses",
+      "passed": true,
+      "evidence": "claims=7, mismatches={}",
+      "blocker": ""
+    },
+    {
+      "name": "BitDistill root-cause audit marks controlled recovery incomplete",
+      "passed": true,
+      "evidence": "controlled=0/3, all=False",
+      "blocker": ""
+    },
+    {
+      "name": "BitDistill root-cause audit carries Q4-vs-I2_SR boundary ratios",
+      "passed": true,
+      "evidence": "q4_vs_i2sr={'decode_speedup': 1.19061682213809, 'file_ratio': 1.2881333039180543, 'ppl_ratio': 3.0323232796303237, 'prefill_speedup': 2.298817760610607, 'rss512_ratio': 1.2685742155747033}",
       "blocker": ""
     },
     {

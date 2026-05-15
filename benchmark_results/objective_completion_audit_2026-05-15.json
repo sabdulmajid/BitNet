@@ -61,7 +61,7 @@
     {
       "requirement": "Produce side-by-side comparison, evidence manifest, prune plan, and honest novelty/product verdict",
       "status": "complete",
-      "evidence": "manifest artifacts=203, missing=0; coverage=True checks=50; publishable ledger scopes negative result plus recovery path",
+      "evidence": "manifest artifacts=203, missing=0; coverage=True checks=53; publishable ledger scopes negative result plus recovery path",
       "remaining_gap": ""
     }
   ],
@@ -369,7 +369,7 @@
       "manifest_artifacts": 203,
       "manifest_missing": 0,
       "coverage_passed": true,
-      "coverage_checks": 50,
+      "coverage_checks": 53,
       "prune_sizes": {}
     }
   }
