@@ -106,8 +106,8 @@ Current BitNet-SFT controls:
 - Best completed budget row: `0.574733` at `3000` steps, `2e-5`, still
   `0.033267` below the paper BitNet-SFT anchor.
 
-The completed `3000`-step rows improve over the best `1000`-step row, so budget
-and schedule are helping. They do not close the anchor gap. The remaining `3000`- and
+The completed `3000`-step sweep improves over the best `1000`-step row, so
+budget and schedule are helping. It does not close the anchor gap. The remaining
 `10000`-step rows are running or queued to separate undertraining from
 recipe/implementation mismatch.
 

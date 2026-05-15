@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "2b7a73271c8693d4632b5aaa000e6ce4058a00d1fe6d995131cdcf80efb34b1b",
-      "size_bytes": 13363
+      "sha256": "cf1364ce1656b9e3980419b3eb2900565a905b11a2d4362f7320c441cc8606f5",
+      "size_bytes": 13353
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "research_redirect_report",
       "metrics": {},
       "path": "benchmarks/results/research_redirect_2026-05-15.md",
-      "sha256": "592811a927b6b3d2ec6f359f727ccb1d3145776fc7f9a711e25560e223d3c7cd",
-      "size_bytes": 5608
+      "sha256": "a4f1e8039487d0fa689ff9a0aa7842e0d6dcdd6fa4dda16a52063e814fe25bb7",
+      "size_bytes": 5610
     },
     {
       "exists": true,
@@ -151,8 +151,8 @@
       "label": "bitnet_sft_recipe_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/bitnet_sft_recipe_alignment_2026-05-15.md",
-      "sha256": "21320c5914263c147ebb8228503f5e9d1a08cc39d7ac23b60d4d392780c46e23",
-      "size_bytes": 2614
+      "sha256": "c25b366172459d7e5758d7d75c06074cd7a33e59238bd1990ac50b89e2493c9a",
+      "size_bytes": 2636
     },
     {
       "exists": true,
@@ -160,8 +160,8 @@
       "label": "bitnet_sft_budget_sweep_report",
       "metrics": {},
       "path": "benchmarks/results/bitnet_sft_budget_sweep_2026-05-15.md",
-      "sha256": "f7f2aaeefab715eb785ee7d9b4346240d9f33b1fab7f8c886dd38b78a565a9d8",
-      "size_bytes": 2368
+      "sha256": "09808b413506cedba9d6b838ce63348ebea89e7a6494cdc5626a7ff92d8c5d2c",
+      "size_bytes": 2405
     },
     {
       "exists": true,
@@ -2187,8 +2187,8 @@
       "label": "bitnet_sft_recipe_alignment_json",
       "metrics": {},
       "path": "benchmark_results/bitnet_sft_recipe_alignment_2026-05-15.json",
-      "sha256": "ed4749a1188f23ba1f62c94abdd0d66f69e196cdf3a4ff64f6c89aee2bf38100",
-      "size_bytes": 3338
+      "sha256": "ea08f1d50aa8e08c65266e14239b2437a94e9970a808593777ad9be0cc72c7f0",
+      "size_bytes": 3360
     },
     {
       "exists": true,
@@ -2196,8 +2196,8 @@
       "label": "bitnet_sft_budget_sweep_json",
       "metrics": {},
       "path": "benchmark_results/bitnet_sft_budget_sweep_2026-05-15.json",
-      "sha256": "59c9be16084f6c97e5f06316efaead01da31d19c161568e92bb5ddb1774ce42e",
-      "size_bytes": 18394
+      "sha256": "3c0b937d3dfc3ea8d49884ca303188ec0f5e98e18cc08fe0d8fd8248b2bab797",
+      "size_bytes": 18873
     },
     {
       "exists": true,

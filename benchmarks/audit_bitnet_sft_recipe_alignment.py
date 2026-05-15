@@ -134,7 +134,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                 if isinstance(best_acc, (int, float)) and best_acc < PAPER_BITNET_SFT_MNLI
                 else "pending",
                 "evidence": f"best_completed={fmt(best_acc)}, steps={best_sweep.get('steps', '-')}, lr={best_sweep.get('lr', '-')}",
-                "risk": "Longer 3000/10000-step rows are needed to distinguish undertraining from equation mismatch.",
+                "risk": "Pending 10000-step rows are needed to distinguish undertraining from equation mismatch.",
             },
             {
                 "check": "Activation quantization explains the gap",
@@ -161,7 +161,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "checks": checks,
         "verdict": "mechanically_plausible_but_not_recipe_matched",
         "next": [
-            "Finish 3000/10000-step BitNet-SFT budget curve.",
+            "Finish the remaining pending budget rows, especially the 10000-step rows.",
             "If the curve saturates low, audit BitLinear/SubLN equation parity against the paper implementation.",
             "Keep row-scale results separate from paper-reproduction labels.",
             "Do not broaden MoE/Kimi claims until dense BitNet-SFT is explained.",

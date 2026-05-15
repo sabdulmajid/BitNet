@@ -54,7 +54,7 @@ Completed controls rule out several simple causes:
 - Current SubLN-only insertion worsens MNLI to `0.350280`, so SubLN placement,
   initialization, or timing is not aligned enough to explain the paper result.
 - A 1000-step LR sweep improved the best short row to `0.523892`.
-- The completed 3000-step rows improve further to `0.574733`, with `48,000`
+- The completed 3000-step sweep improves further to `0.574733`, with `48,000`
   optimizer examples, or `0.122230` MNLI epochs, but the best row still misses
   the paper anchor by `0.033267`.
 
