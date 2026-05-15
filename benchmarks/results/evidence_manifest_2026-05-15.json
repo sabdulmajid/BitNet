@@ -7,7 +7,7 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "c4a308bf0eda132d00c34c12aff04e68a6c10d5a3cd98e219b09e2613ed2b16a",
+      "sha256": "2b7a73271c8693d4632b5aaa000e6ce4058a00d1fe6d995131cdcf80efb34b1b",
       "size_bytes": 13363
     },
     {
@@ -16,7 +16,7 @@
       "label": "research_redirect_report",
       "metrics": {},
       "path": "benchmarks/results/research_redirect_2026-05-15.md",
-      "sha256": "c6f261a53300a003cc78872b895138ae634d6cf217623093d6133fecbc6f7b81",
+      "sha256": "592811a927b6b3d2ec6f359f727ccb1d3145776fc7f9a711e25560e223d3c7cd",
       "size_bytes": 5608
     },
     {
@@ -151,7 +151,7 @@
       "label": "bitnet_sft_recipe_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/bitnet_sft_recipe_alignment_2026-05-15.md",
-      "sha256": "eacbc3b82bf4926342e094c846a4ecb3bc0698c4d3b19f5059d43813196a58f7",
+      "sha256": "21320c5914263c147ebb8228503f5e9d1a08cc39d7ac23b60d4d392780c46e23",
       "size_bytes": 2614
     },
     {
@@ -160,8 +160,8 @@
       "label": "bitnet_sft_budget_sweep_report",
       "metrics": {},
       "path": "benchmarks/results/bitnet_sft_budget_sweep_2026-05-15.md",
-      "sha256": "43ae24eb7d7c039875e64ec086d1755e6f81316f61468aad1964b7639db4e27f",
-      "size_bytes": 2331
+      "sha256": "f7f2aaeefab715eb785ee7d9b4346240d9f33b1fab7f8c886dd38b78a565a9d8",
+      "size_bytes": 2368
     },
     {
       "exists": true,
@@ -2187,8 +2187,8 @@
       "label": "bitnet_sft_recipe_alignment_json",
       "metrics": {},
       "path": "benchmark_results/bitnet_sft_recipe_alignment_2026-05-15.json",
-      "sha256": "c2c9d1e5e941e0f5e1ae993f374f0ddf53512fa7c981bad8b40d2f9504cc9a0d",
-      "size_bytes": 3339
+      "sha256": "ed4749a1188f23ba1f62c94abdd0d66f69e196cdf3a4ff64f6c89aee2bf38100",
+      "size_bytes": 3338
     },
     {
       "exists": true,
@@ -2196,8 +2196,8 @@
       "label": "bitnet_sft_budget_sweep_json",
       "metrics": {},
       "path": "benchmark_results/bitnet_sft_budget_sweep_2026-05-15.json",
-      "sha256": "21fe41077d9427e7c831819e00c6774bc0f687e5727bc0e8746a4f9f2a623b9e",
-      "size_bytes": 17912
+      "sha256": "59c9be16084f6c97e5f06316efaead01da31d19c161568e92bb5ddb1774ce42e",
+      "size_bytes": 18394
     },
     {
       "exists": true,
