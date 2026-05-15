@@ -146,12 +146,15 @@ The weights-only control without activation quantization reaches `0.493734`,
 only `+0.006113` over the default W1.58A8 run, so activation quantization is
 not the dominant cause of the gap. The SubLN-only BitNet-SFT control reaches
 `0.350280`, so the current SubLN insertion by itself worsens the local
-baseline instead of explaining the paper-anchor gap. The unresolved narrow
-blockers are recipe alignment, exact SubLN placement/initialization/timing, and
-Stage-3 budget/LR/epoch search.
-The next active diagnostic is a focused BitNet-SFT MNLI LR/step-budget sweep
-that holds those mechanics fixed and tests whether the paper-anchor gap is a
-simple downstream schedule issue.
+baseline instead of explaining the paper-anchor gap. A focused 1000-step
+BitNet-SFT MNLI LR sweep is now complete across `5e-6`, `1e-5`, `2e-5`, and
+`5e-5`. The best short-schedule row reaches `0.523892` at `5e-5`, improving
+over the default by `+0.036271` but still missing the paper BitNet-SFT anchor
+by `0.084108`. Because that schedule covers only `16,000` optimizer examples,
+or `0.040743` MNLI epochs, longer `3000`- and `10000`-step rows are queued to
+separate undertraining from deeper recipe/implementation mismatch. The
+unresolved narrow blockers are recipe alignment, exact SubLN
+placement/initialization/timing, and downstream budget matching.
 
 Current completed Qwen2.5-0.5B GLUE sequence-classification short-budget
 diagnostics:
