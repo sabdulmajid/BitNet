@@ -245,6 +245,11 @@ training contract and a runtime contract. Ternary storage alone is not enough.
 - TL2 support for row-scale Qwen; current TL2 one-scale error is `1.904230`
   relative output RMS, while exact FP16 row scales would be `0.000197`.
 
+A formal runtime-gap audit currently marks same-artifact task quality plus CPU
+deployment as blocked: `15` strict GLUE checkpoints use
+`Qwen2ForSequenceClassification`, `0` of them are causal-export compatible, and
+the existing causal GGUF/I2_SR path exports `6` different causal-LM artifacts.
+
 ## Canonical Next Matrix
 
 The next experiments are intentionally narrow:
@@ -354,6 +359,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill loss-scale audit](benchmarks/results/bitdistill_loss_scale_audit_2026-05-15.md)
 - [BitDistill loss-contract audit](benchmarks/results/bitdistill_loss_contract_2026-05-15.md)
 - [Ternary flip dynamics audit](benchmarks/results/ternary_flip_dynamics_2026-05-15.md)
+- [Sequence-classification runtime gap audit](benchmarks/results/seqcls_runtime_gap_2026-05-15.md)
 - [Task formulation audit](benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md)
 - [Causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_2026-05-15.md)
 - [CPU tradeoff frontier audit](benchmarks/results/cpu_tradeoff_frontier_2026-05-15.md)

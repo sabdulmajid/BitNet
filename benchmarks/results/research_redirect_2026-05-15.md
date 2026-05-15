@@ -136,6 +136,14 @@ The credible product is a CPU-first retrofit evaluator:
 The product is still useful when it says "no", because it prevents deploying a
 model whose ternary artifact is fast but not accurate.
 
+The current product blocker is now explicitly audited. The strict GLUE quality
+branch has `15` `Qwen2ForSequenceClassification` checkpoint configs and `0`
+causal-export-compatible configs. The current GGUF/I2_SR runtime branch has `6`
+exported causal-LM artifacts, but those are not the same artifacts as the
+sequence-classification quality branch. To close the product loop, implement
+packed sequence-classification inference or make causal prompt scoring the
+primary task formulation.
+
 ## Publishable Angle
 
 The publishable work is not discovering BitDistill. Microsoft did.

@@ -484,6 +484,33 @@ def audit_ternary_flip_dynamics(root: Path, checks: list[dict[str, Any]]) -> Non
     )
 
 
+def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/seqcls_runtime_gap_{DATE}.json"
+    if not path.exists():
+        add_check(checks, "Sequence-classification runtime gap audit exists", False, str(path.relative_to(root)), "missing seqcls runtime gap audit")
+        return
+    data = read_json(path)
+    seqcls = data.get("sequence_classification", {}) if isinstance(data.get("sequence_classification"), dict) else {}
+    causal = data.get("causal_runtime", {}) if isinstance(data.get("causal_runtime"), dict) else {}
+    export = data.get("causal_export_summary", {}) if isinstance(data.get("causal_export_summary"), dict) else {}
+    add_check(
+        checks,
+        "Sequence-classification runtime gap is explicitly blocked",
+        data.get("status") == "blocked_by_classifier_runtime"
+        and data.get("same_artifact_quality_cpu_ready") is False
+        and seqcls.get("sequence_classification", 0) > 0
+        and seqcls.get("causal_export_compatible") == 0
+        and causal.get("causal_export_compatible", 0) > 0
+        and export.get("exported", 0) > 0,
+        (
+            f"status={data.get('status')}, seqcls={seqcls.get('sequence_classification')}, "
+            f"seqcls_exportable={seqcls.get('causal_export_compatible')}, "
+            f"causal_exportable={causal.get('causal_export_compatible')}, exports={export.get('exported')}"
+        ),
+        "quality path and packed runtime path were not cleanly separated",
+    )
+
+
 def audit_qwen3_paper_alignment(root: Path, checks: list[dict[str, Any]]) -> None:
     path = root / f"benchmark_results/qwen3_paper_alignment_{DATE}.json"
     if not path.exists():
@@ -699,6 +726,7 @@ def main() -> None:
     audit_bitdistill_telemetry_coverage(root, checks)
     audit_bitdistill_loss_contract(root, checks)
     audit_ternary_flip_dynamics(root, checks)
+    audit_seqcls_runtime_gap(root, checks)
     audit_qwen3_paper_alignment(root, checks)
     audit_cpu_rows(root, checks)
     audit_cpu_tradeoff_frontier(root, checks)
