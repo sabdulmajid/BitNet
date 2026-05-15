@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "6370a6492a068014c4b561e4945769a8241667dd89a5b0e01b0e57bd377b94f8",
-      "size_bytes": 26055
+      "sha256": "b6fef938f233bda5b07e4577e5b45aaf07ad67f5e34f7eb2bf6ea2fbb5a02854",
+      "size_bytes": 26527
     },
     {
       "exists": true,
@@ -106,8 +106,8 @@
       "label": "bitdistill_reproduction_gate_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_reproduction_gate_2026-05-15.md",
-      "sha256": "b34de9c2e3f018334021bdad66eb77af5c414fb9ebbdb64dd3bc40c2637605dc",
-      "size_bytes": 12568
+      "sha256": "0d6eb2028518703ccd634c22dcbf2ee927515f9e058aeed66db7b806155b8ec4",
+      "size_bytes": 12653
     },
     {
       "exists": true,
@@ -133,8 +133,8 @@
       "label": "bitdistill_paper_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_paper_alignment_2026-05-15.md",
-      "sha256": "75286bfce313da4ba863485cc8be82077e051cdf8c6e08933b5ac907ff22a5a7",
-      "size_bytes": 9679
+      "sha256": "729c5da68883edebf351bb974e29d9b1c11c084a2759c7b4bbd688e36797245b",
+      "size_bytes": 9708
     },
     {
       "exists": true,
@@ -178,8 +178,8 @@
       "label": "bitdistill_job_monitor_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_job_monitor_2026-05-15.md",
-      "sha256": "7c89485d709d3a80e0512fec9ab927e8f3af977eff59b95421f7102adfc126ae",
-      "size_bytes": 12791
+      "sha256": "efef1e70c02224a8b356a73eacf2ad6d28e75d9270384fb73e907856df8e754a",
+      "size_bytes": 12789
     },
     {
       "exists": true,
@@ -295,8 +295,8 @@
       "label": "bitdistill_variant_summary_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_variant_summary_2026-05-15.md",
-      "sha256": "a0f8d5a1fa461bf3f2715de748b0694bbcfd3d71430a15f64d197ea2c998b2c3",
-      "size_bytes": 10347
+      "sha256": "32dca4fcc52280e67afc1f2a67f40b24e5684426c13355b9a7b2ec10ffa48b60",
+      "size_bytes": 19611
     },
     {
       "exists": true,
@@ -2074,10 +2074,10 @@
         "max_fp_gap": 0.01,
         "paper_style_tensor_complete": true,
         "paper_style_tensor_passed": false,
-        "present_rows": 26,
-        "present_with_accuracy_ci95": 26,
-        "present_with_examples": 26,
-        "present_with_full_eval": 26,
+        "present_rows": 28,
+        "present_with_accuracy_ci95": 28,
+        "present_with_examples": 28,
+        "present_with_full_eval": 28,
         "row_scale_complete": true,
         "row_scale_passed": false,
         "rows": 36,
@@ -2088,8 +2088,8 @@
         ]
       },
       "path": "benchmark_results/bitdistill_reproduction_gate_2026-05-15.json",
-      "sha256": "5b226612e9a2d1cd448e7096dd3ad7ff9e7fe29ce4bea5d40eb240aa409e93ae",
-      "size_bytes": 30982
+      "sha256": "067bbff0390160e962c6b9333b398726dc3010c7197e0f2df1a787ef60d115bb",
+      "size_bytes": 31287
     },
     {
       "exists": true,
@@ -2212,8 +2212,8 @@
         "warmup_warnings": []
       },
       "path": "benchmark_results/bitdistill_job_monitor_2026-05-15.json",
-      "sha256": "790eaeba74f408b55075c41f2394cf07b542822c38df54f4205e79913ae5d908",
-      "size_bytes": 72421
+      "sha256": "a8879a51bee3c80fefebee56d87e41e65695ceecf68d726408ed3409d7c23465",
+      "size_bytes": 72070
     },
     {
       "exists": true,
@@ -2459,18 +2459,23 @@
       "kind": "bitdistill_variant_summary_json",
       "label": "bitdistill_variant_summary_json",
       "metrics": {
-        "materialized_rows": 24,
+        "materialized_rows": 47,
         "roots": [
+          "checkpoints/bitdistill-glue-seqcls",
+          "checkpoints/bitdistill-glue-seqcls-paperlogit",
+          "checkpoints/bitdistill-glue-seqcls-ablate",
           "checkpoints/bitdistill-glue-seqcls-longwarmup",
+          "checkpoints/bitdistill-glue-seqcls-longwarmup-headinit",
           "checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma",
           "checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row",
           "checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr1e-5",
+          "checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr5e-5",
+          "checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-headinit",
           "checkpoints/bitdistill-glue-seqcls-longwarmup-gamma1k",
           "checkpoints/bitdistill-glue-seqcls-longwarmup-gamma10k",
-          "checkpoints/bitdistill-glue-seqcls-longwarmup-headinit",
           "checkpoints/bitdistill-glue-seqcls-longwarmup-layer-sweep"
         ],
-        "rows": 24,
+        "rows": 47,
         "tasks": [
           "mnli",
           "qnli",
@@ -2478,8 +2483,8 @@
         ]
       },
       "path": "benchmark_results/bitdistill_variant_summary_2026-05-15.json",
-      "sha256": "1b42b82a327164efb3b5c929e749fbeda81788324cfd879cb576827d118b8dcf",
-      "size_bytes": 23019
+      "sha256": "3a9044ad5c34a76bd51eeedc86317b439ee944fb92d1648fa5ce65917f5c3951",
+      "size_bytes": 44900
     },
     {
       "exists": true,

@@ -60,7 +60,7 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | qnli | BitDistill longwarmup row gamma100 | novelty_gamma100 | true | 0.796998 | 5463 | 5463 | true | 0.898957 | true | 0.101959 |
 | qnli | BitDistill longwarmup tensor paper gamma | paper_candidate | true | 0.759656 | 5463 | 5463 | true | 0.898957 | true | 0.139301 |
 | qnli | BitDistill longwarmup row paper gamma | paper_row_candidate | true | 0.760937 | 5463 | 5463 | true | 0.898957 | true | 0.138019 |
-| qnli | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | false | - | - | 5463 | false | 0.898957 | true | - |
+| qnli | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | true | 0.757459 | 5463 | 5463 | true | 0.898957 | true | 0.141497 |
 | qnli | BitDistill longwarmup tensor paper gamma lr5e-5 | paper_lr_search_pending | false | - | - | 5463 | false | 0.898957 | true | - |
 | qnli | BitDistill longwarmup tensor paper gamma headinit | paper_headinit_pending | false | - | - | 5463 | false | 0.898957 | true | - |
 | sst2 | FP16-SFT | baseline | true | 0.925459 | 872 | 872 | true | 0.925459 | true | 0.000000 |
@@ -72,7 +72,7 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | sst2 | BitDistill longwarmup row gamma100 | novelty_gamma100 | true | 0.854358 | 872 | 872 | true | 0.925459 | true | 0.071101 |
 | sst2 | BitDistill longwarmup tensor paper gamma | paper_candidate | true | 0.841743 | 872 | 872 | true | 0.925459 | true | 0.083716 |
 | sst2 | BitDistill longwarmup row paper gamma | paper_row_candidate | true | 0.837156 | 872 | 872 | true | 0.925459 | true | 0.088303 |
-| sst2 | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | false | - | - | 872 | false | 0.925459 | true | - |
+| sst2 | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | true | 0.846330 | 872 | 872 | true | 0.925459 | true | 0.079128 |
 | sst2 | BitDistill longwarmup tensor paper gamma lr5e-5 | paper_lr_search_pending | false | - | - | 872 | false | 0.925459 | true | - |
 | sst2 | BitDistill longwarmup tensor paper gamma headinit | paper_headinit_pending | false | - | - | 872 | false | 0.925459 | true | - |
 
