@@ -283,6 +283,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill reproduction gap analysis](benchmarks/results/bitdistill_reproduction_gap_analysis_2026-05-15.md)
 - [BitDistill Stage-2 budget curve audit](benchmarks/results/bitdistill_stage2_curve_2026-05-15.md)
 - [BitDistill Stage-2 curve submission](benchmarks/results/bitdistill_stage2_curve_submission_2026-05-15.md)
+- [BitDistill controlled curve audit](benchmarks/results/bitdistill_controlled_curve_2026-05-15.md)
 - [BitNet-SFT baseline audit](benchmarks/results/bitnet_sft_baseline_audit_2026-05-15.md)
 - [BitNet-SFT recipe alignment audit](benchmarks/results/bitnet_sft_recipe_alignment_2026-05-15.md)
 - [BitNet-SFT mechanics audit](benchmarks/results/bitnet_sft_mechanics_audit_2026-05-15.md)

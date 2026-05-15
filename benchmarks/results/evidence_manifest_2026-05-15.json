@@ -1,5 +1,5 @@
 {
-  "artifact_count": 199,
+  "artifact_count": 201,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "b8536c63d5e094e6370e29253aebb2c61ff8b9349740eb2fed4663656f402ab5",
-      "size_bytes": 16099
+      "sha256": "ff7dfa9da2c94e6a54944b406aded64946a0e7227b703bf3240a8b362169452e",
+      "size_bytes": 16199
     },
     {
       "exists": true,
@@ -144,6 +144,15 @@
       "path": "benchmarks/results/bitdistill_stage2_curve_submission_2026-05-15.md",
       "sha256": "77354c56b3ed6a5228485a4d4c0ef5d28cbc4ee9c2b4e40eeb08b68539b4c4ba",
       "size_bytes": 1512
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_controlled_curve_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_controlled_curve_2026-05-15.md",
+      "sha256": "db49f49482c8e46a172c1ce7163c3f7e278ebb8ce579309c7903617cff2bd44a",
+      "size_bytes": 1975
     },
     {
       "exists": true,
@@ -2262,6 +2271,15 @@
       "path": "benchmark_results/bitdistill_stage2_curve_submission_2026-05-15.json",
       "sha256": "ae9d0a82341e0e4aac90fd77b8b172c6ed4c745426b53a937eb95d75b15dfd99",
       "size_bytes": 2131
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "bitdistill_controlled_curve_json",
+      "metrics": {},
+      "path": "benchmark_results/bitdistill_controlled_curve_2026-05-15.json",
+      "sha256": "4e18dccd5eb20897435d80f0cfeb8ccfa5375724db4fd5712508ceebc190ab89",
+      "size_bytes": 6571
     },
     {
       "exists": true,

@@ -1,8 +1,8 @@
 # Evidence Manifest, 2026-05-15
-Artifacts: `199`. Missing: `0`.
+Artifacts: `201`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 16099 | b8536c63d5e0 |  |
+| README | tracked_report | yes | 16199 | ff7dfa9da2c9 |  |
 | research_redirect_report | tracked_report | yes | 6376 | 27b20d2e8677 |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
@@ -18,6 +18,7 @@ Artifacts: `199`. Missing: `0`.
 | bitdistill_recovery_audit_report | tracked_report | yes | 1534 | 4bd7195806a9 |  |
 | bitdistill_stage2_curve_report | tracked_report | yes | 4180 | de98a4baca66 |  |
 | bitdistill_stage2_curve_submission_report | tracked_report | yes | 1512 | 77354c56b3ed |  |
+| bitdistill_controlled_curve_report | tracked_report | yes | 1975 | db49f49482c8 |  |
 | bitdistill_reproduction_gate_report | tracked_report | yes | 12908 | fa3178597d19 |  |
 | bitdistill_paired_predictions_report | tracked_report | yes | 8123 | c9107324629d |  |
 | bitdistill_task_formulation_report | tracked_report | yes | 11647 | cb03c36274ba |  |
@@ -154,6 +155,7 @@ Artifacts: `199`. Missing: `0`.
 | bitdistill_recovery_audit_json | generic_json | yes | 3252 | 5d04cd9280ec |  |
 | bitdistill_stage2_curve_json | generic_json | yes | 19229 | 42f4a99e3a68 |  |
 | bitdistill_stage2_curve_submission_json | generic_json | yes | 2131 | ae9d0a82341e |  |
+| bitdistill_controlled_curve_json | generic_json | yes | 6571 | 4e18dccd5eb2 |  |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 32197 | c581499edff4 | present=34/36, examples=34, full_eval=34, ci95=34, paper_complete=True, paper_passed=False, row_complete=True, row_passed=False, confidence=0.95 |
 | bitnet_sft_baseline_audit_json | generic_json | yes | 48829 | 57c5584b4206 |  |
 | bitnet_sft_recipe_alignment_json | generic_json | yes | 3545 | 2e2449074bb1 |  |

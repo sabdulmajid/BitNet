@@ -1,0 +1,161 @@
+{
+  "all_complete": false,
+  "all_passed_fp_recovery_gate": false,
+  "complete": 0,
+  "date": "2026-05-15",
+  "expected": 3,
+  "passed_fp_recovery_gate": 0,
+  "reference_predictions": "checkpoints/bitdistill-glue-seqcls-predtrace/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+  "rows": [
+    {
+      "dependency": "afterany:10067",
+      "job_id": "10069",
+      "label": "5k-warmup downstream control",
+      "last": {
+        "attention_kd": null,
+        "ce": null,
+        "logit_kd": null,
+        "weighted_attention_kd": null,
+        "weighted_logit_kd": null
+      },
+      "metric_accuracy": null,
+      "metric_eval_examples": null,
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-5kwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-5kwarmup-steps10000-lr2em5-papergamma-headinit",
+      "paired": {
+        "both_correct": 0,
+        "both_wrong": 0,
+        "candidate_accuracy": null,
+        "candidate_wins": 0,
+        "delta_vs_reference": null,
+        "errors": [
+          "missing checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-5kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl"
+        ],
+        "matched": 0,
+        "mcnemar_exact_p": null,
+        "missing": [
+          "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-5kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl"
+        ],
+        "paired_ci95": null,
+        "reference_accuracy": null,
+        "reference_wins": 0,
+        "status": "pending"
+      },
+      "paper_stage2_fraction": 0.004096,
+      "partition": "midcard",
+      "passed_fp_recovery_gate": false,
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-5kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
+      "squeue": {
+        "elapsed": "0:00",
+        "job_id": "10069",
+        "reason": "(Dependency)",
+        "state": "PENDING"
+      },
+      "stage2_token_presentations": 40960000,
+      "steps": null
+    },
+    {
+      "dependency": "afterany:10067",
+      "job_id": "10068",
+      "label": "20k-warmup downstream control",
+      "last": {
+        "attention_kd": null,
+        "ce": null,
+        "logit_kd": null,
+        "weighted_attention_kd": null,
+        "weighted_logit_kd": null
+      },
+      "metric_accuracy": null,
+      "metric_eval_examples": null,
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit",
+      "paired": {
+        "both_correct": 0,
+        "both_wrong": 0,
+        "candidate_accuracy": null,
+        "candidate_wins": 0,
+        "delta_vs_reference": null,
+        "errors": [
+          "missing checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl"
+        ],
+        "matched": 0,
+        "mcnemar_exact_p": null,
+        "missing": [
+          "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl"
+        ],
+        "paired_ci95": null,
+        "reference_accuracy": null,
+        "reference_wins": 0,
+        "status": "pending"
+      },
+      "paper_stage2_fraction": 0.016384,
+      "partition": "midcard",
+      "passed_fp_recovery_gate": false,
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
+      "squeue": {
+        "elapsed": "0:00",
+        "job_id": "10068",
+        "reason": "(Dependency)",
+        "state": "PENDING"
+      },
+      "stage2_token_presentations": 163840000,
+      "steps": null
+    },
+    {
+      "dependency": "afterok:10070",
+      "job_id": "10071",
+      "label": "40k-warmup downstream control",
+      "last": {
+        "attention_kd": null,
+        "ce": null,
+        "logit_kd": null,
+        "weighted_attention_kd": null,
+        "weighted_logit_kd": null
+      },
+      "metric_accuracy": null,
+      "metric_eval_examples": null,
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit",
+      "paired": {
+        "both_correct": 0,
+        "both_wrong": 0,
+        "candidate_accuracy": null,
+        "candidate_wins": 0,
+        "delta_vs_reference": null,
+        "errors": [
+          "missing checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl"
+        ],
+        "matched": 0,
+        "mcnemar_exact_p": null,
+        "missing": [
+          "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl"
+        ],
+        "paired_ci95": null,
+        "reference_accuracy": null,
+        "reference_wins": 0,
+        "status": "pending"
+      },
+      "paper_stage2_fraction": 0.032768,
+      "partition": "midcard",
+      "passed_fp_recovery_gate": false,
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
+      "squeue": {
+        "elapsed": "0:00",
+        "job_id": "10071",
+        "reason": "(Dependency)",
+        "state": "PENDING"
+      },
+      "stage2_token_presentations": 327680000,
+      "steps": null
+    }
+  ],
+  "schema": "bitdistill-controlled-curve-audit-v1",
+  "submission_json": "benchmark_results/bitdistill_stage2_curve_submission_2026-05-15.json",
+  "success_delta_from_fp": -0.01
+}
