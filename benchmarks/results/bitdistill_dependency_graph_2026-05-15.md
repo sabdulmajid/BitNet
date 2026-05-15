@@ -10,7 +10,7 @@ Warm-up log source: `explicit`.
 
 | log | job | step | max steps | progress | expected state exists | expected state |
 | --- | --- | --- | --- | --- | --- | --- |
-| logs/bitdistill-glue-9894.out | 9894 | 18210 | 20000 | 0.910500 | false | checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/custom_state_dict.pt |
+| logs/bitdistill-glue-9894.out | 9894 | 20000 | 20000 | 1.000000 | true | checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/custom_state_dict.pt |
 
 ## Checks
 
@@ -26,7 +26,6 @@ Warm-up log source: `explicit`.
 | warning |
 | --- |
 | 11 output directories appear in multiple historical submission tables; audit uses the latest row per output directory. |
-| Warm-up final state is expectedly absent until Stage-2 finishes; downstream jobs are correctly dependency-blocked. |
 
 ## Blockers
 
@@ -51,8 +50,8 @@ Raw rows: `61`. Deduped rows: `38`. Active rows: `38`.
 | 9964 | PENDING | sst2 | sequence_classification | tensor | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8 |
 | 9965 | PENDING | mnli | sequence_classification | tensor | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup-gamma1k/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8 |
 | 9966 | PENDING | mnli | sequence_classification | tensor | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup-gamma10k/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8 |
-| 9943 | PENDING | mnli | causal_lm | tensor | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8 |
-| 9944 | PENDING | mnli | causal_lm | row | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8 |
+| 9943 | RUNNING | mnli | causal_lm | tensor | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8 |
+| 9944 | RUNNING | mnli | causal_lm | row | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8 |
 | 9945 | PENDING | qnli | causal_lm | tensor | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8 |
 | 9946 | PENDING | qnli | causal_lm | row | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-row-layer-8 |
 | 9947 | PENDING | sst2 | causal_lm | tensor | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8 |

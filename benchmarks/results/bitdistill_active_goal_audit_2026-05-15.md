@@ -12,9 +12,9 @@ Complete rows: `1` / `5`.
 
 Pending rows: `3`.
 
-Tensor warm-up progress: `18160` / `20000` (`0.908000`).
+Tensor warm-up progress: `20000` / `20000` (`1.000000`).
 
-Row warm-up progress: `2020` / `20000` (`0.101000`).
+Row warm-up progress: `3530` / `20000` (`0.176500`).
 
 Runtime gates: row-scale complete=`False`, row-warmup complete=`False`, I2_SR=`False`, CPU=`False`.
 
@@ -22,7 +22,7 @@ Runtime gates: row-scale complete=`False`, row-warmup complete=`False`, I2_SR=`F
 
 | requirement | status | evidence | remaining gap |
 | --- | --- | --- | --- |
-| Reproduce BitDistill GLUE3 baseline on Qwen2.5-0.5B with FP16-SFT, BitNet-SFT, and BitDistill | pending | FP16 tasks=['mnli', 'qnli', 'sst2']; BitNet tasks=['mnli', 'qnli', 'sst2']; paper rows=0/3; matrix=38/38, inferred=0; warm-up=18160/20000 | Long-warmup BitDistill metrics are still pending; short-budget diagnostics are not a paper reproduction. |
+| Reproduce BitDistill GLUE3 baseline on Qwen2.5-0.5B with FP16-SFT, BitNet-SFT, and BitDistill | pending | FP16 tasks=['mnli', 'qnli', 'sst2']; BitNet tasks=['mnli', 'qnli', 'sst2']; paper rows=0/3; matrix=38/38, inferred=0; warm-up=20000/20000 | Long-warmup BitDistill metrics are still pending; short-budget diagnostics are not a paper reproduction. |
 | Implement SubLN, Stage-2 CE, Stage-3 CE+logits KL+attention-relation KD, and layer selection | complete | smoke=True, smoke checks=40, failed features=[] |  |
 | Compare paper-style per-tensor BitDistill against row-scale BitDistill | pending | tensor-warmup row gate complete=False, passed=False; row-warmup gate complete=False, passed=False | Tensor and row long-warmup metrics must finish before the novelty comparison is known. |
 | Export row-scale checkpoints through I2_SR and benchmark CPU speed, memory/RSS, and task quality on Xeon | pending | I2_SR gate=False (0/6 rows); CPU gate=False (0/33 critical rows) | Causal export/CPU benchmark jobs are dependency-blocked on unfinished BitDistill checkpoints. |
