@@ -106,8 +106,10 @@ def audit_reproduction(
     expected = matrix.get("expected_rows")
     inferred_rows = len(matrix.get("inferred_field_rows", [])) if isinstance(matrix.get("inferred_field_rows"), list) else None
     pending = matrix_passed and configured == expected and inferred_rows == 0
-    complete = reproduction.get("paper_style_tensor_complete") is True and reproduction.get("paper_style_tensor_passed") is True
-    status = "complete" if complete else ("pending" if pending else "partial")
+    strict_complete = reproduction.get("paper_style_tensor_complete") is True
+    strict_passed = reproduction.get("paper_style_tensor_passed") is True
+    complete = strict_complete and strict_passed
+    status = "complete" if complete else ("partial" if strict_complete else ("pending" if pending else "partial"))
     metrics["paper_reproduction"] = {
         "fp16_tasks": baseline_tasks,
         "bitnet_tasks": bitnet_tasks,
@@ -134,7 +136,7 @@ def audit_reproduction(
             f"matrix={configured}/{expected}, inferred={inferred_rows}; "
             f"warm-up={step}/{max_steps}"
         ),
-        "Gamma=100 long-warmup BitDistill is complete and below the FP16-gap target; strict paper-gamma, LR-search, and head-init candidates are still pending.",
+        "Gamma=100 and strict paper-gamma tensor BitDistill are complete and below the FP16-gap target; row paper-gamma, LR-search, head-init, and full-budget candidates remain pending.",
     )
 
 
@@ -216,7 +218,7 @@ def audit_novelty_and_runtime(
             f"tensor-warmup row gate complete={row_complete}, passed={row_passed}; "
             f"row-warmup gate complete={rowwarmup_complete}, passed={rowwarmup_passed}"
         ),
-        "Gamma=100 tensor-warmup row comparison is complete but does not pass the FP16-gap gate; strict paper-gamma and row-warmup comparisons remain pending.",
+        "Gamma=100 tensor-warmup row comparison is complete but does not pass the FP16-gap gate; paper-gamma row and row-warmup comparisons remain pending.",
     )
     add_row(
         rows,

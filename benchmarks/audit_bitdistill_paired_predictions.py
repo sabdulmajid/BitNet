@@ -48,6 +48,8 @@ PAPER_ROW = RunRef("BitDistill paper-gamma row", "paper_hparam_row_root", "{task
 PAPER_LR1 = RunRef("BitDistill paper-gamma tensor lr1e-5", "paper_hparam_lr1_root", "{task}/bitdistill-longwarmup-tensor-layer-8")
 PAPER_LR5 = RunRef("BitDistill paper-gamma tensor lr5e-5", "paper_hparam_lr5_root", "{task}/bitdistill-longwarmup-tensor-layer-8")
 PAPER_HEADINIT = RunRef("BitDistill paper-gamma tensor headinit", "paper_hparam_headinit_root", "{task}/bitdistill-longwarmup-tensor-layer-8")
+GAMMA1K = RunRef("BitDistill gamma1k tensor", "gamma1k_root", "{task}/bitdistill-longwarmup-tensor-layer-8")
+GAMMA10K = RunRef("BitDistill gamma10k tensor", "gamma10k_root", "{task}/bitdistill-longwarmup-tensor-layer-8")
 
 
 def run_dir(root: Path, model: str, ref: RunRef, task: str) -> Path:
@@ -291,6 +293,16 @@ def comparison_specs(tasks: list[str]) -> list[ComparisonSpec]:
                 ComparisonSpec("paper-gamma headinit minus default", task, PAPER_TENSOR, PAPER_HEADINIT, "paper_search"),
             ]
         )
+        if task == "mnli":
+            specs.extend(
+                [
+                    ComparisonSpec("gamma1k tensor minus FP16-SFT", task, FP16, GAMMA1K, "gamma_sweep_vs_fp"),
+                    ComparisonSpec("gamma10k tensor minus FP16-SFT", task, FP16, GAMMA10K, "gamma_sweep_vs_fp"),
+                    ComparisonSpec("gamma1k tensor minus gamma100 tensor", task, LONG_TENSOR, GAMMA1K, "gamma_sweep"),
+                    ComparisonSpec("gamma10k tensor minus gamma100 tensor", task, LONG_TENSOR, GAMMA10K, "gamma_sweep"),
+                    ComparisonSpec("paper-gamma tensor minus gamma1k tensor", task, GAMMA1K, PAPER_TENSOR, "gamma_sweep"),
+                ]
+            )
     return specs
 
 
@@ -402,6 +414,8 @@ def main() -> None:
     parser.add_argument("--paper-hparam-lr1-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr1e-5"))
     parser.add_argument("--paper-hparam-lr5-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr5e-5"))
     parser.add_argument("--paper-hparam-headinit-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-headinit"))
+    parser.add_argument("--gamma1k-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-gamma1k"))
+    parser.add_argument("--gamma10k-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-gamma10k"))
     parser.add_argument("--model", default="Qwen/Qwen2.5-0.5B")
     parser.add_argument("--tasks", nargs="+", choices=TASKS, default=TASKS)
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_paired_predictions_{DATE}.json"))

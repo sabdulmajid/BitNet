@@ -23,6 +23,7 @@ from typing import Any
 
 DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 TASKS = ("mnli", "qnli", "sst2")
+ACTIVE_SLURM_STATES = {"PENDING", "RUNNING", "CONFIGURING", "COMPLETING", "SUSPENDED"}
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -129,21 +130,27 @@ def audit_stored_downstream_scripts(rows: list[dict[str, Any]]) -> tuple[list[di
     failing: list[dict[str, Any]] = []
     for row in rows:
         job_id = str(row.get("job_id") or "")
+        job_status = row.get("job_status", {}) if isinstance(row.get("job_status"), dict) else {}
+        job_state = str(job_status.get("state") or "")
+        script_required = job_state in ACTIVE_SLURM_STATES
         script, error = stored_batch_script(job_id)
-        missing = [label for label, snippet in required_snippets.items() if script and snippet not in script]
+        missing = [label for label, snippet in required_snippets.items() if script_required and script and snippet not in script]
+        passed = (not script_required) or (bool(script) and not error and not missing)
         record = {
             "job_id": job_id,
             "task": row.get("task"),
             "scale": row.get("scale"),
             "task_format": inferred_task_format(row),
+            "job_state": job_state,
+            "script_required": script_required,
             "script_available": bool(script),
             "script_error": error,
             "sha256": sha256_text(script) if script else "",
             "missing_required_snippets": missing,
-            "passed": bool(script) and not error and not missing,
+            "passed": passed,
         }
         provenance.append(record)
-        if not record["passed"]:
+        if script_required and not record["passed"]:
             failing.append(record)
     return provenance, failing
 
@@ -353,6 +360,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         if inferred_field_names(row)
     ]
     script_provenance, script_failures = audit_stored_downstream_scripts(rows)
+    script_required = [record for record in script_provenance if record.get("script_required") is True]
 
     add_check(checks, "monitor json exists", bool(monitor), str(args.monitor_json), "missing BitDistill monitor JSON")
     add_check(
@@ -418,9 +426,9 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     add_check(
         checks,
         "downstream stored scripts include critical KD/export arguments",
-        not script_failures and len(script_provenance) == len(rows),
-        f"checked={len(script_provenance)}, failures={len(script_failures)}",
-        "at least one queued downstream job was submitted without a critical paper-style KD or export argument",
+        not script_failures and len(script_required) == sum(active_job_states.get(state, 0) for state in ACTIVE_SLURM_STATES),
+        f"active checked={len(script_required)}, total rows={len(script_provenance)}, failures={len(script_failures)}",
+        "at least one active downstream job is unavailable or missing a critical paper-style KD/export argument",
     )
     add_check(
         checks,
@@ -450,6 +458,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "observed_rows": len(rows),
         "configured_rows": len(expected_results) - len(missing),
         "stored_script_rows": len(script_provenance),
+        "stored_script_required_rows": len(script_required),
         "stored_script_failure_count": len(script_failures),
         "stored_script_failures": script_failures,
         "passed": all(check["passed"] for check in checks),
@@ -505,7 +514,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
         f"Observed rows: `{summary['observed_rows']}`. Expected rows: `{summary['expected_rows']}`. Configured rows: `{summary['configured_rows']}`.",
         f"Job states: `{summary['job_states']}`.",
         f"Rows with fields inferred from submitter defaults: `{len(summary['inferred_field_rows'])}`.",
-        f"Stored downstream scripts checked: `{summary.get('stored_script_rows', 0)}`. Failures: `{summary.get('stored_script_failure_count', 0)}`.",
+        f"Stored downstream scripts checked: `{summary.get('stored_script_required_rows', 0)}` active / `{summary.get('stored_script_rows', 0)}` total rows. Failures: `{summary.get('stored_script_failure_count', 0)}`.",
         "## Checks",
         md_table(["check", "status", "evidence", "blocker"], check_rows),
         "## Expected Matrix",

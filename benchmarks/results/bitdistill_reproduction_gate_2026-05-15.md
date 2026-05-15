@@ -8,7 +8,7 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 
 Confidence intervals: accuracy uses Wilson 95% intervals; this aggregate gate uses unpaired normal delta intervals. The paired-prediction audit is the authoritative example-level comparison when `eval_predictions.jsonl` exists.
 
-Strict paper-hyperparameter tensor candidate complete: `False`.
+Strict paper-hyperparameter tensor candidate complete: `True`.
 
 Strict paper-hyperparameter tensor candidate passed: `False`.
 
@@ -31,7 +31,7 @@ Row-scale candidate passed: `False`.
 | mnli | BitDistill short tensor layer -8 | short | true | 0.535711 | 9815 | 9815 | pass | [0.525832, 0.545561] | 0.807641 | 0.271931 | [0.259355, 0.284507] | fail_or_pending | checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-layer-8/metrics.json |
 | mnli | BitDistill longwarmup tensor layer -8 gamma100 | longwarmup_gamma100 | true | 0.641671 | 9815 | 9815 | pass | [0.632131, 0.651100] | 0.807641 | 0.165970 | [0.153691, 0.178250] | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
 | mnli | BitDistill longwarmup row layer -8 | row_scale_candidate | true | 0.653591 | 9815 | 9815 | pass | [0.644120, 0.662943] | 0.807641 | 0.154050 | [0.141826, 0.166274] | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/metrics.json |
-| mnli | BitDistill longwarmup tensor layer -8 paper gamma | paper_hparam_candidate | false | - | - | 9815 | fail_or_pending | - | 0.807641 | - | - | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
+| mnli | BitDistill longwarmup tensor layer -8 paper gamma | paper_hparam_candidate | true | 0.630260 | 9815 | 9815 | pass | [0.620660, 0.639757] | 0.807641 | 0.177382 | [0.165052, 0.189711] | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
 | mnli | BitDistill longwarmup row layer -8 paper gamma | paper_hparam_row_candidate | false | - | - | 9815 | fail_or_pending | - | 0.807641 | - | - | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/metrics.json |
 | mnli | BitDistill longwarmup tensor layer -8 paper gamma lr1e-5 | paper_hparam_search | false | - | - | 9815 | fail_or_pending | - | 0.807641 | - | - | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr1e-5/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
 | mnli | BitDistill longwarmup tensor layer -8 paper gamma lr5e-5 | paper_hparam_search | false | - | - | 9815 | fail_or_pending | - | 0.807641 | - | - | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr5e-5/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
@@ -43,7 +43,7 @@ Row-scale candidate passed: `False`.
 | qnli | BitDistill short tensor layer -8 | short | false | - | - | 5463 | fail_or_pending | - | 0.898957 | - | - | fail_or_pending | checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/qnli/bitdistill-tensor-layer-8/metrics.json |
 | qnli | BitDistill longwarmup tensor layer -8 gamma100 | longwarmup_gamma100 | true | 0.787846 | 5463 | 5463 | pass | [0.776804, 0.798483] | 0.898957 | 0.111111 | [0.097642, 0.124580] | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
 | qnli | BitDistill longwarmup row layer -8 | row_scale_candidate | true | 0.796998 | 5463 | 5463 | pass | [0.786125, 0.807454] | 0.898957 | 0.101959 | [0.088630, 0.115287] | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-row-layer-8/metrics.json |
-| qnli | BitDistill longwarmup tensor layer -8 paper gamma | paper_hparam_candidate | false | - | - | 5463 | fail_or_pending | - | 0.898957 | - | - | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
+| qnli | BitDistill longwarmup tensor layer -8 paper gamma | paper_hparam_candidate | true | 0.759656 | 5463 | 5463 | pass | [0.748145, 0.770802] | 0.898957 | 0.139301 | [0.125435, 0.153166] | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
 | qnli | BitDistill longwarmup row layer -8 paper gamma | paper_hparam_row_candidate | false | - | - | 5463 | fail_or_pending | - | 0.898957 | - | - | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-row-layer-8/metrics.json |
 | qnli | BitDistill longwarmup tensor layer -8 paper gamma lr1e-5 | paper_hparam_search | false | - | - | 5463 | fail_or_pending | - | 0.898957 | - | - | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr1e-5/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
 | qnli | BitDistill longwarmup tensor layer -8 paper gamma lr5e-5 | paper_hparam_search | false | - | - | 5463 | fail_or_pending | - | 0.898957 | - | - | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr5e-5/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
@@ -55,7 +55,7 @@ Row-scale candidate passed: `False`.
 | sst2 | BitDistill short tensor layer -8 | short | false | - | - | 872 | fail_or_pending | - | 0.925459 | - | - | fail_or_pending | checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/sst2/bitdistill-tensor-layer-8/metrics.json |
 | sst2 | BitDistill longwarmup tensor layer -8 gamma100 | longwarmup_gamma100 | true | 0.866972 | 872 | 872 | pass | [0.842814, 0.887911] | 0.925459 | 0.058486 | [0.029991, 0.086981] | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/metrics.json |
 | sst2 | BitDistill longwarmup row layer -8 | row_scale_candidate | true | 0.854358 | 872 | 872 | pass | [0.829391, 0.876217] | 0.925459 | 0.071101 | [0.041911, 0.100291] | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8/metrics.json |
-| sst2 | BitDistill longwarmup tensor layer -8 paper gamma | paper_hparam_candidate | false | - | - | 872 | fail_or_pending | - | 0.925459 | - | - | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/metrics.json |
+| sst2 | BitDistill longwarmup tensor layer -8 paper gamma | paper_hparam_candidate | true | 0.841743 | 872 | 872 | pass | [0.816026, 0.864462] | 0.925459 | 0.083716 | [0.053870, 0.113561] | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/metrics.json |
 | sst2 | BitDistill longwarmup row layer -8 paper gamma | paper_hparam_row_candidate | false | - | - | 872 | fail_or_pending | - | 0.925459 | - | - | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8/metrics.json |
 | sst2 | BitDistill longwarmup tensor layer -8 paper gamma lr1e-5 | paper_hparam_search | false | - | - | 872 | fail_or_pending | - | 0.925459 | - | - | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr1e-5/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/metrics.json |
 | sst2 | BitDistill longwarmup tensor layer -8 paper gamma lr5e-5 | paper_hparam_search | false | - | - | 872 | fail_or_pending | - | 0.925459 | - | - | fail_or_pending | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr5e-5/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/metrics.json |
@@ -66,8 +66,8 @@ Row-scale candidate passed: `False`.
 | task | comparison | tensor | tensor n | row | row n | row-tensor | row-tensor 95% CI |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | mnli | gamma100_row_minus_tensor | 0.641671 | 9815 | 0.653591 | 9815 | 0.011921 | [-0.001444, 0.025285] |
-| mnli | paper_gamma_row_minus_tensor | - | - | - | - | - | - |
+| mnli | paper_gamma_row_minus_tensor | 0.630260 | 9815 | - | - | - | - |
 | qnli | gamma100_row_minus_tensor | 0.787846 | 5463 | 0.796998 | 5463 | 0.009152 | [-0.006056, 0.024361] |
-| qnli | paper_gamma_row_minus_tensor | - | - | - | - | - | - |
+| qnli | paper_gamma_row_minus_tensor | 0.759656 | 5463 | - | - | - | - |
 | sst2 | gamma100_row_minus_tensor | 0.866972 | 872 | 0.854358 | 872 | -0.012615 | [-0.045114, 0.019885] |
-| sst2 | paper_gamma_row_minus_tensor | - | - | - | - | - | - |
+| sst2 | paper_gamma_row_minus_tensor | 0.841743 | 872 | - | - | - | - |

@@ -4,9 +4,9 @@ Paper classification attention gamma: `100000.0`.
 
 gamma=1e5 is finite in the local smoke test, but it can dominate CE by orders of magnitude under this implementation's relation-loss normalization. Legacy rows used a Q/K/V mean; the projected paper-gamma column converts those rows to the paper-style Q/K/V sum before estimating scale. Treat paper-gamma jobs as strict paper-hyperparameter stress tests and compare them to gamma=100 diagnostics.
 
-Materialized rows with attention KD: `17`.
+Materialized rows with attention KD: `22`.
 
-Projected paper-gamma attention/CE range: `1.062e+03` to `1.578e+04`.
+Projected paper-gamma attention/CE range: `890.466502` to `1.578e+04`.
 
 ## Runs
 
@@ -36,7 +36,9 @@ Projected paper-gamma attention/CE range: `1.062e+03` to `1.578e+04`.
 | mnli:longwarmup-row-gamma100 | true | 1000 | row | -8 | 0.236328 | 0.019382 | sum | 0.019382 | 100.000000 | 1.938158 | 8.201130 | 1.938e+03 | 8.201e+03 | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/metrics.json |
 | qnli:longwarmup-row-gamma100 | true | 1000 | row | -8 | 0.233398 | 0.019064 | sum | 0.019064 | 100.000000 | 1.906420 | 8.168094 | 1.906e+03 | 8.168e+03 | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-row-layer-8/metrics.json |
 | sst2:longwarmup-row-gamma100 | true | 1000 | row | -8 | 1.125000 | 0.011944 | sum | 0.011944 | 100.000000 | 1.194422 | 1.061708 | 1.194e+03 | 1.062e+03 | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8/metrics.json |
-| mnli:longwarmup-tensor-papergamma | false | - | - | - | - | - | legacy_mean | - | - | - | - | - | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
-| qnli:longwarmup-tensor-papergamma | false | - | - | - | - | - | legacy_mean | - | - | - | - | - | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
-| sst2:longwarmup-tensor-papergamma | false | - | - | - | - | - | legacy_mean | - | - | - | - | - | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/metrics.json |
+| mnli:longwarmup-tensor-papergamma | true | 1000 | tensor | -8 | 0.345703 | 0.014930 | sum | 0.014930 | 1.000e+05 | 1.493e+03 | 4.319e+03 | 1.493e+03 | 4.319e+03 | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
+| qnli:longwarmup-tensor-papergamma | true | 1000 | tensor | -8 | 0.667969 | 0.014002 | sum | 0.014002 | 1.000e+05 | 1.400e+03 | 2.096e+03 | 1.400e+03 | 2.096e+03 | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
+| sst2:longwarmup-tensor-papergamma | true | 1000 | tensor | -8 | 1.007812 | 0.008974 | sum | 0.008974 | 1.000e+05 | 897.423279 | 890.466509 | 897.423271 | 890.466502 | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/metrics.json |
+| mnli:longwarmup-tensor-gamma1k | true | 1000 | tensor | -8 | 0.476562 | 0.015023 | sum | 0.015023 | 1.000e+03 | 15.023128 | 31.523940 | 1.502e+03 | 3.152e+03 | checkpoints/bitdistill-glue-seqcls-longwarmup-gamma1k/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
+| mnli:longwarmup-tensor-gamma10k | true | 1000 | tensor | -8 | 0.300781 | 0.014943 | sum | 0.014943 | 1.000e+04 | 149.429718 | 496.805296 | 1.494e+03 | 4.968e+03 | checkpoints/bitdistill-glue-seqcls-longwarmup-gamma10k/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
 | smoke:papergamma | true | 2 | tensor | -1 | 5.606061 | 0.118751 | sum | 0.118751 | 1.000e+05 | 1.188e+04 | 2.118e+03 | 1.188e+04 | 2.118e+03 | benchmark_results/tmp_bitdistill_papergamma_smoke/metrics.json |

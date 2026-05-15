@@ -170,9 +170,9 @@ def alignment_rows(features: dict[str, bool], warmup: dict[str, Any]) -> list[di
         {
             "dimension": "Baselines",
             "paper": "FP16-SFT, BitNet-SFT, BitDistill",
-            "local": "FP16-SFT, BitNet-SFT, and gamma=100 long-warmup BitDistill exist for GLUE3; strict paper-gamma candidates are pending",
+            "local": "FP16-SFT, BitNet-SFT, and gamma=100 long-warmup BitDistill exist for GLUE3; strict paper-gamma candidates are tracked separately",
             "status": "partial",
-            "note": "The completed gamma=100 branch improves over BitNet-SFT but remains below the FP16-gap target; strict paper-hyperparameter rows are not complete.",
+            "note": "The completed gamma=100 branch improves over BitNet-SFT but remains below the FP16-gap target; strict paper-hyperparameter rows determine the strict reproduction gate.",
         },
         {
             "dimension": "Stage-1 SubLN",
@@ -198,7 +198,7 @@ def alignment_rows(features: dict[str, bool], warmup: dict[str, Any]) -> list[di
         {
             "dimension": "Stage-3 attention KD",
             "paper": "single-layer Q/K/V relation KD, gamma 1e5 for classification",
-            "local": "single-layer L2-normalized Q/K/V relation KD implemented with paper-style Q/K/V sum by default; completed runs gamma 100; long-warmup gamma 1e3/1e4/1e5, paper-gamma row/tensor, LR search, headinit, and MNLI layer-sweep branches pending",
+            "local": "single-layer L2-normalized Q/K/V relation KD implemented with paper-style Q/K/V sum by default; completed runs include gamma 100 on GLUE3 plus MNLI tensor probes at gamma 1e3/1e4/1e5; paper-gamma row, LR search, headinit, and MNLI layer-sweep branches remain tracked separately",
             "status": "pending" if features["attention_qkv_sum_default"] else "partial",
             "note": "The gamma sweep is intentional because local loss-scale probes show the paper gamma can dominate CE; queued jobs use the corrected paper-style Q/K/V reduction through the default.",
         },
@@ -271,7 +271,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
     return "\n\n".join(
         [
             f"# BitDistill Paper Alignment Audit, {summary['date']}",
-            "Verdict: local code contains the major BitDistill mechanisms, but the completed results are not a strict paper reproduction. The strict paper-hyperparameter branch is queued/pending.",
+            "Verdict: local code contains the major BitDistill mechanisms, but the completed results are not a strict paper reproduction. The strict paper-hyperparameter branch is tracked separately.",
             f"Full-evaluation contract: `{summary['expected_eval_examples']}` examples. Accuracy rows expose whether each metric is full validation or partial.",
             "## Alignment",
             md_table(["dimension", "paper", "local", "status", "note"], alignment),
@@ -300,8 +300,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
             "\n".join(
                 [
                     "- The completed gamma=100 long-warmup GLUE result is a valid negative reproduction-boundary result.",
-                    "- It is not a disproof of BitDistill because the strict paper-gamma branch, full hyperparameter search, backbone scale, and 10B-token warm-up are not paper-matched yet.",
-                    "- The publishable angle remains independent reproduction plus a row-scale CPU-runtime extension if the strict branch closes the quality gap; otherwise the publishable angle becomes a resource-sensitivity and boundary study.",
+                    "- It is not a disproof of BitDistill because full hyperparameter search, backbone scale, and 10B-token warm-up are not paper-matched yet.",
+                    "- The publishable angle remains independent reproduction plus a row-scale CPU-runtime extension if the remaining row/search branches close the quality gap; otherwise the publishable angle becomes a resource-sensitivity and boundary study.",
                 ]
             ),
         ]

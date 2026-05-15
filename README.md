@@ -55,7 +55,7 @@ with the active `i2sr-row-scale-runtime` branch.
 | Arbitrary FP16/BF16 to ternary conversion is lossless | **No** | Qwen2.5-1.5B naive PTQ collapses from ten-task mean `0.644169` to `0.348671`; WikiText PPL jumps from `13.901` to `3,813,121.803`. |
 | Distillation/QAT can recover useful signal | **Yes, partially** | Best row-scale dense-Qwen run reaches ten-task mean `0.499459`, well above naive PTQ but below FP. |
 | Stable CPU row-scale packed inference exists for dense Qwen | **Yes, for the audited path** | `I2_SR` productization gate passes `9/9`; Xeon I2_SR PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
-| BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B gamma=100 long-warmup GLUE3 sequence-classification runs improve over BitNet-SFT but remain 5.8-16.6 accuracy points below FP16-SFT; strict paper-gamma/search runs are still pending. |
+| BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B gamma=100 and strict paper-gamma tensor GLUE3 sequence-classification runs improve over BitNet-SFT but remain 5.8-17.7 accuracy points below FP16-SFT; row paper-gamma/search/full-budget runs remain pending. |
 | TL2 is ready for the best row-scale checkpoint | **No** | Runtime contract gate fails: current TL2 one-scale error is `1.904230` relative output RMS; exact fp16 row scales would be `0.000197` with only `1.230469` MiB of scales, but converter/runtime/kernel metadata do not carry them. |
 | Kimi/MoE retrofit is proven | **No** | A tiny random Qwen2MoE FP16 fixture now passes converter/runtime smoke. A Kimi-K2 config audit shows the real target needs Kimi/DeepSeekV3 loading, MLA metadata conversion, shared-expert mapping, block-FP8 import, and MoE-aware I2_SR validation before quality or speed claims are defensible. |
 
@@ -116,6 +116,21 @@ Current gamma=100 long-warmup sequence-classification diagnostics:
 | QNLI | `0.898957` | `0.596925` | `0.787846` | `0.111111` | `0.796998` | `0.101959` |
 | SST2 | `0.925459` | `0.770642` | `0.866972` | `0.058486` | `0.854358` | `0.071101` |
 
+The strict paper-gamma tensor branch (`attention_kd_weight=1e5`) is also
+complete on GLUE3:
+
+| task | paper-gamma tensor | FP gap | gamma=100 tensor |
+| --- | ---: | ---: | ---: |
+| MNLI | `0.630260` | `0.177381` | `0.641671` |
+| QNLI | `0.759656` | `0.139301` | `0.787846` |
+| SST2 | `0.841743` | `0.083716` | `0.866972` |
+
+Under this local implementation and budget, the literal paper coefficient does
+not close the quality gap. On MNLI, a coefficient sweep gives gamma=100
+`0.641671`, gamma=1k `0.647275`, gamma=10k `0.635354`, and gamma=100k
+`0.630260`. The best tensor point in that sweep is still `0.160366` accuracy
+behind FP16-SFT and below the gamma=100 row-scale run (`0.653591`).
+
 The paired prediction audit now covers BitNet-SFT versus FP16-SFT on the full
 GLUE validation splits. BitNet-SFT trails FP16-SFT by `31.89` accuracy points
 on MNLI, `29.95` on QNLI, and `14.79` on SST2, with paired confidence
@@ -147,9 +162,10 @@ but they still fail the BitDistill paper-reproduction threshold. Row-scale is
 higher than tensor on MNLI (`+0.011921`, paired 95% CI `[0.004958, 0.018883]`)
 and QNLI (`+0.009152`, paired 95% CI `[0.000093, 0.018212]`), but lower on
 SST2 (`-0.012615`, paired 95% CI `[-0.027678, 0.002448]`). The strict
-paper-gamma, LR-search, head-initialization, layer-sweep, and clean row-warmup
-branches are still running or queued. No paper-level GLUE success claim will
-be made until those full-validation candidates close the FP16 gap.
+paper-gamma tensor branch is complete and negative; paper-gamma row,
+LR-search, head-initialization, layer-sweep, and clean row-warmup branches
+remain running or queued. No paper-level GLUE success claim will be made until
+full-validation candidates close the FP16 gap.
 
 The first exportable causal-LM long-warmup downstream diagnostics have
 completed for MNLI, QNLI, and SST2. On full validation, MNLI reaches `0.615181`
@@ -289,7 +305,7 @@ It does not make blind PTQ viable.
 
 The active public reports use `BITNET_REPORT_DATE=2026-05-15`. They are
 generated from checked-in scripts plus raw artifacts under `benchmark_results/`.
-The strict paper-gamma/search and clean row-warmup jobs are still running or
+The row paper-gamma/search and clean row-warmup jobs are still running or
 queued, so these commands intentionally produce partial or pending gates rather
 than success claims.
 

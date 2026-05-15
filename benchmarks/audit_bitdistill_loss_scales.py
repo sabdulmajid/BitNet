@@ -67,6 +67,19 @@ def metric_paths(args: argparse.Namespace) -> list[tuple[str, Path]]:
     for label, root, template in specs:
         for task in args.tasks:
             paths.append((f"{task}:{label}", root / model_dir / template.format(task=task) / "metrics.json"))
+    if "mnli" in args.tasks:
+        paths.extend(
+            [
+                (
+                    "mnli:longwarmup-tensor-gamma1k",
+                    args.gamma1k_root / model_dir / "mnli/bitdistill-longwarmup-tensor-layer-8/metrics.json",
+                ),
+                (
+                    "mnli:longwarmup-tensor-gamma10k",
+                    args.gamma10k_root / model_dir / "mnli/bitdistill-longwarmup-tensor-layer-8/metrics.json",
+                ),
+            ]
+        )
     if args.smoke_metrics.exists():
         paths.append(("smoke:papergamma", args.smoke_metrics))
     return paths
@@ -217,6 +230,8 @@ def main() -> None:
     parser.add_argument("--paperlogit-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-paperlogit"))
     parser.add_argument("--longwarmup-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup"))
     parser.add_argument("--paper-hparam-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma"))
+    parser.add_argument("--gamma1k-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-gamma1k"))
+    parser.add_argument("--gamma10k-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-gamma10k"))
     parser.add_argument("--smoke-metrics", type=Path, default=Path("benchmark_results/tmp_bitdistill_papergamma_smoke/metrics.json"))
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_loss_scale_audit_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/bitdistill_loss_scale_audit_{DATE}.md"))

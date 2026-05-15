@@ -250,7 +250,7 @@ def build_gate(root: Path) -> dict[str, Any]:
             f"full-quality={bitdistill_cpu_full_quality}/{len(bitdistill_cpu_critical)})"
         ),
         "Claim only after MNLI/QNLI/SST2 full-validation BitDistill rows are within the configured FP16 gap and paired traces/CPU gates are complete.",
-        "Gamma=100 long-warmup rows are complete but below the FP16-gap gate; strict paper-gamma/search rows and CPU full-quality rows are still missing or incomplete.",
+        "Gamma=100 and strict paper-gamma tensor rows are complete but below the FP16-gap gate; row paper-gamma, LR/head-init search, paired-trace coverage, and CPU full-quality rows are still missing or incomplete.",
     )
     bitdistill_i2sr_passed = bool(bitdistill_i2sr.get("passed"))
     add_claim(
@@ -327,7 +327,7 @@ def build_gate(root: Path) -> dict[str, Any]:
         "recommendation": {
             "product": "CPU-first dense-Qwen retrofit evaluator with stable I2_SR runtime support; keep BitDistill quality claims behind the full GLUE reproduction, paired-trace, and CPU full-quality gates.",
             "paper": "Scope as a negative PTQ result plus measured QAT/row-scale/runtime recovery path; add BitDistill reproduction claims only if the full-validation long-warmup gates pass. Do not claim arbitrary or MoE support.",
-            "next_engineering_gate": "Finish the strict paper-hyperparameter/search BitDistill dependency chain, then validate row-scale I2_SR export/CPU evidence and keep MoE/Kimi as a separate milestone.",
+            "next_engineering_gate": "Finish the row paper-gamma, LR/head-init search, paired-trace, and CPU-quality dependency chain, then validate row-scale I2_SR export/CPU evidence and keep MoE/Kimi as a separate milestone.",
         },
     }
 
