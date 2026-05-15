@@ -20,28 +20,38 @@
       },
       "live_log": {
         "ce_attention_equalizing_gamma_summary": {
-          "max": null,
-          "mean": null,
-          "min": null,
-          "p05": null,
-          "p50": null,
-          "p95": null
+          "max": 144.16073162835872,
+          "mean": 55.70383980787502,
+          "min": 13.245478870640339,
+          "p05": 26.670009476131952,
+          "p50": 52.01496816834329,
+          "p95": 101.39633491046231
         },
         "exists": true,
-        "latest": {},
-        "latest_step": null,
-        "latest_weighted_attention_to_ce": null,
-        "max_weighted_attention_to_ce": null,
-        "min_weighted_attention_to_ce": null,
-        "parsed_steps": 0,
+        "latest": {
+          "attention_kd": 0.016784,
+          "ce": 1.484375,
+          "elapsed": 1475.2,
+          "logit_kd": 0.096939,
+          "loss": 1680.873535,
+          "lr": 1.869e-05,
+          "step": 1820.0,
+          "weighted_attention_kd": 1678.4198,
+          "weighted_logit_kd": 0.969391
+        },
+        "latest_step": 1820,
+        "latest_weighted_attention_to_ce": 1130.7249178947368,
+        "max_weighted_attention_to_ce": 7549.916324462138,
+        "min_weighted_attention_to_ce": 693.6774489824561,
+        "parsed_steps": 183,
         "path": "logs/bitdistill-glue-10069.out",
         "weighted_attention_to_ce_summary": {
-          "max": null,
-          "mean": null,
-          "min": null,
-          "p05": null,
-          "p50": null,
-          "p95": null
+          "max": 7549.916324462138,
+          "mean": 2104.1212115199687,
+          "min": 693.6774489824561,
+          "p05": 986.4567075412085,
+          "p50": 1922.5175500227972,
+          "p95": 3749.993306200757
         }
       },
       "metric_accuracy": null,
@@ -74,7 +84,7 @@
       "predictions_exists": false,
       "predictions_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-5kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
       "squeue": {
-        "elapsed": "0:19",
+        "elapsed": "25:47",
         "job_id": "10069",
         "reason": "ece-nebula12",
         "state": "RUNNING"
@@ -158,8 +168,8 @@
       "predictions_exists": true,
       "predictions_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
       "squeue": {
-        "job_id": "10068",
-        "state": "not_in_squeue"
+        "state": "squeue_error",
+        "stderr": "slurm_load_jobs error: Invalid job id specified"
       },
       "stage2_token_presentations": 163840000,
       "steps": 10000

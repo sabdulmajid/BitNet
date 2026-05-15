@@ -142,8 +142,8 @@
       "label": "bitdistill_stage2_curve_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_stage2_curve_2026-05-15.md",
-      "sha256": "de98a4baca663d7e9894840710799552f1b5e3f07e509df594066d95c3727b38",
-      "size_bytes": 4180
+      "sha256": "5199793e2cf642e3fde5b5677a500aaad9431a2468fff853b67e1cca086dabda",
+      "size_bytes": 4184
     },
     {
       "exists": true,
@@ -169,8 +169,8 @@
       "label": "bitdistill_controlled_curve_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_controlled_curve_2026-05-15.md",
-      "sha256": "11b88b594acc42626d9153670d45f7d61e49e7c4c4a26caebab56fca8e75728b",
-      "size_bytes": 2466
+      "sha256": "e02ab23268d48fd4e887443b5878c7a857c9c430824d4fdfc07b072aa4298f65",
+      "size_bytes": 2563
     },
     {
       "exists": true,
@@ -277,8 +277,8 @@
       "label": "bitdistill_loss_contract_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_loss_contract_2026-05-15.md",
-      "sha256": "8c76257c6bea313f0f6fd5a78e6ebd0f0c82d6bb3b868b794b7c1930cf60b1cf",
-      "size_bytes": 2357
+      "sha256": "0d54f2d081219af1e2e54d7026f9efd269957d6053b7be70669e5f00be0e6b75",
+      "size_bytes": 2442
     },
     {
       "exists": true,
@@ -2395,8 +2395,8 @@
       "label": "bitdistill_stage2_curve_json",
       "metrics": {},
       "path": "benchmark_results/bitdistill_stage2_curve_2026-05-15.json",
-      "sha256": "42f4a99e3a68e2b844ba4611e1477a4362fa252d2f6362d4aad827772b9e401c",
-      "size_bytes": 19229
+      "sha256": "e04a6b9f64b1744ce9c8da1a6492ecfd860b13861a8fc7b683338b40a552297c",
+      "size_bytes": 20744
     },
     {
       "exists": true,
@@ -2422,8 +2422,8 @@
       "label": "bitdistill_controlled_curve_json",
       "metrics": {},
       "path": "benchmark_results/bitdistill_controlled_curve_2026-05-15.json",
-      "sha256": "490cc47e4ace45469e0fb22f286158c1560907af779a4ca765f8648cc124dfee",
-      "size_bytes": 8418
+      "sha256": "bae6e57fe1bfb6a15f96d77dc0c13f8598caa465fba14e49196fa354ee3a0808",
+      "size_bytes": 8966
     },
     {
       "exists": true,
@@ -2431,8 +2431,8 @@
       "label": "bitdistill_root_cause_audit_json",
       "metrics": {},
       "path": "benchmark_results/bitdistill_root_cause_audit_2026-05-15.json",
-      "sha256": "d1a8d3ef4cfb7584f9a589534862d303a50cfbd3d72b6f64c2deb8cc4838d782",
-      "size_bytes": 11433
+      "sha256": "595617382d4cf61ffc4c4d47081c01e66b685513069ff99251744dc9c3ec39d0",
+      "size_bytes": 11474
     },
     {
       "exists": true,
@@ -2449,8 +2449,8 @@
       "label": "bitdistill_loss_contract_json",
       "metrics": {},
       "path": "benchmark_results/bitdistill_loss_contract_2026-05-15.json",
-      "sha256": "a8f14ff5076e09c84cd4c27ffc51ba56deac355f348258b957e1aee5a06e62ef",
-      "size_bytes": 3103
+      "sha256": "092f8d30edb420515de33eeefc658fdfca662ec267c16e87c63e0d4954f7f4a9",
+      "size_bytes": 3198
     },
     {
       "exists": true,
@@ -2530,8 +2530,8 @@
       "label": "qwen3_paper_alignment_json",
       "metrics": {},
       "path": "benchmark_results/qwen3_paper_alignment_2026-05-15.json",
-      "sha256": "a0e18cb62fe59b0e5fbf4d1c5edd704ef25c7643daca5c4dd13831f7dd8c5321",
-      "size_bytes": 22176
+      "sha256": "25e6de8bcf97173725492b8b6025b0278e60bf11200e9eb4c704e1fd460d7fc6",
+      "size_bytes": 22177
     },
     {
       "exists": true,

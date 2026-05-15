@@ -17,10 +17,10 @@ Artifacts: `230`. Missing: `0`.
 | bitdistill_root_cause_audit_report | tracked_report | yes | 3901 | 35ee632ae54b |  |
 | bitdistill_recovery_submission_report | tracked_report | yes | 1896 | 56e8811cce5e |  |
 | bitdistill_recovery_audit_report | tracked_report | yes | 1534 | 4bd7195806a9 |  |
-| bitdistill_stage2_curve_report | tracked_report | yes | 4180 | de98a4baca66 |  |
+| bitdistill_stage2_curve_report | tracked_report | yes | 4184 | 5199793e2cf6 |  |
 | bitdistill_stage2_curve_submission_report | tracked_report | yes | 1512 | 77354c56b3ed |  |
 | bitdistill_controlled_postprocess_submission_report | tracked_report | yes | 710 | 8e1b74096b71 |  |
-| bitdistill_controlled_curve_report | tracked_report | yes | 2466 | 11b88b594acc |  |
+| bitdistill_controlled_curve_report | tracked_report | yes | 2563 | e02ab23268d4 |  |
 | bitdistill_reproduction_gate_report | tracked_report | yes | 12908 | fa3178597d19 |  |
 | bitdistill_paired_predictions_report | tracked_report | yes | 8123 | c9107324629d |  |
 | bitdistill_task_formulation_report | tracked_report | yes | 11647 | cb03c36274ba |  |
@@ -32,7 +32,7 @@ Artifacts: `230`. Missing: `0`.
 | subln_activation_variance_report | tracked_report | yes | 2293 | 75e6c8b54d42 |  |
 | bitdistill_paper_alignment_report | tracked_report | yes | 10494 | a5d8df51bcf4 |  |
 | bitdistill_loss_scale_report | tracked_report | yes | 8733 | 628d0414fc13 |  |
-| bitdistill_loss_contract_report | tracked_report | yes | 2357 | 8c76257c6bea |  |
+| bitdistill_loss_contract_report | tracked_report | yes | 2442 | 0d54f2d08121 |  |
 | ternary_flip_dynamics_report | tracked_report | yes | 2765 | d27aad9fe625 |  |
 | seqcls_runtime_gap_report | tracked_report | yes | 3948 | 2cfacc631ff4 |  |
 | seqcls_backbone_i2sr_smoke_report | tracked_report | yes | 1655 | 0bf9e8770821 |  |
@@ -168,13 +168,13 @@ Artifacts: `230`. Missing: `0`.
 | product_scope_gate_json | product_scope_gate_json | yes | 5770 | d0101b25bd20 | scope=research_mvp_only, supported=5, unsupported=4 |
 | bitdistill_recovery_submission_json | generic_json | yes | 1186 | d473cba8d7f2 |  |
 | bitdistill_recovery_audit_json | generic_json | yes | 3252 | 5d04cd9280ec |  |
-| bitdistill_stage2_curve_json | generic_json | yes | 19229 | 42f4a99e3a68 |  |
+| bitdistill_stage2_curve_json | generic_json | yes | 20744 | e04a6b9f64b1 |  |
 | bitdistill_stage2_curve_submission_json | generic_json | yes | 2131 | ae9d0a82341e |  |
 | bitdistill_controlled_postprocess_submission_json | generic_json | yes | 341 | 0eece5b559b7 |  |
-| bitdistill_controlled_curve_json | generic_json | yes | 8418 | 490cc47e4ace |  |
-| bitdistill_root_cause_audit_json | generic_json | yes | 11433 | d1a8d3ef4cfb |  |
+| bitdistill_controlled_curve_json | generic_json | yes | 8966 | bae6e57fe1bf |  |
+| bitdistill_root_cause_audit_json | generic_json | yes | 11474 | 595617382d4c |  |
 | bitdistill_telemetry_coverage_json | generic_json | yes | 3805 | d5972de78a36 |  |
-| bitdistill_loss_contract_json | generic_json | yes | 3103 | a8f14ff5076e |  |
+| bitdistill_loss_contract_json | generic_json | yes | 3198 | 092f8d30edb4 |  |
 | ternary_flip_dynamics_json | generic_json | yes | 12345 | 616addec33ef |  |
 | seqcls_runtime_gap_json | generic_json | yes | 13546 | cacca1ce9e9d |  |
 | seqcls_backbone_i2sr_smoke_json | generic_json | yes | 22648 | 5851d3f13f36 |  |
@@ -183,7 +183,7 @@ Artifacts: `230`. Missing: `0`.
 | seqcls_i2sr_hidden_contract_json | generic_json | yes | 4861 | c1823be48443 |  |
 | seqcls_i2sr_arch_contract_json | generic_json | yes | 3945 | ca692ea2e6ee |  |
 | seqcls_i2sr_sidecar_batching_json | generic_json | yes | 1592 | 674182154e42 |  |
-| qwen3_paper_alignment_json | generic_json | yes | 22176 | a0e18cb62fe5 |  |
+| qwen3_paper_alignment_json | generic_json | yes | 22177 | 25e6de8bcf97 |  |
 | qwen3_postprocess_submission_json | generic_json | yes | 405 | aefafcfc80ef |  |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 32197 | c581499edff4 | present=34/36, examples=34, full_eval=34, ci95=34, paper_complete=True, paper_passed=False, row_complete=True, row_passed=False, confidence=0.95 |
 | bitnet_sft_baseline_audit_json | generic_json | yes | 48829 | 57c5584b4206 |  |

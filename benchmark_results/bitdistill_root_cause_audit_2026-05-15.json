@@ -137,8 +137,8 @@
       "predictions_exists": true,
       "predictions_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
       "squeue": {
-        "job_id": "10068",
-        "state": "not_in_squeue"
+        "state": "squeue_error",
+        "stderr": "slurm_load_jobs error: Invalid job id specified"
       },
       "stage2_token_presentations": 163840000,
       "steps": 10000

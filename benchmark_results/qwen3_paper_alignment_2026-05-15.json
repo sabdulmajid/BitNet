@@ -34,7 +34,7 @@
       "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/continued_pretrain/bitdistill-tensor/eval_predictions.jsonl",
       "preparation": {},
       "queue": {
-        "elapsed": "9:16:11",
+        "elapsed": "10:16:31",
         "job_id": "10040",
         "reason": "ece-nebula10",
         "state": "RUNNING"
