@@ -96,6 +96,8 @@ def run_matrix(args: argparse.Namespace) -> list[dict[str, Any]]:
         ("BitDistill longwarmup tensor paper gamma lr1e-5", args.paper_hparam_lr1_root, "bitdistill-longwarmup-tensor-layer-8", "paper_lr_search", None),
         ("BitDistill longwarmup tensor paper gamma lr5e-5", args.paper_hparam_lr5_root, "bitdistill-longwarmup-tensor-layer-8", "paper_lr_search", None),
         ("BitDistill longwarmup tensor paper gamma headinit", args.paper_hparam_headinit_root, "bitdistill-longwarmup-tensor-layer-8", "paper_headinit_search", None),
+        ("BitDistill row-warmup row gamma100", args.row_warmup_gamma100_root, "bitdistill-longwarmup-row-layer-8", "row_warmup_gamma100", None),
+        ("BitDistill row-warmup row paper gamma", args.row_warmup_papergamma_root, "bitdistill-longwarmup-row-layer-8", "row_warmup_papergamma", None),
         ("BitDistill longwarmup tensor gamma1k", args.gamma1k_root, "bitdistill-longwarmup-tensor-layer-8", "mnli_gamma_sweep", {"mnli"}),
         ("BitDistill longwarmup tensor gamma10k", args.gamma10k_root, "bitdistill-longwarmup-tensor-layer-8", "mnli_gamma_sweep", {"mnli"}),
         ("BitDistill longwarmup tensor layer -1", args.layer_sweep_root, "bitdistill-longwarmup-tensor-layer-1", "mnli_layer_sweep", {"mnli"}),
@@ -170,9 +172,9 @@ def alignment_rows(features: dict[str, bool], warmup: dict[str, Any]) -> list[di
         {
             "dimension": "Baselines",
             "paper": "FP16-SFT, BitNet-SFT, BitDistill",
-            "local": "FP16-SFT, BitNet-SFT, and gamma=100 long-warmup BitDistill exist for GLUE3; strict paper-gamma candidates are tracked separately",
+            "local": "FP16-SFT, BitNet-SFT, gamma=100 long-warmup BitDistill, strict paper-gamma, and clean row-warmup gamma=100 exist for GLUE3; clean row-warmup paper-gamma candidates are tracked separately",
             "status": "partial",
-            "note": "The completed gamma=100 branch improves over BitNet-SFT but remains below the FP16-gap target; strict paper-hyperparameter rows determine the strict reproduction gate.",
+            "note": "The completed gamma=100 and clean row-warmup branches improve over BitNet-SFT but remain below the FP16-gap target; strict paper-hyperparameter rows determine the strict reproduction gate.",
         },
         {
             "dimension": "Stage-1 SubLN",
@@ -299,7 +301,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
             "## Interpretation",
             "\n".join(
                 [
-                    "- The completed gamma=100 and strict paper-gamma local GLUE results are valid negative reproduction-boundary results.",
+                    "- The completed gamma=100, clean row-warmup gamma=100, and strict paper-gamma local GLUE results are valid negative reproduction-boundary results.",
                     "- This is not a disproof of BitDistill because full epoch search, Qwen3 scale, and 10B-token warm-up are not paper-matched.",
                     "- The publishable angle is independent implementation plus row-scale CPU-runtime extension, with the current quality evidence supporting a resource-sensitivity and boundary study rather than a paper-level accuracy claim.",
                 ]
@@ -337,6 +339,8 @@ def main() -> None:
     parser.add_argument("--paper-hparam-lr1-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr1e-5"))
     parser.add_argument("--paper-hparam-lr5-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr5e-5"))
     parser.add_argument("--paper-hparam-headinit-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-headinit"))
+    parser.add_argument("--row-warmup-gamma100-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-rowwarmup-gamma100"))
+    parser.add_argument("--row-warmup-papergamma-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-rowwarmup-papergamma"))
     parser.add_argument("--gamma1k-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-gamma1k"))
     parser.add_argument("--gamma10k-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-gamma10k"))
     parser.add_argument("--layer-sweep-root", type=Path, default=Path("checkpoints/bitdistill-glue-seqcls-longwarmup-layer-sweep"))

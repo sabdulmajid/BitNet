@@ -93,6 +93,7 @@ def audit_reproduction(
     reproduction: dict[str, Any],
     matrix: dict[str, Any],
     monitor: dict[str, Any],
+    rowwarmup: dict[str, Any],
 ) -> None:
     fp = materialized_rows(reproduction, "baseline")
     gamma100 = materialized_rows(reproduction, "longwarmup_gamma100")
@@ -111,6 +112,13 @@ def audit_reproduction(
     strict_passed = reproduction.get("paper_style_tensor_passed") is True
     search_complete = reproduction.get("paper_search_tensor_complete") is True
     search_passed = reproduction.get("paper_search_tensor_passed") is True
+    rowwarmup_families = rowwarmup.get("family_status", {}) if isinstance(rowwarmup.get("family_status"), dict) else {}
+    rowwarmup_gamma100 = rowwarmup_families.get("row_warmup_gamma100", {})
+    rowwarmup_papergamma = rowwarmup_families.get("row_warmup_papergamma", {})
+    rowwarmup_gamma100_complete = isinstance(rowwarmup_gamma100, dict) and rowwarmup_gamma100.get("complete") is True
+    rowwarmup_gamma100_passed = isinstance(rowwarmup_gamma100, dict) and rowwarmup_gamma100.get("passed") is True
+    rowwarmup_papergamma_complete = isinstance(rowwarmup_papergamma, dict) and rowwarmup_papergamma.get("complete") is True
+    rowwarmup_papergamma_passed = isinstance(rowwarmup_papergamma, dict) and rowwarmup_papergamma.get("passed") is True
     complete = strict_complete and strict_passed
     status = "complete" if complete else ("partial" if strict_complete else ("pending" if pending else "partial"))
     if search_complete:
@@ -130,6 +138,10 @@ def audit_reproduction(
         "paper_style_tensor_passed": reproduction.get("paper_style_tensor_passed"),
         "paper_search_tensor_complete": reproduction.get("paper_search_tensor_complete"),
         "paper_search_tensor_passed": reproduction.get("paper_search_tensor_passed"),
+        "rowwarmup_gamma100_complete": rowwarmup_gamma100_complete,
+        "rowwarmup_gamma100_passed": rowwarmup_gamma100_passed,
+        "rowwarmup_papergamma_complete": rowwarmup_papergamma_complete,
+        "rowwarmup_papergamma_passed": rowwarmup_papergamma_passed,
         "job_matrix_passed": matrix_passed,
         "configured_rows": configured,
         "expected_rows": expected,
@@ -150,7 +162,11 @@ def audit_reproduction(
             f"warm-up={step}/{max_steps}; {search_state}, {search_result}"
         ),
         (
-            "Gamma=100, strict paper-gamma tensor, strict paper-gamma row, and LR/head-init "
+            "Gamma=100, strict paper-gamma tensor, strict paper-gamma row, LR/head-init, "
+            "and clean row-warmup gamma=100 searches are complete and below the FP16-gap target; "
+            "clean row-warmup paper-gamma, full-budget, and Qwen3/backbone-scale candidates remain pending."
+            if rowwarmup_gamma100_complete and not rowwarmup_papergamma_complete
+            else "Gamma=100, strict paper-gamma tensor, strict paper-gamma row, and LR/head-init "
             "BitDistill searches are complete and below the FP16-gap target; clean row-warmup "
             "and full-budget candidates remain pending."
             if search_complete
@@ -261,7 +277,12 @@ def audit_novelty_and_runtime(
             f"tensor-warmup row gate complete={row_complete}, passed={row_passed}; "
             f"row-warmup gate complete={rowwarmup_complete}, passed={rowwarmup_passed}"
         ),
-        "Gamma=100 and paper-gamma tensor-warmup row comparisons are complete but do not pass the FP16-gap gate; row-warmup comparisons remain pending.",
+        (
+            "Gamma=100 and paper-gamma tensor-warmup row comparisons are complete and do not pass; "
+            "clean row-warmup gamma=100 is complete and also does not pass; clean row-warmup paper-gamma remains pending."
+            if rowwarmup_complete and not rowwarmup_passed
+            else "Gamma=100 and paper-gamma tensor-warmup row comparisons are complete but do not pass the FP16-gap gate; row-warmup comparisons remain pending."
+        ),
     )
     add_row(
         rows,
@@ -296,7 +317,12 @@ def audit_publishability(
     partial = [row.get("dimension") for row in alignment_rows if isinstance(row, dict) and row.get("status") in {"partial", "pending"}]
     lr_headinit_complete = metrics.get("paper_reproduction", {}).get("paper_search_tensor_complete") is True
     xeon_cpu_complete = metrics.get("row_scale_runtime", {}).get("cpu_xeon_passed") is True
-    if lr_headinit_complete and xeon_cpu_complete:
+    rowwarmup_families = metrics.get("row_scale_runtime", {}).get("row_warmup_families", {})
+    rowwarmup_gamma100 = rowwarmup_families.get("row_warmup_gamma100", {}) if isinstance(rowwarmup_families, dict) else {}
+    rowwarmup_gamma100_complete = isinstance(rowwarmup_gamma100, dict) and rowwarmup_gamma100.get("complete") is True
+    if lr_headinit_complete and xeon_cpu_complete and rowwarmup_gamma100_complete:
+        quality_blocker = "Strict tensor LR/head-init and clean row-warmup gamma=100 searches are complete and negative; remaining quality claims need paper-gamma row-warmup, full-budget, and Qwen3/backbone-scale evidence."
+    elif lr_headinit_complete and xeon_cpu_complete:
         quality_blocker = "Strict tensor LR/head-init searches are complete and negative; remaining quality claims need clean row-warmup/full-budget evidence."
     elif lr_headinit_complete:
         quality_blocker = "Strict tensor LR/head-init searches are complete and negative; remaining quality claims need clean row-warmup/full-budget evidence and full CPU-quality gates."
@@ -336,7 +362,7 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
 
     rows: list[dict[str, Any]] = []
     metrics: dict[str, Any] = {}
-    audit_reproduction(rows, metrics, reproduction, matrix, monitor)
+    audit_reproduction(rows, metrics, reproduction, matrix, monitor, rowwarmup)
     row_step, row_max_steps, row_progress = latest_step(row_monitor)
     metrics["row_warmup"] = {
         "warmup_step": row_step,

@@ -39,11 +39,21 @@ gap:
 | QNLI | `0.759656` | `0.760937` | `+0.001281` | `0.138019` |
 | SST2 | `0.841743` | `0.837156` | `-0.004587` | `0.088303` |
 
+The clean row-scale Stage-2 warm-up gamma=100 branch is also complete on
+GLUE3. It is negative against both FP16-SFT and the earlier tensor-warmup row
+branch:
+
+| task | row-warmup row gamma=100 | FP gap | delta vs tensor-warmup row gamma=100 |
+| --- | ---: | ---: | ---: |
+| MNLI | `0.627713` | `0.179929` | `-0.025879` |
+| QNLI | `0.779791` | `0.119165` | `-0.017207` |
+| SST2 | `0.846330` | `0.079128` | `-0.008028` |
+
 ## What Went Wrong Locally
 
 | gap | local fact | implication |
 | --- | --- | --- |
-| Continued-pretraining budget | Current tensor warm-up target is `163,840,000` token presentations; the paper reports `10,000,000,000`. | Local warm-up is only `1.6384%` of the paper budget. It is enough to test directionality, not enough to claim recipe failure. |
+| Continued-pretraining budget | Current tensor and row warm-up targets are `163,840,000` token presentations; the paper reports `10,000,000,000`. | Local warm-up is only `1.6384%` of the paper budget. It is enough to test directionality, not enough to claim recipe failure. |
 | Backbone/scale | Local strict branch uses `Qwen2.5-0.5B`; the paper centers Qwen3 `0.6B/1.7B/4B` and reports Qwen2.5 as a robustness target. | The local result is relevant, but not the primary paper scale ladder. |
 | Hyperparameter search | Local completed branches use fixed `1000` downstream steps. LR=`1e-5`, LR=`5e-5`, and strict paper-gamma head-init searches are complete and negative. | The paper explicitly uses greedy LR/epoch search, so the remaining mismatch is broader epoch/budget/backbone search, not the two tested LR points or head initialization. |
 | Attention KD scale | Local loss-scale probes show paper `gamma=1e5` can dominate CE by orders of magnitude. | The coefficient is not plug-and-play under smaller budget/backbone/runtime conditions; the sweep is required evidence, not optional tuning. |
@@ -73,7 +83,8 @@ has not recovered FP-level GLUE quality yet.
 | LR search at paper gamma | Test whether fixed `2e-5` LR is the failure mode. | LR=`1e-5` and LR=`5e-5` complete on GLUE3; neither closes the FP16 gap |
 | paper-gamma headinit | Test whether classifier-head transfer closes the gap. | complete on GLUE3 and negative overall |
 | layer sweep | Test whether the selected attention-distillation layer is wrong. | layer `-1`, `-2`, `-4`, and `-8` evidence complete; no layer closes the FP16 gap |
-| clean row warm-up | Test whether row-scale Stage-2 pretraining improves row downstream quality. | warm-up complete at `20,000/20,000` steps with final CE `3.255063`; downstream jobs are released, with MNLI gamma=100 running and the remaining GLUE rows queued |
+| clean row warm-up gamma=100 | Test whether row-scale Stage-2 pretraining improves row downstream quality at the best completed local coefficient. | complete on GLUE3 and negative; no task closes the FP16 gap, and all three tasks trail the earlier tensor-warmup row branch |
+| clean row warm-up paper-gamma | Test whether row-scale Stage-2 pretraining helps under the literal paper attention coefficient. | running or queued |
 | CPU/I2_SR producers | Test full runtime speed/RSS/quality gates for completed causal export candidates. | local causal I2_SR gate passes; scoped Xeon PyTorch CPU GLUE slice passes; full Xeon 512-sample PyTorch CPU gate passes `33/33` critical rows |
 
 ## Publishable Path
