@@ -58,7 +58,7 @@ with the active `i2sr-row-scale-runtime` branch.
 | Arbitrary FP16/BF16 to ternary conversion is lossless | **No** | Qwen2.5-1.5B naive PTQ collapses from ten-task mean `0.644169` to `0.348671`; WikiText PPL jumps from `13.901` to `3,813,121.803`. |
 | Distillation/QAT can recover useful signal | **Yes, partially** | Best row-scale dense-Qwen run reaches ten-task mean `0.499459`, well above naive PTQ but below FP. |
 | Stable CPU row-scale packed inference exists for dense Qwen | **Yes, for the audited path** | `I2_SR` productization gate passes `9/9`; Xeon I2_SR PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
-| BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B gamma=100, strict paper-gamma tensor, strict paper-gamma row, LR=`1e-5`/`5e-5`, and strict paper-gamma head-init GLUE3 sequence-classification runs are complete with full paired prediction traces. They improve over BitNet-SFT but still miss FP16-SFT by `0.058486-0.203260` absolute accuracy depending on task/run. Clean row-warmup, full-budget/backbone-scale search, and full CPU-quality gates remain open. |
+| BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B gamma=100, strict paper-gamma tensor, strict paper-gamma row, LR=`1e-5`/`5e-5`, and strict paper-gamma head-init GLUE3 sequence-classification runs are complete with full paired prediction traces. They improve over BitNet-SFT but still miss FP16-SFT by `0.058486-0.203260` absolute accuracy depending on task/run. Clean row-warmup plus full-budget/backbone-scale search remain open; AMD and Xeon PyTorch CPU quality gates now pass. |
 | TL2 is ready for the best row-scale checkpoint | **No** | Runtime contract gate fails: current TL2 one-scale error is `1.904230` relative output RMS; exact fp16 row scales would be `0.000197` with only `1.230469` MiB of scales, but converter/runtime/kernel metadata do not carry them. |
 | Kimi/MoE retrofit is proven | **No** | Tiny random Qwen2MoE FP16 and ternary `I2_SR` fixtures now pass converter/runtime smoke; the ternary fixture packs 3 merged row-scale expert tensors, runs routed CPU inference, and records `419.29` decode tok/s at `142.48` MiB RSS. A Kimi-K2 config audit still shows the real target needs Kimi/DeepSeekV3 loading, MLA metadata conversion, shared-expert mapping, block-FP8 import, and trained MoE quality/locality benchmarks before product claims are defensible. |
 
@@ -238,22 +238,19 @@ proof that the format/runtime path works and that task-specific causal
 BitDistill does not preserve general language-model quality in this
 configuration.
 
-A full 512-sample PyTorch CPU sequence-classification gate now passes for
-33/33 critical rows, but that completed run was on an AMD Threadripper PRO
-5945WX node, not the target Xeon. It records valid load time, examples/s, RSS,
-sampled accuracy, and stored full-validation accuracy for FP16-SFT,
-BitNet-SFT, gamma=100 tensor/row, strict paper-gamma tensor/row, LR-search,
-and head-init rows across MNLI/QNLI/SST2. A Xeon Silver 4116 full rerun is in
-progress; until it finishes, the only completed Xeon task-runtime evidence is
-the scoped 16-sample gate: 15/15 rows across FP16-SFT, BitNet-SFT, gamma=100
-tensor, gamma=100 row, and paper-gamma tensor. These are PyTorch
+A full 512-sample PyTorch CPU sequence-classification gate now passes on both
+the AMD Threadripper PRO 5945WX control node and the target Intel Xeon Silver
+4116. The Xeon gate covers 33/33 critical rows across FP16-SFT, BitNet-SFT,
+gamma=100 tensor/row, strict paper-gamma tensor/row, LR-search, and head-init
+variants for MNLI/QNLI/SST2. It records valid load time, examples/s, RSS,
+sampled accuracy, and stored full-validation accuracy. These are PyTorch
 sequence-classification measurements, not packed `I2_SR`/llama.cpp claims.
 They show that Python-level BitLinear task inference is memory-heavy and
 slower than FP16-SFT in this setup, which reinforces that the product path must
 use packed GGUF kernels rather than Python-level BitLinear execution.
 
-Active follow-ups are now focused on clean row-scale warm-up, full CPU/I2_SR
-producer gates, and a decision on whether to spend the much larger compute
+Active follow-ups are now focused on clean row-scale warm-up downstream
+results and a decision on whether to spend the much larger compute
 needed for Qwen3/full-budget reproduction. Completed diagnostics already show
 that gamma=100
 teacher-head initialization, strict paper-gamma head-init, the MNLI layer
@@ -379,10 +376,11 @@ It does not make blind PTQ viable.
 
 The active public reports use `BITNET_REPORT_DATE=2026-05-15`. They are
 generated from checked-in scripts plus raw artifacts under `benchmark_results/`.
-Clean row-warmup and the Xeon-local full CPU runtime benchmark are still
-running or queued, while the active `I2_SR` export gate and the AMD full CPU
-PyTorch gate are complete. These commands therefore keep unfinished
-row-warmup and Xeon gates partial rather than success claims.
+Clean row-warmup Stage-2 has completed, and its downstream GLUE jobs are now
+running or queued. The active `I2_SR` export gate, AMD full CPU PyTorch gate,
+and Xeon full CPU PyTorch gate are complete. These commands therefore keep
+unfinished row-warmup downstream quality claims partial rather than success
+claims.
 
 ```bash
 export BITNET_REPORT_DATE=2026-05-15
@@ -437,6 +435,22 @@ python benchmarks/gate_bitdistill_cpu_benchmark.py \
   --output-json benchmark_results/bitdistill_glue_cpu_gate_2026-05-15.json \
   --output-md benchmarks/results/bitdistill_glue_cpu_gate_2026-05-15.md
 python benchmarks/gate_bitdistill_cpu_benchmark.py \
+  --input-json benchmark_results/bitdistill_glue_cpu_xeon_2026-05-15.json \
+  --critical-runs \
+    short:fp16_sft-tensor-layer-1 \
+    short:bitnet_sft-tensor-layer-1 \
+    short:bitdistill-tensor-layer-1 \
+    short:bitdistill-row-layer-1 \
+    longwarmup:bitdistill-longwarmup-tensor-layer-8 \
+    longwarmup:bitdistill-longwarmup-row-layer-8 \
+    papergamma:bitdistill-longwarmup-tensor-layer-8 \
+    papergamma_row:bitdistill-longwarmup-row-layer-8 \
+    papergamma_lr1:bitdistill-longwarmup-tensor-layer-8 \
+    papergamma_lr5:bitdistill-longwarmup-tensor-layer-8 \
+    papergamma_headinit:bitdistill-longwarmup-tensor-layer-8 \
+  --output-json benchmark_results/bitdistill_glue_cpu_xeon_gate_2026-05-15.json \
+  --output-md benchmarks/results/bitdistill_glue_cpu_xeon_gate_2026-05-15.md
+python benchmarks/gate_bitdistill_cpu_benchmark.py \
   --input-json benchmark_results/bitdistill_glue_cpu_fast_2026-05-15.json \
   --critical-runs \
     short:fp16_sft-tensor-layer-1 \
@@ -448,7 +462,8 @@ python benchmarks/gate_bitdistill_cpu_benchmark.py \
   --output-md benchmarks/results/bitdistill_glue_cpu_fast_gate_2026-05-15.md
 python benchmarks/audit_tl2_row_scale_runtime_contract.py
 python benchmarks/audit_product_scope.py
-python benchmarks/audit_bitdistill_active_goal.py
+python benchmarks/audit_bitdistill_active_goal.py \
+  --cpu-xeon-json benchmark_results/bitdistill_glue_cpu_xeon_gate_2026-05-15.json
 ```
 
 Build smoke used for the active `I2_SR` runtime:
@@ -475,6 +490,8 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill task formulation audit](benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md)
 - [BitDistill GLUE CPU benchmark](benchmarks/results/bitdistill_glue_cpu_2026-05-15.md)
 - [BitDistill GLUE CPU gate](benchmarks/results/bitdistill_glue_cpu_gate_2026-05-15.md)
+- [BitDistill Xeon GLUE CPU benchmark](benchmarks/results/bitdistill_glue_cpu_xeon_2026-05-15.md)
+- [BitDistill Xeon GLUE CPU gate](benchmarks/results/bitdistill_glue_cpu_xeon_gate_2026-05-15.md)
 - [BitDistill scoped GLUE CPU gate](benchmarks/results/bitdistill_glue_cpu_fast_gate_2026-05-15.md)
 - [BitDistill causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_2026-05-15.md)
 - [BitDistill local causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_local_2026-05-15.md)

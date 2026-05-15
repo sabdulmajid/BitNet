@@ -277,7 +277,9 @@ def audit_novelty_and_runtime(
             f"scoped CPU slice={cpu_fast_passed} on {cpu_fast_hardware.get('cpu_model', 'unknown')} "
             f"({cpu_fast_complete}/{len(cpu_fast_critical)} critical rows)"
         ),
-        "Causal export/runtime and non-Xeon CPU rows have passed; the Xeon-local full CPU gate must pass before this row is complete.",
+        ""
+        if i2sr_passed and cpu_xeon_passed
+        else "Causal export/runtime and non-Xeon CPU rows have passed; the Xeon-local full CPU gate must pass before this row is complete.",
     )
 
 
@@ -293,11 +295,13 @@ def audit_publishability(
     alignment_rows = paper_alignment.get("alignment", []) if isinstance(paper_alignment.get("alignment"), list) else []
     partial = [row.get("dimension") for row in alignment_rows if isinstance(row, dict) and row.get("status") in {"partial", "pending"}]
     lr_headinit_complete = metrics.get("paper_reproduction", {}).get("paper_search_tensor_complete") is True
-    quality_blocker = (
-        "Strict tensor LR/head-init searches are complete and negative; remaining quality claims need clean row-warmup/full-budget evidence and full CPU-quality gates."
-        if lr_headinit_complete
-        else "Publishable quality claims must wait for strict paper-hyperparameter BitDistill results and full CPU-quality gates; current support is implementation/provenance plus dense-Qwen I2_SR evidence."
-    )
+    xeon_cpu_complete = metrics.get("row_scale_runtime", {}).get("cpu_xeon_passed") is True
+    if lr_headinit_complete and xeon_cpu_complete:
+        quality_blocker = "Strict tensor LR/head-init searches are complete and negative; remaining quality claims need clean row-warmup/full-budget evidence."
+    elif lr_headinit_complete:
+        quality_blocker = "Strict tensor LR/head-init searches are complete and negative; remaining quality claims need clean row-warmup/full-budget evidence and full CPU-quality gates."
+    else:
+        quality_blocker = "Publishable quality claims must wait for strict paper-hyperparameter BitDistill results and full CPU-quality gates; current support is implementation/provenance plus dense-Qwen I2_SR evidence."
     metrics["publication_scope"] = {
         "scope_status": scope,
         "supported_claim_count": supported,

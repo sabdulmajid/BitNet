@@ -8,15 +8,15 @@ Objective achieved: `False`.
 
 Completion status: `partial`.
 
-Complete rows: `1` / `5`.
+Complete rows: `2` / `5`.
 
 Pending rows: `0`.
 
 Tensor warm-up progress: `20000` / `20000` (`1.000000`).
 
-Row warm-up progress: `15860` / `20000` (`0.793000`).
+Row warm-up progress: `20000` / `20000` (`1.000000`).
 
-Runtime gates: row-scale complete=`True`, row-warmup complete=`False`, I2_SR=`True`, local I2_SR=`True`, CPU=`True`, Xeon CPU=`False`, scoped CPU=`True`.
+Runtime gates: row-scale complete=`True`, row-warmup complete=`False`, I2_SR=`True`, local I2_SR=`True`, CPU=`True`, Xeon CPU=`True`, scoped CPU=`True`.
 
 ## Prompt-To-Artifact Checklist
 
@@ -25,8 +25,8 @@ Runtime gates: row-scale complete=`True`, row-warmup complete=`False`, I2_SR=`Tr
 | Reproduce BitDistill GLUE3 baseline on Qwen2.5-0.5B with FP16-SFT, BitNet-SFT, and BitDistill | partial | FP16 tasks=['mnli', 'qnli', 'sst2']; BitNet tasks=['mnli', 'qnli', 'sst2']; gamma100 rows=3/3; strict paper rows=3/3; paper row rows=3/3; matrix=38/38, inferred=0; warm-up=20000/20000; LR/head-init search is complete, did not pass | Gamma=100, strict paper-gamma tensor, strict paper-gamma row, and LR/head-init BitDistill searches are complete and below the FP16-gap target; clean row-warmup and full-budget candidates remain pending. |
 | Implement SubLN, Stage-2 CE, Stage-3 CE+logits KL+attention-relation KD, and layer selection | complete | smoke=True, smoke checks=40, failed features=[] |  |
 | Compare paper-style per-tensor BitDistill against row-scale BitDistill | partial | tensor-warmup row gate complete=True, passed=False; row-warmup gate complete=False, passed=False | Gamma=100 and paper-gamma tensor-warmup row comparisons are complete but do not pass the FP16-gap gate; row-warmup comparisons remain pending. |
-| Export row-scale checkpoints through I2_SR and benchmark CPU speed, memory/RSS, and task quality on Xeon | partial | I2_SR gate=True (6/6 rows); local isolated I2_SR=True (6/6 rows); full CPU gate=True on AMD Ryzen Threadripper PRO 5945WX 12-Cores (33/33 critical rows); Xeon full CPU gate=pending on hardware pending (0/33 critical rows); scoped CPU slice=True on Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz (15/15 critical rows) | Causal export/runtime and non-Xeon CPU rows have passed; the Xeon-local full CPU gate must pass before this row is complete. |
-| Define publishable scope: independent reproduction, open training implementation, row-scale I2_SR extension, boundary study, and MoE/Kimi limits | partial | product scope=research_mvp_only; supported=5; unsupported=4; paper gaps=['Backbone', 'Baselines', 'Stage-2 warm-up', 'Hyperparameter search', 'Hardware/resources'] | Strict tensor LR/head-init searches are complete and negative; remaining quality claims need clean row-warmup/full-budget evidence and full CPU-quality gates. |
+| Export row-scale checkpoints through I2_SR and benchmark CPU speed, memory/RSS, and task quality on Xeon | complete | I2_SR gate=True (6/6 rows); local isolated I2_SR=True (6/6 rows); full CPU gate=True on AMD Ryzen Threadripper PRO 5945WX 12-Cores (33/33 critical rows); Xeon full CPU gate=True on Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz (33/33 critical rows); scoped CPU slice=True on Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz (15/15 critical rows) |  |
+| Define publishable scope: independent reproduction, open training implementation, row-scale I2_SR extension, boundary study, and MoE/Kimi limits | partial | product scope=research_mvp_only; supported=5; unsupported=4; paper gaps=['Backbone', 'Baselines', 'Stage-2 warm-up', 'Hyperparameter search', 'Hardware/resources'] | Strict tensor LR/head-init searches are complete and negative; remaining quality claims need clean row-warmup/full-budget evidence. |
 
 ## Open Requirements
 
@@ -34,7 +34,6 @@ Runtime gates: row-scale complete=`True`, row-warmup complete=`False`, I2_SR=`Tr
 | --- |
 | Reproduce BitDistill GLUE3 baseline on Qwen2.5-0.5B with FP16-SFT, BitNet-SFT, and BitDistill |
 | Compare paper-style per-tensor BitDistill against row-scale BitDistill |
-| Export row-scale checkpoints through I2_SR and benchmark CPU speed, memory/RSS, and task quality on Xeon |
 | Define publishable scope: independent reproduction, open training implementation, row-scale I2_SR extension, boundary study, and MoE/Kimi limits |
 
 ## Inputs

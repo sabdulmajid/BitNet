@@ -1,5 +1,5 @@
 {
-  "artifact_count": 168,
+  "artifact_count": 172,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "b4975541578a18582e64b4102c155c24e6d3d4084dadc1d1c6864678602ee3fe",
-      "size_bytes": 29869
+      "sha256": "a2cf5db841a941e3ffc3cad77772d9c0e5812a57fc4b62056fe04edd36cc88ec",
+      "size_bytes": 30830
     },
     {
       "exists": true,
@@ -79,8 +79,8 @@
       "label": "product_scope_gate",
       "metrics": {},
       "path": "benchmarks/results/product_scope_gate_2026-05-15.md",
-      "sha256": "ed68e47e2db6b29056c1e56e93517d8f9fcd684ba157520f145c4d813a98f326",
-      "size_bytes": 5001
+      "sha256": "274554bfc124a9ff408be19433b551be15ca41245d5e1ba141b32b04d6b6fc2b",
+      "size_bytes": 4919
     },
     {
       "exists": true,
@@ -97,8 +97,8 @@
       "label": "bitdistill_reproduction_gap_analysis",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_reproduction_gap_analysis_2026-05-15.md",
-      "sha256": "a7f4db27b6b9043bab37b1991778725c6267567ad771bbf2c8a1f9f62c0889d1",
-      "size_bytes": 6231
+      "sha256": "f693b63b726aa6e0041e7a84a715c12a760315b6cff16b63ebf906610436e1b8",
+      "size_bytes": 6548
     },
     {
       "exists": true,
@@ -124,8 +124,8 @@
       "label": "bitdistill_task_formulation_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md",
-      "sha256": "05e608289c02e78608a88c285789f5128c604bd124e89be8f558428855ad9d47",
-      "size_bytes": 11554
+      "sha256": "cb03c36274ba3ef92c00eca405e514feb0fe306aaf6fa6fdd4ce59f43d1aaf6c",
+      "size_bytes": 11647
     },
     {
       "exists": true,
@@ -162,6 +162,24 @@
       "path": "benchmarks/results/bitdistill_glue_cpu_gate_2026-05-15.md",
       "sha256": "7e27a5c687831817788f491f9a733865e03f0a7aa4663ec05f07a0f0289e12b1",
       "size_bytes": 7636
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_cpu_xeon_benchmark_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_glue_cpu_xeon_2026-05-15.md",
+      "sha256": "74cfeb16c3a73099c0539a73ddfe72488e0d13638eb070daeb0d5e1a9c154bb9",
+      "size_bytes": 10326
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_cpu_xeon_gate_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_glue_cpu_xeon_gate_2026-05-15.md",
+      "sha256": "4a365c68cb8bbd72fc2e0f34ce972a6c29719f5495ebaf3d962e0715cd0092a8",
+      "size_bytes": 7635
     },
     {
       "exists": true,
@@ -286,8 +304,8 @@
       "label": "bitdistill_active_goal_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_active_goal_audit_2026-05-15.md",
-      "sha256": "3beba4b176264e44234c79fd6558b8b9733968af13a9a7473480fcc6eb40612a",
-      "size_bytes": 4334
+      "sha256": "448d9fd485fc6f23db9980d435a8efe468e6569005bc5aaae14ec9b644f5774a",
+      "size_bytes": 4098
     },
     {
       "exists": true,
@@ -358,7 +376,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "8468c107505d519031e281571d4d65dfec2a3623bda49ba19574ff12a564c489",
+      "sha256": "560f99d35ff02c45fba7fa4191cc8641b78c23f42b0eed307c3800ab834bb0ad",
       "size_bytes": 3438
     },
     {
@@ -2048,7 +2066,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "4afb80bcd74f61c9428cdea6262b2d98465714c864eab0658a25526bc0b65e75",
+      "sha256": "cd99d62c15994935e391b4bbba212bc3ce32a4fd38604627f176b9406a46dae3",
       "size_bytes": 6374
     },
     {
@@ -2080,8 +2098,8 @@
         "unsupported_claim_count": 4
       },
       "path": "benchmark_results/product_scope_gate_2026-05-15.json",
-      "sha256": "a574825c82184d71294b1d56d9c6cba14350f87aad7c6f69a38831e38d98ba31",
-      "size_bytes": 5852
+      "sha256": "d0101b25bd20d926d4d7358aabb9adc986c3f08126372d02a14c1cbddb91798d",
+      "size_bytes": 5770
     },
     {
       "exists": true,
@@ -2136,8 +2154,8 @@
         "sequence_baselines_full": 6
       },
       "path": "benchmark_results/bitdistill_task_formulation_audit_2026-05-15.json",
-      "sha256": "aee2449b00295f8173d710c7a2518413b131c908d236645333afdafbc0ad42a0",
-      "size_bytes": 28281
+      "sha256": "c4e8328337c0092e3343e937a9187b30718f5b6786b38dd442a107f931e187ad",
+      "size_bytes": 28374
     },
     {
       "exists": true,
@@ -2156,6 +2174,24 @@
       "path": "benchmark_results/bitdistill_glue_cpu_gate_2026-05-15.json",
       "sha256": "3868f8437c0416fb6ba1930f63f7bbf0fdb378bc254be520817c7aecce8808ee",
       "size_bytes": 55136
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_cpu_gate_json",
+      "label": "bitdistill_cpu_xeon_gate_json",
+      "metrics": {
+        "blockers": [],
+        "critical": 33,
+        "critical_complete": 33,
+        "critical_full_quality": 33,
+        "input_exists": true,
+        "max_eval_samples": 512,
+        "passed": true,
+        "rows": 33
+      },
+      "path": "benchmark_results/bitdistill_glue_cpu_xeon_gate_2026-05-15.json",
+      "sha256": "071cc29b610dc8e3eb1bf7321310ad71f1856e9ffac3017b1a99b01a2f64ad0b",
+      "size_bytes": 53708
     },
     {
       "exists": true,
@@ -2414,7 +2450,7 @@
       "label": "bitdistill_active_goal_json",
       "metrics": {
         "check_count": 5,
-        "complete_count": 1,
+        "complete_count": 2,
         "completion_status": "partial",
         "cpu_passed": true,
         "i2sr_passed": true,
@@ -2422,7 +2458,6 @@
         "open_requirements": [
           "Reproduce BitDistill GLUE3 baseline on Qwen2.5-0.5B with FP16-SFT, BitNet-SFT, and BitDistill",
           "Compare paper-style per-tensor BitDistill against row-scale BitDistill",
-          "Export row-scale checkpoints through I2_SR and benchmark CPU speed, memory/RSS, and task quality on Xeon",
           "Define publishable scope: independent reproduction, open training implementation, row-scale I2_SR extension, boundary study, and MoE/Kimi limits"
         ],
         "pending_count": 0,
@@ -2431,8 +2466,8 @@
         "warmup_step": 20000
       },
       "path": "benchmark_results/bitdistill_active_goal_audit_2026-05-15.json",
-      "sha256": "082fb657ea5766d1a56626bb154fc44594fe053551c5e51cbbd91c542d419f78",
-      "size_bytes": 6791
+      "sha256": "b2a03965b48e58fe17433bd6fd5dcf16b8e37579a770e94425dbe3eb510f092f",
+      "size_bytes": 6590
     },
     {
       "exists": true,
@@ -2653,6 +2688,15 @@
       "path": "benchmark_results/bitdistill_glue_cpu_2026-05-15.json",
       "sha256": "88a183dd3f9605efdf4a8c17f8174b559d4a458b05851f416a9d0bfe9a6e72fa",
       "size_bytes": 34790
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_cpu_benchmark_json",
+      "label": "bitdistill_cpu_xeon_benchmark_json",
+      "metrics": {},
+      "path": "benchmark_results/bitdistill_glue_cpu_xeon_2026-05-15.json",
+      "sha256": "cf052f417a82cec26d03685810bdc6b94b55e9fdd2b935ef03677711ae474260",
+      "size_bytes": 33485
     },
     {
       "exists": true,
