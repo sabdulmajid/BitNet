@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "bb239947d6af9786a8608423500d2e7abd57c10673da9862371090841ee128b8",
-      "size_bytes": 25330
+      "sha256": "77acd547e643c0dbf901dff3c7cb0cfd6dc588dc19d4fd87f41025827895839b",
+      "size_bytes": 25339
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "research_redirect_report",
       "metrics": {},
       "path": "benchmarks/results/research_redirect_2026-05-15.md",
-      "sha256": "789f388bbc7d7777a510058e5712bec6dc2ffd2eefeacfb14f58d3788bb7e8ed",
-      "size_bytes": 11365
+      "sha256": "f3ffc42da781191d35ed0ca889f422d46a00b2c0c69a36f15de95bd9b8b647da",
+      "size_bytes": 11367
     },
     {
       "exists": true,
@@ -88,7 +88,7 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-15.md",
-      "sha256": "bab628ff05fd3afb2eea4d2b486880c59163008f12e0327b08eb5e8d2ed0d677",
+      "sha256": "974cdf8e2ec6c53eb6aaed2d4151f046d57c930c183ecc36546ee9196c30c1d9",
       "size_bytes": 5646
     },
     {
@@ -2411,7 +2411,7 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-15.json",
-      "sha256": "61f1261febd4602688647ee2fc76e60065a7261ba901be8321a418f22c5d6755",
+      "sha256": "e00bd32173edeb87d7ccad970add46932261482cfc9f6b7e7b1690298b09a317",
       "size_bytes": 16035
     },
     {

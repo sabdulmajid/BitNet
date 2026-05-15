@@ -2,8 +2,8 @@
 Artifacts: `238`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 25330 | bb239947d6af |  |
-| research_redirect_report | tracked_report | yes | 11365 | 789f388bbc7d |  |
+| README | tracked_report | yes | 25339 | 77acd547e643 |  |
+| research_redirect_report | tracked_report | yes | 11367 | f3ffc42da781 |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
 | benchmark_matrix_audit_report | tracked_report | yes | 2739 | baf684c33814 |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
@@ -11,7 +11,7 @@ Artifacts: `238`. Missing: `0`.
 | publishable_claims | tracked_report | yes | 11054 | 63c5e9babbc1 |  |
 | progress_audit | tracked_report | yes | 25612 | 74e3b96847bf |  |
 | active_goal_audit | tracked_report | yes | 10765 | 255dacfeae0a |  |
-| objective_completion_audit | tracked_report | yes | 5646 | bab628ff05fd |  |
+| objective_completion_audit | tracked_report | yes | 5646 | 974cdf8e2ec6 |  |
 | original_benchmark_objective_audit | tracked_report | yes | 3678 | 75b70dbd3b0a |  |
 | product_scope_gate | tracked_report | yes | 4919 | 274554bfc124 |  |
 | bitdistill_reproduction_status | tracked_report | yes | 8481 | 3f0e6a6abc2f |  |
@@ -170,7 +170,7 @@ Artifacts: `238`. Missing: `0`.
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
 | benchmark_matrix_audit_json | generic_json | yes | 16721 | d93ae3f74ea3 |  |
 | benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 14786 | 36eba5363fbe | passed=True, checks=71, failed=0 |
-| objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | 61f1261febd4 | achieved=False, status=not_complete, complete=7/9, open=2 |
+| objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | e00bd32173ed | achieved=False, status=not_complete, complete=7/9, open=2 |
 | original_benchmark_objective_audit_json | generic_json | yes | 4278 | 2f97f3e61ea0 |  |
 | product_scope_gate_json | product_scope_gate_json | yes | 5770 | d0101b25bd20 | scope=research_mvp_only, supported=5, unsupported=4 |
 | bitdistill_recovery_submission_json | generic_json | yes | 1186 | d473cba8d7f2 |  |

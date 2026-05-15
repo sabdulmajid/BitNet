@@ -272,17 +272,17 @@ ReLU-squared FFN path. The fork now adds `bitnet-qwen`, which preserves the
 BitNet/SubLN/I2_SR loader layout and Q/K/V bias slots while dispatching the
 packed graph through Qwen SiLU/SwiGLU semantics. With that fix, HF token IDs and
 `llama-tokenize --no-bos` IDs match for the first MNLI sample, hidden cosine is
-`0.994091`, hidden relative RMS is `0.108662`, and the 64-example CPU sidecar
-probe reaches `0.578125` accuracy with `0.921875` agreement against saved
+`0.994091`, hidden relative RMS is `0.108662`, and the 128-example CPU sidecar
+probe reaches `0.609375` accuracy with `0.914063` agreement against saved
 PyTorch predictions. This is still a prototype: the classifier head is a Python
 sidecar, the hidden contract is not bit-exact, and full-split CPU
 quality/RSS/throughput have not been measured on a single native artifact.
 
 Separator batching is not a safe substitute for native classifier execution yet.
-Batch size `4` improves the 64-example sidecar probe from `0.707` to `2.527`
-examples/sec, but changes `3/64` predictions relative to the batch-size-1
-reference. Treat batch size `1` as the semantic reference until native
-sequence-classification support or batching parity is proven.
+Batch size `4` improves the earlier 64-example sidecar probe from `0.707` to
+`2.527` examples/sec, but changes `3/64` predictions relative to the
+batch-size-1 reference. Treat batch size `1` as the semantic reference until
+native sequence-classification support or batching parity is proven.
 
 ## Canonical Next Matrix
 

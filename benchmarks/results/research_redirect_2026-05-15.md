@@ -25,7 +25,7 @@ result.
 | Row-scale semantics matter | proven for current best row-scale checkpoint | TL2 one-scale relative output RMS error `1.904230`; exact FP16 row scales `0.000197` with only `1.230469 MiB` scale overhead. |
 | Packed row-scale CPU runtime is feasible | proven for dense causal artifact | `I2_SR` Xeon result: PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, file `1211.3 MiB`. |
 | TL2 row-scale packed runtime is ready | not proven; explicitly blocked | The current TL2 runtime contract has `11` checks and remains `false`: converter scale collapse, missing row-scale TL2 storage, one-scale transform metadata, generated `Scales[0]` qgemm, unoffset x86 dispatch, missing loader sidecars, and no passing row-scale TL2 benchmark. |
-| Sequence-classification packed path is possible | prototype only; native head blocked | MNLI long-warmup row-scale checkpoint (`0.653591` PyTorch accuracy) exports as a `352.6 MiB` `I2_SR` backbone plus `10.8 KiB` dense head sidecar. A Qwen-compatible `bitnet-qwen` graph repairs the dominant runtime mismatch: hidden cosine is `0.994091`, hidden relative RMS is `0.108662`, and the 64-example sidecar CPU probe reaches `0.578125` accuracy with `0.921875` agreement against saved PyTorch predictions. Native GGUF classifier inference and full-split CPU validation are not implemented. |
+| Sequence-classification packed path is possible | prototype only; native head blocked | MNLI long-warmup row-scale checkpoint (`0.653591` PyTorch accuracy) exports as a `352.6 MiB` `I2_SR` backbone plus `10.8 KiB` dense head sidecar. A Qwen-compatible `bitnet-qwen` graph repairs the dominant runtime mismatch: hidden cosine is `0.994091`, hidden relative RMS is `0.108662`, and the 128-example sidecar CPU probe reaches `0.609375` accuracy with `0.914063` agreement against saved PyTorch predictions. Native GGUF classifier inference and full-split CPU validation are not implemented. |
 | Paper-level BitDistill is reproduced | not proven | FP16-SFT MNLI is close to paper (`0.807641` vs `0.799100`), and BitNet-SFT now clears its paper anchor (`0.628935` vs `0.608000`) after more budget. This is not yet BitDistill or FP16-level recovery. |
 | Kimi/MoE works | not proven | Tiny Qwen2MoE fixtures prove routing/packing smoke only; no Kimi mapping or trained MoE quality exists. |
 
@@ -148,8 +148,8 @@ sidecar. The original `bitnet-25` graph mismatch is repaired by a dedicated
 using Qwen SiLU/SwiGLU FFN semantics and Q/K/V projection-bias tensors. On the
 audited MNLI sample, token IDs match, hidden cosine is `0.994091`, hidden
 relative RMS is `0.108662`, and score-logit relative RMS is `0.091918`. On a
-64-example CPU sidecar probe, accuracy is `0.578125` and agreement with saved
-PyTorch predictions is `0.921875`. This is a useful prototype, but not a
+128-example CPU sidecar probe, accuracy is `0.609375` and agreement with saved
+PyTorch predictions is `0.914063`. This is a useful prototype, but not a
 deployable classifier: the classifier head is still not native GGUF metadata or
 runtime code, the hidden contract is not bit-exact, and full-split CPU
 quality/RSS/throughput have not been measured on one native artifact.
