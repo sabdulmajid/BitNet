@@ -1,8 +1,8 @@
 # Evidence Manifest, 2026-05-15
-Artifacts: `226`. Missing: `0`.
+Artifacts: `230`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 23221 | 13b327a3a17b |  |
+| README | tracked_report | yes | 23701 | bda75045f164 |  |
 | research_redirect_report | tracked_report | yes | 10525 | 3424c9ee5449 |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
@@ -10,7 +10,7 @@ Artifacts: `226`. Missing: `0`.
 | publishable_claims | tracked_report | yes | 11054 | 63c5e9babbc1 |  |
 | progress_audit | tracked_report | yes | 25612 | 74e3b96847bf |  |
 | active_goal_audit | tracked_report | yes | 10765 | 255dacfeae0a |  |
-| objective_completion_audit | tracked_report | yes | 5646 | 6dba75d3ea5f |  |
+| objective_completion_audit | tracked_report | yes | 5646 | 09864034f806 |  |
 | product_scope_gate | tracked_report | yes | 4919 | 274554bfc124 |  |
 | bitdistill_reproduction_status | tracked_report | yes | 8481 | 3f0e6a6abc2f |  |
 | bitdistill_reproduction_gap_analysis | tracked_report | yes | 7625 | e6aa07a2211f |  |
@@ -37,7 +37,9 @@ Artifacts: `226`. Missing: `0`.
 | seqcls_runtime_gap_report | tracked_report | yes | 3948 | 2cfacc631ff4 |  |
 | seqcls_backbone_i2sr_smoke_report | tracked_report | yes | 1655 | 0bf9e8770821 |  |
 | seqcls_backbone_i2sr_qwen_conversion_json | generic_json | yes | 2134 | 2456fe0b65fa |  |
-| seqcls_i2sr_sidecar_cpu_mnli64_report | tracked_report | yes | 920 | 281968b6fc9e |  |
+| seqcls_i2sr_sidecar_cpu_mnli64_report | tracked_report | yes | 920 | ac54bd3d3a18 |  |
+| seqcls_i2sr_sidecar_cpu_mnli64_batch4_report | tracked_report | yes | 921 | c5e928ce6b8c |  |
+| seqcls_i2sr_sidecar_batching_report | tracked_report | yes | 1043 | 0722a315bb45 |  |
 | seqcls_i2sr_hidden_contract_report | tracked_report | yes | 1394 | 991139477ee1 |  |
 | seqcls_i2sr_arch_contract_report | tracked_report | yes | 2349 | abce022bafc1 |  |
 | bitdistill_telemetry_coverage_report | tracked_report | yes | 2986 | 94048bf25c04 |  |
@@ -71,7 +73,7 @@ Artifacts: `226`. Missing: `0`.
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 1824 | 5d992b3c9a1c |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 8226 | 416e803d798f |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 8226 | 45d4ffcaa14a |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2569 | 51da6738be9d |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -161,8 +163,8 @@ Artifacts: `226`. Missing: `0`.
 | row_scale_qtype_i2sr_promotion_rehearsal_json | row_scale_qtype_gate_json | yes | 3897 | 6ffc161b446b | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 13164 | 26ed0915b3e1 | passed=True, checks=64, failed=0 |
-| objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | 1dae88f97be4 | achieved=False, status=not_complete, complete=7/9, open=2 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 13164 | c3ee443cabd2 | passed=True, checks=64, failed=0 |
+| objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | 6ff998029bc6 | achieved=False, status=not_complete, complete=7/9, open=2 |
 | product_scope_gate_json | product_scope_gate_json | yes | 5770 | d0101b25bd20 | scope=research_mvp_only, supported=5, unsupported=4 |
 | bitdistill_recovery_submission_json | generic_json | yes | 1186 | d473cba8d7f2 |  |
 | bitdistill_recovery_audit_json | generic_json | yes | 3252 | 5d04cd9280ec |  |
@@ -176,9 +178,11 @@ Artifacts: `226`. Missing: `0`.
 | ternary_flip_dynamics_json | generic_json | yes | 12345 | 616addec33ef |  |
 | seqcls_runtime_gap_json | generic_json | yes | 13546 | cacca1ce9e9d |  |
 | seqcls_backbone_i2sr_smoke_json | generic_json | yes | 22648 | 5851d3f13f36 |  |
-| seqcls_i2sr_sidecar_cpu_mnli64_json | generic_json | yes | 4155 | 3f115cc452c8 |  |
+| seqcls_i2sr_sidecar_cpu_mnli64_json | generic_json | yes | 4875 | 70048e13bc76 |  |
+| seqcls_i2sr_sidecar_cpu_mnli64_batch4_json | generic_json | yes | 4863 | 3878f71efb88 |  |
 | seqcls_i2sr_hidden_contract_json | generic_json | yes | 4861 | c1823be48443 |  |
 | seqcls_i2sr_arch_contract_json | generic_json | yes | 3945 | ca692ea2e6ee |  |
+| seqcls_i2sr_sidecar_batching_json | generic_json | yes | 1592 | 674182154e42 |  |
 | qwen3_paper_alignment_json | generic_json | yes | 22176 | a0e18cb62fe5 |  |
 | qwen3_postprocess_submission_json | generic_json | yes | 405 | aefafcfc80ef |  |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 32197 | c581499edff4 | present=34/36, examples=34, full_eval=34, ci95=34, paper_complete=True, paper_passed=False, row_complete=True, row_passed=False, confidence=0.95 |

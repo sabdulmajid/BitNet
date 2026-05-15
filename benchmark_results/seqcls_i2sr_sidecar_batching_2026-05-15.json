@@ -1,0 +1,43 @@
+{
+  "candidate": {
+    "accuracy": 0.609375,
+    "agreement_with_saved_pytorch_predictions": 0.9375,
+    "batch_size": 4,
+    "disagreements_with_saved_pytorch_predictions": 4,
+    "examples": 64,
+    "examples_per_second": 2.526978668349597,
+    "label": "batch4",
+    "prediction_sha256": "db386c70a4e86168f9a2f476452d1729e103945b751528c9f1129ed55a4faf6a",
+    "prompt_eval_tokens_per_second_aggregate": 536.0315465615115,
+    "status": "quality_mismatch"
+  },
+  "comparison": {
+    "agreement": 0.953125,
+    "comparable": true,
+    "first_mismatch_indices": [
+      10,
+      15,
+      35
+    ],
+    "mismatch_count": 3,
+    "reason": ""
+  },
+  "date": "2026-05-15",
+  "interpretation": "Separator batching improves throughput but changes at least one classifier prediction. Treat batch size 1 as the semantic reference until native sequence-classification runtime support is implemented or batching parity is proven.",
+  "reference": {
+    "accuracy": 0.578125,
+    "agreement_with_saved_pytorch_predictions": 0.921875,
+    "batch_size": 1,
+    "disagreements_with_saved_pytorch_predictions": 5,
+    "examples": 64,
+    "examples_per_second": 0.706616588334315,
+    "label": "batch1",
+    "prediction_sha256": "7843e032050a7b6dac73bd38416f782d89aec5743bb926069673a8fa87843ecf",
+    "prompt_eval_tokens_per_second_aggregate": 259.02314561309646,
+    "status": "quality_mismatch"
+  },
+  "schema": "seqcls-i2sr-sidecar-batching-audit-v1",
+  "speedup_examples_per_second": 3.5761666369966836,
+  "speedup_prompt_tokens_per_second": 2.069434935216883,
+  "status": "batching_semantics_drift"
+}

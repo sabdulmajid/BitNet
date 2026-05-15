@@ -270,6 +270,12 @@ PyTorch predictions. This is still a prototype: the classifier head is a Python
 sidecar, the hidden contract is not bit-exact, and full-split CPU
 quality/RSS/throughput have not been measured on a single native artifact.
 
+Separator batching is not a safe substitute for native classifier execution yet.
+Batch size `4` improves the 64-example sidecar probe from `0.707` to `2.527`
+examples/sec, but changes `3/64` predictions relative to the batch-size-1
+reference. Treat batch size `1` as the semantic reference until native
+sequence-classification support or batching parity is proven.
+
 ## Canonical Next Matrix
 
 The next experiments are intentionally narrow:
@@ -384,6 +390,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Sequence-classification runtime gap audit](benchmarks/results/seqcls_runtime_gap_2026-05-15.md)
 - [Sequence-classification I2_SR backbone smoke](benchmarks/results/seqcls_backbone_i2sr_smoke_2026-05-15.md)
 - [Sequence-classification I2_SR sidecar CPU probe](benchmarks/results/seqcls_i2sr_sidecar_cpu_mnli_64_2026-05-15.md)
+- [Sequence-classification sidecar batching audit](benchmarks/results/seqcls_i2sr_sidecar_batching_2026-05-15.md)
 - [Sequence-classification I2_SR hidden-contract audit](benchmarks/results/seqcls_i2sr_hidden_contract_2026-05-15.md)
 - [Sequence-classification I2_SR architecture-contract audit](benchmarks/results/seqcls_i2sr_arch_contract_2026-05-15.md)
 - [Task formulation audit](benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md)

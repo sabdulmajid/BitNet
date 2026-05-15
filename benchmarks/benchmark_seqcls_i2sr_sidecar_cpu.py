@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -196,6 +197,11 @@ def summarize_agreement(predictions: list[int], labels: list[int], trace: list[d
         trace_agreement = sum(int(a == b) for a, b in zip(predictions, trace_predictions, strict=True)) / total
     if len(trace_labels) == total:
         trace_label_match = sum(int(a == b) for a, b in zip(labels, trace_labels, strict=True)) / total
+    trace_mismatches = [
+        idx
+        for idx, (pred, trace_pred) in enumerate(zip(predictions, trace_predictions, strict=False))
+        if pred != trace_pred
+    ]
     return {
         "examples": total,
         "correct": correct,
@@ -203,6 +209,12 @@ def summarize_agreement(predictions: list[int], labels: list[int], trace: list[d
         "accuracy_ci95_wilson": accuracy_ci_wilson(correct, total),
         "saved_trace_predictions": len(trace_predictions),
         "agreement_with_saved_pytorch_predictions": trace_agreement,
+        "disagreements_with_saved_pytorch_predictions": len(trace_mismatches)
+        if len(trace_predictions) == total
+        else None,
+        "first_saved_prediction_mismatch_indices": trace_mismatches[:20]
+        if len(trace_predictions) == total
+        else [],
         "label_agreement_with_saved_trace": trace_label_match,
     }
 
@@ -346,6 +358,7 @@ def main() -> None:
     )
     total_prompt_ms = sum(float(meta.get("perf", {}).get("prompt_eval_ms") or 0.0) for meta in batch_metas)
     summary = summarize_agreement(predictions, labels, prediction_trace)
+    prediction_json = json.dumps(predictions, separators=(",", ":"))
     runtime = {
         "wall_seconds": wall_seconds,
         "examples_per_second": len(rows) / wall_seconds if wall_seconds > 0 else None,
@@ -386,6 +399,8 @@ def main() -> None:
         },
         "summary": summary,
         "runtime": runtime,
+        "predictions": predictions,
+        "prediction_sha256": hashlib.sha256(prediction_json.encode("utf-8")).hexdigest(),
         "sample_predictions": [
             {
                 "index": idx,

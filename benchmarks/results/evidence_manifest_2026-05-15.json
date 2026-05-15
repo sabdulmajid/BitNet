@@ -1,5 +1,5 @@
 {
-  "artifact_count": 226,
+  "artifact_count": 230,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "13b327a3a17be3e5ee0726d2b6209865fc1bf02512d21478fe539ed93e74dc43",
-      "size_bytes": 23221
+      "sha256": "bda75045f1641f0b7f05dc8c2edbff1f92a82acf8ebed5868afaba8eb19ae94e",
+      "size_bytes": 23701
     },
     {
       "exists": true,
@@ -79,7 +79,7 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-15.md",
-      "sha256": "6dba75d3ea5fec6d8b114a9264985f2f4461ae36252bd4534f81393da79710b8",
+      "sha256": "09864034f806f447349877a3a9939b650600d7d915b82b0c248aeadef62db5c7",
       "size_bytes": 5646
     },
     {
@@ -322,8 +322,26 @@
       "label": "seqcls_i2sr_sidecar_cpu_mnli64_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_i2sr_sidecar_cpu_mnli_64_2026-05-15.md",
-      "sha256": "281968b6fc9e60ecd9d8e61a7ca003bf111d05ee6003f32efb741f0c38e7493f",
+      "sha256": "ac54bd3d3a1832305f5e4573377cd5c14e8e6a90331291adc21d8fffcdfe69d5",
       "size_bytes": 920
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "seqcls_i2sr_sidecar_cpu_mnli64_batch4_report",
+      "metrics": {},
+      "path": "benchmarks/results/seqcls_i2sr_sidecar_cpu_mnli64_batch4_2026-05-15.md",
+      "sha256": "c5e928ce6b8cf243e9272170f76146610dc5abeff4481c585d97ed6412a7ea70",
+      "size_bytes": 921
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "seqcls_i2sr_sidecar_batching_report",
+      "metrics": {},
+      "path": "benchmarks/results/seqcls_i2sr_sidecar_batching_2026-05-15.md",
+      "sha256": "0722a315bb45966bac60ae1841afdb634ee4a55a10361c51df5e06fe724a2c14",
+      "size_bytes": 1043
     },
     {
       "exists": true,
@@ -628,7 +646,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "416e803d798f9141ba3dd71db7604f695b8282b5d58f12562283dd5096c45f18",
+      "sha256": "45d4ffcaa14ab3003d708b95fab835fb67c0a10c210222da10324fd02d21a4a3",
       "size_bytes": 8226
     },
     {
@@ -2318,7 +2336,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "26ed0915b3e1eb02f89b85dbb97e723ce6f4f62264b7dfc3992234472279d0b2",
+      "sha256": "c3ee443cabd2039c07e2d46bc6dff5946e21420af15f041270b4699d9c23ead8",
       "size_bytes": 13164
     },
     {
@@ -2336,7 +2354,7 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-15.json",
-      "sha256": "1dae88f97be463d1f98c9edca9099ea502c984f43561b87e350f2f64d0741d53",
+      "sha256": "6ff998029bc6ab0a062409ea837c91f2fcdc24e1b25b5666017c689b00b72643",
       "size_bytes": 16035
     },
     {
@@ -2467,8 +2485,17 @@
       "label": "seqcls_i2sr_sidecar_cpu_mnli64_json",
       "metrics": {},
       "path": "benchmark_results/seqcls_i2sr_sidecar_cpu_mnli_64_2026-05-15.json",
-      "sha256": "3f115cc452c8cbab8774e838b1941ece53aa581d4312ebd8c89c04733673ba39",
-      "size_bytes": 4155
+      "sha256": "70048e13bc7682f213ff33adda0f669ee024a287b432c844a9c6e3a38351c039",
+      "size_bytes": 4875
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "seqcls_i2sr_sidecar_cpu_mnli64_batch4_json",
+      "metrics": {},
+      "path": "benchmark_results/seqcls_i2sr_sidecar_cpu_mnli64_batch4_2026-05-15.json",
+      "sha256": "3878f71efb8839fec73e0bc95242d2618543105b3c82fb7667d54c665b173716",
+      "size_bytes": 4863
     },
     {
       "exists": true,
@@ -2487,6 +2514,15 @@
       "path": "benchmark_results/seqcls_i2sr_arch_contract_2026-05-15.json",
       "sha256": "ca692ea2e6eee04350fece09cbbbcc3f73e197785ef8a50cfd95f03aa1152051",
       "size_bytes": 3945
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "seqcls_i2sr_sidecar_batching_json",
+      "metrics": {},
+      "path": "benchmark_results/seqcls_i2sr_sidecar_batching_2026-05-15.json",
+      "sha256": "674182154e42dfed0946746fae48d2a88de2fcd0697ccfe2d871abd73bfbeb66",
+      "size_bytes": 1592
     },
     {
       "exists": true,

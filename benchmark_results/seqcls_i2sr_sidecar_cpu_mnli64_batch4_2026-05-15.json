@@ -10,7 +10,7 @@
       896
     ]
   },
-  "batch_size": 1,
+  "batch_size": 4,
   "checkpoint": {
     "path": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8",
     "prediction_trace": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/eval_predictions.jsonl",
@@ -25,7 +25,7 @@
     "A low saved-prediction agreement is a blocking runtime-contract failure, not a model-quality result."
   ],
   "max_samples": 64,
-  "prediction_sha256": "7843e032050a7b6dac73bd38416f782d89aec5743bb926069673a8fa87843ecf",
+  "prediction_sha256": "db386c70a4e86168f9a2f476452d1729e103945b751528c9f1129ed55a4faf6a",
   "predictions": [
     1,
     2,
@@ -37,32 +37,32 @@
     0,
     0,
     1,
-    0,
     2,
     2,
-    0,
-    0,
-    1,
-    1,
-    0,
-    1,
-    1,
-    2,
-    1,
-    1,
-    1,
-    0,
-    2,
-    1,
-    2,
-    1,
     2,
     0,
     0,
+    2,
+    1,
+    0,
+    1,
+    1,
+    2,
+    1,
+    1,
+    1,
+    0,
+    2,
+    1,
+    2,
+    1,
+    2,
+    0,
+    0,
     0,
     0,
     2,
-    0,
+    1,
     1,
     1,
     0,
@@ -93,12 +93,12 @@
     0
   ],
   "runtime": {
-    "batches": 64,
-    "examples_per_second": 0.706616588334315,
-    "prompt_eval_ms": 9551.27,
+    "batches": 16,
+    "examples_per_second": 2.526978668349597,
+    "prompt_eval_ms": 4615.4,
     "prompt_eval_tokens": 2474,
-    "prompt_eval_tokens_per_second_aggregate": 259.02314561309646,
-    "wall_seconds": 90.57245620409958
+    "prompt_eval_tokens_per_second_aggregate": 536.0315465615115,
+    "wall_seconds": 25.326687874970958
   },
   "sample_predictions": [
     {
@@ -164,7 +164,7 @@
     {
       "index": 10,
       "label": 2,
-      "prediction": 0,
+      "prediction": 2,
       "saved_pytorch_prediction": 0
     },
     {
@@ -194,7 +194,7 @@
     {
       "index": 15,
       "label": 0,
-      "prediction": 1,
+      "prediction": 2,
       "saved_pytorch_prediction": 2
     },
     {
@@ -225,21 +225,20 @@
   "schema": "seqcls_i2sr_sidecar_cpu.v1",
   "status": "quality_mismatch",
   "summary": {
-    "accuracy": 0.578125,
+    "accuracy": 0.609375,
     "accuracy_ci95_wilson": [
-      0.456100315400829,
-      0.6913021752565451
+      0.4869191788027247,
+      0.7194443081175993
     ],
-    "agreement_with_saved_pytorch_predictions": 0.921875,
-    "correct": 37,
-    "disagreements_with_saved_pytorch_predictions": 5,
+    "agreement_with_saved_pytorch_predictions": 0.9375,
+    "correct": 39,
+    "disagreements_with_saved_pytorch_predictions": 4,
     "examples": 64,
     "first_saved_prediction_mismatch_indices": [
       7,
-      15,
+      10,
       19,
-      26,
-      35
+      26
     ],
     "label_agreement_with_saved_trace": 1.0,
     "saved_trace_predictions": 64
