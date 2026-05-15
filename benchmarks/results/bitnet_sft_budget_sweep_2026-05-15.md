@@ -6,6 +6,15 @@ Completed rows: `6/10`.
 
 Default BitNet-SFT MNLI baseline: `0.487621`.
 
+## Budget Trend
+
+The best completed row at the largest completed step count is still improving over the previous completed step bucket by `0.040754`. This is evidence for an undertraining/schedule component, but the row remains `0.043354` below the paper BitNet-SFT anchor.
+
+| steps | best lr | best accuracy | paper anchor - local | delta vs previous step bucket | MNLI epochs |
+| --- | --- | --- | --- | --- | --- |
+| 1000 | 5e-5 | 0.523892 | 0.084108 | - | 0.040743 |
+| 3000 | 1e-5 | 0.564646 | 0.043354 | 0.040754 | 0.122230 |
+
 ## Runs
 
 | steps | lr | metrics | job | accuracy | examples | full eval | delta vs default | paper anchor - local | train examples | MNLI epochs | last CE | A8 | SubLN |

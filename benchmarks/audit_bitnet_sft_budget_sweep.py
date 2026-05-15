@@ -164,6 +164,29 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
 
     completed = [row for row in rows if row["exists"] and row["accuracy"] is not None]
     best = max(completed, key=lambda row: row["accuracy"]) if completed else None
+    best_by_steps: dict[int, dict[str, Any]] = {}
+    for row in completed:
+        step_best = best_by_steps.get(row["steps"])
+        if step_best is None or row["accuracy"] > step_best["accuracy"]:
+            best_by_steps[row["steps"]] = row
+
+    sorted_step_bests = [best_by_steps[steps] for steps in sorted(best_by_steps)]
+    step_trend = []
+    previous: dict[str, Any] | None = None
+    for row in sorted_step_bests:
+        step_trend.append(
+            {
+                "steps": row["steps"],
+                "lr": row["lr"],
+                "accuracy": row["accuracy"],
+                "paper_anchor_minus_local": row["paper_anchor_minus_local"],
+                "delta_vs_previous_step_best": (
+                    row["accuracy"] - previous["accuracy"] if previous is not None else None
+                ),
+                "train_epoch_fraction": row.get("train_epoch_fraction"),
+            }
+        )
+        previous = row
     return {
         "date": DATE,
         "model": args.model,
@@ -176,6 +199,8 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "complete": len(completed),
         "expected": len(rows),
         "best": best,
+        "best_by_steps": {str(steps): row for steps, row in sorted(best_by_steps.items())},
+        "step_trend": step_trend,
         "job_tables": sorted({row.get("job_table", "") for row in job_rows if row.get("job_table")}),
     }
 
@@ -213,11 +238,48 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 prep.get("subln_inserted"),
             ]
         )
+    trend_rows = [
+        [
+            row["steps"],
+            row["lr"],
+            row["accuracy"],
+            row["paper_anchor_minus_local"],
+            row["delta_vs_previous_step_best"],
+            row.get("train_epoch_fraction"),
+        ]
+        for row in summary.get("step_trend", [])
+    ]
+    if len(trend_rows) >= 2:
+        latest = summary["step_trend"][-1]
+        trend_text = (
+            "The best completed row at the largest completed step count is still improving "
+            f"over the previous completed step bucket by `{fmt(latest['delta_vs_previous_step_best'])}`. "
+            "This is evidence for an undertraining/schedule component, but the row remains "
+            f"`{fmt(latest['paper_anchor_minus_local'])}` below the paper BitNet-SFT anchor."
+        )
+    elif trend_rows:
+        trend_text = "Only one completed step bucket exists, so no budget trend is established yet."
+    else:
+        trend_text = "No completed rows exist yet, so no budget trend is established."
+
     lines = [
         f"# BitNet-SFT Budget Sweep Audit, {summary['date']}",
         verdict,
         f"Completed rows: `{summary['complete']}/{summary['expected']}`.",
         f"Default BitNet-SFT MNLI baseline: `{fmt(summary['default_baseline_accuracy'])}`.",
+        "## Budget Trend",
+        trend_text,
+        md_table(
+            [
+                "steps",
+                "best lr",
+                "best accuracy",
+                "paper anchor - local",
+                "delta vs previous step bucket",
+                "MNLI epochs",
+            ],
+            trend_rows,
+        ),
         "## Runs",
         md_table(
             [
