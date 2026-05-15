@@ -121,11 +121,22 @@ The completed wave also used a legacy Q/K/V mean for attention relation KD;
 the current code defaults new jobs to the paper-style Q/K/V sum and records
 that setting in each metrics file.
 
-The strongest remaining known gap is training budget:
-the completed Stage-2 warm-up used `40.96M` effective token presentations,
-while the paper reports `10B` continued-pretraining tokens. The result should
+The strongest remaining known gap is still training budget:
+the first completed Stage-2 diagnostic used `40.96M` effective token
+presentations, and the current strict tensor-scale warm-up has completed
+`163.84M` token presentations. The paper reports `10B`
+continued-pretraining tokens. The completed short-budget GLUE results should
 therefore be read as a failure boundary for direct or short-warm-up retrofit,
 not as a disproof of BitDistill.
+
+As of the current evidence snapshot, the strict tensor-scale warm-up has
+finished and its ternary checkpoint passes integrity checks: `169/169`
+BitLinear weights exported, `169` tensor scales, valid ternary codes, final CE
+`3.738920`. Downstream long-warmup GLUE jobs are running or queued. The clean
+row-scale warm-up is running with guarded periodic checkpoints; its checked
+snapshots export `169/169` BitLinear weights with `169` row-scale sidecars.
+No paper-level GLUE success claim will be made until the full-validation
+downstream metrics exist.
 
 Active follow-ups are probing teacher-head initialization, attention-layer
 selection, paper-style logits KL scaling, CE-only ablations, a longer
