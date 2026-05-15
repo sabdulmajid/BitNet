@@ -55,7 +55,7 @@ with the active `i2sr-row-scale-runtime` branch.
 | Arbitrary FP16/BF16 to ternary conversion is lossless | **No** | Qwen2.5-1.5B naive PTQ collapses from ten-task mean `0.644169` to `0.348671`; WikiText PPL jumps from `13.901` to `3,813,121.803`. |
 | Distillation/QAT can recover useful signal | **Yes, partially** | Best row-scale dense-Qwen run reaches ten-task mean `0.499459`, well above naive PTQ but below FP. |
 | Stable CPU row-scale packed inference exists for dense Qwen | **Yes, for the audited path** | `I2_SR` productization gate passes `9/9`; Xeon I2_SR PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
-| BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B gamma=100 and strict paper-gamma tensor GLUE3 sequence-classification runs improve over BitNet-SFT but remain 5.8-17.7 accuracy points below FP16-SFT; row paper-gamma/search/full-budget runs remain pending. |
+| BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B gamma=100 and strict paper-gamma tensor GLUE3 sequence-classification runs improve over BitNet-SFT but remain 5.8-17.7 accuracy points below FP16-SFT; paper-gamma row has finished for MNLI/QNLI and also fails, while SST2 row, LR-search, and row-warmup branches remain pending. |
 | TL2 is ready for the best row-scale checkpoint | **No** | Runtime contract gate fails: current TL2 one-scale error is `1.904230` relative output RMS; exact fp16 row scales would be `0.000197` with only `1.230469` MiB of scales, but converter/runtime/kernel metadata do not carry them. |
 | Kimi/MoE retrofit is proven | **No** | A tiny random Qwen2MoE FP16 fixture now passes converter/runtime smoke. A Kimi-K2 config audit shows the real target needs Kimi/DeepSeekV3 loading, MLA metadata conversion, shared-expert mapping, block-FP8 import, and MoE-aware I2_SR validation before quality or speed claims are defensible. |
 
@@ -125,6 +125,15 @@ complete on GLUE3:
 | QNLI | `0.759656` | `0.139301` | `0.787846` |
 | SST2 | `0.841743` | `0.083716` | `0.866972` |
 
+Paper-gamma row-scale results are now partially complete and do not rescue the
+strict paper coefficient:
+
+| task | paper-gamma tensor | paper-gamma row | row-tensor delta |
+| --- | ---: | ---: | ---: |
+| MNLI | `0.630260` | `0.617626` | `-0.012634` |
+| QNLI | `0.759656` | `0.760937` | `+0.001281` |
+| SST2 | `0.841743` | pending | pending |
+
 Under this local implementation and budget, the literal paper coefficient does
 not close the quality gap. On MNLI, a coefficient sweep gives gamma=100
 `0.641671`, gamma=1k `0.647275`, gamma=10k `0.635354`, and gamma=100k
@@ -168,9 +177,12 @@ row from `0.796998` to `0.800476`, leaves SST2 tensor unchanged at
 `0.866972`, and worsens MNLI row plus SST2 row. The first MNLI
 attention-layer sweep result, layer `-1`, reaches `0.645950`, which is a
 small improvement over tensor gamma=100 but still `0.161691` behind FP16-SFT.
-Paper-gamma row, LR-search, remaining layer-sweep, and clean row-warmup
-branches remain running or queued. No paper-level GLUE success claim will be
-made until full-validation candidates close the FP16 gap.
+The next layer-sweep points are worse: layer `-2` reaches `0.642894` and
+layer `-4` reaches `0.640754`. Paper-gamma row is worse than tensor on MNLI
+and essentially tied on QNLI, so it is not the missing fix. LR-search,
+paper-gamma SST2 row, and clean row-warmup branches remain running or queued.
+No paper-level GLUE success claim will be made until full-validation candidates
+close the FP16 gap.
 
 The first exportable causal-LM long-warmup downstream diagnostics have
 completed for MNLI, QNLI, and SST2. On full validation, MNLI reaches `0.615181`
@@ -191,13 +203,23 @@ WikiText PPL is catastrophic (`155,846-347,660`). Treat this as proof that the
 format/runtime path works and that task-specific causal BitDistill does not
 preserve general language-model quality in this configuration.
 
-Active follow-ups are now focused on the remaining attention-layer sweep rows,
-paper-gamma row scaling, LR search, clean row-scale warm-up, and the full
-CPU/I2_SR producer gates. Completed diagnostics already show that gamma=100
-teacher-head initialization and the first layer-sweep point are not enough to
-recover paper-level accuracy. The active long-warmup queue also includes MNLI
-gamma probes at `1e3` and `1e4` because the local relation-loss scale audit
-showed the paper's `1e5` coefficient can dominate CE by orders of magnitude.
+A separate PyTorch CPU sequence-classification slice now passes as a scoped
+runtime artifact on the Xeon: 15/15 rows across MNLI/QNLI/SST2 for FP16-SFT,
+BitNet-SFT, gamma=100 tensor, gamma=100 row, and paper-gamma tensor have
+valid load time, examples/s, RSS, and stored full-validation accuracy. This is
+not a packed `I2_SR` claim. It shows that PyTorch BitLinear task inference is
+memory-heavy and slower than FP16-SFT in this setup, which reinforces that the
+product path must use packed GGUF kernels rather than Python-level BitLinear
+execution.
+
+Active follow-ups are now focused on LR search, the remaining paper-gamma row
+job, clean row-scale warm-up, and the full CPU/I2_SR producer gates. Completed
+diagnostics already show that gamma=100 teacher-head initialization, the MNLI
+layer sweep, and the completed paper-gamma row results are not enough to
+recover paper-level accuracy. The completed MNLI gamma probes at `1e3` and
+`1e4` also support the relation-loss scale audit: the paper's `1e5`
+coefficient can dominate CE by orders of magnitude under this local
+normalization.
 The earlier completed BitDistill runs use attention KD weight `100`; those are
 useful diagnostics but are not a strict match to the paper's reported
 classification setting. Until the remaining gates close, the public claim
@@ -210,7 +232,8 @@ attention-distillation layer improved the best short-budget BitDistill result
 to `0.535711` versus FP16-SFT `0.807641`. CE-only ablations stay near
 `0.492-0.498`, so distillation helps, but the run is still far from
 reproduction-quality. With long-warmup, MNLI layer `-1` now reaches
-`0.645950`, still below the row-scale gamma=100 best of `0.653591`.
+`0.645950`, layer `-2` reaches `0.642894`, and layer `-4` reaches `0.640754`,
+all still below the row-scale gamma=100 best of `0.653591`.
 
 Runtime boundary: the active paper-style GLUE reproduction uses
 `Qwen2ForSequenceClassification`. Those checkpoints can be evaluated on CPU
@@ -312,9 +335,9 @@ It does not make blind PTQ viable.
 
 The active public reports use `BITNET_REPORT_DATE=2026-05-15`. They are
 generated from checked-in scripts plus raw artifacts under `benchmark_results/`.
-The row paper-gamma/search and clean row-warmup jobs are still running or
-queued, so these commands intentionally produce partial or pending gates rather
-than success claims.
+Paper-gamma SST2 row, LR-search, and clean row-warmup jobs are still running
+or queued, so these commands intentionally produce partial or pending gates
+rather than success claims.
 
 ```bash
 export BITNET_REPORT_DATE=2026-05-15
@@ -345,6 +368,16 @@ python benchmarks/audit_bitdistill_paper_alignment.py
 python benchmarks/audit_bitdistill_task_formulation.py
 python benchmarks/gate_bitdistill_i2sr_export.py
 python benchmarks/gate_bitdistill_cpu_benchmark.py
+python benchmarks/gate_bitdistill_cpu_benchmark.py \
+  --input-json benchmark_results/bitdistill_glue_cpu_fast_2026-05-15.json \
+  --critical-runs \
+    short:fp16_sft-tensor-layer-1 \
+    short:bitnet_sft-tensor-layer-1 \
+    longwarmup:bitdistill-longwarmup-tensor-layer-8 \
+    longwarmup:bitdistill-longwarmup-row-layer-8 \
+    papergamma:bitdistill-longwarmup-tensor-layer-8 \
+  --output-json benchmark_results/bitdistill_glue_cpu_fast_gate_2026-05-15.json \
+  --output-md benchmarks/results/bitdistill_glue_cpu_fast_gate_2026-05-15.md
 python benchmarks/audit_tl2_row_scale_runtime_contract.py
 python benchmarks/audit_product_scope.py
 python benchmarks/audit_bitdistill_active_goal.py
@@ -372,6 +405,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill paper alignment audit](benchmarks/results/bitdistill_paper_alignment_2026-05-15.md)
 - [BitDistill task formulation audit](benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md)
 - [BitDistill GLUE CPU gate](benchmarks/results/bitdistill_glue_cpu_gate_2026-05-15.md)
+- [BitDistill scoped GLUE CPU gate](benchmarks/results/bitdistill_glue_cpu_fast_gate_2026-05-15.md)
 - [BitDistill causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_2026-05-15.md)
 - [BitDistill local causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_local_2026-05-15.md)
 - [BitDistill producer script audit](benchmarks/results/bitdistill_producer_script_audit_2026-05-15.md)

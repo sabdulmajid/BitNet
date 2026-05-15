@@ -5,10 +5,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
+DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 TASKS = ["mnli", "qnli", "sst2"]
 BASELINES = ["fp16_sft", "bitnet_sft", "bitdistill"]
 
@@ -132,9 +135,10 @@ def build_matrix(args: argparse.Namespace) -> dict[str, Any]:
         )
     return {
         "schema": "bitdistill-reproduction-plan-v1",
+        "date": DATE,
         "model": args.model,
         "task_format": args.task_format,
-        "success_criterion": "BitDistill within 0.5-1.0 accuracy point of FP16-SFT on MNLI/QNLI/SST2.",
+        "success_criterion": "BitDistill within 0.5-1.0 accuracy point (0.005-0.010 absolute accuracy) of FP16-SFT on MNLI/QNLI/SST2.",
         "required_first": "Run FP16-SFT for each task; those checkpoints become task teachers for BitDistill.",
         "required_warmup": f"Run continued pretraining first and pass `{warmup_state}` to every BitDistill task run.",
         "logits_kd": "Use paper-style logits KL with `LOGIT_KD_TEMPERATURE_SCALE=none`; the tau-squared convention is available only as an explicit diagnostic.",
@@ -163,7 +167,7 @@ def render_markdown(plan: dict[str, Any]) -> str:
     ]
     return "\n\n".join(
         [
-            "# BitDistill Reproduction Plan, 2026-05-14",
+            f"# BitDistill Reproduction Plan, {plan['date']}",
             f"Model: `{plan['model']}`.",
             f"Task format: `{plan['task_format']}`.",
             f"Success criterion: {plan['success_criterion']}",

@@ -37,6 +37,8 @@ CRITICAL_RUNS = [
     ("papergamma_headinit", "bitdistill-longwarmup-tensor-layer-8"),
 ]
 
+VALID_RUN_FAMILIES = tuple(sorted({family for family, _ in CRITICAL_RUNS}))
+
 
 def read_json(path: Path) -> dict[str, Any]:
     if not path.exists():
@@ -47,6 +49,18 @@ def read_json(path: Path) -> dict[str, Any]:
 def write_json(path: Path, data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def parse_critical_runs(values: list[str]) -> list[tuple[str, str]]:
+    parsed: list[tuple[str, str]] = []
+    for value in values:
+        if ":" not in value:
+            raise ValueError(f"critical run must be FAMILY:RUN, got {value!r}")
+        family, run = value.split(":", 1)
+        if family not in VALID_RUN_FAMILIES:
+            raise ValueError(f"run family must be one of {list(VALID_RUN_FAMILIES)}: {value}")
+        parsed.append((family, run))
+    return parsed
 
 
 def row_key(row: dict[str, Any]) -> tuple[str, str, str]:
@@ -71,6 +85,7 @@ def row_complete(row: dict[str, Any], *, expected_full_examples: int, expected_s
 
 
 def build_summary(args: argparse.Namespace) -> dict[str, Any]:
+    critical_runs = args.critical_runs
     data = read_json(args.input_json)
     if not data:
         critical = [
@@ -83,7 +98,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                 "blockers": [f"missing input artifact {args.input_json}"],
             }
             for task in args.tasks
-            for family, run in CRITICAL_RUNS
+            for family, run in critical_runs
         ]
         return {
             "schema": "bitdistill-glue-cpu-benchmark-gate-v1",
@@ -95,6 +110,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
             "rows": [],
             "blockers": [f"missing input artifact {args.input_json}"],
             "expected_eval_examples": {task: EXPECTED_EVAL_EXAMPLES[task] for task in args.tasks},
+            "critical_runs": [f"{family}:{run}" for family, run in critical_runs],
         }
 
     rows = data.get("rows", [])
@@ -107,7 +123,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     for task in args.tasks:
         expected_full_examples = EXPECTED_EVAL_EXAMPLES[task]
         expected_sample_examples = min(max_eval_samples, expected_full_examples) if max_eval_samples > 0 else expected_full_examples
-        for family, run in CRITICAL_RUNS:
+        for family, run in critical_runs:
             key = (task, family, run)
             row = by_key.get(key)
             if row is None:
@@ -171,6 +187,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "max_eval_samples": data.get("max_eval_samples"),
         "expected_eval_examples": {task: EXPECTED_EVAL_EXAMPLES[task] for task in args.tasks},
         "child_timeout_seconds": data.get("child_timeout_seconds"),
+        "critical_runs": [f"{family}:{run}" for family, run in critical_runs],
     }
 
 
@@ -228,6 +245,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
         f"# BitDistill GLUE CPU Benchmark Gate, {summary['date']}",
         f"Input: `{summary['input_json']}`.",
         f"Passed: `{fmt(summary['passed'])}`.",
+        f"Critical run set: `{summary.get('critical_runs')}`.",
         (
             f"Threads: `{fmt(summary.get('threads'))}`. Batch size: `{fmt(summary.get('batch_size'))}`. "
             f"Max eval samples: `{fmt(summary.get('max_eval_samples'))}`. "
@@ -269,9 +287,16 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input-json", type=Path, default=Path(f"benchmark_results/bitdistill_glue_cpu_{DATE}.json"))
     parser.add_argument("--tasks", nargs="+", choices=TASKS, default=TASKS)
+    parser.add_argument(
+        "--critical-runs",
+        nargs="+",
+        default=[f"{family}:{run}" for family, run in CRITICAL_RUNS],
+        help=f"Required rows as FAMILY:RUN, where FAMILY is one of {list(VALID_RUN_FAMILIES)}.",
+    )
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_glue_cpu_gate_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/bitdistill_glue_cpu_gate_{DATE}.md"))
     args = parser.parse_args()
+    args.critical_runs = parse_critical_runs(args.critical_runs)
 
     summary = build_summary(args)
     write_json(args.output_json, summary)

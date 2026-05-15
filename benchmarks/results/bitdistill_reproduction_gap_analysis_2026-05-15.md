@@ -30,6 +30,15 @@ on GLUE3 and is worse than the gamma=100 branch in this local setting:
 | QNLI | `0.787846` | `0.759656` | `0.139301` |
 | SST2 | `0.866972` | `0.841743` | `0.083716` |
 
+The strict paper-gamma row branch has now finished on MNLI and QNLI. It does
+not close the gap:
+
+| task | paper-gamma tensor | paper-gamma row | row-tensor delta | row gap to FP16 |
+| --- | ---: | ---: | ---: | ---: |
+| MNLI | `0.630260` | `0.617626` | `-0.012634` | `0.190015` |
+| QNLI | `0.759656` | `0.760937` | `+0.001281` | `0.138019` |
+| SST2 | `0.841743` | pending | pending | pending |
+
 ## What Went Wrong Locally
 
 | gap | local fact | implication |
@@ -39,7 +48,7 @@ on GLUE3 and is worse than the gamma=100 branch in this local setting:
 | Hyperparameter search | Local completed branch uses fixed `1000` downstream steps and limited LR search is still queued. | The paper explicitly uses greedy LR/epoch search, so a fixed schedule can underfit or over-regularize ternary students. |
 | Attention KD scale | Local loss-scale probes show paper `gamma=1e5` can dominate CE by orders of magnitude. | The coefficient is not plug-and-play under smaller budget/backbone/runtime conditions; the sweep is required evidence, not optional tuning. |
 | Output-head treatment | Gamma=100 head-initialization diagnostics are complete and mixed/negative overall: MNLI row got worse (`0.653591` to `0.646052`), QNLI row improved slightly (`0.796998` to `0.800476`), QNLI tensor got worse (`0.787846` to `0.777778`), SST2 tensor was unchanged (`0.866972`), and SST2 row got worse (`0.854358` to `0.847477`). | Initializing task heads from the teacher is not currently the missing fix. |
-| Attention layer choice | The first long-warmup MNLI layer-sweep point, layer `-1`, reached `0.645950`; gamma=1k tensor remains `0.647275`, and row gamma=100 remains `0.653591`. | Layer choice affects the margin but has not closed the FP16 gap under the current budget. |
+| Attention layer choice | Long-warmup MNLI layer sweep: layer `-1` reached `0.645950`, layer `-2` reached `0.642894`, layer `-4` reached `0.640754`, gamma=1k tensor remains `0.647275`, and row gamma=100 remains `0.653591`. | Layer choice affects the margin but has not closed the FP16 gap under the current budget. |
 | Runtime target mismatch | Strict GLUE reproduction uses `Qwen2ForSequenceClassification`; packed `I2_SR` export is valid today for causal-LM checkpoints, not classification heads. | Quality reproduction and packed CPU productization are coupled but distinct engineering gates. |
 
 ## What The Paper Changes
@@ -60,12 +69,12 @@ has not recovered FP-level GLUE quality yet.
 
 | branch | purpose | current state |
 | --- | --- | --- |
-| paper-gamma row | Test whether row scales help under the literal paper attention coefficient. | queued |
-| LR search at paper gamma | Test whether fixed `2e-5` LR is the failure mode. | queued |
+| paper-gamma row | Test whether row scales help under the literal paper attention coefficient. | MNLI/QNLI complete and negative or neutral; SST2 running |
+| LR search at paper gamma | Test whether fixed `2e-5` LR is the failure mode. | MNLI lr1e-5 running; remaining LR rows queued |
 | paper-gamma headinit | Test whether classifier-head transfer closes the gap. | queued |
-| layer sweep | Test whether the selected attention-distillation layer is wrong. | running; layer `-1` completed at `0.645950`, layers `-2` and `-4` are running |
-| clean row warm-up | Test whether row-scale Stage-2 pretraining improves row downstream quality. | running, about `49%` complete in the latest monitor |
-| CPU/I2_SR producers | Test full runtime speed/RSS/quality gates for completed causal export candidates. | queued/dependency |
+| layer sweep | Test whether the selected attention-distillation layer is wrong. | layer `-1`, `-2`, `-4`, and `-8` evidence complete; no layer closes the FP16 gap |
+| clean row warm-up | Test whether row-scale Stage-2 pretraining improves row downstream quality. | running, about `55%` complete in the latest monitor |
+| CPU/I2_SR producers | Test full runtime speed/RSS/quality gates for completed causal export candidates. | local causal I2_SR gate passes; scoped PyTorch CPU GLUE slice passes; full CPU/product gate still pending |
 
 ## Publishable Path
 
