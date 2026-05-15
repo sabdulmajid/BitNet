@@ -15,6 +15,7 @@ import argparse
 import glob
 import json
 import math
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -50,6 +51,18 @@ def slice_between(text: str, start: str, end: str) -> str:
     if end_index < 0:
         return text[start_index:]
     return text[start_index:end_index]
+
+
+def class_section(text: str, class_name: str) -> str:
+    pattern = re.compile(rf"^class {re.escape(class_name)}\b.*?:", re.MULTILINE)
+    match = pattern.search(text)
+    if match is None:
+        return ""
+    start = match.start()
+    next_match = re.search(r"^(?:@Model\.register|class )", text[match.end():], re.MULTILINE)
+    if next_match is None:
+        return text[start:]
+    return text[start:match.end() + next_match.start()]
 
 
 def latest_existing(pattern: str) -> Path | None:
@@ -163,7 +176,9 @@ def build_audit(root: Path, design_json: Path | None, max_existing_tl2_error: fl
     bitnet_kernel = read_text(bitnet_kernel_path)
 
     transform_to_tl2 = slice_between(converter, "def transform_to_tl2", "def read_model_config")
-    write_tensors = slice_between(converter, "def write_tensors", "def set_gguf_parameters")
+    llama_section = class_section(converter, "LlamaModel")
+    bitnet_section = class_section(converter, "BitnetModel")
+    write_tensors = slice_between(llama_section, "def write_tensors", "def prepare_tensors")
     ggml_nbytes = slice_between(ggml, "size_t ggml_nbytes", "size_t ggml_nbytes_pad")
     bitnet_transform = slice_between(bitnet_kernel, "void ggml_bitnet_transform_tensor", "int ggml_bitnet_get_type_bits")
 
@@ -188,6 +203,16 @@ def build_audit(root: Path, design_json: Path | None, max_existing_tl2_error: fl
         "learned row/group scales" in write_tensors
         and "TL2 stores one tensor scale" in write_tensors
         and "I2_SR" in write_tensors
+    )
+    all_tl2_data_calls = converter.count("transform_to_tl2(data)")
+    sidecar_tl2_data_calls = write_tensors.count("transform_to_tl2(data)")
+    bitnet_tl2_data_calls = bitnet_section.count("transform_to_tl2(data)")
+    uncovered_tl2_data_calls = all_tl2_data_calls - sidecar_tl2_data_calls - bitnet_tl2_data_calls
+    sidecar_call_sites_guarded = (
+        converter_rejects_row_scale_tl2
+        and sidecar_tl2_data_calls > 0
+        and uncovered_tl2_data_calls == 0
+        and "weight_scale" not in bitnet_section
     )
     nbytes_has_row_scale_sidecar = "GGML_TYPE_TL2" in ggml_nbytes and ("lut_scales_size" in ggml_nbytes or "row_scale" in ggml_nbytes)
     transform_single_scale = "const int lut_scales_size = 1" in bitnet_transform and "i2_scales[0]" in bitnet_transform
@@ -224,10 +249,16 @@ def build_audit(root: Path, design_json: Path | None, max_existing_tl2_error: fl
             "The converter still derives one scalar `np.max(abs(x))` scale and writes a single sidecar scale tensor.",
         ),
         make_check(
-            "TL2 converter refuses row-scale sidecar checkpoints safely",
-            converter_rejects_row_scale_tl2,
-            f"rejects_row_scale_tl2={converter_rejects_row_scale_tl2}",
-            "The converter can still silently export row/group-scale sidecar checkpoints through one-scale TL2.",
+            "All sidecar-aware TL2 converter call sites refuse row-scale sidecars safely",
+            sidecar_call_sites_guarded,
+            (
+                f"rejects_row_scale_tl2={converter_rejects_row_scale_tl2}; "
+                f"all_tl2_data_calls={all_tl2_data_calls}; "
+                f"sidecar_aware_calls={sidecar_tl2_data_calls}; "
+                f"bitnet_native_calls={bitnet_tl2_data_calls}; "
+                f"uncovered_calls={uncovered_tl2_data_calls}"
+            ),
+            "A sidecar-aware converter path can still silently export row/group-scale sidecar checkpoints through one-scale TL2.",
         ),
         make_check(
             "ggml TL2 storage accounts for row/group-scale sidecar",
