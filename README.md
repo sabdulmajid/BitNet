@@ -308,7 +308,10 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Direct packed GGUF support audit](benchmarks/results/direct_packed_gguf_support_2026-05-13.md)
 - [TL2 row-scale design audit](benchmarks/results/tl2_row_scale_design_2026-05-13.md)
 - [TL2 row-scale runtime contract](benchmarks/results/tl2_row_scale_runtime_contract_2026-05-15.md)
-- [MoE support audit](benchmarks/results/moe_support_audit_2026-05-14.md)
+- [MoE support audit](benchmarks/results/moe_support_audit_2026-05-15.md)
+- [MoE packing contract](benchmarks/results/moe_packing_contract_2026-05-15.md)
+- [MoE TL2 runtime contract](benchmarks/results/moe_tl2_runtime_contract_2026-05-15.md)
+- [Kimi config feasibility audit](benchmarks/results/kimi_config_feasibility_2026-05-15.md)
 - [Tiny Qwen2MoE runtime fixture](benchmarks/results/tiny_qwen2moe_fixture_2026-05-14.md)
 - [Unblock requirements audit](benchmarks/results/unblock_requirements_2026-05-14.md)
 
