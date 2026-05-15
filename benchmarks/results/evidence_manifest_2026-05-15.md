@@ -1,8 +1,8 @@
 # Evidence Manifest, 2026-05-15
-Artifacts: `236`. Missing: `0`.
+Artifacts: `238`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 25328 | 60b41f34eba9 |  |
+| README | tracked_report | yes | 25330 | bb239947d6af |  |
 | research_redirect_report | tracked_report | yes | 11365 | 789f388bbc7d |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
 | benchmark_matrix_audit_report | tracked_report | yes | 2739 | baf684c33814 |  |
@@ -36,10 +36,11 @@ Artifacts: `236`. Missing: `0`.
 | bitdistill_loss_scale_report | tracked_report | yes | 8733 | 628d0414fc13 |  |
 | bitdistill_loss_contract_report | tracked_report | yes | 2442 | 93abf9eee3b0 |  |
 | ternary_flip_dynamics_report | tracked_report | yes | 2765 | d27aad9fe625 |  |
-| seqcls_runtime_gap_report | tracked_report | yes | 3948 | 2cfacc631ff4 |  |
+| seqcls_runtime_gap_report | tracked_report | yes | 3947 | 8343c324145b |  |
 | seqcls_backbone_i2sr_smoke_report | tracked_report | yes | 1655 | 0bf9e8770821 |  |
 | seqcls_backbone_i2sr_qwen_conversion_json | generic_json | yes | 2134 | 2456fe0b65fa |  |
 | seqcls_i2sr_sidecar_cpu_mnli64_report | tracked_report | yes | 920 | ac54bd3d3a18 |  |
+| seqcls_i2sr_sidecar_cpu_mnli128_report | tracked_report | yes | 923 | b8ba88c71503 |  |
 | seqcls_i2sr_sidecar_cpu_mnli64_batch4_report | tracked_report | yes | 921 | c5e928ce6b8c |  |
 | seqcls_i2sr_sidecar_batching_report | tracked_report | yes | 1043 | 0722a315bb45 |  |
 | seqcls_i2sr_hidden_contract_report | tracked_report | yes | 1394 | 991139477ee1 |  |
@@ -75,7 +76,7 @@ Artifacts: `236`. Missing: `0`.
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 1824 | 5d992b3c9a1c |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 9307 | 2fa52f1aa597 |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 9309 | e20f0be92cf6 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2569 | 51da6738be9d |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -168,7 +169,7 @@ Artifacts: `236`. Missing: `0`.
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
 | benchmark_matrix_audit_json | generic_json | yes | 16721 | d93ae3f74ea3 |  |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 14784 | 3ae154b3eb54 | passed=True, checks=71, failed=0 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 14786 | 36eba5363fbe | passed=True, checks=71, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | 61f1261febd4 | achieved=False, status=not_complete, complete=7/9, open=2 |
 | original_benchmark_objective_audit_json | generic_json | yes | 4278 | 2f97f3e61ea0 |  |
 | product_scope_gate_json | product_scope_gate_json | yes | 5770 | d0101b25bd20 | scope=research_mvp_only, supported=5, unsupported=4 |
@@ -182,9 +183,10 @@ Artifacts: `236`. Missing: `0`.
 | bitdistill_telemetry_coverage_json | generic_json | yes | 3805 | d5972de78a36 |  |
 | bitdistill_loss_contract_json | generic_json | yes | 3200 | a40e2cc942e3 |  |
 | ternary_flip_dynamics_json | generic_json | yes | 12345 | 616addec33ef |  |
-| seqcls_runtime_gap_json | generic_json | yes | 13546 | cacca1ce9e9d |  |
+| seqcls_runtime_gap_json | generic_json | yes | 13549 | 07b29d7ae44f |  |
 | seqcls_backbone_i2sr_smoke_json | generic_json | yes | 22648 | 5851d3f13f36 |  |
 | seqcls_i2sr_sidecar_cpu_mnli64_json | generic_json | yes | 4875 | 70048e13bc76 |  |
+| seqcls_i2sr_sidecar_cpu_mnli128_json | generic_json | yes | 5397 | 43bdb0c81ad2 |  |
 | seqcls_i2sr_sidecar_cpu_mnli64_batch4_json | generic_json | yes | 4863 | 3878f71efb88 |  |
 | seqcls_i2sr_hidden_contract_json | generic_json | yes | 4861 | c1823be48443 |  |
 | seqcls_i2sr_arch_contract_json | generic_json | yes | 3945 | ca692ea2e6ee |  |

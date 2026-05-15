@@ -295,7 +295,7 @@ def render_markdown(result: dict[str, Any]) -> str:
                 "The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. "
                 "It now also has a prototype sequence-classification backbone path through `bitnet-qwen` I2_SR plus "
                 "an external dense head sidecar. The new graph fixes the dominant architecture mismatch: the packed "
-                "hidden vector now has high cosine agreement with PyTorch on the audited MNLI sample, and the 64-sample "
+                "hidden vector now has high cosine agreement with PyTorch on the audited MNLI sample, and the sampled "
                 "sidecar probe mostly agrees with saved PyTorch predictions. This is still not a deployable classifier: "
                 "the classifier head is not native GGUF metadata/runtime code, the hidden contract is not bit-exact, "
                 "and full-split CPU quality/RSS/throughput have not been measured on a single native artifact."
@@ -328,7 +328,7 @@ def main() -> None:
     parser.add_argument(
         "--seqcls-sidecar-cpu-benchmark",
         type=Path,
-        default=Path(f"benchmark_results/seqcls_i2sr_sidecar_cpu_mnli_64_{DATE}.json"),
+        default=Path(f"benchmark_results/seqcls_i2sr_sidecar_cpu_mnli_128_{DATE}.json"),
     )
     parser.add_argument(
         "--seqcls-hidden-contract",

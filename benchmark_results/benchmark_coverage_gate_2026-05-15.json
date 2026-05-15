@@ -314,7 +314,7 @@
     {
       "name": "Sequence-classification sidecar CPU quality mismatch is recorded",
       "passed": true,
-      "evidence": "status=quality_mismatch, examples=64, agreement=0.921875, accuracy=0.578125",
+      "evidence": "status=quality_mismatch, examples=128, agreement=0.9140625, accuracy=0.609375",
       "blocker": ""
     },
     {
@@ -422,7 +422,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=236, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=238, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

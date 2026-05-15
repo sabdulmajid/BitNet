@@ -39,10 +39,10 @@ These checkpoints are the strict GLUE reproduction artifacts. They use `Qwen2For
 | head shape | [3, 896] |
 | finite logits | true |
 | sampled CPU status | quality_mismatch |
-| sampled examples | 64 |
-| sampled accuracy | 0.578125 |
-| agreement with saved PyTorch predictions | 0.921875 |
-| sampled examples/sec | 0.707303 |
+| sampled examples | 128 |
+| sampled accuracy | 0.609375 |
+| agreement with saved PyTorch predictions | 0.914062 |
+| sampled examples/sec | 0.683671 |
 | token IDs match | true |
 | hidden relative RMS | 0.108662 |
 | hidden cosine | 0.994091 |
@@ -79,4 +79,4 @@ These checkpoints are export-compatible with the current GGUF/I2_SR path, but th
 
 ## Interpretation
 
-The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. It now also has a prototype sequence-classification backbone path through `bitnet-qwen` I2_SR plus an external dense head sidecar. The new graph fixes the dominant architecture mismatch: the packed hidden vector now has high cosine agreement with PyTorch on the audited MNLI sample, and the 64-sample sidecar probe mostly agrees with saved PyTorch predictions. This is still not a deployable classifier: the classifier head is not native GGUF metadata/runtime code, the hidden contract is not bit-exact, and full-split CPU quality/RSS/throughput have not been measured on a single native artifact.
+The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. It now also has a prototype sequence-classification backbone path through `bitnet-qwen` I2_SR plus an external dense head sidecar. The new graph fixes the dominant architecture mismatch: the packed hidden vector now has high cosine agreement with PyTorch on the audited MNLI sample, and the sampled sidecar probe mostly agrees with saved PyTorch predictions. This is still not a deployable classifier: the classifier head is not native GGUF metadata/runtime code, the hidden contract is not bit-exact, and full-split CPU quality/RSS/throughput have not been measured on a single native artifact.
