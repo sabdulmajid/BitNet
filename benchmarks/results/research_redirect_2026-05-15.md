@@ -90,10 +90,13 @@ continues to move the discrete ternary representation.
 
 The controlled Stage-2 recovery audit now parses live Slurm logs. The current
 `163.84M`-token paper-gamma row is only a running job, not a quality result,
-but its latest snapshot at step `910` already shows weighted-attention/CE
-`2022.491365` and max observed weighted-attention/CE `6461.961604`. That makes
-loss normalization and update-balance the first BitDistill recovery suspect if
-the final paired MNLI result remains weak.
+but its latest audited snapshot at step `1860` shows weighted-attention/CE
+`2590.461990`, median weighted-attention/CE `1874.689599`, p95
+weighted-attention/CE `5307.021380`, and max observed weighted-attention/CE
+`16326.870293`. The same log implies a median raw CE/attention equalizing gamma
+of `53.341231`, not `100000`. That makes loss normalization and update-balance
+the first BitDistill recovery suspect if the final paired MNLI result remains
+weak.
 
 ## Canonical Next Matrix
 

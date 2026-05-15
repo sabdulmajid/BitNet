@@ -153,11 +153,12 @@ repacking a fixed projection.
 
 The controlled Stage-2 recovery audit also parses live Slurm logs before final
 validation traces exist. Its current snapshot for the `163.84M`-token
-paper-gamma row records step `910`, weighted-attention/CE ratio `2022.491365`,
-and max observed weighted-attention/CE ratio `6461.961604`. This is not a
-quality result; it is a loss-normalization warning that the paper's
-`gamma=100000` coefficient is numerically dominating CE under the local
-implementation.
+paper-gamma row records step `1860`, weighted-attention/CE ratio `2590.461990`,
+median weighted-attention/CE ratio `1874.689599`, p95 ratio `5307.021380`, and
+max observed ratio `16326.870293`. The same log implies a median raw
+CE/attention equalizing gamma of only `53.341231`. This is not a quality
+result; it is a loss-normalization warning that the paper's `gamma=100000`
+coefficient is numerically dominating CE under the local implementation.
 
 The current root-cause ledger is generated in
 [`benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md`](benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md).
