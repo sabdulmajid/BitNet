@@ -323,6 +323,32 @@ def audit_cpu_rows(root: Path, checks: list[dict[str, Any]]) -> None:
         )
 
 
+def audit_cpu_tradeoff_frontier(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/cpu_tradeoff_frontier_{DATE}.json"
+    if not path.exists():
+        add_check(checks, "CPU tradeoff frontier audit exists", False, str(path.relative_to(root)), "missing CPU tradeoff audit")
+        return
+    data = read_json(path)
+    q4 = data.get("q4_vs_i2sr", {}) if isinstance(data.get("q4_vs_i2sr"), dict) else {}
+    rows = data.get("rows", []) if isinstance(data.get("rows"), list) else []
+    required = ["FP F16", "FP Q8_0", "FP Q4_K_M", "row TQ2_0", "row I2_S", "row I2_SR"]
+    labels = {row.get("label") for row in rows if isinstance(row, dict)}
+    add_check(
+        checks,
+        "CPU tradeoff frontier has headline rows",
+        set(required).issubset(labels),
+        f"labels={sorted(label for label in labels if isinstance(label, str))}",
+        "tradeoff frontier is missing a headline CPU artifact",
+    )
+    add_check(
+        checks,
+        "CPU tradeoff frontier reports Q4-vs-I2_SR ratios",
+        all(isinstance(q4.get(key), (int, float)) for key in ["file_ratio", "rss512_ratio", "prefill_speedup", "decode_speedup", "ppl_ratio"]),
+        f"q4_vs_i2sr={q4}",
+        "Q4-vs-I2_SR normalized ratios are missing",
+    )
+
+
 def manifest_missing_is_only_self_coverage(manifest: dict[str, Any]) -> bool:
     missing = manifest.get("missing", [])
     if not isinstance(missing, list):
@@ -422,6 +448,7 @@ def main() -> None:
     audit_bitnet_sft_budget_paired(root, checks)
     audit_subln_activation_variance(root, checks)
     audit_cpu_rows(root, checks)
+    audit_cpu_tradeoff_frontier(root, checks)
     manifest_path = args.manifest_path.resolve() if args.manifest_path is not None else None
     audit_rss_and_gates(root, checks, manifest_path)
 

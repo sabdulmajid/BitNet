@@ -138,6 +138,11 @@ packed CPU format and run faster than FP16 decode while preserving that
 checkpoint's scale semantics. It does not make blind PTQ viable, and it does
 not beat Q4_K_M on quality for the current Qwen2.5-1.5B artifact.
 
+Normalized against FP Q4_K_M on the same Xeon run, row-scale `I2_SR` is
+`1.288133x` the file size, `1.268574x` the RSS at context 512, `2.298818x` the
+prefill throughput, `1.190617x` the decode throughput, and `3.032323x` the PPL.
+This is a speed/runtime-semantics result, not a mature Q4 quality/storage win.
+
 ## What This Fork Adds
 
 - Mathematical and empirical PTQ audits showing why blind FP/BF16 to ternary
@@ -265,6 +270,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill paper alignment audit](benchmarks/results/bitdistill_paper_alignment_2026-05-15.md)
 - [Task formulation audit](benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md)
 - [Causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_2026-05-15.md)
+- [CPU tradeoff frontier audit](benchmarks/results/cpu_tradeoff_frontier_2026-05-15.md)
 - [Benchmark coverage gate](benchmarks/results/benchmark_coverage_gate_2026-05-15.md)
 - [Product scope gate](benchmarks/results/product_scope_gate_2026-05-15.md)
 - [Evidence manifest](benchmarks/results/evidence_manifest_2026-05-15.md)
