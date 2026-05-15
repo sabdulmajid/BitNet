@@ -106,6 +106,7 @@ class BitLinear(nn.Module):
         master_weight_dtype: torch.dtype = torch.float32,
         scale_mode: str = "tensor",
         eps: float = 1e-5,
+        activation_quantization: bool = True,
     ) -> None:
         super().__init__()
         if scale_mode not in {"tensor", "row"}:
@@ -114,6 +115,7 @@ class BitLinear(nn.Module):
         self.out_features = out_features
         self.scale_mode = scale_mode
         self.eps = eps
+        self.activation_quantization = activation_quantization
         self.weight = nn.Parameter(torch.empty(out_features, in_features, dtype=master_weight_dtype))
         self.bias = nn.Parameter(torch.empty(out_features, dtype=master_weight_dtype)) if bias else None
         self.reset_parameters()
@@ -133,6 +135,7 @@ class BitLinear(nn.Module):
         master_weight_dtype: torch.dtype,
         scale_mode: str,
         eps: float,
+        activation_quantization: bool = True,
     ) -> "BitLinear":
         module = cls(
             linear.in_features,
@@ -141,6 +144,7 @@ class BitLinear(nn.Module):
             master_weight_dtype=master_weight_dtype,
             scale_mode=scale_mode,
             eps=eps,
+            activation_quantization=activation_quantization,
         )
         module.weight.data.copy_(linear.weight.detach().to(master_weight_dtype))
         if linear.bias is not None and module.bias is not None:
@@ -150,7 +154,7 @@ class BitLinear(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         scale_mode_id = 0 if self.scale_mode == "tensor" else 1
         q_weight = TernaryWeightSTE.apply(self.weight, self.eps, scale_mode_id).to(x.dtype)
-        q_x = AbsmaxActivationSTE.apply(x, self.eps)
+        q_x = AbsmaxActivationSTE.apply(x, self.eps) if self.activation_quantization else x
         bias = self.bias.to(x.dtype) if self.bias is not None else None
         return F.linear(q_x, q_weight, bias)
 
@@ -180,6 +184,7 @@ def replace_linear_layers(
     scale_mode: str,
     exclude_regex: str,
     eps: float,
+    activation_quantization: bool = True,
 ) -> int:
     pattern = re.compile(exclude_regex) if exclude_regex else None
     replacements: list[tuple[nn.Module, str, BitLinear]] = []
@@ -192,6 +197,7 @@ def replace_linear_layers(
                 master_weight_dtype=master_weight_dtype,
                 scale_mode=scale_mode,
                 eps=eps,
+                activation_quantization=activation_quantization,
             )
             replacements.append((parent, child_name, bitlinear))
 
@@ -752,6 +758,7 @@ def train(args: argparse.Namespace) -> None:
         scale_mode=args.scale_mode,
         exclude_regex=args.exclude_linear_regex,
         eps=args.quant_eps,
+        activation_quantization=args.activation_quantization,
     )
     if replaced == 0:
         raise RuntimeError("no nn.Linear layers were replaced; check model architecture or exclude regex")
@@ -878,6 +885,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--master-weight-dtype", default="fp32", choices=["bf16", "bfloat16", "fp32", "float32"])
     parser.add_argument("--scale-mode", default="tensor", choices=["tensor", "row"])
     parser.add_argument("--quant-eps", type=float, default=1e-5)
+    parser.add_argument("--activation-quantization", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--exclude-linear-regex", default="")
     parser.add_argument("--gradient-checkpointing", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--use-fsdp", action=argparse.BooleanOptionalAction, default=False)

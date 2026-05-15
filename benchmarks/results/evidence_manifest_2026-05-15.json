@@ -1,5 +1,5 @@
 {
-  "artifact_count": 174,
+  "artifact_count": 176,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "345619f71cf85d85dfd3c892ce4d4814e6926fd52b5266781e8a00788bc99689",
-      "size_bytes": 32124
+      "sha256": "59992ecaecaaf85bcc92aea9a43701ea5ab8fd78621c24356cc93963f3dc959f",
+      "size_bytes": 33712
     },
     {
       "exists": true,
@@ -126,6 +126,15 @@
       "path": "benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md",
       "sha256": "cb03c36274ba3ef92c00eca405e514feb0fe306aaf6fa6fdd4ce59f43d1aaf6c",
       "size_bytes": 11647
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitnet_sft_baseline_audit_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitnet_sft_baseline_audit_2026-05-15.md",
+      "sha256": "8a20e524884074f792c05d3c65098c7647d61a4c3a1be4385c924e1af5d1701e",
+      "size_bytes": 4047
     },
     {
       "exists": true,
@@ -385,7 +394,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "c940103998a2211aefc0529d5ef0b7a950fcda026875f894ec4b7c204d7b3e4d",
+      "sha256": "d8eb7181c22f8a626ad547d00737a3a1f54f67444af071193ffeabd764d1d347",
       "size_bytes": 3438
     },
     {
@@ -2075,7 +2084,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "f8b7cf113d509664d6fc7fb10606ef287c8d139374a1a139ef656a3db814892f",
+      "sha256": "b6902c0d7378f268c215064e60b60a791b13ead0fc0e1d0c653c7533f655b48d",
       "size_bytes": 6374
     },
     {
@@ -2135,6 +2144,15 @@
       "path": "benchmark_results/bitdistill_reproduction_gate_2026-05-15.json",
       "sha256": "c581499edff46d286202e7f31195925c028739f64399a503d5440a6de3bdf97b",
       "size_bytes": 32197
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "bitnet_sft_baseline_audit_json",
+      "metrics": {},
+      "path": "benchmark_results/bitnet_sft_baseline_audit_2026-05-15.json",
+      "sha256": "9e07c097db175e650fe22e64d7690c1521eb98d4e2768eb0a6213fb36cec233e",
+      "size_bytes": 45902
     },
     {
       "exists": true,

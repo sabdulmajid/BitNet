@@ -51,7 +51,7 @@ The llama.cpp submodule now points at the writable fork:
 
 with the active `i2sr-row-scale-runtime` branch.
 
-## Current Verdict
+## Claim Ledger
 
 | claim | status | evidence |
 | --- | --- | --- |
@@ -61,6 +61,16 @@ with the active `i2sr-row-scale-runtime` branch.
 | BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B gamma=100, strict paper-gamma tensor, strict paper-gamma row, LR=`1e-5`/`5e-5`, strict paper-gamma head-init, clean row-warmup gamma=100, and clean row-warmup paper-gamma GLUE3 sequence-classification runs are complete with full paired prediction traces. They improve over BitNet-SFT but still miss FP16-SFT by `0.058486-0.203260` absolute accuracy depending on task/run. Full-budget/backbone-scale search remains open; AMD and Xeon PyTorch CPU quality gates now pass. |
 | TL2 is ready for the best row-scale checkpoint | **No** | Runtime contract gate fails: current TL2 one-scale error is `1.904230` relative output RMS; exact fp16 row scales would be `0.000197` with only `1.230469` MiB of scales, but converter/runtime/kernel metadata do not carry them. |
 | Kimi/MoE retrofit is proven | **No** | Tiny random Qwen2MoE FP16 and ternary `I2_SR` fixtures now pass converter/runtime smoke; the ternary fixture packs 3 merged row-scale expert tensors, runs routed CPU inference, and records `419.29` decode tok/s at `142.48` MiB RSS. A Kimi-K2 config audit still shows the real target needs Kimi/DeepSeekV3 loading, MLA metadata conversion, shared-expert mapping, block-FP8 import, and trained MoE quality/locality benchmarks before product claims are defensible. |
+
+## Not Yet Proven
+
+| item | current state |
+| --- | --- |
+| One-click universal FP/BF16-to-ternary conversion | Rejected for the tested dense-Qwen setup. |
+| Paper-level BitDistill reproduction | Not achieved; local FP16-SFT MNLI is close to the paper anchor, but local BitNet-SFT is `0.120379` below the paper's Qwen2.5-0.5B MNLI BitNet-SFT anchor. |
+| Packed sequence-classification runtime | Not implemented; strict GLUE quality rows are PyTorch sequence classifiers, while packed `I2_SR` runtime rows are causal-LM artifacts. |
+| General-LM quality for task-distilled causal exports | Not achieved; causal prompt-scoring exports are deployment diagnostics, not general LLMs. |
+| Kimi/MoE quality or throughput | Not proven; current MoE work is converter/runtime plumbing only. |
 
 ## BitDistill Reproduction Status
 
@@ -101,6 +111,17 @@ Qwen2.5-0.5B MNLI anchor, the local FP16-SFT baseline is close
 short-budget BitDistill (`0.525217` vs `0.799800`) remain far below the paper
 target. That makes the current gap concrete: the baseline task is learnable,
 but the ternary recovery recipe is not yet reproduced.
+
+The focused BitNet-SFT baseline audit shows that this low BitNet-SFT score is
+not an obvious missing-export bug: the MNLI checkpoint has the expected
+`168/168` ternary decoder projection tensors and keeps `score.weight` dense.
+The weights-only control without activation quantization reaches `0.493734`,
+only `+0.006113` over the default W1.58A8 run, so activation quantization is
+not the dominant cause of the gap. The SubLN-only BitNet-SFT control reaches
+`0.350280`, so the current SubLN insertion by itself worsens the local
+baseline instead of explaining the paper-anchor gap. The unresolved narrow
+blockers are recipe alignment, exact SubLN placement/initialization/timing, and
+Stage-3 budget/LR/epoch search.
 
 Current completed Qwen2.5-0.5B GLUE sequence-classification short-budget
 diagnostics:
@@ -510,6 +531,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill snapshot integrity audit](benchmarks/results/bitdistill_snapshot_integrity_2026-05-15.md)
 - [BitDistill reproduction gate](benchmarks/results/bitdistill_reproduction_gate_2026-05-15.md)
 - [BitDistill row-warmup gate](benchmarks/results/bitdistill_rowwarmup_gate_2026-05-15.md)
+- [BitNet-SFT baseline audit](benchmarks/results/bitnet_sft_baseline_audit_2026-05-15.md)
 - [BitDistill paper alignment audit](benchmarks/results/bitdistill_paper_alignment_2026-05-15.md)
 - [BitDistill task formulation audit](benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md)
 - [BitDistill GLUE CPU benchmark](benchmarks/results/bitdistill_glue_cpu_2026-05-15.md)

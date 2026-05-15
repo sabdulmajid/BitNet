@@ -314,6 +314,7 @@ def prepare_bitnet_student(model: nn.Module, args: argparse.Namespace) -> dict[s
         scale_mode=args.scale_mode,
         exclude_regex=args.exclude_linear_regex,
         eps=args.quant_eps,
+        activation_quantization=args.activation_quantization,
     )
     if replaced == 0:
         raise RuntimeError("no nn.Linear modules were replaced with BitLinear")
@@ -322,6 +323,7 @@ def prepare_bitnet_student(model: nn.Module, args: argparse.Namespace) -> dict[s
         "subln_inserted": subln_inserted,
         "bitlinear_replaced": replaced,
         "untied_output_embeddings": untied_output_embeddings,
+        "activation_quantization": args.activation_quantization,
     }
 
 
@@ -1428,6 +1430,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--master-weight-dtype", default="fp32", choices=["bf16", "bfloat16", "fp32", "float32"])
     parser.add_argument("--scale-mode", choices=["tensor", "row"], default="tensor")
     parser.add_argument("--quant-eps", type=float, default=1e-5)
+    parser.add_argument("--activation-quantization", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--use-subln", action=argparse.BooleanOptionalAction, default=None)
     parser.add_argument("--subln-eps", type=float, default=1e-5)
     parser.add_argument("--exclude-linear-regex", default="score|classifier")
