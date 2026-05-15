@@ -2,7 +2,7 @@
 
 Overall status: `pending`.
 
-Rows complete: `9` / `39`. Pending: `30`. Failed: `0`.
+Rows complete: `12` / `39`. Pending: `27`. Failed: `0`.
 
 This report is designed to become the main statistical comparison once long-warmup jobs write `eval_predictions.jsonl`.
 
@@ -39,10 +39,10 @@ Delta is candidate minus reference on the same eval indices; positive means the 
 | qnli | paper-gamma lr5e-5 minus default | pending | 0 | 5463 | - | - | - | - | 0 | 0 | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/eval_predictions.jsonl; checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr5e-5/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/eval_predictions.jsonl |
 | qnli | paper-gamma headinit minus default | pending | 0 | 5463 | - | - | - | - | 0 | 0 | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/eval_predictions.jsonl; checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-headinit/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/eval_predictions.jsonl |
 | sst2 | BitNet-SFT minus FP16-SFT | pass | 872 | 872 | 0.925459 | 0.777523 | -0.147936 | [-0.176904, -0.118967] | 28 | 157 | 0.000000 |  |
-| sst2 | gamma100 row minus tensor | pending | 0 | 872 | - | - | - | - | 0 | 0 | - | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/eval_predictions.jsonl; checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8/eval_predictions.jsonl |
+| sst2 | gamma100 row minus tensor | pass | 872 | 872 | 0.866972 | 0.854358 | -0.012615 | [-0.027678, 0.002448] | 17 | 28 | 0.135156 |  |
 | sst2 | paper-gamma row minus tensor | pending | 0 | 872 | - | - | - | - | 0 | 0 | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/eval_predictions.jsonl; checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8/eval_predictions.jsonl |
-| sst2 | gamma100 tensor minus FP16-SFT | pending | 0 | 872 | - | - | - | - | 0 | 0 | - | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/eval_predictions.jsonl |
-| sst2 | gamma100 row minus FP16-SFT | pending | 0 | 872 | - | - | - | - | 0 | 0 | - | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8/eval_predictions.jsonl |
+| sst2 | gamma100 tensor minus FP16-SFT | pass | 872 | 872 | 0.925459 | 0.866972 | -0.058486 | [-0.080752, -0.036221] | 25 | 76 | 0.000000 |  |
+| sst2 | gamma100 row minus FP16-SFT | pass | 872 | 872 | 0.925459 | 0.854358 | -0.071101 | [-0.093769, -0.048433] | 22 | 84 | 0.000000 |  |
 | sst2 | paper-gamma tensor minus FP16-SFT | pending | 0 | 872 | - | - | - | - | 0 | 0 | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/eval_predictions.jsonl |
 | sst2 | paper-gamma row minus FP16-SFT | pending | 0 | 872 | - | - | - | - | 0 | 0 | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8/eval_predictions.jsonl |
 | sst2 | paper-gamma lr1e-5 tensor minus FP16-SFT | pending | 0 | 872 | - | - | - | - | 0 | 0 | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr1e-5/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/eval_predictions.jsonl |

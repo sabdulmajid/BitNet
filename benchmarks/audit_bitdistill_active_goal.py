@@ -95,6 +95,7 @@ def audit_reproduction(
     monitor: dict[str, Any],
 ) -> None:
     fp = materialized_rows(reproduction, "baseline")
+    gamma100 = materialized_rows(reproduction, "longwarmup_gamma100")
     paper = materialized_rows(reproduction, "paper_hparam_candidate")
     row_scale = materialized_rows(reproduction, "row_scale_candidate")
     baseline_tasks = sorted({row.get("task") for row in fp if row.get("run") == "FP16-SFT"})
@@ -110,6 +111,7 @@ def audit_reproduction(
     metrics["paper_reproduction"] = {
         "fp16_tasks": baseline_tasks,
         "bitnet_tasks": bitnet_tasks,
+        "gamma100_rows": len(gamma100),
         "paper_rows": len(paper),
         "row_scale_rows": len(row_scale),
         "paper_style_tensor_complete": reproduction.get("paper_style_tensor_complete"),
@@ -128,10 +130,11 @@ def audit_reproduction(
         status,
         (
             f"FP16 tasks={baseline_tasks}; BitNet tasks={bitnet_tasks}; "
-            f"paper rows={len(paper)}/3; matrix={configured}/{expected}, inferred={inferred_rows}; "
+            f"gamma100 rows={len(gamma100)}/3; strict paper rows={len(paper)}/3; "
+            f"matrix={configured}/{expected}, inferred={inferred_rows}; "
             f"warm-up={step}/{max_steps}"
         ),
-        "Long-warmup BitDistill metrics are still pending; short-budget diagnostics are not a paper reproduction.",
+        "Gamma=100 long-warmup BitDistill is complete and below the FP16-gap target; strict paper-gamma, LR-search, and head-init candidates are still pending.",
     )
 
 
@@ -208,12 +211,12 @@ def audit_novelty_and_runtime(
     add_row(
         rows,
         "Compare paper-style per-tensor BitDistill against row-scale BitDistill",
-        "complete" if (row_complete and row_passed) or rowwarmup_passed else "pending",
+        "complete" if (row_complete and row_passed) or rowwarmup_passed else ("partial" if row_complete else "pending"),
         (
             f"tensor-warmup row gate complete={row_complete}, passed={row_passed}; "
             f"row-warmup gate complete={rowwarmup_complete}, passed={rowwarmup_passed}"
         ),
-        "Tensor and row long-warmup metrics must finish before the novelty comparison is known.",
+        "Gamma=100 tensor-warmup row comparison is complete but does not pass the FP16-gap gate; strict paper-gamma and row-warmup comparisons remain pending.",
     )
     add_row(
         rows,
@@ -250,7 +253,7 @@ def audit_publishability(
         "Define publishable scope: independent reproduction, open training implementation, row-scale I2_SR extension, boundary study, and MoE/Kimi limits",
         "partial",
         f"product scope={scope}; supported={supported}; unsupported={unsupported}; paper gaps={partial}",
-        "Publishable claims must wait for the long-warmup BitDistill results; current support is implementation/provenance plus dense-Qwen I2_SR evidence.",
+        "Publishable quality claims must wait for strict paper-hyperparameter BitDistill results and full CPU-quality gates; current support is implementation/provenance plus dense-Qwen I2_SR evidence.",
     )
 
 

@@ -89,8 +89,8 @@ def run_matrix(args: argparse.Namespace) -> list[dict[str, Any]]:
         ("BitDistill short tensor gamma100", args.baseline_root, "bitdistill-tensor-layer-1", "diagnostic", None),
         ("BitDistill short row gamma100", args.baseline_root, "bitdistill-row-layer-1", "diagnostic", None),
         ("BitDistill short tensor layer -8", args.baseline_root, "bitdistill-tensor-layer-8", "diagnostic", None),
-        ("BitDistill longwarmup tensor gamma100", args.longwarmup_root, "bitdistill-longwarmup-tensor-layer-8", "diagnostic_pending", None),
-        ("BitDistill longwarmup row gamma100", args.longwarmup_root, "bitdistill-longwarmup-row-layer-8", "novelty_pending", None),
+        ("BitDistill longwarmup tensor gamma100", args.longwarmup_root, "bitdistill-longwarmup-tensor-layer-8", "diagnostic_gamma100", None),
+        ("BitDistill longwarmup row gamma100", args.longwarmup_root, "bitdistill-longwarmup-row-layer-8", "novelty_gamma100", None),
         ("BitDistill longwarmup tensor paper gamma", args.paper_hparam_root, "bitdistill-longwarmup-tensor-layer-8", "paper_candidate", None),
         ("BitDistill longwarmup row paper gamma", args.paper_hparam_row_root, "bitdistill-longwarmup-row-layer-8", "paper_row_candidate", None),
         ("BitDistill longwarmup tensor paper gamma lr1e-5", args.paper_hparam_lr1_root, "bitdistill-longwarmup-tensor-layer-8", "paper_lr_search_pending", None),
@@ -170,9 +170,9 @@ def alignment_rows(features: dict[str, bool], warmup: dict[str, Any]) -> list[di
         {
             "dimension": "Baselines",
             "paper": "FP16-SFT, BitNet-SFT, BitDistill",
-            "local": "All three exist for short-budget GLUE3; long-warmup BitDistill is pending",
+            "local": "FP16-SFT, BitNet-SFT, and gamma=100 long-warmup BitDistill exist for GLUE3; strict paper-gamma candidates are pending",
             "status": "partial",
-            "note": "The final paper candidate is not complete until long-warmup downstream metrics exist.",
+            "note": "The completed gamma=100 branch improves over BitNet-SFT but remains below the FP16-gap target; strict paper-hyperparameter rows are not complete.",
         },
         {
             "dimension": "Stage-1 SubLN",
@@ -299,8 +299,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
             "## Interpretation",
             "\n".join(
                 [
-                    "- The existing negative GLUE result is a valid short-budget boundary result.",
-                    "- It is not a disproof of BitDistill because warm-up budget, attention-KD gamma, backbone scale, and search are not paper-matched yet.",
+                    "- The completed gamma=100 long-warmup GLUE result is a valid negative reproduction-boundary result.",
+                    "- It is not a disproof of BitDistill because the strict paper-gamma branch, full hyperparameter search, backbone scale, and 10B-token warm-up are not paper-matched yet.",
                     "- The publishable angle remains independent reproduction plus a row-scale CPU-runtime extension if the strict branch closes the quality gap; otherwise the publishable angle becomes a resource-sensitivity and boundary study.",
                 ]
             ),

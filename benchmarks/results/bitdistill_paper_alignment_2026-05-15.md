@@ -10,7 +10,7 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | --- | --- | --- | --- | --- |
 | Backbone | Qwen3 0.6B/1.7B/4B primary, plus Qwen2.5/Gemma robustness | Qwen2.5-0.5B | partial | Useful robustness-style target, but not the paper's primary Qwen3 scale ladder. |
 | Tasks | MNLI, QNLI, SST2 first for classification | MNLI, QNLI, SST2 | matched | Task set is aligned. |
-| Baselines | FP16-SFT, BitNet-SFT, BitDistill | All three exist for short-budget GLUE3; long-warmup BitDistill is pending | partial | The final paper candidate is not complete until long-warmup downstream metrics exist. |
+| Baselines | FP16-SFT, BitNet-SFT, BitDistill | FP16-SFT, BitNet-SFT, and gamma=100 long-warmup BitDistill exist for GLUE3; strict paper-gamma candidates are pending | partial | The completed gamma=100 branch improves over BitNet-SFT but remains below the FP16-gap target; strict paper-hyperparameter rows are not complete. |
 | Stage-1 SubLN | SubLN before attention output projection and FFN down projection | Implemented | matched | Implemented as RMSNorm wrappers around Qwen `o_proj` and `down_proj`. |
 | Stage-2 warm-up | 10B-token continued pretraining | active target 163840000 token presentations | partial | Current target is 0.016384 of the paper token budget. |
 | Stage-3 logits KD | temperature 5, lambda 10 | temperature 5, weight 10, no tau^2 scaling by default | matched | First completed wave used tau^2; current code and pending runs use paper-style scaling. |
@@ -39,8 +39,8 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | mnli | BitDistill short tensor gamma100 | diagnostic | true | 0.525217 | 9815 | 9815 | true | 0.807641 | true | 0.282425 |
 | mnli | BitDistill short row gamma100 | diagnostic | true | 0.516556 | 9815 | 9815 | true | 0.807641 | true | 0.291085 |
 | mnli | BitDistill short tensor layer -8 | diagnostic | true | 0.535711 | 9815 | 9815 | true | 0.807641 | true | 0.271931 |
-| mnli | BitDistill longwarmup tensor gamma100 | diagnostic_pending | true | 0.641671 | 9815 | 9815 | true | 0.807641 | true | 0.165970 |
-| mnli | BitDistill longwarmup row gamma100 | novelty_pending | true | 0.653591 | 9815 | 9815 | true | 0.807641 | true | 0.154050 |
+| mnli | BitDistill longwarmup tensor gamma100 | diagnostic_gamma100 | true | 0.641671 | 9815 | 9815 | true | 0.807641 | true | 0.165970 |
+| mnli | BitDistill longwarmup row gamma100 | novelty_gamma100 | true | 0.653591 | 9815 | 9815 | true | 0.807641 | true | 0.154050 |
 | mnli | BitDistill longwarmup tensor paper gamma | paper_candidate | false | - | - | 9815 | false | 0.807641 | true | - |
 | mnli | BitDistill longwarmup row paper gamma | paper_row_candidate | false | - | - | 9815 | false | 0.807641 | true | - |
 | mnli | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | false | - | - | 9815 | false | 0.807641 | true | - |
@@ -56,8 +56,8 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | qnli | BitDistill short tensor gamma100 | diagnostic | true | 0.596925 | 5463 | 5463 | true | 0.898957 | true | 0.302032 |
 | qnli | BitDistill short row gamma100 | diagnostic | true | 0.618525 | 5463 | 5463 | true | 0.898957 | true | 0.280432 |
 | qnli | BitDistill short tensor layer -8 | diagnostic | false | - | - | 5463 | false | 0.898957 | true | - |
-| qnli | BitDistill longwarmup tensor gamma100 | diagnostic_pending | true | 0.787846 | 5463 | 5463 | true | 0.898957 | true | 0.111111 |
-| qnli | BitDistill longwarmup row gamma100 | novelty_pending | true | 0.796998 | 5463 | 5463 | true | 0.898957 | true | 0.101959 |
+| qnli | BitDistill longwarmup tensor gamma100 | diagnostic_gamma100 | true | 0.787846 | 5463 | 5463 | true | 0.898957 | true | 0.111111 |
+| qnli | BitDistill longwarmup row gamma100 | novelty_gamma100 | true | 0.796998 | 5463 | 5463 | true | 0.898957 | true | 0.101959 |
 | qnli | BitDistill longwarmup tensor paper gamma | paper_candidate | false | - | - | 5463 | false | 0.898957 | true | - |
 | qnli | BitDistill longwarmup row paper gamma | paper_row_candidate | false | - | - | 5463 | false | 0.898957 | true | - |
 | qnli | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | false | - | - | 5463 | false | 0.898957 | true | - |
@@ -68,8 +68,8 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | sst2 | BitDistill short tensor gamma100 | diagnostic | true | 0.815367 | 872 | 872 | true | 0.925459 | true | 0.110092 |
 | sst2 | BitDistill short row gamma100 | diagnostic | true | 0.808486 | 872 | 872 | true | 0.925459 | true | 0.116972 |
 | sst2 | BitDistill short tensor layer -8 | diagnostic | false | - | - | 872 | false | 0.925459 | true | - |
-| sst2 | BitDistill longwarmup tensor gamma100 | diagnostic_pending | false | - | - | 872 | false | 0.925459 | true | - |
-| sst2 | BitDistill longwarmup row gamma100 | novelty_pending | false | - | - | 872 | false | 0.925459 | true | - |
+| sst2 | BitDistill longwarmup tensor gamma100 | diagnostic_gamma100 | true | 0.866972 | 872 | 872 | true | 0.925459 | true | 0.058486 |
+| sst2 | BitDistill longwarmup row gamma100 | novelty_gamma100 | true | 0.854358 | 872 | 872 | true | 0.925459 | true | 0.071101 |
 | sst2 | BitDistill longwarmup tensor paper gamma | paper_candidate | false | - | - | 872 | false | 0.925459 | true | - |
 | sst2 | BitDistill longwarmup row paper gamma | paper_row_candidate | false | - | - | 872 | false | 0.925459 | true | - |
 | sst2 | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | false | - | - | 872 | false | 0.925459 | true | - |
@@ -98,6 +98,6 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 
 ## Interpretation
 
-- The existing negative GLUE result is a valid short-budget boundary result.
-- It is not a disproof of BitDistill because warm-up budget, attention-KD gamma, backbone scale, and search are not paper-matched yet.
+- The completed gamma=100 long-warmup GLUE result is a valid negative reproduction-boundary result.
+- It is not a disproof of BitDistill because the strict paper-gamma branch, full hyperparameter search, backbone scale, and 10B-token warm-up are not paper-matched yet.
 - The publishable angle remains independent reproduction plus a row-scale CPU-runtime extension if the strict branch closes the quality gap; otherwise the publishable angle becomes a resource-sensitivity and boundary study.
