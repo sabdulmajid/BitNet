@@ -382,6 +382,17 @@ def run_parent(args: argparse.Namespace) -> dict[str, Any]:
             write_parent_summary(args, build_parent_summary(args, rows, hardware))
             continue
         output = tmp_dir / f"{task}_{family}_{run.replace('/', '_')}.json"
+        if args.reuse_existing_tmp and output.exists():
+            row = read_json(output)
+            row.update({"family": family, "status": "complete", "reused_tmp": True})
+            rows.append(row)
+            print(
+                f"[{index}/{total_runs}] status=reused_tmp examples={row.get('eval_examples')} "
+                f"examples_per_second={row.get('examples_per_second')} maxrss_mib={row.get('maxrss_mib')}",
+                flush=True,
+            )
+            write_parent_summary(args, build_parent_summary(args, rows, hardware))
+            continue
         command = child_command(args, task, family, run, output)
         env = os.environ.copy()
         env.setdefault("TOKENIZERS_PARALLELISM", "false")
@@ -559,6 +570,7 @@ def main() -> None:
     parser.add_argument("--model-dtype", choices=["fp32", "bf16"], default="fp32")
     parser.add_argument("--child-timeout-seconds", type=int, default=0)
     parser.add_argument("--tmp-dir", type=Path, default=Path("benchmark_results/bitdistill_glue_cpu_tmp"))
+    parser.add_argument("--reuse-existing-tmp", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_glue_cpu_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/bitdistill_glue_cpu_{DATE}.md"))
     parser.add_argument("--single-run", action="store_true")

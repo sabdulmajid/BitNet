@@ -25,12 +25,18 @@ MAX_EVAL_SAMPLES="${MAX_EVAL_SAMPLES:-64}"
 BATCH_SIZE="${BATCH_SIZE:-8}"
 MODEL_DTYPE="${MODEL_DTYPE:-fp32}"
 CHILD_TIMEOUT_SECONDS="${CHILD_TIMEOUT_SECONDS:-900}"
+REUSE_EXISTING_TMP="${REUSE_EXISTING_TMP:-0}"
 OUTPUT_JSON="benchmark_results/bitdistill_glue_cpu_${DATE}.json"
 OUTPUT_MD="benchmarks/results/bitdistill_glue_cpu_${DATE}.md"
 LATEST_JSON="benchmark_results/bitdistill_glue_cpu_latest.json"
 LATEST_MD="benchmarks/results/bitdistill_glue_cpu_latest.md"
 
 rm -f "$LATEST_JSON" "$LATEST_MD"
+
+REUSE_ARGS=(--no-reuse-existing-tmp)
+if [ "$REUSE_EXISTING_TMP" = "1" ]; then
+  REUSE_ARGS=(--reuse-existing-tmp)
+fi
 
 python benchmarks/benchmark_bitdistill_glue_cpu.py \
   --tasks mnli qnli sst2 \
@@ -52,6 +58,7 @@ python benchmarks/benchmark_bitdistill_glue_cpu.py \
   --max-eval-samples "$MAX_EVAL_SAMPLES" \
   --model-dtype "$MODEL_DTYPE" \
   --child-timeout-seconds "$CHILD_TIMEOUT_SECONDS" \
+  "${REUSE_ARGS[@]}" \
   --output-json "$OUTPUT_JSON" \
   --output-md "$OUTPUT_MD"
 
