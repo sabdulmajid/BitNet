@@ -1,0 +1,78 @@
+{
+  "candidate_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit",
+  "candidate_metrics": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json",
+  "candidate_predictions": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
+  "date": "2026-05-15",
+  "expected_examples": 9815,
+  "last_loss_components": {
+    "attention_kd": null,
+    "attention_to_ce": null,
+    "ce": null,
+    "logit_kd": null,
+    "logit_to_ce": null,
+    "weighted_attention_kd": null,
+    "weighted_logit_kd": null
+  },
+  "loss_weights": {},
+  "metric_accuracy": null,
+  "metric_eval_examples": null,
+  "metrics_exists": false,
+  "paired": {
+    "both_correct": 0,
+    "both_wrong": 0,
+    "candidate_accuracy": null,
+    "candidate_wins": 0,
+    "delta_vs_reference": null,
+    "errors": [
+      "missing checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl"
+    ],
+    "matched": 0,
+    "mcnemar_exact_p": null,
+    "missing": [
+      "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl"
+    ],
+    "paired_ci95": null,
+    "reference_accuracy": null,
+    "reference_wins": 0,
+    "status": "pending"
+  },
+  "predictions_exists": false,
+  "reference_predictions": "checkpoints/bitdistill-glue-seqcls-predtrace/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+  "schema": "bitdistill-recovery-run-audit-v1",
+  "steps": null,
+  "submission": {
+    "date": "2026-05-15",
+    "dependency": "afterany:10067",
+    "init_state_dict": "checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/custom_state_dict.pt",
+    "interpretation": "pending paper-inspired BitDistill recovery run; not a completed reproduction result",
+    "job_id": "10068",
+    "model": "Qwen/Qwen2.5-0.5B",
+    "output_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit",
+    "partition": "midcard",
+    "recipe": {
+      "attention_kd_weight": 100000,
+      "attention_split_heads": 8,
+      "attention_temperature": 1.0,
+      "distill_layer": -1,
+      "grad_accum_steps": 4,
+      "init_output_head_from_teacher": true,
+      "learning_rate": 2e-05,
+      "logit_kd_weight": 10,
+      "logit_temperature": 5.0,
+      "max_seq_len": 512,
+      "max_steps": 10000,
+      "per_device_batch_size": 4,
+      "save_model_artifacts": false,
+      "scale_mode": "tensor",
+      "subln": true
+    },
+    "status": "pending",
+    "task": "mnli",
+    "task_format": "sequence_classification",
+    "teacher": "checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1"
+  },
+  "submission_json": "benchmark_results/bitdistill_recovery_submission_2026-05-15.json",
+  "success": false,
+  "success_delta_from_fp": -0.01,
+  "verdict": "pending"
+}
