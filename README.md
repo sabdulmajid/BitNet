@@ -143,6 +143,14 @@ claims about update direction, because per-component gradient norms, ternary
 flip rates, scale trajectories, activation int8 saturation, and Q/K/V-split
 attention losses are not yet logged.
 
+The controlled Stage-2 recovery audit also parses live Slurm logs before final
+validation traces exist. Its current snapshot for the `163.84M`-token
+paper-gamma row records step `570`, weighted-attention/CE ratio `1799.792612`,
+and max observed weighted-attention/CE ratio `5278.853516`. This is not a
+quality result; it is a loss-normalization warning that the paper's
+`gamma=100000` coefficient is numerically dominating CE under the local
+implementation.
+
 The current root-cause ledger is generated in
 [`benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md`](benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md).
 
@@ -256,6 +264,9 @@ Decision rule:
   the short-run failure was mostly undertraining/budget.
 - The next interpretation gate is BitDistill/FP16 recovery, not the weaker
   CE-only BitNet-SFT anchor.
+- If controlled BitDistill rows remain weak, the first suspect is Stage-3 loss
+  normalization and update balance, not decoder projection replacement or A8
+  mechanics.
 - Row-scale results should be reported as a separate runtime/retrofit
   contribution, not as a BitDistill reproduction.
 

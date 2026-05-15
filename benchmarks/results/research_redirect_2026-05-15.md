@@ -80,6 +80,13 @@ activation int8 saturation, or Q/K/V-split attention losses. Therefore the
 current evidence supports loss-scale and static-mechanics triage, but it does
 not yet prove which objective term dominates the update direction.
 
+The controlled Stage-2 recovery audit now parses live Slurm logs. The current
+`163.84M`-token paper-gamma row is only a running job, not a quality result,
+but its latest snapshot at step `570` already shows weighted-attention/CE
+`1799.792612` and max observed weighted-attention/CE `5278.853516`. That makes
+loss normalization and update-balance the first BitDistill recovery suspect if
+the final paired MNLI result remains weak.
+
 ## Canonical Next Matrix
 
 Keep the next wave narrow now that the BitNet-SFT anchor is cleared.

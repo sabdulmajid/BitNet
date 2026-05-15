@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "29516978f6c392fa392ccc311b0038cdce8c817b3c692c483aab20047c044491",
-      "size_bytes": 18398
+      "sha256": "3410f12bfc193a6764580b45c2bb02096f5871fa9f15d67fe37851a4a0cfd0dd",
+      "size_bytes": 19026
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "research_redirect_report",
       "metrics": {},
       "path": "benchmarks/results/research_redirect_2026-05-15.md",
-      "sha256": "bf834e113a1bd8c8dce86b714bede8016b3900f3ff924dc20294e110c99a5968",
-      "size_bytes": 7273
+      "sha256": "13c4f24f924324fdd0b20f8799552144893ea4e505304b827e6cb1abf9b41ba8",
+      "size_bytes": 7704
     },
     {
       "exists": true,
