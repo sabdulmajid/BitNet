@@ -302,6 +302,28 @@ def render_markdown(result: dict[str, Any]) -> str:
     comparisons = result["comparisons"]
     pytorch = result["pytorch"]
     llama = result["llama"]
+    hidden_rel = comparisons["hidden_relative_rms"]
+    hidden_cos = comparisons["hidden_cosine"]
+    if result["status"] == "pass":
+        interpretation = "Token IDs and pooled hidden states match within this audit's tolerance for the sampled MNLI prompt."
+    elif comparisons["token_id_match"] and hidden_cos > 0.99 and hidden_rel < 0.2:
+        interpretation = (
+            "Token IDs match and the packed decoder now follows the PyTorch pooled hidden state closely "
+            f"(cosine {hidden_cos:.6f}), but the relative RMS error remains above the strict pass "
+            f"threshold ({hidden_rel:.6f}). Treat this as a repaired runtime contract that still needs "
+            "full-split validation and native classifier-head support, not a final deployable classifier."
+        )
+    elif comparisons["token_id_match"]:
+        interpretation = (
+            "Token IDs matching rules out the tokenizer pair-format path for this sample. "
+            "The hidden-state comparison still shows a runtime/model-state mismatch, so the sidecar "
+            "is not a deployable classifier yet."
+        )
+    else:
+        interpretation = (
+            "Token IDs do not match, so tokenizer or pair-format parity must be fixed before "
+            "interpreting hidden-state or classifier differences."
+        )
     return "\n\n".join(
         [
             f"# Sequence-Classification I2_SR Hidden-Contract Audit, {result['date']}",
@@ -338,12 +360,7 @@ def render_markdown(result: dict[str, Any]) -> str:
                 ],
             ),
             "## Interpretation",
-            (
-                "Token IDs matching rules out the tokenizer pair-format path for this sample. "
-                "The large hidden-state relative RMS and near-zero cosine show that the packed "
-                "decoder embedding does not currently reproduce the PyTorch sequence-classification "
-                "pooled hidden state, so the sidecar is not a deployable classifier yet."
-            ),
+            interpretation,
         ]
     )
 

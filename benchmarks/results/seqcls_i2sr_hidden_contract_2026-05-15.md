@@ -9,12 +9,12 @@ This audit tests whether the current sidecar classifier failure is caused by tok
 | token IDs match | true |
 | token count | 13 |
 | PyTorch prediction | 1 |
-| llama sidecar prediction | 0 |
-| hidden relative RMS | 7.812774 |
-| hidden cosine | 0.012303 |
+| llama sidecar prediction | 1 |
+| hidden relative RMS | 0.108662 |
+| hidden cosine | 0.994091 |
 | PyTorch hidden norm | 26.537035 |
-| llama hidden norm | 205.949269 |
-| logit relative RMS | 7.270589 |
+| llama hidden norm | 26.508326 |
+| logit relative RMS | 0.091918 |
 
 ## Prompt
 
@@ -25,9 +25,9 @@ This audit tests whether the current sidecar classifier failure is caused by tok
 | source | logits |
 | --- | --- |
 | PyTorch model | [-0.51953125, 1.4375, 0.287109375] |
-| llama embedding + sidecar head | [3.6327290534973145, -9.06053352355957, -0.352215051651001] |
+| llama embedding + sidecar head | [-0.5463043451309204, 1.516332983970642, 0.17090028524398804] |
 | PyTorch hidden + sidecar head | [-0.5188282132148743, 1.441055178642273, 0.2875688076019287] |
 
 ## Interpretation
 
-Token IDs matching rules out the tokenizer pair-format path for this sample. The large hidden-state relative RMS and near-zero cosine show that the packed decoder embedding does not currently reproduce the PyTorch sequence-classification pooled hidden state, so the sidecar is not a deployable classifier yet.
+Token IDs match and the packed decoder now follows the PyTorch pooled hidden state closely (cosine 0.994091), but the relative RMS error remains above the strict pass threshold (0.108662). Treat this as a repaired runtime contract that still needs full-split validation and native classifier-head support, not a final deployable classifier.

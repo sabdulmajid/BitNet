@@ -43,7 +43,7 @@ packed CPU path faithful to the trained checkpoint.
 | Arbitrary FP16/BF16 to ternary conversion is lossless | **No** | Qwen2.5-1.5B naive PTQ drops ten-task mean from `0.644169` to `0.348671`; WikiText PPL jumps from `13.901` to `3,813,121.803`. |
 | QAT/distillation recovers useful signal | **Yes, partially** | Best row-scale dense-Qwen run reaches ten-task mean `0.499459`, improving over naive PTQ by `+0.150788` paired mean accuracy. |
 | Row-scale packed CPU inference is viable for compatible dense causal artifacts | **Yes, for the audited path** | `I2_SR` row-scale Qwen2.5-1.5B Xeon run: PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, file `1211.3 MiB`. |
-| Sequence-classification checkpoint can enter the packed path | **Prototype only; hidden-contract mismatch** | MNLI long-warmup row-scale seqcls checkpoint (`0.653591` PyTorch accuracy) exports as a `352.6 MiB` `I2_SR` backbone plus `10.8 KiB` dense score-head sidecar and produces finite CPU logits. The 64-example sidecar CPU probe gets only `0.359375` accuracy and `0.343750` agreement with saved PyTorch predictions; token IDs match for an audited MNLI sample, but llama.cpp hidden state vs PyTorch pooled hidden has relative RMS `7.812774` and cosine `0.012303`. Native GGUF classifier inference is not implemented. |
+| Sequence-classification checkpoint can enter the packed path | **Prototype only; native head blocked** | MNLI long-warmup row-scale seqcls checkpoint (`0.653591` PyTorch accuracy) exports as a `352.6 MiB` `I2_SR` backbone plus `10.8 KiB` dense score-head sidecar. A Qwen-compatible `bitnet-qwen` graph repairs the dominant runtime mismatch: hidden cosine improves to `0.994091`, relative RMS drops to `0.108662`, and the 64-example sidecar CPU probe reaches `0.578125` accuracy with `0.921875` agreement against saved PyTorch predictions. Native GGUF classifier inference and full-split CPU validation are not implemented. |
 | BitDistill paper-level GLUE reproduction is achieved | **No, not yet** | Local FP16-SFT MNLI is close to the paper anchor (`0.807641` vs `0.799100`), and BitNet-SFT now clears its paper anchor (`0.628935` vs `0.608000`) after more budget. This is CE-only BitNet-SFT, not BitDistill or FP16-level recovery. |
 | Row-scale `I2_SR` is standard BitNet | **No** | It is a fork-specific retrofit variant for row-scale students, not the upstream per-tensor BitNet format. |
 | Kimi/MoE retrofit is proven | **No** | Tiny Qwen2MoE fixtures prove converter/runtime plumbing only. No Kimi-specific mapping, trained MoE quality, or real expert-locality benchmark is proven. |
@@ -154,12 +154,12 @@ repacking a fixed projection.
 
 The controlled Stage-2 recovery audit also parses live Slurm logs before final
 validation traces exist. Its current snapshot for the `163.84M`-token
-paper-gamma row records step `1860`, weighted-attention/CE ratio `2590.461990`,
-median weighted-attention/CE ratio `1874.689599`, p95 ratio `5307.021380`, and
-max observed ratio `16326.870293`. The same log implies a median raw
-CE/attention equalizing gamma of only `53.341231`. This is not a quality
-result; it is a loss-normalization warning that the paper's `gamma=100000`
-coefficient is numerically dominating CE under the local implementation.
+paper-gamma row records step `9000`, weighted-attention/CE ratio `1754.833486`,
+median weighted-attention/CE ratio `1759.870617`, p95 ratio `6286.935978`, and
+max observed ratio `37819.641342`. The same log implies a median raw
+CE/attention equalizing gamma of only `56.823222`. This is not a quality result;
+it is a loss-normalization warning that the paper's `gamma=100000` coefficient
+is numerically dominating CE under the local implementation.
 
 The current root-cause ledger is generated in
 [`benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md`](benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md).
@@ -203,6 +203,9 @@ the Q4-normalized `I2_SR` speedup intervals remain above `1.0`: prefill
 - Direct static-ternary GGUF export for dense Qwen checkpoints.
 - A stable row-scale `I2_SR` GGUF/qtype path for preserving row-wise ternary
   scales in packed CPU inference.
+- A Qwen-compatible `bitnet-qwen` packed graph in the llama.cpp fork that keeps
+  the BitNet/SubLN/I2_SR loader contract while using Qwen SiLU/SwiGLU FFN
+  semantics and Q/K/V projection-bias tensors.
 - BitDistill-style training components for Qwen-style models: SubLN insertion,
   Stage-2 continued pretraining, Stage-3 CE + logits KL + Q/K/V
   attention-relation distillation, attention-layer sweep support, and strict
@@ -250,21 +253,17 @@ A formal runtime-gap audit now marks the product gap as narrowed but not closed:
 `15` strict GLUE checkpoints use `Qwen2ForSequenceClassification`, `0` are
 native causal-export compatible, and one MNLI checkpoint has a sidecar
 prototype that loads a packed `I2_SR` backbone and applies a dense score head
-outside llama.cpp. A sampled 64-example CPU sidecar benchmark is explicitly a
-quality mismatch (`0.359375` accuracy, `0.343750` agreement with saved PyTorch
-predictions). The hidden-contract audit narrows this further: HF token IDs and
-`llama-tokenize --no-bos` IDs match for the first MNLI sample, but the
-llama.cpp embedding is not the PyTorch pooled hidden state (`7.812774` relative
-RMS, `0.012303` cosine). A missing RoPE metadata bridge has been fixed
-(`rope_parameters.rope_theta` now exports to `bitnet-25.rope.freq_base =
-1000000.0`), so the remaining mismatch is not explained by tokenizer pairing or
-missing RoPE frequency metadata. The architecture-contract audit now identifies
-a deterministic graph mismatch: the PyTorch checkpoint is Qwen2 with
-`hidden_act = silu`, while the current `bitnet-25` runtime graph uses the
-ReLU-squared FFN path; the plain `bitnet` graph has SiLU but lacks the 72 Q/K/V
-projection-bias tensor slots present in this Qwen2 checkpoint. The next runtime
-task is implementing a Qwen-BitDistill packed graph with native head execution
-before running full GLUE accuracy/RSS/throughput.
+outside llama.cpp. The original `bitnet-25` path had a deterministic graph
+mismatch: Qwen2 uses `hidden_act = silu`, while `bitnet-25` used the
+ReLU-squared FFN path. The fork now adds `bitnet-qwen`, which preserves the
+BitNet/SubLN/I2_SR loader layout and Q/K/V bias slots while dispatching the
+packed graph through Qwen SiLU/SwiGLU semantics. With that fix, HF token IDs and
+`llama-tokenize --no-bos` IDs match for the first MNLI sample, hidden cosine is
+`0.994091`, hidden relative RMS is `0.108662`, and the 64-example CPU sidecar
+probe reaches `0.578125` accuracy with `0.921875` agreement against saved
+PyTorch predictions. This is still a prototype: the classifier head is a Python
+sidecar, the hidden contract is not bit-exact, and full-split CPU
+quality/RSS/throughput have not been measured on a single native artifact.
 
 ## Canonical Next Matrix
 
@@ -342,6 +341,7 @@ python benchmarks/audit_bitnet_sft_mechanics.py
 python benchmarks/audit_bitdistill_telemetry_coverage.py
 python benchmarks/audit_bitdistill_stage2_curve.py
 python benchmarks/audit_seqcls_i2sr_arch_contract.py
+python benchmarks/audit_seqcls_runtime_gap.py
 python benchmarks/audit_benchmark_coverage.py
 python benchmarks/audit_product_scope.py
 python benchmarks/build_evidence_manifest.py \

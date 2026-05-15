@@ -2,7 +2,7 @@
   "artifacts": {
     "classifier_head": "models/seqcls-backbone-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_score_head.npz",
     "embedding_binary": "build-portable-avx2/bin/llama-embedding",
-    "gguf": "models/seqcls-backbone-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet25_i2_sr.gguf",
+    "gguf": "models/seqcls-backbone-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr.gguf",
     "head_weight_shape": [
       3,
       896
@@ -16,10 +16,10 @@
     "stored_accuracy": 0.6535914416709119
   },
   "comparisons": {
-    "hidden_cosine": 0.012302589838196848,
-    "hidden_relative_rms": 7.812774193066907,
-    "llama_hidden_l2": 205.94926904987386,
-    "logit_relative_rms": 7.270589052541309,
+    "hidden_cosine": 0.9940905307837791,
+    "hidden_relative_rms": 0.10866150519771632,
+    "llama_hidden_l2": 26.50832611988938,
+    "logit_relative_rms": 0.09191836414090784,
     "pytorch_hidden_l2": 26.53703466524006,
     "pytorch_logits_equal_sidecar_logits": true,
     "pytorch_logits_vs_sidecar_relative_rms": 0.0023488634895355923,
@@ -39,7 +39,7 @@
       "command": [
         "/mnt/slurm_nfs/a6abdulm/projects/BitNet/build-portable-avx2/bin/llama-embedding",
         "-m",
-        "/mnt/slurm_nfs/a6abdulm/projects/BitNet/models/seqcls-backbone-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet25_i2_sr.gguf",
+        "/mnt/slurm_nfs/a6abdulm/projects/BitNet/models/seqcls-backbone-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr.gguf",
         "-p",
         "The new rights are nice enoughEveryone really likes the newest benefits ",
         "--pooling",
@@ -58,16 +58,16 @@
         "512"
       ],
       "returncode": 0,
-      "stderr_bytes": 9379,
-      "stderr_tail": "common_init_from_params: warming up the model with an empty run - please wait ... (--no-warmup to disable)\n\nsystem_info: n_threads = 24 (n_threads_batch = 24) / 24 | AVX = 1 | AVX_VNNI = 0 | AVX2 = 1 | AVX512 = 0 | AVX512_VBMI = 0 | AVX512_VNNI = 0 | AVX512_BF16 = 0 | FMA = 1 | NEON = 0 | SVE = 0 | ARM_FMA = 0 | F16C = 1 | FP16_VA = 0 | RISCV_VECT = 0 | WASM_SIMD = 0 | BLAS = 0 | SSE3 = 1 | SSSE3 = 1 | VSX = 0 | MATMUL_INT8 = 0 | LLAMAFILE = 1 | \nmain: last token in the prompt is not SEP\nmain: 'tokenizer.ggml.add_eos_token' should be set to 'true' in the GGUF header\nbatch_decode: n_tokens = 13, n_seq = 1\nllama_perf_context_print:        load time =    1139.82 ms\nllama_perf_context_print: prompt eval time =      82.15 ms /    13 tokens (    6.32 ms per token,   158.24 tokens per second)\nllama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)\nllama_perf_context_print:       total time =     103.24 ms /    14 tokens",
-      "stdout_bytes": 9661
+      "stderr_bytes": 9391,
+      "stderr_tail": "common_init_from_params: warming up the model with an empty run - please wait ... (--no-warmup to disable)\n\nsystem_info: n_threads = 24 (n_threads_batch = 24) / 24 | AVX = 1 | AVX_VNNI = 0 | AVX2 = 1 | AVX512 = 0 | AVX512_VBMI = 0 | AVX512_VNNI = 0 | AVX512_BF16 = 0 | FMA = 1 | NEON = 0 | SVE = 0 | ARM_FMA = 0 | F16C = 1 | FP16_VA = 0 | RISCV_VECT = 0 | WASM_SIMD = 0 | BLAS = 0 | SSE3 = 1 | SSSE3 = 1 | VSX = 0 | MATMUL_INT8 = 0 | LLAMAFILE = 1 | \nmain: last token in the prompt is not SEP\nmain: 'tokenizer.ggml.add_eos_token' should be set to 'true' in the GGUF header\nbatch_decode: n_tokens = 13, n_seq = 1\nllama_perf_context_print:        load time =    1118.22 ms\nllama_perf_context_print: prompt eval time =      99.57 ms /    13 tokens (    7.66 ms per token,   130.57 tokens per second)\nllama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)\nllama_perf_context_print:       total time =     120.48 ms /    14 tokens",
+      "stdout_bytes": 9529
     },
     "logits": [
-      3.6327290534973145,
-      -9.06053352355957,
-      -0.352215051651001
+      -0.5463043451309204,
+      1.516332983970642,
+      0.17090028524398804
     ],
-    "prediction": 0
+    "prediction": 1
   },
   "pytorch": {
     "attention_mask_sum": 13,
@@ -124,9 +124,9 @@
       "command": [
         "/mnt/slurm_nfs/a6abdulm/projects/BitNet/build-portable-avx2/bin/llama-tokenize",
         "-m",
-        "/mnt/slurm_nfs/a6abdulm/projects/BitNet/models/seqcls-backbone-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet25_i2_sr.gguf",
+        "/mnt/slurm_nfs/a6abdulm/projects/BitNet/models/seqcls-backbone-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr.gguf",
         "-f",
-        "/tmp/tmp2y_pby0u",
+        "/tmp/tmphhhf0xy0",
         "--no-bos",
         "--ids",
         "--log-disable"

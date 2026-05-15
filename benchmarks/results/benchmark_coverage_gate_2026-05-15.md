@@ -49,11 +49,11 @@ Overall status: **PASS**.
 | BitDistill loss-contract static checks pass | pass | passed=True, checks=6, status=loss_normalization_risk |  |
 | BitDistill loss-contract records paper-gamma dominance risk | pass | status=loss_normalization_risk, max_attn_ce=37819.64134227373 |  |
 | Ternary flip-dynamics audit has nonzero saved-snapshot flips | pass | status=pass, pairs=2, min_flip=0.06454656755885871, max_flip=0.1659562863332169 |  |
-| Sequence-classification runtime gap is narrowed but not closed | pass | status=sidecar_prototype_available_native_runtime_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6 |  |
+| Sequence-classification runtime gap is narrowed but not closed | pass | status=sidecar_qwen_contract_available_native_head_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6 |  |
 | Sequence-classification I2_SR sidecar smoke passes | pass | status=prototype_smoke_passed, returncode=0, head_shape=[3, 896], finite_logits=True |  |
-| Sequence-classification sidecar CPU quality mismatch is recorded | pass | status=quality_mismatch, examples=64, agreement=0.34375, accuracy=0.359375 |  |
-| Sequence-classification hidden contract mismatch is isolated | pass | status=hidden_contract_mismatch, token_match=True, hidden_rel_rms=7.812774193066907, hidden_cosine=0.012302589838196848, logit_rel_rms=7.270589052541309 |  |
-| Sequence-classification architecture contract mismatch is identified | pass | status=architecture_contract_mismatch, hidden_act=silu, bitnet25_activation=relu_sqr, projection_biases=72, checks={'activation_mismatch': True, 'bitnet25_has_bias_slots': True, 'plain_bitnet_bias_contract_gap': True, 'plain_bitnet_has_silu_graph': True} |  |
+| Sequence-classification sidecar CPU quality mismatch is recorded | pass | status=quality_mismatch, examples=64, agreement=0.921875, accuracy=0.578125 |  |
+| Sequence-classification hidden contract is near but not exact | pass | status=hidden_contract_mismatch, token_match=True, hidden_rel_rms=0.10866150519771632, hidden_cosine=0.9940905307837791, logit_rel_rms=0.09191836414090784 |  |
+| Sequence-classification architecture contract is identified and repaired | pass | status=bitnet_qwen_contract_available, hidden_act=silu, bitnet25_activation=relu_sqr, bitnet_qwen={'available': True, 'dispatch_line': 16898, 'ffn_activation': 'silu', 'loader_has_qkv_bias': True, 'silu_branch_line': 15544}, projection_biases=72, checks={'activation_mismatch': True, 'bitnet25_has_bias_slots': True, 'bitnet_qwen_contract_available': True, 'plain_bitnet_bias_contract_gap': True, 'plain_bitnet_has_silu_graph': True} |  |
 | Qwen3 paper-alignment audit tracks required GLUE rows | pass | jobs=16, complete=0, ready=False |  |
 | FP F16 CPU row is finite | pass | ppl=12.2808, prefill=114.468162, decode=5.555998 |  |
 | FP Q8_0 CPU row is finite | pass | ppl=12.3056, prefill=124.864246, decode=10.131914 |  |

@@ -278,7 +278,7 @@
     {
       "name": "Sequence-classification runtime gap is narrowed but not closed",
       "passed": true,
-      "evidence": "status=sidecar_prototype_available_native_runtime_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6",
+      "evidence": "status=sidecar_qwen_contract_available_native_head_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6",
       "blocker": ""
     },
     {
@@ -290,19 +290,19 @@
     {
       "name": "Sequence-classification sidecar CPU quality mismatch is recorded",
       "passed": true,
-      "evidence": "status=quality_mismatch, examples=64, agreement=0.34375, accuracy=0.359375",
+      "evidence": "status=quality_mismatch, examples=64, agreement=0.921875, accuracy=0.578125",
       "blocker": ""
     },
     {
-      "name": "Sequence-classification hidden contract mismatch is isolated",
+      "name": "Sequence-classification hidden contract is near but not exact",
       "passed": true,
-      "evidence": "status=hidden_contract_mismatch, token_match=True, hidden_rel_rms=7.812774193066907, hidden_cosine=0.012302589838196848, logit_rel_rms=7.270589052541309",
+      "evidence": "status=hidden_contract_mismatch, token_match=True, hidden_rel_rms=0.10866150519771632, hidden_cosine=0.9940905307837791, logit_rel_rms=0.09191836414090784",
       "blocker": ""
     },
     {
-      "name": "Sequence-classification architecture contract mismatch is identified",
+      "name": "Sequence-classification architecture contract is identified and repaired",
       "passed": true,
-      "evidence": "status=architecture_contract_mismatch, hidden_act=silu, bitnet25_activation=relu_sqr, projection_biases=72, checks={'activation_mismatch': True, 'bitnet25_has_bias_slots': True, 'plain_bitnet_bias_contract_gap': True, 'plain_bitnet_has_silu_graph': True}",
+      "evidence": "status=bitnet_qwen_contract_available, hidden_act=silu, bitnet25_activation=relu_sqr, bitnet_qwen={'available': True, 'dispatch_line': 16898, 'ffn_activation': 'silu', 'loader_has_qkv_bias': True, 'silu_branch_line': 15544}, projection_biases=72, checks={'activation_mismatch': True, 'bitnet25_has_bias_slots': True, 'bitnet_qwen_contract_available': True, 'plain_bitnet_bias_contract_gap': True, 'plain_bitnet_has_silu_graph': True}",
       "blocker": ""
     },
     {

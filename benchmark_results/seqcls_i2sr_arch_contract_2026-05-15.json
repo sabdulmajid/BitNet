@@ -1,4 +1,11 @@
 {
+  "bitnet_qwen_contract": {
+    "available": true,
+    "dispatch_line": 16898,
+    "ffn_activation": "silu",
+    "loader_has_qkv_bias": true,
+    "silu_branch_line": 15544
+  },
   "checkpoint": {
     "path": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8",
     "state_path": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/ternary_state_dict.pt"
@@ -39,16 +46,17 @@
   "checks": {
     "activation_mismatch": true,
     "bitnet25_has_bias_slots": true,
+    "bitnet_qwen_contract_available": true,
     "plain_bitnet_bias_contract_gap": true,
     "plain_bitnet_has_silu_graph": true
   },
   "date": "2026-05-15",
   "hidden_contract": {
     "comparisons": {
-      "hidden_cosine": 0.012302589838196848,
-      "hidden_relative_rms": 7.812774193066907,
-      "llama_hidden_l2": 205.94926904987386,
-      "logit_relative_rms": 7.270589052541309,
+      "hidden_cosine": 0.9940905307837791,
+      "hidden_relative_rms": 0.10866150519771632,
+      "llama_hidden_l2": 26.50832611988938,
+      "logit_relative_rms": 0.09191836414090784,
       "pytorch_hidden_l2": 26.53703466524006,
       "pytorch_logits_equal_sidecar_logits": true,
       "pytorch_logits_vs_sidecar_relative_rms": 0.0023488634895355923,
@@ -57,15 +65,15 @@
     "path": "benchmark_results/seqcls_i2sr_hidden_contract_2026-05-15.json",
     "status": "hidden_contract_mismatch"
   },
-  "interpretation": "The current sidecar mismatch is not just tokenizer metadata. The exported runtime graph is not the same architecture family as the PyTorch Qwen2 sequence-classification student: bitnet-25 uses ReLU-squared FFN while the checkpoint uses SiLU/SwiGLU. The plain bitnet graph has SiLU but lacks Q/K/V bias tensor slots needed by Qwen2. A dedicated Qwen-BitDistill packed graph is required before full GLUE runtime quality numbers are meaningful.",
+  "interpretation": "The original sidecar mismatch was not tokenizer metadata: bitnet-25 used ReLU-squared FFN while the Qwen2 checkpoint used SiLU/SwiGLU. This fork now has a dedicated bitnet-qwen packed graph for that backbone. The remaining deployment blockers are native classifier-head storage/evaluation and full-split CPU validation.",
   "required_runtime_work": [
     {
       "requirement": "Qwen2/Qwen3 SiLU/SwiGLU FFN in packed graph",
-      "status": "missing in bitnet-25 graph"
+      "status": "present via bitnet-qwen"
     },
     {
       "requirement": "Q/K/V projection-bias tensor slots",
-      "status": "present in bitnet-25 loader, missing in plain bitnet loader"
+      "status": "present in bitnet-qwen/bitnet-25 loader, missing in plain bitnet loader"
     },
     {
       "requirement": "SubLN before attention output and FFN down projections",
@@ -86,17 +94,17 @@
   ],
   "runtime_arch_under_audit": "bitnet-25",
   "runtime_source": {
-    "bitnet25_dispatch_line": 16853,
+    "bitnet25_dispatch_line": 16894,
     "bitnet25_ffn_activation": "relu_sqr",
     "bitnet25_loader_has_qkv_bias": true,
-    "bitnet25_loader_line": 8719,
-    "bitnet25_relu_sqr_line": 15503,
+    "bitnet25_loader_line": 8759,
+    "bitnet25_relu_sqr_line": 15544,
     "bitnet_ffn_activation": "silu",
     "bitnet_loader_has_qkv_bias": false,
-    "bitnet_loader_line": 8679,
-    "bitnet_silu_line": 15355,
+    "bitnet_loader_line": 8719,
+    "bitnet_silu_line": 15396,
     "path": "3rdparty/llama.cpp/src/llama.cpp"
   },
   "schema": "seqcls_i2sr_arch_contract.v1",
-  "status": "architecture_contract_mismatch"
+  "status": "bitnet_qwen_contract_available"
 }

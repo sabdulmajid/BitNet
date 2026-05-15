@@ -19,7 +19,7 @@ This audit is not a quality result. It checks whether the local implementation a
 
 | job | label | state | step | CE | attention KD | weighted attention KD | weighted attention / CE | max weighted attention / CE | median weighted attention / CE | p95 weighted attention / CE | median CE/attention gamma | p95 CE/attention gamma | parsed steps |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 10068 | 20k-warmup downstream control | RUNNING | 7480 | 0.449219 | 0.010841 | 1084.130859 | 2413.368221 | 37819.641342 | 1762.696933 | 6028.384039 | 56.732548 | 126.572808 | 749 |
+| 10068 | 20k-warmup downstream control | RUNNING | 9000 | 0.414062 | 0.007266 | 726.609863 | 1754.833486 | 37819.641342 | 1759.870617 | 6286.935978 | 56.823222 | 129.679747 | 901 |
 
 ## Interpretation
 

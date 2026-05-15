@@ -16,8 +16,8 @@ This is a prototype bridge for the current product gap: a strict GLUE sequence-c
 | head shape | [3, 896] |
 | finite embedding | true |
 | finite logits | true |
-| prompt tok/s | 139.020000 |
-| predicted class for smoke prompt | 0 |
+| prompt tok/s | 228.660000 |
+| predicted class for smoke prompt | 2 |
 
 ## Smoke Prompt
 
@@ -27,9 +27,9 @@ This is a prototype bridge for the current product gap: a strict GLUE sequence-c
 
 | class | logit | probability |
 | --- | --- | --- |
-| 0 | 3.117530 | 0.983521 |
-| 1 | -3.164887 | 0.001838 |
-| 2 | -1.089805 | 0.014641 |
+| 0 | -0.415110 | 0.109037 |
+| 1 | 0.560108 | 0.289138 |
+| 2 | 1.293172 | 0.601825 |
 
 ## Interpretation
 

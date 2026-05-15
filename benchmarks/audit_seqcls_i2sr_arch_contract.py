@@ -117,6 +117,26 @@ def render_markdown(result: dict[str, Any]) -> str:
     runtime = result["runtime_source"]
     hidden = result["hidden_contract"]
     bias = result["checkpoint_biases"]
+    qwen = result["bitnet_qwen_contract"]
+    if qwen["available"]:
+        interpretation = (
+            "The original `bitnet-25` export was a deterministic architecture mismatch for this Qwen2 "
+            "sequence-classification checkpoint because it selected the BitNet ReLU-squared FFN path. "
+            "This fork now carries a dedicated `bitnet-qwen` runtime contract that keeps the BitNet 2.5 "
+            "loader/SubLN/bias layout but dispatches the packed graph through Qwen SiLU/SwiGLU FFN "
+            "semantics. The remaining blocker is no longer the dense backbone graph; it is native "
+            "sequence-classification head/pooling support plus full-split quality validation."
+        )
+    else:
+        interpretation = (
+            "The current seqcls export uses the `bitnet-25` runtime graph, but the checkpoint is a Qwen2 "
+            "sequence-classification student whose config says `hidden_act = silu`. The `bitnet-25` graph "
+            "uses the BitNet b1.58/2.5 ReLU-squared FFN path. The alternative plain `bitnet` graph has "
+            "the SiLU FFN path, but its loader does not declare Q/K/V projection-bias tensors, while this "
+            "Qwen2 checkpoint has 72 such tensors. Therefore the fix is not just changing a metadata "
+            "string; we need a Qwen-BitDistill runtime contract that preserves Qwen2 SwiGLU/SiLU, optional "
+            "projection biases, SubLN, RoPE metadata, and I2_SR row-scale kernels together."
+        )
     return "\n\n".join(
         [
             f"# Sequence-Classification I2_SR Architecture-Contract Audit, {result['date']}",
@@ -132,6 +152,9 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["checkpoint hidden_act", result["checkpoint_config"].get("hidden_act")],
                     ["GGUF runtime arch under audit", result["runtime_arch_under_audit"]],
                     ["bitnet-25 graph activation", runtime["bitnet25_ffn_activation"]],
+                    ["bitnet-qwen contract available", qwen["available"]],
+                    ["bitnet-qwen graph activation", qwen["ffn_activation"]],
+                    ["bitnet-qwen loader has Q/K/V bias slots", qwen["loader_has_qkv_bias"]],
                     ["PyTorch/runtime activation mismatch", result["checks"]["activation_mismatch"]],
                     ["Q/K/V projection bias tensors in checkpoint", bias["projection_bias_count"]],
                     ["plain bitnet loader has Q/K/V bias slots", runtime["bitnet_loader_has_qkv_bias"]],
@@ -145,25 +168,16 @@ def render_markdown(result: dict[str, Any]) -> str:
                 ["source check", "line"],
                 [
                     ["bitnet-25 dispatches to build_bitnet_158", runtime["bitnet25_dispatch_line"]],
+                    ["bitnet-qwen dispatches to build_bitnet_158(true)", qwen["dispatch_line"]],
                     ["build_bitnet_158 uses ReLU squared FFN", runtime["bitnet25_relu_sqr_line"]],
+                    ["build_bitnet_158 has Qwen SiLU branch", qwen["silu_branch_line"]],
                     ["build_bitnet uses SiLU FFN", runtime["bitnet_silu_line"]],
                     ["plain bitnet loader block starts", runtime["bitnet_loader_line"]],
                     ["bitnet-25 loader block starts", runtime["bitnet25_loader_line"]],
                 ],
             ),
             "## Interpretation",
-            (
-                "The current seqcls export uses the `bitnet-25` runtime graph, but the "
-                "checkpoint is a Qwen2 sequence-classification student whose config says "
-                "`hidden_act = silu`. The `bitnet-25` graph uses the BitNet b1.58/2.5 "
-                "ReLU-squared FFN path. That is a deterministic architecture mismatch. "
-                "The alternative plain `bitnet` graph has the SiLU FFN path, but its loader "
-                "does not declare Q/K/V projection-bias tensors, while this Qwen2 checkpoint "
-                "has 72 such tensors. Therefore the fix is not just changing a metadata "
-                "string; we need a Qwen-BitDistill runtime contract that preserves Qwen2 "
-                "SwiGLU/SiLU, optional projection biases, SubLN, RoPE metadata, and I2_SR "
-                "row-scale kernels together."
-            ),
+            interpretation,
             "## Required Runtime Work",
             md_table(
                 ["requirement", "status"],
@@ -191,13 +205,31 @@ def main() -> None:
     config = read_json(checkpoint_dir / "config.json")
     hidden = read_json(hidden_path)
     source = llama_cpp.read_text(encoding="utf-8")
-    build_bitnet = block_between(source, "struct ggml_cgraph * build_bitnet() {", "struct ggml_cgraph * build_bitnet_158() {")
-    build_bitnet_158 = block_between(source, "struct ggml_cgraph * build_bitnet_158() {", "struct ggml_cgraph * build_t5_encoder() {")
+    build_bitnet = block_between(source, "struct ggml_cgraph * build_bitnet() {", "struct ggml_cgraph * build_bitnet_158")
+    build_bitnet_158 = block_between(source, "struct ggml_cgraph * build_bitnet_158", "struct ggml_cgraph * build_t5_encoder() {")
     loader_anchor = "static bool llm_load_tensors("
     bitnet_loader = block_between_after(source, loader_anchor, "case LLM_ARCH_BITNET:", "case LLM_ARCH_BITNET_B158:")
     bitnet25_loader = block_between_after(source, loader_anchor, "case LLM_ARCH_BITNET_B158:", "case LLM_ARCH_T5:")
-    graph_dispatch = block_between(source, "case LLM_ARCH_BITNET:", "case LLM_ARCH_T5:")
+    graph_dispatch = block_between_after(
+        source,
+        "static struct ggml_cgraph * llama_build_graph(",
+        "case LLM_ARCH_BITNET:",
+        "case LLM_ARCH_T5:",
+    )
     biases = bias_summary(checkpoint_dir / "ternary_state_dict.pt")
+    bitnet_qwen_available = (
+        "LLM_ARCH_BITNET_QWEN" in source
+        and "build_bitnet_158(true)" in graph_dispatch
+        and "qwen_silu ? LLM_FFN_SILU : LLM_FFN_RELU_SQR" in build_bitnet_158
+    )
+    bitnet_qwen_contract = {
+        "available": bitnet_qwen_available,
+        "ffn_activation": "silu" if bitnet_qwen_available else "missing",
+        "loader_has_qkv_bias": bitnet_qwen_available
+        and all(token in bitnet25_loader for token in ("layer.bq", "layer.bk", "layer.bv")),
+        "dispatch_line": line_number_after(source, "static struct ggml_cgraph * llama_build_graph(", "case LLM_ARCH_BITNET_QWEN:"),
+        "silu_branch_line": line_number_after(source, "struct ggml_cgraph * build_bitnet_158", "qwen_silu ? LLM_FFN_SILU"),
+    }
 
     runtime = {
         "path": maybe_relative(llama_cpp, root),
@@ -206,18 +238,21 @@ def main() -> None:
         "bitnet_loader_has_qkv_bias": all(token in bitnet_loader for token in ("layer.bq", "layer.bk", "layer.bv")),
         "bitnet25_loader_has_qkv_bias": all(token in bitnet25_loader for token in ("layer.bq", "layer.bk", "layer.bv")),
         "bitnet25_dispatch_line": line_number_after(source, "static struct ggml_cgraph * llama_build_graph(", "case LLM_ARCH_BITNET_25:"),
-        "bitnet25_relu_sqr_line": line_number_after(source, "struct ggml_cgraph * build_bitnet_158() {", "LLM_FFN_RELU_SQR"),
+        "bitnet25_relu_sqr_line": line_number_after(source, "struct ggml_cgraph * build_bitnet_158", "LLM_FFN_RELU_SQR"),
         "bitnet_silu_line": line_number_after(source, "struct ggml_cgraph * build_bitnet() {", "LLM_FFN_SILU"),
         "bitnet_loader_line": line_number_after(source, loader_anchor, "case LLM_ARCH_BITNET:"),
         "bitnet25_loader_line": line_number_after(source, loader_anchor, "case LLM_ARCH_BITNET_B158:"),
     }
     activation_mismatch = config.get("hidden_act") == "silu" and runtime["bitnet25_ffn_activation"] == "relu_sqr"
     bias_contract_gap = biases["projection_bias_count"] > 0 and not runtime["bitnet_loader_has_qkv_bias"]
+    status = "bitnet_qwen_contract_available" if bitnet_qwen_available else (
+        "architecture_contract_mismatch" if activation_mismatch else "needs_review"
+    )
 
     result = {
         "schema": "seqcls_i2sr_arch_contract.v1",
         "date": DATE,
-        "status": "architecture_contract_mismatch" if activation_mismatch else "needs_review",
+        "status": status,
         "checkpoint": {
             "path": maybe_relative(checkpoint_dir, root),
             "state_path": maybe_relative(checkpoint_dir / "ternary_state_dict.pt", root),
@@ -234,6 +269,7 @@ def main() -> None:
         "checkpoint_biases": biases,
         "runtime_arch_under_audit": "bitnet-25",
         "runtime_source": runtime,
+        "bitnet_qwen_contract": bitnet_qwen_contract,
         "hidden_contract": {
             "path": maybe_relative(hidden_path, root),
             "status": hidden.get("status"),
@@ -244,17 +280,31 @@ def main() -> None:
             "plain_bitnet_has_silu_graph": runtime["bitnet_ffn_activation"] == "silu",
             "plain_bitnet_bias_contract_gap": bias_contract_gap,
             "bitnet25_has_bias_slots": runtime["bitnet25_loader_has_qkv_bias"],
+            "bitnet_qwen_contract_available": bitnet_qwen_available,
         },
         "required_runtime_work": [
-            {"requirement": "Qwen2/Qwen3 SiLU/SwiGLU FFN in packed graph", "status": "missing in bitnet-25 graph"},
-            {"requirement": "Q/K/V projection-bias tensor slots", "status": "present in bitnet-25 loader, missing in plain bitnet loader"},
+            {
+                "requirement": "Qwen2/Qwen3 SiLU/SwiGLU FFN in packed graph",
+                "status": "present via bitnet-qwen" if bitnet_qwen_available else "missing in bitnet-25 graph",
+            },
+            {
+                "requirement": "Q/K/V projection-bias tensor slots",
+                "status": "present in bitnet-qwen/bitnet-25 loader, missing in plain bitnet loader"
+                if bitnet_qwen_contract["loader_has_qkv_bias"]
+                else "present in bitnet-25 loader, missing in plain bitnet loader",
+            },
             {"requirement": "SubLN before attention output and FFN down projections", "status": "present in bitnet-25 graph"},
             {"requirement": "RoPE theta from rope_parameters", "status": "fixed in converter"},
             {"requirement": "row-scale I2_SR kernels", "status": "present for dense matmuls"},
             {"requirement": "native sequence-classification score head", "status": "not implemented"},
         ],
         "interpretation": (
-            "The current sidecar mismatch is not just tokenizer metadata. The exported runtime "
+            "The original sidecar mismatch was not tokenizer metadata: bitnet-25 used ReLU-squared FFN "
+            "while the Qwen2 checkpoint used SiLU/SwiGLU. This fork now has a dedicated bitnet-qwen "
+            "packed graph for that backbone. The remaining deployment blockers are native classifier-head "
+            "storage/evaluation and full-split CPU validation."
+            if bitnet_qwen_available
+            else "The current sidecar mismatch is not just tokenizer metadata. The exported runtime "
             "graph is not the same architecture family as the PyTorch Qwen2 sequence-classification "
             "student: bitnet-25 uses ReLU-squared FFN while the checkpoint uses SiLU/SwiGLU. "
             "The plain bitnet graph has SiLU but lacks Q/K/V bias tensor slots needed by Qwen2. "

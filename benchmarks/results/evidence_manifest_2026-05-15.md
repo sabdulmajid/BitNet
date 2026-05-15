@@ -2,7 +2,7 @@
 Artifacts: `225`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 22987 | 4343fe499875 |  |
+| README | tracked_report | yes | 22944 | daa63394526c |  |
 | research_redirect_report | tracked_report | yes | 10777 | 3d2c4e87df00 |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
@@ -20,7 +20,7 @@ Artifacts: `225`. Missing: `0`.
 | bitdistill_stage2_curve_report | tracked_report | yes | 4180 | de98a4baca66 |  |
 | bitdistill_stage2_curve_submission_report | tracked_report | yes | 1512 | 77354c56b3ed |  |
 | bitdistill_controlled_postprocess_submission_report | tracked_report | yes | 710 | 8e1b74096b71 |  |
-| bitdistill_controlled_curve_report | tracked_report | yes | 2550 | 877a66b0fb30 |  |
+| bitdistill_controlled_curve_report | tracked_report | yes | 2549 | ee9a7c2b2f26 |  |
 | bitdistill_reproduction_gate_report | tracked_report | yes | 12908 | fa3178597d19 |  |
 | bitdistill_paired_predictions_report | tracked_report | yes | 8123 | c9107324629d |  |
 | bitdistill_task_formulation_report | tracked_report | yes | 11647 | cb03c36274ba |  |
@@ -32,13 +32,13 @@ Artifacts: `225`. Missing: `0`.
 | subln_activation_variance_report | tracked_report | yes | 2293 | 75e6c8b54d42 |  |
 | bitdistill_paper_alignment_report | tracked_report | yes | 10494 | a5d8df51bcf4 |  |
 | bitdistill_loss_scale_report | tracked_report | yes | 8733 | 628d0414fc13 |  |
-| bitdistill_loss_contract_report | tracked_report | yes | 2254 | a47979147b0f |  |
+| bitdistill_loss_contract_report | tracked_report | yes | 2253 | 8be3fda7678c |  |
 | ternary_flip_dynamics_report | tracked_report | yes | 2765 | d27aad9fe625 |  |
-| seqcls_runtime_gap_report | tracked_report | yes | 3881 | 4ca43dc02d39 |  |
-| seqcls_backbone_i2sr_smoke_report | tracked_report | yes | 1656 | 627920ed4eda |  |
-| seqcls_i2sr_sidecar_cpu_mnli64_report | tracked_report | yes | 923 | 5c2bc4405fff |  |
-| seqcls_i2sr_hidden_contract_report | tracked_report | yes | 1362 | c35663e5fdbe |  |
-| seqcls_i2sr_arch_contract_report | tracked_report | yes | 2251 | 7a5df143d630 |  |
+| seqcls_runtime_gap_report | tracked_report | yes | 3949 | ba06514afe62 |  |
+| seqcls_backbone_i2sr_smoke_report | tracked_report | yes | 1655 | 11ed5f36cc2c |  |
+| seqcls_i2sr_sidecar_cpu_mnli64_report | tracked_report | yes | 920 | 33795867ed92 |  |
+| seqcls_i2sr_hidden_contract_report | tracked_report | yes | 1394 | 991139477ee1 |  |
+| seqcls_i2sr_arch_contract_report | tracked_report | yes | 2349 | abce022bafc1 |  |
 | bitdistill_telemetry_coverage_report | tracked_report | yes | 2986 | 94048bf25c04 |  |
 | qwen3_paper_alignment_report | tracked_report | yes | 4031 | ba25ba86a4cf |  |
 | qwen3_postprocess_submission_report | tracked_report | yes | 798 | 096508f537cf |  |
@@ -70,7 +70,7 @@ Artifacts: `225`. Missing: `0`.
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 1824 | 5d992b3c9a1c |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 8038 | 6aecdc367b2d |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 8226 | e1fec9bdc8a5 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2569 | 51da6738be9d |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -160,7 +160,7 @@ Artifacts: `225`. Missing: `0`.
 | row_scale_qtype_i2sr_promotion_rehearsal_json | row_scale_qtype_gate_json | yes | 3897 | 6ffc161b446b | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 12976 | 53428825e01d | passed=True, checks=64, failed=0 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 13164 | 67fee9594598 | passed=True, checks=64, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | a7a047c75a67 | achieved=False, status=not_complete, complete=7/9, open=2 |
 | product_scope_gate_json | product_scope_gate_json | yes | 5770 | d0101b25bd20 | scope=research_mvp_only, supported=5, unsupported=4 |
 | bitdistill_recovery_submission_json | generic_json | yes | 1186 | d473cba8d7f2 |  |
@@ -168,16 +168,16 @@ Artifacts: `225`. Missing: `0`.
 | bitdistill_stage2_curve_json | generic_json | yes | 19229 | 42f4a99e3a68 |  |
 | bitdistill_stage2_curve_submission_json | generic_json | yes | 2131 | ae9d0a82341e |  |
 | bitdistill_controlled_postprocess_submission_json | generic_json | yes | 341 | 0eece5b559b7 |  |
-| bitdistill_controlled_curve_json | generic_json | yes | 7987 | 2986f4884d75 |  |
+| bitdistill_controlled_curve_json | generic_json | yes | 7980 | 01316bfe125c |  |
 | bitdistill_root_cause_audit_json | generic_json | yes | 8206 | 7eb5698ce541 |  |
 | bitdistill_telemetry_coverage_json | generic_json | yes | 3805 | d5972de78a36 |  |
-| bitdistill_loss_contract_json | generic_json | yes | 2516 | 3ba028c63ac1 |  |
+| bitdistill_loss_contract_json | generic_json | yes | 2512 | b7dd89eb1b86 |  |
 | ternary_flip_dynamics_json | generic_json | yes | 12345 | 616addec33ef |  |
-| seqcls_runtime_gap_json | generic_json | yes | 13421 | 634864b6661b |  |
-| seqcls_backbone_i2sr_smoke_json | generic_json | yes | 22712 | 20d331180789 |  |
-| seqcls_i2sr_sidecar_cpu_mnli64_json | generic_json | yes | 4155 | 0b4754871619 |  |
-| seqcls_i2sr_hidden_contract_json | generic_json | yes | 4849 | 8efa05ebf520 |  |
-| seqcls_i2sr_arch_contract_json | generic_json | yes | 3836 | 655069e24128 |  |
+| seqcls_runtime_gap_json | generic_json | yes | 13547 | b5ab8c1942d7 |  |
+| seqcls_backbone_i2sr_smoke_json | generic_json | yes | 22650 | 713bf68c36c9 |  |
+| seqcls_i2sr_sidecar_cpu_mnli64_json | generic_json | yes | 4155 | dd1f65aafd31 |  |
+| seqcls_i2sr_hidden_contract_json | generic_json | yes | 4861 | 55a2c06bd199 |  |
+| seqcls_i2sr_arch_contract_json | generic_json | yes | 3945 | ca692ea2e6ee |  |
 | qwen3_paper_alignment_json | generic_json | yes | 22176 | a0e18cb62fe5 |  |
 | qwen3_postprocess_submission_json | generic_json | yes | 405 | aefafcfc80ef |  |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 32197 | c581499edff4 | present=34/36, examples=34, full_eval=34, ci95=34, paper_complete=True, paper_passed=False, row_complete=True, row_passed=False, confidence=0.95 |

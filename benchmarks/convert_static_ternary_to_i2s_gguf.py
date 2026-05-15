@@ -339,9 +339,13 @@ def main() -> None:
     parser.add_argument("--keep-output-f16", action="store_true", default=True)
     parser.add_argument(
         "--gguf-arch",
-        choices=["source", "bitnet-25"],
+        choices=["source", "bitnet-25", "bitnet-qwen"],
         default="source",
-        help="Override the emitted GGUF architecture. Use bitnet-25 for Qwen BitDistill checkpoints with SubLN.",
+        help=(
+            "Override the emitted GGUF architecture. Use bitnet-qwen for Qwen "
+            "BitDistill checkpoints with SubLN and SiLU/SwiGLU MLP semantics; "
+            "use bitnet-25 only for checkpoints trained against the BitNet 2.5 runtime graph."
+        ),
     )
     parser.add_argument(
         "--bitdistill-subln",
@@ -387,11 +391,15 @@ def main() -> None:
     architecture = load_architecture(args.checkpoint_dir)
     converter_architecture = args.source_architecture_alias or architecture
     base_cls = converter.Model.from_model_architecture(converter_architecture)
-    if args.gguf_arch == "bitnet-25":
-        args._model_arch_override = converter.gguf.MODEL_ARCH.BITNET_25
+    if args.gguf_arch in {"bitnet-25", "bitnet-qwen"}:
+        args._model_arch_override = (
+            converter.gguf.MODEL_ARCH.BITNET_QWEN
+            if args.gguf_arch == "bitnet-qwen"
+            else converter.gguf.MODEL_ARCH.BITNET_25
+        )
         if not args.bitdistill_subln:
             raise SystemExit(
-                "--gguf-arch bitnet-25 requires --bitdistill-subln for this repo's SubLN wrapper keys"
+                f"--gguf-arch {args.gguf_arch} requires --bitdistill-subln for this repo's SubLN wrapper keys"
             )
     else:
         args._model_arch_override = None

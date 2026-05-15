@@ -22,7 +22,7 @@ Pending: at least one controlled Stage-2 curve row lacks metrics or prediction t
 | job | label | live step | live attn/CE | live max attn/CE | live median attn/CE | live p95 attn/CE | median CE/attn gamma | p95 CE/attn gamma | final CE | final logit KD | final weighted logit KD | final attention KD | final weighted attention KD | live CE | live logit KD | live weighted logit KD | live attention KD | live weighted attention KD |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 10069 | 5k-warmup downstream control | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - |
-| 10068 | 20k-warmup downstream control | 7480 | 2413.368221 | 37819.641342 | 1762.696933 | 6028.384039 | 56.732548 | 126.572808 | - | - | - | - | - | 0.449219 | 0.015607 | 0.156066 | 0.010841 | 1084.130859 |
+| 10068 | 20k-warmup downstream control | 9000 | 1754.833486 | 37819.641342 | 1759.870617 | 6286.935978 | 56.823222 | 129.679747 | - | - | - | - | - | 0.414062 | 0.009272 | 0.092724 | 0.007266 | 726.609863 |
 | 10071 | 40k-warmup downstream control | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - |
 
 ## Interpretation

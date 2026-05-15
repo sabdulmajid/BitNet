@@ -507,7 +507,12 @@ def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
     add_check(
         checks,
         "Sequence-classification runtime gap is narrowed but not closed",
-        data.get("status") in {"blocked_by_classifier_runtime", "sidecar_prototype_available_native_runtime_blocked"}
+        data.get("status")
+        in {
+            "blocked_by_classifier_runtime",
+            "sidecar_prototype_available_native_runtime_blocked",
+            "sidecar_qwen_contract_available_native_head_blocked",
+        }
         and data.get("same_artifact_quality_cpu_ready") is False
         and seqcls.get("sequence_classification", 0) > 0
         and seqcls.get("causal_export_compatible") == 0
@@ -549,20 +554,20 @@ def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
     )
     add_check(
         checks,
-        "Sequence-classification hidden contract mismatch is isolated",
+        "Sequence-classification hidden contract is near but not exact",
         hidden_contract.get("status") == "hidden_contract_mismatch"
         and hidden_contract.get("token_id_match") is True
         and isinstance(hidden_contract.get("hidden_relative_rms"), (int, float))
-        and hidden_contract.get("hidden_relative_rms") > 1.0
+        and 0.05 < hidden_contract.get("hidden_relative_rms") < 0.2
         and isinstance(hidden_contract.get("hidden_cosine"), (int, float))
-        and hidden_contract.get("hidden_cosine") < 0.5,
+        and hidden_contract.get("hidden_cosine") > 0.99,
         (
             f"status={hidden_contract.get('status')}, token_match={hidden_contract.get('token_id_match')}, "
             f"hidden_rel_rms={hidden_contract.get('hidden_relative_rms')}, "
             f"hidden_cosine={hidden_contract.get('hidden_cosine')}, "
             f"logit_rel_rms={hidden_contract.get('logit_relative_rms')}"
         ),
-        "the sidecar failure is not narrowed to a hidden-state runtime-contract mismatch",
+        "the sidecar hidden-contract audit did not record the expected near-pass-but-not-bit-exact state",
     )
     arch_path = root / f"benchmark_results/seqcls_i2sr_arch_contract_{DATE}.json"
     if not arch_path.exists():
@@ -577,22 +582,27 @@ def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
     arch = read_json(arch_path)
     arch_checks = arch.get("checks", {}) if isinstance(arch.get("checks"), dict) else {}
     runtime = arch.get("runtime_source", {}) if isinstance(arch.get("runtime_source"), dict) else {}
+    qwen = arch.get("bitnet_qwen_contract", {}) if isinstance(arch.get("bitnet_qwen_contract"), dict) else {}
     biases = arch.get("checkpoint_biases", {}) if isinstance(arch.get("checkpoint_biases"), dict) else {}
     add_check(
         checks,
-        "Sequence-classification architecture contract mismatch is identified",
-        arch.get("status") == "architecture_contract_mismatch"
+        "Sequence-classification architecture contract is identified and repaired",
+        arch.get("status") == "bitnet_qwen_contract_available"
         and arch_checks.get("activation_mismatch") is True
         and arch_checks.get("plain_bitnet_has_silu_graph") is True
         and arch_checks.get("plain_bitnet_bias_contract_gap") is True
+        and arch_checks.get("bitnet_qwen_contract_available") is True
         and runtime.get("bitnet25_ffn_activation") == "relu_sqr"
+        and qwen.get("available") is True
+        and qwen.get("ffn_activation") == "silu"
+        and qwen.get("loader_has_qkv_bias") is True
         and biases.get("projection_bias_count") == 72,
         (
             f"status={arch.get('status')}, hidden_act={arch.get('checkpoint_config', {}).get('hidden_act')}, "
             f"bitnet25_activation={runtime.get('bitnet25_ffn_activation')}, "
-            f"projection_biases={biases.get('projection_bias_count')}, checks={arch_checks}"
+            f"bitnet_qwen={qwen}, projection_biases={biases.get('projection_bias_count')}, checks={arch_checks}"
         ),
-        "the seqcls runtime gap lacks a concrete architecture-contract explanation",
+        "the seqcls runtime gap lacks the expected bitnet-qwen architecture-contract repair",
     )
 
 

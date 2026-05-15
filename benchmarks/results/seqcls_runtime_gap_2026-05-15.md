@@ -4,18 +4,18 @@ This audit separates the best GLUE quality path from the packed CPU runtime path
 
 | field | value |
 | --- | --- |
-| status | sidecar_prototype_available_native_runtime_blocked |
+| status | sidecar_qwen_contract_available_native_head_blocked |
 | same artifact quality+CPU ready | false |
 | sidecar prototype smoke | prototype_smoke_passed |
 | sidecar sampled CPU quality | quality_mismatch |
 | sidecar hidden contract | hidden_contract_mismatch |
-| sidecar architecture contract | architecture_contract_mismatch |
+| sidecar architecture contract | bitnet_qwen_contract_available |
 | seqcls configs | 15 |
 | seqcls causal-export compatible | 0 |
 | causal runtime configs | 6 |
 | causal GGUF exports | 6 |
 | llama.cpp fork remote | https://github.com/sabdulmajid/llama.cpp.git |
-| llama.cpp worktree clean | true |
+| llama.cpp worktree clean | false |
 
 ## Sequence-Classification Quality Path
 
@@ -23,7 +23,7 @@ This audit separates the best GLUE quality path from the packed CPU runtime path
 | --- | --- |
 | Qwen2ForSequenceClassification | 15 |
 
-These checkpoints are the strict GLUE reproduction artifacts. They use `Qwen2ForSequenceClassification`. The standard causal export path still does not implement a native sequence-classification head, but the sidecar smoke below shows that a packed decoder backbone plus dense score-head sidecar is now loadable.
+These checkpoints are the strict GLUE reproduction artifacts. They use `Qwen2ForSequenceClassification`. The standard causal export path still does not implement a native sequence-classification head, but the sidecar smoke below shows that a Qwen-compatible packed decoder backbone plus dense score-head sidecar is now loadable.
 
 ## Sidecar Prototype
 
@@ -40,15 +40,18 @@ These checkpoints are the strict GLUE reproduction artifacts. They use `Qwen2For
 | finite logits | true |
 | sampled CPU status | quality_mismatch |
 | sampled examples | 64 |
-| sampled accuracy | 0.359375 |
-| agreement with saved PyTorch predictions | 0.343750 |
-| sampled examples/sec | 0.706330 |
+| sampled accuracy | 0.578125 |
+| agreement with saved PyTorch predictions | 0.921875 |
+| sampled examples/sec | 0.714970 |
 | token IDs match | true |
-| hidden relative RMS | 7.812774 |
-| hidden cosine | 0.012303 |
-| logit relative RMS | 7.270589 |
+| hidden relative RMS | 0.108662 |
+| hidden cosine | 0.994091 |
+| logit relative RMS | 0.091918 |
 | checkpoint hidden_act | silu |
 | bitnet-25 FFN activation | relu_sqr |
+| bitnet-qwen contract available | true |
+| bitnet-qwen FFN activation | silu |
+| bitnet-qwen has Q/K/V bias slots | true |
 | Q/K/V projection bias tensors | 72 |
 
 ## Causal Runtime Path
@@ -64,11 +67,11 @@ These checkpoints are export-compatible with the current GGUF/I2_SR path, but th
 | item | status |
 | --- | --- |
 | Backbone GGUF + dense head sidecar smoke | prototype implemented |
-| Sampled sidecar CPU quality agreement | failing |
+| Sampled sidecar CPU quality agreement | prototype improved; needs full validation |
 | Tokenizer pair formatting parity | passes for audited MNLI sample |
-| PyTorch pooled hidden state matches llama.cpp embedding | failing |
-| Packed graph matches Qwen2 SiLU/SwiGLU semantics | failing |
-| Packed loader supports Qwen2 Q/K/V projection biases | partial: bitnet-25 yes, plain bitnet no |
+| PyTorch pooled hidden state matches llama.cpp embedding | near pass on audited sample, not exact |
+| Packed graph matches Qwen2 SiLU/SwiGLU semantics | implemented via bitnet-qwen |
+| Packed loader supports Qwen2 Q/K/V projection biases | implemented via bitnet-qwen |
 | GGUF writer persists classifier/score head tensors and label metadata | not implemented |
 | llama.cpp pools the last non-padding token for Qwen sequence classification | not implemented |
 | CPU evaluator reports GLUE accuracy from the packed classifier artifact | not implemented |
@@ -76,4 +79,4 @@ These checkpoints are export-compatible with the current GGUF/I2_SR path, but th
 
 ## Interpretation
 
-The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. It now also has a prototype sequence-classification backbone smoke through I2_SR plus an external dense head sidecar. The sampled sidecar CPU quality probe currently disagrees with saved PyTorch predictions. The hidden-contract audit narrows the issue: token IDs match for the first MNLI sample, but the llama.cpp embedding has high relative RMS error and near-zero cosine versus the PyTorch pooled hidden state. The architecture-contract audit gives a concrete root cause to fix: the current bitnet-25 graph uses ReLU-squared FFN while the Qwen2 checkpoint uses SiLU/SwiGLU; the plain bitnet graph has SiLU but lacks the 72 Q/K/V bias tensor slots present in the checkpoint. This is a runtime/model-state mismatch, not a deployable classifier.
+The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. It now also has a prototype sequence-classification backbone path through `bitnet-qwen` I2_SR plus an external dense head sidecar. The new graph fixes the dominant architecture mismatch: the packed hidden vector now has high cosine agreement with PyTorch on the audited MNLI sample, and the 64-sample sidecar probe mostly agrees with saved PyTorch predictions. This is still not a deployable classifier: the classifier head is not native GGUF metadata/runtime code, the hidden contract is not bit-exact, and full-split CPU quality/RSS/throughput have not been measured on a single native artifact.

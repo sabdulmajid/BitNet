@@ -36,7 +36,7 @@
   "date": "2026-05-15",
   "exporter_rejects_non_causal": true,
   "llama_cpp": {
-    "clean": true,
+    "clean": false,
     "origin": "https://github.com/sabdulmajid/llama.cpp.git",
     "path": "3rdparty/llama.cpp"
   },
@@ -282,19 +282,22 @@
   "seqcls_arch_contract": {
     "activation_mismatch": true,
     "bitnet25_ffn_activation": "relu_sqr",
+    "bitnet_qwen_available": true,
+    "bitnet_qwen_ffn_activation": "silu",
+    "bitnet_qwen_loader_has_qkv_bias": true,
     "exists": true,
     "hidden_act": "silu",
     "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/seqcls_i2sr_arch_contract_2026-05-15.json",
     "plain_bitnet_bias_contract_gap": true,
     "projection_bias_count": 72,
-    "status": "architecture_contract_mismatch"
+    "status": "bitnet_qwen_contract_available"
   },
   "seqcls_hidden_contract": {
     "exists": true,
-    "hidden_cosine": 0.012302589838196848,
-    "hidden_relative_rms": 7.812774193066907,
-    "llama_hidden_l2": 205.94926904987386,
-    "logit_relative_rms": 7.270589052541309,
+    "hidden_cosine": 0.9940905307837791,
+    "hidden_relative_rms": 0.10866150519771632,
+    "llama_hidden_l2": 26.50832611988938,
+    "logit_relative_rms": 0.09191836414090784,
     "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/seqcls_i2sr_hidden_contract_2026-05-15.json",
     "pytorch_hidden_l2": 26.53703466524006,
     "pytorch_logits_equal_sidecar_logits": true,
@@ -302,10 +305,10 @@
     "token_id_match": true
   },
   "seqcls_sidecar_cpu_benchmark": {
-    "accuracy": 0.359375,
-    "agreement_with_saved_pytorch_predictions": 0.34375,
+    "accuracy": 0.578125,
+    "agreement_with_saved_pytorch_predictions": 0.921875,
     "examples": 64,
-    "examples_per_second": 0.7063297899005901,
+    "examples_per_second": 0.7149700901754824,
     "exists": true,
     "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/seqcls_i2sr_sidecar_cpu_mnli_64_2026-05-15.json",
     "status": "quality_mismatch",
@@ -346,5 +349,5 @@
     ],
     "ternary_checkpoints": 12
   },
-  "status": "sidecar_prototype_available_native_runtime_blocked"
+  "status": "sidecar_qwen_contract_available_native_head_blocked"
 }

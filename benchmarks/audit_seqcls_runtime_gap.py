@@ -152,6 +152,7 @@ def load_arch_contract(path: Path) -> dict[str, Any]:
     data = read_json(path)
     checks = data.get("checks", {}) if isinstance(data.get("checks"), dict) else {}
     runtime = data.get("runtime_source", {}) if isinstance(data.get("runtime_source"), dict) else {}
+    qwen = data.get("bitnet_qwen_contract", {}) if isinstance(data.get("bitnet_qwen_contract"), dict) else {}
     biases = data.get("checkpoint_biases", {}) if isinstance(data.get("checkpoint_biases"), dict) else {}
     config = data.get("checkpoint_config", {}) if isinstance(data.get("checkpoint_config"), dict) else {}
     return {
@@ -160,6 +161,9 @@ def load_arch_contract(path: Path) -> dict[str, Any]:
         "status": data.get("status"),
         "hidden_act": config.get("hidden_act"),
         "bitnet25_ffn_activation": runtime.get("bitnet25_ffn_activation"),
+        "bitnet_qwen_available": qwen.get("available"),
+        "bitnet_qwen_ffn_activation": qwen.get("ffn_activation"),
+        "bitnet_qwen_loader_has_qkv_bias": qwen.get("loader_has_qkv_bias"),
         "projection_bias_count": biases.get("projection_bias_count"),
         "activation_mismatch": checks.get("activation_mismatch"),
         "plain_bitnet_bias_contract_gap": checks.get("plain_bitnet_bias_contract_gap"),
@@ -231,7 +235,8 @@ def render_markdown(result: dict[str, Any]) -> str:
                 "These checkpoints are the strict GLUE reproduction artifacts. They use "
                 "`Qwen2ForSequenceClassification`. The standard causal export path still does "
                 "not implement a native sequence-classification head, but the sidecar smoke below "
-                "shows that a packed decoder backbone plus dense score-head sidecar is now loadable."
+                "shows that a Qwen-compatible packed decoder backbone plus dense score-head sidecar "
+                "is now loadable."
             ),
             "## Sidecar Prototype",
             md_table(
@@ -257,6 +262,9 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["logit relative RMS", hidden_contract["logit_relative_rms"]],
                     ["checkpoint hidden_act", arch_contract["hidden_act"]],
                     ["bitnet-25 FFN activation", arch_contract["bitnet25_ffn_activation"]],
+                    ["bitnet-qwen contract available", arch_contract["bitnet_qwen_available"]],
+                    ["bitnet-qwen FFN activation", arch_contract["bitnet_qwen_ffn_activation"]],
+                    ["bitnet-qwen has Q/K/V bias slots", arch_contract["bitnet_qwen_loader_has_qkv_bias"]],
                     ["Q/K/V projection bias tensors", arch_contract["projection_bias_count"]],
                 ],
             ),
@@ -271,11 +279,11 @@ def render_markdown(result: dict[str, Any]) -> str:
                 ["item", "status"],
                 [
                     ["Backbone GGUF + dense head sidecar smoke", "prototype implemented"],
-                    ["Sampled sidecar CPU quality agreement", "failing"],
+                    ["Sampled sidecar CPU quality agreement", "prototype improved; needs full validation"],
                     ["Tokenizer pair formatting parity", "passes for audited MNLI sample"],
-                    ["PyTorch pooled hidden state matches llama.cpp embedding", "failing"],
-                    ["Packed graph matches Qwen2 SiLU/SwiGLU semantics", "failing"],
-                    ["Packed loader supports Qwen2 Q/K/V projection biases", "partial: bitnet-25 yes, plain bitnet no"],
+                    ["PyTorch pooled hidden state matches llama.cpp embedding", "near pass on audited sample, not exact"],
+                    ["Packed graph matches Qwen2 SiLU/SwiGLU semantics", "implemented via bitnet-qwen"],
+                    ["Packed loader supports Qwen2 Q/K/V projection biases", "implemented via bitnet-qwen"],
                     ["GGUF writer persists classifier/score head tensors and label metadata", "not implemented"],
                     ["llama.cpp pools the last non-padding token for Qwen sequence classification", "not implemented"],
                     ["CPU evaluator reports GLUE accuracy from the packed classifier artifact", "not implemented"],
@@ -285,14 +293,12 @@ def render_markdown(result: dict[str, Any]) -> str:
             "## Interpretation",
             (
                 "The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. "
-                "It now also has a prototype sequence-classification backbone smoke through I2_SR plus an external "
-                "dense head sidecar. The sampled sidecar CPU quality probe currently disagrees with saved PyTorch "
-                "predictions. The hidden-contract audit narrows the issue: token IDs match for the first MNLI "
-                "sample, but the llama.cpp embedding has high relative RMS error and near-zero cosine versus the "
-                "PyTorch pooled hidden state. The architecture-contract audit gives a concrete root cause to fix: "
-                "the current bitnet-25 graph uses ReLU-squared FFN while the Qwen2 checkpoint uses SiLU/SwiGLU; "
-                "the plain bitnet graph has SiLU but lacks the 72 Q/K/V bias tensor slots present in the checkpoint. "
-                "This is a runtime/model-state mismatch, not a deployable classifier."
+                "It now also has a prototype sequence-classification backbone path through `bitnet-qwen` I2_SR plus "
+                "an external dense head sidecar. The new graph fixes the dominant architecture mismatch: the packed "
+                "hidden vector now has high cosine agreement with PyTorch on the audited MNLI sample, and the 64-sample "
+                "sidecar probe mostly agrees with saved PyTorch predictions. This is still not a deployable classifier: "
+                "the classifier head is not native GGUF metadata/runtime code, the hidden contract is not bit-exact, "
+                "and full-split CPU quality/RSS/throughput have not been measured on a single native artifact."
             ),
         ]
     )
@@ -361,6 +367,12 @@ def main() -> None:
     )
     if same_artifact_ready:
         status = "ready"
+    elif (
+        sidecar_smoke["passed"]
+        and isinstance(sidecar_cpu.get("agreement_with_saved_pytorch_predictions"), (int, float))
+        and sidecar_cpu["agreement_with_saved_pytorch_predictions"] >= 0.9
+    ):
+        status = "sidecar_qwen_contract_available_native_head_blocked"
     elif sidecar_smoke["passed"]:
         status = "sidecar_prototype_available_native_runtime_blocked"
     else:

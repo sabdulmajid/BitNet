@@ -74,37 +74,37 @@
       "live_log": {
         "ce_attention_equalizing_gamma_summary": {
           "max": 214.87603305785126,
-          "mean": 62.275538926867796,
+          "mean": 63.24458114764293,
           "min": 2.6441235459286,
-          "p05": 16.594345205775824,
-          "p50": 56.73254778379119,
-          "p95": 126.57280761417152
+          "p05": 15.906480778521637,
+          "p50": 56.82322157175803,
+          "p95": 129.67974740640506
         },
         "exists": true,
         "latest": {
-          "attention_kd": 0.010841,
-          "ce": 0.449219,
-          "elapsed": 6051.1,
-          "logit_kd": 0.015607,
-          "loss": 1084.736084,
-          "lr": 4.728e-06,
-          "step": 7480.0,
-          "weighted_attention_kd": 1084.130859,
-          "weighted_logit_kd": 0.156066
+          "attention_kd": 0.007266,
+          "ce": 0.414062,
+          "elapsed": 7280.8,
+          "logit_kd": 0.009272,
+          "loss": 727.116638,
+          "lr": 2.449e-06,
+          "step": 9000.0,
+          "weighted_attention_kd": 726.609863,
+          "weighted_logit_kd": 0.092724
         },
-        "latest_step": 7480,
-        "latest_weighted_attention_to_ce": 2413.3682212907293,
+        "latest_step": 9000,
+        "latest_weighted_attention_to_ce": 1754.833486289493,
         "max_weighted_attention_to_ce": 37819.64134227373,
         "min_weighted_attention_to_ce": 465.370568,
-        "parsed_steps": 749,
+        "parsed_steps": 901,
         "path": "logs/bitdistill-glue-10068.out",
         "weighted_attention_to_ce_summary": {
           "max": 37819.64134227373,
-          "mean": 2380.0681696468937,
+          "mean": 2386.459473217573,
           "min": 465.370568,
-          "p05": 790.0811369492558,
-          "p50": 1762.6969334339624,
-          "p95": 6028.384039314291
+          "p05": 771.1359547826088,
+          "p50": 1759.87061697561,
+          "p95": 6286.935978374531
         }
       },
       "metric_accuracy": null,
@@ -137,7 +137,7 @@
       "predictions_exists": false,
       "predictions_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
       "squeue": {
-        "elapsed": "1:42:23",
+        "elapsed": "2:02:50",
         "job_id": "10068",
         "reason": "ece-nebula12",
         "state": "RUNNING"
