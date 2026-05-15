@@ -127,7 +127,16 @@ def parse_warmup_log(path: Path, *, root: Path, max_seq_len: int) -> dict[str, A
     output_dir = Path(output_dir_value) if output_dir_value else None
     if output_dir is not None and not output_dir.is_absolute():
         output_dir = root / output_dir
-    snapshot_dirs = sorted(output_dir.glob("checkpoint-*")) if output_dir is not None and output_dir.exists() else []
+
+    def snapshot_step(snapshot: Path) -> int:
+        match = re.search(r"checkpoint-(\d+)$", snapshot.name)
+        return int(match.group(1)) if match else -1
+
+    snapshot_dirs = (
+        sorted(output_dir.glob("checkpoint-*"), key=snapshot_step)
+        if output_dir is not None and output_dir.exists()
+        else []
+    )
     warnings: list[str] = []
     token_step = per_device_batch_size * grad_accum_steps * observed_max_seq_len
     latest = steps[-1] if steps else None
@@ -324,7 +333,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
 def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     root = args.repo_root.resolve()
     if args.job_table is not None:
-        tables = [args.job_table if args.job_table.is_absolute() else root / args.job_table]
+        requested_tables = args.job_table if isinstance(args.job_table, list) else [args.job_table]
+        tables = [table if table.is_absolute() else root / table for table in requested_tables]
     else:
         tables = discover_job_tables(root)
     rows = read_job_tables(tables)
@@ -349,7 +359,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
-    parser.add_argument("--job-table", type=Path)
+    parser.add_argument("--job-table", type=Path, nargs="+")
     parser.add_argument("--warmup-log", type=Path)
     parser.add_argument("--max-seq-len", type=int, default=512)
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_job_monitor_{DATE}.json"))

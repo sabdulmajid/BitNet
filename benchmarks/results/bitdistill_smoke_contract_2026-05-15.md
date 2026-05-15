@@ -31,7 +31,7 @@ GGUF export checks use a smoke-only synthetic tokenizer stub. They validate pack
 | task-sft writes metrics | pass | benchmark_results/bitdistill-smoke-contract-2026-05-15/task_sft/metrics.json |  |
 | task-sft takes two steps | pass | steps=2 |  |
 | task-sft uses BitLinear and SubLN | pass | bitlinear=15, subln=4 |  |
-| task-sft logits KD is finite | pass | weighted_logit_kd=0.0093889981508255 |  |
+| task-sft logits KD is finite | pass | weighted_logit_kd=0.009390302002429962 |  |
 | task-sft attention KD is finite | pass | weighted_attention_kd=11.875125885009766 |  |
 | task-sft records paper-style Q/K/V reduction | pass | attention_qkv_reduction=sum |  |
 | task-sft eval accuracy is finite | pass | accuracy=0.5 |  |
@@ -40,8 +40,8 @@ GGUF export checks use a smoke-only synthetic tokenizer stub. They validate pack
 | row task-sft writes metrics | pass | benchmark_results/bitdistill-smoke-contract-2026-05-15/task_sft_row/metrics.json |  |
 | row task-sft takes two steps | pass | steps=2 |  |
 | row task-sft uses BitLinear and SubLN | pass | bitlinear=15, subln=4 |  |
-| row task-sft logits KD is finite | pass | weighted_logit_kd=0.009045824408531189 |  |
-| row task-sft attention KD is finite | pass | weighted_attention_kd=11.805890083312988 |  |
+| row task-sft logits KD is finite | pass | weighted_logit_kd=0.009047351777553558 |  |
+| row task-sft attention KD is finite | pass | weighted_attention_kd=11.805891036987305 |  |
 | row task-sft records paper-style Q/K/V reduction | pass | attention_qkv_reduction=sum |  |
 | row task-sft eval accuracy is finite | pass | accuracy=0.5 |  |
 | row task-sft writes per-example predictions | pass | predictions=8, eval_examples=8.0 |  |

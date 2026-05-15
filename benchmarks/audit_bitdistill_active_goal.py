@@ -191,6 +191,7 @@ def audit_novelty_and_runtime(
     i2sr: dict[str, Any],
     i2sr_local: dict[str, Any],
     cpu: dict[str, Any],
+    cpu_xeon: dict[str, Any],
     cpu_fast: dict[str, Any],
 ) -> None:
     row_complete = reproduction.get("row_scale_complete") is True
@@ -207,15 +208,23 @@ def audit_novelty_and_runtime(
     i2sr_passed = i2sr.get("passed") is True
     i2sr_local_passed = i2sr_local.get("passed") is True
     cpu_passed = cpu.get("passed") is True
+    cpu_xeon_passed = cpu_xeon.get("passed") is True
     cpu_fast_passed = cpu_fast.get("passed") is True
     i2sr_rows = i2sr.get("rows", []) if isinstance(i2sr.get("rows"), list) else []
     i2sr_local_rows = i2sr_local.get("rows", []) if isinstance(i2sr_local.get("rows"), list) else []
     i2sr_complete = sum(1 for row in i2sr_rows if isinstance(row, dict) and row.get("complete"))
     i2sr_local_complete = sum(1 for row in i2sr_local_rows if isinstance(row, dict) and row.get("complete"))
     cpu_critical = cpu.get("critical", []) if isinstance(cpu.get("critical"), list) else []
+    cpu_xeon_critical = cpu_xeon.get("critical", []) if isinstance(cpu_xeon.get("critical"), list) else []
     cpu_fast_critical = cpu_fast.get("critical", []) if isinstance(cpu_fast.get("critical"), list) else []
     cpu_complete = sum(1 for row in cpu_critical if isinstance(row, dict) and row.get("complete"))
+    cpu_xeon_complete = sum(1 for row in cpu_xeon_critical if isinstance(row, dict) and row.get("complete"))
     cpu_fast_complete = sum(1 for row in cpu_fast_critical if isinstance(row, dict) and row.get("complete"))
+    cpu_xeon_expected = len(cpu_xeon_critical) or len(cpu_critical)
+    cpu_xeon_status: Any = cpu_xeon_passed if cpu_xeon else "pending"
+    cpu_hardware = cpu.get("hardware", {}) if isinstance(cpu.get("hardware"), dict) else {}
+    cpu_xeon_hardware = cpu_xeon.get("hardware", {}) if isinstance(cpu_xeon.get("hardware"), dict) else {}
+    cpu_fast_hardware = cpu_fast.get("hardware", {}) if isinstance(cpu_fast.get("hardware"), dict) else {}
     metrics["row_scale_runtime"] = {
         "row_scale_complete": row_complete,
         "row_scale_passed": row_passed,
@@ -231,10 +240,18 @@ def audit_novelty_and_runtime(
         "cpu_passed": cpu_passed,
         "cpu_complete": cpu_complete,
         "cpu_expected": len(cpu_critical),
+        "cpu_model": cpu_hardware.get("cpu_model"),
+        "cpu_xeon_passed": cpu_xeon_passed,
+        "cpu_xeon_present": bool(cpu_xeon),
+        "cpu_xeon_complete": cpu_xeon_complete,
+        "cpu_xeon_expected": cpu_xeon_expected,
+        "cpu_xeon_model": cpu_xeon_hardware.get("cpu_model"),
         "cpu_fast_passed": cpu_fast_passed,
         "cpu_fast_complete": cpu_fast_complete,
         "cpu_fast_expected": len(cpu_fast_critical),
+        "cpu_fast_model": cpu_fast_hardware.get("cpu_model"),
         "cpu_blockers": cpu.get("blockers", []),
+        "cpu_xeon_blockers": cpu_xeon.get("blockers", []),
     }
     add_row(
         rows,
@@ -249,14 +266,18 @@ def audit_novelty_and_runtime(
     add_row(
         rows,
         "Export row-scale checkpoints through I2_SR and benchmark CPU speed, memory/RSS, and task quality on Xeon",
-        "complete" if i2sr_passed and cpu_passed else ("partial" if i2sr_local_passed or cpu_fast_passed else "pending"),
+        "complete" if i2sr_passed and cpu_xeon_passed else ("partial" if i2sr_local_passed or cpu_fast_passed or cpu_passed else "pending"),
         (
             f"I2_SR gate={i2sr_passed} ({i2sr_complete}/{len(i2sr_rows)} rows); "
             f"local isolated I2_SR={i2sr_local_passed} ({i2sr_local_complete}/{len(i2sr_local_rows)} rows); "
-            f"CPU gate={cpu_passed} ({cpu_complete}/{len(cpu_critical)} critical rows); "
-            f"scoped CPU slice={cpu_fast_passed} ({cpu_fast_complete}/{len(cpu_fast_critical)} critical rows)"
+            f"full CPU gate={cpu_passed} on {cpu_hardware.get('cpu_model', 'unknown')} "
+            f"({cpu_complete}/{len(cpu_critical)} critical rows); "
+            f"Xeon full CPU gate={cpu_xeon_status} on {cpu_xeon_hardware.get('cpu_model', 'hardware pending')} "
+            f"({cpu_xeon_complete}/{cpu_xeon_expected} critical rows); "
+            f"scoped CPU slice={cpu_fast_passed} on {cpu_fast_hardware.get('cpu_model', 'unknown')} "
+            f"({cpu_fast_complete}/{len(cpu_fast_critical)} critical rows)"
         ),
-        "Local causal export/runtime and the scoped PyTorch CPU slice have passed, but the queued full CPU/product gate is still pending.",
+        "Causal export/runtime and non-Xeon CPU rows have passed; the Xeon-local full CPU gate must pass before this row is complete.",
     )
 
 
@@ -305,6 +326,7 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
     i2sr = read_json(root / args.i2sr_json)
     i2sr_local = read_json(root / args.i2sr_local_json)
     cpu = read_json(root / args.cpu_json)
+    cpu_xeon = read_json(root / args.cpu_xeon_json)
     cpu_fast = read_json(root / args.cpu_fast_json)
     product = read_json(root / args.product_json)
 
@@ -318,7 +340,7 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
         "warmup_progress": row_progress,
     }
     audit_components(rows, metrics, smoke, paper_alignment)
-    audit_novelty_and_runtime(rows, metrics, reproduction, rowwarmup, i2sr, i2sr_local, cpu, cpu_fast)
+    audit_novelty_and_runtime(rows, metrics, reproduction, rowwarmup, i2sr, i2sr_local, cpu, cpu_xeon, cpu_fast)
     audit_publishability(rows, metrics, product, paper_alignment)
     complete_count = sum(1 for row in rows if row["status"] == "complete")
     pending_count = sum(1 for row in rows if row["status"] == "pending")
@@ -344,6 +366,7 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
             "i2sr_json": rel(root / args.i2sr_json, root),
             "i2sr_local_json": rel(root / args.i2sr_local_json, root),
             "cpu_json": rel(root / args.cpu_json, root),
+            "cpu_xeon_json": rel(root / args.cpu_xeon_json, root),
             "cpu_fast_json": rel(root / args.cpu_fast_json, root),
             "product_json": rel(root / args.product_json, root),
         },
@@ -400,7 +423,8 @@ def render_markdown(result: dict[str, Any]) -> str:
                 f"Runtime gates: row-scale complete=`{runtime.get('row_scale_complete')}`, "
                 f"row-warmup complete=`{runtime.get('row_warmup_complete')}`, "
                 f"I2_SR=`{runtime.get('i2sr_passed')}`, local I2_SR=`{runtime.get('i2sr_local_passed')}`, "
-                f"CPU=`{runtime.get('cpu_passed')}`, scoped CPU=`{runtime.get('cpu_fast_passed')}`."
+                f"CPU=`{runtime.get('cpu_passed')}`, Xeon CPU=`{runtime.get('cpu_xeon_passed')}`, "
+                f"scoped CPU=`{runtime.get('cpu_fast_passed')}`."
             ),
             "## Prompt-To-Artifact Checklist",
             md_table(["requirement", "status", "evidence", "remaining gap"], checklist_rows),
@@ -425,6 +449,7 @@ def main() -> None:
     parser.add_argument("--i2sr-json", type=Path, default=Path(f"benchmark_results/bitdistill_i2sr_export_gate_{DATE}.json"))
     parser.add_argument("--i2sr-local-json", type=Path, default=Path(f"benchmark_results/bitdistill_i2sr_export_gate_local_{DATE}.json"))
     parser.add_argument("--cpu-json", type=Path, default=Path(f"benchmark_results/bitdistill_glue_cpu_gate_{DATE}.json"))
+    parser.add_argument("--cpu-xeon-json", type=Path, default=Path(f"benchmark_results/bitdistill_glue_cpu_xeon_gate_{DATE}.json"))
     parser.add_argument("--cpu-fast-json", type=Path, default=Path(f"benchmark_results/bitdistill_glue_cpu_fast_gate_{DATE}.json"))
     parser.add_argument("--product-json", type=Path, default=Path(f"benchmark_results/product_scope_gate_{DATE}.json"))
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_active_goal_audit_{DATE}.json"))

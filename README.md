@@ -238,14 +238,19 @@ proof that the format/runtime path works and that task-specific causal
 BitDistill does not preserve general language-model quality in this
 configuration.
 
-A separate PyTorch CPU sequence-classification slice now passes as a scoped
-runtime artifact on the Xeon: 15/15 rows across MNLI/QNLI/SST2 for FP16-SFT,
-BitNet-SFT, gamma=100 tensor, gamma=100 row, and paper-gamma tensor have
-valid load time, examples/s, RSS, and stored full-validation accuracy. This is
-not a packed `I2_SR` claim. It shows that PyTorch BitLinear task inference is
-memory-heavy and slower than FP16-SFT in this setup, which reinforces that the
-product path must use packed GGUF kernels rather than Python-level BitLinear
-execution.
+A full 512-sample PyTorch CPU sequence-classification gate now passes for
+33/33 critical rows, but that completed run was on an AMD Threadripper PRO
+5945WX node, not the target Xeon. It records valid load time, examples/s, RSS,
+sampled accuracy, and stored full-validation accuracy for FP16-SFT,
+BitNet-SFT, gamma=100 tensor/row, strict paper-gamma tensor/row, LR-search,
+and head-init rows across MNLI/QNLI/SST2. A Xeon Silver 4116 full rerun is in
+progress; until it finishes, the only completed Xeon task-runtime evidence is
+the scoped 16-sample gate: 15/15 rows across FP16-SFT, BitNet-SFT, gamma=100
+tensor, gamma=100 row, and paper-gamma tensor. These are PyTorch
+sequence-classification measurements, not packed `I2_SR`/llama.cpp claims.
+They show that Python-level BitLinear task inference is memory-heavy and
+slower than FP16-SFT in this setup, which reinforces that the product path must
+use packed GGUF kernels rather than Python-level BitLinear execution.
 
 Active follow-ups are now focused on clean row-scale warm-up, full CPU/I2_SR
 producer gates, and a decision on whether to spend the much larger compute
@@ -374,10 +379,10 @@ It does not make blind PTQ viable.
 
 The active public reports use `BITNET_REPORT_DATE=2026-05-15`. They are
 generated from checked-in scripts plus raw artifacts under `benchmark_results/`.
-Clean row-warmup and the full CPU runtime benchmark are still running or
-queued, while the active `I2_SR` export gate is complete. These commands
-therefore keep the unfinished row-warmup and CPU gates partial rather than
-success claims.
+Clean row-warmup and the Xeon-local full CPU runtime benchmark are still
+running or queued, while the active `I2_SR` export gate and the AMD full CPU
+PyTorch gate are complete. These commands therefore keep unfinished
+row-warmup and Xeon gates partial rather than success claims.
 
 ```bash
 export BITNET_REPORT_DATE=2026-05-15
@@ -389,6 +394,14 @@ python benchmarks/monitor_bitdistill_jobs.py \
   --warmup-log logs/bitdistill-glue-10028.out \
   --output-json benchmark_results/bitdistill_row_warmup_monitor_2026-05-15.json \
   --output-md benchmarks/results/bitdistill_row_warmup_monitor_2026-05-15.md
+
+python benchmarks/monitor_bitdistill_jobs.py \
+  --job-table \
+    benchmark_results/bitdistill_rowwarmup_downstream_gamma100_20260515.tsv \
+    benchmark_results/bitdistill_rowwarmup_downstream_papergamma_20260515.tsv \
+  --warmup-log logs/bitdistill-glue-10028.out \
+  --output-json benchmark_results/bitdistill_row_warmup_combined_monitor_2026-05-15.json \
+  --output-md benchmarks/results/bitdistill_row_warmup_combined_monitor_2026-05-15.md
 
 python benchmarks/audit_bitdistill_warmup_health.py
 
@@ -407,7 +420,22 @@ python benchmarks/gate_bitdistill_rowwarmup.py
 python benchmarks/audit_bitdistill_paper_alignment.py
 python benchmarks/audit_bitdistill_task_formulation.py
 python benchmarks/gate_bitdistill_i2sr_export.py
-python benchmarks/gate_bitdistill_cpu_benchmark.py
+python benchmarks/gate_bitdistill_cpu_benchmark.py \
+  --input-json benchmark_results/bitdistill_glue_cpu_2026-05-15.json \
+  --critical-runs \
+    short:fp16_sft-tensor-layer-1 \
+    short:bitnet_sft-tensor-layer-1 \
+    short:bitdistill-tensor-layer-1 \
+    short:bitdistill-row-layer-1 \
+    longwarmup:bitdistill-longwarmup-tensor-layer-8 \
+    longwarmup:bitdistill-longwarmup-row-layer-8 \
+    papergamma:bitdistill-longwarmup-tensor-layer-8 \
+    papergamma_row:bitdistill-longwarmup-row-layer-8 \
+    papergamma_lr1:bitdistill-longwarmup-tensor-layer-8 \
+    papergamma_lr5:bitdistill-longwarmup-tensor-layer-8 \
+    papergamma_headinit:bitdistill-longwarmup-tensor-layer-8 \
+  --output-json benchmark_results/bitdistill_glue_cpu_gate_2026-05-15.json \
+  --output-md benchmarks/results/bitdistill_glue_cpu_gate_2026-05-15.md
 python benchmarks/gate_bitdistill_cpu_benchmark.py \
   --input-json benchmark_results/bitdistill_glue_cpu_fast_2026-05-15.json \
   --critical-runs \
@@ -438,12 +466,14 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill reproduction gap analysis](benchmarks/results/bitdistill_reproduction_gap_analysis_2026-05-15.md)
 - [BitDistill warm-up health audit](benchmarks/results/bitdistill_warmup_health_2026-05-15.md)
 - [BitDistill row-warmup monitor](benchmarks/results/bitdistill_row_warmup_monitor_2026-05-15.md)
+- [BitDistill combined row-warmup monitor](benchmarks/results/bitdistill_row_warmup_combined_monitor_2026-05-15.md)
 - [BitDistill row-warmup health audit](benchmarks/results/bitdistill_row_warmup_health_2026-05-15.md)
 - [BitDistill snapshot integrity audit](benchmarks/results/bitdistill_snapshot_integrity_2026-05-15.md)
 - [BitDistill reproduction gate](benchmarks/results/bitdistill_reproduction_gate_2026-05-15.md)
 - [BitDistill row-warmup gate](benchmarks/results/bitdistill_rowwarmup_gate_2026-05-15.md)
 - [BitDistill paper alignment audit](benchmarks/results/bitdistill_paper_alignment_2026-05-15.md)
 - [BitDistill task formulation audit](benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md)
+- [BitDistill GLUE CPU benchmark](benchmarks/results/bitdistill_glue_cpu_2026-05-15.md)
 - [BitDistill GLUE CPU gate](benchmarks/results/bitdistill_glue_cpu_gate_2026-05-15.md)
 - [BitDistill scoped GLUE CPU gate](benchmarks/results/bitdistill_glue_cpu_fast_gate_2026-05-15.md)
 - [BitDistill causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_2026-05-15.md)
@@ -462,8 +492,9 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [MoE packing contract](benchmarks/results/moe_packing_contract_2026-05-15.md)
 - [MoE TL2 runtime contract](benchmarks/results/moe_tl2_runtime_contract_2026-05-15.md)
 - [Kimi config feasibility audit](benchmarks/results/kimi_config_feasibility_2026-05-15.md)
-- [Tiny Qwen2MoE runtime fixture](benchmarks/results/tiny_qwen2moe_fixture_2026-05-14.md)
-- [Unblock requirements audit](benchmarks/results/unblock_requirements_2026-05-14.md)
+- [Tiny Qwen2MoE runtime fixture](benchmarks/results/tiny_qwen2moe_fixture_2026-05-15.md)
+- [Tiny Qwen2MoE expert scaling](benchmarks/results/tiny_qwen2moe_expert_scaling_2026-05-15.md)
+- [Unblock requirements audit](benchmarks/results/unblock_requirements_2026-05-15.md)
 
 ## Product Direction
 

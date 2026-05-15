@@ -17,7 +17,7 @@ Overall status: `pass`.
 | step numbers are strictly increasing | pass | first=1, latest=20000, observations=2001 |  |
 | CE values are finite | pass | nonfinite=0, latest_ce=3.73892 |  |
 | latest progress is within target | pass | latest=20000, max_steps=20000, progress=1.0 |  |
-| log is fresh while job is active | pass | age_seconds=18697.8 |  |
+| log is fresh while job is active | pass | age_seconds=22553.0 |  |
 | ETA is finite | pass | seconds_per_step=1.8200900000000002, eta_seconds=0.0 |  |
 | monitor identifies same warm-up job | pass | monitor_job=9894, parsed_job=9894 |  |
 

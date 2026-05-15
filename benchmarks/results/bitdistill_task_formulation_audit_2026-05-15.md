@@ -6,7 +6,7 @@ Paper anchor source: BitDistill paper excerpt, Table 3 Qwen2.5-0.5B MNLI row.
 
 This audit prevents sequence-classification, causal prompt scoring, and paper table anchors from being mixed into one overbroad claim.
 
-Sequence-classification full baselines: `6`. Causal diagnostic rows materialized: `17`. Pending paper candidates: `3`.
+Sequence-classification full baselines: `6`. Causal diagnostic rows materialized: `17`. Pending paper candidates: `0`.
 
 ## Claim Controls
 
@@ -39,9 +39,9 @@ Sequence-classification full baselines: `6`. Causal diagnostic rows materialized
 | mnli | BitDistill longwarmup tensor paper gamma | sequence_classification | completed_paper_candidate | true | 0.630260 | 9815 | true | 0.799800 | -0.169540 | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
 | qnli | BitDistill longwarmup tensor paper gamma | sequence_classification | completed_paper_candidate | true | 0.759656 | 5463 | true | - | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8/metrics.json |
 | sst2 | BitDistill longwarmup tensor paper gamma | sequence_classification | completed_paper_candidate | true | 0.841743 | 872 | true | - | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8/metrics.json |
-| mnli | BitDistill longwarmup row paper gamma | sequence_classification | pending_row_candidate | false | - | - | false | 0.799800 | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/metrics.json |
-| qnli | BitDistill longwarmup row paper gamma | sequence_classification | pending_row_candidate | false | - | - | false | - | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-row-layer-8/metrics.json |
-| sst2 | BitDistill longwarmup row paper gamma | sequence_classification | pending_row_candidate | false | - | - | false | - | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8/metrics.json |
+| mnli | BitDistill longwarmup row paper gamma | sequence_classification | pending_row_candidate | true | 0.617626 | 9815 | true | 0.799800 | -0.182174 | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/metrics.json |
+| qnli | BitDistill longwarmup row paper gamma | sequence_classification | pending_row_candidate | true | 0.760937 | 5463 | true | - | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-row-layer-8/metrics.json |
+| sst2 | BitDistill longwarmup row paper gamma | sequence_classification | pending_row_candidate | true | 0.837156 | 872 | true | - | - | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8/metrics.json |
 | mnli | Causal FP16-SFT words | causal_lm_words | diagnostic | true | 0.829852 | 9815 | true | - | - | checkpoints/bitdistill-glue/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1/metrics.json |
 | qnli | Causal FP16-SFT words | causal_lm_words | diagnostic | true | 0.900970 | 5463 | true | - | - | checkpoints/bitdistill-glue/Qwen-Qwen2.5-0.5B/qnli/fp16_sft-tensor-layer-1/metrics.json |
 | sst2 | Causal FP16-SFT words | causal_lm_words | diagnostic | true | 0.939220 | 872 | true | - | - | checkpoints/bitdistill-glue/Qwen-Qwen2.5-0.5B/sst2/fp16_sft-tensor-layer-1/metrics.json |

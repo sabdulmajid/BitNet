@@ -139,7 +139,9 @@ def main() -> None:
     if work_dir.exists():
         if "bitdistill-smoke-contract" not in work_dir.name:
             raise SystemExit(f"refusing to remove unexpected work dir: {work_dir}")
-        shutil.rmtree(work_dir)
+        # After-any and after-ok postprocess jobs can race on this shared
+        # smoke directory. Treat a concurrently removed path as already clean.
+        shutil.rmtree(work_dir, ignore_errors=True)
     work_dir.mkdir(parents=True, exist_ok=True)
 
     py = sys.executable

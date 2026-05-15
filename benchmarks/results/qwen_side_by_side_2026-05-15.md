@@ -18,7 +18,7 @@ Generated from benchmark JSON artifacts. Missing rows are intentionally shown as
 | product scope | research_mvp_only | negative arbitrary-retrofit result plus dense-Qwen row-scale recovery path, with BitDistill reproduction and I2_SR row-scale extensions gated separately | Do not claim arbitrary lossless retrofit or MoE/Kimi support. |
 | I2_SR active submodule | ready | active=True; patch_applies=False; blockers=0 | Quality-valid CPU path is active when the fork branch is reachable and the superproject pointer is clean. |
 | MoE/Kimi packing | ready | tl2_3d=True; i2sr_3d=True; 2d_control=True | Synthetic contract separates direct I2_S/I2_SR packing from TL2; still no trained MoE or Kimi artifact. |
-| tiny Qwen2MoE FP16 fixture | pass | arch=qwen2moe; experts=2; used=1; decode=601.22 tok/s; rss=105.09765625 MiB | Positive converter/runtime smoke only; no quality, Kimi, ternary, TL2, or I2_SR MoE claim. |
+| tiny Qwen2MoE FP16 fixture | pass | arch=qwen2moe; experts=2; used=1; decode=2175.26 tok/s; rss=105.109375 MiB | Positive converter/runtime smoke only; no quality, Kimi, ternary, TL2, or I2_SR MoE claim. |
 
 ## Perplexity
 

@@ -1,5 +1,5 @@
 {
-  "artifact_count": 166,
+  "artifact_count": 168,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "d73356ea4e09aa98e7e143443cf852857ba3d00293544269065c8d691d2588a4",
-      "size_bytes": 27879
+      "sha256": "b4975541578a18582e64b4102c155c24e6d3d4084dadc1d1c6864678602ee3fe",
+      "size_bytes": 29869
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "side_by_side_report",
       "metrics": {},
       "path": "benchmarks/results/qwen_side_by_side_2026-05-15.md",
-      "sha256": "f3a17212cfe852da53be46a5ea73ebc4b58b3f02f3b284b38a6f1790f70a5187",
-      "size_bytes": 17207
+      "sha256": "3e4cc51b063c19fe62b5088928717074586ccccd1276a38f70b0d336a5247d34",
+      "size_bytes": 17206
     },
     {
       "exists": true,
@@ -79,8 +79,8 @@
       "label": "product_scope_gate",
       "metrics": {},
       "path": "benchmarks/results/product_scope_gate_2026-05-15.md",
-      "sha256": "aa79fa97cc88c180181952cbac1afb130d30e82fbedb2d1eedac4b08c8c19d58",
-      "size_bytes": 4848
+      "sha256": "ed68e47e2db6b29056c1e56e93517d8f9fcd684ba157520f145c4d813a98f326",
+      "size_bytes": 5001
     },
     {
       "exists": true,
@@ -124,8 +124,8 @@
       "label": "bitdistill_task_formulation_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md",
-      "sha256": "a9673ae56024d8f214bebafefea44bec108d3535c5d4c2d5ea48eae2f457ecc5",
-      "size_bytes": 11523
+      "sha256": "05e608289c02e78608a88c285789f5128c604bd124e89be8f558428855ad9d47",
+      "size_bytes": 11554
     },
     {
       "exists": true,
@@ -148,11 +148,20 @@
     {
       "exists": true,
       "kind": "tracked_report",
+      "label": "bitdistill_cpu_benchmark_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_glue_cpu_2026-05-15.md",
+      "sha256": "dd84bc0eee978ae38ae431189293b434185ba294ec13a01b136f3a67bef53dbb",
+      "size_bytes": 10840
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
       "label": "bitdistill_cpu_gate_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_glue_cpu_gate_2026-05-15.md",
-      "sha256": "652745d24866c1535501d3a9f59fb590cc39d8798d7a1a77c650067f54dd29ac",
-      "size_bytes": 7445
+      "sha256": "7e27a5c687831817788f491f9a733865e03f0a7aa4663ec05f07a0f0289e12b1",
+      "size_bytes": 7636
     },
     {
       "exists": true,
@@ -232,7 +241,7 @@
       "label": "bitdistill_warmup_health_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_warmup_health_2026-05-15.md",
-      "sha256": "1a399dba2d448826b4fb87afe1a0a98c2c5f19e20bb57fa1577a8342cf411668",
+      "sha256": "13b2619e075e0251702c09c7e90987b7fb9650fef5ecc70400a2520f9c9253bc",
       "size_bytes": 1691
     },
     {
@@ -277,8 +286,8 @@
       "label": "bitdistill_active_goal_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_active_goal_audit_2026-05-15.md",
-      "sha256": "3ee4886cf60dba162c47e458e2fcf593b46b905a2ca9a78bf7f6ca039f052a0c",
-      "size_bytes": 4071
+      "sha256": "3beba4b176264e44234c79fd6558b8b9733968af13a9a7473480fcc6eb40612a",
+      "size_bytes": 4334
     },
     {
       "exists": true,
@@ -295,8 +304,8 @@
       "label": "bitdistill_smoke_contract_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_smoke_contract_2026-05-15.md",
-      "sha256": "f7dc1484ffc2e96cc413b43d487da828547613df73324f8116ea498de4b08783",
-      "size_bytes": 3955
+      "sha256": "1b50a231dd44762993b4e98f70d20150c82869a577300e911eda9b30b8e72ea8",
+      "size_bytes": 3957
     },
     {
       "exists": true,
@@ -349,7 +358,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "d9e83da1998915c43e127eb9d06ce14916df8af0ec320749ce4a434afb564c3f",
+      "sha256": "8468c107505d519031e281571d4d65dfec2a3623bda49ba19574ff12a564c489",
       "size_bytes": 3438
     },
     {
@@ -529,8 +538,8 @@
       "label": "moe_report",
       "metrics": {},
       "path": "benchmarks/results/moe_support_audit_2026-05-15.md",
-      "sha256": "0aba3144f72b049592311af573d9dd2d92ac44ce3f034e7d65894e0c1e245ba0",
-      "size_bytes": 5455
+      "sha256": "ee6a6156c7fcf14e91b6f8be3d785a42fdb82247f14cd6eff6bd56d49068f357",
+      "size_bytes": 5453
     },
     {
       "exists": true,
@@ -564,9 +573,9 @@
       "kind": "tracked_report",
       "label": "tiny_qwen2moe_fixture_report",
       "metrics": {},
-      "path": "benchmarks/results/tiny_qwen2moe_fixture_2026-05-14.md",
-      "sha256": "1ad4c2961f423bd50682694bd6ee4d9219260205d2acf5276a30381ed0facd40",
-      "size_bytes": 1097
+      "path": "benchmarks/results/tiny_qwen2moe_fixture_2026-05-15.md",
+      "sha256": "aa83b61bf7354e8bd81b7c4b567fab21953e4b62ed7091431d0c6a348a963d71",
+      "size_bytes": 1094
     },
     {
       "exists": true,
@@ -582,18 +591,18 @@
       "kind": "tracked_report",
       "label": "tiny_qwen2moe_expert_scaling_report",
       "metrics": {},
-      "path": "benchmarks/results/tiny_qwen2moe_expert_scaling_2026-05-14.md",
-      "sha256": "fce193aa66e61dcd296a46564c5a071622ea871241077e800a537b8b0977ea62",
-      "size_bytes": 1026
+      "path": "benchmarks/results/tiny_qwen2moe_expert_scaling_2026-05-15.md",
+      "sha256": "ffee726c8dace51687b370479e1997669eca74d64c882c6a183da27b924ea13b",
+      "size_bytes": 1030
     },
     {
       "exists": true,
       "kind": "tracked_report",
       "label": "unblock_requirements_report",
       "metrics": {},
-      "path": "benchmarks/results/unblock_requirements_2026-05-14.md",
-      "sha256": "c5fad110f46ffe4c5ef9f9c6586ffebfce1821cd52053e409eb73d41ada1d0db",
-      "size_bytes": 2039
+      "path": "benchmarks/results/unblock_requirements_2026-05-15.md",
+      "sha256": "36416578e206b349e38527461ea2b46cbb26e7e09560711d3e03fa573510a60e",
+      "size_bytes": 1996
     },
     {
       "exists": true,
@@ -2039,7 +2048,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "c5500e584abefe6221aca1207e376e58e25b2d3a9b0039d9764350901e9133d6",
+      "sha256": "4afb80bcd74f61c9428cdea6262b2d98465714c864eab0658a25526bc0b65e75",
       "size_bytes": 6374
     },
     {
@@ -2071,8 +2080,8 @@
         "unsupported_claim_count": 4
       },
       "path": "benchmark_results/product_scope_gate_2026-05-15.json",
-      "sha256": "666dbe73378c8d0d09d6f87ba78a6779513478797324d554bba4c8df174bc4e9",
-      "size_bytes": 5699
+      "sha256": "a574825c82184d71294b1d56d9c6cba14350f87aad7c6f69a38831e38d98ba31",
+      "size_bytes": 5852
     },
     {
       "exists": true,
@@ -2122,33 +2131,31 @@
       "metrics": {
         "causal_rows_materialized": 17,
         "paper_anchor_source": "BitDistill paper excerpt, Table 3 Qwen2.5-0.5B MNLI row.",
-        "pending_paper_candidates": 3,
+        "pending_paper_candidates": 0,
         "rows": 45,
         "sequence_baselines_full": 6
       },
       "path": "benchmark_results/bitdistill_task_formulation_audit_2026-05-15.json",
-      "sha256": "d3d8b0cb36e86efdcfdcba2fd1749901079426252772e5bd9522c29037a4147c",
-      "size_bytes": 28152
+      "sha256": "aee2449b00295f8173d710c7a2518413b131c908d236645333afdafbc0ad42a0",
+      "size_bytes": 28281
     },
     {
       "exists": true,
       "kind": "bitdistill_cpu_gate_json",
       "label": "bitdistill_cpu_gate_json",
       "metrics": {
-        "blockers": [
-          "missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-15.json"
-        ],
+        "blockers": [],
         "critical": 33,
-        "critical_complete": 0,
-        "critical_full_quality": 0,
-        "input_exists": false,
-        "max_eval_samples": null,
-        "passed": false,
-        "rows": 0
+        "critical_complete": 33,
+        "critical_full_quality": 33,
+        "input_exists": true,
+        "max_eval_samples": 512,
+        "passed": true,
+        "rows": 36
       },
       "path": "benchmark_results/bitdistill_glue_cpu_gate_2026-05-15.json",
-      "sha256": "916b3c88ed5a086ab00a500d3134c0e9d9118bcfed298830a072024a112f1ece",
-      "size_bytes": 9566
+      "sha256": "3868f8437c0416fb6ba1930f63f7bbf0fdb378bc254be520817c7aecce8808ee",
+      "size_bytes": 55136
     },
     {
       "exists": true,
@@ -2333,8 +2340,8 @@
         "warnings": 1
       },
       "path": "benchmark_results/bitdistill_warmup_health_2026-05-15.json",
-      "sha256": "ec9d22585e61e089ba14f892958ab34d1708c4efd67c712ff73fa637b8e996c3",
-      "size_bytes": 4290
+      "sha256": "7ee562f8bfc72f4265a4da5e8b5284069524df650ecd89ab5000cc3225128f34",
+      "size_bytes": 4289
     },
     {
       "exists": true,
@@ -2409,7 +2416,7 @@
         "check_count": 5,
         "complete_count": 1,
         "completion_status": "partial",
-        "cpu_passed": false,
+        "cpu_passed": true,
         "i2sr_passed": true,
         "objective_achieved": false,
         "open_requirements": [
@@ -2424,8 +2431,8 @@
         "warmup_step": 20000
       },
       "path": "benchmark_results/bitdistill_active_goal_audit_2026-05-15.json",
-      "sha256": "56a8a32d3363e603aec666c66f8b4c9731997ca2fd96b788e956ea7d8c597a98",
-      "size_bytes": 6314
+      "sha256": "082fb657ea5766d1a56626bb154fc44594fe053551c5e51cbbd91c542d419f78",
+      "size_bytes": 6791
     },
     {
       "exists": true,
@@ -2464,8 +2471,8 @@
         "task_subln": 4
       },
       "path": "benchmark_results/bitdistill_smoke_contract_2026-05-15.json",
-      "sha256": "8c552c1d616a080a4224d93e3141d5f2a1c56d1bdd22900e873c5a2644cdff4a",
-      "size_bytes": 37146
+      "sha256": "f62058de909ea1a46e0223d11319569a5834e911ac750392aba68914f423fd2e",
+      "size_bytes": 37355
     },
     {
       "exists": true,
@@ -2568,8 +2575,8 @@
         "tiny_qwen2moe_ternary_i2sr_passed": true
       },
       "path": "benchmark_results/moe_support_audit_2026-05-15.json",
-      "sha256": "4a73c4846ef742395a9bb8b253af578d998dfb7bb64efc0899d6f5949dbc061c",
-      "size_bytes": 39564
+      "sha256": "c7070308eeaf9ce57cfe5ade9448079f2993cac1ff41296208e99081d541e206",
+      "size_bytes": 38761
     },
     {
       "exists": true,
@@ -2640,12 +2647,21 @@
     },
     {
       "exists": true,
+      "kind": "bitdistill_cpu_benchmark_json",
+      "label": "bitdistill_cpu_benchmark_json",
+      "metrics": {},
+      "path": "benchmark_results/bitdistill_glue_cpu_2026-05-15.json",
+      "sha256": "88a183dd3f9605efdf4a8c17f8174b559d4a458b05851f416a9d0bfe9a6e72fa",
+      "size_bytes": 34790
+    },
+    {
+      "exists": true,
       "kind": "tiny_qwen2moe_fixture_json",
       "label": "tiny_qwen2moe_fixture_json",
       "metrics": {
         "architecture": "qwen2moe",
         "cpu_buffer_mib": 37.16,
-        "decode_tok_s": 601.22,
+        "decode_tok_s": 2175.26,
         "expert_count": 2,
         "expert_used_count": 1,
         "gates": {
@@ -2656,14 +2672,14 @@
           "rss_measured": true
         },
         "gguf_mib": 42.807647705078125,
-        "max_rss_mib": 105.09765625,
+        "max_rss_mib": 105.109375,
         "model_params_m": 19.48,
         "passed": true,
-        "prompt_eval_tok_s": 2424.83
+        "prompt_eval_tok_s": 9633.91
       },
-      "path": "benchmark_results/tiny_qwen2moe_fixture_2026-05-14.json",
-      "sha256": "025b905b3fa8bd0a9b069dac093bdf86a41e5e6db93b988ed971faa5f695befb",
-      "size_bytes": 3480
+      "path": "benchmark_results/tiny_qwen2moe_fixture_2026-05-15.json",
+      "sha256": "ef4bf9431b081c25e4aebb650316dd13345f1aaa9ee07d3f42772c0c9bf2bbca",
+      "size_bytes": 3497
     },
     {
       "exists": true,
@@ -2703,15 +2719,15 @@
       "kind": "tiny_qwen2moe_expert_scaling_json",
       "label": "tiny_qwen2moe_expert_scaling_json",
       "metrics": {
-        "max_decode_tok_s": 595.88,
-        "min_decode_tok_s": 545.06,
+        "max_decode_tok_s": 2202.32,
+        "min_decode_tok_s": 2182.77,
         "passed": true,
         "passed_rows": 4,
         "rows": 4
       },
-      "path": "benchmark_results/tiny_qwen2moe_expert_scaling_2026-05-14.json",
-      "sha256": "a2f81a1e5203329c72317a55403b8f4cdd1e43c786b661e9953dfb88a863f3d7",
-      "size_bytes": 15370
+      "path": "benchmark_results/tiny_qwen2moe_expert_scaling_2026-05-15.json",
+      "sha256": "7ee53c4b675266b2a36271ca5f527c51d1400c7530fde3b372d9d38e3ce61100",
+      "size_bytes": 14591
     },
     {
       "exists": true,
@@ -2721,16 +2737,15 @@
         "can_continue_productively_without_input": false,
         "candidate_fork_reachable": true,
         "missing": [
-          "Local trained Kimi/Qwen2MoE model artifact",
           "MoE quality/locality benchmark artifacts"
         ],
-        "missing_count": 2,
+        "missing_count": 1,
         "objective_status": "not_complete",
         "requirements": 5
       },
-      "path": "benchmark_results/unblock_requirements_2026-05-14.json",
-      "sha256": "78499a2b0c8d78b160ac2eb31220104f7d8d63d4af96455a85e9458ba8ce92f0",
-      "size_bytes": 2678
+      "path": "benchmark_results/unblock_requirements_2026-05-15.json",
+      "sha256": "e63955e134a470b1005eea3ed4c5c274f1ce020c275fd6d289ee7cdb97478ea0",
+      "size_bytes": 4880
     },
     {
       "exists": true,

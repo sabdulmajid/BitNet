@@ -1,6 +1,6 @@
 # BitDistill Job Monitor, 2026-05-15
 
-Job tables: `benchmark_results/bitdistill_rowwarmup_downstream_papergamma_20260515.tsv`.
+Job tables: `benchmark_results/bitdistill_rowwarmup_downstream_gamma100_20260515.tsv, benchmark_results/bitdistill_rowwarmup_downstream_papergamma_20260515.tsv`.
 
 ## Stage-2 Warm-Up
 
@@ -18,6 +18,9 @@ Job tables: `benchmark_results/bitdistill_rowwarmup_downstream_papergamma_202605
 
 | job | task | format | scale | layer | steps | logit KD | attention KD | logit temp scale | excluded linears | state | elapsed | node/reason | metrics | accuracy | metrics path |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 10029 | mnli | sequence_classification | row | -8 | 1000 | 10.0 | 100.0 | none | score\|classifier | PENDING | 0:00 | (Dependency) | false | - | checkpoints/bitdistill-glue-seqcls-rowwarmup-gamma100/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/metrics.json |
+| 10030 | qnli | sequence_classification | row | -8 | 1000 | 10.0 | 100.0 | none | score\|classifier | PENDING | 0:00 | (Dependency) | false | - | checkpoints/bitdistill-glue-seqcls-rowwarmup-gamma100/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-row-layer-8/metrics.json |
+| 10031 | sst2 | sequence_classification | row | -8 | 1000 | 10.0 | 100.0 | none | score\|classifier | PENDING | 0:00 | (Dependency) | false | - | checkpoints/bitdistill-glue-seqcls-rowwarmup-gamma100/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8/metrics.json |
 | 10032 | mnli | sequence_classification | row | -8 | 1000 | 10.0 | 100000 | none | score\|classifier | PENDING | 0:00 | (Dependency) | false | - | checkpoints/bitdistill-glue-seqcls-rowwarmup-papergamma/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/metrics.json |
 | 10033 | qnli | sequence_classification | row | -8 | 1000 | 10.0 | 100000 | none | score\|classifier | PENDING | 0:00 | (Dependency) | false | - | checkpoints/bitdistill-glue-seqcls-rowwarmup-papergamma/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-row-layer-8/metrics.json |
 | 10034 | sst2 | sequence_classification | row | -8 | 1000 | 10.0 | 100000 | none | score\|classifier | PENDING | 0:00 | (Dependency) | false | - | checkpoints/bitdistill-glue-seqcls-rowwarmup-papergamma/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8/metrics.json |

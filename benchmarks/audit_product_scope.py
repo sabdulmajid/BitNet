@@ -175,6 +175,31 @@ def build_gate(root: Path) -> dict[str, Any]:
     bitdistill_cpu_full_quality = sum(
         1 for row in bitdistill_cpu_critical if isinstance(row, dict) and row.get("full_quality_available")
     )
+    bitdistill_cpu_hardware = (
+        bitdistill_cpu.get("hardware", {}) if isinstance(bitdistill_cpu.get("hardware"), dict) else {}
+    )
+    bitdistill_cpu_model = bitdistill_cpu_hardware.get("cpu_model") or "unknown CPU"
+    bitdistill_xeon_cpu_path = root / f"benchmark_results/bitdistill_glue_cpu_xeon_gate_{DATE}.json"
+    bitdistill_xeon_cpu = read_json(bitdistill_xeon_cpu_path) if bitdistill_xeon_cpu_path.exists() else {}
+    bitdistill_xeon_cpu_critical = (
+        bitdistill_xeon_cpu.get("critical", [])
+        if isinstance(bitdistill_xeon_cpu.get("critical"), list)
+        else []
+    )
+    bitdistill_xeon_cpu_complete = sum(
+        1 for row in bitdistill_xeon_cpu_critical if isinstance(row, dict) and row.get("complete")
+    )
+    bitdistill_xeon_cpu_full_quality = sum(
+        1 for row in bitdistill_xeon_cpu_critical if isinstance(row, dict) and row.get("full_quality_available")
+    )
+    bitdistill_xeon_cpu_hardware = (
+        bitdistill_xeon_cpu.get("hardware", {})
+        if isinstance(bitdistill_xeon_cpu.get("hardware"), dict)
+        else {}
+    )
+    bitdistill_xeon_cpu_model = bitdistill_xeon_cpu_hardware.get("cpu_model") or "hardware pending"
+    bitdistill_xeon_cpu_state: Any = bitdistill_xeon_cpu.get("passed") if bitdistill_xeon_cpu else "pending"
+    bitdistill_xeon_cpu_expected = len(bitdistill_xeon_cpu_critical) or len(bitdistill_cpu_critical)
 
     active_gate = read_json(root / "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json")
     patch_gate = read_json(root / "benchmark_results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.json")
@@ -255,7 +280,20 @@ def build_gate(root: Path) -> dict[str, Any]:
         "Dense Qwen2.5-1.5B I2_SR evidence in this fork on Intel Xeon Silver 4116.",
     )
     bitdistill_paper_passed = bool(bitdistill_reproduction.get("paper_style_tensor_passed"))
-    if bitdistill_paired_passed:
+    bitdistill_cpu_passed = bool(bitdistill_cpu.get("passed"))
+    bitdistill_xeon_cpu_passed = bool(bitdistill_xeon_cpu.get("passed"))
+    if bitdistill_paired_passed and bitdistill_cpu_passed and bitdistill_xeon_cpu_passed:
+        bitdistill_reproduction_blocker = (
+            "Gamma=100, strict paper-gamma tensor, strict paper-gamma row, and LR/head-init runs are complete "
+            "with paired traces plus AMD and Xeon CPU full-quality rows, but remain below the FP16-gap gate."
+        )
+    elif bitdistill_paired_passed and bitdistill_cpu_passed:
+        bitdistill_reproduction_blocker = (
+            "Gamma=100, strict paper-gamma tensor, strict paper-gamma row, and LR/head-init runs are complete "
+            "with paired traces and full-quality CPU rows on the non-Xeon CPU benchmark node, but remain below "
+            "the FP16-gap gate; the Xeon-local CPU rerun is still missing or incomplete."
+        )
+    elif bitdistill_paired_passed:
         bitdistill_reproduction_blocker = (
             "Gamma=100, strict paper-gamma tensor, strict paper-gamma row, and LR/head-init runs are complete "
             "with paired traces but remain below the FP16-gap gate; CPU full-quality rows are still missing or incomplete."
@@ -281,8 +319,12 @@ def build_gate(root: Path) -> dict[str, Any]:
             f"expected eval={bitdistill_expected_examples}; "
             f"paired status={bitdistill_paired.get('status')}; "
             f"paired complete={bitdistill_paired_complete}/{bitdistill_paired_total}; "
-            f"cpu gate={bitdistill_cpu.get('passed')} ({bitdistill_cpu_complete}/{len(bitdistill_cpu_critical)} rows, "
-            f"full-quality={bitdistill_cpu_full_quality}/{len(bitdistill_cpu_critical)})"
+            f"cpu gate={bitdistill_cpu.get('passed')} on {bitdistill_cpu_model} "
+            f"({bitdistill_cpu_complete}/{len(bitdistill_cpu_critical)} rows, "
+            f"full-quality={bitdistill_cpu_full_quality}/{len(bitdistill_cpu_critical)}); "
+            f"xeon cpu gate={bitdistill_xeon_cpu_state} on {bitdistill_xeon_cpu_model} "
+            f"({bitdistill_xeon_cpu_complete}/{bitdistill_xeon_cpu_expected} rows, "
+            f"full-quality={bitdistill_xeon_cpu_full_quality}/{bitdistill_xeon_cpu_expected})"
         ),
         "Claim only after MNLI/QNLI/SST2 full-validation BitDistill rows are within the configured FP16 gap and paired traces/CPU gates are complete.",
         bitdistill_reproduction_blocker,
@@ -363,9 +405,18 @@ def build_gate(root: Path) -> dict[str, Any]:
         "unsupported_claim_count": len(unsupported),
         "claims": claims,
         "recommendation": {
-            "product": "CPU-first dense-Qwen retrofit evaluator with stable I2_SR runtime support; keep BitDistill quality claims behind the full GLUE reproduction and CPU full-quality gates.",
+            "product": (
+                "CPU-first dense-Qwen retrofit evaluator with stable I2_SR runtime support; "
+                "keep BitDistill quality claims behind the full GLUE reproduction gate."
+            ),
             "paper": "Scope as a negative PTQ result plus measured QAT/row-scale/runtime recovery path; add BitDistill reproduction claims only if the full-validation long-warmup gates pass. Do not claim arbitrary or MoE support.",
-            "next_engineering_gate": "Finish the CPU-quality dependency chain and clean row-warmup comparisons; keep MoE/Kimi as a separate milestone.",
+            "next_engineering_gate": (
+                "Finish clean row-warmup comparisons and the Xeon-local CPU rerun; keep MoE/Kimi as a separate milestone."
+                if bitdistill_cpu_passed and not bitdistill_xeon_cpu_passed
+                else "Finish clean row-warmup comparisons; keep MoE/Kimi as a separate milestone."
+                if bitdistill_xeon_cpu_passed
+                else "Finish the CPU-quality dependency chain and clean row-warmup comparisons; keep MoE/Kimi as a separate milestone."
+            ),
         },
     }
 
