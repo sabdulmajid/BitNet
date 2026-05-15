@@ -508,11 +508,12 @@ python benchmarks/audit_i2sr_submodule_promotion.py \
 ```
 
 The current report is
-`benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md`; it is
-expected to fail until the submodule points at a pushed branch containing the
-row-scale qtype/runtime changes. The current failure is specific: the upstream
-submodule remote returns 403 for this user, and the expected
-`sabdulmajid/llama.cpp` fork URL is not reachable from this environment.
+`benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md`. The
+submodule now points at `https://github.com/sabdulmajid/llama.cpp.git` on the
+`i2sr-row-scale-runtime` branch, the active source contains `I2_SR`, and the
+remote write probe passes. The split promotion patches no longer apply cleanly
+because the active source is already promoted; that is recorded as a warning,
+not a blocker.
 
 The monolithic candidate patch can be split into promotion-ready pieces with:
 
