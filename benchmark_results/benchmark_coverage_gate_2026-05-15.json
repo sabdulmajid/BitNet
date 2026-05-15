@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 55,
+  "check_count": 56,
   "failed": [],
   "checks": [
     {
@@ -258,6 +258,12 @@
       "blocker": ""
     },
     {
+      "name": "Qwen3 paper-alignment audit tracks required GLUE rows",
+      "passed": true,
+      "evidence": "jobs=16, complete=0, ready=False",
+      "blocker": ""
+    },
+    {
       "name": "FP F16 CPU row is finite",
       "passed": true,
       "evidence": "ppl=12.2808, prefill=114.468162, decode=5.555998",
@@ -326,7 +332,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=207, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=211, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

@@ -1,5 +1,5 @@
 {
-  "artifact_count": 207,
+  "artifact_count": 211,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "086cd7074c5c3ecdd868478d2de3e607fe5ddc81ce346c11ef2cabae0a4ecd20",
-      "size_bytes": 16951
+      "sha256": "ab31793303f58728d412fdacdfbe8aaa9486ebd355c1560b20e0c9c13d27980a",
+      "size_bytes": 18190
     },
     {
       "exists": true,
@@ -283,6 +283,24 @@
     {
       "exists": true,
       "kind": "tracked_report",
+      "label": "qwen3_paper_alignment_report",
+      "metrics": {},
+      "path": "benchmarks/results/qwen3_paper_alignment_2026-05-15.md",
+      "sha256": "ba25ba86a4cf37a7b08ba986bb00450e2937fa1c49a6c66657f2e4710acf7bea",
+      "size_bytes": 4031
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "qwen3_postprocess_submission_report",
+      "metrics": {},
+      "path": "benchmarks/results/qwen3_postprocess_submission_2026-05-15.md",
+      "sha256": "096508f537cf1903a15c7716a810bcc51b716b93529656bb3236575acb860d7d",
+      "size_bytes": 798
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
       "label": "bitdistill_cpu_benchmark_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_glue_cpu_2026-05-15.md",
@@ -538,8 +556,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "0c7f99f73bf01e93be613f056d8826f3bc1abab6520c445c79beee9631d6f33f",
-      "size_bytes": 6446
+      "sha256": "f7f536d1c3d8cda099a501d540b2698595f094eb4fd7ba51b0c79e62976d4c2a",
+      "size_bytes": 6549
     },
     {
       "exists": true,
@@ -2223,13 +2241,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 55,
+        "check_count": 56,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "dba4cd2a5ce1ab0c455729ff0a8d4485088601803d9b77fca3ddb9abb7de12b5",
-      "size_bytes": 10691
+      "sha256": "f81af4f77ea576b5331cc9980ff441f85bb7f3e097003a1fb5bb7c1304b18153",
+      "size_bytes": 10871
     },
     {
       "exists": true,
@@ -2334,6 +2352,24 @@
       "path": "benchmark_results/bitdistill_telemetry_coverage_2026-05-15.json",
       "sha256": "d5972de78a36d9474e8ab0ef24eb3b099b1284d1c572ba4e9f26a7fdc1ddcc16",
       "size_bytes": 3805
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "qwen3_paper_alignment_json",
+      "metrics": {},
+      "path": "benchmark_results/qwen3_paper_alignment_2026-05-15.json",
+      "sha256": "d89033e7b8f651169bbcc70491093693dbc3e0f34f71a7e909a0d86517d917af",
+      "size_bytes": 22176
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "qwen3_postprocess_submission_json",
+      "metrics": {},
+      "path": "benchmark_results/qwen3_postprocess_submission_2026-05-15.json",
+      "sha256": "aefafcfc80efc3d3181cfe996dc47a5a736e64e356e556c2c7717be7d6da67fd",
+      "size_bytes": 405
     },
     {
       "exists": true,

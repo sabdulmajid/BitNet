@@ -1,0 +1,557 @@
+{
+  "bitnet_complete_tasks": [],
+  "complete_count": 0,
+  "date": "2026-05-15",
+  "expected_examples": {
+    "mnli": 9815,
+    "qnli": 5463,
+    "sst2": 872
+  },
+  "fp_complete_tasks": [],
+  "gap_pass_count": 0,
+  "job_count": 16,
+  "jobs_tsv": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/bitdistill_glue_jobs_20260515_124507.tsv",
+  "paper_reproduction_ready": false,
+  "row_bitdistill_complete_tasks": [],
+  "rows": [
+    {
+      "accuracy": null,
+      "complete": false,
+      "dependency": "none",
+      "eval_examples": null,
+      "expected_examples": null,
+      "job_id": "10040",
+      "last_ce": null,
+      "layer": "-",
+      "method": "bitdistill",
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/continued_pretrain/bitdistill-tensor/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/continued_pretrain/bitdistill-tensor",
+      "paired": {},
+      "passes_fp_gap": false,
+      "phase": "stage2",
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/continued_pretrain/bitdistill-tensor/eval_predictions.jsonl",
+      "preparation": {},
+      "queue": {
+        "elapsed": "7:17:52",
+        "job_id": "10040",
+        "reason": "ece-nebula10",
+        "state": "RUNNING"
+      },
+      "scale": "tensor",
+      "steps": null,
+      "task": "-"
+    },
+    {
+      "accuracy": null,
+      "complete": false,
+      "dependency": "none",
+      "eval_examples": null,
+      "expected_examples": 9815,
+      "job_id": "10041",
+      "last_ce": null,
+      "layer": "-1",
+      "method": "fp16_sft",
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/fp16_sft-tensor-layer-1/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/fp16_sft-tensor-layer-1",
+      "paired": {},
+      "passes_fp_gap": false,
+      "phase": "paper_baseline",
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+      "preparation": {},
+      "queue": {
+        "elapsed": "0:00",
+        "job_id": "10041",
+        "reason": "(Resources)",
+        "state": "PENDING"
+      },
+      "scale": "tensor",
+      "steps": null,
+      "task": "mnli"
+    },
+    {
+      "accuracy": null,
+      "complete": false,
+      "dependency": "none",
+      "eval_examples": null,
+      "expected_examples": 9815,
+      "job_id": "10042",
+      "last_ce": null,
+      "layer": "-1",
+      "method": "bitnet_sft",
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitnet_sft-tensor-layer-1/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitnet_sft-tensor-layer-1",
+      "paired": {
+        "errors": [
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitnet_sft-tensor-layer-1/eval_predictions.jsonl"
+        ],
+        "status": "pending"
+      },
+      "passes_fp_gap": false,
+      "phase": "paper_baseline",
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitnet_sft-tensor-layer-1/eval_predictions.jsonl",
+      "preparation": {},
+      "queue": {
+        "elapsed": "0:00",
+        "job_id": "10042",
+        "reason": "(Priority)",
+        "state": "PENDING"
+      },
+      "scale": "tensor",
+      "steps": null,
+      "task": "mnli"
+    },
+    {
+      "accuracy": null,
+      "complete": false,
+      "dependency": "afterok:10040:10041",
+      "eval_examples": null,
+      "expected_examples": 9815,
+      "job_id": "10043",
+      "last_ce": null,
+      "layer": "-1",
+      "method": "bitdistill",
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-1/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-1",
+      "paired": {
+        "errors": [
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-1/eval_predictions.jsonl"
+        ],
+        "status": "pending"
+      },
+      "passes_fp_gap": false,
+      "phase": "paper_baseline",
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-1/eval_predictions.jsonl",
+      "preparation": {},
+      "queue": {
+        "elapsed": "0:00",
+        "job_id": "10043",
+        "reason": "(Dependency)",
+        "state": "PENDING"
+      },
+      "scale": "tensor",
+      "steps": null,
+      "task": "mnli"
+    },
+    {
+      "accuracy": null,
+      "complete": false,
+      "dependency": "afterok:10040:10041",
+      "eval_examples": null,
+      "expected_examples": 9815,
+      "job_id": "10044",
+      "last_ce": null,
+      "layer": "-1",
+      "method": "bitdistill",
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-row-layer-1/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-row-layer-1",
+      "paired": {
+        "errors": [
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-row-layer-1/eval_predictions.jsonl"
+        ],
+        "status": "pending"
+      },
+      "passes_fp_gap": false,
+      "phase": "novelty_row_scale",
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-row-layer-1/eval_predictions.jsonl",
+      "preparation": {},
+      "queue": {
+        "elapsed": "0:00",
+        "job_id": "10044",
+        "reason": "(Dependency)",
+        "state": "PENDING"
+      },
+      "scale": "row",
+      "steps": null,
+      "task": "mnli"
+    },
+    {
+      "accuracy": null,
+      "complete": false,
+      "dependency": "none",
+      "eval_examples": null,
+      "expected_examples": 5463,
+      "job_id": "10045",
+      "last_ce": null,
+      "layer": "-1",
+      "method": "fp16_sft",
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/fp16_sft-tensor-layer-1/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/fp16_sft-tensor-layer-1",
+      "paired": {},
+      "passes_fp_gap": false,
+      "phase": "paper_baseline",
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+      "preparation": {},
+      "queue": {
+        "elapsed": "0:00",
+        "job_id": "10045",
+        "reason": "(Priority)",
+        "state": "PENDING"
+      },
+      "scale": "tensor",
+      "steps": null,
+      "task": "qnli"
+    },
+    {
+      "accuracy": null,
+      "complete": false,
+      "dependency": "none",
+      "eval_examples": null,
+      "expected_examples": 5463,
+      "job_id": "10046",
+      "last_ce": null,
+      "layer": "-1",
+      "method": "bitnet_sft",
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitnet_sft-tensor-layer-1/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitnet_sft-tensor-layer-1",
+      "paired": {
+        "errors": [
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitnet_sft-tensor-layer-1/eval_predictions.jsonl"
+        ],
+        "status": "pending"
+      },
+      "passes_fp_gap": false,
+      "phase": "paper_baseline",
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitnet_sft-tensor-layer-1/eval_predictions.jsonl",
+      "preparation": {},
+      "queue": {
+        "elapsed": "0:00",
+        "job_id": "10046",
+        "reason": "(Priority)",
+        "state": "PENDING"
+      },
+      "scale": "tensor",
+      "steps": null,
+      "task": "qnli"
+    },
+    {
+      "accuracy": null,
+      "complete": false,
+      "dependency": "afterok:10040:10045",
+      "eval_examples": null,
+      "expected_examples": 5463,
+      "job_id": "10047",
+      "last_ce": null,
+      "layer": "-1",
+      "method": "bitdistill",
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitdistill-tensor-layer-1/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitdistill-tensor-layer-1",
+      "paired": {
+        "errors": [
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitdistill-tensor-layer-1/eval_predictions.jsonl"
+        ],
+        "status": "pending"
+      },
+      "passes_fp_gap": false,
+      "phase": "paper_baseline",
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitdistill-tensor-layer-1/eval_predictions.jsonl",
+      "preparation": {},
+      "queue": {
+        "elapsed": "0:00",
+        "job_id": "10047",
+        "reason": "(Dependency)",
+        "state": "PENDING"
+      },
+      "scale": "tensor",
+      "steps": null,
+      "task": "qnli"
+    },
+    {
+      "accuracy": null,
+      "complete": false,
+      "dependency": "afterok:10040:10045",
+      "eval_examples": null,
+      "expected_examples": 5463,
+      "job_id": "10048",
+      "last_ce": null,
+      "layer": "-1",
+      "method": "bitdistill",
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitdistill-row-layer-1/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitdistill-row-layer-1",
+      "paired": {
+        "errors": [
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitdistill-row-layer-1/eval_predictions.jsonl"
+        ],
+        "status": "pending"
+      },
+      "passes_fp_gap": false,
+      "phase": "novelty_row_scale",
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitdistill-row-layer-1/eval_predictions.jsonl",
+      "preparation": {},
+      "queue": {
+        "elapsed": "0:00",
+        "job_id": "10048",
+        "reason": "(Dependency)",
+        "state": "PENDING"
+      },
+      "scale": "row",
+      "steps": null,
+      "task": "qnli"
+    },
+    {
+      "accuracy": null,
+      "complete": false,
+      "dependency": "none",
+      "eval_examples": null,
+      "expected_examples": 872,
+      "job_id": "10049",
+      "last_ce": null,
+      "layer": "-1",
+      "method": "fp16_sft",
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/fp16_sft-tensor-layer-1/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/fp16_sft-tensor-layer-1",
+      "paired": {},
+      "passes_fp_gap": false,
+      "phase": "paper_baseline",
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+      "preparation": {},
+      "queue": {
+        "elapsed": "0:00",
+        "job_id": "10049",
+        "reason": "(Priority)",
+        "state": "PENDING"
+      },
+      "scale": "tensor",
+      "steps": null,
+      "task": "sst2"
+    },
+    {
+      "accuracy": null,
+      "complete": false,
+      "dependency": "none",
+      "eval_examples": null,
+      "expected_examples": 872,
+      "job_id": "10050",
+      "last_ce": null,
+      "layer": "-1",
+      "method": "bitnet_sft",
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitnet_sft-tensor-layer-1/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitnet_sft-tensor-layer-1",
+      "paired": {
+        "errors": [
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitnet_sft-tensor-layer-1/eval_predictions.jsonl"
+        ],
+        "status": "pending"
+      },
+      "passes_fp_gap": false,
+      "phase": "paper_baseline",
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitnet_sft-tensor-layer-1/eval_predictions.jsonl",
+      "preparation": {},
+      "queue": {
+        "elapsed": "0:00",
+        "job_id": "10050",
+        "reason": "(Priority)",
+        "state": "PENDING"
+      },
+      "scale": "tensor",
+      "steps": null,
+      "task": "sst2"
+    },
+    {
+      "accuracy": null,
+      "complete": false,
+      "dependency": "afterok:10040:10049",
+      "eval_examples": null,
+      "expected_examples": 872,
+      "job_id": "10051",
+      "last_ce": null,
+      "layer": "-1",
+      "method": "bitdistill",
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitdistill-tensor-layer-1/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitdistill-tensor-layer-1",
+      "paired": {
+        "errors": [
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitdistill-tensor-layer-1/eval_predictions.jsonl"
+        ],
+        "status": "pending"
+      },
+      "passes_fp_gap": false,
+      "phase": "paper_baseline",
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitdistill-tensor-layer-1/eval_predictions.jsonl",
+      "preparation": {},
+      "queue": {
+        "elapsed": "0:00",
+        "job_id": "10051",
+        "reason": "(Dependency)",
+        "state": "PENDING"
+      },
+      "scale": "tensor",
+      "steps": null,
+      "task": "sst2"
+    },
+    {
+      "accuracy": null,
+      "complete": false,
+      "dependency": "afterok:10040:10049",
+      "eval_examples": null,
+      "expected_examples": 872,
+      "job_id": "10052",
+      "last_ce": null,
+      "layer": "-1",
+      "method": "bitdistill",
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitdistill-row-layer-1/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitdistill-row-layer-1",
+      "paired": {
+        "errors": [
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitdistill-row-layer-1/eval_predictions.jsonl"
+        ],
+        "status": "pending"
+      },
+      "passes_fp_gap": false,
+      "phase": "novelty_row_scale",
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitdistill-row-layer-1/eval_predictions.jsonl",
+      "preparation": {},
+      "queue": {
+        "elapsed": "0:00",
+        "job_id": "10052",
+        "reason": "(Dependency)",
+        "state": "PENDING"
+      },
+      "scale": "row",
+      "steps": null,
+      "task": "sst2"
+    },
+    {
+      "accuracy": null,
+      "complete": false,
+      "dependency": "afterok:10040:10041",
+      "eval_examples": null,
+      "expected_examples": 9815,
+      "job_id": "10053",
+      "last_ce": null,
+      "layer": "-8",
+      "method": "bitdistill",
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-8/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-8",
+      "paired": {
+        "errors": [
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-8/eval_predictions.jsonl"
+        ],
+        "status": "pending"
+      },
+      "passes_fp_gap": false,
+      "phase": "attention_layer_sweep",
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-8/eval_predictions.jsonl",
+      "preparation": {},
+      "queue": {
+        "elapsed": "0:00",
+        "job_id": "10053",
+        "reason": "(Dependency)",
+        "state": "PENDING"
+      },
+      "scale": "tensor",
+      "steps": null,
+      "task": "mnli"
+    },
+    {
+      "accuracy": null,
+      "complete": false,
+      "dependency": "afterok:10040:10041",
+      "eval_examples": null,
+      "expected_examples": 9815,
+      "job_id": "10054",
+      "last_ce": null,
+      "layer": "-2",
+      "method": "bitdistill",
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-2/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-2",
+      "paired": {
+        "errors": [
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-2/eval_predictions.jsonl"
+        ],
+        "status": "pending"
+      },
+      "passes_fp_gap": false,
+      "phase": "attention_layer_sweep",
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-2/eval_predictions.jsonl",
+      "preparation": {},
+      "queue": {
+        "elapsed": "0:00",
+        "job_id": "10054",
+        "reason": "(Dependency)",
+        "state": "PENDING"
+      },
+      "scale": "tensor",
+      "steps": null,
+      "task": "mnli"
+    },
+    {
+      "accuracy": null,
+      "complete": false,
+      "dependency": "afterok:10040:10041",
+      "eval_examples": null,
+      "expected_examples": 9815,
+      "job_id": "10055",
+      "last_ce": null,
+      "layer": "-4",
+      "method": "bitdistill",
+      "metrics_exists": false,
+      "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-4/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-4",
+      "paired": {
+        "errors": [
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-4/eval_predictions.jsonl"
+        ],
+        "status": "pending"
+      },
+      "passes_fp_gap": false,
+      "phase": "attention_layer_sweep",
+      "predictions_exists": false,
+      "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-4/eval_predictions.jsonl",
+      "preparation": {},
+      "queue": {
+        "elapsed": "0:00",
+        "job_id": "10055",
+        "reason": "(Dependency)",
+        "state": "PENDING"
+      },
+      "scale": "tensor",
+      "steps": null,
+      "task": "mnli"
+    }
+  ],
+  "schema": "qwen3-paper-alignment-audit-v1",
+  "success_delta_from_fp": -0.01,
+  "tensor_bitdistill_complete_tasks": []
+}

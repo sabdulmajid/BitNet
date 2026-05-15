@@ -1,0 +1,10 @@
+{
+  "date": "2026-05-15",
+  "dependency": "afterany:10040:10041:10042:10043:10044:10045:10046:10047:10048:10049:10050:10051:10052:10053:10054:10055",
+  "job_id": "10073",
+  "partition": "dualcard",
+  "script": "slurm_bitdistill_qwen3_postprocess.sh",
+  "stderr": "logs/bitdistill-qwen3-post-10073.err",
+  "stdout": "logs/bitdistill-qwen3-post-10073.out",
+  "state_at_submission": "PENDING (Dependency)"
+}

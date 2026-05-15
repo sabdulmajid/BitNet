@@ -197,6 +197,22 @@ https://github.com/sabdulmajid/llama.cpp
 
 with the active `i2sr-row-scale-runtime` branch.
 
+## Publishable Angle
+
+This fork should not be framed as discovering BitDistill or as a universal
+BitNet converter. The defensible contribution is an independent, CPU-first
+retrofit evaluation stack:
+
+- a negative boundary result for blind FP/BF16-to-ternary PTQ,
+- a controlled reproduction path for BitDistill-style task adaptation,
+- a row-scale ternary retrofit variant with paired statistical audits,
+- a packed `I2_SR` CPU runtime contract that preserves row-scale semantics,
+- explicit quality/runtime/product gates that prevent fast but unusable
+  artifacts from being reported as successful LLMs.
+
+The publishable systems thesis is that extreme quantization requires both a
+training contract and a runtime contract. Ternary storage alone is not enough.
+
 ## Not Yet Proven
 
 - One-click universal FP/BF16-to-ternary conversion.
@@ -222,6 +238,14 @@ The next experiments are intentionally narrow:
 | Quantization | paper-style tensor scale first; row-scale only as `retrofit-variant` |
 | Budget curve | `1000`, `3000`, `10000` downstream steps now; larger Stage-2 token budgets if the curve justifies it |
 | Success gate | full validation accuracy within about `0.5-1.0` point of FP16-SFT, with paired traces |
+
+Current lanes:
+
+- Qwen2.5-0.5B controlled recovery: hold Stage-3 fixed and isolate Stage-2
+  token budget across `40.96M`, `163.84M`, and `327.68M` token presentations.
+- Qwen3-0.6B paper-alignment branch: track FP16-SFT, BitNet-SFT, tensor
+  BitDistill, row BitDistill, and MNLI attention-layer sweep rows for MNLI,
+  QNLI, and SST2. This branch is pending and has no quality claim yet.
 
 Decision rule:
 
@@ -296,6 +320,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill Stage-2 curve submission](benchmarks/results/bitdistill_stage2_curve_submission_2026-05-15.md)
 - [BitDistill controlled curve audit](benchmarks/results/bitdistill_controlled_curve_2026-05-15.md)
 - [BitDistill telemetry coverage audit](benchmarks/results/bitdistill_telemetry_coverage_2026-05-15.md)
+- [Qwen3 paper-alignment audit](benchmarks/results/qwen3_paper_alignment_2026-05-15.md)
 - [BitNet-SFT baseline audit](benchmarks/results/bitnet_sft_baseline_audit_2026-05-15.md)
 - [BitNet-SFT recipe alignment audit](benchmarks/results/bitnet_sft_recipe_alignment_2026-05-15.md)
 - [BitNet-SFT mechanics audit](benchmarks/results/bitnet_sft_mechanics_audit_2026-05-15.md)

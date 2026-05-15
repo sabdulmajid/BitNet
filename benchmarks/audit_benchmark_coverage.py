@@ -434,6 +434,35 @@ def audit_bitdistill_telemetry_coverage(root: Path, checks: list[dict[str, Any]]
     )
 
 
+def audit_qwen3_paper_alignment(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/qwen3_paper_alignment_{DATE}.json"
+    if not path.exists():
+        add_check(checks, "Qwen3 paper-alignment audit exists", False, str(path.relative_to(root)), "missing Qwen3 audit")
+        return
+    data = read_json(path)
+    rows = data.get("rows", []) if isinstance(data.get("rows"), list) else []
+    methods = {(row.get("task"), row.get("method"), row.get("scale"), row.get("phase")) for row in rows if isinstance(row, dict)}
+    required_rows = {
+        ("mnli", "fp16_sft", "tensor", "paper_baseline"),
+        ("mnli", "bitnet_sft", "tensor", "paper_baseline"),
+        ("mnli", "bitdistill", "tensor", "paper_baseline"),
+        ("mnli", "bitdistill", "row", "novelty_row_scale"),
+        ("qnli", "fp16_sft", "tensor", "paper_baseline"),
+        ("qnli", "bitnet_sft", "tensor", "paper_baseline"),
+        ("qnli", "bitdistill", "tensor", "paper_baseline"),
+        ("sst2", "fp16_sft", "tensor", "paper_baseline"),
+        ("sst2", "bitnet_sft", "tensor", "paper_baseline"),
+        ("sst2", "bitdistill", "tensor", "paper_baseline"),
+    }
+    add_check(
+        checks,
+        "Qwen3 paper-alignment audit tracks required GLUE rows",
+        data.get("job_count") == 16 and required_rows.issubset(methods),
+        f"jobs={data.get('job_count')}, complete={data.get('complete_count')}, ready={data.get('paper_reproduction_ready')}",
+        "Qwen3 audit is missing one or more paper-alignment rows",
+    )
+
+
 def find_row(summary: dict[str, Any], name: str) -> dict[str, Any] | None:
     for row in summary.get("rows", []):
         if row.get("name") == name:
@@ -618,6 +647,7 @@ def main() -> None:
     audit_subln_activation_variance(root, checks)
     audit_bitdistill_root_cause(root, checks)
     audit_bitdistill_telemetry_coverage(root, checks)
+    audit_qwen3_paper_alignment(root, checks)
     audit_cpu_rows(root, checks)
     audit_cpu_tradeoff_frontier(root, checks)
     audit_cpu_speed_uncertainty(root, checks)
