@@ -55,6 +55,10 @@ Completed controls rule out several simple causes:
   `0.493734`, so A8 is not the dominant cause.
 - Current SubLN-only insertion worsens MNLI to `0.350280`, so SubLN placement,
   initialization, or timing is not aligned enough to explain the paper result.
+- A direct SubLN activation audit on a local Qwen2.5-0.5B checkpoint shows why
+  this is plausible: adding the local SubLN wrappers inserts `48` RMSNorms,
+  normalizes audited projection inputs to near unit RMS, and causes last-token
+  logit relative RMS drift `0.768044` before any warmup.
 - A 1000-step LR sweep improved the best short row to `0.523892`.
 - The completed 3000-step sweep improves further to `0.574733`, with `48,000`
   optimizer examples, or `0.122230` MNLI epochs.

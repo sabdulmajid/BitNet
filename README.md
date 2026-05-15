@@ -103,6 +103,10 @@ Current BitNet-SFT controls:
 - Weights-only/no-A8 control: `0.493734`, only `+0.006113` over W1.58A8.
 - SubLN-only local control: `0.350280`, so current SubLN insertion by itself
   worsens the local baseline.
+- SubLN activation audit on a local Qwen2.5-0.5B checkpoint inserts `48`
+  modules and shows untrained architecture surgery is not identity-preserving:
+  last-token logit relative RMS drift `0.768044`, cosine `0.698252`, top-1
+  agreement `0.000000`.
 - Best completed budget row: `0.628935` at `10000` steps, `2e-5`, exceeding
   the paper BitNet-SFT anchor by `0.020935` but still `0.178706` below the
   local FP16-SFT row.
@@ -257,6 +261,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitNet-SFT recipe alignment audit](benchmarks/results/bitnet_sft_recipe_alignment_2026-05-15.md)
 - [BitNet-SFT budget sweep audit](benchmarks/results/bitnet_sft_budget_sweep_2026-05-15.md)
 - [BitNet-SFT budget paired audit](benchmarks/results/bitnet_sft_budget_paired_2026-05-15.md)
+- [SubLN activation variance audit](benchmarks/results/subln_activation_variance_2026-05-15.md)
 - [BitDistill paper alignment audit](benchmarks/results/bitdistill_paper_alignment_2026-05-15.md)
 - [Task formulation audit](benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md)
 - [Causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_2026-05-15.md)

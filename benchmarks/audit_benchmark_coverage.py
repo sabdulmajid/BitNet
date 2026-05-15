@@ -264,6 +264,42 @@ def audit_bitnet_sft_budget_paired(root: Path, checks: list[dict[str, Any]]) -> 
     )
 
 
+def audit_subln_activation_variance(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/subln_activation_variance_{DATE}.json"
+    if not path.exists():
+        add_check(checks, "SubLN activation-variance audit exists", False, str(path.relative_to(root)), "missing SubLN audit")
+        return
+    data = read_json(path)
+    rel = data.get("logit_relative_rms")
+    cosine = data.get("logit_cosine")
+    inserted = data.get("subln_inserted")
+    families = data.get("families", {}) if isinstance(data.get("families"), dict) else {}
+    output_rms = []
+    for family in (".self_attn.o_proj", ".mlp.down_proj"):
+        row = families.get(family, {})
+        subln_output = row.get("subln_output", {}) if isinstance(row, dict) else {}
+        value = subln_output.get("token_rms_mean") if isinstance(subln_output, dict) else None
+        if isinstance(value, (int, float)):
+            output_rms.append(float(value))
+    add_check(
+        checks,
+        "SubLN activation-variance audit has finite logit drift",
+        isinstance(inserted, int)
+        and inserted > 0
+        and isinstance(rel, (int, float))
+        and isinstance(cosine, (int, float)),
+        f"inserted={inserted}, rel_rms={rel}, cosine={cosine}, path={path.relative_to(root)}",
+        "SubLN audit did not quantify finite logit drift",
+    )
+    add_check(
+        checks,
+        "SubLN audit confirms projection-input normalization",
+        len(output_rms) == 2 and all(0.9 <= value <= 1.1 for value in output_rms),
+        f"subln_output_rms={output_rms}",
+        "SubLN output RMS is not near unit scale for both audited projection families",
+    )
+
+
 def find_row(summary: dict[str, Any], name: str) -> dict[str, Any] | None:
     for row in summary.get("rows", []):
         if row.get("name") == name:
@@ -384,6 +420,7 @@ def main() -> None:
     audit_paired_reports(root, checks)
     audit_bitdistill_paired_baselines(root, checks)
     audit_bitnet_sft_budget_paired(root, checks)
+    audit_subln_activation_variance(root, checks)
     audit_cpu_rows(root, checks)
     manifest_path = args.manifest_path.resolve() if args.manifest_path is not None else None
     audit_rss_and_gates(root, checks, manifest_path)

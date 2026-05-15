@@ -1,5 +1,5 @@
 {
-  "artifact_count": 183,
+  "artifact_count": 185,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "7151c5bb0c140b10c455c44e91357eb8113b4419274d314e441101c1c1889395",
-      "size_bytes": 13715
+      "sha256": "d7beeeba4d360998795717e275eb7b73a85bbf66347de0953f984e490677c366",
+      "size_bytes": 14062
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "research_redirect_report",
       "metrics": {},
       "path": "benchmarks/results/research_redirect_2026-05-15.md",
-      "sha256": "681add900bdb8322b950e2387d62d784e01b5036b28d5a302dd73e007590f081",
-      "size_bytes": 6085
+      "sha256": "27b20d2e8677370d74cf74723482531267ebdcca562347bcaa9cd6c2d42e18e4",
+      "size_bytes": 6376
     },
     {
       "exists": true,
@@ -171,6 +171,15 @@
       "path": "benchmarks/results/bitnet_sft_budget_paired_2026-05-15.md",
       "sha256": "9c3eb547f8cc2379ad80ee144fe06ba66f505e6f46bc5633a4a89948e9da56cc",
       "size_bytes": 1914
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "subln_activation_variance_report",
+      "metrics": {},
+      "path": "benchmarks/results/subln_activation_variance_2026-05-15.md",
+      "sha256": "75e6c8b54d42868b0fb81ca60f5c249fba55e9a19b78671d57c6842ae053cac4",
+      "size_bytes": 2293
     },
     {
       "exists": true,
@@ -2216,6 +2225,15 @@
       "path": "benchmark_results/bitnet_sft_budget_paired_2026-05-15.json",
       "sha256": "df413564bddbb34a9da04e41f0242a2ec8907a2e170e709b73e18453a9613e97",
       "size_bytes": 9077
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "subln_activation_variance_json",
+      "metrics": {},
+      "path": "benchmark_results/subln_activation_variance_2026-05-15.json",
+      "sha256": "02e9fdf289c90585bd464e727c06ecb2d5c323eb1469b65d85dfc879b69e06f7",
+      "size_bytes": 16243
     },
     {
       "exists": true,

@@ -1,9 +1,9 @@
 # Evidence Manifest, 2026-05-15
-Artifacts: `183`. Missing: `0`.
+Artifacts: `185`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 13715 | 7151c5bb0c14 |  |
-| research_redirect_report | tracked_report | yes | 6085 | 681add900bdb |  |
+| README | tracked_report | yes | 14062 | d7beeeba4d36 |  |
+| research_redirect_report | tracked_report | yes | 6376 | 27b20d2e8677 |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
 | paired_row_minus_ptq_report | tracked_report | yes | 1332 | 20a5aee1eb99 |  |
@@ -21,6 +21,7 @@ Artifacts: `183`. Missing: `0`.
 | bitnet_sft_recipe_alignment_report | tracked_report | yes | 2883 | 69950837db67 |  |
 | bitnet_sft_budget_sweep_report | tracked_report | yes | 2513 | 7922b908e05d |  |
 | bitnet_sft_budget_paired_report | tracked_report | yes | 1914 | 9c3eb547f8cc |  |
+| subln_activation_variance_report | tracked_report | yes | 2293 | 75e6c8b54d42 |  |
 | bitdistill_paper_alignment_report | tracked_report | yes | 10494 | a5d8df51bcf4 |  |
 | bitdistill_loss_scale_report | tracked_report | yes | 8733 | 628d0414fc13 |  |
 | bitdistill_cpu_benchmark_report | tracked_report | yes | 10840 | dd84bc0eee97 |  |
@@ -147,6 +148,7 @@ Artifacts: `183`. Missing: `0`.
 | bitnet_sft_recipe_alignment_json | generic_json | yes | 3545 | 2e2449074bb1 |  |
 | bitnet_sft_budget_sweep_json | generic_json | yes | 21065 | 1d9f6722f15a |  |
 | bitnet_sft_budget_paired_json | generic_json | yes | 9077 | df413564bddb |  |
+| subln_activation_variance_json | generic_json | yes | 16243 | 02e9fdf289c9 |  |
 | bitdistill_paired_predictions_json | bitdistill_paired_predictions_json | yes | 71851 | 4b50cdbc3d9b | status=pass, complete=44/44, pending=0, failed=0 |
 | bitdistill_task_formulation_json | bitdistill_task_formulation_json | yes | 28374 | c4e8328337c0 | seq_full=6, causal_rows=17, pending_paper=0, rows=45 |
 | bitdistill_cpu_gate_json | bitdistill_cpu_gate_json | yes | 55136 | 3868f8437c04 | passed=True, input=True, critical=33/33, full_quality=33, sample_n=512, blockers=0 |
