@@ -19,8 +19,8 @@ This audit is not a quality result. It checks whether the local implementation a
 
 | job | label | state | step | CE | attention KD | weighted attention KD | weighted attention / CE | max weighted attention / CE | parsed steps |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 10068 | 20k-warmup downstream control | RUNNING | 910 | 0.890625 | 0.018013 | 1801.281372 | 2022.491365 | 6461.961604 | 92 |
+| 10068 | 20k-warmup downstream control | RUNNING | 1670 | 1.437500 | 0.011914 | 1191.376953 | 828.783967 | 16326.870293 | 168 |
 
 ## Interpretation
 
-The risk threshold is weighted-attention/CE >= `100.0`. The max observed ratio is `6461.961604`. If final BitDistill quality remains weak, the first follow-up is loss-normalization and gradient-balance telemetry, not another broad model/task sweep.
+The risk threshold is weighted-attention/CE >= `100.0`. The max observed ratio is `16326.870293`. If final BitDistill quality remains weak, the first follow-up is loss-normalization and gradient-balance telemetry, not another broad model/task sweep.

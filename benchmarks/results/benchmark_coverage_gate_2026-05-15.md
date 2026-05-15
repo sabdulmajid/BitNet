@@ -47,7 +47,7 @@ Overall status: **PASS**.
 | BitDistill telemetry coverage audit measures current loss diagnostics | pass | status=partial_observability, measured=5/5 |  |
 | BitDistill telemetry coverage audit keeps advanced causality claims blocked | pass | missing=['Q/K/V relation KD split', 'activation int8 saturation rate', 'gradient norm by loss component', 'scale trajectory per layer', 'ternary flip rate per step/layer'] |  |
 | BitDistill loss-contract static checks pass | pass | passed=True, checks=6, status=loss_normalization_risk |  |
-| BitDistill loss-contract records paper-gamma dominance risk | pass | status=loss_normalization_risk, max_attn_ce=6461.961603640245 |  |
+| BitDistill loss-contract records paper-gamma dominance risk | pass | status=loss_normalization_risk, max_attn_ce=16326.870292845022 |  |
 | Ternary flip-dynamics audit has nonzero saved-snapshot flips | pass | status=pass, pairs=2, min_flip=0.06454656755885871, max_flip=0.1659562863332169 |  |
 | Qwen3 paper-alignment audit tracks required GLUE rows | pass | jobs=16, complete=0, ready=False |  |
 | FP F16 CPU row is finite | pass | ppl=12.2808, prefill=114.468162, decode=5.555998 |  |

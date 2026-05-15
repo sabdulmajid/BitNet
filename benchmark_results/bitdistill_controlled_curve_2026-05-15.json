@@ -74,21 +74,21 @@
       "live_log": {
         "exists": true,
         "latest": {
-          "attention_kd": 0.018013,
-          "ce": 0.890625,
-          "elapsed": 736.7,
-          "logit_kd": 0.036578,
-          "loss": 1802.53772,
-          "lr": 1.97e-05,
-          "step": 910.0,
-          "weighted_attention_kd": 1801.281372,
-          "weighted_logit_kd": 0.365781
+          "attention_kd": 0.011914,
+          "ce": 1.4375,
+          "elapsed": 1351.5,
+          "logit_kd": 0.063636,
+          "loss": 1193.450806,
+          "lr": 1.891e-05,
+          "step": 1670.0,
+          "weighted_attention_kd": 1191.376953,
+          "weighted_logit_kd": 0.636361
         },
-        "latest_step": 910,
-        "latest_weighted_attention_to_ce": 2022.4913650526314,
-        "max_weighted_attention_to_ce": 6461.961603640245,
-        "min_weighted_attention_to_ce": 813.6714545230769,
-        "parsed_steps": 92,
+        "latest_step": 1670,
+        "latest_weighted_attention_to_ce": 828.7839673043478,
+        "max_weighted_attention_to_ce": 16326.870292845022,
+        "min_weighted_attention_to_ce": 632.0040304761906,
+        "parsed_steps": 168,
         "path": "logs/bitdistill-glue-10068.out"
       },
       "metric_accuracy": null,
@@ -121,7 +121,7 @@
       "predictions_exists": false,
       "predictions_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
       "squeue": {
-        "elapsed": "13:51",
+        "elapsed": "24:06",
         "job_id": "10068",
         "reason": "ece-nebula12",
         "state": "RUNNING"
