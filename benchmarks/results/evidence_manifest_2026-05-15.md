@@ -1,5 +1,5 @@
 # Evidence Manifest, 2026-05-15
-Artifacts: `201`. Missing: `0`.
+Artifacts: `203`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
 | README | tracked_report | yes | 16199 | ff7dfa9da2c9 |  |
@@ -14,6 +14,7 @@ Artifacts: `201`. Missing: `0`.
 | product_scope_gate | tracked_report | yes | 4919 | 274554bfc124 |  |
 | bitdistill_reproduction_status | tracked_report | yes | 8481 | 3f0e6a6abc2f |  |
 | bitdistill_reproduction_gap_analysis | tracked_report | yes | 7625 | e6aa07a2211f |  |
+| bitdistill_root_cause_audit_report | tracked_report | yes | 3590 | 456eec35d737 |  |
 | bitdistill_recovery_submission_report | tracked_report | yes | 1896 | 56e8811cce5e |  |
 | bitdistill_recovery_audit_report | tracked_report | yes | 1534 | 4bd7195806a9 |  |
 | bitdistill_stage2_curve_report | tracked_report | yes | 4180 | de98a4baca66 |  |
@@ -156,6 +157,7 @@ Artifacts: `201`. Missing: `0`.
 | bitdistill_stage2_curve_json | generic_json | yes | 19229 | 42f4a99e3a68 |  |
 | bitdistill_stage2_curve_submission_json | generic_json | yes | 2131 | ae9d0a82341e |  |
 | bitdistill_controlled_curve_json | generic_json | yes | 6571 | 4e18dccd5eb2 |  |
+| bitdistill_root_cause_audit_json | generic_json | yes | 8205 | 295e16a65756 |  |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 32197 | c581499edff4 | present=34/36, examples=34, full_eval=34, ci95=34, paper_complete=True, paper_passed=False, row_complete=True, row_passed=False, confidence=0.95 |
 | bitnet_sft_baseline_audit_json | generic_json | yes | 48829 | 57c5584b4206 |  |
 | bitnet_sft_recipe_alignment_json | generic_json | yes | 3545 | 2e2449074bb1 |  |

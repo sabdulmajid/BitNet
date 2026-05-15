@@ -1,0 +1,185 @@
+{
+  "bitdistill": {
+    "best_row_retrofit": {
+      "accuracy": 0.6535914416709119,
+      "attention_kd_weight": 100.0,
+      "attention_qkv_reduction": "sum",
+      "delta_vs_fp16": -0.15455934793683135,
+      "distill_layer": -8,
+      "eval_examples": 9815.0,
+      "exists": true,
+      "family": "retrofit_variant",
+      "label": "BitDistill row downstream, tensor warm-up",
+      "last_ce": 0.236328125,
+      "method": "bitdistill",
+      "metrics_path": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/metrics.json",
+      "note": "Row-scale downstream retrofit variant loaded from the tensor Stage-2 checkpoint.",
+      "output_head_copied": false,
+      "paper_stage2_fraction": 0.016384,
+      "scale_mode": "row",
+      "stage": "task_sft",
+      "steps": 1000,
+      "task_format": "sequence_classification",
+      "warmup_metrics_path": "checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/metrics.json",
+      "warmup_scale_mode": "tensor",
+      "warmup_steps": 20000,
+      "warmup_token_source": "recorded",
+      "warmup_tokens": 163840000.0,
+      "weighted_attention_kd": 1.938157558441162,
+      "weighted_attention_to_ce": 8.20112950348657,
+      "weighted_logit_kd": 0.13088521361351013,
+      "weighted_logit_to_ce": 0.553828341901795
+    },
+    "best_tensor": {
+      "accuracy": 0.6416709118695874,
+      "attention_kd_weight": 100.0,
+      "attention_qkv_reduction": "sum",
+      "delta_vs_fp16": -0.16647987773815587,
+      "distill_layer": -8,
+      "eval_examples": 9815.0,
+      "exists": true,
+      "family": "bitdistill_tensor",
+      "label": "BitDistill tensor 20k warm-up",
+      "last_ce": 0.26953125,
+      "method": "bitdistill",
+      "metrics_path": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8/metrics.json",
+      "note": "Uses 20k-step tensor Stage-2 warm-up and explicit Q/K/V-sum attention relation loss.",
+      "output_head_copied": false,
+      "paper_stage2_fraction": 0.016384,
+      "scale_mode": "tensor",
+      "stage": "task_sft",
+      "steps": 1000,
+      "task_format": "sequence_classification",
+      "warmup_metrics_path": "checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/metrics.json",
+      "warmup_scale_mode": "tensor",
+      "warmup_steps": 20000,
+      "warmup_token_source": "recorded",
+      "warmup_tokens": 163840000.0,
+      "weighted_attention_kd": 1.816802978515625,
+      "weighted_attention_to_ce": 6.740602355072464,
+      "weighted_logit_kd": 0.14036980271339417,
+      "weighted_logit_to_ce": 0.520792311516361
+    },
+    "controlled_all_complete": false,
+    "controlled_complete": 0,
+    "controlled_expected": 3
+  },
+  "bitnet_sft": {
+    "best": {
+      "both_correct": 5548,
+      "both_wrong": 1258,
+      "candidate_accuracy": 0.6289353031074886,
+      "candidate_wins": 625,
+      "clears_paper_anchor": true,
+      "delta_vs_paper_anchor": 0.02093530310748859,
+      "delta_vs_reference": -0.17921548650025465,
+      "errors": [],
+      "job_id": "10066",
+      "lr": "2e-5",
+      "matched": 9815,
+      "mcnemar_exact_p": 3.4383886495134495e-240,
+      "metrics_accuracy": 0.6289353031074886,
+      "paired_ci95": [
+        -0.18958024909015786,
+        -0.16885072391035155
+      ],
+      "paper_anchor": 0.608,
+      "prediction_path": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5/eval_predictions.jsonl",
+      "reference_accuracy": 0.8081507896077432,
+      "reference_wins": 2384,
+      "status": "pass",
+      "steps": 10000
+    },
+    "complete_rows": 9
+  },
+  "claims": [
+    {
+      "claim": "Blind ternary PTQ is not a viable universal retrofit for tested Qwen.",
+      "evidence": "WikiText PPL 13.901475 -> 3.813e+06; ten-task mean 0.644169 -> 0.348671 (delta -0.295498).",
+      "next_gate": "None for the tested dense-Qwen setup; this is already a negative result.",
+      "status": "supported_for_tested_setup"
+    },
+    {
+      "claim": "The early weak BitNet-SFT baseline was not just broken mechanics.",
+      "evidence": "mechanics passed=true; best 10k CE-only MNLI=0.628935, paper anchor delta=0.020935, FP paired delta=-0.179215.",
+      "next_gate": "Finish the second 10k LR row and keep paired traces for schedule robustness.",
+      "status": "supported"
+    },
+    {
+      "claim": "BitDistill paper-level recovery has not been locally reproduced.",
+      "evidence": "best tensor BitDistill MNLI=0.641671 (delta vs FP -0.166480); controlled rows complete=0/3.",
+      "next_gate": "Ingest fixed-recipe 5k/20k/40k Stage-2 rows when Slurm jobs finish.",
+      "status": "not_proven"
+    },
+    {
+      "claim": "Loss normalization is a live reproduction risk.",
+      "evidence": "projected paper-gamma attention/CE range 890.466502 to 1.578e+04; materialized rows=22.",
+      "next_gate": "For new jobs, compare CE/logit-KD/attention-KD magnitudes before interpreting gamma sweeps.",
+      "status": "supported"
+    },
+    {
+      "claim": "Local SubLN surgery is not identity-preserving before adaptation.",
+      "evidence": "inserted=48; logit relative RMS drift=0.768044; cosine=0.698252; top1 agreement=0.000000.",
+      "next_gate": "Treat SubLN timing/init as part of the training recipe, not as harmless module insertion.",
+      "status": "supported"
+    },
+    {
+      "claim": "Row-scale I2_SR is a runtime-semantics contribution, not a Q4 quality/storage win.",
+      "evidence": "row-scale ten-task mean=0.499459 (delta vs FP -0.144710); I2_SR/Q4 prefill=2.298818x, decode=1.190617x, file=1.288133x, PPL=3.032323x.",
+      "next_gate": "Keep claims scoped to speed and scale-contract fidelity until quality improves.",
+      "status": "supported"
+    },
+    {
+      "claim": "TL2 row-scale and real Kimi/MoE product claims remain open.",
+      "evidence": "TL2 ready=false; TL2 row one-scale error=1.904230; MoE gates failed=3/9; Kimi config supported=false.",
+      "next_gate": "Do not foreground Kimi/MoE until trained quality, routing locality, and runtime support exist.",
+      "status": "not_proven"
+    }
+  ],
+  "date": "2026-05-15",
+  "loss_scale": {
+    "materialized_rows": 22,
+    "projected_paper_attention_to_ce_max": 15779.832789772436,
+    "projected_paper_attention_to_ce_min": 890.4665015464606
+  },
+  "open_runtime_claims": {
+    "kimi_config_supported": false,
+    "kimi_unsupported_features": [
+      "Kimi/DeepSeekV3 architecture loader",
+      "MLA/Q-LoRA attention metadata",
+      "Shared expert path",
+      "Block-FP8 source checkpoint import"
+    ],
+    "moe_failed_productization_gates": 3,
+    "moe_productization_gates": 9,
+    "tl2_current_one_scale_error": 1.9042302114103853,
+    "tl2_failed_checks": 6,
+    "tl2_row_fp16_error": 0.00019744640689756221,
+    "tl2_row_scale_runtime_ready": false
+  },
+  "quality": {
+    "fp_tasks": 10,
+    "fp_ten_task_mean": 0.6441691641219306,
+    "fp_wikitext_ppl": 13.901475466625362,
+    "ptq_delta_vs_fp": -0.29549814696751625,
+    "ptq_tasks": 10,
+    "ptq_ten_task_mean": 0.34867101715441434,
+    "ptq_wikitext_ppl": 3813121.80332679,
+    "row_delta_vs_fp": -0.14470996363954236,
+    "row_tasks": 10,
+    "row_ten_task_mean": 0.49945920048238823,
+    "row_wikitext_ppl": 38.58006540148406
+  },
+  "runtime": {
+    "interpretation": "I2_SR is a speed-oriented proof of row-scale ternary runtime semantics. It improves decode speed versus FP16 and is faster than Q4_K_M in the audited run, but it is larger than Q4_K_M and has much worse PPL. It should not be claimed as a quality/storage win over mature Q4 quantization.",
+    "q4_vs_i2sr": {
+      "decode_speedup": 1.19061682213809,
+      "file_ratio": 1.2881333039180543,
+      "ppl_ratio": 3.0323232796303237,
+      "prefill_speedup": 2.298817760610607,
+      "rss512_ratio": 1.2685742155747033
+    }
+  },
+  "schema": "bitdistill-root-cause-audit-v1",
+  "verdict": "The current evidence supports a negative PTQ result and a positive row-scale runtime-semantics result. It does not yet support a paper-level BitDistill reproduction or Kimi/MoE product claim."
+}

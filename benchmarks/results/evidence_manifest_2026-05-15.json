@@ -1,5 +1,5 @@
 {
-  "artifact_count": 201,
+  "artifact_count": 203,
   "entries": [
     {
       "exists": true,
@@ -108,6 +108,15 @@
       "path": "benchmarks/results/bitdistill_reproduction_gap_analysis_2026-05-15.md",
       "sha256": "e6aa07a2211f2a1f72b3e01b8237788634b58404d42ce7b4d022e885bea02c73",
       "size_bytes": 7625
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_root_cause_audit_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md",
+      "sha256": "456eec35d737e1ac2d1d1eee8c01dcfc703e0f0e48a3ffb84cd2b541590f125f",
+      "size_bytes": 3590
     },
     {
       "exists": true,
@@ -2280,6 +2289,15 @@
       "path": "benchmark_results/bitdistill_controlled_curve_2026-05-15.json",
       "sha256": "4e18dccd5eb20897435d80f0cfeb8ccfa5375724db4fd5712508ceebc190ab89",
       "size_bytes": 6571
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "bitdistill_root_cause_audit_json",
+      "metrics": {},
+      "path": "benchmark_results/bitdistill_root_cause_audit_2026-05-15.json",
+      "sha256": "295e16a65756ff18666dcdeec1bfc81afc5928e37f432889bcdf0af4ea1f60e2",
+      "size_bytes": 8205
     },
     {
       "exists": true,
