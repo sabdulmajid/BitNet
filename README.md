@@ -88,7 +88,7 @@ full GLUE validation counts: MNLI `9815`, QNLI `5463`, SST2 `872`.
 | --- | ---: | ---: |
 | Qwen2.5-0.5B MNLI FP16-SFT | `0.807641` | `0.799100` |
 | Qwen2.5-0.5B MNLI BitNet-SFT default | `0.487621` | `0.608000` |
-| Qwen2.5-0.5B MNLI BitNet-SFT best completed 1000-step LR row | `0.523892` | `0.608000` |
+| Qwen2.5-0.5B MNLI BitNet-SFT best completed budget row | `0.542435` | `0.608000` |
 | Qwen2.5-0.5B MNLI best current long-warmup row-scale diagnostic | `0.653591` | FP16 gap within `0.005-0.010` |
 
 The important failure is specific: FP16-SFT learns the task, but local
@@ -103,11 +103,13 @@ Current BitNet-SFT controls:
 - Weights-only/no-A8 control: `0.493734`, only `+0.006113` over W1.58A8.
 - SubLN-only local control: `0.350280`, so current SubLN insertion by itself
   worsens the local baseline.
-- Best completed 1000-step LR row: `0.523892` at `5e-5`, still `0.084108`
-  below the paper BitNet-SFT anchor.
+- Best completed budget row: `0.542435` at `3000` steps, `5e-6`, still
+  `0.065565` below the paper BitNet-SFT anchor.
 
-Longer `3000`- and `10000`-step BitNet-SFT rows are running or queued to
-separate undertraining from recipe/implementation mismatch.
+The first `3000`-step row improves over the best `1000`-step row, so budget is
+helping. It does not close the anchor gap. The remaining `3000`- and
+`10000`-step rows are running or queued to separate undertraining from
+recipe/implementation mismatch.
 
 ### Xeon CPU Runtime
 
