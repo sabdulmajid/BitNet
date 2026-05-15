@@ -95,6 +95,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "moe_packing_contract_report", "kind": "tracked_report", "path": f"benchmarks/results/moe_packing_contract_{DATE}.md"},
     {"label": "moe_tl2_runtime_contract_report", "kind": "tracked_report", "path": f"benchmarks/results/moe_tl2_runtime_contract_{DATE}.md"},
     {"label": "tiny_qwen2moe_fixture_report", "kind": "tracked_report", "path": "benchmarks/results/tiny_qwen2moe_fixture_2026-05-14.md"},
+    {"label": "tiny_qwen2moe_ternary_i2sr_fixture_report", "kind": "tracked_report", "path": f"benchmarks/results/tiny_qwen2moe_ternary_i2sr_fixture_{DATE}.md"},
     {"label": "tiny_qwen2moe_expert_scaling_report", "kind": "tracked_report", "path": "benchmarks/results/tiny_qwen2moe_expert_scaling_2026-05-14.md"},
     {"label": "unblock_requirements_report", "kind": "tracked_report", "path": "benchmarks/results/unblock_requirements_2026-05-14.md"},
     {"label": "i2sr_combined_patch", "kind": "tracked_report", "path": "patches/llama-i2sr-row-scale-qtype.patch"},
@@ -194,6 +195,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "moe_packing_contract_json", "kind": "moe_packing_contract_json", "path": f"benchmark_results/moe_packing_contract_{DATE}.json"},
     {"label": "moe_tl2_runtime_contract_json", "kind": "moe_tl2_runtime_contract_json", "path": f"benchmark_results/moe_tl2_runtime_contract_{DATE}.json"},
     {"label": "tiny_qwen2moe_fixture_json", "kind": "tiny_qwen2moe_fixture_json", "path": "benchmark_results/tiny_qwen2moe_fixture_2026-05-14.json"},
+    {"label": "tiny_qwen2moe_ternary_i2sr_fixture_json", "kind": "tiny_qwen2moe_ternary_i2sr_fixture_json", "path": f"benchmark_results/tiny_qwen2moe_ternary_i2sr_fixture_{DATE}.json"},
     {"label": "tiny_qwen2moe_expert_scaling_json", "kind": "tiny_qwen2moe_expert_scaling_json", "path": "benchmark_results/tiny_qwen2moe_expert_scaling_2026-05-14.json"},
     {"label": "unblock_requirements_json", "kind": "unblock_requirements_json", "path": "benchmark_results/unblock_requirements_2026-05-14.json"},
     {"label": "tl2_generic_summary", "kind": "gguf_summary_json", "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json"},
@@ -827,6 +829,11 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
         failed = [gate.get("name") for gate in gates if isinstance(gate, dict) and not gate.get("passed")]
         checks = data.get("checks", [])
         tiny = data.get("tiny_qwen2moe_fixture", {}) if isinstance(data.get("tiny_qwen2moe_fixture"), dict) else {}
+        ternary_tiny = (
+            data.get("tiny_qwen2moe_ternary_i2sr_fixture", {})
+            if isinstance(data.get("tiny_qwen2moe_ternary_i2sr_fixture"), dict)
+            else {}
+        )
         return {
             "checks": len(checks) if isinstance(checks, list) else None,
             "present_checks": sum(1 for check in checks if isinstance(check, dict) and check.get("status") == "present"),
@@ -835,6 +842,7 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "kimi_source_matches": len(data.get("kimi_source_matches", [])),
             "local_kimi_artifacts": len(data.get("local_kimi_artifacts", [])),
             "tiny_qwen2moe_passed": tiny.get("passed"),
+            "tiny_qwen2moe_ternary_i2sr_passed": ternary_tiny.get("passed"),
         }
     if kind == "kimi_config_feasibility_json":
         architecture = data.get("architecture", {}) if isinstance(data.get("architecture"), dict) else {}
@@ -904,6 +912,28 @@ def extract_metrics(kind: str, path: Path) -> dict[str, Any]:
             "prompt_eval_tok_s": smoke.get("prompt_eval_tok_s"),
             "decode_tok_s": smoke.get("decode_tok_s"),
             "max_rss_mib": rss.get("max_rss_mib"),
+            "gates": gates,
+        }
+    if kind == "tiny_qwen2moe_ternary_i2sr_fixture_json":
+        smoke = data.get("smoke", {}) if isinstance(data.get("smoke"), dict) else {}
+        rss = data.get("rss", {}) if isinstance(data.get("rss"), dict) else {}
+        gates = data.get("gates", {}) if isinstance(data.get("gates"), dict) else {}
+        conversion = data.get("conversion_summary", {}) if isinstance(data.get("conversion_summary"), dict) else {}
+        return {
+            "passed": data.get("passed"),
+            "gguf_mib": data.get("gguf_mib"),
+            "architecture": smoke.get("architecture"),
+            "expert_count": smoke.get("expert_count"),
+            "expert_used_count": smoke.get("expert_used_count"),
+            "model_params_m": smoke.get("model_params_m"),
+            "cpu_buffer_mib": smoke.get("cpu_buffer_mib"),
+            "prompt_eval_tok_s": smoke.get("prompt_eval_tok_s"),
+            "decode_tok_s": smoke.get("decode_tok_s"),
+            "max_rss_mib": rss.get("max_rss_mib"),
+            "ternary_i2s_packed": conversion.get("ternary_i2s_packed"),
+            "row_scale_i2s_packed": conversion.get("row_scale_i2s_packed"),
+            "output_ftype_name": conversion.get("output_ftype_name"),
+            "packed_i2s_bytes": conversion.get("packed_i2s_bytes"),
             "gates": gates,
         }
     if kind == "tiny_qwen2moe_expert_scaling_json":
@@ -1257,7 +1287,8 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"present={metrics.get('present_checks', '-')}/{metrics.get('checks', '-')}, "
                 f"gates={metrics.get('gates', '-')}, failed={len(metrics.get('failed_gates', []))}, "
                 f"kimi_artifacts={metrics.get('local_kimi_artifacts', '-')}, "
-                f"tiny_qwen2moe={metrics.get('tiny_qwen2moe_passed', '-')}"
+                f"tiny_qwen2moe={metrics.get('tiny_qwen2moe_passed', '-')}, "
+                f"tiny_i2sr_moe={metrics.get('tiny_qwen2moe_ternary_i2sr_passed', '-')}"
             )
         elif entry["kind"] == "kimi_config_feasibility_json":
             summary = (
@@ -1294,6 +1325,18 @@ def build_report(manifest: dict[str, Any]) -> str:
                 f"passed={metrics.get('passed', '-')}, "
                 f"arch={metrics.get('architecture', '-')}, "
                 f"experts={metrics.get('expert_used_count', '-')}/{metrics.get('expert_count', '-')}, "
+                f"file={fmt_metric(metrics.get('gguf_mib'))} MiB, "
+                f"decode={fmt_metric(metrics.get('decode_tok_s'))} tok/s, "
+                f"rss={fmt_metric(metrics.get('max_rss_mib'))} MiB"
+            )
+        elif entry["kind"] == "tiny_qwen2moe_ternary_i2sr_fixture_json":
+            summary = (
+                f"passed={metrics.get('passed', '-')}, "
+                f"arch={metrics.get('architecture', '-')}, "
+                f"experts={metrics.get('expert_used_count', '-')}/{metrics.get('expert_count', '-')}, "
+                f"qtype={metrics.get('output_ftype_name', '-')}, "
+                f"packed={metrics.get('ternary_i2s_packed', '-')}, "
+                f"row_scale={metrics.get('row_scale_i2s_packed', '-')}, "
                 f"file={fmt_metric(metrics.get('gguf_mib'))} MiB, "
                 f"decode={fmt_metric(metrics.get('decode_tok_s'))} tok/s, "
                 f"rss={fmt_metric(metrics.get('max_rss_mib'))} MiB"

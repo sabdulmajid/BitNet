@@ -97,6 +97,7 @@ def audit_reproduction(
     fp = materialized_rows(reproduction, "baseline")
     gamma100 = materialized_rows(reproduction, "longwarmup_gamma100")
     paper = materialized_rows(reproduction, "paper_hparam_candidate")
+    paper_row = materialized_rows(reproduction, "paper_hparam_row_candidate")
     row_scale = materialized_rows(reproduction, "row_scale_candidate")
     baseline_tasks = sorted({row.get("task") for row in fp if row.get("run") == "FP16-SFT"})
     bitnet_tasks = sorted({row.get("task") for row in fp if row.get("run") == "BitNet-SFT"})
@@ -115,6 +116,7 @@ def audit_reproduction(
         "bitnet_tasks": bitnet_tasks,
         "gamma100_rows": len(gamma100),
         "paper_rows": len(paper),
+        "paper_row_rows": len(paper_row),
         "row_scale_rows": len(row_scale),
         "paper_style_tensor_complete": reproduction.get("paper_style_tensor_complete"),
         "paper_style_tensor_passed": reproduction.get("paper_style_tensor_passed"),
@@ -133,10 +135,11 @@ def audit_reproduction(
         (
             f"FP16 tasks={baseline_tasks}; BitNet tasks={bitnet_tasks}; "
             f"gamma100 rows={len(gamma100)}/3; strict paper rows={len(paper)}/3; "
+            f"paper row rows={len(paper_row)}/3; "
             f"matrix={configured}/{expected}, inferred={inferred_rows}; "
             f"warm-up={step}/{max_steps}"
         ),
-        "Gamma=100 and strict paper-gamma tensor BitDistill are complete and below the FP16-gap target; row paper-gamma, LR-search, head-init, and full-budget candidates remain pending.",
+        "Gamma=100, strict paper-gamma tensor, and strict paper-gamma row BitDistill are complete and below the FP16-gap target; LR-search, head-init, and full-budget candidates remain pending.",
     )
 
 
@@ -225,7 +228,7 @@ def audit_novelty_and_runtime(
             f"tensor-warmup row gate complete={row_complete}, passed={row_passed}; "
             f"row-warmup gate complete={rowwarmup_complete}, passed={rowwarmup_passed}"
         ),
-        "Gamma=100 tensor-warmup row comparison is complete but does not pass the FP16-gap gate; paper-gamma row and row-warmup comparisons remain pending.",
+        "Gamma=100 and paper-gamma tensor-warmup row comparisons are complete but do not pass the FP16-gap gate; row-warmup comparisons remain pending.",
     )
     add_row(
         rows,

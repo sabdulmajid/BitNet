@@ -424,6 +424,11 @@ def audit_moe(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -
     productization_gates = moe.get("productization_gates", [])
     failed_gates = [gate for gate in productization_gates if isinstance(gate, dict) and not gate.get("passed")]
     tiny_qwen2moe = moe.get("tiny_qwen2moe_fixture", {}) if isinstance(moe.get("tiny_qwen2moe_fixture"), dict) else {}
+    tiny_qwen2moe_ternary_i2sr = (
+        moe.get("tiny_qwen2moe_ternary_i2sr_fixture", {})
+        if isinstance(moe.get("tiny_qwen2moe_ternary_i2sr_fixture"), dict)
+        else {}
+    )
     tiny_qwen2moe_scaling = moe.get("tiny_qwen2moe_expert_scaling", {}) if isinstance(moe.get("tiny_qwen2moe_expert_scaling"), dict) else {}
     tiny_qwen2moe_scaling_rows = tiny_qwen2moe_scaling.get("rows", []) if isinstance(tiny_qwen2moe_scaling.get("rows"), list) else []
     metrics["moe"] = {
@@ -437,6 +442,7 @@ def audit_moe(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -
         "kimi_config_passed": kimi_config.get("passed"),
         "kimi_config_unsupported": kimi_config.get("unsupported_features", []),
         "tiny_qwen2moe_fixture_passed": tiny_qwen2moe.get("passed"),
+        "tiny_qwen2moe_ternary_i2sr_fixture_passed": tiny_qwen2moe_ternary_i2sr.get("passed"),
         "tiny_qwen2moe_expert_scaling_passed": tiny_qwen2moe_scaling.get("passed"),
         "tiny_qwen2moe_expert_scaling_rows": len(tiny_qwen2moe_scaling_rows),
     }
@@ -449,9 +455,10 @@ def audit_moe(root: Path, rows: list[dict[str, Any]], metrics: dict[str, Any]) -
             f"Kimi artifacts={len(local_kimi)}; Kimi source matches={len(source_kimi)}; "
             f"Kimi config supported={kimi_config.get('passed')}; config gaps={len(kimi_config.get('unsupported_features', []))}; "
             f"tiny Qwen2MoE FP16 fixture passed={tiny_qwen2moe.get('passed')}; "
+            f"tiny Qwen2MoE ternary I2_SR fixture passed={tiny_qwen2moe_ternary_i2sr.get('passed')}; "
             f"synthetic expert scaling passed={tiny_qwen2moe_scaling.get('passed')}; scaling rows={len(tiny_qwen2moe_scaling_rows)}"
         ),
-        "The Kimi config audit shows missing direct Kimi/DeepSeekV3 loading, MLA conversion metadata, shared-expert mapping, and block-FP8 import. A tiny random Qwen2MoE FP16 GGUF fixture and synthetic expert-scaling probe validate generic converter/runtime plumbing and routed shape execution, but no validated Kimi-specific mapping, trained Qwen2MoE/Kimi quality artifact, ternary MoE runtime artifact, TL2 MoE runtime support, router distillation, MoE quality run, trained throughput run, or trained expert-locality benchmark exists.",
+        "The Kimi config audit shows missing direct Kimi/DeepSeekV3 loading, MLA conversion metadata, shared-expert mapping, and block-FP8 import. Tiny random Qwen2MoE FP16 and ternary I2_SR GGUF fixtures validate generic converter/runtime plumbing, merged expert packing, and routed shape execution, but no validated Kimi-specific mapping, trained Qwen2MoE/Kimi quality artifact, TL2 MoE runtime support, router distillation, MoE quality run, trained throughput run, or trained expert-locality benchmark exists.",
     )
 
 

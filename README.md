@@ -35,12 +35,15 @@ Added work in this fork includes:
 - Direct static-ternary GGUF export for dense Qwen checkpoints.
 - A stable row-scale `I2_SR` llama.cpp qtype/file type for preserving row-wise
   ternary scales in packed CPU inference.
+- Routed `ggml_mul_mat_id` support for packed `I2_S`/`I2_SR` expert tensors,
+  allowing tiny Qwen2MoE merged experts to execute through the CPU MoE path.
 - A BitDistill smoke contract that now validates PyTorch QAT, tensor-scale
   `I2_S` GGUF export, row-scale `I2_SR` GGUF export, and SubLN key remapping.
 - MoE/Kimi feasibility audits that separate generic routing support from real
   Kimi/MoE benchmark evidence.
-- A tiny random Qwen2MoE FP16 GGUF runtime fixture proving generic converter
-  and CPU execution plumbing, without claiming Kimi or ternary MoE quality.
+- Tiny random Qwen2MoE FP16 and ternary `I2_SR` GGUF runtime fixtures proving
+  generic converter, merged-expert packing, and CPU routed execution plumbing,
+  without claiming Kimi or trained MoE quality.
 
 The llama.cpp submodule now points at the writable fork:
 
@@ -55,9 +58,9 @@ with the active `i2sr-row-scale-runtime` branch.
 | Arbitrary FP16/BF16 to ternary conversion is lossless | **No** | Qwen2.5-1.5B naive PTQ collapses from ten-task mean `0.644169` to `0.348671`; WikiText PPL jumps from `13.901` to `3,813,121.803`. |
 | Distillation/QAT can recover useful signal | **Yes, partially** | Best row-scale dense-Qwen run reaches ten-task mean `0.499459`, well above naive PTQ but below FP. |
 | Stable CPU row-scale packed inference exists for dense Qwen | **Yes, for the audited path** | `I2_SR` productization gate passes `9/9`; Xeon I2_SR PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
-| BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B gamma=100 and strict paper-gamma tensor GLUE3 sequence-classification runs improve over BitNet-SFT but remain 5.8-17.7 accuracy points below FP16-SFT; paper-gamma row has finished for MNLI/QNLI and also fails, while SST2 row, LR-search, and row-warmup branches remain pending. |
+| BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B gamma=100 and strict paper-gamma tensor GLUE3 sequence-classification runs improve over BitNet-SFT but remain 5.8-17.7 accuracy points below FP16-SFT; strict paper-gamma row is also complete and remains 8.8-19.0 points below FP16-SFT. LR/head-init search, clean row-warmup, paired traces, and full CPU-quality gates remain open. |
 | TL2 is ready for the best row-scale checkpoint | **No** | Runtime contract gate fails: current TL2 one-scale error is `1.904230` relative output RMS; exact fp16 row scales would be `0.000197` with only `1.230469` MiB of scales, but converter/runtime/kernel metadata do not carry them. |
-| Kimi/MoE retrofit is proven | **No** | A tiny random Qwen2MoE FP16 fixture now passes converter/runtime smoke. A Kimi-K2 config audit shows the real target needs Kimi/DeepSeekV3 loading, MLA metadata conversion, shared-expert mapping, block-FP8 import, and MoE-aware I2_SR validation before quality or speed claims are defensible. |
+| Kimi/MoE retrofit is proven | **No** | Tiny random Qwen2MoE FP16 and ternary `I2_SR` fixtures now pass converter/runtime smoke; the ternary fixture packs 3 merged row-scale expert tensors, runs routed CPU inference, and records `419.29` decode tok/s at `142.48` MiB RSS. A Kimi-K2 config audit still shows the real target needs Kimi/DeepSeekV3 loading, MLA metadata conversion, shared-expert mapping, block-FP8 import, and trained MoE quality/locality benchmarks before product claims are defensible. |
 
 ## BitDistill Reproduction Status
 
@@ -125,14 +128,14 @@ complete on GLUE3:
 | QNLI | `0.759656` | `0.139301` | `0.787846` |
 | SST2 | `0.841743` | `0.083716` | `0.866972` |
 
-Paper-gamma row-scale results are now partially complete and do not rescue the
+Paper-gamma row-scale results are now complete and do not rescue the
 strict paper coefficient:
 
 | task | paper-gamma tensor | paper-gamma row | row-tensor delta |
 | --- | ---: | ---: | ---: |
 | MNLI | `0.630260` | `0.617626` | `-0.012634` |
 | QNLI | `0.759656` | `0.760937` | `+0.001281` |
-| SST2 | `0.841743` | pending | pending |
+| SST2 | `0.841743` | `0.837156` | `-0.004587` |
 
 Under this local implementation and budget, the literal paper coefficient does
 not close the quality gap. On MNLI, a coefficient sweep gives gamma=100
@@ -212,12 +215,13 @@ memory-heavy and slower than FP16-SFT in this setup, which reinforces that the
 product path must use packed GGUF kernels rather than Python-level BitLinear
 execution.
 
-Active follow-ups are now focused on LR search, the remaining paper-gamma row
-job, clean row-scale warm-up, and the full CPU/I2_SR producer gates. Completed
-diagnostics already show that gamma=100 teacher-head initialization, the MNLI
-layer sweep, and the completed paper-gamma row results are not enough to
-recover paper-level accuracy. The completed MNLI gamma probes at `1e3` and
-`1e4` also support the relation-loss scale audit: the paper's `1e5`
+Active follow-ups are now focused on the remaining LR/head-init search,
+clean row-scale warm-up, paired prediction traces, and the full CPU/I2_SR
+producer gates. Completed diagnostics already show that gamma=100 teacher-head
+initialization, the MNLI layer sweep, strict paper-gamma row, and the completed
+MNLI paper-gamma LR=`1e-5` probe are not enough to recover paper-level
+accuracy. The completed MNLI gamma probes at `1e3` and `1e4` also support the
+relation-loss scale audit: the paper's `1e5`
 coefficient can dominate CE by orders of magnitude under this local
 normalization.
 The earlier completed BitDistill runs use attention KD weight `100`; those are

@@ -8,7 +8,7 @@ Active runtime support: `true`.
 
 Patch applies cleanly: `false`.
 
-Submodule: `https://github.com/sabdulmajid/llama.cpp.git` branch `i2sr-row-scale-runtime` at `106eac0c8`.
+Submodule: `https://github.com/sabdulmajid/llama.cpp.git` branch `i2sr-row-scale-runtime` at `7a8827cd2`.
 
 Remote branches containing HEAD: `origin/i2sr-row-scale-runtime`.
 
@@ -36,26 +36,6 @@ Prepared local handoff: `true` commit `cb38942486a05e3a1212e6eba1462e178478f459`
 | warning |
 | --- |
 | A split promotion patch no longer applies cleanly, but the active source is already promoted and the submodule HEAD is reachable from the configured fork branch. |
-
-## Remote Write Probe
-
-| field | value |
-| --- | --- |
-| branch | `i2sr-row-scale-runtime` |
-| returncode | `0` |
-| writable | `true` |
-| permission_denied | `false` |
-| stderr | `Everything up-to-date` |
-
-## Candidate Fork Probe
-
-| field | value |
-| --- | --- |
-| url | `https://github.com/sabdulmajid/llama.cpp` |
-| returncode | `0` |
-| reachable | `true` |
-| heads | `i2sr-row-scale-runtime, master` |
-| stderr | `` |
 
 ## Split Promotion Patches
 

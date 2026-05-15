@@ -158,6 +158,14 @@ def build_report(data: dict[str, Any]) -> str:
     fixture = data.get("tiny_qwen2moe_fixture") or {}
     fixture_smoke = fixture.get("smoke", {}) if isinstance(fixture.get("smoke"), dict) else {}
     fixture_rss = fixture.get("rss", {}) if isinstance(fixture.get("rss"), dict) else {}
+    ternary_fixture = data.get("tiny_qwen2moe_ternary_i2sr_fixture") or {}
+    ternary_fixture_smoke = ternary_fixture.get("smoke", {}) if isinstance(ternary_fixture.get("smoke"), dict) else {}
+    ternary_fixture_rss = ternary_fixture.get("rss", {}) if isinstance(ternary_fixture.get("rss"), dict) else {}
+    ternary_fixture_conversion = (
+        ternary_fixture.get("conversion_summary", {})
+        if isinstance(ternary_fixture.get("conversion_summary"), dict)
+        else {}
+    )
     fixture_note = (
         "Tiny Qwen2MoE FP16 runtime fixture: "
         f"passed={fixture.get('passed')}; "
@@ -177,18 +185,33 @@ def build_report(data: dict[str, Any]) -> str:
         if scaling
         else "Tiny Qwen2MoE expert-scaling probe artifact is missing."
     )
+    ternary_fixture_note = (
+        "Tiny Qwen2MoE ternary I2_SR runtime fixture: "
+        f"passed={ternary_fixture.get('passed')}; "
+        f"packed={ternary_fixture_conversion.get('ternary_i2s_packed')}; "
+        f"row_scale={ternary_fixture_conversion.get('row_scale_i2s_packed')}; "
+        f"arch={ternary_fixture_smoke.get('architecture')}; "
+        f"experts={ternary_fixture_smoke.get('expert_count')}; "
+        f"used={ternary_fixture_smoke.get('expert_used_count')}; "
+        f"decode_tok_s={ternary_fixture_smoke.get('decode_tok_s')}; "
+        f"peak_rss_mib={ternary_fixture_rss.get('max_rss_mib')}."
+        if ternary_fixture
+        else "Tiny Qwen2MoE ternary I2_SR runtime fixture artifact is missing."
+    )
     verdict = (
         "Generic MoE infrastructure is present: GGUF metadata has expert counts, "
         "Qwen2MoE is registered in the vendored llama.cpp converter, expert "
         "weights are merged into 3D tensors, and the runtime builds sparse "
         "top-k expert execution with `ggml_mul_mat_id`. A tiny random Qwen2MoE "
-        "FP16 fixture now validates converter-to-runtime plumbing on CPU. This "
+        "FP16 fixture validates converter-to-runtime plumbing on CPU, and a "
+        "tiny random Qwen2MoE ternary fixture now validates merged 3D expert "
+        "GGUF export plus routed CPU execution with row-scale `I2_SR`. This "
         "does not prove Kimi support: no Kimi-specific mapping or benchmark "
         "artifact is present, no trained MoE checkpoint has been evaluated, the "
         "TL2 packing path is only synthetically validated, and the active TL2 "
         "runtime contract still does not route merged experts correctly. The "
-        "direct I2_S/I2_SR path is only a synthetic packing contract until it "
-        "is validated with a trained MoE GGUF/runtime artifact."
+        "new ternary fixture is a runtime contract, not a quality or product "
+        "benchmark."
     )
     gate_rows = [
         [
@@ -214,7 +237,7 @@ def build_report(data: dict[str, Any]) -> str:
             "## Productization Gates",
             md_table(["gate", "status", "evidence", "blocker"], gate_rows),
             "## Negative Checks",
-            "\n".join([kimi_note, artifact_note, contract_note, tl2_note, fixture_note, scaling_note]),
+            "\n".join([kimi_note, artifact_note, contract_note, tl2_note, fixture_note, ternary_fixture_note, scaling_note]),
             "## Verdict",
             verdict,
             "## Required Plan",
@@ -231,6 +254,7 @@ def build_productization_gates(
     moe_packing_contract: dict[str, Any],
     moe_tl2_runtime_contract: dict[str, Any],
     tiny_qwen2moe_fixture: dict[str, Any],
+    tiny_qwen2moe_ternary_i2sr_fixture: dict[str, Any],
     tiny_qwen2moe_expert_scaling: dict[str, Any],
 ) -> list[dict[str, Any]]:
     check_by_label = {check["label"]: check for check in checks}
@@ -255,6 +279,22 @@ def build_productization_gates(
     fixture_passed = bool(tiny_qwen2moe_fixture.get("passed"))
     fixture_smoke = tiny_qwen2moe_fixture.get("smoke", {}) if isinstance(tiny_qwen2moe_fixture.get("smoke"), dict) else {}
     fixture_rss = tiny_qwen2moe_fixture.get("rss", {}) if isinstance(tiny_qwen2moe_fixture.get("rss"), dict) else {}
+    ternary_fixture_passed = bool(tiny_qwen2moe_ternary_i2sr_fixture.get("passed"))
+    ternary_fixture_smoke = (
+        tiny_qwen2moe_ternary_i2sr_fixture.get("smoke", {})
+        if isinstance(tiny_qwen2moe_ternary_i2sr_fixture.get("smoke"), dict)
+        else {}
+    )
+    ternary_fixture_rss = (
+        tiny_qwen2moe_ternary_i2sr_fixture.get("rss", {})
+        if isinstance(tiny_qwen2moe_ternary_i2sr_fixture.get("rss"), dict)
+        else {}
+    )
+    ternary_fixture_conversion = (
+        tiny_qwen2moe_ternary_i2sr_fixture.get("conversion_summary", {})
+        if isinstance(tiny_qwen2moe_ternary_i2sr_fixture.get("conversion_summary"), dict)
+        else {}
+    )
     scaling_rows = tiny_qwen2moe_expert_scaling.get("rows", []) if isinstance(tiny_qwen2moe_expert_scaling.get("rows"), list) else []
     scaling_passed = bool(tiny_qwen2moe_expert_scaling.get("passed")) and len(scaling_rows) >= 4
 
@@ -290,6 +330,18 @@ def build_productization_gates(
                 f"contract_2d_control={contract_2d_control}; direct_i2sr_writer_rejects_non_2d={direct_i2sr_is_2d}"
             ),
             "The direct packed I2_S/I2_SR writer must accept synthetic 3D expert tensors without regressing 2D dense packing.",
+        ),
+        make_gate(
+            "tiny Qwen2MoE ternary I2_SR GGUF CPU fixture passes",
+            ternary_fixture_passed,
+            (
+                f"passed={ternary_fixture_passed}; arch={ternary_fixture_smoke.get('architecture')}; "
+                f"experts={ternary_fixture_smoke.get('expert_count')}; used={ternary_fixture_smoke.get('expert_used_count')}; "
+                f"packed={ternary_fixture_conversion.get('ternary_i2s_packed')}; "
+                f"row_scale={ternary_fixture_conversion.get('row_scale_i2s_packed')}; "
+                f"decode_tok_s={ternary_fixture_smoke.get('decode_tok_s')}; peak_rss_mib={ternary_fixture_rss.get('max_rss_mib')}"
+            ),
+            "The direct row-scale I2_SR path needs an executable merged-expert GGUF fixture before real MoE benchmarking.",
         ),
         make_gate(
             "tiny Qwen2MoE FP16 GGUF CPU fixture passes",
@@ -381,6 +433,13 @@ def main() -> None:
     tiny_qwen2moe_fixture = read_json(
         latest_artifact(root, "benchmark_results/tiny_qwen2moe_fixture_*.json", "benchmark_results/tiny_qwen2moe_fixture_2026-05-14.json")
     )
+    tiny_qwen2moe_ternary_i2sr_fixture = read_json(
+        latest_artifact(
+            root,
+            "benchmark_results/tiny_qwen2moe_ternary_i2sr_fixture_*.json",
+            "benchmark_results/tiny_qwen2moe_ternary_i2sr_fixture_2026-05-15.json",
+        )
+    )
     tiny_qwen2moe_expert_scaling = read_json(
         latest_artifact(root, "benchmark_results/tiny_qwen2moe_expert_scaling_*.json", "benchmark_results/tiny_qwen2moe_expert_scaling_2026-05-14.json")
     )
@@ -396,6 +455,7 @@ def main() -> None:
             moe_packing_contract,
             moe_tl2_runtime_contract,
             tiny_qwen2moe_fixture,
+            tiny_qwen2moe_ternary_i2sr_fixture,
             tiny_qwen2moe_expert_scaling,
         ),
         "kimi_source_matches": kimi_source_matches,
@@ -403,6 +463,7 @@ def main() -> None:
         "moe_packing_contract": moe_packing_contract,
         "moe_tl2_runtime_contract": moe_tl2_runtime_contract,
         "tiny_qwen2moe_fixture": tiny_qwen2moe_fixture,
+        "tiny_qwen2moe_ternary_i2sr_fixture": tiny_qwen2moe_ternary_i2sr_fixture,
         "tiny_qwen2moe_expert_scaling": tiny_qwen2moe_expert_scaling,
     }
     report = build_report(data)

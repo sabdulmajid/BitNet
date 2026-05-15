@@ -43,7 +43,7 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | mnli | BitDistill longwarmup row gamma100 | novelty_gamma100 | true | 0.653591 | 9815 | 9815 | true | 0.807641 | true | 0.154050 |
 | mnli | BitDistill longwarmup tensor paper gamma | paper_candidate | true | 0.630260 | 9815 | 9815 | true | 0.807641 | true | 0.177382 |
 | mnli | BitDistill longwarmup row paper gamma | paper_row_candidate | true | 0.617626 | 9815 | 9815 | true | 0.807641 | true | 0.190015 |
-| mnli | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | false | - | - | 9815 | false | 0.807641 | true | - |
+| mnli | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | true | 0.604381 | 9815 | 9815 | true | 0.807641 | true | 0.203260 |
 | mnli | BitDistill longwarmup tensor paper gamma lr5e-5 | paper_lr_search_pending | false | - | - | 9815 | false | 0.807641 | true | - |
 | mnli | BitDistill longwarmup tensor paper gamma headinit | paper_headinit_pending | false | - | - | 9815 | false | 0.807641 | true | - |
 | mnli | BitDistill longwarmup tensor gamma1k | mnli_gamma_sweep_pending | true | 0.647275 | 9815 | 9815 | true | 0.807641 | true | 0.160367 |
@@ -71,7 +71,7 @@ Full-evaluation contract: `{'mnli': 9815, 'qnli': 5463, 'sst2': 872}` examples. 
 | sst2 | BitDistill longwarmup tensor gamma100 | diagnostic_gamma100 | true | 0.866972 | 872 | 872 | true | 0.925459 | true | 0.058486 |
 | sst2 | BitDistill longwarmup row gamma100 | novelty_gamma100 | true | 0.854358 | 872 | 872 | true | 0.925459 | true | 0.071101 |
 | sst2 | BitDistill longwarmup tensor paper gamma | paper_candidate | true | 0.841743 | 872 | 872 | true | 0.925459 | true | 0.083716 |
-| sst2 | BitDistill longwarmup row paper gamma | paper_row_candidate | false | - | - | 872 | false | 0.925459 | true | - |
+| sst2 | BitDistill longwarmup row paper gamma | paper_row_candidate | true | 0.837156 | 872 | 872 | true | 0.925459 | true | 0.088303 |
 | sst2 | BitDistill longwarmup tensor paper gamma lr1e-5 | paper_lr_search_pending | false | - | - | 872 | false | 0.925459 | true | - |
 | sst2 | BitDistill longwarmup tensor paper gamma lr5e-5 | paper_lr_search_pending | false | - | - | 872 | false | 0.925459 | true | - |
 | sst2 | BitDistill longwarmup tensor paper gamma headinit | paper_headinit_pending | false | - | - | 872 | false | 0.925459 | true | - |
