@@ -1,5 +1,5 @@
 {
-  "artifact_count": 205,
+  "artifact_count": 207,
   "entries": [
     {
       "exists": true,
@@ -153,6 +153,15 @@
       "path": "benchmarks/results/bitdistill_stage2_curve_submission_2026-05-15.md",
       "sha256": "77354c56b3ed6a5228485a4d4c0ef5d28cbc4ee9c2b4e40eeb08b68539b4c4ba",
       "size_bytes": 1512
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_controlled_postprocess_submission_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_controlled_postprocess_submission_2026-05-15.md",
+      "sha256": "8e1b74096b7157b32b55c1472588e39397b350c58f1759aff19dbe570c479fd8",
+      "size_bytes": 710
     },
     {
       "exists": true,
@@ -529,7 +538,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "892d09528a0530180c55b3ed7ddfc7f482c34a24093272e154f9fecbad26d935",
+      "sha256": "0c7f99f73bf01e93be613f056d8826f3bc1abab6520c445c79beee9631d6f33f",
       "size_bytes": 6446
     },
     {
@@ -2219,7 +2228,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "666b76b141947337580c9fe32ee6046a645ad84078d3ee76436c9b7ad7b694ac",
+      "sha256": "dba4cd2a5ce1ab0c455729ff0a8d4485088601803d9b77fca3ddb9abb7de12b5",
       "size_bytes": 10691
     },
     {
@@ -2289,6 +2298,15 @@
       "path": "benchmark_results/bitdistill_stage2_curve_submission_2026-05-15.json",
       "sha256": "ae9d0a82341e0e4aac90fd77b8b172c6ed4c745426b53a937eb95d75b15dfd99",
       "size_bytes": 2131
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "bitdistill_controlled_postprocess_submission_json",
+      "metrics": {},
+      "path": "benchmark_results/bitdistill_controlled_postprocess_submission_2026-05-15.json",
+      "sha256": "0eece5b559b74f0d8bcb9b0b2098ea07a894fc6844555cedb384544b8b54a24b",
+      "size_bytes": 341
     },
     {
       "exists": true,

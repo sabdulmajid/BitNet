@@ -1,0 +1,10 @@
+{
+  "date": "2026-05-15",
+  "dependency": "afterany:10067:10068:10069:10070:10071",
+  "job_id": "10072",
+  "partition": "midcard",
+  "script": "slurm_bitdistill_controlled_postprocess.sh",
+  "stderr": "logs/bitdistill-ctrl-post-10072.err",
+  "stdout": "logs/bitdistill-ctrl-post-10072.out",
+  "state_at_submission": "PENDING (Dependency)"
+}

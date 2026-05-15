@@ -1,5 +1,5 @@
 # Evidence Manifest, 2026-05-15
-Artifacts: `205`. Missing: `0`.
+Artifacts: `207`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
 | README | tracked_report | yes | 16951 | 086cd7074c5c |  |
@@ -19,6 +19,7 @@ Artifacts: `205`. Missing: `0`.
 | bitdistill_recovery_audit_report | tracked_report | yes | 1534 | 4bd7195806a9 |  |
 | bitdistill_stage2_curve_report | tracked_report | yes | 4180 | de98a4baca66 |  |
 | bitdistill_stage2_curve_submission_report | tracked_report | yes | 1512 | 77354c56b3ed |  |
+| bitdistill_controlled_postprocess_submission_report | tracked_report | yes | 710 | 8e1b74096b71 |  |
 | bitdistill_controlled_curve_report | tracked_report | yes | 1975 | db49f49482c8 |  |
 | bitdistill_reproduction_gate_report | tracked_report | yes | 12908 | fa3178597d19 |  |
 | bitdistill_paired_predictions_report | tracked_report | yes | 8123 | c9107324629d |  |
@@ -60,7 +61,7 @@ Artifacts: `205`. Missing: `0`.
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 1824 | 5d992b3c9a1c |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 6446 | 892d09528a05 |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 6446 | 0c7f99f73bf0 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2569 | 51da6738be9d |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -150,13 +151,14 @@ Artifacts: `205`. Missing: `0`.
 | row_scale_qtype_i2sr_promotion_rehearsal_json | row_scale_qtype_gate_json | yes | 3897 | 6ffc161b446b | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 10691 | 666b76b14194 | passed=True, checks=55, failed=0 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 10691 | dba4cd2a5ce1 | passed=True, checks=55, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | a7a047c75a67 | achieved=False, status=not_complete, complete=7/9, open=2 |
 | product_scope_gate_json | product_scope_gate_json | yes | 5770 | d0101b25bd20 | scope=research_mvp_only, supported=5, unsupported=4 |
 | bitdistill_recovery_submission_json | generic_json | yes | 1186 | d473cba8d7f2 |  |
 | bitdistill_recovery_audit_json | generic_json | yes | 3252 | 5d04cd9280ec |  |
 | bitdistill_stage2_curve_json | generic_json | yes | 19229 | 42f4a99e3a68 |  |
 | bitdistill_stage2_curve_submission_json | generic_json | yes | 2131 | ae9d0a82341e |  |
+| bitdistill_controlled_postprocess_submission_json | generic_json | yes | 341 | 0eece5b559b7 |  |
 | bitdistill_controlled_curve_json | generic_json | yes | 6571 | 4e18dccd5eb2 |  |
 | bitdistill_root_cause_audit_json | generic_json | yes | 8205 | 295e16a65756 |  |
 | bitdistill_telemetry_coverage_json | generic_json | yes | 3805 | d5972de78a36 |  |
