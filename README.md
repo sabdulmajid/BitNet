@@ -354,6 +354,13 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [TL2 row-scale runtime contract](benchmarks/results/tl2_row_scale_runtime_contract_2026-05-15.md)
 - [Kimi config feasibility audit](benchmarks/results/kimi_config_feasibility_2026-05-15.md)
 
+## References
+
+- [BitNet Distillation](https://arxiv.org/html/2510.13998v1), Microsoft Research.
+- [BitNet b1.58 2B4T Technical Report](https://arxiv.org/html/2504.12285v1), Microsoft Research.
+- [bitnet.cpp: Efficient Edge Inference for Ternary LLMs](https://arxiv.org/html/2502.11880v1), Microsoft Research.
+- [llama.cpp](https://github.com/ggml-org/llama.cpp), ggml-org.
+
 ## Upstream Attribution
 
 This fork is based on Microsoft's BitNet / bitnet.cpp work and uses llama.cpp
