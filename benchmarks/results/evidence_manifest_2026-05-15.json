@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "dd9a85a7a1c160afb05e7133bbdadbc9ff743848d1f7f1f172580e1ab67456d0",
-      "size_bytes": 33992
+      "sha256": "88b108f05b87095fcf23a414e5e63682357dda1312d82032cba878db7534150c",
+      "size_bytes": 35552
     },
     {
       "exists": true,
@@ -142,8 +142,8 @@
       "label": "bitnet_sft_budget_sweep_report",
       "metrics": {},
       "path": "benchmarks/results/bitnet_sft_budget_sweep_2026-05-15.md",
-      "sha256": "7fb0b23d924811569ecc62244d3df9c2dda52a720cc46fb06ce7b6e66cb1c19c",
-      "size_bytes": 1168
+      "sha256": "ffe038cb1b1ef5f5998a769917dcc52863cc0027424f20b4191713308035641a",
+      "size_bytes": 1206
     },
     {
       "exists": true,
@@ -2169,8 +2169,8 @@
       "label": "bitnet_sft_budget_sweep_json",
       "metrics": {},
       "path": "benchmark_results/bitnet_sft_budget_sweep_2026-05-15.json",
-      "sha256": "c9cf0c7b5ea5cc95842d564c745842bcbd114622094d658530920fb499121596",
-      "size_bytes": 8704
+      "sha256": "6fe4d3d359b255072068ed3841166bd74d0eaa15e88eb40ea59fa8e082772ae2",
+      "size_bytes": 9180
     },
     {
       "exists": true,

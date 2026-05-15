@@ -17,6 +17,25 @@ This repository is therefore a research fork, not a claim that arbitrary Qwen,
 Kimi, or other open-weight models can be converted to 1.58-bit form with no
 quality loss.
 
+## Research Direction
+
+The original question was a post-training retrofit question:
+
+> Can an arbitrary pretrained FP16/BF16 model be projected into ternary
+> BitNet-style weights and still behave like the source model?
+
+The current evidence rejects that path for the tested dense-Qwen checkpoints.
+The redirected research question is narrower and more defensible:
+
+> Can a pretrained teacher train a task-specific ternary student, and can the
+> packed CPU runtime preserve the scale semantics that student learned?
+
+That distinction controls every claim in this fork. A checkpoint can be a valid
+packed-runtime artifact and still fail as a general language model; a PyTorch
+GLUE classifier can be a valid task-quality result and still not be deployable
+through llama.cpp until the runtime supports its head. Quality, file format,
+and CPU throughput are reported as separate gates.
+
 ## What This Fork Adds
 
 The upstream Microsoft BitNet project provides optimized inference machinery
@@ -61,6 +80,14 @@ with the active `i2sr-row-scale-runtime` branch.
 | BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B gamma=100, strict paper-gamma tensor, strict paper-gamma row, LR=`1e-5`/`5e-5`, strict paper-gamma head-init, clean row-warmup gamma=100, and clean row-warmup paper-gamma GLUE3 sequence-classification runs are complete with full paired prediction traces. They improve over BitNet-SFT but still miss FP16-SFT by `0.058486-0.203260` absolute accuracy depending on task/run. Full-budget/backbone-scale search remains open; AMD and Xeon PyTorch CPU quality gates now pass. |
 | TL2 is ready for the best row-scale checkpoint | **No** | Runtime contract gate fails: current TL2 one-scale error is `1.904230` relative output RMS; exact fp16 row scales would be `0.000197` with only `1.230469` MiB of scales, but converter/runtime/kernel metadata do not carry them. |
 | Kimi/MoE retrofit is proven | **No** | Tiny random Qwen2MoE FP16 and ternary `I2_SR` fixtures now pass converter/runtime smoke; the ternary fixture packs 3 merged row-scale expert tensors, runs routed CPU inference, and records `419.29` decode tok/s at `142.48` MiB RSS. A Kimi-K2 config audit still shows the real target needs Kimi/DeepSeekV3 loading, MLA metadata conversion, shared-expert mapping, block-FP8 import, and trained MoE quality/locality benchmarks before product claims are defensible. |
+
+## Evidence Labels
+
+| label | meaning |
+| --- | --- |
+| `paper-reproduction` | Same task family, model class, quantization semantics, and recipe target as the BitDistill paper. These rows must use full validation splits and are not successful unless they close the FP16 gap. |
+| `paper-inspired` | Uses BitDistill-like ingredients but changes budget, backbone, scale granularity, loss normalization, or task formulation. These rows are diagnostics, not reproduction claims. |
+| `retrofit-variant` | Fork-specific extensions such as row-scale ternary and `I2_SR`. These are evaluated as original systems/research variants, not as standard BitNet or paper-equivalent results. |
 
 ## Not Yet Proven
 

@@ -2,7 +2,7 @@
 Artifacts: `178`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 33992 | dd9a85a7a1c1 |  |
+| README | tracked_report | yes | 35552 | 88b108f05b87 |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
 | paired_row_minus_ptq_report | tracked_report | yes | 1332 | 20a5aee1eb99 |  |
@@ -17,7 +17,7 @@ Artifacts: `178`. Missing: `0`.
 | bitdistill_paired_predictions_report | tracked_report | yes | 8123 | c9107324629d |  |
 | bitdistill_task_formulation_report | tracked_report | yes | 11647 | cb03c36274ba |  |
 | bitnet_sft_baseline_audit_report | tracked_report | yes | 4047 | 8a20e5248840 |  |
-| bitnet_sft_budget_sweep_report | tracked_report | yes | 1168 | 7fb0b23d9248 |  |
+| bitnet_sft_budget_sweep_report | tracked_report | yes | 1206 | ffe038cb1b1e |  |
 | bitdistill_paper_alignment_report | tracked_report | yes | 10494 | a5d8df51bcf4 |  |
 | bitdistill_loss_scale_report | tracked_report | yes | 8733 | 628d0414fc13 |  |
 | bitdistill_cpu_benchmark_report | tracked_report | yes | 10840 | dd84bc0eee97 |  |
@@ -141,7 +141,7 @@ Artifacts: `178`. Missing: `0`.
 | product_scope_gate_json | product_scope_gate_json | yes | 5770 | d0101b25bd20 | scope=research_mvp_only, supported=5, unsupported=4 |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 32197 | c581499edff4 | present=34/36, examples=34, full_eval=34, ci95=34, paper_complete=True, paper_passed=False, row_complete=True, row_passed=False, confidence=0.95 |
 | bitnet_sft_baseline_audit_json | generic_json | yes | 45902 | 9e07c097db17 |  |
-| bitnet_sft_budget_sweep_json | generic_json | yes | 8704 | c9cf0c7b5ea5 |  |
+| bitnet_sft_budget_sweep_json | generic_json | yes | 9180 | 6fe4d3d359b2 |  |
 | bitdistill_paired_predictions_json | bitdistill_paired_predictions_json | yes | 71851 | 4b50cdbc3d9b | status=pass, complete=44/44, pending=0, failed=0 |
 | bitdistill_task_formulation_json | bitdistill_task_formulation_json | yes | 28374 | c4e8328337c0 | seq_full=6, causal_rows=17, pending_paper=0, rows=45 |
 | bitdistill_cpu_gate_json | bitdistill_cpu_gate_json | yes | 55136 | 3868f8437c04 | passed=True, input=True, critical=33/33, full_quality=33, sample_n=512, blockers=0 |
