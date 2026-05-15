@@ -6,19 +6,19 @@ Overall status: `pass`.
 
 | log | job | state | step | max steps | progress | latest CE | last CE mean | last-first CE mean | sec/step | ETA | final state | snapshots |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| logs/bitdistill-glue-9894.out | 9894 | RUNNING | 17430 | 20000 | 0.871500 | 4.128016 | 4.077017 | -1.857968 | 1.820201 | 1.30h | false | 0 |
+| logs/bitdistill-glue-9894.out | 9894 | RUNNING | 17850 | 20000 | 0.892500 | 4.339255 | 4.056790 | -1.878196 | 1.820179 | 1.09h | false | 0 |
 
 ## Checks
 
 | check | status | evidence | blocker |
 | --- | --- | --- | --- |
 | warm-up log exists | pass | logs/bitdistill-glue-9894.out |  |
-| warm-up has enough observations | pass | observations=1744, required=10 |  |
-| step numbers are strictly increasing | pass | first=1, latest=17430, observations=1744 |  |
-| CE values are finite | pass | nonfinite=0, latest_ce=4.128016 |  |
-| latest progress is within target | pass | latest=17430, max_steps=20000, progress=0.8715 |  |
-| log is fresh while job is active | pass | age_seconds=13.6 |  |
-| ETA is finite | pass | seconds_per_step=1.8202008032128514, eta_seconds=4677.916064257028 |  |
+| warm-up has enough observations | pass | observations=1786, required=10 |  |
+| step numbers are strictly increasing | pass | first=1, latest=17850, observations=1786 |  |
+| CE values are finite | pass | nonfinite=0, latest_ce=4.339255 |  |
+| latest progress is within target | pass | latest=17850, max_steps=20000, progress=0.8925 |  |
+| log is fresh while job is active | pass | age_seconds=19.6 |  |
+| ETA is finite | pass | seconds_per_step=1.8201792717086835, eta_seconds=3913.3854341736696 |  |
 | monitor identifies same warm-up job | pass | monitor_job=9894, parsed_job=9894 |  |
 
 ## Script Provenance
