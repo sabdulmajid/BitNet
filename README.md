@@ -133,6 +133,9 @@ Queued controlled recovery rows now hold the Stage-3 recipe fixed across
 `40.96M`, `163.84M`, and `327.68M` Stage-2 token presentations; those rows are
 pending and have no quality claim until their paired MNLI audits complete.
 
+The current root-cause ledger is generated in
+[`benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md`](benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md).
+
 ### Xeon CPU Runtime
 
 Fixed-excerpt llama.cpp CPU runs on Intel Xeon Silver 4116, portable AVX2 build.
