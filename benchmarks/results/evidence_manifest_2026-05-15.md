@@ -2,7 +2,7 @@
 Artifacts: `166`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 27832 | 18f9143ab2c4 |  |
+| README | tracked_report | yes | 27879 | d73356ea4e09 |  |
 | side_by_side_report | tracked_report | yes | 17207 | f3a17212cfe8 |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
 | paired_row_minus_ptq_report | tracked_report | yes | 1332 | 20a5aee1eb99 |  |

@@ -374,9 +374,10 @@ It does not make blind PTQ viable.
 
 The active public reports use `BITNET_REPORT_DATE=2026-05-15`. They are
 generated from checked-in scripts plus raw artifacts under `benchmark_results/`.
-Clean row-warmup, full CPU runtime, and full `I2_SR` producer jobs are still
-running or queued, so these commands intentionally keep those specific gates
-partial rather than success claims.
+Clean row-warmup and the full CPU runtime benchmark are still running or
+queued, while the active `I2_SR` export gate is complete. These commands
+therefore keep the unfinished row-warmup and CPU gates partial rather than
+success claims.
 
 ```bash
 export BITNET_REPORT_DATE=2026-05-15
