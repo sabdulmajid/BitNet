@@ -16,6 +16,11 @@ from typing import Any
 
 DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 FULL_MNLI_VALIDATION = 9815
+TRAIN_EXAMPLES = {
+    "mnli": 392702,
+    "qnli": 104743,
+    "sst2": 67349,
+}
 PAPER_BITNET_SFT_MNLI = 0.6080
 
 
@@ -105,13 +110,17 @@ def expected_runs_from_args_and_jobs(args: argparse.Namespace, job_rows: list[di
     return sorted(expected, key=lambda item: (item[0], float(item[1])))
 
 
-def summarize_run(root: Path, *, steps: int, lr: str, job_rows: list[dict[str, str]]) -> dict[str, Any]:
+def summarize_run(root: Path, *, task_name: str, steps: int, lr: str, job_rows: list[dict[str, str]]) -> dict[str, Any]:
     metrics_path = root / "metrics.json"
     metrics = read_json(metrics_path)
     accuracy = finite_float(nested(metrics, "eval", "accuracy"))
     examples = finite_float(nested(metrics, "eval", "eval_examples"))
     matching_jobs = [row for row in job_rows if row.get("output_dir") == str(root)]
     job = matching_jobs[-1] if matching_jobs else {}
+    per_device_batch = int(job.get("per_device_batch_size") or nested(metrics, "training_budget", "per_device_batch_size", default=0) or 0)
+    grad_accum = int(job.get("grad_accum_steps") or nested(metrics, "training_budget", "grad_accum_steps", default=0) or 0)
+    effective_examples = steps * per_device_batch * grad_accum if per_device_batch and grad_accum else None
+    train_examples = TRAIN_EXAMPLES.get(task_name)
     return {
         "root": str(root),
         "metrics_path": str(metrics_path),
@@ -130,6 +139,10 @@ def summarize_run(root: Path, *, steps: int, lr: str, job_rows: list[dict[str, s
         "default_baseline_delta": None,
         "last_loss": finite_float(nested(metrics, "last", "loss")),
         "last_ce": finite_float(nested(metrics, "last", "ce")),
+        "per_device_batch_size": per_device_batch or None,
+        "grad_accum_steps": grad_accum or None,
+        "effective_train_examples": effective_examples,
+        "train_epoch_fraction": effective_examples / train_examples if effective_examples and train_examples else None,
         "preparation": metrics.get("preparation", {}),
         "training_budget": metrics.get("training_budget", {}),
     }
@@ -141,7 +154,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     rows = []
     for steps, lr in expected_runs_from_args_and_jobs(args, job_rows):
         root = args.output_root / model_slug / args.task_name / f"bitnet_sft-{args.scale_mode}-steps{steps}-lr{safe_value(lr)}"
-        rows.append(summarize_run(root, steps=steps, lr=lr, job_rows=job_rows))
+        rows.append(summarize_run(root, task_name=args.task_name, steps=steps, lr=lr, job_rows=job_rows))
 
     baseline_metrics = read_json(args.default_baseline_root / "metrics.json")
     baseline_accuracy = finite_float(nested(baseline_metrics, "eval", "accuracy"))
@@ -193,6 +206,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 row.get("full_eval"),
                 row.get("default_baseline_delta"),
                 row.get("paper_anchor_minus_local"),
+                row.get("effective_train_examples"),
+                row.get("train_epoch_fraction"),
                 row.get("last_ce"),
                 prep.get("activation_quantization"),
                 prep.get("subln_inserted"),
@@ -215,6 +230,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 "full eval",
                 "delta vs default",
                 "paper anchor - local",
+                "train examples",
+                "MNLI epochs",
                 "last CE",
                 "A8",
                 "SubLN",

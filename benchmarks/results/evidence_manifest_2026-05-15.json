@@ -142,8 +142,8 @@
       "label": "bitnet_sft_budget_sweep_report",
       "metrics": {},
       "path": "benchmarks/results/bitnet_sft_budget_sweep_2026-05-15.md",
-      "sha256": "d20f1c149f9742b721b565b32427809d478b4070bafae18de823363be5c6b114",
-      "size_bytes": 1416
+      "sha256": "0f5c7d9ee81cd1c739cf90d49470e3245249b9211bd23db2e206c5a6b0e901db",
+      "size_bytes": 1651
     },
     {
       "exists": true,
@@ -2169,8 +2169,8 @@
       "label": "bitnet_sft_budget_sweep_json",
       "metrics": {},
       "path": "benchmark_results/bitnet_sft_budget_sweep_2026-05-15.json",
-      "sha256": "2ffdaa762beb3d7be10d1251f1aad7537cbc171838334a1813304e390a1ec9c9",
-      "size_bytes": 10867
+      "sha256": "3a8bd12b27dfb21ece194dd070f21be675a45b3dd3e5d8340a10dae4743c1c0e",
+      "size_bytes": 12564
     },
     {
       "exists": true,
