@@ -499,6 +499,11 @@ def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
         if isinstance(data.get("seqcls_sidecar_cpu_benchmark"), dict)
         else {}
     )
+    hidden_contract = (
+        data.get("seqcls_hidden_contract", {})
+        if isinstance(data.get("seqcls_hidden_contract"), dict)
+        else {}
+    )
     add_check(
         checks,
         "Sequence-classification runtime gap is narrowed but not closed",
@@ -541,6 +546,23 @@ def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
             f"accuracy={sidecar_cpu.get('accuracy')}"
         ),
         "sampled sidecar CPU benchmark should make the runtime-contract mismatch explicit",
+    )
+    add_check(
+        checks,
+        "Sequence-classification hidden contract mismatch is isolated",
+        hidden_contract.get("status") == "hidden_contract_mismatch"
+        and hidden_contract.get("token_id_match") is True
+        and isinstance(hidden_contract.get("hidden_relative_rms"), (int, float))
+        and hidden_contract.get("hidden_relative_rms") > 1.0
+        and isinstance(hidden_contract.get("hidden_cosine"), (int, float))
+        and hidden_contract.get("hidden_cosine") < 0.5,
+        (
+            f"status={hidden_contract.get('status')}, token_match={hidden_contract.get('token_id_match')}, "
+            f"hidden_rel_rms={hidden_contract.get('hidden_relative_rms')}, "
+            f"hidden_cosine={hidden_contract.get('hidden_cosine')}, "
+            f"logit_rel_rms={hidden_contract.get('logit_relative_rms')}"
+        ),
+        "the sidecar failure is not narrowed to a hidden-state runtime-contract mismatch",
     )
 
 

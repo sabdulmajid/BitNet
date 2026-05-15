@@ -1,0 +1,139 @@
+{
+  "artifacts": {
+    "classifier_head": "models/seqcls-backbone-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_score_head.npz",
+    "embedding_binary": "build-portable-avx2/bin/llama-embedding",
+    "gguf": "models/seqcls-backbone-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet25_i2_sr.gguf",
+    "head_weight_shape": [
+      3,
+      896
+    ],
+    "tokenize_binary": "build-portable-avx2/bin/llama-tokenize"
+  },
+  "checkpoint": {
+    "method": "bitdistill",
+    "path": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8",
+    "scale_mode": "row",
+    "stored_accuracy": 0.6535914416709119
+  },
+  "comparisons": {
+    "hidden_cosine": 0.029207017949426112,
+    "hidden_relative_rms": 7.8347962282051,
+    "llama_hidden_l2": 206.98829226332305,
+    "logit_relative_rms": 3.8641490512153855,
+    "pytorch_hidden_l2": 26.53703466524006,
+    "pytorch_logits_equal_sidecar_logits": true,
+    "pytorch_logits_vs_sidecar_relative_rms": 0.0023488634895355923,
+    "token_id_match": true
+  },
+  "date": "2026-05-15",
+  "example": {
+    "hypothesis": "Everyone really likes the newest benefits ",
+    "index": 0,
+    "label": 1,
+    "premise": "The new rights are nice enough",
+    "task": "mnli"
+  },
+  "interpretation": "Tokenization matches but hidden states diverge; fix pooling/final-norm/runtime semantics before treating the sidecar path as classifier quality evidence.",
+  "llama": {
+    "embedding": {
+      "command": [
+        "/mnt/slurm_nfs/a6abdulm/projects/BitNet/build-portable-avx2/bin/llama-embedding",
+        "-m",
+        "/mnt/slurm_nfs/a6abdulm/projects/BitNet/models/seqcls-backbone-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet25_i2_sr.gguf",
+        "-p",
+        "The new rights are nice enoughEveryone really likes the newest benefits ",
+        "--pooling",
+        "last",
+        "--attention",
+        "causal",
+        "--embd-output-format",
+        "json",
+        "--embd-normalize",
+        "-1",
+        "-ngl",
+        "0",
+        "-t",
+        "24",
+        "-c",
+        "512"
+      ],
+      "returncode": 0,
+      "stderr_bytes": 9268,
+      "stderr_tail": "common_init_from_params: warming up the model with an empty run - please wait ... (--no-warmup to disable)\n\nsystem_info: n_threads = 24 (n_threads_batch = 24) / 24 | AVX = 1 | AVX_VNNI = 0 | AVX2 = 1 | AVX512 = 0 | AVX512_VBMI = 0 | AVX512_VNNI = 0 | AVX512_BF16 = 0 | FMA = 1 | NEON = 0 | SVE = 0 | ARM_FMA = 0 | F16C = 1 | FP16_VA = 0 | RISCV_VECT = 0 | WASM_SIMD = 0 | BLAS = 0 | SSE3 = 1 | SSSE3 = 1 | VSX = 0 | MATMUL_INT8 = 0 | LLAMAFILE = 1 | \nmain: last token in the prompt is not SEP\nmain: 'tokenizer.ggml.add_eos_token' should be set to 'true' in the GGUF header\nbatch_decode: n_tokens = 13, n_seq = 1\nllama_perf_context_print:        load time =    1132.42 ms\nllama_perf_context_print: prompt eval time =      69.06 ms /    13 tokens (    5.31 ms per token,   188.23 tokens per second)\nllama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)\nllama_perf_context_print:       total time =      89.92 ms /    14 tokens",
+      "stdout_bytes": 9667
+    },
+    "logits": [
+      2.182292938232422,
+      -3.929462432861328,
+      0.17850446701049805
+    ],
+    "prediction": 0
+  },
+  "pytorch": {
+    "attention_mask_sum": 13,
+    "logits": [
+      -0.51953125,
+      1.4375,
+      0.287109375
+    ],
+    "model_dtype": "bf16",
+    "prediction": 1,
+    "sequence_index": 12,
+    "sidecar_head_logits": [
+      -0.5188282132148743,
+      1.441055178642273,
+      0.2875688076019287
+    ],
+    "sidecar_head_prediction": 1
+  },
+  "schema": "seqcls_i2sr_hidden_contract.v1",
+  "status": "hidden_contract_mismatch",
+  "tokenization": {
+    "decoded_prompt": "The new rights are nice enoughEveryone really likes the newest benefits ",
+    "hf_ids": [
+      785,
+      501,
+      3188,
+      525,
+      6419,
+      3322,
+      33024,
+      2167,
+      13151,
+      279,
+      23601,
+      7567,
+      220
+    ],
+    "llama_ids": [
+      785,
+      501,
+      3188,
+      525,
+      6419,
+      3322,
+      33024,
+      2167,
+      13151,
+      279,
+      23601,
+      7567,
+      220
+    ],
+    "llama_tokenize": {
+      "command": [
+        "/mnt/slurm_nfs/a6abdulm/projects/BitNet/build-portable-avx2/bin/llama-tokenize",
+        "-m",
+        "/mnt/slurm_nfs/a6abdulm/projects/BitNet/models/seqcls-backbone-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet25_i2_sr.gguf",
+        "-f",
+        "/tmp/tmpj23iy71z",
+        "--no-bos",
+        "--ids",
+        "--log-disable"
+      ],
+      "returncode": 0,
+      "stderr_tail": "",
+      "stdout": "[785, 501, 3188, 525, 6419, 3322, 33024, 2167, 13151, 279, 23601, 7567, 220]"
+    }
+  }
+}

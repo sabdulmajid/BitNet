@@ -131,6 +131,23 @@ def load_sidecar_cpu_benchmark(path: Path) -> dict[str, Any]:
     }
 
 
+def load_hidden_contract(path: Path) -> dict[str, Any]:
+    data = read_json(path)
+    comparisons = data.get("comparisons", {}) if isinstance(data.get("comparisons"), dict) else {}
+    return {
+        "path": str(path),
+        "exists": path.exists(),
+        "status": data.get("status"),
+        "token_id_match": comparisons.get("token_id_match"),
+        "hidden_relative_rms": comparisons.get("hidden_relative_rms"),
+        "hidden_cosine": comparisons.get("hidden_cosine"),
+        "pytorch_hidden_l2": comparisons.get("pytorch_hidden_l2"),
+        "llama_hidden_l2": comparisons.get("llama_hidden_l2"),
+        "logit_relative_rms": comparisons.get("logit_relative_rms"),
+        "pytorch_logits_equal_sidecar_logits": comparisons.get("pytorch_logits_equal_sidecar_logits"),
+    }
+
+
 def fmt(value: Any) -> str:
     if value is None:
         return "-"
@@ -167,11 +184,13 @@ def summarize_records(records: list[dict[str, Any]]) -> dict[str, Any]:
 def render_markdown(result: dict[str, Any]) -> str:
     smoke = result["seqcls_sidecar_smoke"]
     sidecar_cpu = result["seqcls_sidecar_cpu_benchmark"]
+    hidden_contract = result["seqcls_hidden_contract"]
     headline_rows = [
         ["status", result["status"]],
         ["same artifact quality+CPU ready", result["same_artifact_quality_cpu_ready"]],
         ["sidecar prototype smoke", smoke["status"]],
         ["sidecar sampled CPU quality", sidecar_cpu["status"]],
+        ["sidecar hidden contract", hidden_contract["status"]],
         ["seqcls configs", result["sequence_classification"]["configs"]],
         ["seqcls causal-export compatible", result["sequence_classification"]["causal_export_compatible"]],
         ["causal runtime configs", result["causal_runtime"]["configs"]],
@@ -212,6 +231,10 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["sampled accuracy", sidecar_cpu["accuracy"]],
                     ["agreement with saved PyTorch predictions", sidecar_cpu["agreement_with_saved_pytorch_predictions"]],
                     ["sampled examples/sec", sidecar_cpu["examples_per_second"]],
+                    ["token IDs match", hidden_contract["token_id_match"]],
+                    ["hidden relative RMS", hidden_contract["hidden_relative_rms"]],
+                    ["hidden cosine", hidden_contract["hidden_cosine"]],
+                    ["logit relative RMS", hidden_contract["logit_relative_rms"]],
                 ],
             ),
             "## Causal Runtime Path",
@@ -226,6 +249,8 @@ def render_markdown(result: dict[str, Any]) -> str:
                 [
                     ["Backbone GGUF + dense head sidecar smoke", "prototype implemented"],
                     ["Sampled sidecar CPU quality agreement", "failing"],
+                    ["Tokenizer pair formatting parity", "passes for audited MNLI sample"],
+                    ["PyTorch pooled hidden state matches llama.cpp embedding", "failing"],
                     ["GGUF writer persists classifier/score head tensors and label metadata", "not implemented"],
                     ["llama.cpp pools the last non-padding token for Qwen sequence classification", "not implemented"],
                     ["CPU evaluator reports GLUE accuracy from the packed classifier artifact", "not implemented"],
@@ -237,7 +262,9 @@ def render_markdown(result: dict[str, Any]) -> str:
                 "The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. "
                 "It now also has a prototype sequence-classification backbone smoke through I2_SR plus an external "
                 "dense head sidecar. The sampled sidecar CPU quality probe currently disagrees with saved PyTorch "
-                "predictions, so this is a runtime-contract mismatch, not a deployable classifier."
+                "predictions. The hidden-contract audit narrows the issue: token IDs match for the first MNLI "
+                "sample, but the llama.cpp embedding has high relative RMS error and near-zero cosine versus the "
+                "PyTorch pooled hidden state. This is a runtime/model-state mismatch, not a deployable classifier."
             ),
         ]
     )
@@ -269,6 +296,11 @@ def main() -> None:
         type=Path,
         default=Path(f"benchmark_results/seqcls_i2sr_sidecar_cpu_mnli_64_{DATE}.json"),
     )
+    parser.add_argument(
+        "--seqcls-hidden-contract",
+        type=Path,
+        default=Path(f"benchmark_results/seqcls_i2sr_hidden_contract_{DATE}.json"),
+    )
     parser.add_argument("--llama-cpp", type=Path, default=Path("3rdparty/llama.cpp"))
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/seqcls_runtime_gap_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/seqcls_runtime_gap_{DATE}.md"))
@@ -287,6 +319,7 @@ def main() -> None:
     causal_quality = load_causal_quality_summary(root / args.causal_quality_summary)
     sidecar_smoke = load_sidecar_smoke(root / args.seqcls_sidecar_smoke)
     sidecar_cpu = load_sidecar_cpu_benchmark(root / args.seqcls_sidecar_cpu_benchmark)
+    hidden_contract = load_hidden_contract(root / args.seqcls_hidden_contract)
     same_artifact_ready = (
         seqcls_summary["causal_export_compatible"] > 0
         and export_summary["exported"] > 0
@@ -309,6 +342,7 @@ def main() -> None:
         "causal_quality_summary": causal_quality,
         "seqcls_sidecar_smoke": sidecar_smoke,
         "seqcls_sidecar_cpu_benchmark": sidecar_cpu,
+        "seqcls_hidden_contract": hidden_contract,
         "exporter_rejects_non_causal": "architecture.endswith(\"ForCausalLM\")"
         in (root / "benchmarks/export_bitdistill_i2sr_suite.py").read_text(encoding="utf-8"),
         "llama_cpp": {

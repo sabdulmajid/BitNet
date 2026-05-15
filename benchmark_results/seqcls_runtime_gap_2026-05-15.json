@@ -279,6 +279,18 @@
   },
   "same_artifact_quality_cpu_ready": false,
   "schema": "seqcls_runtime_gap.v1",
+  "seqcls_hidden_contract": {
+    "exists": true,
+    "hidden_cosine": 0.029207017949426112,
+    "hidden_relative_rms": 7.8347962282051,
+    "llama_hidden_l2": 206.98829226332305,
+    "logit_relative_rms": 3.8641490512153855,
+    "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/seqcls_i2sr_hidden_contract_2026-05-15.json",
+    "pytorch_hidden_l2": 26.53703466524006,
+    "pytorch_logits_equal_sidecar_logits": true,
+    "status": "hidden_contract_mismatch",
+    "token_id_match": true
+  },
   "seqcls_sidecar_cpu_benchmark": {
     "accuracy": 0.34375,
     "agreement_with_saved_pytorch_predictions": 0.296875,

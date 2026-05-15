@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 62,
+  "check_count": 63,
   "failed": [],
   "checks": [
     {
@@ -294,6 +294,12 @@
       "blocker": ""
     },
     {
+      "name": "Sequence-classification hidden contract mismatch is isolated",
+      "passed": true,
+      "evidence": "status=hidden_contract_mismatch, token_match=True, hidden_rel_rms=7.8347962282051, hidden_cosine=0.029207017949426112, logit_rel_rms=3.8641490512153855",
+      "blocker": ""
+    },
+    {
       "name": "Qwen3 paper-alignment audit tracks required GLUE rows",
       "passed": true,
       "evidence": "jobs=16, complete=0, ready=False",
@@ -368,7 +374,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=221, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=223, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

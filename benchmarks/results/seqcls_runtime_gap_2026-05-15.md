@@ -8,6 +8,7 @@ This audit separates the best GLUE quality path from the packed CPU runtime path
 | same artifact quality+CPU ready | false |
 | sidecar prototype smoke | prototype_smoke_passed |
 | sidecar sampled CPU quality | quality_mismatch |
+| sidecar hidden contract | hidden_contract_mismatch |
 | seqcls configs | 15 |
 | seqcls causal-export compatible | 0 |
 | causal runtime configs | 6 |
@@ -41,6 +42,10 @@ These checkpoints are the strict GLUE reproduction artifacts. They use `Qwen2For
 | sampled accuracy | 0.343750 |
 | agreement with saved PyTorch predictions | 0.296875 |
 | sampled examples/sec | 0.704972 |
+| token IDs match | true |
+| hidden relative RMS | 7.834796 |
+| hidden cosine | 0.029207 |
+| logit relative RMS | 3.864149 |
 
 ## Causal Runtime Path
 
@@ -56,6 +61,8 @@ These checkpoints are export-compatible with the current GGUF/I2_SR path, but th
 | --- | --- |
 | Backbone GGUF + dense head sidecar smoke | prototype implemented |
 | Sampled sidecar CPU quality agreement | failing |
+| Tokenizer pair formatting parity | passes for audited MNLI sample |
+| PyTorch pooled hidden state matches llama.cpp embedding | failing |
 | GGUF writer persists classifier/score head tensors and label metadata | not implemented |
 | llama.cpp pools the last non-padding token for Qwen sequence classification | not implemented |
 | CPU evaluator reports GLUE accuracy from the packed classifier artifact | not implemented |
@@ -63,4 +70,4 @@ These checkpoints are export-compatible with the current GGUF/I2_SR path, but th
 
 ## Interpretation
 
-The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. It now also has a prototype sequence-classification backbone smoke through I2_SR plus an external dense head sidecar. The sampled sidecar CPU quality probe currently disagrees with saved PyTorch predictions, so this is a runtime-contract mismatch, not a deployable classifier.
+The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. It now also has a prototype sequence-classification backbone smoke through I2_SR plus an external dense head sidecar. The sampled sidecar CPU quality probe currently disagrees with saved PyTorch predictions. The hidden-contract audit narrows the issue: token IDs match for the first MNLI sample, but the llama.cpp embedding has high relative RMS error and near-zero cosine versus the PyTorch pooled hidden state. This is a runtime/model-state mismatch, not a deployable classifier.
