@@ -14,6 +14,8 @@ Job states: `{'PENDING': 38}`.
 
 Rows with fields inferred from submitter defaults: `0`.
 
+Stored downstream scripts checked: `38`. Failures: `0`.
+
 ## Checks
 
 | check | status | evidence | blocker |
@@ -23,7 +25,8 @@ Rows with fields inferred from submitter defaults: `0`.
 | active row count matches design | pass | rows=38, expected=38 |  |
 | output directories are unique | pass | duplicates=[] |  |
 | all expected experiment rows are present and configured | pass | configured=38/38 |  |
-| warm-up progress is finite | pass | step=15060/20000 |  |
+| downstream stored scripts include critical KD/export arguments | pass | checked=38, failures=0 |  |
+| warm-up progress is finite | pass | step=15220/20000 |  |
 
 ## Expected Matrix
 

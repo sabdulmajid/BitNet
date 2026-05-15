@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import math
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -27,7 +28,7 @@ SELECTED_LM_EVAL_METRICS = {
 
 
 CATASTROPHIC_PPL_THRESHOLD = 1.0e4
-DATE = datetime.now(timezone.utc).date().isoformat()
+DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 
 
 ARTIFACTS: list[dict[str, str]] = [

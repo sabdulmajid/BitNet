@@ -124,7 +124,7 @@
       "label": "bitdistill_paper_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_paper_alignment_2026-05-14.md",
-      "sha256": "19638937ba962340c229b918f1570ffdee05c51f5ec208452b5ad9d438be6db2",
+      "sha256": "0044e02b51142c08107750597f1fcca20b0a00ea5c1a82543627244101f1fc4a",
       "size_bytes": 9183
     },
     {
@@ -160,7 +160,7 @@
       "label": "bitdistill_job_monitor_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_job_monitor_2026-05-14.md",
-      "sha256": "92d95b1a5cedb736f3f0f5dc79ced56b93907846484b4b76af6ab9579d3b57f7",
+      "sha256": "d4d73eb29b2c77a1ebdb2ffc053cba8555b22dfa4619cf63391599dce34a1202",
       "size_bytes": 12979
     },
     {
@@ -214,7 +214,7 @@
       "label": "bitdistill_warmup_health_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_warmup_health_2026-05-14.md",
-      "sha256": "4f31dbe24acbdd53623370bbcc86f6c356fb2449620643d1e0bc33827351b4ad",
+      "sha256": "2f7530100b5690b62250f6530f91109b52ce0261238c8952f62d3aa017831c85",
       "size_bytes": 2065
     },
     {
@@ -241,8 +241,8 @@
       "label": "bitdistill_job_matrix_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_job_matrix_audit_2026-05-14.md",
-      "sha256": "b6468a1d2b1c1a44209dd9553243938d10dcb858a595b05bc808fcd5cf54b112",
-      "size_bytes": 6146
+      "sha256": "522c8593ce6803e390d9aec2e159508a632a71391ce273a0c235c2f6bfe3e7f2",
+      "size_bytes": 6305
     },
     {
       "exists": true,
@@ -250,7 +250,7 @@
       "label": "bitdistill_active_goal_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_active_goal_audit_2026-05-14.md",
-      "sha256": "efcd08094f24892b9239e441da9eb0c51cfc8546a31ed0dc3adfddecc7fca820",
+      "sha256": "f8a1ee04bdbcf3700919ec86ae6fe9d5add9b01202de36edb999e20d32d258e8",
       "size_bytes": 3201
     },
     {
@@ -2142,18 +2142,18 @@
         "downstream_states": [
           "PENDING"
         ],
-        "warmup_latest_ce": 4.274324,
+        "warmup_latest_ce": 3.906153,
         "warmup_max_steps": 20000,
-        "warmup_progress": 0.753,
+        "warmup_progress": 0.761,
         "warmup_save_every_steps": 0,
         "warmup_snapshots": 0,
-        "warmup_step": 15060,
+        "warmup_step": 15220,
         "warmup_warnings": [
           "Stage-2 warm-up is running without intermediate snapshots; if the job fails, progress before final save is not recoverable."
         ]
       },
       "path": "benchmark_results/bitdistill_job_monitor_2026-05-14.json",
-      "sha256": "72070e6ed5dcb1287e5765af7e1fa94e8f1249e964d31ec8deb32b50729314ac",
+      "sha256": "7152ba2b776bcedb25f2bb3e578181f7ac2c24d306009c4e43a7bcdb082f22c6",
       "size_bytes": 78014
     },
     {
@@ -2259,22 +2259,22 @@
       "label": "bitdistill_warmup_health_json",
       "metrics": {
         "checks": 8,
-        "eta_seconds": 8992.374501992032,
+        "eta_seconds": 8701.107490144546,
         "failed": 0,
         "final_state_exists": false,
-        "last_ce_mean": 4.10677768,
-        "latest_ce": 4.274324,
+        "last_ce_mean": 4.09826665,
+        "latest_ce": 3.906153,
         "max_steps": 20000,
         "passed": true,
-        "progress": 0.753,
-        "seconds_per_step": 1.8203187250996016,
+        "progress": 0.761,
+        "seconds_per_step": 1.8203153745072274,
         "snapshot_count": 0,
-        "step": 15060,
+        "step": 15220,
         "warnings": 3
       },
       "path": "benchmark_results/bitdistill_warmup_health_2026-05-14.json",
-      "sha256": "2554c841b76e55a96df2bf3d14796b4211396f58e1c2b34b9b1e5d442a67a686",
-      "size_bytes": 4804
+      "sha256": "1ecfa2032909f1c6c0fae470b0a983acf14b000f41d4b0f2a59d41d3e0e98f94",
+      "size_bytes": 4803
     },
     {
       "exists": true,
@@ -2325,8 +2325,8 @@
         "passed": true
       },
       "path": "benchmark_results/bitdistill_job_matrix_audit_2026-05-14.json",
-      "sha256": "88a5bf61bce86fec3af0c80e0b6716d22a4bf6baa352fb364f3ee67aac47031a",
-      "size_bytes": 42926
+      "sha256": "7f180af6a0fa7ce776f2437bd4b6549a5b326d68ab40f026d3016a9295078a3b",
+      "size_bytes": 43201
     },
     {
       "exists": true,
@@ -2348,10 +2348,10 @@
         "pending_count": 3,
         "row_scale_complete": false,
         "warmup_max_steps": 20000,
-        "warmup_step": 15060
+        "warmup_step": 15220
       },
       "path": "benchmark_results/bitdistill_active_goal_audit_2026-05-14.json",
-      "sha256": "49b744bd078cfd687bd47632f9a7bf9abb1dae6554a21cbb4c47151cf811d5d2",
+      "sha256": "82829576dfaf3f8ed5d037aab670efcf5288fa57783d090d12de65ce8073e80b",
       "size_bytes": 4787
     },
     {
