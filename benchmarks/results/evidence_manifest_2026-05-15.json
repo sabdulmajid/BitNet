@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "e3124dcfaf50b0365eea344d8d65b4d04b35ddad3aea78cfb573462859cb695f",
-      "size_bytes": 27743
+      "sha256": "18f9143ab2c482faddefa801877f762affcace4f47975b25bc6f46f673c400d1",
+      "size_bytes": 27832
     },
     {
       "exists": true,
@@ -70,7 +70,7 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-15.md",
-      "sha256": "63b5aa453a1aba5149e2cae95ebec11c6772818b368b22f31986ba52699bfa67",
+      "sha256": "0b57d6c30d703d0f46f033504d083188fe0c816a5e848d25d7f8fa1dcaef4d14",
       "size_bytes": 5646
     },
     {
@@ -79,8 +79,8 @@
       "label": "product_scope_gate",
       "metrics": {},
       "path": "benchmarks/results/product_scope_gate_2026-05-15.md",
-      "sha256": "6468cb18b3fbd884e0136754ed5c07f1190cf05dc7db8c375917a1fa75be09e0",
-      "size_bytes": 4890
+      "sha256": "aa79fa97cc88c180181952cbac1afb130d30e82fbedb2d1eedac4b08c8c19d58",
+      "size_bytes": 4848
     },
     {
       "exists": true,
@@ -115,8 +115,8 @@
       "label": "bitdistill_paired_predictions_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_paired_predictions_2026-05-15.md",
-      "sha256": "d94bb6ac8ada6272329990776c10191bdcd6200478d0f5f9fb77e2fc017cee33",
-      "size_bytes": 10345
+      "sha256": "c9107324629d00363f5c2eefe0927e383ff15b2214f337f37bc08b1843beb634",
+      "size_bytes": 8123
     },
     {
       "exists": true,
@@ -349,8 +349,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "968db06eaf1eeb13b52f211ac653d008c2513d9faa6c0da38ff0855f05396912",
-      "size_bytes": 3257
+      "sha256": "d9e83da1998915c43e127eb9d06ce14916df8af0ec320749ce4a434afb564c3f",
+      "size_bytes": 3438
     },
     {
       "exists": true,
@@ -2034,13 +2034,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 36,
+        "check_count": 38,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "3d89ae5096bd0befb2a7bfc85f01728cfe3317674c377d212026ec743373e3e6",
-      "size_bytes": 6039
+      "sha256": "c5500e584abefe6221aca1207e376e58e25b2d3a9b0039d9764350901e9133d6",
+      "size_bytes": 6374
     },
     {
       "exists": true,
@@ -2057,7 +2057,7 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-15.json",
-      "sha256": "322493b7083d46e10cc2f9cba4d2f6432920c0ab921a72fba8d80f253341357a",
+      "sha256": "d88671d7e8c3e9ee241fd99a6e62a6a8fc3e2fd94282f120442ee00fcbd70c69",
       "size_bytes": 16035
     },
     {
@@ -2071,8 +2071,8 @@
         "unsupported_claim_count": 4
       },
       "path": "benchmark_results/product_scope_gate_2026-05-15.json",
-      "sha256": "4e46a017d7f37fe6fcf09ee7b2896c4564636770b963f67d9d29504aa6d4393d",
-      "size_bytes": 5741
+      "sha256": "666dbe73378c8d0d09d6f87ba78a6779513478797324d554bba4c8df174bc4e9",
+      "size_bytes": 5699
     },
     {
       "exists": true,
@@ -2105,15 +2105,15 @@
       "kind": "bitdistill_paired_predictions_json",
       "label": "bitdistill_paired_predictions_json",
       "metrics": {
-        "complete": 20,
+        "complete": 44,
         "failed": 0,
-        "pending": 24,
+        "pending": 0,
         "rows": 44,
-        "status": "pending"
+        "status": "pass"
       },
       "path": "benchmark_results/bitdistill_paired_predictions_2026-05-15.json",
-      "sha256": "6093467145ac30e391cbe27004aa90e27c8126f3a889ebcbe0a260c690dc7586",
-      "size_bytes": 76360
+      "sha256": "4b50cdbc3d9bc83b72586a7646e8a957392e593ca40036866f18aed8fbb30663",
+      "size_bytes": 71851
     },
     {
       "exists": true,

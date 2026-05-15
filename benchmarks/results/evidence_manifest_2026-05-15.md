@@ -2,19 +2,19 @@
 Artifacts: `166`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 27743 | e3124dcfaf50 |  |
+| README | tracked_report | yes | 27832 | 18f9143ab2c4 |  |
 | side_by_side_report | tracked_report | yes | 17207 | f3a17212cfe8 |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
 | paired_row_minus_ptq_report | tracked_report | yes | 1332 | 20a5aee1eb99 |  |
 | publishable_claims | tracked_report | yes | 11054 | 63c5e9babbc1 |  |
 | progress_audit | tracked_report | yes | 25612 | 74e3b96847bf |  |
 | active_goal_audit | tracked_report | yes | 10765 | 255dacfeae0a |  |
-| objective_completion_audit | tracked_report | yes | 5646 | 63b5aa453a1a |  |
-| product_scope_gate | tracked_report | yes | 4890 | 6468cb18b3fb |  |
+| objective_completion_audit | tracked_report | yes | 5646 | 0b57d6c30d70 |  |
+| product_scope_gate | tracked_report | yes | 4848 | aa79fa97cc88 |  |
 | bitdistill_reproduction_status | tracked_report | yes | 8481 | 3f0e6a6abc2f |  |
 | bitdistill_reproduction_gap_analysis | tracked_report | yes | 6231 | a7f4db27b6b9 |  |
 | bitdistill_reproduction_gate_report | tracked_report | yes | 12908 | fa3178597d19 |  |
-| bitdistill_paired_predictions_report | tracked_report | yes | 10345 | d94bb6ac8ada |  |
+| bitdistill_paired_predictions_report | tracked_report | yes | 8123 | c9107324629d |  |
 | bitdistill_task_formulation_report | tracked_report | yes | 11523 | a9673ae56024 |  |
 | bitdistill_paper_alignment_report | tracked_report | yes | 9615 | 7bbf76e1dba9 |  |
 | bitdistill_loss_scale_report | tracked_report | yes | 8733 | 628d0414fc13 |  |
@@ -40,7 +40,7 @@ Artifacts: `166`. Missing: `0`.
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 1824 | 5d992b3c9a1c |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 3257 | 968db06eaf1e |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 3438 | d9e83da19989 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2569 | 51da6738be9d |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -130,11 +130,11 @@ Artifacts: `166`. Missing: `0`.
 | row_scale_qtype_i2sr_promotion_rehearsal_json | row_scale_qtype_gate_json | yes | 3897 | 6ffc161b446b | passed=True, gates=9, failed=0, stable_qtype=True, writer=True, stable_quality=True, stable_max_ppl=38.8477, layout_verified=True |
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 6039 | 3d89ae5096bd | passed=True, checks=36, failed=0 |
-| objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | 322493b7083d | achieved=False, status=not_complete, complete=7/9, open=2 |
-| product_scope_gate_json | product_scope_gate_json | yes | 5741 | 4e46a017d7f3 | scope=research_mvp_only, supported=5, unsupported=4 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 6374 | c5500e584abe | passed=True, checks=38, failed=0 |
+| objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | d88671d7e8c3 | achieved=False, status=not_complete, complete=7/9, open=2 |
+| product_scope_gate_json | product_scope_gate_json | yes | 5699 | 666dbe73378c | scope=research_mvp_only, supported=5, unsupported=4 |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 32197 | c581499edff4 | present=34/36, examples=34, full_eval=34, ci95=34, paper_complete=True, paper_passed=False, row_complete=True, row_passed=False, confidence=0.95 |
-| bitdistill_paired_predictions_json | bitdistill_paired_predictions_json | yes | 76360 | 6093467145ac | status=pending, complete=20/44, pending=24, failed=0 |
+| bitdistill_paired_predictions_json | bitdistill_paired_predictions_json | yes | 71851 | 4b50cdbc3d9b | status=pass, complete=44/44, pending=0, failed=0 |
 | bitdistill_task_formulation_json | bitdistill_task_formulation_json | yes | 28152 | d3d8b0cb36e8 | seq_full=6, causal_rows=17, pending_paper=3, rows=45 |
 | bitdistill_cpu_gate_json | bitdistill_cpu_gate_json | yes | 9566 | 916b3c88ed5a | passed=False, input=False, critical=0/33, full_quality=0, sample_n=None, blockers=1 |
 | bitdistill_i2sr_gate_json | bitdistill_i2sr_gate_json | yes | 5080 | 5becec24ef74 | passed=True, complete=6/6, tasks=['mnli', 'qnli', 'sst2'], scales=['tensor', 'row'], blockers=0 |

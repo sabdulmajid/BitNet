@@ -162,6 +162,14 @@ def audit_bitdistill_paired_baselines(root: Path, checks: list[dict[str, Any]]) 
     rows = data.get("rows", [])
     if not isinstance(rows, list):
         rows = []
+    complete_rows = [row for row in rows if isinstance(row, dict) and row.get("status") == "pass"]
+    stats_complete_rows = [
+        row
+        for row in complete_rows
+        if isinstance(row.get("paired_ci95"), list)
+        and len(row.get("paired_ci95")) == 2
+        and isinstance(row.get("mcnemar_exact_p"), (int, float))
+    ]
     baseline_rows = [
         row
         for row in rows
@@ -181,6 +189,23 @@ def audit_bitdistill_paired_baselines(root: Path, checks: list[dict[str, Any]]) 
         and len(row.get("paired_ci95")) == 2
         and isinstance(row.get("mcnemar_exact_p"), (int, float))
     ]
+    add_check(
+        checks,
+        "BitDistill paired audit is complete",
+        data.get("status") == "pass"
+        and data.get("complete") == data.get("total") == len(rows)
+        and data.get("pending") == 0
+        and data.get("failed") == 0,
+        f"complete={data.get('complete')}/{data.get('total')}, pending={data.get('pending')}, failed={data.get('failed')}",
+        "paired prediction audit still has pending or failed rows",
+    )
+    add_check(
+        checks,
+        "BitDistill paired audit has paired statistics for every row",
+        len(stats_complete_rows) == len(rows) and len(rows) > 0,
+        f"stats_rows={len(stats_complete_rows)}/{len(rows)}",
+        "at least one completed paired row lacks CI or McNemar statistics",
+    )
     add_check(
         checks,
         "BitDistill paired audit has BitNet baseline rows",

@@ -58,7 +58,7 @@ with the active `i2sr-row-scale-runtime` branch.
 | Arbitrary FP16/BF16 to ternary conversion is lossless | **No** | Qwen2.5-1.5B naive PTQ collapses from ten-task mean `0.644169` to `0.348671`; WikiText PPL jumps from `13.901` to `3,813,121.803`. |
 | Distillation/QAT can recover useful signal | **Yes, partially** | Best row-scale dense-Qwen run reaches ten-task mean `0.499459`, well above naive PTQ but below FP. |
 | Stable CPU row-scale packed inference exists for dense Qwen | **Yes, for the audited path** | `I2_SR` productization gate passes `9/9`; Xeon I2_SR PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
-| BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B gamma=100, strict paper-gamma tensor, strict paper-gamma row, LR=`1e-5`/`5e-5`, and strict paper-gamma head-init GLUE3 sequence-classification runs are complete. They improve over BitNet-SFT but still miss FP16-SFT by `0.058486-0.203260` absolute accuracy depending on task/run. Clean row-warmup, full-budget/backbone-scale search, paired traces beyond the current audit, and full CPU-quality gates remain open. |
+| BitDistill paper-level GLUE reproduction is achieved here | **No, not yet** | Qwen2.5-0.5B gamma=100, strict paper-gamma tensor, strict paper-gamma row, LR=`1e-5`/`5e-5`, and strict paper-gamma head-init GLUE3 sequence-classification runs are complete with full paired prediction traces. They improve over BitNet-SFT but still miss FP16-SFT by `0.058486-0.203260` absolute accuracy depending on task/run. Clean row-warmup, full-budget/backbone-scale search, and full CPU-quality gates remain open. |
 | TL2 is ready for the best row-scale checkpoint | **No** | Runtime contract gate fails: current TL2 one-scale error is `1.904230` relative output RMS; exact fp16 row scales would be `0.000197` with only `1.230469` MiB of scales, but converter/runtime/kernel metadata do not carry them. |
 | Kimi/MoE retrofit is proven | **No** | Tiny random Qwen2MoE FP16 and ternary `I2_SR` fixtures now pass converter/runtime smoke; the ternary fixture packs 3 merged row-scale expert tensors, runs routed CPU inference, and records `419.29` decode tok/s at `142.48` MiB RSS. A Kimi-K2 config audit still shows the real target needs Kimi/DeepSeekV3 loading, MLA metadata conversion, shared-expert mapping, block-FP8 import, and trained MoE quality/locality benchmarks before product claims are defensible. |
 
@@ -171,10 +171,12 @@ not close the quality gap. On MNLI, a coefficient sweep gives gamma=100
 `0.630260`. The best tensor point in that sweep is still `0.160366` accuracy
 behind FP16-SFT and below the gamma=100 row-scale run (`0.653591`).
 
-The paired prediction audit now covers BitNet-SFT versus FP16-SFT on the full
-GLUE validation splits. BitNet-SFT trails FP16-SFT by `31.89` accuracy points
-on MNLI, `29.95` on QNLI, and `14.79` on SST2, with paired confidence
-intervals and exact McNemar tests recorded in the evidence bundle.
+The paired prediction audit now passes `44/44` matched-example comparisons on
+the full GLUE validation splits. BitNet-SFT trails FP16-SFT by `31.89`
+accuracy points on MNLI, `29.95` on QNLI, and `14.79` on SST2. The best
+gamma=100 row-scale BitDistill branch is still behind FP16-SFT by `15.46`
+points on MNLI, `10.25` on QNLI, and `7.11` on SST2. All rows include paired
+confidence intervals and exact McNemar tests in the evidence bundle.
 
 These runs do **not** reproduce the paper target of being within 0.5-1.0
 accuracy point of FP16-SFT. The early completed wave is labeled as a
@@ -245,10 +247,10 @@ memory-heavy and slower than FP16-SFT in this setup, which reinforces that the
 product path must use packed GGUF kernels rather than Python-level BitLinear
 execution.
 
-Active follow-ups are now focused on clean row-scale warm-up, paired prediction
-traces for the strongest candidates, full CPU/I2_SR producer gates, and a
-decision on whether to spend the much larger compute needed for Qwen3/full
-budget reproduction. Completed diagnostics already show that gamma=100
+Active follow-ups are now focused on clean row-scale warm-up, full CPU/I2_SR
+producer gates, and a decision on whether to spend the much larger compute
+needed for Qwen3/full-budget reproduction. Completed diagnostics already show
+that gamma=100
 teacher-head initialization, strict paper-gamma head-init, the MNLI layer
 sweep, strict paper-gamma row, and the completed paper-gamma LR=`1e-5` /
 LR=`5e-5` GLUE3 probes are not enough to recover paper-level accuracy. The
@@ -373,8 +375,8 @@ It does not make blind PTQ viable.
 The active public reports use `BITNET_REPORT_DATE=2026-05-15`. They are
 generated from checked-in scripts plus raw artifacts under `benchmark_results/`.
 Clean row-warmup, full CPU runtime, and full `I2_SR` producer jobs are still
-running or queued, so these commands intentionally produce partial or pending
-gates rather than success claims.
+running or queued, so these commands intentionally keep those specific gates
+partial rather than success claims.
 
 ```bash
 export BITNET_REPORT_DATE=2026-05-15

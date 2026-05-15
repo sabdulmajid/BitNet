@@ -28,6 +28,8 @@ Overall status: **PASS**.
 | row minus KL-only has ten paired task rows | pass | rows=10 |  |
 | row minus KL-only has expected paired examples | pass | matched=22382 |  |
 | row minus KL-only has macro CI | pass | +0.016021 [+0.006145, +0.025897] |  |
+| BitDistill paired audit is complete | pass | complete=44/44, pending=0, failed=0 |  |
+| BitDistill paired audit has paired statistics for every row | pass | stats_rows=44/44 |  |
 | BitDistill paired audit has BitNet baseline rows | pass | rows=3, path=benchmark_results/bitdistill_paired_predictions_2026-05-15.json |  |
 | BitNet baseline paired rows cover full GLUE validation | pass | full_rows=3, matched=16150 |  |
 | BitNet baseline paired rows have paired statistics | pass | stats_rows=3 |  |

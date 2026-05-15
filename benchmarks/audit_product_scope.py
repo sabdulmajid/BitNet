@@ -156,6 +156,12 @@ def build_gate(root: Path) -> dict[str, Any]:
     bitdistill_paired = read_json(bitdistill_paired_path) if bitdistill_paired_path.exists() else {}
     bitdistill_paired_complete = bitdistill_paired.get("complete_count", bitdistill_paired.get("complete"))
     bitdistill_paired_total = bitdistill_paired.get("check_count", bitdistill_paired.get("total"))
+    bitdistill_paired_passed = (
+        bitdistill_paired.get("status") == "pass"
+        and bitdistill_paired_complete == bitdistill_paired_total
+        and bitdistill_paired.get("pending", 0) == 0
+        and bitdistill_paired.get("failed", 0) == 0
+    )
     bitdistill_cpu_path = latest_json_path(
         root,
         "benchmark_results/bitdistill_glue_cpu_gate_*.json",
@@ -249,6 +255,16 @@ def build_gate(root: Path) -> dict[str, Any]:
         "Dense Qwen2.5-1.5B I2_SR evidence in this fork on Intel Xeon Silver 4116.",
     )
     bitdistill_paper_passed = bool(bitdistill_reproduction.get("paper_style_tensor_passed"))
+    if bitdistill_paired_passed:
+        bitdistill_reproduction_blocker = (
+            "Gamma=100, strict paper-gamma tensor, strict paper-gamma row, and LR/head-init runs are complete "
+            "with paired traces but remain below the FP16-gap gate; CPU full-quality rows are still missing or incomplete."
+        )
+    else:
+        bitdistill_reproduction_blocker = (
+            "Gamma=100, strict paper-gamma tensor, strict paper-gamma row, and LR/head-init runs are complete "
+            "but below the FP16-gap gate; paired-trace coverage and CPU full-quality rows are still missing or incomplete."
+        )
     add_claim(
         claims,
         "BitDistill paper-level GLUE reproduction on Qwen2.5-0.5B",
@@ -269,7 +285,7 @@ def build_gate(root: Path) -> dict[str, Any]:
             f"full-quality={bitdistill_cpu_full_quality}/{len(bitdistill_cpu_critical)})"
         ),
         "Claim only after MNLI/QNLI/SST2 full-validation BitDistill rows are within the configured FP16 gap and paired traces/CPU gates are complete.",
-        "Gamma=100, strict paper-gamma tensor, strict paper-gamma row, and LR/head-init runs are complete but below the FP16-gap gate; paired-trace coverage and CPU full-quality rows are still missing or incomplete.",
+        bitdistill_reproduction_blocker,
     )
     bitdistill_i2sr_passed = bool(bitdistill_i2sr.get("passed"))
     add_claim(
@@ -347,9 +363,9 @@ def build_gate(root: Path) -> dict[str, Any]:
         "unsupported_claim_count": len(unsupported),
         "claims": claims,
         "recommendation": {
-            "product": "CPU-first dense-Qwen retrofit evaluator with stable I2_SR runtime support; keep BitDistill quality claims behind the full GLUE reproduction, paired-trace, and CPU full-quality gates.",
+            "product": "CPU-first dense-Qwen retrofit evaluator with stable I2_SR runtime support; keep BitDistill quality claims behind the full GLUE reproduction and CPU full-quality gates.",
             "paper": "Scope as a negative PTQ result plus measured QAT/row-scale/runtime recovery path; add BitDistill reproduction claims only if the full-validation long-warmup gates pass. Do not claim arbitrary or MoE support.",
-            "next_engineering_gate": "Finish paired-trace coverage, the CPU-quality dependency chain, and clean row-warmup comparisons; keep MoE/Kimi as a separate milestone.",
+            "next_engineering_gate": "Finish the CPU-quality dependency chain and clean row-warmup comparisons; keep MoE/Kimi as a separate milestone.",
         },
     }
 
