@@ -6,7 +6,7 @@ Job tables: `benchmark_results/bitdistill_longwarmup_downstream_20260514_163342.
 
 | log | step | max steps | progress | latest CE | effective tokens | target tokens | save every | snapshots | latest snapshot | ETA |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| logs/bitdistill-glue-9894.out | 17850 | 20000 | 0.892500 | 4.339255 | 146227200 | 163840000 | 0 | 0 | - | 1.09h |
+| logs/bitdistill-glue-9894.out | 18160 | 20000 | 0.908000 | 3.624918 | 148766720 | 163840000 | 0 | 0 | - | 0.93h |
 
 ## Operational Warnings
 

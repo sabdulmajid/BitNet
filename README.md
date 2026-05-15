@@ -307,6 +307,8 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_2026-05-15.md)
 - [BitDistill producer script audit](benchmarks/results/bitdistill_producer_script_audit_2026-05-15.md)
 - [Objective completion audit](benchmarks/results/objective_completion_audit_2026-05-15.md)
+- [Evidence manifest](benchmarks/results/evidence_manifest_2026-05-15.md)
+- [Benchmark coverage gate](benchmarks/results/benchmark_coverage_gate_2026-05-15.md)
 - [Product scope gate](benchmarks/results/product_scope_gate_2026-05-15.md)
 - [I2_SR submodule promotion audit](benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md)
 - [Row-scale qtype productization gate](benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md)

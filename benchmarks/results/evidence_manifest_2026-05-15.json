@@ -1,0 +1,2762 @@
+{
+  "artifact_count": 159,
+  "entries": [
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "README",
+      "metrics": {},
+      "path": "README.md",
+      "sha256": "fae36847057da56e8fe6f1ebbdd5d426248aec28c5127ac5fce93eded7b9ef2b",
+      "size_bytes": 19223
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "side_by_side_report",
+      "metrics": {},
+      "path": "benchmarks/results/qwen_side_by_side_2026-05-15.md",
+      "sha256": "f3a17212cfe852da53be46a5ea73ebc4b58b3f02f3b284b38a6f1790f70a5187",
+      "size_bytes": 17207
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "paired_row_minus_fp_report",
+      "metrics": {},
+      "path": "benchmarks/results/paired_row_densehead_minus_fp_2026-05-13.md",
+      "sha256": "21aa1b85402fd18ebbc925ef95cc0c089df6f6091d5a497a546594db4b4527d3",
+      "size_bytes": 1311
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "paired_row_minus_ptq_report",
+      "metrics": {},
+      "path": "benchmarks/results/paired_row_densehead_minus_ptq_2026-05-13.md",
+      "sha256": "20a5aee1eb9940fbe97256d1839f92ae990423c4b33927c3bf29bbc50dc02b4a",
+      "size_bytes": 1332
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "publishable_claims",
+      "metrics": {},
+      "path": "benchmarks/results/publishable_claims_2026-05-05.md",
+      "sha256": "63c5e9babbc19d2f95bf5433dbe134781934131158581ee86d2d7eff5a28bbda",
+      "size_bytes": 11054
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "progress_audit",
+      "metrics": {},
+      "path": "benchmarks/results/progress_audit_2026-05-05.md",
+      "sha256": "74e3b96847bfc34eb02c8d862a8e1fe680626b8f69507bcbdead95847482eb4c",
+      "size_bytes": 25612
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "active_goal_audit",
+      "metrics": {},
+      "path": "benchmarks/results/active_goal_completion_audit_2026-05-05.md",
+      "sha256": "255dacfeae0a7c3c4e095e0ab86bc9ca43026a4c87ede3b6e7d874cbb05bd248",
+      "size_bytes": 10765
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "objective_completion_audit",
+      "metrics": {},
+      "path": "benchmarks/results/objective_completion_audit_2026-05-15.md",
+      "sha256": "2f7f02702a8664388fda0e9fd840cfa6d3083f66e4219616e1f56a1f6fa8c5d6",
+      "size_bytes": 5645
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "product_scope_gate",
+      "metrics": {},
+      "path": "benchmarks/results/product_scope_gate_2026-05-15.md",
+      "sha256": "96ab10de3eb043ce762f059c7fd6f5898e64d342d65736dcba9ee663447c0188",
+      "size_bytes": 4920
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_reproduction_status",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_reproduction_status_2026-05-14.md",
+      "sha256": "3f0e6a6abc2fa6d76238607d6d32783b1b653fa629969ecf81cf4487ec99b09e",
+      "size_bytes": 8481
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_reproduction_gate_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_reproduction_gate_2026-05-15.md",
+      "sha256": "897c1cc8ca85ff6715172bd46f27a571b732ff6ca1bfa65331df678d7188d175",
+      "size_bytes": 11734
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_paired_predictions_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_paired_predictions_2026-05-15.md",
+      "sha256": "496f2fcf1e77d34ace5eebbef582d7b939469699eead4dc6f0175d8b44275959",
+      "size_bytes": 11743
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_task_formulation_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md",
+      "sha256": "410fa66bdbd2ca4b32f887a3a1ab1f97d7b58f1d944562a344c21e7ba6992d8f",
+      "size_bytes": 9794
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_paper_alignment_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_paper_alignment_2026-05-15.md",
+      "sha256": "8cb85c18b0d3c12d970d2100b778619f4b2c47512e45d03f9903785d2c60d02e",
+      "size_bytes": 9183
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_loss_scale_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_loss_scale_audit_2026-05-15.md",
+      "sha256": "f3c9f871bb9693091247936365e19aaec6aeccf5dad0b5ef45920fd5cc42cbf5",
+      "size_bytes": 7608
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_cpu_gate_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_glue_cpu_gate_2026-05-15.md",
+      "sha256": "652745d24866c1535501d3a9f59fb590cc39d8798d7a1a77c650067f54dd29ac",
+      "size_bytes": 7445
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_i2sr_gate_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_i2sr_export_gate_2026-05-15.md",
+      "sha256": "107e45e1a8f454144ae67c8cf4ac1734384d51317874747a4a0aa83a14bd34b9",
+      "size_bytes": 3711
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_job_monitor_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_job_monitor_2026-05-15.md",
+      "sha256": "269ee5a608a266a7c4b8c4d8d717e6306fd9b8da71114ea8171e004167c2f6a2",
+      "size_bytes": 12979
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_dependency_graph_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_dependency_graph_2026-05-15.md",
+      "sha256": "22be2b78a7e2701f67e016ca42489a7bc82ccf00a843fe3f62b4167befb3913c",
+      "size_bytes": 10559
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_postprocess_submission_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_postprocess_submission_2026-05-15.md",
+      "sha256": "7b9ae9af9eab1ec6959197e9fe3152b65ecccad9c74c2b8941ca997a9322c694",
+      "size_bytes": 986
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_postprocess_dependency_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_postprocess_dependency_audit_2026-05-15.md",
+      "sha256": "bcf2860e01070e73b676f17f8c51c251918ccda1bf925d5659afea1382faaee4",
+      "size_bytes": 1977
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_afterany_postprocess_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_afterany_postprocess_2026-05-15.md",
+      "sha256": "65b5774a8fb7df66fdfc90bb163db95d4f53a5b109162a7f117e9522708bc2df",
+      "size_bytes": 992
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_afterany_postprocess_dependency_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_afterany_postprocess_dependency_2026-05-15.md",
+      "sha256": "ece4a9d6924e12bf368f3ad4cd5f9263bf250c3fe725016552ecd4375a90775d",
+      "size_bytes": 2022
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_warmup_health_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_warmup_health_2026-05-15.md",
+      "sha256": "8dda5626f67513330f69fdfd81cff5e2108686ac23709669a69b6523dea67beb",
+      "size_bytes": 2063
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_warmup_finalizer_submission_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_warmup_finalizer_submission_2026-05-15.md",
+      "sha256": "59326eeddacf312e0cb3eb78fb66cff8f850cc00fb7512c181f63183b93c341b",
+      "size_bytes": 404
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_producer_script_audit_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_producer_script_audit_2026-05-15.md",
+      "sha256": "4778dbf8d7beae947c0e70301c29803436626016865a4b06d40f5fcca51a260b",
+      "size_bytes": 2632
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_job_matrix_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_job_matrix_audit_2026-05-15.md",
+      "sha256": "5ec7989243790a7a946340318a8f7577c4f13f2bf6ffc75682e45b35e630211b",
+      "size_bytes": 6305
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_active_goal_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_active_goal_audit_2026-05-15.md",
+      "sha256": "d921c96b7829df5aa9cf581a0d1909515d9db9fe57f9864cdf50d714d66b0f07",
+      "size_bytes": 3507
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_snapshot_integrity_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_snapshot_integrity_2026-05-15.md",
+      "sha256": "25a3ea989abcbcd8e0e48fa77009d961b36be7ff87dddc4a263f895052be3fd5",
+      "size_bytes": 532
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_smoke_contract_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_smoke_contract_2026-05-15.md",
+      "sha256": "f7dc1484ffc2e96cc413b43d487da828547613df73324f8116ea498de4b08783",
+      "size_bytes": 3955
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_variant_summary_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_variant_summary_2026-05-15.md",
+      "sha256": "88f91af709aafa703981776ffaafd11befd100c8d9b2fe4cea0c1412f6b54bba",
+      "size_bytes": 8539
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_causal_longwarmup_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_causal_longwarmup_densehead_summary_2026-05-15.md",
+      "sha256": "dbb1897f668ec84e6aebe939f1282e585196678a5dde1fcc438a2893f10fad64",
+      "size_bytes": 3592
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_glue3_summary_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_seqcls_glue3_primary_summary_2026-05-14.md",
+      "sha256": "73e1b7b6396d32e6a87028ed83c7a56fd33e1e31338baa78a504bedb117af2e9",
+      "size_bytes": 4352
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_mnli_diagnostic_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_seqcls_mnli_diagnostic_variant_summary_2026-05-14.md",
+      "sha256": "9f7ade51c3d99159da2d536affc15f060cf08892399afb4ecb6aff0c05dcff57",
+      "size_bytes": 6593
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2sr_submodule_promotion_audit",
+      "metrics": {},
+      "path": "benchmarks/results/i2sr_submodule_promotion_audit_2026-05-13.md",
+      "sha256": "f24bbadb07e15360720d4b88f2f754f2593abffff16e862deb734a68b82a8ef7",
+      "size_bytes": 2246
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "benchmark_coverage_gate_report",
+      "metrics": {},
+      "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
+      "sha256": "5acb4591bce35256bdeb239c346859a3e55156e4ad1d8355075c821bd86caaa0",
+      "size_bytes": 3321
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "direct_static_ternary_gguf_report",
+      "metrics": {},
+      "path": "benchmarks/results/direct_static_ternary_gguf_2026-05-13.md",
+      "sha256": "ff830f6c1d725e7c233409f9840d98dfdb9d8879e9f556db21a9f2bc9f3deea9",
+      "size_bytes": 2072
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "direct_packed_gguf_support_report",
+      "metrics": {},
+      "path": "benchmarks/results/direct_packed_gguf_support_2026-05-13.md",
+      "sha256": "51da6738be9de86d49ca313b0daf06c8c31a3a471752769816f59e297aea62d4",
+      "size_bytes": 2569
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "direct_i2s_scalar_gguf_report",
+      "metrics": {},
+      "path": "benchmarks/results/direct_i2s_scalar_gguf_2026-05-13.md",
+      "sha256": "b4ea3c5c6f686408fdac9538729e9c22ae90fa38da049c091e945e925a43108e",
+      "size_bytes": 6338
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "direct_row_i2s_qwen05b_report",
+      "metrics": {},
+      "path": "benchmarks/results/direct_row_i2s_qwen05b_2026-05-13.md",
+      "sha256": "f5f6d912626b928e4e4f3a91c49b145a475316e3ab5a7e470a1c475e4658ca39",
+      "size_bytes": 3967
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "tl2_shape_report",
+      "metrics": {},
+      "path": "benchmarks/results/tl2_shape_support_audit_2026-05-05.md",
+      "sha256": "8dddd65315e02d2cce6c36dab7ce670212463a5663f508320ce6230c1e08ec70",
+      "size_bytes": 2817
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "tl2_probe_report",
+      "metrics": {},
+      "path": "benchmarks/results/qwen05b_tl2_probe_2026-05-05.md",
+      "sha256": "dd7e4fa29cc1e9e660ce8a4daaa05e8c6a8256c4b94c23ad015d7fad7aa25568",
+      "size_bytes": 3608
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "tl2_scale_report",
+      "metrics": {},
+      "path": "benchmarks/results/tl2_scale_semantics_2026-05-05.md",
+      "sha256": "30bbfbd225596b9776e3651fe474f059c9467726e6c737cd867d6c7cd42da2ad",
+      "size_bytes": 2321
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "tl2_row_scale_design_report",
+      "metrics": {},
+      "path": "benchmarks/results/tl2_row_scale_design_2026-05-13.md",
+      "sha256": "fd035ed1fd6dbda71a473810567368e24bc7be3738ad665d8d0d47677ecdd71e",
+      "size_bytes": 4004
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "tl2_row_scale_runtime_contract_report",
+      "metrics": {},
+      "path": "benchmarks/results/tl2_row_scale_runtime_contract_2026-05-15.md",
+      "sha256": "3f2e5468f229bf919b5059676247067982cf3d1cff69e548c642d586d7cd67ce",
+      "size_bytes": 4330
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2s_row_scale_format_report",
+      "metrics": {},
+      "path": "benchmarks/results/i2s_row_scale_format_audit_2026-05-13.md",
+      "sha256": "256abf73581c7d5d49ea22d6f1ec0bf6e3cf8e17dd5fafbdafd47242c77484b5",
+      "size_bytes": 1759
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "row_scale_qtype_productization_gate_report",
+      "metrics": {},
+      "path": "benchmarks/results/row_scale_qtype_productization_gate_2026-05-13.md",
+      "sha256": "cdfb84616ba1d06deb4673dc02c29a7f802cdcffdd6bbd4ed78e04f211fae8d4",
+      "size_bytes": 2399
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "row_scale_qtype_i2sr_active_patch_gate_report",
+      "metrics": {},
+      "path": "benchmarks/results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.md",
+      "sha256": "42acb39176cb4f5fc9a3b6b54b8ba3ab90b4c01df7f96811b9725904204c3bca",
+      "size_bytes": 2390
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "row_scale_qtype_i2sr_promotion_rehearsal_report",
+      "metrics": {},
+      "path": "benchmarks/results/row_scale_qtype_productization_gate_i2sr_promotion_rehearsal_2026-05-13.md",
+      "sha256": "f734b60cc1ec39233ef41c4d9d357d2fa1f712408af1726ce3979aebd7d0de04",
+      "size_bytes": 2671
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2sr_promotion_handoff_report",
+      "metrics": {},
+      "path": "benchmarks/results/i2sr_promotion_handoff_2026-05-13.md",
+      "sha256": "8d68db61ff0565590b0e4cc65023354c92f641fa4f52f80e85e594832386fb54",
+      "size_bytes": 3556
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2sr_qwen15b_candidate_report",
+      "metrics": {},
+      "path": "benchmarks/results/i2sr_qwen15b_candidate_2026-05-13.md",
+      "sha256": "0e61281598cebd54838900316cb722c5b8b1ee514e6ec394701afd6ea02811a4",
+      "size_bytes": 2330
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2sr_x86act_fix_report",
+      "metrics": {},
+      "path": "benchmarks/results/i2sr_x86act_fix_2026-05-13.md",
+      "sha256": "828c0baaa784b20ce156b48acc2e7e3ecaf96502d6c6a6ee6d91c8d30566f426",
+      "size_bytes": 2113
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2s_packing_layout_verify_report",
+      "metrics": {},
+      "path": "benchmarks/results/i2s_packing_layout_verify_2026-05-13.md",
+      "sha256": "c11acd561e3c069ab3595231a42fcdb48974b2a3fc06727531d6e18412f9cb4c",
+      "size_bytes": 1075
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2sr_rss_report",
+      "metrics": {},
+      "path": "benchmarks/results/i2sr_rss_2026-05-13.md",
+      "sha256": "cd21d1ee3435e4d0f287d235397cce29973e6e0ff76f07cf73c1a6dad644b209",
+      "size_bytes": 1698
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "artifact_prune_application_report",
+      "metrics": {},
+      "path": "benchmarks/results/artifact_prune_application_2026-05-13.md",
+      "sha256": "803c9fe72cdb098b402b873bb1b3191dcd93f364f5e58863b3def67cf59ab3cc",
+      "size_bytes": 4276
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "moe_report",
+      "metrics": {},
+      "path": "benchmarks/results/moe_support_audit_2026-05-15.md",
+      "sha256": "b9ffcc7ab9dbfffb6205b2c6d8692fb2c9383195918c2e2d844dce477418e074",
+      "size_bytes": 5020
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "kimi_config_feasibility_report",
+      "metrics": {},
+      "path": "benchmarks/results/kimi_config_feasibility_2026-05-15.md",
+      "sha256": "c7dba0ade99eaceea36bcc2dd9c9360a1894f17c292a631ddd2a497517131430",
+      "size_bytes": 1999
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "moe_packing_contract_report",
+      "metrics": {},
+      "path": "benchmarks/results/moe_packing_contract_2026-05-15.md",
+      "sha256": "3eabfbc4171a03f7ae0698109386c2fb42f5ae1091ae6db09471173defc5a158",
+      "size_bytes": 1861
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "moe_tl2_runtime_contract_report",
+      "metrics": {},
+      "path": "benchmarks/results/moe_tl2_runtime_contract_2026-05-15.md",
+      "sha256": "0d159c89f473de443d27d9867c52d2966e9fa1826822885a4d1692d9db4e3c6d",
+      "size_bytes": 3207
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "tiny_qwen2moe_fixture_report",
+      "metrics": {},
+      "path": "benchmarks/results/tiny_qwen2moe_fixture_2026-05-14.md",
+      "sha256": "1ad4c2961f423bd50682694bd6ee4d9219260205d2acf5276a30381ed0facd40",
+      "size_bytes": 1097
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "tiny_qwen2moe_expert_scaling_report",
+      "metrics": {},
+      "path": "benchmarks/results/tiny_qwen2moe_expert_scaling_2026-05-14.md",
+      "sha256": "fce193aa66e61dcd296a46564c5a071622ea871241077e800a537b8b0977ea62",
+      "size_bytes": 1026
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "unblock_requirements_report",
+      "metrics": {},
+      "path": "benchmarks/results/unblock_requirements_2026-05-14.md",
+      "sha256": "c5fad110f46ffe4c5ef9f9c6586ffebfce1821cd52053e409eb73d41ada1d0db",
+      "size_bytes": 2039
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2sr_combined_patch",
+      "metrics": {},
+      "path": "patches/llama-i2sr-row-scale-qtype.patch",
+      "sha256": "d02e20bd9e00c5703521749a49af9d3c433fa01d8b7257d31aae8f050a325643",
+      "size_bytes": 26764
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2sr_root_runtime_patch",
+      "metrics": {},
+      "path": "patches/bitnet-i2sr-root-runtime.patch",
+      "sha256": "c4c30c8e2053fac2c098db0f7a45b70d4966468707988c2a42b2a3690b59ec2b",
+      "size_bytes": 5408
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "i2sr_submodule_patch",
+      "metrics": {},
+      "path": "patches/llama-i2sr-row-scale-qtype.submodule.patch",
+      "sha256": "aa68da60931a7047c7a459db503210dd87c5baa6dcecfcbfebe86fa8880a9b9a",
+      "size_bytes": 20824
+    },
+    {
+      "exists": true,
+      "kind": "evidence_audit_md",
+      "label": "latest_nonrow_audit",
+      "metrics": {},
+      "path": "benchmark_results/evidence_audit/latest_nonrow.md",
+      "sha256": "6d8c31e958f10386cf0b986ef49583414168259a286f29740e5f1265c1ef981c",
+      "size_bytes": 4396
+    },
+    {
+      "exists": true,
+      "kind": "evidence_audit_md",
+      "label": "row_notie_5000_audit",
+      "metrics": {},
+      "path": "benchmark_results/evidence_audit/qwen15b_row_notie_5000.md",
+      "sha256": "4615a642257d18b19cea5b99ed542af3ab578d7b03b09613534adc8fed47b18c",
+      "size_bytes": 2569
+    },
+    {
+      "exists": true,
+      "kind": "evidence_audit_md",
+      "label": "row_i2s_heapfix_audit",
+      "metrics": {},
+      "path": "benchmark_results/evidence_audit/qwen15b_row_i2s_heapfix.md",
+      "sha256": "7077cdc4e602a66a0dadf73ca5f891dd62405dae2495d474b81b9d0904a690ed",
+      "size_bytes": 964
+    },
+    {
+      "exists": true,
+      "kind": "evidence_audit_md",
+      "label": "row_i2s_thread_scaling_audit",
+      "metrics": {},
+      "path": "benchmark_results/evidence_audit/qwen15b_row_i2s_thread_scaling.md",
+      "sha256": "1321b4c78650a5bf5a9a20da348fe0e4ee8cb7a3fd163374e67dbba1a4181540",
+      "size_bytes": 848
+    },
+    {
+      "exists": true,
+      "kind": "evidence_audit_md",
+      "label": "context_scaling_rss_audit",
+      "metrics": {},
+      "path": "benchmark_results/evidence_audit/qwen15b_context_scaling_rss.md",
+      "sha256": "ef8e7c7a87270d6948c7b1c95793af5a171a53c35f1793d21e1dabd24424c851",
+      "size_bytes": 939
+    },
+    {
+      "exists": true,
+      "kind": "evidence_audit_md",
+      "label": "qwen05b_tl2_probe_audit",
+      "metrics": {},
+      "path": "benchmark_results/evidence_audit/qwen05b_tl2_probe.md",
+      "sha256": "ff37bffc1242ffb64e19f0b4841da2e39c223aac5b29060dd9263a663e95e741",
+      "size_bytes": 777
+    },
+    {
+      "exists": true,
+      "kind": "perplexity_json",
+      "label": "fp_wikitext",
+      "metrics": {
+        "eval_tokens": 32704.0,
+        "model_kind": "hf",
+        "nll": 2.6319949831813574,
+        "perplexity": 13.901475466625362
+      },
+      "path": "benchmark_results/quality-9735/qwen15b_fp_wikitext.json",
+      "sha256": "acd79bab6f4020657f052232e19474fdd484b87885e09c810cac27c2a2392e58",
+      "size_bytes": 473
+    },
+    {
+      "exists": true,
+      "kind": "perplexity_json",
+      "label": "fp_fineweb",
+      "metrics": {
+        "eval_tokens": 32736.0,
+        "model_kind": "hf",
+        "nll": 2.329091429710388,
+        "perplexity": 10.268607541663883
+      },
+      "path": "benchmark_results/quality-9735/qwen15b_fp_fineweb_heldout.json",
+      "sha256": "f493c13eb9cf322c6bf89b3007a43bfcdcec19538277dda483042cb2bec2e09c",
+      "size_bytes": 488
+    },
+    {
+      "exists": true,
+      "kind": "perplexity_json",
+      "label": "ptq_wikitext",
+      "metrics": {
+        "eval_tokens": 32704.0,
+        "model_kind": "ternary",
+        "nll": 15.153958782553673,
+        "perplexity": 3813121.80332679
+      },
+      "path": "benchmark_results/quality-ptq-qwen15b/qwen15b_naive_ptq_wikitext.json",
+      "sha256": "8481ac1399014e94c23860ce8e9dbc2d9c50512634ac15d5f6886625141bab34",
+      "size_bytes": 499
+    },
+    {
+      "exists": true,
+      "kind": "perplexity_json",
+      "label": "ptq_fineweb",
+      "metrics": {
+        "eval_tokens": 32736.0,
+        "model_kind": "ternary",
+        "nll": 16.07549324631691,
+        "perplexity": 9582923.269140046
+      },
+      "path": "benchmark_results/quality-ptq-qwen15b/qwen15b_naive_ptq_fineweb_heldout.json",
+      "sha256": "3d8b77f56169fc425c52daaccab3b03df963be9a537cd15f4d9d450630455fad",
+      "size_bytes": 517
+    },
+    {
+      "exists": true,
+      "kind": "perplexity_json",
+      "label": "hidden_mse_wikitext",
+      "metrics": {
+        "eval_tokens": 32704.0,
+        "model_kind": "ternary",
+        "nll": 4.459149207919836,
+        "perplexity": 86.41395750155097
+      },
+      "path": "benchmark_results/quality-9735/qwen15b_ternary_wikitext.json",
+      "sha256": "78bf0bea21b489f45635727081ac897e3e505c6bd988f67ad960656609f9902d",
+      "size_bytes": 504
+    },
+    {
+      "exists": true,
+      "kind": "perplexity_json",
+      "label": "hidden_mse_fineweb",
+      "metrics": {
+        "eval_tokens": 32736.0,
+        "model_kind": "ternary",
+        "nll": 3.69878239184618,
+        "perplexity": 40.39808536328532
+      },
+      "path": "benchmark_results/quality-9735/qwen15b_ternary_fineweb_heldout.json",
+      "sha256": "46c9b60cae1f0b0d2c97f2dcfdff79d4f434c1968232523e7b354f05c57fa234",
+      "size_bytes": 519
+    },
+    {
+      "exists": true,
+      "kind": "perplexity_json",
+      "label": "kl_wikitext",
+      "metrics": {
+        "eval_tokens": 32704.0,
+        "model_kind": "ternary",
+        "nll": 3.923860389739275,
+        "perplexity": 50.59538617072306
+      },
+      "path": "benchmark_results/quality-qwen15b-klonly-5000/qwen15b_ternary_wikitext.json",
+      "sha256": "71d506623bda2510c48d481b16967b900259f85f3547ae90090ed7a44fb6614f",
+      "size_bytes": 515
+    },
+    {
+      "exists": true,
+      "kind": "perplexity_json",
+      "label": "kl_fineweb",
+      "metrics": {
+        "eval_tokens": 32736.0,
+        "model_kind": "ternary",
+        "nll": 3.280875191092491,
+        "perplexity": 26.599041760368934
+      },
+      "path": "benchmark_results/quality-qwen15b-klonly-5000/qwen15b_ternary_fineweb_heldout.json",
+      "sha256": "77bc5e4d44257360fe30a6ac6070e7cd4173580c03678cf0eca215c345983c9a",
+      "size_bytes": 534
+    },
+    {
+      "exists": true,
+      "kind": "perplexity_json",
+      "label": "kl_dense_head_wikitext",
+      "metrics": {
+        "eval_tokens": 32704.0,
+        "model_kind": "ternary",
+        "nll": 3.769823282957077,
+        "perplexity": 43.37239951638826
+      },
+      "path": "benchmark_results/quality-qwen15b-klonly-notiehead-5000/qwen15b_ternary_wikitext.json",
+      "sha256": "05f3adf09ed6f4666d85fea817a2aa74b320e7ae746551d7e6c118df8b26c0a8",
+      "size_bytes": 526
+    },
+    {
+      "exists": true,
+      "kind": "perplexity_json",
+      "label": "kl_dense_head_fineweb",
+      "metrics": {
+        "eval_tokens": 32736.0,
+        "model_kind": "ternary",
+        "nll": 3.1249595880508423,
+        "perplexity": 22.75897534038801
+      },
+      "path": "benchmark_results/quality-qwen15b-klonly-notiehead-5000/qwen15b_ternary_fineweb_heldout.json",
+      "sha256": "84c6bcda2904ef50692c559f62ed226514266026e9f412f42e9236b651321a9b",
+      "size_bytes": 545
+    },
+    {
+      "exists": true,
+      "kind": "perplexity_json",
+      "label": "row_dense_head_wikitext",
+      "metrics": {
+        "eval_tokens": 32704.0,
+        "model_kind": "ternary",
+        "nll": 3.6527357026934624,
+        "perplexity": 38.58006540148406
+      },
+      "path": "benchmark_results/quality-qwen15b-klonly-row-notiehead-5000/qwen15b_ternary_wikitext.json",
+      "sha256": "3e0d76dd25731dc5a8de74f80dd41fc307297bfecdab52c0b8d791f26357e580",
+      "size_bytes": 532
+    },
+    {
+      "exists": true,
+      "kind": "perplexity_json",
+      "label": "row_dense_head_fineweb",
+      "metrics": {
+        "eval_tokens": 32736.0,
+        "model_kind": "ternary",
+        "nll": 3.06026528775692,
+        "perplexity": 21.333215852384445
+      },
+      "path": "benchmark_results/quality-qwen15b-klonly-row-notiehead-5000/qwen15b_ternary_fineweb_heldout.json",
+      "sha256": "f16a9f34682174adb437b4cdaacf975a43330db7a0412fe2b3771095e4710a45",
+      "size_bytes": 546
+    },
+    {
+      "exists": true,
+      "kind": "lm_eval_json",
+      "label": "lm_eval_fp",
+      "metrics": {
+        "missing": [],
+        "samples": 22382,
+        "selected_mean": 0.6441691641219306,
+        "selected_tasks": 10,
+        "task_metrics": {
+          "arc_challenge": 0.4496587030716723,
+          "arc_easy": 0.7196969696969697,
+          "boolq": 0.7259938837920489,
+          "copa": 0.83,
+          "hellaswag": 0.6779525990838479,
+          "openbookqa": 0.404,
+          "piqa": 0.7578890097932536,
+          "sciq": 0.934,
+          "truthfulqa_mc1": 0.3047735618115055,
+          "winogrande": 0.6377269139700079
+        }
+      },
+      "path": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json",
+      "sha256": "e48cdc1bb44f1979512cef71f50b31b370692b11d08a4baa45dc7757ac71d6dd",
+      "size_bytes": 87341049
+    },
+    {
+      "exists": true,
+      "kind": "lm_eval_json",
+      "label": "lm_eval_ptq",
+      "metrics": {
+        "missing": [],
+        "samples": 22382,
+        "selected_mean": 0.34867101715441434,
+        "selected_tasks": 10,
+        "task_metrics": {
+          "arc_challenge": 0.2619453924914676,
+          "arc_easy": 0.2441077441077441,
+          "boolq": 0.5055045871559632,
+          "copa": 0.51,
+          "hellaswag": 0.26419040031866164,
+          "openbookqa": 0.276,
+          "piqa": 0.5076169749727966,
+          "sciq": 0.199,
+          "truthfulqa_mc1": 0.22031823745410037,
+          "winogrande": 0.4980268350434096
+        }
+      },
+      "path": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json",
+      "sha256": "46e7097b707eb8b145579eed40eabd6a3707cd73dd6d92a5d5665788fe197804",
+      "size_bytes": 87307748
+    },
+    {
+      "exists": true,
+      "kind": "lm_eval_json",
+      "label": "lm_eval_hidden_mse",
+      "metrics": {
+        "missing": [],
+        "samples": 22382,
+        "selected_mean": 0.464808593509838,
+        "selected_tasks": 10,
+        "task_metrics": {
+          "arc_challenge": 0.2636518771331058,
+          "arc_easy": 0.4781144781144781,
+          "boolq": 0.5926605504587156,
+          "copa": 0.64,
+          "hellaswag": 0.3623780123481378,
+          "openbookqa": 0.312,
+          "piqa": 0.6218715995647442,
+          "sciq": 0.613,
+          "truthfulqa_mc1": 0.24112607099143207,
+          "winogrande": 0.5232833464877664
+        }
+      },
+      "path": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_qat_ternary.json",
+      "sha256": "34dd9886b1330384d7a77d3f2a3ea9ce14bea6ca6360b4b941addeb0f7913258",
+      "size_bytes": 87323009
+    },
+    {
+      "exists": true,
+      "kind": "lm_eval_json",
+      "label": "lm_eval_kl",
+      "metrics": {
+        "missing": [],
+        "samples": 22382,
+        "selected_mean": 0.48343812779268475,
+        "selected_tasks": 10,
+        "task_metrics": {
+          "arc_challenge": 0.2713310580204778,
+          "arc_easy": 0.4831649831649832,
+          "boolq": 0.5960244648318043,
+          "copa": 0.7,
+          "hellaswag": 0.3777136028679546,
+          "openbookqa": 0.312,
+          "piqa": 0.6371055495103374,
+          "sciq": 0.695,
+          "truthfulqa_mc1": 0.24112607099143207,
+          "winogrande": 0.5209155485398579
+        }
+      },
+      "path": "benchmark_results/lm-eval-qwen15b-klonly-full10/qwen15b_qat_ternary.json",
+      "sha256": "602e3c07c7929c6bc43561ea72604c800ed26ff354bd552e11f19912fbbce217",
+      "size_bytes": 87321092
+    },
+    {
+      "exists": true,
+      "kind": "lm_eval_json",
+      "label": "lm_eval_kl_dense_head",
+      "metrics": {
+        "missing": [],
+        "samples": 22382,
+        "selected_mean": 0.484378450609269,
+        "selected_tasks": 10,
+        "task_metrics": {
+          "arc_challenge": 0.2636518771331058,
+          "arc_easy": 0.5008417508417509,
+          "boolq": 0.5972477064220183,
+          "copa": 0.68,
+          "hellaswag": 0.39075881298546106,
+          "openbookqa": 0.308,
+          "piqa": 0.6474428726877041,
+          "sciq": 0.7,
+          "truthfulqa_mc1": 0.23255813953488372,
+          "winogrande": 0.5232833464877664
+        }
+      },
+      "path": "benchmark_results/lm-eval-qwen15b-klonly-notiehead-full10/qwen15b_qat_ternary.json",
+      "sha256": "7ea31be6cee468a6b0d516841fc440b7fd99f1805c85c4d1662cdad04aad2c0a",
+      "size_bytes": 87322204
+    },
+    {
+      "exists": true,
+      "kind": "lm_eval_json",
+      "label": "lm_eval_row_dense_head",
+      "metrics": {
+        "missing": [],
+        "samples": 22382,
+        "selected_mean": 0.49945920048238823,
+        "selected_tasks": 10,
+        "task_metrics": {
+          "arc_challenge": 0.2721843003412969,
+          "arc_easy": 0.5176767676767676,
+          "boolq": 0.6051987767584098,
+          "copa": 0.69,
+          "hellaswag": 0.41216889065923124,
+          "openbookqa": 0.316,
+          "piqa": 0.6501632208922742,
+          "sciq": 0.733,
+          "truthfulqa_mc1": 0.2607099143206854,
+          "winogrande": 0.5374901341752171
+        }
+      },
+      "path": "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/qwen15b_qat_ternary.json",
+      "sha256": "50cda719e02af1824b041667ecdde0dbccd999a53d8aaa08cbe88e9af4553a5b",
+      "size_bytes": 87327355
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "gguf_kl_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 5.465147,
+            "file_mib": 2950.3500366210938,
+            "kind": "fp_reference",
+            "name": "qwen15b_fp_f16",
+            "ppl": 12.2806,
+            "prefill_tok_s": 104.228432
+          },
+          {
+            "decode_tok_s": 10.025032,
+            "file_mib": 1570.2914428710938,
+            "kind": "llama_q8",
+            "name": "qwen15b_fp_q8_0",
+            "ppl": 12.3207,
+            "prefill_tok_s": 134.478184
+          },
+          {
+            "decode_tok_s": 15.726521,
+            "file_mib": 940.3661499023438,
+            "kind": "llama_q4",
+            "name": "qwen15b_fp_q4_k_m",
+            "ppl": 12.8452,
+            "prefill_tok_s": 94.031662
+          },
+          {
+            "decode_tok_s": 18.340734,
+            "file_mib": 773.4867553710938,
+            "kind": "blind_ternary_tq2",
+            "name": "qwen15b_fp_tq2_0",
+            "ppl": 18041439.0235,
+            "prefill_tok_s": 160.656156
+          },
+          {
+            "decode_tok_s": 18.341419,
+            "file_mib": 766.0543823242188,
+            "kind": "blind_bitnet_i2s",
+            "name": "qwen15b_fp_i2_s",
+            "ppl": 1.2061220080732695e+51,
+            "prefill_tok_s": 204.572577
+          },
+          {
+            "decode_tok_s": 5.502428,
+            "file_mib": 3395.4750061035156,
+            "kind": "qat_klonly_static_ternary_materialized",
+            "name": "qwen15b_klonly_static_ternary_f16",
+            "ppl": 55.0971,
+            "prefill_tok_s": 105.341127
+          },
+          {
+            "decode_tok_s": 18.425469,
+            "file_mib": 1218.6117248535156,
+            "kind": "qat_klonly_static_ternary_tq2",
+            "name": "qwen15b_klonly_static_ternary_tq2_0",
+            "ppl": 55.1562,
+            "prefill_tok_s": 160.930157
+          },
+          {
+            "decode_tok_s": 18.595755,
+            "file_mib": 1208.8559875488281,
+            "kind": "qat_klonly_static_ternary_i2s_single_thread_quant",
+            "name": "qwen15b_klonly_static_ternary_i2_s",
+            "ppl": 54.7366,
+            "prefill_tok_s": 205.762345
+          }
+        ],
+        "catastrophic_ppl": [
+          "qwen15b_fp_tq2_0",
+          "qwen15b_fp_i2_s"
+        ],
+        "catastrophic_ppl_threshold": 10000.0,
+        "failed": [],
+        "max_finite_ppl": 1.2061220080732695e+51,
+        "nan_ppl": [],
+        "rows": 8
+      },
+      "path": "benchmark_results/gguf-qwen15b-klonly-suite/summary.json",
+      "sha256": "07a517cd5c679c1de6a9bb7ad20d7f9470513824c0601feb657537741aa75db7",
+      "size_bytes": 9552
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "gguf_dense_head_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 12.458888,
+            "file_mib": 2950.3500366210938,
+            "kind": "fp_reference",
+            "name": "qwen15b_fp_f16",
+            "ppl": 12.2808,
+            "prefill_tok_s": 218.457811
+          },
+          {
+            "decode_tok_s": 23.140297,
+            "file_mib": 1570.2914428710938,
+            "kind": "llama_q8",
+            "name": "qwen15b_fp_q8_0",
+            "ppl": 12.3056,
+            "prefill_tok_s": 215.002867
+          },
+          {
+            "decode_tok_s": 36.500249,
+            "file_mib": 940.3661499023438,
+            "kind": "llama_q4",
+            "name": "qwen15b_fp_q4_k_m",
+            "ppl": 12.8112,
+            "prefill_tok_s": 172.139182
+          },
+          {
+            "decode_tok_s": 12.48046,
+            "file_mib": 3395.4749755859375,
+            "kind": "static_ternary_materialized",
+            "name": "qwen15b_klonly_notie_static_ternary_f16",
+            "ppl": 47.2994,
+            "prefill_tok_s": 222.071824
+          },
+          {
+            "decode_tok_s": 44.027734,
+            "file_mib": 1218.6116943359375,
+            "kind": "static_ternary_tq2",
+            "name": "qwen15b_klonly_notie_static_ternary_tq2_0",
+            "ppl": 47.2823,
+            "prefill_tok_s": 348.884233
+          },
+          {
+            "decode_tok_s": 45.495878,
+            "file_mib": 1208.85595703125,
+            "kind": "static_ternary_i2s_single_thread_quant",
+            "name": "qwen15b_klonly_notie_static_ternary_i2_s",
+            "ppl": 47.3435,
+            "prefill_tok_s": 464.194972
+          }
+        ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
+        "failed": [],
+        "max_finite_ppl": 47.3435,
+        "nan_ppl": [],
+        "rows": 6
+      },
+      "path": "benchmark_results/gguf-qwen15b-klonly-notiehead-suite/summary.json",
+      "sha256": "bd4f50ffc310aabb51000bfa6e9635fb0a4625bc2723fa700bd715790e194ce7",
+      "size_bytes": 7291
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "gguf_row_dense_head_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 11.991453,
+            "file_mib": 2950.3500366210938,
+            "kind": "fp_reference",
+            "name": "qwen15b_fp_f16",
+            "ppl": 12.2808,
+            "prefill_tok_s": 219.268759
+          },
+          {
+            "decode_tok_s": 22.505303,
+            "file_mib": 1570.2914428710938,
+            "kind": "llama_q8",
+            "name": "qwen15b_fp_q8_0",
+            "ppl": 12.3056,
+            "prefill_tok_s": 214.694915
+          },
+          {
+            "decode_tok_s": 36.817521,
+            "file_mib": 940.3661499023438,
+            "kind": "llama_q4",
+            "name": "qwen15b_fp_q4_k_m",
+            "ppl": 12.8112,
+            "prefill_tok_s": 172.365585
+          },
+          {
+            "decode_tok_s": 12.49159,
+            "file_mib": 3395.4749755859375,
+            "kind": "static_ternary_materialized",
+            "name": "qwen15b_klonly_row_notie_static_ternary_f16",
+            "ppl": 38.8651,
+            "prefill_tok_s": 221.638224
+          },
+          {
+            "decode_tok_s": 44.851688,
+            "file_mib": 1218.6116943359375,
+            "kind": "static_ternary_tq2",
+            "name": "qwen15b_klonly_row_notie_static_ternary_tq2_0",
+            "ppl": 38.8224,
+            "prefill_tok_s": 345.322143
+          },
+          {
+            "decode_tok_s": 46.13062,
+            "file_mib": 1208.85595703125,
+            "kind": "static_ternary_i2s_single_thread_quant",
+            "name": "qwen15b_klonly_row_notie_static_ternary_i2_s",
+            "ppl": 1197135.5848,
+            "prefill_tok_s": 465.341117
+          }
+        ],
+        "catastrophic_ppl": [
+          "qwen15b_klonly_row_notie_static_ternary_i2_s"
+        ],
+        "catastrophic_ppl_threshold": 10000.0,
+        "failed": [],
+        "max_finite_ppl": 1197135.5848,
+        "nan_ppl": [],
+        "rows": 6
+      },
+      "path": "benchmark_results/gguf-qwen15b-klonly-row-notiehead-suite/summary.json",
+      "sha256": "228c6502be565b69d5061e90b3512bdb613f1f1de09cfa05fcbd4b8fb938f108",
+      "size_bytes": 7297
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "gguf_row_i2s_heapfix",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 18.973629,
+            "file_mib": 1211.31689453125,
+            "kind": "static_ternary_i2s_row_scale_prototype_heap_tmp_fix",
+            "name": "qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale",
+            "ppl": 38.8832,
+            "prefill_tok_s": 218.172685
+          }
+        ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
+        "failed": [],
+        "max_finite_ppl": 38.8832,
+        "nan_ppl": [],
+        "rows": 1
+      },
+      "path": "benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json",
+      "sha256": "734fa7c103f1979cd3c41d0c31fef65122eb57fe867ef3a2bfd52bf3c5bfd292",
+      "size_bytes": 1647
+    },
+    {
+      "exists": true,
+      "kind": "thread_scaling_json",
+      "label": "gguf_row_i2s_thread_scaling",
+      "metrics": {
+        "max_decode_tok_s": 19.494095,
+        "max_prefill_tok_s": 245.313922,
+        "rows": 7,
+        "threads": [
+          1,
+          2,
+          4,
+          8,
+          12,
+          16,
+          24
+        ]
+      },
+      "path": "benchmark_results/i2s-row-scale-thread-scaling-fixed-2026-05-05/summary.json",
+      "sha256": "0396f5c951bdead7121a109f861b2682d2216ac086a7dec5ea876bc9fe3b01e8",
+      "size_bytes": 2296
+    },
+    {
+      "exists": true,
+      "kind": "gguf_memory_json",
+      "label": "gguf_context_rss",
+      "metrics": {
+        "contexts": [
+          512,
+          2048,
+          8192,
+          32768
+        ],
+        "rows": 24
+      },
+      "path": "benchmark_results/gguf-rss-qwen15b-context-scaling-2026-05-05/summary.json",
+      "sha256": "fd135b202cfdc42036221a9a99b76fa6b8046f45cf0726df178bb1d432bfbcef",
+      "size_bytes": 9911
+    },
+    {
+      "exists": true,
+      "kind": "gguf_memory_json",
+      "label": "i2sr_x86act_rss",
+      "metrics": {
+        "contexts": [
+          512,
+          2048,
+          8192,
+          32768
+        ],
+        "rows": 4
+      },
+      "path": "benchmark_results/gguf-rss-qwen15b-i2sr-x86act-context-2026-05-13/summary.json",
+      "sha256": "0ff7563901fb8b9e0568d322bec965bf256b8223397a786c4bacfc67cd7f25b9",
+      "size_bytes": 2331
+    },
+    {
+      "exists": true,
+      "kind": "direct_gguf_json",
+      "label": "direct_gguf_tiny",
+      "metrics": {
+        "architecture": "LlamaForCausalLM",
+        "copied_tensors": 4,
+        "gguf_reader_returncode": 0,
+        "gguf_reader_tensors": 12,
+        "outfile_size_bytes": 25357088,
+        "output_tensors": 12,
+        "outtype": "f16",
+        "smoke_returncode": null,
+        "ternary_materialized": 8
+      },
+      "path": "benchmark_results/direct-gguf-tiny-2026-05-13/summary.json",
+      "sha256": "a01c51bbb398944383d3ef2c8eb8201c48f1d47bb137a2a7c35161118873d28a",
+      "size_bytes": 1972
+    },
+    {
+      "exists": true,
+      "kind": "direct_gguf_json",
+      "label": "direct_gguf_qwen05b",
+      "metrics": {
+        "architecture": "Qwen2ForCausalLM",
+        "copied_tensors": 123,
+        "gguf_reader_returncode": 0,
+        "gguf_reader_tensors": 291,
+        "outfile_size_bytes": 1266423040,
+        "output_tensors": 291,
+        "outtype": "f16",
+        "smoke_returncode": 0,
+        "ternary_materialized": 168
+      },
+      "path": "benchmark_results/direct-gguf-qwen05b-klonly-notie-2026-05-13/summary.json",
+      "sha256": "fb82f94beb5754b9e385d1bc1fadcc2755924887c8b40584eeace8d9b9f44998",
+      "size_bytes": 2546
+    },
+    {
+      "exists": true,
+      "kind": "direct_i2s_json",
+      "label": "direct_i2s_tiny",
+      "metrics": {
+        "architecture": "LlamaForCausalLM",
+        "copied_tensors": 4,
+        "has_native_gguf_python_constants": false,
+        "has_native_i2s_gguf_python_constants": null,
+        "has_native_i2sr_gguf_python_constants": null,
+        "i2_sr_dtype": null,
+        "mostly_i2_sr_file_type": null,
+        "outfile_size_bytes": 25339392,
+        "output_f16_tensors": 1,
+        "output_tensors": 12,
+        "row_scale_i2s_packed": 0,
+        "row_scale_prototype": false,
+        "row_scale_qtype": null,
+        "row_scale_rejected": 0,
+        "ternary_i2s_packed": 7
+      },
+      "path": "benchmark_results/direct-i2s-tiny-2026-05-13/selfcontained_summary.json",
+      "sha256": "496c4a2bac8d54913ec5bf8571de7b43675a7d3efb4674533c90408077154dee",
+      "size_bytes": 1087
+    },
+    {
+      "exists": true,
+      "kind": "direct_i2s_json",
+      "label": "direct_i2s_qwen05b_rowgroup_conversion",
+      "metrics": {
+        "architecture": "Qwen2ForCausalLM",
+        "copied_tensors": 122,
+        "has_native_gguf_python_constants": false,
+        "has_native_i2s_gguf_python_constants": null,
+        "has_native_i2sr_gguf_python_constants": null,
+        "i2_sr_dtype": null,
+        "mostly_i2_sr_file_type": null,
+        "outfile_size_bytes": 640231936,
+        "output_f16_tensors": 1,
+        "output_tensors": 291,
+        "row_scale_i2s_packed": 0,
+        "row_scale_prototype": false,
+        "row_scale_qtype": null,
+        "row_scale_rejected": 0,
+        "ternary_i2s_packed": 168
+      },
+      "path": "benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/conversion_summary.json",
+      "sha256": "deecbf0d1031eb5dd6146a85126cf79c87cff3dd06521e64d3cf9d64b0b8ff7e",
+      "size_bytes": 1146
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "direct_i2s_qwen05b_rowgroup_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 16.296986,
+            "file_mib": 948.098876953125,
+            "kind": "fp16-baseline",
+            "name": "qwen05b_fp_f16",
+            "ppl": 18.0984,
+            "prefill_tok_s": 331.419753
+          },
+          {
+            "decode_tok_s": 37.302017,
+            "file_mib": 610.57275390625,
+            "kind": "direct-scalar-i2s",
+            "name": "qwen05b_klonly_direct_i2_s",
+            "ppl": "NaN",
+            "prefill_tok_s": 523.685215
+          }
+        ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
+        "failed": [],
+        "max_finite_ppl": 18.0984,
+        "nan_ppl": [
+          "qwen05b_klonly_direct_i2_s"
+        ],
+        "rows": 2
+      },
+      "path": "benchmark_results/direct-i2s-qwen05b-klonly-2026-05-13/summary.json",
+      "sha256": "d6451c122755b39b3f80b49d1252a915ba4dd4dfd2305a7a931ccb6f1d852950",
+      "size_bytes": 2559
+    },
+    {
+      "exists": true,
+      "kind": "direct_i2s_json",
+      "label": "direct_i2s_qwen05b_x86act_conversion",
+      "metrics": {
+        "architecture": "Qwen2ForCausalLM",
+        "copied_tensors": 122,
+        "has_native_gguf_python_constants": null,
+        "has_native_i2s_gguf_python_constants": false,
+        "has_native_i2sr_gguf_python_constants": false,
+        "i2_sr_dtype": 40,
+        "mostly_i2_sr_file_type": 41,
+        "outfile_size_bytes": 640231936,
+        "output_f16_tensors": 1,
+        "output_tensors": 291,
+        "row_scale_i2s_packed": 0,
+        "row_scale_prototype": false,
+        "row_scale_qtype": null,
+        "row_scale_rejected": 0,
+        "ternary_i2s_packed": 168
+      },
+      "path": "benchmark_results/direct-i2s-qwen05b-klonly-x86act-2026-05-13/conversion_summary.json",
+      "sha256": "d465fe463870cd3400a01f5494685c874034d1ddf2628a355af282c37e22000f",
+      "size_bytes": 1434
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "direct_i2s_qwen05b_x86act_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 16.677618,
+            "file_mib": 948.098876953125,
+            "kind": "fp16_baseline",
+            "name": "qwen05b_fp_f16",
+            "ppl": 18.0986,
+            "prefill_tok_s": 367.954946
+          },
+          {
+            "decode_tok_s": 40.04494,
+            "file_mib": 610.57275390625,
+            "kind": "direct_scalar_i2s_x86_act_pack",
+            "name": "qwen05b_klonly_direct_i2_s_x86act",
+            "ppl": 423.4528,
+            "prefill_tok_s": 540.972199
+          }
+        ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
+        "failed": [],
+        "max_finite_ppl": 423.4528,
+        "nan_ppl": [],
+        "rows": 2
+      },
+      "path": "benchmark_results/direct-i2s-qwen05b-klonly-x86act-2026-05-13/summary.json",
+      "sha256": "bb63cf2ca6d6422d2bacea6255f19944a667aaac0a99a880ab9eb0396df77f3b",
+      "size_bytes": 2688
+    },
+    {
+      "exists": true,
+      "kind": "direct_i2s_json",
+      "label": "direct_row_i2s_qwen05b_conversion",
+      "metrics": {
+        "architecture": "Qwen2ForCausalLM",
+        "copied_tensors": 122,
+        "has_native_gguf_python_constants": false,
+        "has_native_i2s_gguf_python_constants": null,
+        "has_native_i2sr_gguf_python_constants": null,
+        "i2_sr_dtype": null,
+        "mostly_i2_sr_file_type": null,
+        "outfile_size_bytes": 641448448,
+        "output_f16_tensors": 1,
+        "output_tensors": 291,
+        "row_scale_i2s_packed": 168,
+        "row_scale_prototype": true,
+        "row_scale_qtype": null,
+        "row_scale_rejected": 0,
+        "ternary_i2s_packed": 168
+      },
+      "path": "benchmark_results/direct-row-i2s-qwen05b-2026-05-13/conversion_summary.json",
+      "sha256": "a7ee2b556bc3867a31381b3a83f2057f884ba3ab7eb830374b4850506df0ba0c",
+      "size_bytes": 1157
+    },
+    {
+      "exists": true,
+      "kind": "direct_i2s_json",
+      "label": "i2sr_writer_smoke_qwen05b",
+      "metrics": {
+        "architecture": "Qwen2ForCausalLM",
+        "copied_tensors": 122,
+        "has_native_gguf_python_constants": null,
+        "has_native_i2s_gguf_python_constants": false,
+        "has_native_i2sr_gguf_python_constants": false,
+        "i2_sr_dtype": 40,
+        "mostly_i2_sr_file_type": 41,
+        "outfile_size_bytes": 641448448,
+        "output_f16_tensors": 1,
+        "output_tensors": 291,
+        "row_scale_i2s_packed": 168,
+        "row_scale_prototype": false,
+        "row_scale_qtype": "i2_sr",
+        "row_scale_rejected": 0,
+        "ternary_i2s_packed": 168
+      },
+      "path": "benchmark_results/i2sr-writer-smoke-2026-05-13/summary.json",
+      "sha256": "42f8bed864e76f5594d3fdc10426a507a1f813f15ac127f41814d91ae6f3516a",
+      "size_bytes": 1421
+    },
+    {
+      "exists": true,
+      "kind": "direct_i2s_json",
+      "label": "i2sr_row_scale_qwen15b_conversion",
+      "metrics": {
+        "architecture": "Qwen2ForCausalLM",
+        "copied_tensors": 143,
+        "has_native_gguf_python_constants": null,
+        "has_native_i2s_gguf_python_constants": true,
+        "has_native_i2sr_gguf_python_constants": true,
+        "i2_sr_dtype": 40,
+        "mostly_i2_sr_file_type": 41,
+        "outfile_size_bytes": 1270157888,
+        "output_f16_tensors": 0,
+        "output_tensors": 339,
+        "row_scale_i2s_packed": 196,
+        "row_scale_prototype": false,
+        "row_scale_qtype": "i2_sr",
+        "row_scale_rejected": 0,
+        "ternary_i2s_packed": 196
+      },
+      "path": "benchmark_results/i2sr-row-scale-qwen15b-convert-2026-05-13/summary.json",
+      "sha256": "a2b6641a4a553293cae88ada3156c185db91b7334b9756064d16b0885ad335e9",
+      "size_bytes": 1495
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "i2sr_row_scale_qwen15b_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 19.009282,
+            "file_mib": 1211.3169555664062,
+            "kind": "static_ternary_i2sr_row_scale_candidate",
+            "name": "qwen15b_klonly_row_notie_static_ternary_i2_sr",
+            "ppl": 20074699.9423,
+            "prefill_tok_s": 212.095876
+          }
+        ],
+        "catastrophic_ppl": [
+          "qwen15b_klonly_row_notie_static_ternary_i2_sr"
+        ],
+        "catastrophic_ppl_threshold": 10000.0,
+        "failed": [],
+        "max_finite_ppl": 20074699.9423,
+        "nan_ppl": [],
+        "rows": 1
+      },
+      "path": "benchmark_results/i2sr-row-scale-qwen15b-suite-2026-05-13/summary.json",
+      "sha256": "d31d7de92fa12494e7c5afe513347bd9f5bca92a5dc4620f9e3ca223bc2311b6",
+      "size_bytes": 1670
+    },
+    {
+      "exists": true,
+      "kind": "direct_i2s_json",
+      "label": "i2sr_x86act_qwen15b_conversion",
+      "metrics": {
+        "architecture": "Qwen2ForCausalLM",
+        "copied_tensors": 143,
+        "has_native_gguf_python_constants": null,
+        "has_native_i2s_gguf_python_constants": true,
+        "has_native_i2sr_gguf_python_constants": true,
+        "i2_sr_dtype": 40,
+        "mostly_i2_sr_file_type": 41,
+        "outfile_size_bytes": 1270157888,
+        "output_f16_tensors": 0,
+        "output_tensors": 339,
+        "row_scale_i2s_packed": 196,
+        "row_scale_prototype": false,
+        "row_scale_qtype": "i2_sr",
+        "row_scale_rejected": 0,
+        "ternary_i2s_packed": 196
+      },
+      "path": "benchmark_results/i2sr-row-scale-qwen15b-x86act-convert-2026-05-13/summary.json",
+      "sha256": "81195fb04a42dbbb22daf8b12d9f84ef84ce534f379bd6b78b1bf016a0e8908b",
+      "size_bytes": 1502
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "i2sr_x86act_qwen15b_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 19.065496,
+            "file_mib": 1211.3169555664062,
+            "kind": "static_ternary_i2sr_row_scale_candidate_x86_act_pack",
+            "name": "qwen15b_klonly_row_notie_static_ternary_i2_sr_x86act",
+            "ppl": 38.8477,
+            "prefill_tok_s": 211.668328
+          }
+        ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
+        "failed": [],
+        "max_finite_ppl": 38.8477,
+        "nan_ppl": [],
+        "rows": 1
+      },
+      "path": "benchmark_results/i2sr-row-scale-qwen15b-x86act-suite-2026-05-13/summary.json",
+      "sha256": "a12b1ca591a860cc632a97ec8a43af9d0bcb0c48e0cc964586f1963d8f73d69e",
+      "size_bytes": 1688
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "direct_row_i2s_qwen05b_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 16.609699,
+            "file_mib": 948.098876953125,
+            "kind": "fp16-baseline",
+            "name": "qwen05b_fp_f16",
+            "ppl": 18.0986,
+            "prefill_tok_s": 365.735135
+          },
+          {
+            "decode_tok_s": 39.556297,
+            "file_mib": 611.73291015625,
+            "kind": "direct-row-i2s-prototype",
+            "name": "qwen05b_row_direct_i2_s_prototype",
+            "ppl": 59401.5449,
+            "prefill_tok_s": 544.865326
+          }
+        ],
+        "catastrophic_ppl": [
+          "qwen05b_row_direct_i2_s_prototype"
+        ],
+        "catastrophic_ppl_threshold": 10000.0,
+        "failed": [],
+        "max_finite_ppl": 59401.5449,
+        "nan_ppl": [],
+        "rows": 2
+      },
+      "path": "benchmark_results/direct-row-i2s-qwen05b-portable-2026-05-13/summary.json",
+      "sha256": "ebdafab23882aae87929970077951cfac915c11d58f911d985e9b6be4d464550",
+      "size_bytes": 2637
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "row_f16_qwen05b_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 16.610504,
+            "file_mib": 948.098876953125,
+            "kind": "fp16-baseline",
+            "name": "qwen05b_fp_f16",
+            "ppl": 18.0986,
+            "prefill_tok_s": 365.320107
+          },
+          {
+            "decode_tok_s": 16.457316,
+            "file_mib": 1207.7550659179688,
+            "kind": "materialized-row-f16",
+            "name": "qwen05b_row_materialized_f16",
+            "ppl": 578.4833,
+            "prefill_tok_s": 367.597655
+          }
+        ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
+        "failed": [],
+        "max_finite_ppl": 578.4833,
+        "nan_ppl": [],
+        "rows": 2
+      },
+      "path": "benchmark_results/row-f16-qwen05b-2026-05-13/summary.json",
+      "sha256": "cc45835930427167a37752cbecff9f7d448c4e63dbb4d6b13f0faafb780e42f3",
+      "size_bytes": 2575
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "row_i2s_quantized_qwen05b_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 16.627707,
+            "file_mib": 948.098876953125,
+            "kind": "fp16-baseline",
+            "name": "qwen05b_fp_f16",
+            "ppl": 18.0986,
+            "prefill_tok_s": 365.557662
+          },
+          {
+            "decode_tok_s": 56.470084,
+            "file_mib": 490.63348388671875,
+            "kind": "materialized-row-i2s-quantized",
+            "name": "qwen05b_row_materialized_i2_s_quantized",
+            "ppl": "NaN",
+            "prefill_tok_s": 548.130546
+          }
+        ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
+        "failed": [],
+        "max_finite_ppl": 18.0986,
+        "nan_ppl": [
+          "qwen05b_row_materialized_i2_s_quantized"
+        ],
+        "rows": 2
+      },
+      "path": "benchmark_results/quantized-row-i2s-qwen05b-2026-05-13/summary.json",
+      "sha256": "23b71114cdaee41d839ec2d1b2e31b45b1e81c82b649e23061cba6954affe0cf",
+      "size_bytes": 2645
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "row_tq2_qwen05b_suite",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 16.483184,
+            "file_mib": 948.098876953125,
+            "kind": "fp16-baseline",
+            "name": "qwen05b_fp_f16",
+            "ppl": 18.0986,
+            "prefill_tok_s": 365.162742
+          },
+          {
+            "decode_tok_s": 57.922909,
+            "file_mib": 491.51971435546875,
+            "kind": "materialized-row-tq2_0",
+            "name": "qwen05b_row_materialized_tq2_0_t1",
+            "ppl": 5118527.5782,
+            "prefill_tok_s": 430.517012
+          }
+        ],
+        "catastrophic_ppl": [
+          "qwen05b_row_materialized_tq2_0_t1"
+        ],
+        "catastrophic_ppl_threshold": 10000.0,
+        "failed": [],
+        "max_finite_ppl": 5118527.5782,
+        "nan_ppl": [],
+        "rows": 2
+      },
+      "path": "benchmark_results/row-tq2-qwen05b-2026-05-13/summary.json",
+      "sha256": "d3005c427d44807b3bd0d1d52cf7ef03522a5fa3be5a1b604d1fd9d391d59139",
+      "size_bytes": 2667
+    },
+    {
+      "exists": true,
+      "kind": "direct_packed_support_json",
+      "label": "direct_packed_gguf_support_json",
+      "metrics": {
+        "direct_dense_gguf_supported": true,
+        "direct_packed_i2s_supported": true,
+        "product_safe_row_scale_packed_supported": true,
+        "py_gguf_has_i2s_quant_type": true,
+        "requires_stable_row_scale_type_or_version": false
+      },
+      "path": "benchmark_results/direct_packed_gguf_support_2026-05-13.json",
+      "sha256": "995eab70b2070b3db20f01cbea883718b38405d832654a3ade1172b90f8b5762",
+      "size_bytes": 3199
+    },
+    {
+      "exists": true,
+      "kind": "tl2_shape_json",
+      "label": "tl2_shape_json",
+      "metrics": {
+        "builds": [
+          {
+            "bitnet_x86_tl2": "OFF",
+            "cache": "build/CMakeCache.txt"
+          },
+          {
+            "bitnet_x86_tl2": "OFF",
+            "cache": "build-portable-avx2/CMakeCache.txt"
+          },
+          {
+            "bitnet_x86_tl2": "ON",
+            "cache": "build-qwen05b-tl2/CMakeCache.txt"
+          }
+        ],
+        "models": [
+          {
+            "eligible_tensors": 168,
+            "label": "qwen2.5-0.5b",
+            "unique_shapes": 4
+          },
+          {
+            "eligible_tensors": 196,
+            "label": "qwen2.5-1.5b",
+            "unique_shapes": 4
+          }
+        ]
+      },
+      "path": "benchmark_results/tl2_shape_support_audit_2026-05-05.json",
+      "sha256": "a99430f0f4b0426468ab030b4629933645090523769c489dfb18ecfde657af78",
+      "size_bytes": 12054
+    },
+    {
+      "exists": true,
+      "kind": "tl2_scale_json",
+      "label": "tl2_scale_json",
+      "metrics": {
+        "results": [
+          {
+            "label": "qwen15b_tensor_scale",
+            "max_tensor_relative_fro_error": 0.0,
+            "row_scale_tensors": 0,
+            "scalar_scale_tensors": 196,
+            "tensors": 196,
+            "total_relative_fro_error_if_one_scale": 0.0
+          },
+          {
+            "label": "qwen15b_row_scale",
+            "max_tensor_relative_fro_error": 8.196454939866694,
+            "row_scale_tensors": 196,
+            "scalar_scale_tensors": 0,
+            "tensors": 196,
+            "total_relative_fro_error_if_one_scale": 1.9042302114103853
+          }
+        ]
+      },
+      "path": "benchmark_results/tl2_scale_semantics_2026-05-05.json",
+      "sha256": "bf2d36674b725708d1978cb5e1d59c4b0db73120a67577c7c7ab8649e05966df",
+      "size_bytes": 14344
+    },
+    {
+      "exists": true,
+      "kind": "tl2_row_scale_design_json",
+      "label": "tl2_row_scale_design_json",
+      "metrics": {
+        "results": [
+          {
+            "current_tl2_error": 0.0,
+            "group32_fp16_error": 0.00017500793684525103,
+            "label": "qwen15b_tensor_scale",
+            "row_fp16_error": 0.00017500793684525103,
+            "row_fp16_scale_mib": 1.520263671875,
+            "row_scale_tensors": 0,
+            "tensors": 197
+          },
+          {
+            "current_tl2_error": 1.9042302114103853,
+            "group32_fp16_error": 0.1428438042225288,
+            "label": "qwen15b_row_scale",
+            "row_fp16_error": 0.00019744640689756221,
+            "row_fp16_scale_mib": 1.23046875,
+            "row_scale_tensors": 196,
+            "tensors": 196
+          }
+        ]
+      },
+      "path": "benchmark_results/tl2_row_scale_design_2026-05-13.json",
+      "sha256": "0fd577484ee85a5e0b6799bc02def75c073d839dd07e33357d4f1ad24d04af79",
+      "size_bytes": 29878
+    },
+    {
+      "exists": true,
+      "kind": "tl2_row_scale_runtime_contract_json",
+      "label": "tl2_row_scale_runtime_contract_json",
+      "metrics": {
+        "checks": 8,
+        "current_tl2_tensor_max_error": 1.9042302114103853,
+        "failed": [
+          "Existing TL2 one-scale error is below product threshold",
+          "TL2 converter accepts learned row/group scale metadata",
+          "TL2 converter no longer recomputes one scalar max scale",
+          "ggml TL2 storage accounts for row/group-scale sidecar",
+          "TL2 transform metadata is row/group-scale aware",
+          "Row-scale TL2 has quality and speed benchmark evidence"
+        ],
+        "ready": false,
+        "row_fp16_error": 0.00019744640689756221,
+        "row_fp16_scale_mib": 1.23046875,
+        "row_scale_tl2_finite_quality_rows": 0,
+        "row_scale_tl2_rows": 0
+      },
+      "path": "benchmark_results/tl2_row_scale_runtime_contract_2026-05-15.json",
+      "sha256": "2d74c1c991b7073777274f5effc2f91f7b016cf9efbe80c07073e8d865f8399d",
+      "size_bytes": 4791
+    },
+    {
+      "exists": true,
+      "kind": "i2s_format_json",
+      "label": "i2s_row_scale_format_json",
+      "metrics": {
+        "current_patch_is_product_format_safe": false,
+        "default_i2s_to_tq2_ppl_ratio": 30836.207570886912,
+        "direct_ternary_gguf_writer_still_required": true,
+        "prototype_i2s_to_tq2_ppl_ratio": 1.0015661061655128,
+        "row_scale_i2s_physically_possible": true,
+        "stable_new_format_required": true
+      },
+      "path": "benchmark_results/i2s_row_scale_format_audit_2026-05-13.json",
+      "sha256": "e17297539b9d50082fb6fee89bf5744517b521ffb342135900935eedf3eeb23f",
+      "size_bytes": 1528
+    },
+    {
+      "exists": true,
+      "kind": "row_scale_qtype_gate_json",
+      "label": "row_scale_qtype_productization_gate_json",
+      "metrics": {
+        "default_ratio": 30836.207570886912,
+        "direct_writer_emits_stable_qtype": true,
+        "failed": [],
+        "gates": 9,
+        "has_ggml_stable_qtype": true,
+        "has_llama_stable_ftype": true,
+        "packing_verification_checked_tensors": 5,
+        "packing_verification_passed": true,
+        "passed": true,
+        "prototype_ratio": 1.0015661061655128,
+        "stable_benchmark_max_ppl": 38.8477,
+        "stable_benchmark_present": true,
+        "stable_benchmark_quality_ok": true
+      },
+      "path": "benchmark_results/row_scale_qtype_productization_gate_2026-05-13.json",
+      "sha256": "87f2e567d27c73bf8041d7fc4bdca97975bd6608ae805c47401fbebfe007f820",
+      "size_bytes": 3610
+    },
+    {
+      "exists": true,
+      "kind": "row_scale_qtype_gate_json",
+      "label": "row_scale_qtype_i2sr_active_patch_gate_json",
+      "metrics": {
+        "default_ratio": 30836.207570886912,
+        "direct_writer_emits_stable_qtype": true,
+        "failed": [],
+        "gates": 9,
+        "has_ggml_stable_qtype": true,
+        "has_llama_stable_ftype": true,
+        "packing_verification_checked_tensors": 5,
+        "packing_verification_passed": true,
+        "passed": true,
+        "prototype_ratio": 1.0015661061655128,
+        "stable_benchmark_max_ppl": 38.8477,
+        "stable_benchmark_present": true,
+        "stable_benchmark_quality_ok": true
+      },
+      "path": "benchmark_results/row_scale_qtype_productization_gate_i2sr_active_patch_2026-05-13.json",
+      "sha256": "cb42720567a11cde149d930264220bd9f90de58acbed8a7037b163c9adb51928",
+      "size_bytes": 3616
+    },
+    {
+      "exists": true,
+      "kind": "row_scale_qtype_gate_json",
+      "label": "row_scale_qtype_i2sr_promotion_rehearsal_json",
+      "metrics": {
+        "default_ratio": 30836.207570886912,
+        "direct_writer_emits_stable_qtype": true,
+        "failed": [],
+        "gates": 9,
+        "has_ggml_stable_qtype": true,
+        "has_llama_stable_ftype": true,
+        "packing_verification_checked_tensors": 5,
+        "packing_verification_passed": true,
+        "passed": true,
+        "prototype_ratio": 1.0015661061655128,
+        "stable_benchmark_max_ppl": 38.8477,
+        "stable_benchmark_present": true,
+        "stable_benchmark_quality_ok": true
+      },
+      "path": "benchmark_results/row_scale_qtype_productization_gate_i2sr_promotion_rehearsal_2026-05-13.json",
+      "sha256": "6ffc161b446b0c2eeb764a907ef60b1b759539e121258f7928a90e1b87017040",
+      "size_bytes": 3897
+    },
+    {
+      "exists": true,
+      "kind": "i2sr_promotion_handoff_json",
+      "label": "i2sr_promotion_handoff_json",
+      "metrics": {
+        "blockers": [],
+        "candidate_fork_reachable": true,
+        "ready_for_handoff": true,
+        "root_clean": true,
+        "root_patch_applies": true,
+        "submodule_clean": true,
+        "submodule_patch_applies": true
+      },
+      "path": "benchmark_results/i2sr_promotion_handoff_2026-05-13.json",
+      "sha256": "cf5aa0d11481b4ff8c6dade4ccc1562a64766da2416387b8070b53168ebe9db5",
+      "size_bytes": 4901
+    },
+    {
+      "exists": true,
+      "kind": "packing_verify_json",
+      "label": "i2s_packing_layout_verify_json",
+      "metrics": {
+        "checked_tensors": 5,
+        "passed": true,
+        "passed_tensors": 5
+      },
+      "path": "benchmark_results/i2s-packing-layout-verify-2026-05-13/summary.json",
+      "sha256": "88fee552ba2ebc123fc8063f3b1ab94f67acbeadc29b90df5c7d0abe23bcc7c3",
+      "size_bytes": 3409
+    },
+    {
+      "exists": true,
+      "kind": "benchmark_coverage_gate_json",
+      "label": "benchmark_coverage_gate_json",
+      "metrics": {
+        "check_count": 36,
+        "failed": [],
+        "passed": true
+      },
+      "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
+      "sha256": "4c3bad0edfca65f9968f4e608654cbb7fc4ad94dd0c9b8bbcce4e5e1af5c5b59",
+      "size_bytes": 6103
+    },
+    {
+      "exists": true,
+      "kind": "objective_completion_audit_json",
+      "label": "objective_completion_audit_json",
+      "metrics": {
+        "check_count": 9,
+        "complete_count": 7,
+        "completion_status": "not_complete",
+        "objective_achieved": false,
+        "partial_or_missing": [
+          "Convert repaired checkpoints into GGUF/TL2/I2_S and run actual bitnet.cpp/llama.cpp CPU inference",
+          "Evaluate MoE/Kimi feasibility including converter mapping, router/expert execution, quality, throughput, and locality"
+        ]
+      },
+      "path": "benchmark_results/objective_completion_audit_2026-05-15.json",
+      "sha256": "40f642b567e7cdca6542a998e77550d4d789498df454b50206cd917c5710315b",
+      "size_bytes": 15953
+    },
+    {
+      "exists": true,
+      "kind": "product_scope_gate_json",
+      "label": "product_scope_gate_json",
+      "metrics": {
+        "publishable_angle": "negative arbitrary-retrofit result plus dense-Qwen row-scale recovery path, with BitDistill reproduction and I2_SR row-scale extensions gated separately",
+        "scope_status": "research_mvp_only",
+        "supported_claim_count": 4,
+        "unsupported_claim_count": 5
+      },
+      "path": "benchmark_results/product_scope_gate_2026-05-15.json",
+      "sha256": "c421003852a46d3753788064338a7e1866f003bcdb775cbb2e0c0309d559d36c",
+      "size_bytes": 5771
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_reproduction_gate_json",
+      "label": "bitdistill_reproduction_gate_json",
+      "metrics": {
+        "confidence_level": 0.95,
+        "max_fp_gap": 0.01,
+        "paper_style_tensor_complete": false,
+        "paper_style_tensor_passed": false,
+        "present_rows": 13,
+        "present_with_accuracy_ci95": 13,
+        "present_with_examples": 13,
+        "present_with_full_eval": 13,
+        "row_scale_complete": false,
+        "row_scale_passed": false,
+        "rows": 36,
+        "tasks": [
+          "mnli",
+          "qnli",
+          "sst2"
+        ]
+      },
+      "path": "benchmark_results/bitdistill_reproduction_gate_2026-05-15.json",
+      "sha256": "8e582d1355a8c89990a70531027df0a6eaa2869407eca40b8424f191a946a154",
+      "size_bytes": 26085
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_paired_predictions_json",
+      "label": "bitdistill_paired_predictions_json",
+      "metrics": {
+        "complete": 3,
+        "failed": 0,
+        "pending": 36,
+        "rows": 39,
+        "status": "pending"
+      },
+      "path": "benchmark_results/bitdistill_paired_predictions_2026-05-15.json",
+      "sha256": "b36f73fea34cf0aa606c5e011443ec6620d0183c38004f239b401793c7427854",
+      "size_bytes": 71373
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_task_formulation_json",
+      "label": "bitdistill_task_formulation_json",
+      "metrics": {
+        "causal_rows_materialized": 11,
+        "paper_anchor_source": "BitDistill paper excerpt, Table 3 Qwen2.5-0.5B MNLI row.",
+        "pending_paper_candidates": 9,
+        "rows": 39,
+        "sequence_baselines_full": 6
+      },
+      "path": "benchmark_results/bitdistill_task_formulation_audit_2026-05-15.json",
+      "sha256": "05ad02659704b7a49bf5a84b82730f52ce12389371df33eb9bda1748f10908d5",
+      "size_bytes": 24000
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_cpu_gate_json",
+      "label": "bitdistill_cpu_gate_json",
+      "metrics": {
+        "blockers": [
+          "missing input artifact benchmark_results/bitdistill_glue_cpu_2026-05-15.json"
+        ],
+        "critical": 33,
+        "critical_complete": 0,
+        "critical_full_quality": 0,
+        "input_exists": false,
+        "max_eval_samples": null,
+        "passed": false,
+        "rows": 0
+      },
+      "path": "benchmark_results/bitdistill_glue_cpu_gate_2026-05-15.json",
+      "sha256": "916b3c88ed5a086ab00a500d3134c0e9d9118bcfed298830a072024a112f1ece",
+      "size_bytes": 9566
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_i2sr_gate_json",
+      "label": "bitdistill_i2sr_gate_json",
+      "metrics": {
+        "blockers": [
+          "missing export row",
+          "missing export summary benchmark_results/bitdistill-causal-longwarmup-i2sr-2026-05-15/export_summary.json",
+          "missing memory summary benchmark_results/bitdistill-causal-longwarmup-i2sr-2026-05-15/memory/summary.json",
+          "missing suite summary benchmark_results/bitdistill-causal-longwarmup-i2sr-2026-05-15/gguf_suite/summary.json"
+        ],
+        "complete": 0,
+        "passed": false,
+        "rows": 6,
+        "scales": [
+          "tensor",
+          "row"
+        ],
+        "tasks": [
+          "mnli",
+          "qnli",
+          "sst2"
+        ]
+      },
+      "path": "benchmark_results/bitdistill_i2sr_export_gate_2026-05-15.json",
+      "sha256": "2d00cedb4e48369849224847124d38c62dc2c1ba9bd6fed0c2c93a912ba0eeb5",
+      "size_bytes": 5831
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_job_monitor_json",
+      "label": "bitdistill_job_monitor_json",
+      "metrics": {
+        "downstream_jobs": 38,
+        "downstream_states": [
+          "PENDING"
+        ],
+        "warmup_latest_ce": 3.624918,
+        "warmup_max_steps": 20000,
+        "warmup_progress": 0.908,
+        "warmup_save_every_steps": 0,
+        "warmup_snapshots": 0,
+        "warmup_step": 18160,
+        "warmup_warnings": [
+          "Stage-2 warm-up is running without intermediate snapshots; if the job fails, progress before final save is not recoverable."
+        ]
+      },
+      "path": "benchmark_results/bitdistill_job_monitor_2026-05-15.json",
+      "sha256": "9e931ef68f5bcef9f8fe82b18193c05428575032a92846ab63e758d5fee9a939",
+      "size_bytes": 78012
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_dependency_graph_json",
+      "label": "bitdistill_dependency_graph_json",
+      "metrics": {
+        "active_rows": 38,
+        "blockers": [],
+        "checks": 4,
+        "deduped_rows": 38,
+        "failed": 0,
+        "raw_rows": 61,
+        "ready": true,
+        "warmup_max_steps": 20000,
+        "warmup_step": 18210,
+        "warnings": [
+          "11 output directories appear in multiple historical submission tables; audit uses the latest row per output directory.",
+          "Warm-up final state is expectedly absent until Stage-2 finishes; downstream jobs are correctly dependency-blocked."
+        ]
+      },
+      "path": "benchmark_results/bitdistill_dependency_graph_2026-05-15.json",
+      "sha256": "bcff339d85d29e70e22129357a40e213ab65a45fb9d2559676101286cc13698e",
+      "size_bytes": 24835
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_postprocess_submission_json",
+      "label": "bitdistill_postprocess_submission_json",
+      "metrics": {
+        "dependency_type": "afterok",
+        "downstream_jobs": 38,
+        "extra_jobs": 2,
+        "job_id": "10027",
+        "note": "",
+        "producer_jobs": 41,
+        "submitted": true,
+        "warmup_jobs": 1
+      },
+      "path": "benchmark_results/bitdistill_postprocess_submission_2026-05-15.json",
+      "sha256": "d6ad7ef86f1cd51845fce4ce578bbcf61ef076207a1ee9426abe3312ff0a5311",
+      "size_bytes": 1920
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_postprocess_dependency_json",
+      "label": "bitdistill_postprocess_dependency_json",
+      "metrics": {
+        "checks": 4,
+        "downstream_jobs": 38,
+        "expected_jobs": 41,
+        "extra_jobs": 2,
+        "failed": 0,
+        "missing": [],
+        "passed": true,
+        "postprocess_job": "10027",
+        "warmup_jobs": 1
+      },
+      "path": "benchmark_results/bitdistill_postprocess_dependency_audit_2026-05-15.json",
+      "sha256": "4386e41265ddbc5e2222b40a567d84ec5c5c9bf91b4774bcbd077c61748ad819",
+      "size_bytes": 4671
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_afterany_postprocess_submission_json",
+      "label": "bitdistill_afterany_postprocess_json",
+      "metrics": {
+        "dependency_type": "afterany",
+        "downstream_jobs": 38,
+        "extra_jobs": 2,
+        "job_id": "10026",
+        "note": "",
+        "producer_jobs": 41,
+        "submitted": true,
+        "warmup_jobs": 1
+      },
+      "path": "benchmark_results/bitdistill_afterany_postprocess_2026-05-15.json",
+      "sha256": "631a65823b4458e8bfbf7bb689f683e82f6155c5141764e313d185dd57b2a4ef",
+      "size_bytes": 1930
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_postprocess_dependency_json",
+      "label": "bitdistill_afterany_postprocess_dependency_json",
+      "metrics": {
+        "checks": 4,
+        "downstream_jobs": 38,
+        "expected_jobs": 41,
+        "extra_jobs": 2,
+        "failed": 0,
+        "missing": [],
+        "passed": true,
+        "postprocess_job": "10026",
+        "warmup_jobs": 1
+      },
+      "path": "benchmark_results/bitdistill_afterany_postprocess_dependency_2026-05-15.json",
+      "sha256": "c151847109aca383ee582917b6045c288d6b40017d4d649c487263862e8c14d3",
+      "size_bytes": 4724
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_warmup_health_json",
+      "label": "bitdistill_warmup_health_json",
+      "metrics": {
+        "checks": 8,
+        "eta_seconds": 3349.1140969163,
+        "failed": 0,
+        "final_state_exists": false,
+        "last_ce_mean": 4.08478992,
+        "latest_ce": 3.624918,
+        "max_steps": 20000,
+        "passed": true,
+        "progress": 0.908,
+        "seconds_per_step": 1.8201707048458151,
+        "snapshot_count": 0,
+        "step": 18160,
+        "warnings": 3
+      },
+      "path": "benchmark_results/bitdistill_warmup_health_2026-05-15.json",
+      "sha256": "70ddd81b50e5b0443a9aca7b837b0869771ea9d8f27e20611b5af15617e2a62a",
+      "size_bytes": 4800
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_warmup_finalizer_submission_json",
+      "label": "bitdistill_warmup_finalizer_submission_json",
+      "metrics": {
+        "dependency_type": "afterany",
+        "job_id": "10023",
+        "note": "",
+        "submitted": true,
+        "warmup_jobs": 1
+      },
+      "path": "benchmark_results/bitdistill_warmup_finalizer_submission_2026-05-15.json",
+      "sha256": "b9006b1eab965001510feda0e7370e0bb5eb3e8c0c58159610d6c2dac4862ad8",
+      "size_bytes": 661
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_producer_script_audit_json",
+      "label": "bitdistill_producer_script_audit_json",
+      "metrics": {
+        "afterany_postprocess_job": "10026",
+        "checks": 14,
+        "cpu_job": "10025",
+        "downstream_jobs": 38,
+        "failed": 0,
+        "i2sr_job": "10024",
+        "passed": true,
+        "strict_postprocess_job": "10027"
+      },
+      "path": "benchmark_results/bitdistill_producer_script_audit_2026-05-15.json",
+      "sha256": "1e14ef86cad97ed0f4f77371902ea091ee5ced570393ce2ea3f7e13ae1e6bab7",
+      "size_bytes": 5053
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_job_matrix_json",
+      "label": "bitdistill_job_matrix_json",
+      "metrics": {
+        "blockers": [],
+        "configured_rows": 38,
+        "expected_rows": 38,
+        "inferred_rows": 0,
+        "job_states": {
+          "PENDING": 38
+        },
+        "observed_rows": 38,
+        "passed": true
+      },
+      "path": "benchmark_results/bitdistill_job_matrix_audit_2026-05-15.json",
+      "sha256": "8266de50ae89152295e9f9b7533532e5086300bb2bf5fe4a3e157255eeb773cc",
+      "size_bytes": 43201
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_active_goal_json",
+      "label": "bitdistill_active_goal_json",
+      "metrics": {
+        "check_count": 5,
+        "complete_count": 1,
+        "completion_status": "partial",
+        "cpu_passed": false,
+        "i2sr_passed": false,
+        "objective_achieved": false,
+        "open_requirements": [
+          "Reproduce BitDistill GLUE3 baseline on Qwen2.5-0.5B with FP16-SFT, BitNet-SFT, and BitDistill",
+          "Compare paper-style per-tensor BitDistill against row-scale BitDistill",
+          "Export row-scale checkpoints through I2_SR and benchmark CPU speed, memory/RSS, and task quality on Xeon",
+          "Define publishable scope: independent reproduction, open training implementation, row-scale I2_SR extension, boundary study, and MoE/Kimi limits"
+        ],
+        "pending_count": 3,
+        "row_scale_complete": false,
+        "warmup_max_steps": 20000,
+        "warmup_step": 18160
+      },
+      "path": "benchmark_results/bitdistill_active_goal_audit_2026-05-15.json",
+      "sha256": "d72091c6265ef4beab3bb946a9a36f413cd416164ce6608c3b14f2c9836ffbba",
+      "size_bytes": 5442
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_snapshot_integrity_json",
+      "label": "bitdistill_snapshot_integrity_json",
+      "metrics": {
+        "ce": 5.269656181335449,
+        "codes_valid": true,
+        "expected_ternary": 169,
+        "passed": true,
+        "passed_snapshots": 1,
+        "row_scale_count": 169,
+        "scale_mode": "row",
+        "snapshot_count": 1,
+        "step": 1000,
+        "tensor_scale_count": 0,
+        "ternary_weight_count": 169,
+        "weight_scale_count": 169
+      },
+      "path": "benchmark_results/bitdistill_snapshot_integrity_2026-05-15.json",
+      "sha256": "5bc2c51ee887a63db4506953c164e9646c12d3bbbc59cafc703f6422e48ab00c",
+      "size_bytes": 1127
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_smoke_contract_json",
+      "label": "bitdistill_smoke_contract_json",
+      "metrics": {
+        "check_count": 40,
+        "checks": 40,
+        "continued_bitlinear": 15,
+        "continued_subln": 4,
+        "failed_count": 0,
+        "passed": true,
+        "task_bitlinear": 15,
+        "task_subln": 4
+      },
+      "path": "benchmark_results/bitdistill_smoke_contract_2026-05-15.json",
+      "sha256": "0feb44df8301fd1dbba9178cd229ea292020117ca0cbd47bba73e5c8d0804bf1",
+      "size_bytes": 37145
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_variant_summary_json",
+      "label": "bitdistill_variant_summary_json",
+      "metrics": {
+        "materialized_rows": 21,
+        "roots": [
+          "checkpoints/bitdistill-glue-seqcls",
+          "checkpoints/bitdistill-glue-seqcls-paperlogit",
+          "checkpoints/bitdistill-glue-seqcls-ablate",
+          "checkpoints/bitdistill-glue-seqcls-longwarmup",
+          "checkpoints/bitdistill-glue-seqcls-longwarmup-headinit",
+          "checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma",
+          "checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-row",
+          "checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr1e-5",
+          "checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-lr5e-5",
+          "checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma-headinit",
+          "checkpoints/bitdistill-glue-seqcls-longwarmup-gamma1k",
+          "checkpoints/bitdistill-glue-seqcls-longwarmup-gamma10k",
+          "checkpoints/bitdistill-glue-seqcls-longwarmup-layer-sweep"
+        ],
+        "rows": 21,
+        "tasks": [
+          "mnli",
+          "qnli",
+          "sst2"
+        ]
+      },
+      "path": "benchmark_results/bitdistill_variant_summary_2026-05-15.json",
+      "sha256": "16c37e2313beb006726f1c0ef0966f3d2efd01582ee262d100ba25747073a828",
+      "size_bytes": 19963
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_causal_summary_json",
+      "label": "bitdistill_causal_longwarmup_json",
+      "metrics": {
+        "materialized_rows": 6,
+        "passed": false,
+        "passed_verdicts": 0,
+        "rows": 12,
+        "tasks": [
+          "mnli",
+          "qnli",
+          "sst2"
+        ],
+        "verdicts": 3
+      },
+      "path": "benchmark_results/bitdistill_causal_longwarmup_densehead_summary_2026-05-15.json",
+      "sha256": "b2c0c451c3916ee8c8c9b51f8641b1a03fba85f8bdc0f5d811f22cccf3f98267",
+      "size_bytes": 11519
+    },
+    {
+      "exists": true,
+      "kind": "bitdistill_loss_scale_json",
+      "label": "bitdistill_loss_scale_json",
+      "metrics": {
+        "materialized_rows": 11,
+        "paper_gamma": 100000.0,
+        "projected_attention_to_ce_max": 15779.832789772436,
+        "projected_attention_to_ce_min": 2118.2653550131104,
+        "rows": 28
+      },
+      "path": "benchmark_results/bitdistill_loss_scale_audit_2026-05-15.json",
+      "sha256": "998ad66f551813ede266c0644ca68422eefb5ba36593a5c67ddbf3762d6bff3a",
+      "size_bytes": 24932
+    },
+    {
+      "exists": true,
+      "kind": "i2sr_submodule_promotion_audit_json",
+      "label": "i2sr_submodule_promotion_audit_json",
+      "metrics": {
+        "active_runtime_support": true,
+        "blockers": [],
+        "patch_applies_cleanly": false,
+        "promotion_ready": true,
+        "submodule_short": "106eac0c8"
+      },
+      "path": "benchmark_results/i2sr_submodule_promotion_audit_2026-05-13.json",
+      "sha256": "6dea55655cb313a927ec89283b00b39f757dcb2a9b74110fa56343199c3db09a",
+      "size_bytes": 2889
+    },
+    {
+      "exists": true,
+      "kind": "moe_support_json",
+      "label": "moe_support_json",
+      "metrics": {
+        "checks": 6,
+        "failed_gates": [
+          "TL2 converter path is validated for merged 3D expert tensors",
+          "local Kimi model/eval artifacts exist",
+          "MoE quality and locality benchmarks exist"
+        ],
+        "gates": 8,
+        "kimi_source_matches": 0,
+        "local_kimi_artifacts": 0,
+        "present_checks": 6,
+        "tiny_qwen2moe_passed": true
+      },
+      "path": "benchmark_results/moe_support_audit_2026-05-15.json",
+      "sha256": "389d4b1beccacdfd3816af9bf523c290df9e3763b230f83301da12e1bff18ed7",
+      "size_bytes": 31948
+    },
+    {
+      "exists": true,
+      "kind": "kimi_config_feasibility_json",
+      "label": "kimi_config_feasibility_json",
+      "metrics": {
+        "architectures": [
+          "DeepseekV3ForCausalLM"
+        ],
+        "experts_per_token": 8,
+        "layers": 61,
+        "model_type": "kimi_k2",
+        "passed": false,
+        "required_features": 6,
+        "routed_experts": 384,
+        "unsupported_features": [
+          "Kimi/DeepSeekV3 architecture loader",
+          "MLA/Q-LoRA attention metadata",
+          "Shared expert path",
+          "Block-FP8 source checkpoint import"
+        ]
+      },
+      "path": "benchmark_results/kimi_config_feasibility_2026-05-15.json",
+      "sha256": "ee0f52fb22e954d9ce81528479149fad52a8fb3f7f4115462ba938b6451cde5b",
+      "size_bytes": 4382
+    },
+    {
+      "exists": true,
+      "kind": "moe_packing_contract_json",
+      "label": "moe_packing_contract_json",
+      "metrics": {
+        "blockers": [],
+        "checks": 5,
+        "dense_2d_control": true,
+        "i2sr_3d": true,
+        "layout_checks": 4,
+        "layout_verified": 4,
+        "moe_packing_ready": true,
+        "tl2_3d": true
+      },
+      "path": "benchmark_results/moe_packing_contract_2026-05-15.json",
+      "sha256": "c2b5c06ae8f58f4af3438cf9939b7286ea53685ef378da8691895f7785de9c13",
+      "size_bytes": 2940
+    },
+    {
+      "exists": true,
+      "kind": "moe_tl2_runtime_contract_json",
+      "label": "moe_tl2_runtime_contract_json",
+      "metrics": {
+        "blockers": [
+          "`ggml_compute_forward_mul_mat_id` does not route TL2 through the BitNet LUT kernel; TL2 type traits fall back to F32 vec-dot semantics.",
+          "`GGML_OP_MUL_MAT_ID` workspace sizing does not reserve BitNet LUT preprocessor buffers, so adding a kernel route also requires a wsize contract.",
+          "`ggml_bitnet_transform_tensor` derives metadata from only `tensor->ne[1]` and stores one tensor scale, so merged experts lack explicit per-expert offsets/scales."
+        ],
+        "checks": 7,
+        "failed": [
+          "TL2 LUT kernel is routed for MoE ggml_mul_mat_id",
+          "TL2 mul_mat_id scratch buffer sizes BitNet LUT workspace",
+          "TL2 tensor transform metadata is expert-plane aware"
+        ],
+        "tl2_moe_runtime_ready": false,
+        "underreport_bytes": 0,
+        "underreport_ratio": 1.0
+      },
+      "path": "benchmark_results/moe_tl2_runtime_contract_2026-05-15.json",
+      "sha256": "17ddae2afb065d2a57cb1b57b6c272f3048a7b4ad9c220e8c49c5a1c5550379a",
+      "size_bytes": 3862
+    },
+    {
+      "exists": true,
+      "kind": "tiny_qwen2moe_fixture_json",
+      "label": "tiny_qwen2moe_fixture_json",
+      "metrics": {
+        "architecture": "qwen2moe",
+        "cpu_buffer_mib": 37.16,
+        "decode_tok_s": 601.22,
+        "expert_count": 2,
+        "expert_used_count": 1,
+        "gates": {
+          "cpu_smoke_executed": true,
+          "gguf_converted": true,
+          "hf_checkpoint_created": true,
+          "qwen2moe_metadata_present": true,
+          "rss_measured": true
+        },
+        "gguf_mib": 42.807647705078125,
+        "max_rss_mib": 105.09765625,
+        "model_params_m": 19.48,
+        "passed": true,
+        "prompt_eval_tok_s": 2424.83
+      },
+      "path": "benchmark_results/tiny_qwen2moe_fixture_2026-05-14.json",
+      "sha256": "025b905b3fa8bd0a9b069dac093bdf86a41e5e6db93b988ed971faa5f695befb",
+      "size_bytes": 3480
+    },
+    {
+      "exists": true,
+      "kind": "tiny_qwen2moe_expert_scaling_json",
+      "label": "tiny_qwen2moe_expert_scaling_json",
+      "metrics": {
+        "max_decode_tok_s": 595.88,
+        "min_decode_tok_s": 545.06,
+        "passed": true,
+        "passed_rows": 4,
+        "rows": 4
+      },
+      "path": "benchmark_results/tiny_qwen2moe_expert_scaling_2026-05-14.json",
+      "sha256": "a2f81a1e5203329c72317a55403b8f4cdd1e43c786b661e9953dfb88a863f3d7",
+      "size_bytes": 15370
+    },
+    {
+      "exists": true,
+      "kind": "unblock_requirements_json",
+      "label": "unblock_requirements_json",
+      "metrics": {
+        "can_continue_productively_without_input": false,
+        "candidate_fork_reachable": true,
+        "missing": [
+          "Local trained Kimi/Qwen2MoE model artifact",
+          "MoE quality/locality benchmark artifacts"
+        ],
+        "missing_count": 2,
+        "objective_status": "not_complete",
+        "requirements": 5
+      },
+      "path": "benchmark_results/unblock_requirements_2026-05-14.json",
+      "sha256": "78499a2b0c8d78b160ac2eb31220104f7d8d63d4af96455a85e9458ba8ce92f0",
+      "size_bytes": 2678
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "tl2_generic_summary",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 16.695891,
+            "file_mib": 948.098876953125,
+            "kind": "fp16 dense",
+            "name": "qwen05b_fp_f16",
+            "ppl": 18.0986,
+            "prefill_tok_s": 370.219939
+          },
+          {
+            "decode_tok_s": 38.058118,
+            "file_mib": 379.376220703125,
+            "kind": "fp16 baseline quantized",
+            "name": "qwen05b_fp_q4_k_m",
+            "ppl": 18.8044,
+            "prefill_tok_s": 210.364436
+          },
+          {
+            "decode_tok_s": 51.902441,
+            "file_mib": 489.473388671875,
+            "kind": "distilled ternary I2_S",
+            "name": "qwen05b_qat_i2_s",
+            "ppl": "NaN",
+            "prefill_tok_s": 553.08987
+          },
+          {
+            "decode_tok_s": 21.626749,
+            "file_mib": 599.4500732421875,
+            "kind": "distilled ternary TL2 probe",
+            "name": "qwen05b_qat_tl2",
+            "ppl": null,
+            "prefill_tok_s": 265.776754
+          }
+        ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
+        "failed": [
+          "qwen05b_qat_tl2:smoke_returncode=-11",
+          "qwen05b_qat_tl2:ppl_returncode=-11"
+        ],
+        "max_finite_ppl": 18.8044,
+        "nan_ppl": [
+          "qwen05b_qat_i2_s"
+        ],
+        "rows": 4
+      },
+      "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json",
+      "sha256": "306a682203b20ca0679f13a5d7dac3f7a26b1566618728f250cf7d1923794e22",
+      "size_bytes": 4494
+    },
+    {
+      "exists": true,
+      "kind": "gguf_summary_json",
+      "label": "tl2_avx512_summary",
+      "metrics": {
+        "artifacts": [
+          {
+            "decode_tok_s": 16.403518,
+            "file_mib": 948.098876953125,
+            "kind": "fp16 dense",
+            "name": "qwen05b_fp_f16",
+            "ppl": 18.0984,
+            "prefill_tok_s": 329.303892
+          },
+          {
+            "decode_tok_s": 35.609704,
+            "file_mib": 379.376220703125,
+            "kind": "fp16 baseline quantized",
+            "name": "qwen05b_fp_q4_k_m",
+            "ppl": 18.8239,
+            "prefill_tok_s": 213.59662
+          },
+          {
+            "decode_tok_s": 49.375379,
+            "file_mib": 489.473388671875,
+            "kind": "distilled ternary I2_S",
+            "name": "qwen05b_qat_i2_s",
+            "ppl": "NaN",
+            "prefill_tok_s": 533.895923
+          },
+          {
+            "decode_tok_s": 22.9511,
+            "file_mib": 599.4500732421875,
+            "kind": "distilled ternary TL2 probe",
+            "name": "qwen05b_qat_tl2",
+            "ppl": "NaN",
+            "prefill_tok_s": 229.517043
+          }
+        ],
+        "catastrophic_ppl": [],
+        "catastrophic_ppl_threshold": 10000.0,
+        "failed": [],
+        "max_finite_ppl": 18.8239,
+        "nan_ppl": [
+          "qwen05b_qat_i2_s",
+          "qwen05b_qat_tl2"
+        ],
+        "rows": 4
+      },
+      "path": "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json",
+      "sha256": "6ec820472f370f339be2e3b72b0bca483bd842d447f49927fcfae862a80bdc2c",
+      "size_bytes": 4573
+    },
+    {
+      "exists": true,
+      "kind": "math_json",
+      "label": "ptq_math",
+      "metrics": {
+        "relative_output_fro_error_mean": 0.5125422656536103,
+        "theoretical_mean_abs_relative_fro_error": 0.5132073369131759,
+        "trials": 10
+      },
+      "path": "benchmark_results/math_viability_gaussian_10trial_2026-05-05.json",
+      "sha256": "8cedd88658e01d98c85d214273efa19c3b48bb4319727b70cd8bf651f99dce88",
+      "size_bytes": 14010
+    }
+  ],
+  "missing": [],
+  "missing_count": 0,
+  "schema": "bitnet-evidence-manifest-v1"
+}
