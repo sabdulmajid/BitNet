@@ -253,6 +253,11 @@ training contract and a runtime contract. Ternary storage alone is not enough.
   product viability.
 - TL2 support for row-scale Qwen; current TL2 one-scale error is `1.904230`
   relative output RMS, while exact FP16 row scales would be `0.000197`.
+  The implementation blocker is now audited down to generated code: TL2
+  packing recomputes one scalar scale, `GGML_TYPE_TL2` has no row-scale sidecar
+  storage, generated x86 TL2 qgemm multiplies by `Scales[0]`, and no row-scale
+  TL2 GGUF has passed quality/speed/RSS evidence. Use `I2_SR` for row-scale
+  checkpoints until a new TL2 row/group-scale contract is implemented.
 
 A formal runtime-gap audit now marks the product gap as narrowed but not closed:
 `15` strict GLUE checkpoints use `Qwen2ForSequenceClassification`, `0` are

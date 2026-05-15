@@ -24,6 +24,7 @@ result.
 | QAT/distillation recovers signal | proven partially | Best row-scale dense-Qwen ten-task mean `0.499459`; paired recovery over naive PTQ `+0.150788` with 95% CI `[+0.053427, +0.248149]`. |
 | Row-scale semantics matter | proven for current best row-scale checkpoint | TL2 one-scale relative output RMS error `1.904230`; exact FP16 row scales `0.000197` with only `1.230469 MiB` scale overhead. |
 | Packed row-scale CPU runtime is feasible | proven for dense causal artifact | `I2_SR` Xeon result: PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, file `1211.3 MiB`. |
+| TL2 row-scale packed runtime is ready | not proven; explicitly blocked | The current TL2 runtime contract has `11` checks and remains `false`: converter scale collapse, missing row-scale TL2 storage, one-scale transform metadata, generated `Scales[0]` qgemm, unoffset x86 dispatch, missing loader sidecars, and no passing row-scale TL2 benchmark. |
 | Sequence-classification packed path is possible | prototype only; native head blocked | MNLI long-warmup row-scale checkpoint (`0.653591` PyTorch accuracy) exports as a `352.6 MiB` `I2_SR` backbone plus `10.8 KiB` dense head sidecar. A Qwen-compatible `bitnet-qwen` graph repairs the dominant runtime mismatch: hidden cosine is `0.994091`, hidden relative RMS is `0.108662`, and the 64-example sidecar CPU probe reaches `0.578125` accuracy with `0.921875` agreement against saved PyTorch predictions. Native GGUF classifier inference and full-split CPU validation are not implemented. |
 | Paper-level BitDistill is reproduced | not proven | FP16-SFT MNLI is close to paper (`0.807641` vs `0.799100`), and BitNet-SFT now clears its paper anchor (`0.628935` vs `0.608000`) after more budget. This is not yet BitDistill or FP16-level recovery. |
 | Kimi/MoE works | not proven | Tiny Qwen2MoE fixtures prove routing/packing smoke only; no Kimi mapping or trained MoE quality exists. |
@@ -152,6 +153,14 @@ PyTorch predictions is `0.921875`. This is a useful prototype, but not a
 deployable classifier: the classifier head is still not native GGUF metadata or
 runtime code, the hidden contract is not bit-exact, and full-split CPU
 quality/RSS/throughput have not been measured on one native artifact.
+
+For row-scale causal artifacts, the supported packed runtime remains `I2_SR`.
+TL2 is not a shortcut: the converter recomputes one scalar scale, ggml byte
+sizing has no row-scale TL2 sidecar, the transform stores one scale, generated
+x86 TL2 qgemm multiplies by `Scales[0]`, and the x86 dispatch passes the same
+scale pointer to each qgemm call. A quality-preserving TL2 variant needs an
+explicit new row/group-scale metadata contract plus fresh PPL, task, throughput,
+and RSS benchmarks.
 
 ## Publishable Angle
 

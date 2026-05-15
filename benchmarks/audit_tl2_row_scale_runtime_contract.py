@@ -168,19 +168,26 @@ def build_audit(root: Path, design_json: Path | None, max_existing_tl2_error: fl
     ggml_h_path = root / "3rdparty/llama.cpp/ggml/include/ggml.h"
     generated_kernel_path = root / "include/bitnet-lut-kernels.h"
     preset_kernel_path = root / "preset_kernels/bitnet_b1_58-large/bitnet-lut-kernels-tl2.h"
+    codegen_path = root / "utils/codegen_tl2.py"
+    llama_path = root / "3rdparty/llama.cpp/src/llama.cpp"
     bitnet_kernel_path = generated_kernel_path if "ggml_bitnet_transform_tensor" in read_text(generated_kernel_path) else preset_kernel_path
 
     converter = read_text(converter_path)
     ggml = read_text(ggml_path)
     ggml_h = read_text(ggml_h_path)
     bitnet_kernel = read_text(bitnet_kernel_path)
+    codegen = read_text(codegen_path)
+    llama_cpp = read_text(llama_path)
 
     transform_to_tl2 = slice_between(converter, "def transform_to_tl2", "def read_model_config")
     llama_section = class_section(converter, "LlamaModel")
     bitnet_section = class_section(converter, "BitnetModel")
     write_tensors = slice_between(llama_section, "def write_tensors", "def prepare_tensors")
     ggml_nbytes = slice_between(ggml, "size_t ggml_nbytes", "size_t ggml_nbytes_pad")
+    ggml_mul_mat_tl2 = slice_between(ggml, "#if defined(GGML_BITNET_X86_TL2)", "#endif")
     bitnet_transform = slice_between(bitnet_kernel, "void ggml_bitnet_transform_tensor", "int ggml_bitnet_get_type_bits")
+    bitnet_arch_loader = slice_between(llama_cpp, "case LLM_ARCH_BITNET:", "case LLM_ARCH_BITNET_B158:")
+    qwen_bitnet_loader = slice_between(llama_cpp, "case LLM_ARCH_BITNET_B158:", "case LLM_ARCH_T5:")
 
     design_path = resolve_under_root(root, design_json) or latest_existing(str(root / "benchmark_results/tl2_row_scale_design_*.json"))
     design = read_json(design_path) if design_path else {}
@@ -217,6 +224,16 @@ def build_audit(root: Path, design_json: Path | None, max_existing_tl2_error: fl
     nbytes_has_row_scale_sidecar = "GGML_TYPE_TL2" in ggml_nbytes and ("lut_scales_size" in ggml_nbytes or "row_scale" in ggml_nbytes)
     transform_single_scale = "const int lut_scales_size = 1" in bitnet_transform and "i2_scales[0]" in bitnet_transform
     transform_uses_all_rows = "ggml_nrows(tensor)" in bitnet_transform or "tensor->ne[2]" in bitnet_transform
+    generated_qgemm_uses_scale_zero = "((float*)Scales)[0]" in bitnet_kernel
+    codegen_emits_scale_zero = "((float*)Scales)[0]" in codegen
+    generated_qgemm_mentions_row_scale = "row_scale" in bitnet_kernel or "row_scales" in bitnet_kernel
+    codegen_mentions_row_scale = "row_scale" in codegen or "row_scales" in codegen
+    x86_tl2_passes_unoffset_scales = "wt->scales," in ggml_mul_mat_tl2
+    bitnet_loader_scale_sidecars_disabled_for_tl2 = (
+        "#if !defined(GGML_BITNET_ARM_TL1) && !defined(GGML_BITNET_X86_TL2)" in llama_cpp
+        and 'tn(LLM_TENSOR_ATTN_Q,   "scale"' in llama_cpp
+    )
+    qwen_loader_has_scale_sidecars = 'tn(LLM_TENSOR_ATTN_Q,   "scale"' in qwen_bitnet_loader or "wq_scale" in qwen_bitnet_loader
     has_dedicated_row_tl2_type = "TL2_R" in ggml_h or "TL2_SR" in ggml_h or "TL2_G" in ggml_h
     has_i2sr_fallback = "GGML_TYPE_I2_SR" in ggml_h and "LLAMA_FTYPE_MOSTLY_I2_SR" in read_text(root / "3rdparty/llama.cpp/include/llama.h")
     benchmark_evidence = collect_benchmark_evidence(root)
@@ -281,6 +298,37 @@ def build_audit(root: Path, design_json: Path | None, max_existing_tl2_error: fl
             "`ggml_bitnet_transform_tensor` still builds metadata for one scale, not one scale per row or row group.",
         ),
         make_check(
+            "Generated TL2 qgemm applies output-row or row-group scales",
+            not generated_qgemm_uses_scale_zero and not codegen_emits_scale_zero and (generated_qgemm_mentions_row_scale or codegen_mentions_row_scale),
+            (
+                f"kernel_source={bitnet_kernel_path.relative_to(root)}; "
+                f"generated_uses_Scales0={generated_qgemm_uses_scale_zero}; "
+                f"codegen_emits_Scales0={codegen_emits_scale_zero}; "
+                f"kernel_mentions_row_scale={generated_qgemm_mentions_row_scale}; "
+                f"codegen_mentions_row_scale={codegen_mentions_row_scale}"
+            ),
+            "Generated TL2 qgemm multiplies by `Scales[0]`; row-scale support needs kernels that index the learned output-row or row-group scale.",
+        ),
+        make_check(
+            "x86 TL2 matmul dispatch offsets scale metadata per output tile/row group",
+            not x86_tl2_passes_unoffset_scales or has_dedicated_row_tl2_type,
+            (
+                f"mul_mat_tl2_line={first_line(ggml, '#if defined(GGML_BITNET_X86_TL2)')}; "
+                f"passes_unoffset_wt_scales={x86_tl2_passes_unoffset_scales}; "
+                f"dedicated_row_tl2_type={has_dedicated_row_tl2_type}"
+            ),
+            "The x86 TL2 dispatch passes the same `wt->scales` pointer into every generated qgemm call, matching the one-scale kernel contract.",
+        ),
+        make_check(
+            "BitNet/Qwen TL2 loader exposes learned scale sidecars when required",
+            qwen_loader_has_scale_sidecars and not bitnet_loader_scale_sidecars_disabled_for_tl2,
+            (
+                f"bitnet_scale_sidecars_disabled_for_tl2={bitnet_loader_scale_sidecars_disabled_for_tl2}; "
+                f"qwen_bitnet_loader_has_scale_sidecars={qwen_loader_has_scale_sidecars}"
+            ),
+            "The active BitNet/Qwen TL2 loader path does not create learned row-scale sidecar tensors; TL2 expects scale metadata inside the packed tensor/kernel path.",
+        ),
+        make_check(
             "A compatibility-safe row-scale runtime path exists",
             has_i2sr_fallback,
             f"GGML_TYPE_I2_SR={has_i2sr_fallback}",
@@ -301,7 +349,9 @@ def build_audit(root: Path, design_json: Path | None, max_existing_tl2_error: fl
             "converter": str(converter_path.relative_to(root)),
             "ggml": str(ggml_path.relative_to(root)),
             "ggml_h": str(ggml_h_path.relative_to(root)),
+            "llama_cpp": str(llama_path.relative_to(root)),
             "bitnet_kernel": str(bitnet_kernel_path.relative_to(root)),
+            "tl2_codegen": str(codegen_path.relative_to(root)),
             "design_json": display_path(root, design_path),
         },
         "math": {
@@ -323,6 +373,7 @@ def build_audit(root: Path, design_json: Path | None, max_existing_tl2_error: fl
             "Teach the converter to pass learned tensor/row/group scales into TL2 packing instead of recomputing one `max(abs(W))` scale.",
             "Extend GGUF/ggml byte-size semantics so packed TL2 data carries the exact number of fp16/fp32 row or row-group scales.",
             "Update generated TL2 transform metadata and kernels to index the correct scale for each output row or row group.",
+            "Update x86 TL2 matmul dispatch so each tile sees the correct scale span, and add loader-side compatibility guards for old single-scale TL2 files.",
             "Run dense Qwen PPL, lm-eval/task quality, llama-bench throughput, and RSS benchmarks before enabling any product claim.",
         ],
     }

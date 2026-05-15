@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "9ed3717686525f73cc6ae9eebbacacc20a83b45fb016bef814e27e636b2c48a6",
-      "size_bytes": 23809
+      "sha256": "292f98633a0b7ae81067db150cd566ee3f07143ebfb07db1569ef8707bb2f656",
+      "size_bytes": 24187
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "research_redirect_report",
       "metrics": {},
       "path": "benchmarks/results/research_redirect_2026-05-15.md",
-      "sha256": "3424c9ee5449e8315a032592a6f7cf5ef95285ffc67651082bb1ead508672b72",
-      "size_bytes": 10525
+      "sha256": "789f388bbc7d7777a510058e5712bec6dc2ffd2eefeacfb14f58d3788bb7e8ed",
+      "size_bytes": 11365
     },
     {
       "exists": true,
@@ -736,8 +736,8 @@
       "label": "tl2_row_scale_runtime_contract_report",
       "metrics": {},
       "path": "benchmarks/results/tl2_row_scale_runtime_contract_2026-05-15.md",
-      "sha256": "3f2e5468f229bf919b5059676247067982cf3d1cff69e548c642d586d7cd67ce",
-      "size_bytes": 4330
+      "sha256": "038dec0e468f21608d2adf15245d03cf37a651348d62d8a20101142496af1726",
+      "size_bytes": 5946
     },
     {
       "exists": true,
@@ -2200,7 +2200,7 @@
       "kind": "tl2_row_scale_runtime_contract_json",
       "label": "tl2_row_scale_runtime_contract_json",
       "metrics": {
-        "checks": 8,
+        "checks": 11,
         "current_tl2_tensor_max_error": 1.9042302114103853,
         "failed": [
           "Existing TL2 one-scale error is below product threshold",
@@ -2208,6 +2208,9 @@
           "TL2 converter no longer recomputes one scalar max scale",
           "ggml TL2 storage accounts for row/group-scale sidecar",
           "TL2 transform metadata is row/group-scale aware",
+          "Generated TL2 qgemm applies output-row or row-group scales",
+          "x86 TL2 matmul dispatch offsets scale metadata per output tile/row group",
+          "BitNet/Qwen TL2 loader exposes learned scale sidecars when required",
           "Row-scale TL2 has quality and speed benchmark evidence"
         ],
         "ready": false,
@@ -2217,8 +2220,8 @@
         "row_scale_tl2_rows": 0
       },
       "path": "benchmark_results/tl2_row_scale_runtime_contract_2026-05-15.json",
-      "sha256": "2d74c1c991b7073777274f5effc2f91f7b016cf9efbe80c07073e8d865f8399d",
-      "size_bytes": 4791
+      "sha256": "4e631065cf2ef7df7eeca3dbb911516abed7360e678c75fb1a6c6062ed3506f5",
+      "size_bytes": 6749
     },
     {
       "exists": true,
