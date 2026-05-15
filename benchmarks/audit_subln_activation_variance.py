@@ -30,6 +30,8 @@ from train_bitdistill import SubLNLinear, add_subln_to_qwen_blocks
 
 
 DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
+DEFAULT_LOCAL_MODEL = "checkpoints/qwen2.5-0.5b-fineweb-edu-12/step-1000"
+DEFAULT_MODEL = DEFAULT_LOCAL_MODEL if (REPO_ROOT / DEFAULT_LOCAL_MODEL).exists() else "Qwen/Qwen2.5-0.5B"
 
 PROMPTS = [
     "Premise: A scientist adjusts a small radio telescope during a winter field test. Hypothesis: A researcher is working outdoors.",
@@ -302,7 +304,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--model", default="Qwen/Qwen2.5-0.5B")
+    parser.add_argument("--model", default=DEFAULT_MODEL)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--examples", type=int, default=4)
     parser.add_argument("--max-length", type=int, default=64)
