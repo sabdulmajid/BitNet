@@ -1,0 +1,49 @@
+{
+  "date": "2026-05-15",
+  "negative_result_supported": true,
+  "qwen15b_row_scale_best_one_scale_error": 0.1611730201316774,
+  "qwen15b_row_scale_current_tl2_error": 1.9042302114103853,
+  "qwen15b_row_scale_exact_fp16_error": 0.00019744640689756221,
+  "qwen15b_row_scale_exact_fp16_scale_mib": 1.23046875,
+  "qwen15b_row_scale_group32_fp16_error": 0.1428438042225288,
+  "qwen15b_tensor_scale_error": 0.0,
+  "runtime_blockers": [
+    "Existing TL2 collapses learned row scales to one scale and exceeds the allowed relative output RMS error.",
+    "`transform_to_tl2` is data-only and recomputes a scalar scale instead of carrying checkpoint row/group scales.",
+    "The converter still derives one scalar `np.max(abs(x))` scale and writes a single sidecar scale tensor.",
+    "`GGML_TYPE_TL2` storage has no explicit row/group-scale count or dedicated row-scale TL2 qtype.",
+    "`ggml_bitnet_transform_tensor` still builds metadata for one scale, not one scale per row or row group.",
+    "Generated TL2 qgemm multiplies by `Scales[0]`; row-scale support needs kernels that index the learned output-row or row-group scale.",
+    "The x86 TL2 dispatch passes the same `wt->scales` pointer into every generated qgemm call, matching the one-scale kernel contract.",
+    "The active BitNet/Qwen TL2 loader path does not create learned row-scale sidecar tensors; TL2 expects scale metadata inside the packed tensor/kernel path.",
+    "No row-scale TL2 GGUF has passed PPL, throughput, and RSS-style evidence."
+  ],
+  "runtime_failed_checks": 9,
+  "runtime_ready": false,
+  "schema": "tl2-negative-result-audit-v1",
+  "tl2_cpu_executed": true,
+  "tl2_cpu_probe_rows": [
+    {
+      "cpu_executed": true,
+      "decode_tok_s": 21.626749,
+      "file_mib": 599.4500732421875,
+      "name": "qwen05b_qat_tl2",
+      "path": "benchmark_results/gguf-qwen05b-tl2-probe-2026-05-05/summary.json",
+      "ppl": null,
+      "prefill_tok_s": 265.776754,
+      "quality_finite": false
+    },
+    {
+      "cpu_executed": true,
+      "decode_tok_s": 22.9511,
+      "file_mib": 599.4500732421875,
+      "name": "qwen05b_qat_tl2",
+      "path": "benchmark_results/gguf-qwen05b-tl2-avx512-2026-05-05/summary.json",
+      "ppl": "NaN",
+      "prefill_tok_s": 229.517043,
+      "quality_finite": false
+    }
+  ],
+  "tl2_probe_has_finite_quality": false,
+  "verdict": "TL2 has CPU execution evidence, but current one-scale TL2 is a negative result for learned row-scale checkpoints. I2_SR remains the supported row-scale packed path until TL2 gains row/group-scale metadata and kernels."
+}

@@ -50,6 +50,8 @@ Overall status: **PASS**.
 | BitDistill loss-contract records paper-gamma dominance risk | pass | status=loss_normalization_risk, max_attn_ce=37819.64134227373 |  |
 | Original benchmark objective audit maps all six requested deliverables | pass | completion=5/6, status=partial |  |
 | Original benchmark objective audit keeps TL2 row-scale blocker explicit | pass | partial_rows=1, partial=5. Convert repaired checkpoints into GGUF/TL2/I2_S and run CPU inference Dense GGUF and row-scale I2_SR/I2_S CPU inference exist, but TL2 is not quality-preserving for learned row-scale checkpoints until row/group-scale metadata and kernels |  |
+| TL2 negative-result audit has CPU probe evidence | pass | cpu_executed=True, finite_quality=False |  |
+| TL2 negative-result audit proves row-scale mismatch | pass | supported=True, current=1.9042302114103853, row_fp16=0.00019744640689756221, failed_checks=9 |  |
 | Ternary flip-dynamics audit has nonzero saved-snapshot flips | pass | status=pass, pairs=2, min_flip=0.06454656755885871, max_flip=0.1659562863332169 |  |
 | Sequence-classification runtime gap is narrowed but not closed | pass | status=sidecar_qwen_contract_available_native_head_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6 |  |
 | Sequence-classification I2_SR sidecar smoke passes | pass | status=prototype_smoke_passed, returncode=0, head_shape=[3, 896], finite_logits=True |  |
@@ -71,5 +73,5 @@ Overall status: **PASS**.
 | Benchmark matrix audit has Xeon runtime and RSS evidence | pass | finite_rows=5, rss_contexts=[512, 2048, 8192, 32768] |  |
 | Benchmark matrix audit keeps TL2 row-scale excluded | pass | tl2_ready=False, failed=9 |  |
 | fixed I2_SR RSS has four context rows | pass | contexts=[512, 2048, 8192, 32768] |  |
-| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=234, missing=0, missing_labels=[] |  |
+| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=236, missing=0, missing_labels=[] |  |
 | productization gate passes for stable I2_SR | pass | passed=True, failed=0, stable_quality=True, layout=True |  |

@@ -258,6 +258,9 @@ training contract and a runtime contract. Ternary storage alone is not enough.
   storage, generated x86 TL2 qgemm multiplies by `Scales[0]`, and no row-scale
   TL2 GGUF has passed quality/speed/RSS evidence. Use `I2_SR` for row-scale
   checkpoints until a new TL2 row/group-scale contract is implemented.
+  The TL2 negative-result audit also records that Qwen0.5B TL2 CPU probes
+  execute but do not produce finite quality, so TL2 is evidence for a boundary,
+  not a deployable row-scale path.
 
 A formal runtime-gap audit now marks the product gap as narrowed but not closed:
 `15` strict GLUE checkpoints use `Qwen2ForSequenceClassification`, `0` are
@@ -373,6 +376,7 @@ python benchmarks/audit_bitdistill_root_cause.py
 python benchmarks/audit_seqcls_i2sr_arch_contract.py
 python benchmarks/audit_seqcls_runtime_gap.py
 python benchmarks/audit_benchmark_matrix.py
+python benchmarks/audit_tl2_negative_result.py
 python benchmarks/audit_benchmark_coverage.py
 python benchmarks/audit_product_scope.py
 python benchmarks/build_evidence_manifest.py \
@@ -424,6 +428,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Product scope gate](benchmarks/results/product_scope_gate_2026-05-15.md)
 - [Evidence manifest](benchmarks/results/evidence_manifest_2026-05-15.md)
 - [TL2 row-scale runtime contract](benchmarks/results/tl2_row_scale_runtime_contract_2026-05-15.md)
+- [TL2 negative-result audit](benchmarks/results/tl2_negative_result_2026-05-15.md)
 - [Kimi config feasibility audit](benchmarks/results/kimi_config_feasibility_2026-05-15.md)
 
 ## References

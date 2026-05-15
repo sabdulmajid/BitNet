@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 69,
+  "check_count": 71,
   "failed": [],
   "checks": [
     {
@@ -282,6 +282,18 @@
       "blocker": ""
     },
     {
+      "name": "TL2 negative-result audit has CPU probe evidence",
+      "passed": true,
+      "evidence": "cpu_executed=True, finite_quality=False",
+      "blocker": ""
+    },
+    {
+      "name": "TL2 negative-result audit proves row-scale mismatch",
+      "passed": true,
+      "evidence": "supported=True, current=1.9042302114103853, row_fp16=0.00019744640689756221, failed_checks=9",
+      "blocker": ""
+    },
+    {
       "name": "Ternary flip-dynamics audit has nonzero saved-snapshot flips",
       "passed": true,
       "evidence": "status=pass, pairs=2, min_flip=0.06454656755885871, max_flip=0.1659562863332169",
@@ -410,7 +422,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=234, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=236, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

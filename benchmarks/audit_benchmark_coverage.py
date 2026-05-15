@@ -500,6 +500,39 @@ def audit_original_benchmark_objective(root: Path, checks: list[dict[str, Any]])
     )
 
 
+def audit_tl2_negative_result(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/tl2_negative_result_{DATE}.json"
+    if not path.exists():
+        add_check(checks, "TL2 negative-result audit exists", False, str(path.relative_to(root)), "missing TL2 negative-result audit")
+        return
+    data = read_json(path)
+    add_check(
+        checks,
+        "TL2 negative-result audit has CPU probe evidence",
+        data.get("tl2_cpu_executed") is True
+        and data.get("tl2_probe_has_finite_quality") is False,
+        f"cpu_executed={data.get('tl2_cpu_executed')}, finite_quality={data.get('tl2_probe_has_finite_quality')}",
+        "TL2 negative result should include actual CPU probe evidence and quality failure status",
+    )
+    add_check(
+        checks,
+        "TL2 negative-result audit proves row-scale mismatch",
+        data.get("negative_result_supported") is True
+        and isinstance(data.get("qwen15b_row_scale_current_tl2_error"), (int, float))
+        and data.get("qwen15b_row_scale_current_tl2_error") > 1.0
+        and isinstance(data.get("qwen15b_row_scale_exact_fp16_error"), (int, float))
+        and data.get("qwen15b_row_scale_exact_fp16_error") < 0.01
+        and int(data.get("runtime_failed_checks") or 0) > 0,
+        (
+            f"supported={data.get('negative_result_supported')}, "
+            f"current={data.get('qwen15b_row_scale_current_tl2_error')}, "
+            f"row_fp16={data.get('qwen15b_row_scale_exact_fp16_error')}, "
+            f"failed_checks={data.get('runtime_failed_checks')}"
+        ),
+        "TL2 negative result should connect CPU probes, row-scale math, and runtime blockers",
+    )
+
+
 def audit_ternary_flip_dynamics(root: Path, checks: list[dict[str, Any]]) -> None:
     path = root / f"benchmark_results/ternary_flip_dynamics_{DATE}.json"
     if not path.exists():
@@ -891,6 +924,7 @@ def main() -> None:
     audit_bitdistill_telemetry_coverage(root, checks)
     audit_bitdistill_loss_contract(root, checks)
     audit_original_benchmark_objective(root, checks)
+    audit_tl2_negative_result(root, checks)
     audit_ternary_flip_dynamics(root, checks)
     audit_seqcls_runtime_gap(root, checks)
     audit_qwen3_paper_alignment(root, checks)
