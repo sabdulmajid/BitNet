@@ -264,6 +264,51 @@ def audit_bitnet_sft_budget_paired(root: Path, checks: list[dict[str, Any]]) -> 
     )
 
 
+def audit_bitnet_sft_mechanics(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/bitnet_sft_mechanics_audit_{DATE}.json"
+    if not path.exists():
+        add_check(checks, "BitNet-SFT mechanics audit exists", False, str(path.relative_to(root)), "missing mechanics audit")
+        return
+    data = read_json(path)
+    ternary = data.get("ternary_state", {}) if isinstance(data.get("ternary_state"), dict) else {}
+    family_counts = ternary.get("family_tensor_counts", {}) if isinstance(ternary.get("family_tensor_counts"), dict) else {}
+    code_fractions = ternary.get("code_fractions", {}) if isinstance(ternary.get("code_fractions"), dict) else {}
+    expected_families = {"q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"}
+    add_check(
+        checks,
+        "BitNet-SFT mechanics audit passes",
+        data.get("passed") is True and data.get("verdict") == "basic_mechanics_pass_bitdistill_recovery_pending",
+        f"passed={data.get('passed')}, verdict={data.get('verdict')}, path={path.relative_to(root)}",
+        "mechanics audit did not pass",
+    )
+    add_check(
+        checks,
+        "BitNet-SFT mechanics audit has exact projection replacement counts",
+        ternary.get("ternary_weight_count") == 168
+        and set(family_counts) == expected_families
+        and all(family_counts.get(name) == 24 for name in expected_families),
+        f"ternary={ternary.get('ternary_weight_count')}, families={family_counts}",
+        "missing or extra ternary projection families",
+    )
+    add_check(
+        checks,
+        "BitNet-SFT mechanics audit confirms dense non-projection tensors",
+        ternary.get("score_weight_dense") is True
+        and ternary.get("score_ternary_present") is False
+        and ternary.get("forbidden_ternary_keys") == [],
+        f"score_dense={ternary.get('score_weight_dense')}, score_ternary={ternary.get('score_ternary_present')}, forbidden={ternary.get('forbidden_ternary_keys')}",
+        "sequence head, embedding, or norm was unexpectedly ternarized",
+    )
+    add_check(
+        checks,
+        "BitNet-SFT mechanics audit confirms three-symbol ternary distribution",
+        set(code_fractions) == {"-1", "0", "1"}
+        and all(isinstance(code_fractions.get(key), (int, float)) for key in ["-1", "0", "1"]),
+        f"fractions={code_fractions}, entropy={ternary.get('code_entropy_bits')}",
+        "ternary code distribution is incomplete or malformed",
+    )
+
+
 def audit_subln_activation_variance(root: Path, checks: list[dict[str, Any]]) -> None:
     path = root / f"benchmark_results/subln_activation_variance_{DATE}.json"
     if not path.exists():
@@ -480,6 +525,7 @@ def main() -> None:
     audit_paired_reports(root, checks)
     audit_bitdistill_paired_baselines(root, checks)
     audit_bitnet_sft_budget_paired(root, checks)
+    audit_bitnet_sft_mechanics(root, checks)
     audit_subln_activation_variance(root, checks)
     audit_cpu_rows(root, checks)
     audit_cpu_tradeoff_frontier(root, checks)

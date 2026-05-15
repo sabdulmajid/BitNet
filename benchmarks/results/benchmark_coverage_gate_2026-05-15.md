@@ -35,6 +35,10 @@ Overall status: **PASS**.
 | BitNet baseline paired rows have paired statistics | pass | stats_rows=3 |  |
 | BitNet-SFT budget paired audit has completed full-MNLI rows | pass | complete=9/10, best_matched=9815, path=benchmark_results/bitnet_sft_budget_paired_2026-05-15.json |  |
 | BitNet-SFT best budget row has paired CI and McNemar test | pass | delta=-0.17921548650025465, ci=[-0.18958024909015786, -0.16885072391035155], mcnemar=3.4383886495134495e-240 |  |
+| BitNet-SFT mechanics audit passes | pass | passed=True, verdict=basic_mechanics_pass_bitdistill_recovery_pending, path=benchmark_results/bitnet_sft_mechanics_audit_2026-05-15.json |  |
+| BitNet-SFT mechanics audit has exact projection replacement counts | pass | ternary=168, families={'down_proj': 24, 'gate_proj': 24, 'k_proj': 24, 'o_proj': 24, 'q_proj': 24, 'up_proj': 24, 'v_proj': 24} |  |
+| BitNet-SFT mechanics audit confirms dense non-projection tensors | pass | score_dense=True, score_ternary=False, forbidden=[] |  |
+| BitNet-SFT mechanics audit confirms three-symbol ternary distribution | pass | fractions={'-1': 0.33324317512931406, '0': 0.33317633827964027, '1': 0.33358048659104567}, entropy=1.5849622976253435 |  |
 | SubLN activation-variance audit has finite logit drift | pass | inserted=48, rel_rms=0.7680435180664062, cosine=0.6982523202896118, path=benchmark_results/subln_activation_variance_2026-05-15.json |  |
 | SubLN audit confirms projection-input normalization | pass | subln_output_rms=[0.9996804222464561, 0.99930373330911] |  |
 | FP F16 CPU row is finite | pass | ppl=12.2808, prefill=114.468162, decode=5.555998 |  |
@@ -48,5 +52,5 @@ Overall status: **PASS**.
 | CPU speed uncertainty audit has I2_SR-vs-Q4 intervals | pass | prefill_ci=[2.2578672451091255, 2.34051098794489], decode_ci=[1.1861079640891115, 1.1951428201115284] |  |
 | I2_SR-vs-Q4 speedup intervals stay above 1 | pass | prefill_ci=[2.2578672451091255, 2.34051098794489], decode_ci=[1.1861079640891115, 1.1951428201115284] |  |
 | fixed I2_SR RSS has four context rows | pass | contexts=[512, 2048, 8192, 32768] |  |
-| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=189, missing=0, missing_labels=[] |  |
+| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=191, missing=0, missing_labels=[] |  |
 | productization gate passes for stable I2_SR | pass | passed=True, failed=0, stable_quality=True, layout=True |  |

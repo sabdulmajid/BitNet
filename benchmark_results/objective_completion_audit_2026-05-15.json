@@ -1,0 +1,376 @@
+{
+  "schema": "bitnet-objective-completion-audit-v1",
+  "date": "2026-05-15",
+  "objective_achieved": false,
+  "completion_status": "not_complete",
+  "check_count": 9,
+  "complete_count": 7,
+  "partial_or_missing": [
+    "Convert repaired checkpoints into GGUF/TL2/I2_S and run actual bitnet.cpp/llama.cpp CPU inference",
+    "Evaluate MoE/Kimi feasibility including converter mapping, router/expert execution, quality, throughput, and locality"
+  ],
+  "checklist": [
+    {
+      "requirement": "Fix FSDP ternary export bug and re-export Qwen2.5-1.5B step-5000; target 197 ternary linear keys, not 1",
+      "status": "complete",
+      "evidence": "Qwen2.5-1.5B repaired hidden-MSE step-5000: ternary=197/197, scales=197, dense=True; Qwen2.5-0.5B step-1000: ternary=169/169, scales=169, dense=True; Qwen2.5-1.5B KL row-scale dense-head step-5000: ternary=196/196, scales=196, dense=True",
+      "remaining_gap": ""
+    },
+    {
+      "requirement": "Run fixed prompt suites for repaired 1.5B and complete 0.5B checkpoints",
+      "status": "complete",
+      "evidence": "Qwen2.5-1.5B repaired step-5000: 5 prompts; Qwen2.5-0.5B step-1000: 5 prompts",
+      "remaining_gap": ""
+    },
+    {
+      "requirement": "Add WikiText and FineWeb heldout perplexity for FP, naive PTQ, hidden-MSE QAT, KL QAT, dense-head, and row-scale variants",
+      "status": "complete",
+      "evidence": "12/12 finite artifacts=True; FP WikiText=13.901475466625362; naive PTQ WikiText=3813121.80332679; best row-scale WikiText=38.58006540148406",
+      "remaining_gap": ""
+    },
+    {
+      "requirement": "Add HellaSwag/PIQA/ARC and broader ten-task EleutherAI lm-eval comparisons with logged samples",
+      "status": "complete",
+      "evidence": "models=6, tasks/model=10, samples/model=22382; FP mean=0.644169; PTQ mean=0.348671; row-scale mean=0.499459",
+      "remaining_gap": ""
+    },
+    {
+      "requirement": "Add baselines: original FP, naive PTQ, llama.cpp Q4_K_M/Q8_0, QAT with/without hidden MSE, row-scale versus tensor-scale",
+      "status": "complete",
+      "evidence": "row-FP=-0.144710 [-0.185756, -0.103664]; row-PTQ=+0.150788 [+0.053427, +0.248149]; row-tensor=+0.015081 [+0.009028, +0.021134]; row-KL=+0.016021 [+0.006145, +0.025897]",
+      "remaining_gap": ""
+    },
+    {
+      "requirement": "Measure Xeon model size, quality, prompt throughput, decode throughput, and RSS/context scaling",
+      "status": "complete",
+      "evidence": "I2_SR PPL=38.8477, file=1211.3 MiB, prompt=211.67 tok/s, decode=19.07 tok/s; Q4_K_M file=940.4 MiB; RSS contexts=[512, 2048, 8192, 32768]",
+      "remaining_gap": ""
+    },
+    {
+      "requirement": "Convert repaired checkpoints into GGUF/TL2/I2_S and run actual bitnet.cpp/llama.cpp CPU inference",
+      "status": "partial",
+      "evidence": "direct dense/scalar writers exist; I2_SR candidate gate=True; active default gate=True; TL2 row-scale one-scale error=1.9042302114103853; row-fp16 design error=0.00019744640689756221 at 1.23046875 MiB",
+      "remaining_gap": "Packed row-scale CPU inference is active through stable I2_SR for dense Qwen; TL2 quality-preserving row-scale Qwen1.5B still requires row/group-scale runtime and kernel support."
+    },
+    {
+      "requirement": "Evaluate MoE/Kimi feasibility including converter mapping, router/expert execution, quality, throughput, and locality",
+      "status": "not_complete",
+      "evidence": "generic MoE checks present=6; productization gates failed=3/9; Kimi artifacts=0; Kimi source matches=0; Kimi config supported=False; config gaps=4; tiny Qwen2MoE FP16 fixture passed=True; tiny Qwen2MoE ternary I2_SR fixture passed=True; synthetic expert scaling passed=True; scaling rows=4",
+      "remaining_gap": "The Kimi config audit shows missing direct Kimi/DeepSeekV3 loading, MLA conversion metadata, shared-expert mapping, and block-FP8 import. Tiny random Qwen2MoE FP16 and ternary I2_SR GGUF fixtures validate generic converter/runtime plumbing, merged expert packing, and routed shape execution, but no validated Kimi-specific mapping, trained Qwen2MoE/Kimi quality artifact, TL2 MoE runtime support, router distillation, MoE quality run, trained throughput run, or trained expert-locality benchmark exists."
+    },
+    {
+      "requirement": "Produce side-by-side comparison, evidence manifest, prune plan, and honest novelty/product verdict",
+      "status": "complete",
+      "evidence": "manifest artifacts=191, missing=0; coverage=True checks=50; publishable ledger scopes negative result plus recovery path",
+      "remaining_gap": ""
+    }
+  ],
+  "metrics": {
+    "ternary_exports": {
+      "Qwen2.5-1.5B repaired hidden-MSE step-5000": {
+        "is_dict": true,
+        "key_count": 536,
+        "ternary_weight_count": 197,
+        "weight_scale_count": 197,
+        "row_scale_count": 0,
+        "scalar_scale_count": 197,
+        "first_ternary_keys": [
+          "lm_head.ternary_weight",
+          "model.layers.0.mlp.down_proj.ternary_weight",
+          "model.layers.0.mlp.gate_proj.ternary_weight"
+        ],
+        "state": "checkpoints/qwen2.5-1.5b-fineweb-edu/step-5000/ternary_state_dict.pt",
+        "dense": "checkpoints/qwen2.5-1.5b-fineweb-edu/step-5000/model.safetensors",
+        "dense_exists": true,
+        "expected_ternary_weight_count": 197
+      },
+      "Qwen2.5-0.5B step-1000": {
+        "is_dict": true,
+        "key_count": 460,
+        "ternary_weight_count": 169,
+        "weight_scale_count": 169,
+        "row_scale_count": 0,
+        "scalar_scale_count": 169,
+        "first_ternary_keys": [
+          "model.layers.0.self_attn.q_proj.ternary_weight",
+          "model.layers.0.self_attn.k_proj.ternary_weight",
+          "model.layers.0.self_attn.v_proj.ternary_weight"
+        ],
+        "state": "checkpoints/qwen2.5-0.5b-fineweb-edu-12/step-1000/ternary_state_dict.pt",
+        "dense": "checkpoints/qwen2.5-0.5b-fineweb-edu-12/step-1000/model.safetensors",
+        "dense_exists": true,
+        "expected_ternary_weight_count": 169
+      },
+      "Qwen2.5-1.5B KL row-scale dense-head step-5000": {
+        "is_dict": true,
+        "key_count": 535,
+        "ternary_weight_count": 196,
+        "weight_scale_count": 196,
+        "row_scale_count": 196,
+        "scalar_scale_count": 0,
+        "first_ternary_keys": [
+          "model.layers.0.self_attn.q_proj.ternary_weight",
+          "model.layers.0.self_attn.k_proj.ternary_weight",
+          "model.layers.0.self_attn.v_proj.ternary_weight"
+        ],
+        "state": "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-row-notiehead-5000/step-5000/ternary_state_dict.pt",
+        "dense": "checkpoints/qwen2.5-1.5b-fineweb-edu-klonly-row-notiehead-5000/step-5000/model.safetensors",
+        "dense_exists": true,
+        "expected_ternary_weight_count": 196
+      }
+    },
+    "prompt_suites": {
+      "Qwen2.5-1.5B repaired step-5000": {
+        "path": "benchmark_results/generation/qwen15b_step5000_core_cpu_16tok.jsonl",
+        "line_count": 5,
+        "exists": true
+      },
+      "Qwen2.5-0.5B step-1000": {
+        "path": "benchmark_results/generation/qwen05b_step1000_core_cpu.jsonl",
+        "line_count": 5,
+        "exists": true
+      }
+    },
+    "ppl": {
+      "FP WikiText": {
+        "path": "benchmark_results/quality-9735/qwen15b_fp_wikitext.json",
+        "perplexity": 13.901475466625362,
+        "eval_tokens": 32704.0,
+        "ok": true
+      },
+      "FP FineWeb": {
+        "path": "benchmark_results/quality-9735/qwen15b_fp_fineweb_heldout.json",
+        "perplexity": 10.268607541663883,
+        "eval_tokens": 32736.0,
+        "ok": true
+      },
+      "naive PTQ WikiText": {
+        "path": "benchmark_results/quality-ptq-qwen15b/qwen15b_naive_ptq_wikitext.json",
+        "perplexity": 3813121.80332679,
+        "eval_tokens": 32704.0,
+        "ok": true
+      },
+      "naive PTQ FineWeb": {
+        "path": "benchmark_results/quality-ptq-qwen15b/qwen15b_naive_ptq_fineweb_heldout.json",
+        "perplexity": 9582923.269140046,
+        "eval_tokens": 32736.0,
+        "ok": true
+      },
+      "hidden-MSE QAT WikiText": {
+        "path": "benchmark_results/quality-9735/qwen15b_ternary_wikitext.json",
+        "perplexity": 86.41395750155097,
+        "eval_tokens": 32704.0,
+        "ok": true
+      },
+      "hidden-MSE QAT FineWeb": {
+        "path": "benchmark_results/quality-9735/qwen15b_ternary_fineweb_heldout.json",
+        "perplexity": 40.39808536328532,
+        "eval_tokens": 32736.0,
+        "ok": true
+      },
+      "KL-only QAT WikiText": {
+        "path": "benchmark_results/quality-qwen15b-klonly-5000/qwen15b_ternary_wikitext.json",
+        "perplexity": 50.59538617072306,
+        "eval_tokens": 32704.0,
+        "ok": true
+      },
+      "KL-only QAT FineWeb": {
+        "path": "benchmark_results/quality-qwen15b-klonly-5000/qwen15b_ternary_fineweb_heldout.json",
+        "perplexity": 26.599041760368934,
+        "eval_tokens": 32736.0,
+        "ok": true
+      },
+      "dense-head QAT WikiText": {
+        "path": "benchmark_results/quality-qwen15b-klonly-notiehead-5000/qwen15b_ternary_wikitext.json",
+        "perplexity": 43.37239951638826,
+        "eval_tokens": 32704.0,
+        "ok": true
+      },
+      "dense-head QAT FineWeb": {
+        "path": "benchmark_results/quality-qwen15b-klonly-notiehead-5000/qwen15b_ternary_fineweb_heldout.json",
+        "perplexity": 22.75897534038801,
+        "eval_tokens": 32736.0,
+        "ok": true
+      },
+      "row-scale dense-head QAT WikiText": {
+        "path": "benchmark_results/quality-qwen15b-klonly-row-notiehead-5000/qwen15b_ternary_wikitext.json",
+        "perplexity": 38.58006540148406,
+        "eval_tokens": 32704.0,
+        "ok": true
+      },
+      "row-scale dense-head QAT FineWeb": {
+        "path": "benchmark_results/quality-qwen15b-klonly-row-notiehead-5000/qwen15b_ternary_fineweb_heldout.json",
+        "perplexity": 21.333215852384445,
+        "eval_tokens": 32736.0,
+        "ok": true
+      }
+    },
+    "lm_eval": {
+      "FP": {
+        "path": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json",
+        "selected_tasks": 10,
+        "sample_count": 22382,
+        "selected_mean": 0.6441691641219306,
+        "missing": [],
+        "ok": true
+      },
+      "naive PTQ": {
+        "path": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json",
+        "selected_tasks": 10,
+        "sample_count": 22382,
+        "selected_mean": 0.34867101715441434,
+        "missing": [],
+        "ok": true
+      },
+      "hidden-MSE QAT": {
+        "path": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_qat_ternary.json",
+        "selected_tasks": 10,
+        "sample_count": 22382,
+        "selected_mean": 0.464808593509838,
+        "missing": [],
+        "ok": true
+      },
+      "KL-only QAT": {
+        "path": "benchmark_results/lm-eval-qwen15b-klonly-full10/qwen15b_qat_ternary.json",
+        "selected_tasks": 10,
+        "sample_count": 22382,
+        "selected_mean": 0.48343812779268475,
+        "missing": [],
+        "ok": true
+      },
+      "dense-head QAT": {
+        "path": "benchmark_results/lm-eval-qwen15b-klonly-notiehead-full10/qwen15b_qat_ternary.json",
+        "selected_tasks": 10,
+        "sample_count": 22382,
+        "selected_mean": 0.484378450609269,
+        "missing": [],
+        "ok": true
+      },
+      "row-scale dense-head QAT": {
+        "path": "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/qwen15b_qat_ternary.json",
+        "selected_tasks": 10,
+        "sample_count": 22382,
+        "selected_mean": 0.49945920048238823,
+        "missing": [],
+        "ok": true
+      }
+    },
+    "paired_deltas": {
+      "row_minus_fp": "-0.144710 [-0.185756, -0.103664]",
+      "row_minus_ptq": "+0.150788 [+0.053427, +0.248149]",
+      "row_minus_tensor_dense_head": "+0.015081 [+0.009028, +0.021134]",
+      "row_minus_kl_only": "+0.016021 [+0.006145, +0.025897]"
+    },
+    "cpu": {
+      "FP F16": {
+        "path": "benchmark_results/gguf-qwen15b-row-i2s-prototype-suite/summary.json",
+        "row": "qwen15b_fp_f16",
+        "ppl": 12.2808,
+        "prefill_tok_s": 114.468162,
+        "decode_tok_s": 5.555998,
+        "file_mib": 2950.3500366210938,
+        "ok": true
+      },
+      "FP Q8_0": {
+        "path": "benchmark_results/gguf-qwen15b-row-i2s-prototype-suite/summary.json",
+        "row": "qwen15b_fp_q8_0",
+        "ppl": 12.3056,
+        "prefill_tok_s": 124.864246,
+        "decode_tok_s": 10.131914,
+        "file_mib": 1570.2914428710938,
+        "ok": true
+      },
+      "FP Q4_K_M": {
+        "path": "benchmark_results/gguf-qwen15b-row-i2s-prototype-suite/summary.json",
+        "row": "qwen15b_fp_q4_k_m",
+        "ppl": 12.8112,
+        "prefill_tok_s": 92.077037,
+        "decode_tok_s": 16.013125,
+        "file_mib": 940.3661499023438,
+        "ok": true
+      },
+      "row-scale TQ2_0": {
+        "path": "benchmark_results/gguf-qwen15b-row-i2s-prototype-suite/summary.json",
+        "row": "qwen15b_klonly_row_notie_static_ternary_tq2_0",
+        "ppl": 38.8224,
+        "prefill_tok_s": 169.460897,
+        "decode_tok_s": 18.675323,
+        "file_mib": 1218.6116943359375,
+        "ok": true
+      },
+      "row-scale I2_S prototype": {
+        "path": "benchmark_results/gguf-qwen15b-row-i2s-heapfix-confirm/summary.json",
+        "row": "qwen15b_klonly_row_notie_static_ternary_i2_s_rowscale",
+        "ppl": 38.8832,
+        "prefill_tok_s": 218.172685,
+        "decode_tok_s": 18.973629,
+        "file_mib": 1211.31689453125,
+        "ok": true
+      },
+      "row-scale I2_SR candidate": {
+        "path": "benchmark_results/i2sr-row-scale-qwen15b-x86act-suite-2026-05-13/summary.json",
+        "row": "qwen15b_klonly_row_notie_static_ternary_i2_sr_x86act",
+        "ppl": 38.8477,
+        "prefill_tok_s": 211.668328,
+        "decode_tok_s": 19.065496,
+        "file_mib": 1211.3169555664062,
+        "ok": true
+      }
+    },
+    "i2sr_rss_contexts": [
+      512,
+      2048,
+      8192,
+      32768
+    ],
+    "productization": {
+      "active_qtype_gate_passed": true,
+      "candidate_patch_gate_passed": true,
+      "direct_packed_verdict": {
+        "candidate_i2sr_layout_verified": true,
+        "candidate_i2sr_quality_valid": true,
+        "candidate_i2sr_writer_supported": true,
+        "direct_dense_gguf_supported": true,
+        "direct_packed_i2s_supported": true,
+        "direct_packed_i2s_supported_via_native_py_stack": false,
+        "product_safe_row_scale_packed_supported": true,
+        "requires_python_gguf_i2s_support": false,
+        "requires_special_row_scale_nbytes": false,
+        "requires_stable_row_scale_type_or_version": false,
+        "stable_i2sr_runtime_supported": true
+      },
+      "qwen15b_row_scale_tl2_one_scale_error": 1.9042302114103853,
+      "qwen15b_row_scale_tl2_row_fp16_error": 0.00019744640689756221,
+      "qwen15b_row_scale_tl2_row_fp16_scale_mib": 1.23046875
+    },
+    "moe": {
+      "path": "benchmark_results/moe_support_audit_2026-05-15.json",
+      "kimi_config_path": "benchmark_results/kimi_config_feasibility_2026-05-15.json",
+      "present_generic_checks": 6,
+      "productization_gate_count": 9,
+      "failed_productization_gate_count": 3,
+      "local_kimi_artifact_count": 0,
+      "kimi_source_match_count": 0,
+      "kimi_config_passed": false,
+      "kimi_config_unsupported": [
+        "Kimi/DeepSeekV3 architecture loader",
+        "MLA/Q-LoRA attention metadata",
+        "Shared expert path",
+        "Block-FP8 source checkpoint import"
+      ],
+      "tiny_qwen2moe_fixture_passed": true,
+      "tiny_qwen2moe_ternary_i2sr_fixture_passed": true,
+      "tiny_qwen2moe_expert_scaling_passed": true,
+      "tiny_qwen2moe_expert_scaling_rows": 4
+    },
+    "meta": {
+      "manifest_path": "benchmarks/results/evidence_manifest_2026-05-15.json",
+      "coverage_path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
+      "manifest_artifacts": 191,
+      "manifest_missing": 0,
+      "coverage_passed": true,
+      "coverage_checks": 50,
+      "prune_sizes": {}
+    }
+  }
+}

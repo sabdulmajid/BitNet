@@ -1,5 +1,5 @@
 {
-  "artifact_count": 189,
+  "artifact_count": 191,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "98818803aa0f0de32fa340a2ae5d48642eb3473a6be3025ae931e861ab81021b",
-      "size_bytes": 14755
+      "sha256": "8d288eef975f2737b799c4fb26936ec274838b8f87ef8ea32f0ca32eb114425d",
+      "size_bytes": 15163
     },
     {
       "exists": true,
@@ -79,7 +79,7 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-15.md",
-      "sha256": "ea35b31e4ac69914b2d49741b21e67472d213776c91ce097467ff2962b532e03",
+      "sha256": "ac3f8ba60788b53cdc308618bd85b7903db705b785158e8834452b943ec61175",
       "size_bytes": 5646
     },
     {
@@ -153,6 +153,15 @@
       "path": "benchmarks/results/bitnet_sft_recipe_alignment_2026-05-15.md",
       "sha256": "69950837db6742e8ca59fbd8033de4df89bfc2cfc7a77b4d267d4d117f3b4849",
       "size_bytes": 2883
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitnet_sft_mechanics_audit_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitnet_sft_mechanics_audit_2026-05-15.md",
+      "sha256": "8d5e6bccb240f9098f73eb4b78651fecf1615d97c3911aacbe46a2dc76005b0b",
+      "size_bytes": 4040
     },
     {
       "exists": true,
@@ -457,8 +466,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "6a59cefffee6b7511da9174a4c2ed0f080aaa114d91f5ae54c6c637e59d46c50",
-      "size_bytes": 4513
+      "sha256": "3f125c1961122e0659fb21cb762a973c79ded4e04757261f19343eeb47fe538e",
+      "size_bytes": 5581
     },
     {
       "exists": true,
@@ -2142,13 +2151,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 44,
+        "check_count": 50,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "7337f995293f7013e3d21bd48627fdcd625a5f3a8251eef51edcff1e68b01d55",
-      "size_bytes": 7911
+      "sha256": "788c5876a937fffbcda3ae952b2c422ee61a29fc5a1f69c81d0fa80fc04ece6c",
+      "size_bytes": 9441
     },
     {
       "exists": true,
@@ -2165,7 +2174,7 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-15.json",
-      "sha256": "870a1042e0a8ef5dc159c7503f19be382f678a548f08750a5a7f6e42f61dd755",
+      "sha256": "e84b5d0ac2ec12f6858a71176674181bd9dd72cd2eb0dbafc04835bda159dda8",
       "size_bytes": 16035
     },
     {
@@ -2225,6 +2234,15 @@
       "path": "benchmark_results/bitnet_sft_recipe_alignment_2026-05-15.json",
       "sha256": "2e2449074bb1a937964a0d2d02563f01232f05c09f91ad124dfccc329abb72b7",
       "size_bytes": 3545
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "bitnet_sft_mechanics_audit_json",
+      "metrics": {},
+      "path": "benchmark_results/bitnet_sft_mechanics_audit_2026-05-15.json",
+      "sha256": "47c1fa293d7a604ae0489c8502a74bac8f7120ee40cc56f0b5e61ca61d7cf1ca",
+      "size_bytes": 76773
     },
     {
       "exists": true,

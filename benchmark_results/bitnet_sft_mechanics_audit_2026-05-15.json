@@ -1,0 +1,1878 @@
+{
+  "baseline": {
+    "best_budget_paired": {
+      "both_correct": 5548,
+      "both_wrong": 1258,
+      "candidate_accuracy": 0.6289353031074886,
+      "candidate_wins": 625,
+      "clears_paper_anchor": true,
+      "delta_vs_paper_anchor": 0.02093530310748859,
+      "delta_vs_reference": -0.17921548650025465,
+      "errors": [],
+      "job_id": "10066",
+      "lr": "2e-5",
+      "matched": 9815,
+      "mcnemar_exact_p": 3.4383886495134495e-240,
+      "metrics_accuracy": 0.6289353031074886,
+      "paired_ci95": [
+        -0.18958024909015786,
+        -0.16885072391035155
+      ],
+      "paper_anchor": 0.608,
+      "prediction_path": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5/eval_predictions.jsonl",
+      "reference_accuracy": 0.8081507896077432,
+      "reference_wins": 2384,
+      "status": "pass",
+      "steps": 10000
+    },
+    "best_budget_sweep": {
+      "accuracy": 0.6289353031074886,
+      "default_baseline_delta": 0.1413143148242486,
+      "effective_train_examples": 160000,
+      "eval_examples": 9815.0,
+      "exists": true,
+      "full_eval": true,
+      "grad_accum_steps": 4,
+      "job_id": "10066",
+      "job_table": "benchmark_results/bitnet_sft_budget_sweep_long_20260515_135825.tsv",
+      "last_ce": 0.56640625,
+      "last_loss": 0.56640625,
+      "lr": "2e-5",
+      "method": "bitnet_sft",
+      "metrics_path": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5/metrics.json",
+      "paper_anchor": 0.608,
+      "paper_anchor_minus_local": -0.02093530310748859,
+      "per_device_batch_size": 4,
+      "preparation": {
+        "activation_quantization": true,
+        "bitlinear_replaced": 168,
+        "subln_inserted": 0,
+        "untied_output_embeddings": false
+      },
+      "root": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5",
+      "scale_mode": "tensor",
+      "steps": 10000,
+      "train_epoch_fraction": 0.4074336265157804,
+      "training_budget": {
+        "effective_train_token_presentations_upper_bound": 81920000,
+        "grad_accum_steps": 4,
+        "max_eval_samples": 0,
+        "max_seq_len": 512,
+        "max_steps": 10000,
+        "max_train_samples": 0,
+        "per_device_batch_size": 4
+      }
+    },
+    "checkpoints": [
+      {
+        "accuracy": 0.8076413652572593,
+        "eval_examples": 9815.0,
+        "exists": true,
+        "fp16_gap": 0.0,
+        "full_eval": true,
+        "last": {
+          "attention_kd": 0.0,
+          "ce": 0.08544921875,
+          "logit_kd": 0.0,
+          "loss": 0.08544921875,
+          "lr": 2.0000000000000003e-06,
+          "weighted_attention_kd": 0.0,
+          "weighted_logit_kd": 0.0
+        },
+        "loss_weights": {
+          "attention_kd_weight": 100.0,
+          "attention_temperature": 1.0,
+          "logit_kd_weight": 10.0,
+          "logit_temperature": 5.0
+        },
+        "method": "fp16_sft",
+        "metrics_path": "checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1/metrics.json",
+        "name": "FP16-SFT",
+        "paper_anchor": 0.7991,
+        "paper_gap": -0.008541365257259237,
+        "preparation": {
+          "bitlinear_replaced": 0,
+          "subln_inserted": 0
+        },
+        "root": "checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1",
+        "scale_mode": "tensor",
+        "state_load": {
+          "loaded": false
+        },
+        "steps": 1000,
+        "task": "mnli",
+        "task_format": "sequence_classification",
+        "ternary": {
+          "exists": false,
+          "path": "checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1/ternary_state_dict.pt"
+        },
+        "training_budget": {
+          "effective_train_token_presentations_upper_bound": 8192000,
+          "grad_accum_steps": 4,
+          "max_eval_samples": 0,
+          "max_seq_len": 512,
+          "max_steps": 1000,
+          "max_train_samples": 0,
+          "per_device_batch_size": 4
+        }
+      },
+      {
+        "accuracy": 0.48762098828323996,
+        "eval_examples": 9815.0,
+        "exists": true,
+        "fp16_gap": 0.3200203769740193,
+        "full_eval": true,
+        "last": {
+          "attention_kd": 0.0,
+          "ce": 0.64453125,
+          "logit_kd": 0.0,
+          "loss": 0.64453125,
+          "lr": 2.0000000000000003e-06,
+          "weighted_attention_kd": 0.0,
+          "weighted_logit_kd": 0.0
+        },
+        "loss_weights": {
+          "attention_kd_weight": 100.0,
+          "attention_temperature": 1.0,
+          "logit_kd_weight": 10.0,
+          "logit_temperature": 5.0
+        },
+        "method": "bitnet_sft",
+        "metrics_path": "checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-layer-1/metrics.json",
+        "name": "BitNet-SFT",
+        "paper_anchor": 0.608,
+        "paper_gap": 0.12037901171676002,
+        "preparation": {
+          "activation_quantization": true,
+          "bitlinear_replaced": 168,
+          "subln_inserted": 0
+        },
+        "root": "checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-layer-1",
+        "scale_mode": "tensor",
+        "state_load": {
+          "loaded": false
+        },
+        "steps": 1000,
+        "task": "mnli",
+        "task_format": "sequence_classification",
+        "ternary": {
+          "bias_count": 72,
+          "code_counts": {
+            "-1": 119243259,
+            "0": 119219343,
+            "1": 119363958
+          },
+          "code_fractions": {
+            "-1": 0.33324317512931406,
+            "0": 0.33317633827964027,
+            "1": 0.33358048659104567
+          },
+          "dense_weight_count": 51,
+          "dense_weight_keys": [
+            "model.embed_tokens.weight",
+            "model.layers.0.input_layernorm.weight",
+            "model.layers.0.post_attention_layernorm.weight",
+            "model.layers.1.input_layernorm.weight",
+            "model.layers.1.post_attention_layernorm.weight",
+            "model.layers.10.input_layernorm.weight",
+            "model.layers.10.post_attention_layernorm.weight",
+            "model.layers.11.input_layernorm.weight",
+            "model.layers.11.post_attention_layernorm.weight",
+            "model.layers.12.input_layernorm.weight",
+            "model.layers.12.post_attention_layernorm.weight",
+            "model.layers.13.input_layernorm.weight",
+            "model.layers.13.post_attention_layernorm.weight",
+            "model.layers.14.input_layernorm.weight",
+            "model.layers.14.post_attention_layernorm.weight",
+            "model.layers.15.input_layernorm.weight",
+            "model.layers.15.post_attention_layernorm.weight",
+            "model.layers.16.input_layernorm.weight",
+            "model.layers.16.post_attention_layernorm.weight",
+            "model.layers.17.input_layernorm.weight",
+            "model.layers.17.post_attention_layernorm.weight",
+            "model.layers.18.input_layernorm.weight",
+            "model.layers.18.post_attention_layernorm.weight",
+            "model.layers.19.input_layernorm.weight",
+            "model.layers.19.post_attention_layernorm.weight",
+            "model.layers.2.input_layernorm.weight",
+            "model.layers.2.post_attention_layernorm.weight",
+            "model.layers.20.input_layernorm.weight",
+            "model.layers.20.post_attention_layernorm.weight",
+            "model.layers.21.input_layernorm.weight",
+            "model.layers.21.post_attention_layernorm.weight",
+            "model.layers.22.input_layernorm.weight",
+            "model.layers.22.post_attention_layernorm.weight",
+            "model.layers.23.input_layernorm.weight",
+            "model.layers.23.post_attention_layernorm.weight",
+            "model.layers.3.input_layernorm.weight",
+            "model.layers.3.post_attention_layernorm.weight",
+            "model.layers.4.input_layernorm.weight",
+            "model.layers.4.post_attention_layernorm.weight",
+            "model.layers.5.input_layernorm.weight",
+            "model.layers.5.post_attention_layernorm.weight",
+            "model.layers.6.input_layernorm.weight",
+            "model.layers.6.post_attention_layernorm.weight",
+            "model.layers.7.input_layernorm.weight",
+            "model.layers.7.post_attention_layernorm.weight",
+            "model.layers.8.input_layernorm.weight",
+            "model.layers.8.post_attention_layernorm.weight",
+            "model.layers.9.input_layernorm.weight",
+            "model.layers.9.post_attention_layernorm.weight",
+            "model.norm.weight",
+            "score.weight"
+          ],
+          "exists": true,
+          "families": {
+            "mlp.down_proj": {
+              "codes": 104595456,
+              "minus_one_frac": 0.33334029348273025,
+              "plus_one_frac": 0.3332980354328203,
+              "tensors": 24,
+              "zero_frac": 0.3333616710844494
+            },
+            "mlp.gate_proj": {
+              "codes": 104595456,
+              "minus_one_frac": 0.33513826833930527,
+              "plus_one_frac": 0.3362529247924499,
+              "tensors": 24,
+              "zero_frac": 0.32860880686824484
+            },
+            "mlp.up_proj": {
+              "codes": 104595456,
+              "minus_one_frac": 0.33851220075946703,
+              "plus_one_frac": 0.338636106715764,
+              "tensors": 24,
+              "zero_frac": 0.322851692524769
+            },
+            "self_attn.k_proj": {
+              "codes": 2752512,
+              "minus_one_frac": 0.31740897042410715,
+              "plus_one_frac": 0.31727854410807294,
+              "tensors": 24,
+              "zero_frac": 0.3653124854678199
+            },
+            "self_attn.o_proj": {
+              "codes": 19267584,
+              "minus_one_frac": 0.32066646238573554,
+              "plus_one_frac": 0.32058980513592156,
+              "tensors": 24,
+              "zero_frac": 0.3587437324783429
+            },
+            "self_attn.q_proj": {
+              "codes": 19267584,
+              "minus_one_frac": 0.3095516282684949,
+              "plus_one_frac": 0.30942260326982357,
+              "tensors": 24,
+              "zero_frac": 0.38102576846168157
+            },
+            "self_attn.v_proj": {
+              "codes": 2752512,
+              "minus_one_frac": 0.3270281837100074,
+              "plus_one_frac": 0.3269893101283482,
+              "tensors": 24,
+              "zero_frac": 0.34598250616164433
+            }
+          },
+          "layer_count": 24,
+          "layer_max": 23,
+          "layer_min": 0,
+          "path": "checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-layer-1/ternary_state_dict.pt",
+          "scale_numel_by_key": {
+            "1": 168
+          },
+          "scale_summary": {
+            "count": 168,
+            "max": 0.050910744816064835,
+            "mean": 0.01599222980439663,
+            "min": 0.00850316695868969,
+            "std": 0.0044018058106303215
+          },
+          "ternary_weight_count": 168,
+          "total_codes": 357826560,
+          "total_keys": 459,
+          "weight_scale_count": 168
+        },
+        "training_budget": {
+          "effective_train_token_presentations_upper_bound": 8192000,
+          "grad_accum_steps": 4,
+          "max_eval_samples": 0,
+          "max_seq_len": 512,
+          "max_steps": 1000,
+          "max_train_samples": 0,
+          "per_device_batch_size": 4
+        }
+      },
+      {
+        "accuracy": 0.4937340804890474,
+        "eval_examples": 9815.0,
+        "exists": true,
+        "fp16_gap": 0.3139072847682119,
+        "full_eval": true,
+        "last": {
+          "attention_kd": 0.0,
+          "ce": 0.671875,
+          "logit_kd": 0.0,
+          "loss": 0.671875,
+          "lr": 2.0000000000000003e-06,
+          "weighted_attention_kd": 0.0,
+          "weighted_logit_kd": 0.0
+        },
+        "loss_weights": {
+          "attention_kd_weight": 100.0,
+          "attention_qkv_reduction": "sum",
+          "attention_temperature": 1.0,
+          "logit_kd_temperature_scale": "none",
+          "logit_kd_weight": 10.0,
+          "logit_temperature": 5.0
+        },
+        "method": "bitnet_sft",
+        "metrics_path": "checkpoints/bitdistill-glue-seqcls-ablate/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-noa8-layer-1/metrics.json",
+        "name": "BitNet-SFT weights-only",
+        "paper_anchor": null,
+        "paper_gap": null,
+        "preparation": {
+          "activation_quantization": false,
+          "bitlinear_replaced": 168,
+          "subln_inserted": 0,
+          "untied_output_embeddings": false
+        },
+        "root": "checkpoints/bitdistill-glue-seqcls-ablate/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-noa8-layer-1",
+        "scale_mode": "tensor",
+        "state_load": {
+          "loaded": false
+        },
+        "steps": 1000,
+        "task": "mnli",
+        "task_format": "sequence_classification",
+        "ternary": {
+          "bias_count": 72,
+          "code_counts": {
+            "-1": 119241766,
+            "0": 119219886,
+            "1": 119364908
+          },
+          "code_fractions": {
+            "-1": 0.333239002716847,
+            "0": 0.3331778557745965,
+            "1": 0.33358314150855656
+          },
+          "dense_weight_count": 51,
+          "dense_weight_keys": [
+            "model.embed_tokens.weight",
+            "model.layers.0.input_layernorm.weight",
+            "model.layers.0.post_attention_layernorm.weight",
+            "model.layers.1.input_layernorm.weight",
+            "model.layers.1.post_attention_layernorm.weight",
+            "model.layers.10.input_layernorm.weight",
+            "model.layers.10.post_attention_layernorm.weight",
+            "model.layers.11.input_layernorm.weight",
+            "model.layers.11.post_attention_layernorm.weight",
+            "model.layers.12.input_layernorm.weight",
+            "model.layers.12.post_attention_layernorm.weight",
+            "model.layers.13.input_layernorm.weight",
+            "model.layers.13.post_attention_layernorm.weight",
+            "model.layers.14.input_layernorm.weight",
+            "model.layers.14.post_attention_layernorm.weight",
+            "model.layers.15.input_layernorm.weight",
+            "model.layers.15.post_attention_layernorm.weight",
+            "model.layers.16.input_layernorm.weight",
+            "model.layers.16.post_attention_layernorm.weight",
+            "model.layers.17.input_layernorm.weight",
+            "model.layers.17.post_attention_layernorm.weight",
+            "model.layers.18.input_layernorm.weight",
+            "model.layers.18.post_attention_layernorm.weight",
+            "model.layers.19.input_layernorm.weight",
+            "model.layers.19.post_attention_layernorm.weight",
+            "model.layers.2.input_layernorm.weight",
+            "model.layers.2.post_attention_layernorm.weight",
+            "model.layers.20.input_layernorm.weight",
+            "model.layers.20.post_attention_layernorm.weight",
+            "model.layers.21.input_layernorm.weight",
+            "model.layers.21.post_attention_layernorm.weight",
+            "model.layers.22.input_layernorm.weight",
+            "model.layers.22.post_attention_layernorm.weight",
+            "model.layers.23.input_layernorm.weight",
+            "model.layers.23.post_attention_layernorm.weight",
+            "model.layers.3.input_layernorm.weight",
+            "model.layers.3.post_attention_layernorm.weight",
+            "model.layers.4.input_layernorm.weight",
+            "model.layers.4.post_attention_layernorm.weight",
+            "model.layers.5.input_layernorm.weight",
+            "model.layers.5.post_attention_layernorm.weight",
+            "model.layers.6.input_layernorm.weight",
+            "model.layers.6.post_attention_layernorm.weight",
+            "model.layers.7.input_layernorm.weight",
+            "model.layers.7.post_attention_layernorm.weight",
+            "model.layers.8.input_layernorm.weight",
+            "model.layers.8.post_attention_layernorm.weight",
+            "model.layers.9.input_layernorm.weight",
+            "model.layers.9.post_attention_layernorm.weight",
+            "model.norm.weight",
+            "score.weight"
+          ],
+          "exists": true,
+          "families": {
+            "mlp.down_proj": {
+              "codes": 104595456,
+              "minus_one_frac": 0.3333358095403303,
+              "plus_one_frac": 0.3332910274801995,
+              "tensors": 24,
+              "zero_frac": 0.3333731629794702
+            },
+            "mlp.gate_proj": {
+              "codes": 104595456,
+              "minus_one_frac": 0.33512694853589053,
+              "plus_one_frac": 0.33625744697742893,
+              "tensors": 24,
+              "zero_frac": 0.3286156044866806
+            },
+            "mlp.up_proj": {
+              "codes": 104595456,
+              "minus_one_frac": 0.3385168376721834,
+              "plus_one_frac": 0.3386409922052446,
+              "tensors": 24,
+              "zero_frac": 0.32284217012257205
+            },
+            "self_attn.k_proj": {
+              "codes": 2752512,
+              "minus_one_frac": 0.3173824491954985,
+              "plus_one_frac": 0.3173759097144717,
+              "tensors": 24,
+              "zero_frac": 0.36524164109002977
+            },
+            "self_attn.o_proj": {
+              "codes": 19267584,
+              "minus_one_frac": 0.320666825690237,
+              "plus_one_frac": 0.3206166377683886,
+              "tensors": 24,
+              "zero_frac": 0.35871653654137436
+            },
+            "self_attn.q_proj": {
+              "codes": 19267584,
+              "minus_one_frac": 0.30953486436078337,
+              "plus_one_frac": 0.3094186069203072,
+              "tensors": 24,
+              "zero_frac": 0.3810465287189094
+            },
+            "self_attn.v_proj": {
+              "codes": 2752512,
+              "minus_one_frac": 0.3270514351981027,
+              "plus_one_frac": 0.3269860403878348,
+              "tensors": 24,
+              "zero_frac": 0.3459625244140625
+            }
+          },
+          "layer_count": 24,
+          "layer_max": 23,
+          "layer_min": 0,
+          "path": "checkpoints/bitdistill-glue-seqcls-ablate/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-noa8-layer-1/ternary_state_dict.pt",
+          "scale_numel_by_key": {
+            "1": 168
+          },
+          "scale_summary": {
+            "count": 168,
+            "max": 0.05091139301657677,
+            "mean": 0.015992358326911926,
+            "min": 0.008505329489707947,
+            "std": 0.00440197391435504
+          },
+          "ternary_weight_count": 168,
+          "total_codes": 357826560,
+          "total_keys": 459,
+          "weight_scale_count": 168
+        },
+        "training_budget": {
+          "effective_train_token_presentations_upper_bound": 8192000,
+          "grad_accum_steps": 4,
+          "max_eval_samples": 0,
+          "max_seq_len": 512,
+          "max_steps": 1000,
+          "max_train_samples": 0,
+          "per_device_batch_size": 4
+        }
+      },
+      {
+        "accuracy": 0.3502801833927662,
+        "eval_examples": 9815.0,
+        "exists": true,
+        "fp16_gap": 0.4573611818644931,
+        "full_eval": true,
+        "last": {
+          "attention_kd": 0.0,
+          "ce": 0.8984375,
+          "logit_kd": 0.0,
+          "loss": 0.8984375,
+          "lr": 2.0000000000000003e-06,
+          "weighted_attention_kd": 0.0,
+          "weighted_logit_kd": 0.0
+        },
+        "loss_weights": {
+          "attention_kd_weight": 100.0,
+          "attention_qkv_reduction": "sum",
+          "attention_temperature": 1.0,
+          "logit_kd_temperature_scale": "none",
+          "logit_kd_weight": 10.0,
+          "logit_temperature": 5.0
+        },
+        "method": "bitnet_sft",
+        "metrics_path": "checkpoints/bitdistill-glue-seqcls-ablate/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-subln-tensor-layer-1/metrics.json",
+        "name": "BitNet-SFT SubLN",
+        "paper_anchor": null,
+        "paper_gap": null,
+        "preparation": {
+          "activation_quantization": true,
+          "bitlinear_replaced": 168,
+          "subln_inserted": 48,
+          "untied_output_embeddings": false
+        },
+        "root": "checkpoints/bitdistill-glue-seqcls-ablate/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-subln-tensor-layer-1",
+        "scale_mode": "tensor",
+        "state_load": {
+          "loaded": false
+        },
+        "steps": 1000,
+        "task": "mnli",
+        "task_format": "sequence_classification",
+        "ternary": {
+          "bias_count": 72,
+          "code_counts": {
+            "-1": 119240475,
+            "0": 119222585,
+            "1": 119363500
+          },
+          "code_fractions": {
+            "-1": 0.3332353948236822,
+            "0": 0.3331853985349774,
+            "1": 0.33357920664134044
+          },
+          "dense_weight_count": 99,
+          "dense_weight_keys": [
+            "model.embed_tokens.weight",
+            "model.layers.0.input_layernorm.weight",
+            "model.layers.0.mlp.down_proj.subln.weight",
+            "model.layers.0.post_attention_layernorm.weight",
+            "model.layers.0.self_attn.o_proj.subln.weight",
+            "model.layers.1.input_layernorm.weight",
+            "model.layers.1.mlp.down_proj.subln.weight",
+            "model.layers.1.post_attention_layernorm.weight",
+            "model.layers.1.self_attn.o_proj.subln.weight",
+            "model.layers.10.input_layernorm.weight",
+            "model.layers.10.mlp.down_proj.subln.weight",
+            "model.layers.10.post_attention_layernorm.weight",
+            "model.layers.10.self_attn.o_proj.subln.weight",
+            "model.layers.11.input_layernorm.weight",
+            "model.layers.11.mlp.down_proj.subln.weight",
+            "model.layers.11.post_attention_layernorm.weight",
+            "model.layers.11.self_attn.o_proj.subln.weight",
+            "model.layers.12.input_layernorm.weight",
+            "model.layers.12.mlp.down_proj.subln.weight",
+            "model.layers.12.post_attention_layernorm.weight",
+            "model.layers.12.self_attn.o_proj.subln.weight",
+            "model.layers.13.input_layernorm.weight",
+            "model.layers.13.mlp.down_proj.subln.weight",
+            "model.layers.13.post_attention_layernorm.weight",
+            "model.layers.13.self_attn.o_proj.subln.weight",
+            "model.layers.14.input_layernorm.weight",
+            "model.layers.14.mlp.down_proj.subln.weight",
+            "model.layers.14.post_attention_layernorm.weight",
+            "model.layers.14.self_attn.o_proj.subln.weight",
+            "model.layers.15.input_layernorm.weight",
+            "model.layers.15.mlp.down_proj.subln.weight",
+            "model.layers.15.post_attention_layernorm.weight",
+            "model.layers.15.self_attn.o_proj.subln.weight",
+            "model.layers.16.input_layernorm.weight",
+            "model.layers.16.mlp.down_proj.subln.weight",
+            "model.layers.16.post_attention_layernorm.weight",
+            "model.layers.16.self_attn.o_proj.subln.weight",
+            "model.layers.17.input_layernorm.weight",
+            "model.layers.17.mlp.down_proj.subln.weight",
+            "model.layers.17.post_attention_layernorm.weight",
+            "model.layers.17.self_attn.o_proj.subln.weight",
+            "model.layers.18.input_layernorm.weight",
+            "model.layers.18.mlp.down_proj.subln.weight",
+            "model.layers.18.post_attention_layernorm.weight",
+            "model.layers.18.self_attn.o_proj.subln.weight",
+            "model.layers.19.input_layernorm.weight",
+            "model.layers.19.mlp.down_proj.subln.weight",
+            "model.layers.19.post_attention_layernorm.weight",
+            "model.layers.19.self_attn.o_proj.subln.weight",
+            "model.layers.2.input_layernorm.weight",
+            "model.layers.2.mlp.down_proj.subln.weight",
+            "model.layers.2.post_attention_layernorm.weight",
+            "model.layers.2.self_attn.o_proj.subln.weight",
+            "model.layers.20.input_layernorm.weight",
+            "model.layers.20.mlp.down_proj.subln.weight",
+            "model.layers.20.post_attention_layernorm.weight",
+            "model.layers.20.self_attn.o_proj.subln.weight",
+            "model.layers.21.input_layernorm.weight",
+            "model.layers.21.mlp.down_proj.subln.weight",
+            "model.layers.21.post_attention_layernorm.weight",
+            "model.layers.21.self_attn.o_proj.subln.weight",
+            "model.layers.22.input_layernorm.weight",
+            "model.layers.22.mlp.down_proj.subln.weight",
+            "model.layers.22.post_attention_layernorm.weight",
+            "model.layers.22.self_attn.o_proj.subln.weight",
+            "model.layers.23.input_layernorm.weight",
+            "model.layers.23.mlp.down_proj.subln.weight",
+            "model.layers.23.post_attention_layernorm.weight",
+            "model.layers.23.self_attn.o_proj.subln.weight",
+            "model.layers.3.input_layernorm.weight",
+            "model.layers.3.mlp.down_proj.subln.weight",
+            "model.layers.3.post_attention_layernorm.weight",
+            "model.layers.3.self_attn.o_proj.subln.weight",
+            "model.layers.4.input_layernorm.weight",
+            "model.layers.4.mlp.down_proj.subln.weight",
+            "model.layers.4.post_attention_layernorm.weight",
+            "model.layers.4.self_attn.o_proj.subln.weight",
+            "model.layers.5.input_layernorm.weight",
+            "model.layers.5.mlp.down_proj.subln.weight",
+            "model.layers.5.post_attention_layernorm.weight",
+            "model.layers.5.self_attn.o_proj.subln.weight",
+            "model.layers.6.input_layernorm.weight",
+            "model.layers.6.mlp.down_proj.subln.weight",
+            "model.layers.6.post_attention_layernorm.weight",
+            "model.layers.6.self_attn.o_proj.subln.weight",
+            "model.layers.7.input_layernorm.weight",
+            "model.layers.7.mlp.down_proj.subln.weight",
+            "model.layers.7.post_attention_layernorm.weight",
+            "model.layers.7.self_attn.o_proj.subln.weight",
+            "model.layers.8.input_layernorm.weight",
+            "model.layers.8.mlp.down_proj.subln.weight",
+            "model.layers.8.post_attention_layernorm.weight",
+            "model.layers.8.self_attn.o_proj.subln.weight",
+            "model.layers.9.input_layernorm.weight",
+            "model.layers.9.mlp.down_proj.subln.weight",
+            "model.layers.9.post_attention_layernorm.weight",
+            "model.layers.9.self_attn.o_proj.subln.weight",
+            "model.norm.weight",
+            "score.weight"
+          ],
+          "exists": true,
+          "families": {
+            "mlp.down_proj": {
+              "codes": 104595456,
+              "minus_one_frac": 0.3333331038778587,
+              "plus_one_frac": 0.33329400084072486,
+              "tensors": 24,
+              "zero_frac": 0.33337289528141645
+            },
+            "mlp.gate_proj": {
+              "codes": 104595456,
+              "minus_one_frac": 0.33513167149440987,
+              "plus_one_frac": 0.3362451902308261,
+              "tensors": 24,
+              "zero_frac": 0.3286231382747641
+            },
+            "mlp.up_proj": {
+              "codes": 104595456,
+              "minus_one_frac": 0.33850797495447604,
+              "plus_one_frac": 0.3386550272317757,
+              "tensors": 24,
+              "zero_frac": 0.32283699781374825
+            },
+            "self_attn.k_proj": {
+              "codes": 2752512,
+              "minus_one_frac": 0.3173726399739583,
+              "plus_one_frac": 0.31736646379743305,
+              "tensors": 24,
+              "zero_frac": 0.36526089622860863
+            },
+            "self_attn.o_proj": {
+              "codes": 19267584,
+              "minus_one_frac": 0.3206724828603316,
+              "plus_one_frac": 0.32056722835618623,
+              "tensors": 24,
+              "zero_frac": 0.35876028878348215
+            },
+            "self_attn.q_proj": {
+              "codes": 19267584,
+              "minus_one_frac": 0.3095161801292783,
+              "plus_one_frac": 0.30937594459170387,
+              "tensors": 24,
+              "zero_frac": 0.38110787527901785
+            },
+            "self_attn.v_proj": {
+              "codes": 2752512,
+              "minus_one_frac": 0.3269435337611607,
+              "plus_one_frac": 0.32694789341517855,
+              "tensors": 24,
+              "zero_frac": 0.3461085728236607
+            }
+          },
+          "layer_count": 24,
+          "layer_max": 23,
+          "layer_min": 0,
+          "path": "checkpoints/bitdistill-glue-seqcls-ablate/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-subln-tensor-layer-1/ternary_state_dict.pt",
+          "scale_numel_by_key": {
+            "1": 168
+          },
+          "scale_summary": {
+            "count": 168,
+            "max": 0.050910163670778275,
+            "mean": 0.015992088243365288,
+            "min": 0.00850526150316,
+            "std": 0.0044014547020196915
+          },
+          "ternary_weight_count": 168,
+          "total_codes": 357826560,
+          "total_keys": 507,
+          "weight_scale_count": 168
+        },
+        "training_budget": {
+          "effective_train_token_presentations_upper_bound": 8192000,
+          "grad_accum_steps": 4,
+          "max_eval_samples": 0,
+          "max_seq_len": 512,
+          "max_steps": 1000,
+          "max_train_samples": 0,
+          "per_device_batch_size": 4
+        }
+      },
+      {
+        "accuracy": 0.49699439633214465,
+        "eval_examples": 9815.0,
+        "exists": true,
+        "fp16_gap": 0.3106469689251146,
+        "full_eval": true,
+        "last": {
+          "attention_kd": 0.0,
+          "ce": 0.671875,
+          "logit_kd": 0.0,
+          "loss": 0.671875,
+          "lr": 2.0000000000000003e-06,
+          "weighted_attention_kd": 0.0,
+          "weighted_logit_kd": 0.0
+        },
+        "loss_weights": {
+          "attention_kd_weight": 100.0,
+          "attention_temperature": 1.0,
+          "logit_kd_weight": 10.0,
+          "logit_temperature": 5.0
+        },
+        "method": "bitnet_sft",
+        "metrics_path": "checkpoints/bitdistill-glue-seqcls-teacherhead/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-headinit-tensor-layer-1/metrics.json",
+        "name": "BitNet-SFT head-init",
+        "paper_anchor": null,
+        "paper_gap": null,
+        "preparation": {
+          "activation_quantization": true,
+          "bitlinear_replaced": 168,
+          "subln_inserted": 0
+        },
+        "root": "checkpoints/bitdistill-glue-seqcls-teacherhead/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-headinit-tensor-layer-1",
+        "scale_mode": "tensor",
+        "state_load": {
+          "loaded": false
+        },
+        "steps": 1000,
+        "task": "mnli",
+        "task_format": "sequence_classification",
+        "ternary": {
+          "bias_count": 72,
+          "code_counts": {
+            "-1": 119241291,
+            "0": 119221153,
+            "1": 119364116
+          },
+          "code_fractions": {
+            "-1": 0.3332376752580915,
+            "0": 0.33318139659616103,
+            "1": 0.33358092814574747
+          },
+          "dense_weight_count": 51,
+          "dense_weight_keys": [
+            "model.embed_tokens.weight",
+            "model.layers.0.input_layernorm.weight",
+            "model.layers.0.post_attention_layernorm.weight",
+            "model.layers.1.input_layernorm.weight",
+            "model.layers.1.post_attention_layernorm.weight",
+            "model.layers.10.input_layernorm.weight",
+            "model.layers.10.post_attention_layernorm.weight",
+            "model.layers.11.input_layernorm.weight",
+            "model.layers.11.post_attention_layernorm.weight",
+            "model.layers.12.input_layernorm.weight",
+            "model.layers.12.post_attention_layernorm.weight",
+            "model.layers.13.input_layernorm.weight",
+            "model.layers.13.post_attention_layernorm.weight",
+            "model.layers.14.input_layernorm.weight",
+            "model.layers.14.post_attention_layernorm.weight",
+            "model.layers.15.input_layernorm.weight",
+            "model.layers.15.post_attention_layernorm.weight",
+            "model.layers.16.input_layernorm.weight",
+            "model.layers.16.post_attention_layernorm.weight",
+            "model.layers.17.input_layernorm.weight",
+            "model.layers.17.post_attention_layernorm.weight",
+            "model.layers.18.input_layernorm.weight",
+            "model.layers.18.post_attention_layernorm.weight",
+            "model.layers.19.input_layernorm.weight",
+            "model.layers.19.post_attention_layernorm.weight",
+            "model.layers.2.input_layernorm.weight",
+            "model.layers.2.post_attention_layernorm.weight",
+            "model.layers.20.input_layernorm.weight",
+            "model.layers.20.post_attention_layernorm.weight",
+            "model.layers.21.input_layernorm.weight",
+            "model.layers.21.post_attention_layernorm.weight",
+            "model.layers.22.input_layernorm.weight",
+            "model.layers.22.post_attention_layernorm.weight",
+            "model.layers.23.input_layernorm.weight",
+            "model.layers.23.post_attention_layernorm.weight",
+            "model.layers.3.input_layernorm.weight",
+            "model.layers.3.post_attention_layernorm.weight",
+            "model.layers.4.input_layernorm.weight",
+            "model.layers.4.post_attention_layernorm.weight",
+            "model.layers.5.input_layernorm.weight",
+            "model.layers.5.post_attention_layernorm.weight",
+            "model.layers.6.input_layernorm.weight",
+            "model.layers.6.post_attention_layernorm.weight",
+            "model.layers.7.input_layernorm.weight",
+            "model.layers.7.post_attention_layernorm.weight",
+            "model.layers.8.input_layernorm.weight",
+            "model.layers.8.post_attention_layernorm.weight",
+            "model.layers.9.input_layernorm.weight",
+            "model.layers.9.post_attention_layernorm.weight",
+            "model.norm.weight",
+            "score.weight"
+          ],
+          "exists": true,
+          "families": {
+            "mlp.down_proj": {
+              "codes": 104595456,
+              "minus_one_frac": 0.3333410583343123,
+              "plus_one_frac": 0.33329332203494577,
+              "tensors": 24,
+              "zero_frac": 0.3333656196307419
+            },
+            "mlp.gate_proj": {
+              "codes": 104595456,
+              "minus_one_frac": 0.33513007486673224,
+              "plus_one_frac": 0.3362518731215245,
+              "tensors": 24,
+              "zero_frac": 0.3286180520117432
+            },
+            "mlp.up_proj": {
+              "codes": 104595456,
+              "minus_one_frac": 0.3385036439823925,
+              "plus_one_frac": 0.33863880281759084,
+              "tensors": 24,
+              "zero_frac": 0.32285755320001663
+            },
+            "self_attn.k_proj": {
+              "codes": 2752512,
+              "minus_one_frac": 0.3173864455450149,
+              "plus_one_frac": 0.31739734468005953,
+              "tensors": 24,
+              "zero_frac": 0.3652162097749256
+            },
+            "self_attn.o_proj": {
+              "codes": 19267584,
+              "minus_one_frac": 0.32066744849795387,
+              "plus_one_frac": 0.32059037604299534,
+              "tensors": 24,
+              "zero_frac": 0.3587421754590508
+            },
+            "self_attn.q_proj": {
+              "codes": 19267584,
+              "minus_one_frac": 0.3095359542742878,
+              "plus_one_frac": 0.30942758573155826,
+              "tensors": 24,
+              "zero_frac": 0.3810364599941539
+            },
+            "self_attn.v_proj": {
+              "codes": 2752512,
+              "minus_one_frac": 0.32704598563058035,
+              "plus_one_frac": 0.3270056588309152,
+              "tensors": 24,
+              "zero_frac": 0.34594835553850445
+            }
+          },
+          "layer_count": 24,
+          "layer_max": 23,
+          "layer_min": 0,
+          "path": "checkpoints/bitdistill-glue-seqcls-teacherhead/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-headinit-tensor-layer-1/ternary_state_dict.pt",
+          "scale_numel_by_key": {
+            "1": 168
+          },
+          "scale_summary": {
+            "count": 168,
+            "max": 0.05091104283928871,
+            "mean": 0.01599239371716976,
+            "min": 0.008504639379680157,
+            "std": 0.004402003716677427
+          },
+          "ternary_weight_count": 168,
+          "total_codes": 357826560,
+          "total_keys": 459,
+          "weight_scale_count": 168
+        },
+        "training_budget": {
+          "effective_train_token_presentations_upper_bound": 8192000,
+          "grad_accum_steps": 4,
+          "max_eval_samples": 0,
+          "max_seq_len": 512,
+          "max_steps": 1000,
+          "max_train_samples": 0,
+          "per_device_batch_size": 4
+        }
+      },
+      {
+        "accuracy": 0.6535914416709119,
+        "eval_examples": 9815.0,
+        "exists": true,
+        "fp16_gap": 0.1540499235863474,
+        "full_eval": true,
+        "last": {
+          "attention_kd": 0.019381575286388397,
+          "ce": 0.236328125,
+          "logit_kd": 0.013088520616292953,
+          "loss": 2.305370807647705,
+          "lr": 2.0000000000000003e-06,
+          "weighted_attention_kd": 1.938157558441162,
+          "weighted_logit_kd": 0.13088521361351013
+        },
+        "loss_weights": {
+          "attention_kd_weight": 100.0,
+          "attention_qkv_reduction": "sum",
+          "attention_temperature": 1.0,
+          "logit_kd_temperature_scale": "none",
+          "logit_kd_weight": 10.0,
+          "logit_temperature": 5.0
+        },
+        "method": "bitdistill",
+        "metrics_path": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/metrics.json",
+        "name": "Best local row-scale BitDistill",
+        "paper_anchor": null,
+        "paper_gap": null,
+        "preparation": {
+          "activation_quantization": true,
+          "bitlinear_replaced": 168,
+          "subln_inserted": 48,
+          "untied_output_embeddings": false
+        },
+        "root": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8",
+        "scale_mode": "row",
+        "state_load": {
+          "loaded": true,
+          "missing_keys": [
+            "score.weight"
+          ],
+          "path": "checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/custom_state_dict.pt",
+          "skipped_shape_mismatches": {},
+          "unexpected_keys": [
+            "lm_head.weight"
+          ]
+        },
+        "steps": 1000,
+        "task": "mnli",
+        "task_format": "sequence_classification",
+        "ternary": {
+          "bias_count": 72,
+          "code_counts": {
+            "-1": 121208353,
+            "0": 115289903,
+            "1": 121328304
+          },
+          "code_fractions": {
+            "-1": 0.33873492509890823,
+            "0": 0.3221949287386604,
+            "1": 0.3390701461624313
+          },
+          "dense_weight_count": 99,
+          "dense_weight_keys": [
+            "model.embed_tokens.weight",
+            "model.layers.0.input_layernorm.weight",
+            "model.layers.0.mlp.down_proj.subln.weight",
+            "model.layers.0.post_attention_layernorm.weight",
+            "model.layers.0.self_attn.o_proj.subln.weight",
+            "model.layers.1.input_layernorm.weight",
+            "model.layers.1.mlp.down_proj.subln.weight",
+            "model.layers.1.post_attention_layernorm.weight",
+            "model.layers.1.self_attn.o_proj.subln.weight",
+            "model.layers.10.input_layernorm.weight",
+            "model.layers.10.mlp.down_proj.subln.weight",
+            "model.layers.10.post_attention_layernorm.weight",
+            "model.layers.10.self_attn.o_proj.subln.weight",
+            "model.layers.11.input_layernorm.weight",
+            "model.layers.11.mlp.down_proj.subln.weight",
+            "model.layers.11.post_attention_layernorm.weight",
+            "model.layers.11.self_attn.o_proj.subln.weight",
+            "model.layers.12.input_layernorm.weight",
+            "model.layers.12.mlp.down_proj.subln.weight",
+            "model.layers.12.post_attention_layernorm.weight",
+            "model.layers.12.self_attn.o_proj.subln.weight",
+            "model.layers.13.input_layernorm.weight",
+            "model.layers.13.mlp.down_proj.subln.weight",
+            "model.layers.13.post_attention_layernorm.weight",
+            "model.layers.13.self_attn.o_proj.subln.weight",
+            "model.layers.14.input_layernorm.weight",
+            "model.layers.14.mlp.down_proj.subln.weight",
+            "model.layers.14.post_attention_layernorm.weight",
+            "model.layers.14.self_attn.o_proj.subln.weight",
+            "model.layers.15.input_layernorm.weight",
+            "model.layers.15.mlp.down_proj.subln.weight",
+            "model.layers.15.post_attention_layernorm.weight",
+            "model.layers.15.self_attn.o_proj.subln.weight",
+            "model.layers.16.input_layernorm.weight",
+            "model.layers.16.mlp.down_proj.subln.weight",
+            "model.layers.16.post_attention_layernorm.weight",
+            "model.layers.16.self_attn.o_proj.subln.weight",
+            "model.layers.17.input_layernorm.weight",
+            "model.layers.17.mlp.down_proj.subln.weight",
+            "model.layers.17.post_attention_layernorm.weight",
+            "model.layers.17.self_attn.o_proj.subln.weight",
+            "model.layers.18.input_layernorm.weight",
+            "model.layers.18.mlp.down_proj.subln.weight",
+            "model.layers.18.post_attention_layernorm.weight",
+            "model.layers.18.self_attn.o_proj.subln.weight",
+            "model.layers.19.input_layernorm.weight",
+            "model.layers.19.mlp.down_proj.subln.weight",
+            "model.layers.19.post_attention_layernorm.weight",
+            "model.layers.19.self_attn.o_proj.subln.weight",
+            "model.layers.2.input_layernorm.weight",
+            "model.layers.2.mlp.down_proj.subln.weight",
+            "model.layers.2.post_attention_layernorm.weight",
+            "model.layers.2.self_attn.o_proj.subln.weight",
+            "model.layers.20.input_layernorm.weight",
+            "model.layers.20.mlp.down_proj.subln.weight",
+            "model.layers.20.post_attention_layernorm.weight",
+            "model.layers.20.self_attn.o_proj.subln.weight",
+            "model.layers.21.input_layernorm.weight",
+            "model.layers.21.mlp.down_proj.subln.weight",
+            "model.layers.21.post_attention_layernorm.weight",
+            "model.layers.21.self_attn.o_proj.subln.weight",
+            "model.layers.22.input_layernorm.weight",
+            "model.layers.22.mlp.down_proj.subln.weight",
+            "model.layers.22.post_attention_layernorm.weight",
+            "model.layers.22.self_attn.o_proj.subln.weight",
+            "model.layers.23.input_layernorm.weight",
+            "model.layers.23.mlp.down_proj.subln.weight",
+            "model.layers.23.post_attention_layernorm.weight",
+            "model.layers.23.self_attn.o_proj.subln.weight",
+            "model.layers.3.input_layernorm.weight",
+            "model.layers.3.mlp.down_proj.subln.weight",
+            "model.layers.3.post_attention_layernorm.weight",
+            "model.layers.3.self_attn.o_proj.subln.weight",
+            "model.layers.4.input_layernorm.weight",
+            "model.layers.4.mlp.down_proj.subln.weight",
+            "model.layers.4.post_attention_layernorm.weight",
+            "model.layers.4.self_attn.o_proj.subln.weight",
+            "model.layers.5.input_layernorm.weight",
+            "model.layers.5.mlp.down_proj.subln.weight",
+            "model.layers.5.post_attention_layernorm.weight",
+            "model.layers.5.self_attn.o_proj.subln.weight",
+            "model.layers.6.input_layernorm.weight",
+            "model.layers.6.mlp.down_proj.subln.weight",
+            "model.layers.6.post_attention_layernorm.weight",
+            "model.layers.6.self_attn.o_proj.subln.weight",
+            "model.layers.7.input_layernorm.weight",
+            "model.layers.7.mlp.down_proj.subln.weight",
+            "model.layers.7.post_attention_layernorm.weight",
+            "model.layers.7.self_attn.o_proj.subln.weight",
+            "model.layers.8.input_layernorm.weight",
+            "model.layers.8.mlp.down_proj.subln.weight",
+            "model.layers.8.post_attention_layernorm.weight",
+            "model.layers.8.self_attn.o_proj.subln.weight",
+            "model.layers.9.input_layernorm.weight",
+            "model.layers.9.mlp.down_proj.subln.weight",
+            "model.layers.9.post_attention_layernorm.weight",
+            "model.layers.9.self_attn.o_proj.subln.weight",
+            "model.norm.weight",
+            "score.weight"
+          ],
+          "exists": true,
+          "families": {
+            "mlp.down_proj": {
+              "codes": 104595456,
+              "minus_one_frac": 0.3375499505446967,
+              "plus_one_frac": 0.3374755974102737,
+              "tensors": 24,
+              "zero_frac": 0.32497445204502956
+            },
+            "mlp.gate_proj": {
+              "codes": 104595456,
+              "minus_one_frac": 0.3406119478077518,
+              "plus_one_frac": 0.3417557642274632,
+              "tensors": 24,
+              "zero_frac": 0.317632287964785
+            },
+            "mlp.up_proj": {
+              "codes": 104595456,
+              "minus_one_frac": 0.3399263444102199,
+              "plus_one_frac": 0.34003743910251705,
+              "tensors": 24,
+              "zero_frac": 0.3200362164872631
+            },
+            "self_attn.k_proj": {
+              "codes": 2752512,
+              "minus_one_frac": 0.33752041771298363,
+              "plus_one_frac": 0.3372719174339658,
+              "tensors": 24,
+              "zero_frac": 0.3252076648530506
+            },
+            "self_attn.o_proj": {
+              "codes": 19267584,
+              "minus_one_frac": 0.3324980962844122,
+              "plus_one_frac": 0.33246202533747876,
+              "tensors": 24,
+              "zero_frac": 0.33503987837810906
+            },
+            "self_attn.q_proj": {
+              "codes": 19267584,
+              "minus_one_frac": 0.33659850659013607,
+              "plus_one_frac": 0.3364744640531994,
+              "tensors": 24,
+              "zero_frac": 0.32692702935666457
+            },
+            "self_attn.v_proj": {
+              "codes": 2752512,
+              "minus_one_frac": 0.3269904000418527,
+              "plus_one_frac": 0.3270772298177083,
+              "tensors": 24,
+              "zero_frac": 0.345932370140439
+            }
+          },
+          "layer_count": 24,
+          "layer_max": 23,
+          "layer_min": 0,
+          "path": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/ternary_state_dict.pt",
+          "scale_numel_by_key": {
+            "128": 48,
+            "4864": 48,
+            "896": 72
+          },
+          "scale_summary": {
+            "count": 304128,
+            "max": 0.3554270267486572,
+            "mean": 0.01588115096092224,
+            "min": 0.0022694971412420273,
+            "std": 0.004491954576224089
+          },
+          "ternary_weight_count": 168,
+          "total_codes": 357826560,
+          "total_keys": 507,
+          "weight_scale_count": 168
+        },
+        "training_budget": {
+          "effective_train_token_presentations_upper_bound": 8192000,
+          "grad_accum_steps": 4,
+          "max_eval_samples": 0,
+          "max_seq_len": 512,
+          "max_steps": 1000,
+          "max_train_samples": 0,
+          "per_device_batch_size": 4
+        }
+      }
+    ],
+    "checks": [
+      {
+        "check": "FP16-SFT local task is learnable",
+        "evidence": "local=0.807641, paper_anchor=0.799100, delta=0.008541",
+        "implication": "The weak BitNet-SFT result is unlikely to be caused only by task formatting or dataset split.",
+        "status": "pass"
+      },
+      {
+        "check": "Default 1000-step BitNet-SFT matches paper anchor",
+        "evidence": "local=0.487621, paper_anchor=0.608000, delta=-0.120379",
+        "implication": "The short/default run is undertrained and should not be used as the final BitNet-SFT anchor.",
+        "status": "fail"
+      },
+      {
+        "check": "Best completed budget BitNet-SFT matches paper anchor",
+        "evidence": "best=0.628935, paper_anchor=0.608000, steps=10000, lr=2e-5",
+        "implication": "The local blocker has shifted from BitNet-SFT viability to BitDistill/FP16-level recovery.",
+        "status": "pass"
+      },
+      {
+        "check": "Best completed budget BitNet-SFT is still below paired FP16",
+        "evidence": "candidate_minus_fp16=-0.179215, ci95=[-0.189580, -0.168851], mcnemar=3.438389e-240",
+        "implication": "Clearing the paper BitNet-SFT anchor is not enough; the BitDistill stage must recover the remaining FP16 gap.",
+        "status": "fail"
+      },
+      {
+        "check": "BitNet-SFT ternary projection count matches Qwen2.5-0.5B decoder projections",
+        "evidence": "ternary=168, expected=168",
+        "implication": "The low baseline is not explained by exporting only one ternary tensor or missing whole decoder projection families.",
+        "status": "pass"
+      },
+      {
+        "check": "Classifier head remains dense",
+        "evidence": "score.weight",
+        "implication": "The poor score is not caused by accidentally ternarizing the classification head in this checkpoint.",
+        "status": "pass"
+      },
+      {
+        "check": "SubLN-only BitNet-SFT control explains the gap",
+        "evidence": "default_subln_inserted=0, subln_accuracy=0.350280, delta_vs_default=-0.137341",
+        "implication": "Current SubLN insertion alone does not recover the paper anchor; either the SubLN recipe differs or it requires matched warmup/search.",
+        "status": "fail"
+      },
+      {
+        "check": "Weights-only vs W1.58A8 ablation exists",
+        "evidence": "weights_only_accuracy=0.493734, A8_accuracy=0.487621",
+        "implication": "This separates weight-code collapse from activation-quantization damage.",
+        "status": "pass"
+      },
+      {
+        "check": "BitNet-SFT budget issue is explained",
+        "evidence": "default_steps=1000, default_acc=0.487621, best_steps=10000, best_acc=0.628935",
+        "implication": "The next controlled comparison should use the best budget row, not the default 1000-step row.",
+        "status": "pass"
+      }
+    ],
+    "date": "2026-05-15",
+    "expected_qwen25_05b_ternary_projection_count": 168,
+    "paper_anchor": {
+      "BitDistill": 0.7998,
+      "BitNet-SFT": 0.608,
+      "FP16-SFT": 0.7991
+    },
+    "schema": "bitnet-sft-baseline-audit-v1"
+  },
+  "baseline_json": "benchmark_results/bitnet_sft_baseline_audit_2026-05-15.json",
+  "best_budget": {
+    "accuracy": 0.6289353031074886,
+    "default_baseline_delta": 0.1413143148242486,
+    "effective_train_examples": 160000,
+    "eval_examples": 9815.0,
+    "exists": true,
+    "full_eval": true,
+    "grad_accum_steps": 4,
+    "job_id": "10066",
+    "job_table": "benchmark_results/bitnet_sft_budget_sweep_long_20260515_135825.tsv",
+    "last_ce": 0.56640625,
+    "last_loss": 0.56640625,
+    "lr": "2e-5",
+    "method": "bitnet_sft",
+    "metrics_path": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5/metrics.json",
+    "paper_anchor": 0.608,
+    "paper_anchor_minus_local": -0.02093530310748859,
+    "per_device_batch_size": 4,
+    "preparation": {
+      "activation_quantization": true,
+      "bitlinear_replaced": 168,
+      "subln_inserted": 0,
+      "untied_output_embeddings": false
+    },
+    "root": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5",
+    "scale_mode": "tensor",
+    "steps": 10000,
+    "train_epoch_fraction": 0.4074336265157804,
+    "training_budget": {
+      "effective_train_token_presentations_upper_bound": 81920000,
+      "grad_accum_steps": 4,
+      "max_eval_samples": 0,
+      "max_seq_len": 512,
+      "max_steps": 10000,
+      "max_train_samples": 0,
+      "per_device_batch_size": 4
+    }
+  },
+  "budget_sweep_json": "benchmark_results/bitnet_sft_budget_sweep_2026-05-15.json",
+  "checks": [
+    {
+      "evidence": "TernaryWeightSTE implements alpha=mean(abs(W)), round(W/alpha), clamp [-1,1], with identity STE backward.",
+      "implication": "The tensor-scale path matches the paper-style absmean ternary projection. Row-scale remains a fork variant.",
+      "item": "C. BitLinear equation",
+      "status": "pass"
+    },
+    {
+      "evidence": "AbsmaxActivationSTE uses per-token absmax / 127 with int8 clamp and identity backward.",
+      "implication": "A8 is present and can be ablated with --no-activation-quantization.",
+      "item": "B. Activation quantization equation",
+      "status": "pass"
+    },
+    {
+      "evidence": "Default exclude_linear_regex is score|classifier.",
+      "implication": "Sequence-classification head treatment is not the obvious reason for the weak early BitNet-SFT row.",
+      "item": "E. Dense classifier head default",
+      "status": "pass"
+    },
+    {
+      "evidence": "add_subln_to_qwen_blocks wraps self_attn.o_proj and mlp.down_proj.",
+      "implication": "Placement is mechanically consistent with the paper description, but the exact timing/init still matters.",
+      "item": "D. SubLN insertion points",
+      "status": "pass"
+    },
+    {
+      "evidence": "ternary=168/168; families={'down_proj': 24, 'gate_proj': 24, 'k_proj': 24, 'o_proj': 24, 'q_proj': 24, 'up_proj': 24, 'v_proj': 24}",
+      "implication": "All Q/K/V/O and MLP gate/up/down decoder projections are represented as ternary tensors.",
+      "item": "F. Projection replacement count",
+      "status": "pass"
+    },
+    {
+      "evidence": "score_dense=True, score_ternary=False, forbidden=[]",
+      "implication": "The audit does not find accidental ternarization of embeddings, norms, or the sequence-classification head.",
+      "item": "G. Non-projection tensors stay dense",
+      "status": "pass"
+    },
+    {
+      "evidence": "scale_numel_by_key={'1': 168}",
+      "implication": "The audited paper-style checkpoint stores one scalar scale per projection tensor, not row-scale metadata.",
+      "item": "Tensor-scale checkpoint scales",
+      "status": "pass"
+    },
+    {
+      "evidence": "fractions={'-1': 0.33324317512931406, '0': 0.33317633827964027, '1': 0.33358048659104567}, entropy_bits=1.584962/1.584963",
+      "implication": "Storage has the expected 1.58-bit ternary alphabet; this is also the information bottleneck that blind PTQ cannot avoid.",
+      "item": "H. Ternary code distribution is three-symbol",
+      "status": "pass"
+    },
+    {
+      "evidence": "weights_only=0.493734, W1.58A8=0.487621, delta=0.006113",
+      "implication": "Disabling activation quantization changes MNLI only slightly in the local control; ternary training/recipe dominates the gap.",
+      "item": "A/B. A8 ablation is not the primary gap",
+      "status": "pass"
+    },
+    {
+      "evidence": "logit_rel_rms=0.768044, top1_agreement=0.000000, subln_only=0.350280, default=0.487621",
+      "implication": "SubLN should be treated as architecture surgery requiring matched warmup/distillation, not as a harmless drop-in for short SFT.",
+      "item": "I/J. SubLN is not identity-preserving locally",
+      "status": "pass"
+    },
+    {
+      "evidence": "best_budget_accuracy=0.628935, paper_bitnet_sft_anchor=0.608000, default=0.487621",
+      "implication": "The earliest BitNet-SFT failure was substantially undertraining/schedule. The active blocker is now FP16-level BitDistill recovery.",
+      "item": "Budget explanation for weak early baseline",
+      "status": "pass"
+    }
+  ],
+  "date": "2026-05-15",
+  "default_bitnet_sft_accuracy": 0.48762098828323996,
+  "interpretation": "The audited implementation clears the basic mechanical checks for the paper-style tensor-scale BitNet-SFT baseline: exact absmean STE equation, A8 path, dense classifier head, 168 decoder projection tensors, scalar tensor scales, and no accidental embedding/norm/head ternarization. The weak early BitNet-SFT row is best explained by budget/schedule, while the remaining research blocker is BitDistill recovery toward FP16 accuracy and the non-identity behavior of SubLN without matched warmup.",
+  "paper_bitnet_sft_mnli": 0.608,
+  "passed": true,
+  "schema": "bitnet-sft-mechanics-audit-v1",
+  "subln_activation": {
+    "date": "2026-05-15",
+    "device": "cpu",
+    "examples": 4,
+    "families": {
+      ".mlp.down_proj": {
+        "base_input": {
+          "element_absmax": 172.54834105571112,
+          "element_std": 0.6861163390179476,
+          "modules": 24,
+          "token_rms_mean": 0.3808831088244915,
+          "token_rms_std": 0.4704496295501788
+        },
+        "subln_input": {
+          "element_absmax": 16.03739432990551,
+          "element_std": 0.1665480622711281,
+          "modules": 24,
+          "token_rms_mean": 0.15976952870065966,
+          "token_rms_std": 0.03988115345903983
+        },
+        "subln_output": {
+          "element_absmax": 40.85556252797445,
+          "element_std": 0.999257005751133,
+          "modules": 24,
+          "token_rms_mean": 0.99930373330911,
+          "token_rms_std": 0.00025778061134928976
+        }
+      },
+      ".self_attn.o_proj": {
+        "base_input": {
+          "element_absmax": 4.193092318872611,
+          "element_std": 0.40220824380715686,
+          "modules": 24,
+          "token_rms_mean": 0.38831099464247626,
+          "token_rms_std": 0.09887394085914518
+        },
+        "subln_input": {
+          "element_absmax": 3.2682844971617064,
+          "element_std": 0.46936887813111144,
+          "modules": 24,
+          "token_rms_mean": 0.46812776445100707,
+          "token_rms_std": 0.04066642181714997
+        },
+        "subln_output": {
+          "element_absmax": 6.833792587121327,
+          "element_std": 0.9976959327856699,
+          "modules": 24,
+          "token_rms_mean": 0.9996804222464561,
+          "token_rms_std": 8.809452730199989e-05
+        }
+      }
+    },
+    "interpretation": "Local SubLN insertion is not an identity-preserving conversion. It normalizes the tensors entering o_proj/down_proj to unit RMS and can materially perturb logits before any continued pretraining. Therefore a short SubLN-only downstream run is not a decisive test of the paper's Stage-1 recipe.",
+    "last_token_top1_agreement": 0.0,
+    "logit_cosine": 0.6982523202896118,
+    "logit_relative_rms": 0.7680435180664062,
+    "max_length": 64,
+    "model": "checkpoints/qwen2.5-0.5b-fineweb-edu-12/step-1000",
+    "rows": [
+      {
+        "base_input_absmax": 7.439883232116699,
+        "base_input_rms": 0.12367497384548187,
+        "module": "model.layers.0.mlp.down_proj",
+        "subln_input_rms": 0.11030970513820648,
+        "subln_output_absmax": 39.41840362548828,
+        "subln_output_rms": 0.9993268251419067
+      },
+      {
+        "base_input_absmax": 0.32412296533584595,
+        "base_input_rms": 0.028068535029888153,
+        "module": "model.layers.0.self_attn.o_proj",
+        "subln_input_rms": 0.028068535029888153,
+        "subln_output_absmax": 9.68506908416748,
+        "subln_output_rms": 0.9932699799537659
+      },
+      {
+        "base_input_absmax": 9.975130081176758,
+        "base_input_rms": 0.15577255189418793,
+        "module": "model.layers.1.mlp.down_proj",
+        "subln_input_rms": 0.1373218148946762,
+        "subln_output_absmax": 54.71512985229492,
+        "subln_output_rms": 0.9997015595436096
+      },
+      {
+        "base_input_absmax": 3.060990810394287,
+        "base_input_rms": 0.264993816614151,
+        "module": "model.layers.1.self_attn.o_proj",
+        "subln_input_rms": 0.2532496154308319,
+        "subln_output_absmax": 10.124833106994629,
+        "subln_output_rms": 0.9999188184738159
+      },
+      {
+        "base_input_absmax": 7.78772497177124,
+        "base_input_rms": 0.14563831686973572,
+        "module": "model.layers.10.mlp.down_proj",
+        "subln_input_rms": 0.048795185983181,
+        "subln_output_absmax": 47.6965446472168,
+        "subln_output_rms": 0.9976803660392761
+      },
+      {
+        "base_input_absmax": 2.6724250316619873,
+        "base_input_rms": 0.26865074038505554,
+        "module": "model.layers.10.self_attn.o_proj",
+        "subln_input_rms": 0.2672988772392273,
+        "subln_output_absmax": 7.24261999130249,
+        "subln_output_rms": 0.9999275803565979
+      },
+      {
+        "base_input_absmax": 7.537001132965088,
+        "base_input_rms": 0.15138006210327148,
+        "module": "model.layers.11.mlp.down_proj",
+        "subln_input_rms": 0.05784732475876808,
+        "subln_output_absmax": 26.303518295288086,
+        "subln_output_rms": 0.9983574151992798
+      },
+      {
+        "base_input_absmax": 2.9721312522888184,
+        "base_input_rms": 0.22499719262123108,
+        "module": "model.layers.11.self_attn.o_proj",
+        "subln_input_rms": 0.30632999539375305,
+        "subln_output_absmax": 6.22475004196167,
+        "subln_output_rms": 0.9999450445175171
+      },
+      {
+        "base_input_absmax": 4.53344202041626,
+        "base_input_rms": 0.1326597034931183,
+        "module": "model.layers.12.mlp.down_proj",
+        "subln_input_rms": 0.056343503296375275,
+        "subln_output_absmax": 31.113981246948242,
+        "subln_output_rms": 0.9982090592384338
+      },
+      {
+        "base_input_absmax": 2.6773242950439453,
+        "base_input_rms": 0.24390099942684174,
+        "module": "model.layers.12.self_attn.o_proj",
+        "subln_input_rms": 0.33888423442840576,
+        "subln_output_absmax": 7.503241539001465,
+        "subln_output_rms": 0.9999552369117737
+      },
+      {
+        "base_input_absmax": 10.515610694885254,
+        "base_input_rms": 0.15431100130081177,
+        "module": "model.layers.13.mlp.down_proj",
+        "subln_input_rms": 0.0591890849173069,
+        "subln_output_absmax": 44.28642654418945,
+        "subln_output_rms": 0.9983910918235779
+      },
+      {
+        "base_input_absmax": 2.0017340183258057,
+        "base_input_rms": 0.22428704798221588,
+        "module": "model.layers.13.self_attn.o_proj",
+        "subln_input_rms": 0.30220669507980347,
+        "subln_output_absmax": 4.119547367095947,
+        "subln_output_rms": 0.9999427199363708
+      },
+      {
+        "base_input_absmax": 7.082805633544922,
+        "base_input_rms": 0.17747698724269867,
+        "module": "model.layers.14.mlp.down_proj",
+        "subln_input_rms": 0.06600723415613174,
+        "subln_output_absmax": 27.504629135131836,
+        "subln_output_rms": 0.9987695217132568
+      },
+      {
+        "base_input_absmax": 3.615229368209839,
+        "base_input_rms": 0.4126031994819641,
+        "module": "model.layers.14.self_attn.o_proj",
+        "subln_input_rms": 0.2769174873828888,
+        "subln_output_absmax": 6.261805057525635,
+        "subln_output_rms": 0.9999329447746277
+      },
+      {
+        "base_input_absmax": 18.982206344604492,
+        "base_input_rms": 0.20507925748825073,
+        "module": "model.layers.15.mlp.down_proj",
+        "subln_input_rms": 0.07964663207530975,
+        "subln_output_absmax": 25.6243839263916,
+        "subln_output_rms": 0.9991534352302551
+      },
+      {
+        "base_input_absmax": 2.8375561237335205,
+        "base_input_rms": 0.2935325801372528,
+        "module": "model.layers.15.self_attn.o_proj",
+        "subln_input_rms": 0.33596494793891907,
+        "subln_output_absmax": 6.560032367706299,
+        "subln_output_rms": 0.9999551177024841
+      },
+      {
+        "base_input_absmax": 20.699180603027344,
+        "base_input_rms": 0.2721547484397888,
+        "module": "model.layers.16.mlp.down_proj",
+        "subln_input_rms": 0.1268337368965149,
+        "subln_output_absmax": 35.24109649658203,
+        "subln_output_rms": 0.9996596574783325
+      },
+      {
+        "base_input_absmax": 2.5101425647735596,
+        "base_input_rms": 0.16723282635211945,
+        "module": "model.layers.16.self_attn.o_proj",
+        "subln_input_rms": 0.4337438941001892,
+        "subln_output_absmax": 6.390939712524414,
+        "subln_output_rms": 0.9999727606773376
+      },
+      {
+        "base_input_absmax": 28.586341857910156,
+        "base_input_rms": 0.2882612943649292,
+        "module": "model.layers.17.mlp.down_proj",
+        "subln_input_rms": 0.12048664689064026,
+        "subln_output_absmax": 37.25231170654297,
+        "subln_output_rms": 0.9996363520622253
+      },
+      {
+        "base_input_absmax": 5.964815139770508,
+        "base_input_rms": 0.4851343333721161,
+        "module": "model.layers.17.self_attn.o_proj",
+        "subln_input_rms": 0.5819376111030579,
+        "subln_output_absmax": 7.911351203918457,
+        "subln_output_rms": 0.9999850392341614
+      },
+      {
+        "base_input_absmax": 18.863786697387695,
+        "base_input_rms": 0.28616589307785034,
+        "module": "model.layers.18.mlp.down_proj",
+        "subln_input_rms": 0.11106643080711365,
+        "subln_output_absmax": 40.09280776977539,
+        "subln_output_rms": 0.9995743632316589
+      },
+      {
+        "base_input_absmax": 5.041154384613037,
+        "base_input_rms": 0.3678611218929291,
+        "module": "model.layers.18.self_attn.o_proj",
+        "subln_input_rms": 0.38093122839927673,
+        "subln_output_absmax": 7.461940765380859,
+        "subln_output_rms": 0.9999651312828064
+      },
+      {
+        "base_input_absmax": 19.686410903930664,
+        "base_input_rms": 0.37847900390625,
+        "module": "model.layers.19.mlp.down_proj",
+        "subln_input_rms": 0.17638052999973297,
+        "subln_output_absmax": 39.61444854736328,
+        "subln_output_rms": 0.9998329877853394
+      },
+      {
+        "base_input_absmax": 6.781340599060059,
+        "base_input_rms": 0.44883865118026733,
+        "module": "model.layers.19.self_attn.o_proj",
+        "subln_input_rms": 0.3813876807689667,
+        "subln_output_absmax": 7.8336100578308105,
+        "subln_output_rms": 0.9999644160270691
+      },
+      {
+        "base_input_absmax": 1269.3355712890625,
+        "base_input_rms": 0.6921729445457458,
+        "module": "model.layers.2.mlp.down_proj",
+        "subln_input_rms": 0.15857577323913574,
+        "subln_output_absmax": 68.67182922363281,
+        "subln_output_rms": 0.9997687935829163
+      },
+      {
+        "base_input_absmax": 2.677640199661255,
+        "base_input_rms": 0.2554489076137543,
+        "module": "model.layers.2.self_attn.o_proj",
+        "subln_input_rms": 0.22938945889472961,
+        "subln_output_absmax": 7.298351764678955,
+        "subln_output_rms": 0.9999018311500549
+      },
+      {
+        "base_input_absmax": 30.62361717224121,
+        "base_input_rms": 0.4692523181438446,
+        "module": "model.layers.20.mlp.down_proj",
+        "subln_input_rms": 0.20322759449481964,
+        "subln_output_absmax": 41.705352783203125,
+        "subln_output_rms": 0.999872088432312
+      },
+      {
+        "base_input_absmax": 7.8400654792785645,
+        "base_input_rms": 0.6625279784202576,
+        "module": "model.layers.20.self_attn.o_proj",
+        "subln_input_rms": 0.865447461605072,
+        "subln_output_absmax": 8.671899795532227,
+        "subln_output_rms": 0.9999932646751404
+      },
+      {
+        "base_input_absmax": 1422.7135009765625,
+        "base_input_rms": 1.1712177991867065,
+        "module": "model.layers.21.mlp.down_proj",
+        "subln_input_rms": 0.2515313923358917,
+        "subln_output_absmax": 48.01409912109375,
+        "subln_output_rms": 0.999914288520813
+      },
+      {
+        "base_input_absmax": 10.485881805419922,
+        "base_input_rms": 0.8914145231246948,
+        "module": "model.layers.21.self_attn.o_proj",
+        "subln_input_rms": 1.298677682876587,
+        "subln_output_absmax": 8.421420097351074,
+        "subln_output_rms": 0.9999970197677612
+      },
+      {
+        "base_input_absmax": 50.47549057006836,
+        "base_input_rms": 0.6683248281478882,
+        "module": "model.layers.22.mlp.down_proj",
+        "subln_input_rms": 0.31642377376556396,
+        "subln_output_absmax": 31.63970184326172,
+        "subln_output_rms": 0.9999457001686096
+      },
+      {
+        "base_input_absmax": 8.594822883605957,
+        "base_input_rms": 0.9267628192901611,
+        "module": "model.layers.22.self_attn.o_proj",
+        "subln_input_rms": 1.1698602437973022,
+        "subln_output_absmax": 5.329470157623291,
+        "subln_output_rms": 0.9999963045120239
+      },
+      {
+        "base_input_absmax": 76.25340270996094,
+        "base_input_rms": 1.4772406816482544,
+        "module": "model.layers.23.mlp.down_proj",
+        "subln_input_rms": 0.8943954110145569,
+        "subln_output_absmax": 36.54473876953125,
+        "subln_output_rms": 0.9999927878379822
+      },
+      {
+        "base_input_absmax": 7.131102561950684,
+        "base_input_rms": 1.0447804927825928,
+        "module": "model.layers.23.self_attn.o_proj",
+        "subln_input_rms": 1.241221308708191,
+        "subln_output_absmax": 4.369287490844727,
+        "subln_output_rms": 0.9999966025352478
+      },
+      {
+        "base_input_absmax": 1021.9993286132812,
+        "base_input_rms": 0.9170125126838684,
+        "module": "model.layers.3.mlp.down_proj",
+        "subln_input_rms": 0.21574841439723969,
+        "subln_output_absmax": 51.6839714050293,
+        "subln_output_rms": 0.9998561143875122
+      },
+      {
+        "base_input_absmax": 2.7554855346679688,
+        "base_input_rms": 0.24608327448368073,
+        "module": "model.layers.3.self_attn.o_proj",
+        "subln_input_rms": 0.42937251925468445,
+        "subln_output_absmax": 7.1822967529296875,
+        "subln_output_rms": 0.9999717473983765
+      },
+      {
+        "base_input_absmax": 19.632932662963867,
+        "base_input_rms": 0.24653880298137665,
+        "module": "model.layers.4.mlp.down_proj",
+        "subln_input_rms": 0.16439718008041382,
+        "subln_output_absmax": 40.0236701965332,
+        "subln_output_rms": 0.9998006820678711
+      },
+      {
+        "base_input_absmax": 3.526137590408325,
+        "base_input_rms": 0.366507351398468,
+        "module": "model.layers.4.self_attn.o_proj",
+        "subln_input_rms": 0.42069128155708313,
+        "subln_output_absmax": 5.398045063018799,
+        "subln_output_rms": 0.9999707341194153
+      },
+      {
+        "base_input_absmax": 54.380149841308594,
+        "base_input_rms": 0.2644713521003723,
+        "module": "model.layers.5.mlp.down_proj",
+        "subln_input_rms": 0.15202637016773224,
+        "subln_output_absmax": 67.0752182006836,
+        "subln_output_rms": 0.9997550249099731
+      },
+      {
+        "base_input_absmax": 4.339850902557373,
+        "base_input_rms": 0.34023845195770264,
+        "module": "model.layers.5.self_attn.o_proj",
+        "subln_input_rms": 0.3895343542098999,
+        "subln_output_absmax": 4.97597599029541,
+        "subln_output_rms": 0.9999653100967407
+      },
+      {
+        "base_input_absmax": 10.078104019165039,
+        "base_input_rms": 0.21704187989234924,
+        "module": "model.layers.6.mlp.down_proj",
+        "subln_input_rms": 0.10411764681339264,
+        "subln_output_absmax": 32.832122802734375,
+        "subln_output_rms": 0.9995047450065613
+      },
+      {
+        "base_input_absmax": 3.4186148643493652,
+        "base_input_rms": 0.3094663619995117,
+        "module": "model.layers.6.self_attn.o_proj",
+        "subln_input_rms": 0.31470251083374023,
+        "subln_output_absmax": 5.024445533752441,
+        "subln_output_rms": 0.9999465346336365
+      },
+      {
+        "base_input_absmax": 9.911694526672363,
+        "base_input_rms": 0.21478277444839478,
+        "module": "model.layers.7.mlp.down_proj",
+        "subln_input_rms": 0.09714965522289276,
+        "subln_output_absmax": 31.150344848632812,
+        "subln_output_rms": 0.9994245767593384
+      },
+      {
+        "base_input_absmax": 4.377915859222412,
+        "base_input_rms": 0.32747942209243774,
+        "module": "model.layers.7.self_attn.o_proj",
+        "subln_input_rms": 0.3386530876159668,
+        "subln_output_absmax": 7.690544605255127,
+        "subln_output_rms": 0.9999549388885498
+      },
+      {
+        "base_input_absmax": 6.33794641494751,
+        "base_input_rms": 0.17268408834934235,
+        "module": "model.layers.8.mlp.down_proj",
+        "subln_input_rms": 0.069467693567276,
+        "subln_output_absmax": 46.36676025390625,
+        "subln_output_rms": 0.9988781809806824
+      },
+      {
+        "base_input_absmax": 2.497272491455078,
+        "base_input_rms": 0.3100936710834503,
+        "module": "model.layers.8.self_attn.o_proj",
+        "subln_input_rms": 0.3462083637714386,
+        "subln_output_absmax": 6.130277633666992,
+        "subln_output_rms": 0.9999566674232483
+      },
+      {
+        "base_input_absmax": 7.728922367095947,
+        "base_input_rms": 0.1594008356332779,
+        "module": "model.layers.9.mlp.down_proj",
+        "subln_input_rms": 0.057179953902959824,
+        "subln_output_absmax": 35.96200942993164,
+        "subln_output_rms": 0.9982839822769165
+      },
+      {
+        "base_input_absmax": 2.530458927154541,
+        "base_input_rms": 0.2085595726966858,
+        "module": "model.layers.9.self_attn.o_proj",
+        "subln_input_rms": 0.30438727140426636,
+        "subln_output_absmax": 6.1992669105529785,
+        "subln_output_rms": 0.9999443888664246
+      }
+    ],
+    "schema": "subln-activation-variance-audit-v1",
+    "subln_eps": 1e-05,
+    "subln_inserted": 48,
+    "tokens": 104
+  },
+  "subln_json": "benchmark_results/subln_activation_variance_2026-05-15.json",
+  "subln_only_accuracy": 0.3502801833927662,
+  "ternary_state": {
+    "code_counts": {
+      "-1": 119243259,
+      "0": 119219343,
+      "1": 119363958
+    },
+    "code_entropy_bits": 1.5849622976253435,
+    "code_fractions": {
+      "-1": 0.33324317512931406,
+      "0": 0.33317633827964027,
+      "1": 0.33358048659104567
+    },
+    "exists": true,
+    "families": {
+      "down_proj": {
+        "minus_one_frac": 0.33334029348273025,
+        "plus_one_frac": 0.3332980354328203,
+        "tensors": 24,
+        "zero_frac": 0.3333616710844494
+      },
+      "gate_proj": {
+        "minus_one_frac": 0.33513826833930527,
+        "plus_one_frac": 0.3362529247924499,
+        "tensors": 24,
+        "zero_frac": 0.32860880686824484
+      },
+      "k_proj": {
+        "minus_one_frac": 0.31740897042410715,
+        "plus_one_frac": 0.31727854410807294,
+        "tensors": 24,
+        "zero_frac": 0.3653124854678199
+      },
+      "o_proj": {
+        "minus_one_frac": 0.32066646238573554,
+        "plus_one_frac": 0.32058980513592156,
+        "tensors": 24,
+        "zero_frac": 0.3587437324783429
+      },
+      "q_proj": {
+        "minus_one_frac": 0.3095516282684949,
+        "plus_one_frac": 0.30942260326982357,
+        "tensors": 24,
+        "zero_frac": 0.38102576846168157
+      },
+      "up_proj": {
+        "minus_one_frac": 0.33851220075946703,
+        "plus_one_frac": 0.338636106715764,
+        "tensors": 24,
+        "zero_frac": 0.322851692524769
+      },
+      "v_proj": {
+        "minus_one_frac": 0.3270281837100074,
+        "plus_one_frac": 0.3269893101283482,
+        "tensors": 24,
+        "zero_frac": 0.34598250616164433
+      }
+    },
+    "family_tensor_counts": {
+      "down_proj": 24,
+      "gate_proj": 24,
+      "k_proj": 24,
+      "o_proj": 24,
+      "q_proj": 24,
+      "up_proj": 24,
+      "v_proj": 24
+    },
+    "forbidden_ternary_keys": [],
+    "layer_count": 24,
+    "layer_max": 23,
+    "layer_min": 0,
+    "max_ternary_entropy_bits": 1.584962500721156,
+    "path": "checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-layer-1/ternary_state_dict.pt",
+    "scale_numel_by_key": {
+      "1": 168
+    },
+    "score_ternary_present": false,
+    "score_weight_dense": true,
+    "ternary_weight_count": 168,
+    "total_state_keys": 459,
+    "weight_scale_count": 168
+  },
+  "verdict": "basic_mechanics_pass_bitdistill_recovery_pending",
+  "weights_only_accuracy": 0.4937340804890474
+}

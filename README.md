@@ -100,6 +100,10 @@ Current BitNet-SFT controls:
 
 - Expected ternary decoder projection tensors: `168/168`.
 - Classifier head remains dense.
+- Focused mechanics audit passes: exact absmean STE equation, per-token A8
+  path, `24 x 7` decoder projection replacement, scalar tensor-scale metadata,
+  no accidental embedding/norm/head ternarization, and balanced ternary code
+  fractions (`-1/0/+1 ~= 1/3` each).
 - Weights-only/no-A8 control: `0.493734`, only `+0.006113` over W1.58A8.
 - SubLN-only local control: `0.350280`, so current SubLN insertion by itself
   worsens the local baseline.
@@ -246,6 +250,7 @@ The current public reports use `BITNET_REPORT_DATE=2026-05-15`.
 export BITNET_REPORT_DATE=2026-05-15
 
 python benchmarks/audit_bitnet_sft_budget_sweep.py
+python benchmarks/audit_bitnet_sft_mechanics.py
 python benchmarks/audit_benchmark_coverage.py
 python benchmarks/audit_product_scope.py
 python benchmarks/build_evidence_manifest.py \
@@ -267,6 +272,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill reproduction gap analysis](benchmarks/results/bitdistill_reproduction_gap_analysis_2026-05-15.md)
 - [BitNet-SFT baseline audit](benchmarks/results/bitnet_sft_baseline_audit_2026-05-15.md)
 - [BitNet-SFT recipe alignment audit](benchmarks/results/bitnet_sft_recipe_alignment_2026-05-15.md)
+- [BitNet-SFT mechanics audit](benchmarks/results/bitnet_sft_mechanics_audit_2026-05-15.md)
 - [BitNet-SFT budget sweep audit](benchmarks/results/bitnet_sft_budget_sweep_2026-05-15.md)
 - [BitNet-SFT budget paired audit](benchmarks/results/bitnet_sft_budget_paired_2026-05-15.md)
 - [SubLN activation variance audit](benchmarks/results/subln_activation_variance_2026-05-15.md)

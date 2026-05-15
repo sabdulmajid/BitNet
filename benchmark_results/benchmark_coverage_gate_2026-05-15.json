@@ -1,0 +1,309 @@
+{
+  "schema": "benchmark_coverage_gate.v1",
+  "date": "2026-05-15",
+  "passed": true,
+  "check_count": 50,
+  "failed": [],
+  "checks": [
+    {
+      "name": "FP has ten selected lm-eval tasks",
+      "passed": true,
+      "evidence": "tasks=10, missing=[]",
+      "blocker": ""
+    },
+    {
+      "name": "FP has expected logged samples",
+      "passed": true,
+      "evidence": "samples=22382",
+      "blocker": ""
+    },
+    {
+      "name": "naive PTQ has ten selected lm-eval tasks",
+      "passed": true,
+      "evidence": "tasks=10, missing=[]",
+      "blocker": ""
+    },
+    {
+      "name": "naive PTQ has expected logged samples",
+      "passed": true,
+      "evidence": "samples=22382",
+      "blocker": ""
+    },
+    {
+      "name": "QAT hidden-MSE has ten selected lm-eval tasks",
+      "passed": true,
+      "evidence": "tasks=10, missing=[]",
+      "blocker": ""
+    },
+    {
+      "name": "QAT hidden-MSE has expected logged samples",
+      "passed": true,
+      "evidence": "samples=22382",
+      "blocker": ""
+    },
+    {
+      "name": "QAT KL-only has ten selected lm-eval tasks",
+      "passed": true,
+      "evidence": "tasks=10, missing=[]",
+      "blocker": ""
+    },
+    {
+      "name": "QAT KL-only has expected logged samples",
+      "passed": true,
+      "evidence": "samples=22382",
+      "blocker": ""
+    },
+    {
+      "name": "QAT KL-only dense lm_head has ten selected lm-eval tasks",
+      "passed": true,
+      "evidence": "tasks=10, missing=[]",
+      "blocker": ""
+    },
+    {
+      "name": "QAT KL-only dense lm_head has expected logged samples",
+      "passed": true,
+      "evidence": "samples=22382",
+      "blocker": ""
+    },
+    {
+      "name": "QAT KL-only row dense lm_head has ten selected lm-eval tasks",
+      "passed": true,
+      "evidence": "tasks=10, missing=[]",
+      "blocker": ""
+    },
+    {
+      "name": "QAT KL-only row dense lm_head has expected logged samples",
+      "passed": true,
+      "evidence": "samples=22382",
+      "blocker": ""
+    },
+    {
+      "name": "row minus FP has ten paired task rows",
+      "passed": true,
+      "evidence": "rows=10",
+      "blocker": ""
+    },
+    {
+      "name": "row minus FP has expected paired examples",
+      "passed": true,
+      "evidence": "matched=22382",
+      "blocker": ""
+    },
+    {
+      "name": "row minus FP has macro CI",
+      "passed": true,
+      "evidence": "-0.144710 [-0.185756, -0.103664]",
+      "blocker": ""
+    },
+    {
+      "name": "row minus naive PTQ has ten paired task rows",
+      "passed": true,
+      "evidence": "rows=10",
+      "blocker": ""
+    },
+    {
+      "name": "row minus naive PTQ has expected paired examples",
+      "passed": true,
+      "evidence": "matched=22382",
+      "blocker": ""
+    },
+    {
+      "name": "row minus naive PTQ has macro CI",
+      "passed": true,
+      "evidence": "+0.150788 [+0.053427, +0.248149]",
+      "blocker": ""
+    },
+    {
+      "name": "row minus tensor dense-head has ten paired task rows",
+      "passed": true,
+      "evidence": "rows=10",
+      "blocker": ""
+    },
+    {
+      "name": "row minus tensor dense-head has expected paired examples",
+      "passed": true,
+      "evidence": "matched=22382",
+      "blocker": ""
+    },
+    {
+      "name": "row minus tensor dense-head has macro CI",
+      "passed": true,
+      "evidence": "+0.015081 [+0.009028, +0.021134]",
+      "blocker": ""
+    },
+    {
+      "name": "row minus KL-only has ten paired task rows",
+      "passed": true,
+      "evidence": "rows=10",
+      "blocker": ""
+    },
+    {
+      "name": "row minus KL-only has expected paired examples",
+      "passed": true,
+      "evidence": "matched=22382",
+      "blocker": ""
+    },
+    {
+      "name": "row minus KL-only has macro CI",
+      "passed": true,
+      "evidence": "+0.016021 [+0.006145, +0.025897]",
+      "blocker": ""
+    },
+    {
+      "name": "BitDistill paired audit is complete",
+      "passed": true,
+      "evidence": "complete=44/44, pending=0, failed=0",
+      "blocker": ""
+    },
+    {
+      "name": "BitDistill paired audit has paired statistics for every row",
+      "passed": true,
+      "evidence": "stats_rows=44/44",
+      "blocker": ""
+    },
+    {
+      "name": "BitDistill paired audit has BitNet baseline rows",
+      "passed": true,
+      "evidence": "rows=3, path=benchmark_results/bitdistill_paired_predictions_2026-05-15.json",
+      "blocker": ""
+    },
+    {
+      "name": "BitNet baseline paired rows cover full GLUE validation",
+      "passed": true,
+      "evidence": "full_rows=3, matched=16150",
+      "blocker": ""
+    },
+    {
+      "name": "BitNet baseline paired rows have paired statistics",
+      "passed": true,
+      "evidence": "stats_rows=3",
+      "blocker": ""
+    },
+    {
+      "name": "BitNet-SFT budget paired audit has completed full-MNLI rows",
+      "passed": true,
+      "evidence": "complete=9/10, best_matched=9815, path=benchmark_results/bitnet_sft_budget_paired_2026-05-15.json",
+      "blocker": ""
+    },
+    {
+      "name": "BitNet-SFT best budget row has paired CI and McNemar test",
+      "passed": true,
+      "evidence": "delta=-0.17921548650025465, ci=[-0.18958024909015786, -0.16885072391035155], mcnemar=3.4383886495134495e-240",
+      "blocker": ""
+    },
+    {
+      "name": "BitNet-SFT mechanics audit passes",
+      "passed": true,
+      "evidence": "passed=True, verdict=basic_mechanics_pass_bitdistill_recovery_pending, path=benchmark_results/bitnet_sft_mechanics_audit_2026-05-15.json",
+      "blocker": ""
+    },
+    {
+      "name": "BitNet-SFT mechanics audit has exact projection replacement counts",
+      "passed": true,
+      "evidence": "ternary=168, families={'down_proj': 24, 'gate_proj': 24, 'k_proj': 24, 'o_proj': 24, 'q_proj': 24, 'up_proj': 24, 'v_proj': 24}",
+      "blocker": ""
+    },
+    {
+      "name": "BitNet-SFT mechanics audit confirms dense non-projection tensors",
+      "passed": true,
+      "evidence": "score_dense=True, score_ternary=False, forbidden=[]",
+      "blocker": ""
+    },
+    {
+      "name": "BitNet-SFT mechanics audit confirms three-symbol ternary distribution",
+      "passed": true,
+      "evidence": "fractions={'-1': 0.33324317512931406, '0': 0.33317633827964027, '1': 0.33358048659104567}, entropy=1.5849622976253435",
+      "blocker": ""
+    },
+    {
+      "name": "SubLN activation-variance audit has finite logit drift",
+      "passed": true,
+      "evidence": "inserted=48, rel_rms=0.7680435180664062, cosine=0.6982523202896118, path=benchmark_results/subln_activation_variance_2026-05-15.json",
+      "blocker": ""
+    },
+    {
+      "name": "SubLN audit confirms projection-input normalization",
+      "passed": true,
+      "evidence": "subln_output_rms=[0.9996804222464561, 0.99930373330911]",
+      "blocker": ""
+    },
+    {
+      "name": "FP F16 CPU row is finite",
+      "passed": true,
+      "evidence": "ppl=12.2808, prefill=114.468162, decode=5.555998",
+      "blocker": ""
+    },
+    {
+      "name": "FP Q8_0 CPU row is finite",
+      "passed": true,
+      "evidence": "ppl=12.3056, prefill=124.864246, decode=10.131914",
+      "blocker": ""
+    },
+    {
+      "name": "FP Q4_K_M CPU row is finite",
+      "passed": true,
+      "evidence": "ppl=12.8112, prefill=92.077037, decode=16.013125",
+      "blocker": ""
+    },
+    {
+      "name": "row-scale TQ2_0 CPU row is finite",
+      "passed": true,
+      "evidence": "ppl=38.8224, prefill=169.460897, decode=18.675323",
+      "blocker": ""
+    },
+    {
+      "name": "row-scale I2_S CPU row is finite",
+      "passed": true,
+      "evidence": "ppl=38.8832, prefill=218.172685, decode=18.973629",
+      "blocker": ""
+    },
+    {
+      "name": "row-scale I2_SR CPU row is finite",
+      "passed": true,
+      "evidence": "ppl=38.8477, prefill=211.668328, decode=19.065496",
+      "blocker": ""
+    },
+    {
+      "name": "CPU tradeoff frontier has headline rows",
+      "passed": true,
+      "evidence": "labels=['FP F16', 'FP Q4_K_M', 'FP Q8_0', 'row I2_S', 'row I2_SR', 'row TQ2_0']",
+      "blocker": ""
+    },
+    {
+      "name": "CPU tradeoff frontier reports Q4-vs-I2_SR ratios",
+      "passed": true,
+      "evidence": "q4_vs_i2sr={'decode_speedup': 1.19061682213809, 'file_ratio': 1.2881333039180543, 'ppl_ratio': 3.0323232796303237, 'prefill_speedup': 2.298817760610607, 'rss512_ratio': 1.2685742155747033}",
+      "blocker": ""
+    },
+    {
+      "name": "CPU speed uncertainty audit has I2_SR-vs-Q4 intervals",
+      "passed": true,
+      "evidence": "prefill_ci=[2.2578672451091255, 2.34051098794489], decode_ci=[1.1861079640891115, 1.1951428201115284]",
+      "blocker": ""
+    },
+    {
+      "name": "I2_SR-vs-Q4 speedup intervals stay above 1",
+      "passed": true,
+      "evidence": "prefill_ci=[2.2578672451091255, 2.34051098794489], decode_ci=[1.1861079640891115, 1.1951428201115284]",
+      "blocker": ""
+    },
+    {
+      "name": "fixed I2_SR RSS has four context rows",
+      "passed": true,
+      "evidence": "contexts=[512, 2048, 8192, 32768]",
+      "blocker": ""
+    },
+    {
+      "name": "evidence manifest has no missing artifacts",
+      "passed": true,
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=191, missing=0, missing_labels=[]",
+      "blocker": ""
+    },
+    {
+      "name": "productization gate passes for stable I2_SR",
+      "passed": true,
+      "evidence": "passed=True, failed=0, stable_quality=True, layout=True",
+      "blocker": ""
+    }
+  ]
+}
