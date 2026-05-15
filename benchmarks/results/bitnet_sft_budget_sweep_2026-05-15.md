@@ -2,7 +2,7 @@
 
 Best completed sweep row is accuracy `0.485991` at steps=`1000`, lr=`1e-5`. The paper BitNet-SFT anchor remains `0.608000`, so the remaining gap is `0.122009`.
 
-Completed rows: `2/8`.
+Completed rows: `2/10`.
 
 Default BitNet-SFT MNLI baseline: `0.487621`.
 
@@ -18,7 +18,10 @@ Default BitNet-SFT MNLI baseline: `0.487621`.
 | 3000 | 1e-5 | false | 10063 | - | - | false | - | - | - | - | - |
 | 3000 | 2e-5 | false | 10064 | - | - | false | - | - | - | - | - |
 | 3000 | 5e-5 | false | 10065 | - | - | false | - | - | - | - | - |
+| 10000 | 2e-5 | false | 10066 | - | - | false | - | - | - | - | - |
+| 10000 | 5e-5 | false | 10067 | - | - | false | - | - | - | - | - |
 
 ## Job Tables
 
 - `benchmark_results/bitnet_sft_budget_sweep_20260515_132906_2052239_12830.tsv`
+- `benchmark_results/bitnet_sft_budget_sweep_long_20260515_135825.tsv`

@@ -80,6 +80,31 @@ def read_job_tables(pattern: str) -> list[dict[str, str]]:
     return rows
 
 
+def expected_runs_from_args_and_jobs(args: argparse.Namespace, job_rows: list[dict[str, str]]) -> list[tuple[int, str]]:
+    expected = {(steps, lr) for steps in args.steps for lr in args.lrs}
+    model_slug = args.model.replace("/", "-")
+    root_prefix = str(args.output_root / model_slug / args.task_name)
+    for row in job_rows:
+        if row.get("task") != args.task_name:
+            continue
+        if row.get("method") != "bitnet_sft":
+            continue
+        if row.get("scale") != args.scale_mode:
+            continue
+        output_dir = row.get("output_dir", "")
+        if output_dir and not output_dir.startswith(root_prefix):
+            continue
+        try:
+            steps = int(row.get("steps", ""))
+        except ValueError:
+            continue
+        lr = row.get("lr", "")
+        if not lr:
+            continue
+        expected.add((steps, lr))
+    return sorted(expected, key=lambda item: (item[0], float(item[1])))
+
+
 def summarize_run(root: Path, *, steps: int, lr: str, job_rows: list[dict[str, str]]) -> dict[str, Any]:
     metrics_path = root / "metrics.json"
     metrics = read_json(metrics_path)
@@ -114,10 +139,9 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     model_slug = args.model.replace("/", "-")
     job_rows = read_job_tables(args.job_table_glob)
     rows = []
-    for steps in args.steps:
-        for lr in args.lrs:
-            root = args.output_root / model_slug / args.task_name / f"bitnet_sft-{args.scale_mode}-steps{steps}-lr{safe_value(lr)}"
-            rows.append(summarize_run(root, steps=steps, lr=lr, job_rows=job_rows))
+    for steps, lr in expected_runs_from_args_and_jobs(args, job_rows):
+        root = args.output_root / model_slug / args.task_name / f"bitnet_sft-{args.scale_mode}-steps{steps}-lr{safe_value(lr)}"
+        rows.append(summarize_run(root, steps=steps, lr=lr, job_rows=job_rows))
 
     baseline_metrics = read_json(args.default_baseline_root / "metrics.json")
     baseline_accuracy = finite_float(nested(baseline_metrics, "eval", "accuracy"))
