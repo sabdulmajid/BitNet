@@ -100,7 +100,10 @@ def active_downstream_ids(monitor: dict[str, Any]) -> list[str]:
     ids = {
         str(row.get("job_id"))
         for row in rows
-        if isinstance(row, dict) and row.get("job_id")
+        if isinstance(row, dict)
+        and row.get("job_id")
+        and isinstance(row.get("job_status"), dict)
+        and row["job_status"].get("state") in ACTIVE_STATES
     }
     return sorted(ids, key=int)
 

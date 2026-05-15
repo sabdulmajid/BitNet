@@ -4,7 +4,7 @@ Ready for downstream release: `True`.
 
 Monitor JSON: `benchmark_results/bitdistill_job_monitor_2026-05-15.json`.
 
-Warm-up log source: `explicit`.
+Warm-up log source: `monitor`.
 
 ## Warm-Up
 
@@ -17,8 +17,8 @@ Warm-up log source: `explicit`.
 | check | status | evidence | blocker |
 | --- | --- | --- | --- |
 | warm-up log exposes final output directory | pass | log=logs/bitdistill-glue-9894.out, expected_state=checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/custom_state_dict.pt |  |
-| active downstream jobs point at warm-up final state | pass | active_rows=38, mismatches=0 |  |
-| active downstream jobs have FP16 teacher metrics | pass | active_rows=38, missing=0 |  |
+| active downstream jobs point at warm-up final state | pass | active_rows=32, mismatches=0 |  |
+| active downstream jobs have FP16 teacher metrics | pass | active_rows=32, missing=0 |  |
 | active downstream jobs depend on the running warm-up job | pass | warmup_job=9894, bad=0 |  |
 
 ## Warnings
@@ -35,12 +35,12 @@ Warm-up log source: `explicit`.
 
 ## Submission Rows
 
-Raw rows: `61`. Deduped rows: `38`. Active rows: `38`.
+Raw rows: `61`. Deduped rows: `38`. Active rows: `32`.
 
 | job | state | task | format | scale | layer | teacher metrics | warmup match | output dir |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 9956 | PENDING | mnli | sequence_classification | tensor | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8 |
-| 9957 | PENDING | mnli | sequence_classification | row | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8 |
+| 9956 | RUNNING | mnli | sequence_classification | tensor | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8 |
+| 9957 | RUNNING | mnli | sequence_classification | row | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8 |
 | 9958 | PENDING | qnli | sequence_classification | tensor | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8 |
 | 9959 | PENDING | qnli | sequence_classification | row | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-row-layer-8 |
 | 9960 | PENDING | sst2 | sequence_classification | tensor | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8 |
@@ -50,12 +50,12 @@ Raw rows: `61`. Deduped rows: `38`. Active rows: `38`.
 | 9964 | PENDING | sst2 | sequence_classification | tensor | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup-papergamma/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8 |
 | 9965 | PENDING | mnli | sequence_classification | tensor | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup-gamma1k/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8 |
 | 9966 | PENDING | mnli | sequence_classification | tensor | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup-gamma10k/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8 |
-| 9943 | RUNNING | mnli | causal_lm | tensor | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8 |
-| 9944 | RUNNING | mnli | causal_lm | row | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8 |
-| 9945 | PENDING | qnli | causal_lm | tensor | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8 |
-| 9946 | PENDING | qnli | causal_lm | row | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-row-layer-8 |
-| 9947 | PENDING | sst2 | causal_lm | tensor | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8 |
-| 9948 | PENDING | sst2 | causal_lm | row | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8 |
+| 9943 | not_in_squeue | mnli | causal_lm | tensor | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8 |
+| 9944 | not_in_squeue | mnli | causal_lm | row | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8 |
+| 9945 | not_in_squeue | qnli | causal_lm | tensor | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8 |
+| 9946 | not_in_squeue | qnli | causal_lm | row | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-row-layer-8 |
+| 9947 | not_in_squeue | sst2 | causal_lm | tensor | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-tensor-layer-8 |
+| 9948 | not_in_squeue | sst2 | causal_lm | row | -8 | true | true | checkpoints/bitdistill-glue-causal-longwarmup-densehead/Qwen-Qwen2.5-0.5B/sst2/bitdistill-longwarmup-row-layer-8 |
 | 9971 | PENDING | mnli | sequence_classification | tensor | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup-headinit/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-tensor-layer-8 |
 | 9972 | PENDING | mnli | sequence_classification | row | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup-headinit/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8 |
 | 9973 | PENDING | qnli | sequence_classification | tensor | -8 | true | true | checkpoints/bitdistill-glue-seqcls-longwarmup-headinit/Qwen-Qwen2.5-0.5B/qnli/bitdistill-longwarmup-tensor-layer-8 |

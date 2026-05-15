@@ -1,5 +1,5 @@
 {
-  "artifact_count": 159,
+  "artifact_count": 161,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "b203fd0a92243d61b53c4cc816b5a48ab21bc659a56596b1d942d3b274766249",
-      "size_bytes": 20562
+      "sha256": "301d0baf186fe9ececbfd4aaf77d2ea48be474989a81d860f941265be882bda8",
+      "size_bytes": 21889
     },
     {
       "exists": true,
@@ -79,8 +79,8 @@
       "label": "product_scope_gate",
       "metrics": {},
       "path": "benchmarks/results/product_scope_gate_2026-05-15.md",
-      "sha256": "96ab10de3eb043ce762f059c7fd6f5898e64d342d65736dcba9ee663447c0188",
-      "size_bytes": 4920
+      "sha256": "9cf38615e7811dac88660e89c0a8f3f73f825c92963adbe55dc79b28240f750d",
+      "size_bytes": 4581
     },
     {
       "exists": true,
@@ -97,8 +97,8 @@
       "label": "bitdistill_reproduction_gate_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_reproduction_gate_2026-05-15.md",
-      "sha256": "897c1cc8ca85ff6715172bd46f27a571b732ff6ca1bfa65331df678d7188d175",
-      "size_bytes": 11734
+      "sha256": "5b5953ace6405d7478bb8f019aa4ec6cea37420be21a94aa997579ae111b7465",
+      "size_bytes": 11867
     },
     {
       "exists": true,
@@ -115,8 +115,8 @@
       "label": "bitdistill_task_formulation_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md",
-      "sha256": "ccd2db12d82858dce6fd1c8ea380037f50c3eadd68edfd3f54cdc3c942cc0b02",
-      "size_bytes": 11394
+      "sha256": "9f8347f27de633166960880472144cddd7c58791411d57410fb1259ab4ebd824",
+      "size_bytes": 11410
     },
     {
       "exists": true,
@@ -157,11 +157,20 @@
     {
       "exists": true,
       "kind": "tracked_report",
+      "label": "bitdistill_i2sr_local_gate_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_i2sr_export_gate_local_2026-05-15.md",
+      "sha256": "b0d32985ce0356e0f32a1aace0c014c33cdddffb8a1449cd15029d327c1474c0",
+      "size_bytes": 2121
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
       "label": "bitdistill_job_monitor_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_job_monitor_2026-05-15.md",
-      "sha256": "13a82d4d059b8f6f9526da1d1eecb2fbe4e14c1c3f1063dfff6c82882dafc4b5",
-      "size_bytes": 12791
+      "sha256": "5cca82ce2ae2a0582a2ef64427a886e16f2598e0ee73f7db61724d073c2a5f0b",
+      "size_bytes": 12789
     },
     {
       "exists": true,
@@ -169,8 +178,8 @@
       "label": "bitdistill_dependency_graph_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_dependency_graph_2026-05-15.md",
-      "sha256": "26ccc53c56c035eef53e17f69975f9134cfac132ff97d94b30770c963924836c",
-      "size_bytes": 10439
+      "sha256": "8cad3ce8e66225849d18bf469d26ac7813767c77c968ec04d647e2dffffb8654",
+      "size_bytes": 10474
     },
     {
       "exists": true,
@@ -178,8 +187,8 @@
       "label": "bitdistill_postprocess_submission_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_postprocess_submission_2026-05-15.md",
-      "sha256": "7b9ae9af9eab1ec6959197e9fe3152b65ecccad9c74c2b8941ca997a9322c694",
-      "size_bytes": 986
+      "sha256": "0b25409e44809bfce3689603ecaa2e13940b12a6e2c873f055f3d8ab5e352142",
+      "size_bytes": 911
     },
     {
       "exists": true,
@@ -187,8 +196,8 @@
       "label": "bitdistill_postprocess_dependency_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_postprocess_dependency_audit_2026-05-15.md",
-      "sha256": "bcf2860e01070e73b676f17f8c51c251918ccda1bf925d5659afea1382faaee4",
-      "size_bytes": 1977
+      "sha256": "f8601972a3f4a0db70665d59eb4621cbf5a82cea4e2912015991334efc6ae3a1",
+      "size_bytes": 1738
     },
     {
       "exists": true,
@@ -196,8 +205,8 @@
       "label": "bitdistill_afterany_postprocess_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_afterany_postprocess_2026-05-15.md",
-      "sha256": "65b5774a8fb7df66fdfc90bb163db95d4f53a5b109162a7f117e9522708bc2df",
-      "size_bytes": 992
+      "sha256": "128cdccaa8352ac4dcdb7501cde1e8f7beb83186efa65aa8a5f7e82432bd74f4",
+      "size_bytes": 917
     },
     {
       "exists": true,
@@ -205,8 +214,8 @@
       "label": "bitdistill_afterany_postprocess_dependency_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_afterany_postprocess_dependency_2026-05-15.md",
-      "sha256": "ece4a9d6924e12bf368f3ad4cd5f9263bf250c3fe725016552ecd4375a90775d",
-      "size_bytes": 2022
+      "sha256": "59c36cab974e4a7d1dfc44b41e9e0c412622fe59bfa98734465163a1ac4ec628",
+      "size_bytes": 1774
     },
     {
       "exists": true,
@@ -232,8 +241,8 @@
       "label": "bitdistill_producer_script_audit_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_producer_script_audit_2026-05-15.md",
-      "sha256": "4778dbf8d7beae947c0e70301c29803436626016865a4b06d40f5fcca51a260b",
-      "size_bytes": 2632
+      "sha256": "87aec6b9697da23281e61fd3893d74712fd23f40131d97f864f02710d101074f",
+      "size_bytes": 2630
     },
     {
       "exists": true,
@@ -250,8 +259,8 @@
       "label": "bitdistill_active_goal_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_active_goal_audit_2026-05-15.md",
-      "sha256": "3a3d808c5897614aed6945abe520456033ff152a769f685260b5f7a4b2fab68e",
-      "size_bytes": 3507
+      "sha256": "28959db7fe0361761d3d5a361b5dd19808ef964b767a18ecf167567e0ee13fef",
+      "size_bytes": 3656
     },
     {
       "exists": true,
@@ -2031,12 +2040,12 @@
       "metrics": {
         "publishable_angle": "negative arbitrary-retrofit result plus dense-Qwen row-scale recovery path, with BitDistill reproduction and I2_SR row-scale extensions gated separately",
         "scope_status": "research_mvp_only",
-        "supported_claim_count": 4,
-        "unsupported_claim_count": 5
+        "supported_claim_count": 5,
+        "unsupported_claim_count": 4
       },
       "path": "benchmark_results/product_scope_gate_2026-05-15.json",
-      "sha256": "c421003852a46d3753788064338a7e1866f003bcdb775cbb2e0c0309d559d36c",
-      "size_bytes": 5771
+      "sha256": "789a0d09ed7399b3dd7de1079cc8d27703c90023dcead6a83b12b3c00bd1d386",
+      "size_bytes": 5432
     },
     {
       "exists": true,
@@ -2047,10 +2056,10 @@
         "max_fp_gap": 0.01,
         "paper_style_tensor_complete": false,
         "paper_style_tensor_passed": false,
-        "present_rows": 13,
-        "present_with_accuracy_ci95": 13,
-        "present_with_examples": 13,
-        "present_with_full_eval": 13,
+        "present_rows": 15,
+        "present_with_accuracy_ci95": 15,
+        "present_with_examples": 15,
+        "present_with_full_eval": 15,
         "row_scale_complete": false,
         "row_scale_passed": false,
         "rows": 36,
@@ -2061,8 +2070,8 @@
         ]
       },
       "path": "benchmark_results/bitdistill_reproduction_gate_2026-05-15.json",
-      "sha256": "8e582d1355a8c89990a70531027df0a6eaa2869407eca40b8424f191a946a154",
-      "size_bytes": 26085
+      "sha256": "3671732f375da876d79d8f42dc33c43e9f4c6a90c5eb722288bd4676c0369a7d",
+      "size_bytes": 26489
     },
     {
       "exists": true,
@@ -2086,13 +2095,13 @@
       "metrics": {
         "causal_rows_materialized": 17,
         "paper_anchor_source": "BitDistill paper excerpt, Table 3 Qwen2.5-0.5B MNLI row.",
-        "pending_paper_candidates": 9,
+        "pending_paper_candidates": 8,
         "rows": 45,
         "sequence_baselines_full": 6
       },
       "path": "benchmark_results/bitdistill_task_formulation_audit_2026-05-15.json",
-      "sha256": "f716923943772376951f5c7e34c8f495b1f06d6dc1d6d11107d2ac6e11fb8e9e",
-      "size_bytes": 27829
+      "sha256": "cd3d154014acad41471a643ea05161153afe716d86c29afa5336fe226e3e3fb7",
+      "size_bytes": 27882
     },
     {
       "exists": true,
@@ -2144,6 +2153,29 @@
     },
     {
       "exists": true,
+      "kind": "bitdistill_i2sr_gate_json",
+      "label": "bitdistill_i2sr_local_gate_json",
+      "metrics": {
+        "blockers": [],
+        "complete": 6,
+        "passed": true,
+        "rows": 6,
+        "scales": [
+          "tensor",
+          "row"
+        ],
+        "tasks": [
+          "mnli",
+          "qnli",
+          "sst2"
+        ]
+      },
+      "path": "benchmark_results/bitdistill_i2sr_export_gate_local_2026-05-15.json",
+      "sha256": "90370ce4417fc0e4df55c93c5a45e55bda80cfaccd42793bafc2c9592513dd4c",
+      "size_bytes": 5149
+    },
+    {
+      "exists": true,
       "kind": "bitdistill_job_monitor_json",
       "label": "bitdistill_job_monitor_json",
       "metrics": {
@@ -2162,15 +2194,15 @@
         "warmup_warnings": []
       },
       "path": "benchmark_results/bitdistill_job_monitor_2026-05-15.json",
-      "sha256": "3ade506db0519bb713e86194738aca77a410fabaae2de16e6d02f2bc2086f5cf",
-      "size_bytes": 76929
+      "sha256": "76edf1139e8191c26c1eb6a8937fe4f2ee8e1e344189041c96ab446f8dc0379b",
+      "size_bytes": 76231
     },
     {
       "exists": true,
       "kind": "bitdistill_dependency_graph_json",
       "label": "bitdistill_dependency_graph_json",
       "metrics": {
-        "active_rows": 38,
+        "active_rows": 32,
         "blockers": [],
         "checks": 4,
         "deduped_rows": 38,
@@ -2184,8 +2216,8 @@
         ]
       },
       "path": "benchmark_results/bitdistill_dependency_graph_2026-05-15.json",
-      "sha256": "c0eb157443f7e4669cfbc75ab4dee77cd1c88440cb3943cb0b530081cc80140c",
-      "size_bytes": 24705
+      "sha256": "ff22cfc73817b790d324ae1852eb4b885eb803de94213038f5c8d4d3cb44b0c9",
+      "size_bytes": 24740
     },
     {
       "exists": true,
@@ -2193,17 +2225,17 @@
       "label": "bitdistill_postprocess_submission_json",
       "metrics": {
         "dependency_type": "afterok",
-        "downstream_jobs": 38,
+        "downstream_jobs": 32,
         "extra_jobs": 2,
-        "job_id": "10027",
+        "job_id": "10039",
         "note": "",
-        "producer_jobs": 41,
+        "producer_jobs": 34,
         "submitted": true,
-        "warmup_jobs": 1
+        "warmup_jobs": 0
       },
       "path": "benchmark_results/bitdistill_postprocess_submission_2026-05-15.json",
-      "sha256": "d6ad7ef86f1cd51845fce4ce578bbcf61ef076207a1ee9426abe3312ff0a5311",
-      "size_bytes": 1920
+      "sha256": "7bafc57bbb480bf522986bed62d32fad87ab1510ccb40344d3f75eeed1a763d3",
+      "size_bytes": 1715
     },
     {
       "exists": true,
@@ -2211,18 +2243,18 @@
       "label": "bitdistill_postprocess_dependency_json",
       "metrics": {
         "checks": 4,
-        "downstream_jobs": 38,
-        "expected_jobs": 41,
+        "downstream_jobs": 30,
+        "expected_jobs": 32,
         "extra_jobs": 2,
         "failed": 0,
         "missing": [],
         "passed": true,
-        "postprocess_job": "10027",
-        "warmup_jobs": 1
+        "postprocess_job": "10039",
+        "warmup_jobs": 0
       },
       "path": "benchmark_results/bitdistill_postprocess_dependency_audit_2026-05-15.json",
-      "sha256": "4386e41265ddbc5e2222b40a567d84ec5c5c9bf91b4774bcbd077c61748ad819",
-      "size_bytes": 4671
+      "sha256": "dbc018e79e1414137f95d2a251bf02ef0edfdd0da638df6c6aa259c98141e995",
+      "size_bytes": 4053
     },
     {
       "exists": true,
@@ -2230,17 +2262,17 @@
       "label": "bitdistill_afterany_postprocess_json",
       "metrics": {
         "dependency_type": "afterany",
-        "downstream_jobs": 38,
+        "downstream_jobs": 32,
         "extra_jobs": 2,
-        "job_id": "10026",
+        "job_id": "10038",
         "note": "",
-        "producer_jobs": 41,
+        "producer_jobs": 34,
         "submitted": true,
-        "warmup_jobs": 1
+        "warmup_jobs": 0
       },
       "path": "benchmark_results/bitdistill_afterany_postprocess_2026-05-15.json",
-      "sha256": "631a65823b4458e8bfbf7bb689f683e82f6155c5141764e313d185dd57b2a4ef",
-      "size_bytes": 1930
+      "sha256": "f8af1b2080e5778fdaefd9d2a3c623de5c70bcd7ef6632f590074da2f0a4c128",
+      "size_bytes": 1725
     },
     {
       "exists": true,
@@ -2248,18 +2280,18 @@
       "label": "bitdistill_afterany_postprocess_dependency_json",
       "metrics": {
         "checks": 4,
-        "downstream_jobs": 38,
-        "expected_jobs": 41,
+        "downstream_jobs": 30,
+        "expected_jobs": 32,
         "extra_jobs": 2,
         "failed": 0,
         "missing": [],
         "passed": true,
-        "postprocess_job": "10026",
-        "warmup_jobs": 1
+        "postprocess_job": "10038",
+        "warmup_jobs": 0
       },
       "path": "benchmark_results/bitdistill_afterany_postprocess_dependency_2026-05-15.json",
-      "sha256": "c151847109aca383ee582917b6045c288d6b40017d4d649c487263862e8c14d3",
-      "size_bytes": 4724
+      "sha256": "599e3b8a3038ba7d8731a9138d478afd241c51bd55d2bbc84cf0670e91399399",
+      "size_bytes": 4097
     },
     {
       "exists": true,
@@ -2304,18 +2336,18 @@
       "kind": "bitdistill_producer_script_audit_json",
       "label": "bitdistill_producer_script_audit_json",
       "metrics": {
-        "afterany_postprocess_job": "10026",
+        "afterany_postprocess_job": "10038",
         "checks": 14,
         "cpu_job": "10025",
-        "downstream_jobs": 38,
+        "downstream_jobs": 30,
         "failed": 0,
-        "i2sr_job": "10024",
+        "i2sr_job": "10037",
         "passed": true,
-        "strict_postprocess_job": "10027"
+        "strict_postprocess_job": "10039"
       },
       "path": "benchmark_results/bitdistill_producer_script_audit_2026-05-15.json",
-      "sha256": "1e14ef86cad97ed0f4f77371902ea091ee5ced570393ce2ea3f7e13ae1e6bab7",
-      "size_bytes": 5053
+      "sha256": "58f4ea588411cf7c2260bd994bd6d82263811096f0c7a825961c388851931baf",
+      "size_bytes": 4953
     },
     {
       "exists": true,
@@ -2353,14 +2385,14 @@
           "Export row-scale checkpoints through I2_SR and benchmark CPU speed, memory/RSS, and task quality on Xeon",
           "Define publishable scope: independent reproduction, open training implementation, row-scale I2_SR extension, boundary study, and MoE/Kimi limits"
         ],
-        "pending_count": 3,
+        "pending_count": 2,
         "row_scale_complete": false,
         "warmup_max_steps": 20000,
         "warmup_step": 20000
       },
       "path": "benchmark_results/bitdistill_active_goal_audit_2026-05-15.json",
-      "sha256": "7af9b08986837d5c3858027ef4b6db5edebcf409666cd3e9e5e60076798cc38e",
-      "size_bytes": 5439
+      "sha256": "115d2960e4c54399daefe02ad514f18e40393ced6660929f340a00d0697a06af",
+      "size_bytes": 5671
     },
     {
       "exists": true,

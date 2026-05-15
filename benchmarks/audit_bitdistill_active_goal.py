@@ -165,6 +165,7 @@ def audit_novelty_and_runtime(
     reproduction: dict[str, Any],
     rowwarmup: dict[str, Any],
     i2sr: dict[str, Any],
+    i2sr_local: dict[str, Any],
     cpu: dict[str, Any],
 ) -> None:
     row_complete = reproduction.get("row_scale_complete") is True
@@ -179,9 +180,12 @@ def audit_novelty_and_runtime(
         for status in rowwarmup_families.values()
     )
     i2sr_passed = i2sr.get("passed") is True
+    i2sr_local_passed = i2sr_local.get("passed") is True
     cpu_passed = cpu.get("passed") is True
     i2sr_rows = i2sr.get("rows", []) if isinstance(i2sr.get("rows"), list) else []
+    i2sr_local_rows = i2sr_local.get("rows", []) if isinstance(i2sr_local.get("rows"), list) else []
     i2sr_complete = sum(1 for row in i2sr_rows if isinstance(row, dict) and row.get("complete"))
+    i2sr_local_complete = sum(1 for row in i2sr_local_rows if isinstance(row, dict) and row.get("complete"))
     cpu_critical = cpu.get("critical", []) if isinstance(cpu.get("critical"), list) else []
     cpu_complete = sum(1 for row in cpu_critical if isinstance(row, dict) and row.get("complete"))
     metrics["row_scale_runtime"] = {
@@ -193,6 +197,9 @@ def audit_novelty_and_runtime(
         "i2sr_passed": i2sr_passed,
         "i2sr_complete": i2sr_complete,
         "i2sr_expected": len(i2sr_rows),
+        "i2sr_local_passed": i2sr_local_passed,
+        "i2sr_local_complete": i2sr_local_complete,
+        "i2sr_local_expected": len(i2sr_local_rows),
         "cpu_passed": cpu_passed,
         "cpu_complete": cpu_complete,
         "cpu_expected": len(cpu_critical),
@@ -211,9 +218,13 @@ def audit_novelty_and_runtime(
     add_row(
         rows,
         "Export row-scale checkpoints through I2_SR and benchmark CPU speed, memory/RSS, and task quality on Xeon",
-        "complete" if i2sr_passed and cpu_passed else "pending",
-        f"I2_SR gate={i2sr_passed} ({i2sr_complete}/{len(i2sr_rows)} rows); CPU gate={cpu_passed} ({cpu_complete}/{len(cpu_critical)} critical rows)",
-        "Causal export/CPU benchmark jobs are dependency-blocked on unfinished BitDistill checkpoints.",
+        "complete" if i2sr_passed and cpu_passed else ("partial" if i2sr_local_passed else "pending"),
+        (
+            f"I2_SR gate={i2sr_passed} ({i2sr_complete}/{len(i2sr_rows)} rows); "
+            f"local isolated I2_SR={i2sr_local_passed} ({i2sr_local_complete}/{len(i2sr_local_rows)} rows); "
+            f"CPU gate={cpu_passed} ({cpu_complete}/{len(cpu_critical)} critical rows)"
+        ),
+        "Local causal export/runtime has passed, but the queued full CPU/product gate is still pending.",
     )
 
 
@@ -253,6 +264,7 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
     smoke = read_json(root / args.smoke_json)
     paper_alignment = read_json(root / args.paper_alignment_json)
     i2sr = read_json(root / args.i2sr_json)
+    i2sr_local = read_json(root / args.i2sr_local_json)
     cpu = read_json(root / args.cpu_json)
     product = read_json(root / args.product_json)
 
@@ -266,7 +278,7 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
         "warmup_progress": row_progress,
     }
     audit_components(rows, metrics, smoke, paper_alignment)
-    audit_novelty_and_runtime(rows, metrics, reproduction, rowwarmup, i2sr, cpu)
+    audit_novelty_and_runtime(rows, metrics, reproduction, rowwarmup, i2sr, i2sr_local, cpu)
     audit_publishability(rows, metrics, product, paper_alignment)
     complete_count = sum(1 for row in rows if row["status"] == "complete")
     pending_count = sum(1 for row in rows if row["status"] == "pending")
@@ -290,6 +302,7 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
             "smoke_json": rel(root / args.smoke_json, root),
             "paper_alignment_json": rel(root / args.paper_alignment_json, root),
             "i2sr_json": rel(root / args.i2sr_json, root),
+            "i2sr_local_json": rel(root / args.i2sr_local_json, root),
             "cpu_json": rel(root / args.cpu_json, root),
             "product_json": rel(root / args.product_json, root),
         },
@@ -345,7 +358,8 @@ def render_markdown(result: dict[str, Any]) -> str:
             (
                 f"Runtime gates: row-scale complete=`{runtime.get('row_scale_complete')}`, "
                 f"row-warmup complete=`{runtime.get('row_warmup_complete')}`, "
-                f"I2_SR=`{runtime.get('i2sr_passed')}`, CPU=`{runtime.get('cpu_passed')}`."
+                f"I2_SR=`{runtime.get('i2sr_passed')}`, local I2_SR=`{runtime.get('i2sr_local_passed')}`, "
+                f"CPU=`{runtime.get('cpu_passed')}`."
             ),
             "## Prompt-To-Artifact Checklist",
             md_table(["requirement", "status", "evidence", "remaining gap"], checklist_rows),
@@ -368,6 +382,7 @@ def main() -> None:
     parser.add_argument("--smoke-json", type=Path, default=Path(f"benchmark_results/bitdistill_smoke_contract_{DATE}.json"))
     parser.add_argument("--paper-alignment-json", type=Path, default=Path(f"benchmark_results/bitdistill_paper_alignment_{DATE}.json"))
     parser.add_argument("--i2sr-json", type=Path, default=Path(f"benchmark_results/bitdistill_i2sr_export_gate_{DATE}.json"))
+    parser.add_argument("--i2sr-local-json", type=Path, default=Path(f"benchmark_results/bitdistill_i2sr_export_gate_local_{DATE}.json"))
     parser.add_argument("--cpu-json", type=Path, default=Path(f"benchmark_results/bitdistill_glue_cpu_gate_{DATE}.json"))
     parser.add_argument("--product-json", type=Path, default=Path(f"benchmark_results/product_scope_gate_{DATE}.json"))
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_active_goal_audit_{DATE}.json"))

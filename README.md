@@ -138,6 +138,16 @@ snapshots export `169/169` BitLinear weights with `169` row-scale sidecars.
 No paper-level GLUE success claim will be made until the full-validation
 downstream metrics exist.
 
+The first strict sequence-classification long-warmup pair has completed on
+MNLI. Tensor-scale gamma-100 BitDistill reaches `0.641671` and row-scale reaches
+`0.653591`, versus sequence-classification FP16-SFT `0.807641` and BitNet-SFT
+`0.487621`. This is a meaningful recovery over BitNet-SFT, but it is still
+`15.4-16.6` accuracy points behind FP16 and therefore fails the BitDistill
+paper-reproduction threshold. The row advantage on this completed MNLI pair is
+`+0.011921`, with a 95% interval that still crosses zero
+(`[-0.001444, 0.025285]`). QNLI and SST2 strict long-warmup jobs are still
+running or queued.
+
 The first exportable causal-LM long-warmup downstream diagnostics have
 completed for MNLI, QNLI, and SST2. On full validation, MNLI reaches `0.615181`
 tensor / `0.608355` row versus causal FP16 `0.829852` and causal BitNet-SFT
@@ -147,6 +157,15 @@ tensor / `0.840596` row versus causal FP16 `0.939220` and causal BitNet-SFT
 `0.831422`. This is useful recovery over BitNet-SFT on MNLI and QNLI, and a
 small recovery on SST2, but it is not a paper-level reproduction and it is not
 the strict `Qwen2ForSequenceClassification` branch.
+
+Those causal checkpoints also export through the packed runtime path on the
+Xeon: tensor-scale checkpoints emit `MOSTLY_I2_S`, row-scale checkpoints emit
+`MOSTLY_I2_SR`, and the local isolated export gate passes `6/6` rows with
+`168` packed ternary tensors each. Runtime throughput is about `517-520`
+prefill tok/s and `38.6-39.0` decode tok/s at roughly `0.70` GiB max RSS, but
+WikiText PPL is catastrophic (`155,846-347,660`). Treat this as proof that the
+format/runtime path works and that task-specific causal BitDistill does not
+preserve general language-model quality in this configuration.
 
 Active follow-ups are probing teacher-head initialization, attention-layer
 selection, paper-style logits KL scaling, CE-only ablations, a longer
@@ -326,6 +345,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill task formulation audit](benchmarks/results/bitdistill_task_formulation_audit_2026-05-15.md)
 - [BitDistill GLUE CPU gate](benchmarks/results/bitdistill_glue_cpu_gate_2026-05-15.md)
 - [BitDistill causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_2026-05-15.md)
+- [BitDistill local causal I2_SR export gate](benchmarks/results/bitdistill_i2sr_export_gate_local_2026-05-15.md)
 - [BitDistill producer script audit](benchmarks/results/bitdistill_producer_script_audit_2026-05-15.md)
 - [Objective completion audit](benchmarks/results/objective_completion_audit_2026-05-15.md)
 - [Evidence manifest](benchmarks/results/evidence_manifest_2026-05-15.md)
