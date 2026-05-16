@@ -15,6 +15,26 @@ This repository is therefore a research and evaluation fork. It does not claim
 that arbitrary Qwen, Kimi, or other open-weight models can be converted to
 1.58-bit form with no quality loss.
 
+## Current Redirect
+
+The project has deliberately moved away from "one-click BitNet conversion."
+The current evidence supports a sharper research program:
+
+1. **Negative boundary:** blind FP/BF16 to ternary PTQ fails for the tested
+   dense-Qwen checkpoints.
+2. **Training path:** task-specific ternary students can recover signal through
+   QAT/distillation, but this fork has not reproduced paper-level BitDistill
+   FP recovery yet.
+3. **Runtime contract:** row-scale retrofit students require row-scale metadata
+   in the packed CPU format; `I2_SR` preserves that contract, while TL2 remains
+   blocked for row-scale checkpoints.
+
+The immediate scientific question is therefore narrow: does controlled
+paper-style tensor-scale BitDistill move monotonically toward the local FP16
+task model as Stage-2 tokens increase, or does it saturate because the local
+loss normalization, SubLN timing, optimizer schedule, or update balance is
+still misaligned?
+
 ## Current Thesis
 
 Extreme ternary quantization is not just a storage format. It changes the model
@@ -396,9 +416,12 @@ The current public reports use `BITNET_REPORT_DATE=2026-05-15`.
 export BITNET_REPORT_DATE=2026-05-15
 
 python benchmarks/audit_bitnet_sft_budget_sweep.py
+python benchmarks/audit_bitnet_sft_ls_init.py
 python benchmarks/audit_bitnet_sft_mechanics.py
 python benchmarks/audit_bitdistill_telemetry_coverage.py
 python benchmarks/audit_bitdistill_stage2_curve.py
+python benchmarks/audit_bitdistill_controlled_curve.py
+python benchmarks/audit_bitdistill_gamma60_diagnostic.py
 python benchmarks/audit_bitdistill_root_cause.py
 python benchmarks/audit_research_redirect_claims.py
 python benchmarks/audit_seqcls_i2sr_arch_contract.py
