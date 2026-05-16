@@ -26,7 +26,7 @@ result.
 | Packed row-scale CPU runtime is feasible | proven for dense causal artifact | `I2_SR` Xeon result: PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, file `1211.3 MiB`. |
 | TL2 row-scale packed runtime is ready | not proven; explicitly blocked | The current TL2 runtime contract has `11` checks and remains `false`: converter scale collapse, missing row-scale TL2 storage, one-scale transform metadata, generated `Scales[0]` qgemm, unoffset x86 dispatch, missing loader sidecars, and no passing row-scale TL2 benchmark. |
 | Sequence-classification packed path is possible | prototype only; native head blocked | MNLI long-warmup row-scale checkpoint (`0.653591` PyTorch accuracy) exports as a `352.6 MiB` `I2_SR` backbone plus `10.8 KiB` dense head sidecar. A Qwen-compatible `bitnet-qwen` graph repairs the dominant runtime mismatch: hidden cosine is `0.994091`, hidden relative RMS is `0.108662`, and the 128-example sidecar CPU probe reaches `0.609375` accuracy with `0.914063` agreement against saved PyTorch predictions. Native GGUF classifier inference and full-split CPU validation are not implemented. |
-| Paper-level BitDistill is reproduced | not proven | FP16-SFT MNLI is close to paper (`0.807641` vs `0.799100`), and a tensor-scale CE-only BitNet-SFT schedule/budget row clears its paper anchor (`0.628935` vs `0.608000`). This is not yet BitDistill or FP16-level recovery, and the Qwen3 paper-alignment branch still fails its BitNet-SFT baseline. |
+| Paper-level BitDistill is reproduced | not proven | FP16-SFT MNLI is close to paper (`0.807641` vs `0.799100`), and a tensor-scale CE-only BitNet-SFT schedule/budget row clears its paper anchor (`0.628935` vs `0.608000`). This is not yet BitDistill or FP16-level recovery, and the Qwen3 paper-alignment branch still fails its BitNet-SFT baselines: MNLI `0.477127` vs FP `0.829750`, QNLI `0.587040` vs FP `0.921106`. |
 | Kimi/MoE works | not proven | Tiny Qwen2MoE fixtures prove routing/packing smoke only; no Kimi mapping or trained MoE quality exists. |
 
 ## Baseline Status
@@ -49,7 +49,7 @@ interpretation: the weak baseline was substantially undertrained at the shorter
 budgets. The current blocker is now BitDistill recovery toward the FP16 task
 model, not whether the Qwen2.5 CE-only BitNet-SFT baseline can reach the
 paper's weaker BitNet-SFT anchor. This does not generalize to the completed
-Qwen3 MNLI baseline, which remains weak.
+Qwen3 MNLI and QNLI baselines, which remain weak.
 
 Completed controls rule out several simple causes:
 

@@ -476,7 +476,7 @@
     {
       "name": "Qwen3 paper-alignment audit tracks required GLUE rows",
       "passed": true,
-      "evidence": "jobs=16, complete=5, ready=False",
+      "evidence": "jobs=16, complete=6, ready=False",
       "blocker": ""
     },
     {
