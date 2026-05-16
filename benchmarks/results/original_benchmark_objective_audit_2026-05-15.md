@@ -7,7 +7,7 @@ This audit maps the original six requested benchmark deliverables to concrete ar
 | objective achieved | false |
 | completion | 5/6 |
 | coverage passed | true |
-| coverage checks | 71 |
+| coverage checks | 77 |
 
 ## Checklist
 

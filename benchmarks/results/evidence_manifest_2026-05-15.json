@@ -97,7 +97,7 @@
       "label": "objective_completion_audit",
       "metrics": {},
       "path": "benchmarks/results/objective_completion_audit_2026-05-15.md",
-      "sha256": "f2690751f9047cc2a625125bce5b20fc0e7b026f8214f7245ca922eb0051f380",
+      "sha256": "fdf93c1fd1ad94aea0426c69be69989beae0381186e944fe72370f8efd850ef7",
       "size_bytes": 5646
     },
     {
@@ -106,7 +106,7 @@
       "label": "original_benchmark_objective_audit",
       "metrics": {},
       "path": "benchmarks/results/original_benchmark_objective_audit_2026-05-15.md",
-      "sha256": "75b70dbd3b0a477481d91f9cfcd10b7b44de7d2de42ed5c558be9595c5cc1f8a",
+      "sha256": "d091a45ef6a08af7293cc6288e9776423eb639c6f6f739a454a62c2b93fdb11f",
       "size_bytes": 3678
     },
     {
@@ -2465,7 +2465,7 @@
         ]
       },
       "path": "benchmark_results/objective_completion_audit_2026-05-15.json",
-      "sha256": "e90d1e00e17a17f7b26238fd77dadf405e1a7a9b8d83c9ef51ec54d03180dec4",
+      "sha256": "bb6912119dfc1f0a05c5e2466ec3de53c7a071145f64831030cef5d3a9e4194c",
       "size_bytes": 16035
     },
     {
@@ -2474,7 +2474,7 @@
       "label": "original_benchmark_objective_audit_json",
       "metrics": {},
       "path": "benchmark_results/original_benchmark_objective_audit_2026-05-15.json",
-      "sha256": "2f97f3e61ea0f429964fd55a3e47b8ff6f5b19f17983f879ea6f50a11af63bab",
+      "sha256": "1ebdde38950309e49d58f4cfe7d2384e86394e566fede24bf931d5ef5a9f85eb",
       "size_bytes": 4278
     },
     {
