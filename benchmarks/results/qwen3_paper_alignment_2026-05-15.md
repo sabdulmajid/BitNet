@@ -9,11 +9,11 @@ This audit tracks the queued Qwen3-0.6B branch. Rows remain pending until full v
 | field | value |
 | --- | --- |
 | jobs | 16 |
-| complete rows | 0 |
-| FP complete tasks | [] |
-| BitNet-SFT complete tasks | [] |
-| tensor BitDistill complete tasks | [] |
-| row BitDistill complete tasks | [] |
+| complete rows | 4 |
+| FP complete tasks | [mnli] |
+| BitNet-SFT complete tasks | [mnli] |
+| tensor BitDistill complete tasks | [mnli] |
+| row BitDistill complete tasks | [mnli] |
 | gap-pass rows | 0 |
 | paper reproduction ready | false |
 
@@ -21,12 +21,12 @@ This audit tracks the queued Qwen3-0.6B branch. Rows remain pending until full v
 
 | job | phase | task | method | scale | layer | queue | complete | accuracy | delta vs FP | CI95 | gap pass | output |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 10040 | stage2 | - | bitdistill | tensor | - | RUNNING | false | - | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/continued_pretrain/bitdistill-tensor |
-| 10041 | paper_baseline | mnli | fp16_sft | tensor | -1 | PENDING | false | - | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/fp16_sft-tensor-layer-1 |
-| 10042 | paper_baseline | mnli | bitnet_sft | tensor | -1 | PENDING | false | - | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitnet_sft-tensor-layer-1 |
-| 10043 | paper_baseline | mnli | bitdistill | tensor | -1 | PENDING | false | - | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-1 |
-| 10044 | novelty_row_scale | mnli | bitdistill | row | -1 | PENDING | false | - | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-row-layer-1 |
-| 10045 | paper_baseline | qnli | fp16_sft | tensor | -1 | PENDING | false | - | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/fp16_sft-tensor-layer-1 |
+| 10040 | stage2 | - | bitdistill | tensor | - | not_in_squeue | false | - | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/continued_pretrain/bitdistill-tensor |
+| 10041 | paper_baseline | mnli | fp16_sft | tensor | -1 | not_in_squeue | true | 0.829750 | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/fp16_sft-tensor-layer-1 |
+| 10042 | paper_baseline | mnli | bitnet_sft | tensor | -1 | not_in_squeue | true | 0.477127 | -0.352624 | [-0.364186, -0.341061] | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitnet_sft-tensor-layer-1 |
+| 10043 | paper_baseline | mnli | bitdistill | tensor | -1 | not_in_squeue | true | 0.723484 | -0.106266 | [-0.115044, -0.097488] | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-1 |
+| 10044 | novelty_row_scale | mnli | bitdistill | row | -1 | not_in_squeue | true | 0.696179 | -0.133571 | [-0.142757, -0.124385] | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-row-layer-1 |
+| 10045 | paper_baseline | qnli | fp16_sft | tensor | -1 | RUNNING | false | - | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/fp16_sft-tensor-layer-1 |
 | 10046 | paper_baseline | qnli | bitnet_sft | tensor | -1 | PENDING | false | - | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitnet_sft-tensor-layer-1 |
 | 10047 | paper_baseline | qnli | bitdistill | tensor | -1 | PENDING | false | - | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitdistill-tensor-layer-1 |
 | 10048 | novelty_row_scale | qnli | bitdistill | row | -1 | PENDING | false | - | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitdistill-row-layer-1 |

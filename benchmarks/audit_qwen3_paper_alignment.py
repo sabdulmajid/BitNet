@@ -81,7 +81,10 @@ def squeue_state(job_id: str) -> dict[str, str]:
     except FileNotFoundError:
         return {"state": "squeue_unavailable"}
     if result.returncode != 0:
-        return {"state": "squeue_error", "stderr": result.stderr.strip()}
+        stderr = result.stderr.strip()
+        if "Invalid job id" in stderr or "Invalid job id specified" in stderr:
+            return {"job_id": job_id, "state": "not_in_squeue"}
+        return {"state": "squeue_error", "stderr": stderr}
     line = result.stdout.strip()
     if not line:
         return {"job_id": job_id, "state": "not_in_squeue"}

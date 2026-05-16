@@ -76,6 +76,10 @@ validation splits: MNLI `9815`, QNLI `5463`, SST2 `872`.
 | Qwen2.5-0.5B controlled BitDistill, 40.96M Stage-2 tokens | `0.616607` | FP recovery target |
 | Qwen2.5-0.5B controlled BitDistill, 163.84M Stage-2 tokens | `0.691187` | FP recovery target |
 | Qwen2.5-0.5B gamma-60 diagnostic, matched 163.84M control | `0.738462` | improves over paper-gamma by `+0.047275`, still below FP |
+| Qwen3-0.6B-Base MNLI FP16-SFT | `0.829750` | local branch reference |
+| Qwen3-0.6B-Base MNLI BitNet-SFT | `0.477127` | `-0.352624` paired delta vs local FP |
+| Qwen3-0.6B-Base MNLI tensor BitDistill | `0.723484` | `-0.106266` paired delta vs local FP |
+| Qwen3-0.6B-Base MNLI row BitDistill | `0.696179` | `retrofit-variant`; `-0.133571` paired delta vs local FP |
 
 The baseline problem has narrowed. Short CE-only BitNet-SFT was undertrained;
 the longer CE-only row clears the paper BitNet-SFT anchor. The remaining
@@ -83,6 +87,12 @@ question is whether BitDistill-style continued pretraining and distillation can
 move toward the local FP16 task model. The completed gamma-60 diagnostic is
 evidence that loss normalization/update balance matters: it improves over the
 matched paper-gamma row but still misses FP recovery.
+
+The Qwen3-0.6B-Base MNLI branch is also not a paper-level reproduction pass.
+Tensor BitDistill improves strongly over local BitNet-SFT, but it remains more
+than ten accuracy points behind the local FP16 task model. On this branch,
+row-scale is worse than tensor-scale and should not be treated as universally
+better.
 
 ### CPU Runtime
 
