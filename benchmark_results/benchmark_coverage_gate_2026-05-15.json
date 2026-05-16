@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 80,
+  "check_count": 82,
   "failed": [],
   "checks": [
     {
@@ -336,6 +336,18 @@
       "blocker": ""
     },
     {
+      "name": "Second-order ternary init audit improves synthetic reconstruction",
+      "passed": true,
+      "evidence": "status=synthetic_promising_ls_integrated_diag_calibration_pending, deltas=[-0.0775993565718333, -0.094802921017011]",
+      "blocker": ""
+    },
+    {
+      "name": "Second-order ternary init audit blocks quality overclaim",
+      "passed": true,
+      "evidence": "quality_proven=False, ls_integrated=True, diag_integrated=False",
+      "blocker": ""
+    },
+    {
       "name": "Sequence-classification runtime gap is narrowed but not closed",
       "passed": true,
       "evidence": "status=sidecar_qwen_contract_available_native_head_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6",
@@ -476,7 +488,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=250, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=252, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

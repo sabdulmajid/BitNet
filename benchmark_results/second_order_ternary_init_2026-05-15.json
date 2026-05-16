@@ -1,0 +1,173 @@
+{
+  "activation_profiles": [
+    "isotropic",
+    "lognormal_diag"
+  ],
+  "cols": 512,
+  "date": "2026-05-15",
+  "diag_hessian_training_integrated": false,
+  "iterations": 8,
+  "next_gate": "Run MNLI BitNet-SFT with --ternary-init-mode ls against the absmean baseline, then add calibration activation collection for the diagonal-Hessian variant and repeat the paired full-validation comparison.",
+  "profiles": {
+    "isotropic": {
+      "methods": {
+        "row_absmean_retrofit": {
+          "output_rel_rms": {
+            "max": 0.5137702822685242,
+            "mean": 0.512512281537056,
+            "min": 0.5109996199607849,
+            "std": 0.0007533355036400657
+          },
+          "zero_fraction": {
+            "max": 0.31116485595703125,
+            "mean": 0.30985228220621747,
+            "min": 0.30865478515625,
+            "std": 0.000760171093006231
+          }
+        },
+        "row_diag_hessian_ls": {
+          "output_rel_rms": {
+            "max": 0.4363691210746765,
+            "mean": 0.43491292496522266,
+            "min": 0.433989554643631,
+            "std": 0.0007408340052465931
+          },
+          "zero_fraction": {
+            "max": 0.4597930908203125,
+            "mean": 0.45792992909749347,
+            "min": 0.4559173583984375,
+            "std": 0.0014120130470063016
+          }
+        },
+        "tensor_absmean_paper": {
+          "output_rel_rms": {
+            "max": 0.5142261981964111,
+            "mean": 0.5130701263745626,
+            "min": 0.511681854724884,
+            "std": 0.0007376977348069971
+          },
+          "zero_fraction": {
+            "max": 0.31145477294921875,
+            "mean": 0.31012821197509766,
+            "min": 0.3089485168457031,
+            "std": 0.0007816734585050091
+          }
+        },
+        "tensor_diag_hessian_ls": {
+          "output_rel_rms": {
+            "max": 0.43724340200424194,
+            "mean": 0.435858815908432,
+            "min": 0.4349459409713745,
+            "std": 0.0007036585285070157
+          },
+          "zero_fraction": {
+            "max": 0.4613189697265625,
+            "mean": 0.459408442179362,
+            "min": 0.45713043212890625,
+            "std": 0.0014915708858060442
+          }
+        }
+      },
+      "row_diag_hessian_ls_minus_row_absmean": {
+        "max": -0.07670605182647705,
+        "mean": -0.0775993565718333,
+        "min": -0.07886826992034912,
+        "std": 0.0006245382706738789,
+        "trials": 12,
+        "wins": 12
+      },
+      "trials": 12
+    },
+    "lognormal_diag": {
+      "methods": {
+        "row_absmean_retrofit": {
+          "output_rel_rms": {
+            "max": 0.520334005355835,
+            "mean": 0.5125306695699692,
+            "min": 0.5056836605072021,
+            "std": 0.00362879379076174
+          },
+          "zero_fraction": {
+            "max": 0.3103981018066406,
+            "mean": 0.30960718790690106,
+            "min": 0.3087615966796875,
+            "std": 0.0005057372056037801
+          }
+        },
+        "row_diag_hessian_ls": {
+          "output_rel_rms": {
+            "max": 0.42962148785591125,
+            "mean": 0.4177277485529582,
+            "min": 0.39400410652160645,
+            "std": 0.013595667380432195
+          },
+          "zero_fraction": {
+            "max": 0.45821380615234375,
+            "mean": 0.4508517583211263,
+            "min": 0.4396514892578125,
+            "std": 0.0057037902505743185
+          }
+        },
+        "tensor_absmean_paper": {
+          "output_rel_rms": {
+            "max": 0.5220014452934265,
+            "mean": 0.5132028162479401,
+            "min": 0.5063867568969727,
+            "std": 0.0038154572776200194
+          },
+          "zero_fraction": {
+            "max": 0.31078338623046875,
+            "mean": 0.30992794036865234,
+            "min": 0.3090782165527344,
+            "std": 0.0005290824325711255
+          }
+        },
+        "tensor_diag_hessian_ls": {
+          "output_rel_rms": {
+            "max": 0.4399759769439697,
+            "mean": 0.4358906572063764,
+            "min": 0.4285142123699188,
+            "std": 0.003217547392942767
+          },
+          "zero_fraction": {
+            "max": 0.46704864501953125,
+            "mean": 0.45953623453776044,
+            "min": 0.4522514343261719,
+            "std": 0.003814254841050032
+          }
+        }
+      },
+      "row_diag_hessian_ls_minus_row_absmean": {
+        "max": -0.08118036389350891,
+        "mean": -0.094802921017011,
+        "min": -0.12632989883422852,
+        "std": 0.014437972383443347,
+        "trials": 12,
+        "wins": 12
+      },
+      "trials": 12
+    }
+  },
+  "quality_proven": false,
+  "rows": 512,
+  "samples": 2048,
+  "schema": "second-order-ternary-init-audit-v1",
+  "source_checks": [
+    {
+      "check": "least-squares initializer helper exists",
+      "passed": true
+    },
+    {
+      "check": "BitDistill CLI exposes opt-in init mode",
+      "passed": true
+    },
+    {
+      "check": "trained checkpoint loads are not reinitialized",
+      "passed": true
+    }
+  ],
+  "status": "synthetic_promising_ls_integrated_diag_calibration_pending",
+  "training_integrated": true,
+  "trials_per_profile": 12,
+  "verdict": "Diagonal-Hessian weighted ternary least-squares reduces synthetic output reconstruction error versus absmean row-scale initialization, so it is a credible next training initializer. The current training hook exposes the unweighted least-squares fixed-point initializer; activation-calibrated diagonal Hessian collection remains a separate implementation step. This is not a GLUE or language-model quality claim until a full BitNet-SFT/BitDistill run uses it."
+}

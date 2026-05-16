@@ -40,6 +40,7 @@ from train_distill import (
     BitLinear,
     build_ternary_state_dict,
     dtype_from_name,
+    initialize_bitlinear_least_squares,
     mark_untied_output_if_needed,
     replace_linear_layers,
 )
@@ -603,12 +604,25 @@ def prepare_bitnet_student(model: nn.Module, args: argparse.Namespace) -> dict[s
     )
     if replaced == 0:
         raise RuntimeError("no nn.Linear modules were replaced with BitLinear")
+    ternary_init = {"mode": args.ternary_init_mode, "applied": False}
+    if args.ternary_init_mode == "ls":
+        if args.init_state_dict:
+            ternary_init["skip_reason"] = "init_state_dict_will_load_trained_weights"
+        else:
+            ternary_init = {
+                **initialize_bitlinear_least_squares(
+                    model,
+                    iterations=args.ternary_init_iterations,
+                ),
+                "applied": True,
+            }
     untied_output_embeddings = mark_untied_output_if_needed(model)
     return {
         "subln_inserted": subln_inserted,
         "bitlinear_replaced": replaced,
         "untied_output_embeddings": untied_output_embeddings,
         "activation_quantization": args.activation_quantization,
+        "ternary_init": ternary_init,
     }
 
 
@@ -1859,6 +1873,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--master-weight-dtype", default="fp32", choices=["bf16", "bfloat16", "fp32", "float32"])
     parser.add_argument("--scale-mode", choices=["tensor", "row"], default="tensor")
     parser.add_argument("--quant-eps", type=float, default=1e-5)
+    parser.add_argument("--ternary-init-mode", choices=["absmean", "ls"], default="absmean")
+    parser.add_argument("--ternary-init-iterations", type=int, default=8)
     parser.add_argument("--activation-quantization", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--use-subln", action=argparse.BooleanOptionalAction, default=None)
     parser.add_argument("--subln-eps", type=float, default=1e-5)

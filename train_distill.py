@@ -206,6 +206,123 @@ def replace_linear_layers(
     return len(replacements)
 
 
+def least_squares_ternary_codes_and_scale(
+    weight: torch.Tensor,
+    *,
+    scale_mode: str,
+    eps: float,
+    iterations: int,
+    diag_hessian: torch.Tensor | None = None,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Return ternary codes and scales for weighted least-squares init.
+
+    This is an initializer, not the forward quantizer.  With diagonal activation
+    covariance h, it approximately minimizes sum_j h_j (w_j - s t_j)^2 with
+    t_j in {-1, 0, +1}.  Passing diag_hessian=None gives the unweighted least
+    squares version.
+    """
+
+    if weight.ndim != 2:
+        raise ValueError(f"expected 2D BitLinear weight, got shape={tuple(weight.shape)}")
+    if scale_mode not in {"tensor", "row"}:
+        raise ValueError("scale_mode must be 'tensor' or 'row'")
+
+    work = weight.detach().float()
+    if diag_hessian is None:
+        h = torch.ones((1, work.shape[1]), device=work.device, dtype=work.dtype)
+    else:
+        h = diag_hessian.detach().float().to(device=work.device).reshape(1, -1).clamp_min(eps)
+        if h.shape[1] != work.shape[1]:
+            raise ValueError(f"diag_hessian has {h.shape[1]} columns, expected {work.shape[1]}")
+
+    if scale_mode == "tensor":
+        scale = work.abs().mean().clamp_min(eps)
+        for _ in range(max(iterations, 1)):
+            active = (work.abs() > scale / 2.0).float()
+            denom = (active * h).sum().clamp_min(eps)
+            scale = ((active * h) * work.abs()).sum() / denom
+        codes = torch.sign(work) * (work.abs() > scale / 2.0).float()
+        return codes.to(torch.int8), scale.reshape(1)
+
+    scale = work.abs().mean(dim=1, keepdim=True).clamp_min(eps)
+    for _ in range(max(iterations, 1)):
+        active = (work.abs() > scale / 2.0).float()
+        denom = (active * h).sum(dim=1, keepdim=True).clamp_min(eps)
+        scale = ((active * h) * work.abs()).sum(dim=1, keepdim=True) / denom
+    codes = torch.sign(work) * (work.abs() > scale / 2.0).float()
+    return codes.to(torch.int8), scale
+
+
+def master_weight_from_ternary_codes(
+    codes: torch.Tensor,
+    scale: torch.Tensor,
+    *,
+    scale_mode: str,
+    eps: float,
+) -> torch.Tensor:
+    """Encode desired ternary codes/scales as BitLinear master weights.
+
+    BitLinear recomputes alpha as mean(abs(master)).  To make the first forward
+    pass materialize the requested scale, nonzero master entries are inflated by
+    the active density so mean(abs(master)) equals the target scale.
+    """
+
+    code_float = codes.float()
+    if scale_mode == "tensor":
+        active_density = (code_float != 0).float().mean().clamp_min(eps)
+    elif scale_mode == "row":
+        active_density = (code_float != 0).float().mean(dim=1, keepdim=True).clamp_min(eps)
+    else:
+        raise ValueError("scale_mode must be 'tensor' or 'row'")
+    return code_float * scale.to(code_float.device, dtype=code_float.dtype) / active_density
+
+
+def initialize_bitlinear_least_squares(
+    model: nn.Module,
+    *,
+    iterations: int,
+) -> dict[str, float | int | str]:
+    """Initialize BitLinear master weights from least-squares ternary codes."""
+
+    module_count = 0
+    total_values = 0
+    zero_values = 0
+    scale_values: list[torch.Tensor] = []
+    with torch.no_grad():
+        for module in model.modules():
+            if not isinstance(module, BitLinear):
+                continue
+            codes, scale = least_squares_ternary_codes_and_scale(
+                module.weight,
+                scale_mode=module.scale_mode,
+                eps=module.eps,
+                iterations=iterations,
+            )
+            master = master_weight_from_ternary_codes(
+                codes,
+                scale,
+                scale_mode=module.scale_mode,
+                eps=module.eps,
+            )
+            module.weight.data.copy_(master.to(dtype=module.weight.dtype, device=module.weight.device))
+            module_count += 1
+            total_values += int(codes.numel())
+            zero_values += int((codes == 0).sum().item())
+            scale_values.append(scale.detach().float().reshape(-1).cpu())
+
+    scales = torch.cat(scale_values) if scale_values else torch.empty(0)
+    return {
+        "mode": "ls",
+        "modules": module_count,
+        "iterations": int(iterations),
+        "total_values": total_values,
+        "zero_fraction": zero_values / total_values if total_values else 0.0,
+        "scale_count": int(scales.numel()),
+        "scale_mean": float(scales.mean().item()) if scales.numel() else 0.0,
+        "scale_std": float(scales.std(unbiased=False).item()) if scales.numel() else 0.0,
+    }
+
+
 def mark_untied_output_if_needed(model: nn.Module) -> bool:
     """Keep HF config metadata consistent after replacing `lm_head`.
 

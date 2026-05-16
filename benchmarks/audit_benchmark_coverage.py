@@ -685,6 +685,49 @@ def audit_ternary_threshold_dynamics(root: Path, checks: list[dict[str, Any]]) -
     )
 
 
+def audit_second_order_ternary_init(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/second_order_ternary_init_{DATE}.json"
+    if not path.exists():
+        add_check(
+            checks,
+            "Second-order ternary init audit exists",
+            False,
+            str(path.relative_to(root)),
+            "missing second-order ternary init audit",
+        )
+        return
+    data = read_json(path)
+    profiles = data.get("profiles", {}) if isinstance(data.get("profiles"), dict) else {}
+    deltas = [
+        profile.get("row_diag_hessian_ls_minus_row_absmean", {})
+        for profile in profiles.values()
+        if isinstance(profile, dict)
+    ]
+    add_check(
+        checks,
+        "Second-order ternary init audit improves synthetic reconstruction",
+        data.get("status") == "synthetic_promising_ls_integrated_diag_calibration_pending"
+        and len(deltas) >= 2
+        and all(delta.get("mean", 0.0) < -0.02 for delta in deltas)
+        and all(delta.get("wins") == delta.get("trials") for delta in deltas),
+        f"status={data.get('status')}, deltas={[delta.get('mean') for delta in deltas]}",
+        "diagonal-Hessian LS should beat row absmean in the synthetic reconstruction audit before promotion",
+    )
+    add_check(
+        checks,
+        "Second-order ternary init audit blocks quality overclaim",
+        data.get("quality_proven") is False
+        and data.get("training_integrated") is True
+        and data.get("diag_hessian_training_integrated") is False,
+        (
+            f"quality_proven={data.get('quality_proven')}, "
+            f"ls_integrated={data.get('training_integrated')}, "
+            f"diag_integrated={data.get('diag_hessian_training_integrated')}"
+        ),
+        "audit should distinguish synthetic reconstruction, unweighted LS integration, and missing calibrated Hessian training",
+    )
+
+
 def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
     path = root / f"benchmark_results/seqcls_runtime_gap_{DATE}.json"
     if not path.exists():
@@ -1105,6 +1148,7 @@ def main() -> None:
     audit_tl2_implementation_plan(root, checks)
     audit_ternary_flip_dynamics(root, checks)
     audit_ternary_threshold_dynamics(root, checks)
+    audit_second_order_ternary_init(root, checks)
     audit_seqcls_runtime_gap(root, checks)
     audit_qwen3_paper_alignment(root, checks)
     audit_cpu_rows(root, checks)
