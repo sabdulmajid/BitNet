@@ -4,7 +4,7 @@ Artifacts: `284`. Missing: `0`.
 | --- | --- | --- | ---: | --- | --- |
 | README | tracked_report | yes | 15536 | b20b2df29347 |  |
 | current_research_plan_report | tracked_report | yes | 12808 | 4ccc8fb062ab |  |
-| research_redirect_report | tracked_report | yes | 11672 | d76e7a2a77f6 |  |
+| research_redirect_report | tracked_report | yes | 12057 | 8f43406797c4 |  |
 | research_redirect_claims_report | tracked_report | yes | 2392 | 0a0d290f728d |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
 | benchmark_matrix_audit_report | tracked_report | yes | 2739 | baf684c33814 |  |
