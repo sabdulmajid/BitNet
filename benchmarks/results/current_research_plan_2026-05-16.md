@@ -64,7 +64,7 @@ At the last local check:
 
 | Job | Partition / node | Purpose | Status |
 | ---: | --- | --- | --- |
-| `10043` | `dualcard / ece-nebula10` | Qwen3 paper-alignment run | running at last check |
+| `10044` | `dualcard / ece-nebula10` | Qwen3 paper-alignment run | running at last check |
 | `10079` | `midcard / ece-nebula12` | unweighted LS BitNet-SFT initializer benchmark | running at last check |
 | `10070` | `dualcard` | controlled 327.68M Stage-2 row | pending |
 | `10080` | `midcard` | calibrated diag-LS BitNet-SFT initializer benchmark | pending |

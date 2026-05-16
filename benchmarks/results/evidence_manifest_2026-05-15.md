@@ -3,7 +3,7 @@ Artifacts: `278`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
 | README | tracked_report | yes | 13591 | 6ecde701b8e9 |  |
-| current_research_plan_report | tracked_report | yes | 10935 | ba12a1604399 |  |
+| current_research_plan_report | tracked_report | yes | 10935 | a6a03ddadf40 |  |
 | research_redirect_report | tracked_report | yes | 11367 | f3ffc42da781 |  |
 | research_redirect_claims_report | tracked_report | yes | 2392 | 0a0d290f728d |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
