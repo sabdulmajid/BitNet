@@ -1302,6 +1302,17 @@ def audit_seqcls_native_i2sr_cpu_sample(root: Path, checks: list[dict[str, Any]]
     duplicate_path = root / f"benchmark_results/seqcls_native_duplicate_batching_audit_{DATE}.json"
     duplicate = read_json(duplicate_path)
     duplicate_summary = duplicate.get("summary", {}) if isinstance(duplicate.get("summary"), dict) else {}
+    duplicate_controls = {
+        control.get("label"): control
+        for control in duplicate.get("control_models", [])
+        if isinstance(control, dict)
+    }
+    fp_control = duplicate_controls.get("fp_qwen05b_f16", {})
+    fp_control_summary = fp_control.get("summary", {}) if isinstance(fp_control, dict) else {}
+    bitnet_backbone_control = duplicate_controls.get("bitnet_qwen_i2sr_backbone", {})
+    bitnet_backbone_summary = (
+        bitnet_backbone_control.get("summary", {}) if isinstance(bitnet_backbone_control, dict) else {}
+    )
     add_check(
         checks,
         "Sequence-classification duplicate-prompt batching audit rules out prompt formatting",
@@ -1321,6 +1332,21 @@ def audit_seqcls_native_i2sr_cpu_sample(root: Path, checks: list[dict[str, Any]]
             f"ready={duplicate.get('ready_for_batched_product_benchmark')}"
         ),
         "duplicate token-ID prompts should prove whether batching drift is independent of prompt formatting/tokenization",
+    )
+    add_check(
+        checks,
+        "Sequence-classification duplicate-prompt controls isolate BitNet/I2_SR drift",
+        isinstance(fp_control_summary.get("max_relative_rms_vs_alone"), (int, float))
+        and fp_control_summary.get("max_relative_rms_vs_alone") < 0.001
+        and isinstance(bitnet_backbone_summary.get("max_relative_rms_vs_alone"), (int, float))
+        and bitnet_backbone_summary.get("max_relative_rms_vs_alone") > 0.05,
+        (
+            f"fp_max_rel={fp_control_summary.get('max_relative_rms_vs_alone')}, "
+            f"fp_logits_invariant={fp_control_summary.get('all_logits_invariant')}, "
+            f"bitnet_backbone_max_rel={bitnet_backbone_summary.get('max_relative_rms_vs_alone')}, "
+            f"bitnet_backbone_logits_invariant={bitnet_backbone_summary.get('all_logits_invariant')}"
+        ),
+        "duplicate batching controls should distinguish generic FP16 pooled-embedding drift from BitNet/I2_SR drift",
     )
     full_progress_path = root / f"benchmark_results/seqcls_native_full_progress_{DATE}.json"
     full_progress = read_json(full_progress_path)

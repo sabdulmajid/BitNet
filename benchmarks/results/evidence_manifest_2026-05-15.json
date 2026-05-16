@@ -115,7 +115,7 @@
       "label": "original_benchmark_objective_audit",
       "metrics": {},
       "path": "benchmarks/results/original_benchmark_objective_audit_2026-05-15.md",
-      "sha256": "548bfae221eae9a5e4b8c9381c87b1030773e37713c3bba038f4d8754e5a1807",
+      "sha256": "ba868834239805b7ce6f7d08f166c662cadeb1d7c0260d99549b8545f739d0c3",
       "size_bytes": 3679
     },
     {
@@ -592,8 +592,8 @@
       "label": "seqcls_native_duplicate_batching_audit_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_native_duplicate_batching_audit_2026-05-15.md",
-      "sha256": "6ee7032500ce10e34775eb8bfcdef8f9f4d652b9475ae57e55ca48790daf6e0d",
-      "size_bytes": 2833
+      "sha256": "1a7c87f3b474faa53f7e0108b8734c77e30c8d8ecc3ca443a9fae10b1fcd3e14",
+      "size_bytes": 3242
     },
     {
       "exists": true,
@@ -916,8 +916,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "028e4ca8aa825c1ad50da3918740deb9dcf071a2fb371458c2598138918a31ce",
-      "size_bytes": 14638
+      "sha256": "0c30ef456c2c0fa5c866f513522c6dbbe07bb242204c0a4a4ea8a1821168fed5",
+      "size_bytes": 14876
     },
     {
       "exists": true,
@@ -2667,13 +2667,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 104,
+        "check_count": 105,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "438abb5aece257df18d05f9b041cfd3040f9e50a9948aa79352f07c4822f85bf",
-      "size_bytes": 22657
+      "sha256": "6b6aa698689f2638836229861395c14704bcdbb8cf34e052dd4ff0bd036ba74e",
+      "size_bytes": 22972
     },
     {
       "exists": true,
@@ -2699,7 +2699,7 @@
       "label": "original_benchmark_objective_audit_json",
       "metrics": {},
       "path": "benchmark_results/original_benchmark_objective_audit_2026-05-15.json",
-      "sha256": "733275491ab88e6adfbf8ecfb246e86551f2e286bfe0c76cd77432d180c2f51e",
+      "sha256": "43baf0b7a4459be381f090376073a35a0454b344a3250f6f4a3e6ab4d2ae9f91",
       "size_bytes": 4279
     },
     {
@@ -3064,8 +3064,8 @@
       "label": "seqcls_native_duplicate_batching_audit_json",
       "metrics": {},
       "path": "benchmark_results/seqcls_native_duplicate_batching_audit_2026-05-15.json",
-      "sha256": "1048e9f35f1c4704350cc250bfdb1fd16d299aee69a41bc90b1b7f13685ce199",
-      "size_bytes": 11675
+      "sha256": "15da23a5e08196d06dea916ac576a027940e794e5ca0a5aaad00b4f1ac59861a",
+      "size_bytes": 25780
     },
     {
       "exists": true,

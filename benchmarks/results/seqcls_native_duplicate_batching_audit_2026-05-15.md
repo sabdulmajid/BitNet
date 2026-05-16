@@ -40,6 +40,13 @@ This audit repeats the same rendered token-ID prompt within a single native llam
 | 2 | 2 | 1 | 1.121605 | 0.095216 | true | [0.102435, 1.224041, -0.128150] |
 | 2 | 3 | 1 | 1.076745 | 0.075370 | true | [0.121887, 1.198632, -0.146296] |
 
+## Control Models
+
+| model | logits invariant | argmax invariant | changed argmax | max rel RMS | gguf |
+| --- | --- | --- | --- | --- | --- |
+| fp_qwen05b_f16 | false | true | 0 | 0.000577 | models/qwen2.5-0.5b-fp/qwen05b_fp_f16.gguf |
+| bitnet_qwen_i2sr_backbone | false | false | 3 | 0.074285 | models/seqcls-backbone-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr.gguf |
+
 ## Interpretation
 
 Duplicate token-ID prompts are not invariant across batch positions. Because every entry in each audited batch is the exact same rendered token-ID prompt, this rules out tokenizer round-trip differences, text formatting differences, and output-row swaps as sufficient explanations. Batched sequence-classification throughput must remain blocked until this native runtime position-dependent drift is fixed.

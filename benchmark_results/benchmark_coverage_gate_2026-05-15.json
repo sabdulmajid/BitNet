@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 104,
+  "check_count": 105,
   "failed": [],
   "checks": [
     {
@@ -501,6 +501,12 @@
       "name": "Sequence-classification duplicate-prompt batching audit rules out prompt formatting",
       "passed": true,
       "evidence": "status=duplicate_batching_parity_mismatch, same_prompt=True, logits_invariant=False, predictions_invariant=False, changed_predictions=4, max_rel=0.30515261718676356, ready=False",
+      "blocker": ""
+    },
+    {
+      "name": "Sequence-classification duplicate-prompt controls isolate BitNet/I2_SR drift",
+      "passed": true,
+      "evidence": "fp_max_rel=0.0005771210893230367, fp_logits_invariant=False, bitnet_backbone_max_rel=0.07428541742772618, bitnet_backbone_logits_invariant=False",
       "blocker": ""
     },
     {
