@@ -115,7 +115,7 @@
       "label": "original_benchmark_objective_audit",
       "metrics": {},
       "path": "benchmarks/results/original_benchmark_objective_audit_2026-05-15.md",
-      "sha256": "ba868834239805b7ce6f7d08f166c662cadeb1d7c0260d99549b8545f739d0c3",
+      "sha256": "ace4cbe52d9c7afda31c80840dec2bc0f4a46e2a6a6a9a1cdaa48af31d0ee0f0",
       "size_bytes": 3679
     },
     {
@@ -943,7 +943,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "9928d9e0f077d47632d871d2e84a93bb0bace9b1497e118b670f19842d85876e",
+      "sha256": "b9bd864d5ee21d733d3b5bee66e97cbe58982c48f3d8c57143d3cbb812f3ddb0",
       "size_bytes": 15626
     },
     {
@@ -2699,7 +2699,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "d6997e04615ebfd090665d15496fef707534115e87bdced9b318721b71945f8a",
+      "sha256": "10e3d6c18d01cd927c4c03748db8106a127ede2650e0a2f7c3314abe406740ab",
       "size_bytes": 23953
     },
     {
@@ -2726,7 +2726,7 @@
       "label": "original_benchmark_objective_audit_json",
       "metrics": {},
       "path": "benchmark_results/original_benchmark_objective_audit_2026-05-15.json",
-      "sha256": "43baf0b7a4459be381f090376073a35a0454b344a3250f6f4a3e6ab4d2ae9f91",
+      "sha256": "6fa319f2a25022224aa92f48de09eec73bfefc2f783a8b789981a5a5ce53c59d",
       "size_bytes": 4279
     },
     {
