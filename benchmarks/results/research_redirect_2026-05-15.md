@@ -26,7 +26,7 @@ result.
 | Packed row-scale CPU runtime is feasible | proven for dense causal artifact | `I2_SR` Xeon result: PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, file `1211.3 MiB`. |
 | TL2 row-scale packed runtime is ready | not proven; explicitly blocked | The current TL2 runtime contract has `11` checks and remains `false`: converter scale collapse, missing row-scale TL2 storage, one-scale transform metadata, generated `Scales[0]` qgemm, unoffset x86 dispatch, missing loader sidecars, and no passing row-scale TL2 benchmark. |
 | Sequence-classification packed path is possible | prototype only; native plumbing incomplete | MNLI long-warmup row-scale checkpoint (`0.653591` PyTorch accuracy) exports as a `352.6 MiB` `I2_SR` backbone plus `10.8 KiB` dense head sidecar. A Qwen-compatible `bitnet-qwen` graph repairs the dominant runtime mismatch: hidden cosine is `0.994091`, hidden relative RMS is `0.108662`, and the 128-example sidecar CPU probe reaches `0.609375` accuracy with `0.914063` agreement against saved PyTorch predictions. A native single-artifact classifier-head smoke now matches the sidecar path, and a repaired 64-example direct-token CPU sample reaches saved-PyTorch agreement `0.96875`; full-split CPU validation and batching parity are still blocked. |
-| Paper-level BitDistill is reproduced | not proven | FP16-SFT MNLI is close to paper (`0.807641` vs `0.799100`), and a tensor-scale CE-only BitNet-SFT schedule/budget row clears its paper anchor (`0.628935` vs `0.608000`). This is not yet BitDistill or FP16-level recovery. Qwen3 QNLI tensor BitDistill recovers from `0.587040` BitNet-SFT to `0.861065`, but still trails FP `0.921106` by paired delta `-0.060040`; row-scale QNLI is lower at `0.848435`; Qwen3 SST2 BitNet-SFT is `0.799312` vs FP `0.930046`. |
+| Paper-level BitDistill is reproduced | not proven | FP16-SFT MNLI is close to paper (`0.807641` vs `0.799100`), and a tensor-scale CE-only BitNet-SFT schedule/budget row clears its paper anchor (`0.628935` vs `0.608000`). This is not yet BitDistill or FP16-level recovery. Qwen3 QNLI tensor BitDistill recovers from `0.587040` BitNet-SFT to `0.861065`, but still trails FP `0.921106` by paired delta `-0.060040`; Qwen3 SST2 tensor BitDistill recovers from `0.799312` BitNet-SFT to `0.871560`, but still trails FP `0.930046` by paired delta `-0.058486`; row-scale QNLI is lower at `0.848435`. |
 | Kimi/MoE works | not proven | Tiny Qwen2MoE fixtures prove routing/packing smoke only; no Kimi mapping or trained MoE quality exists. |
 
 ## Baseline Status
@@ -72,10 +72,11 @@ Completed controls rule out several simple causes:
 - The second 10000-step row at `lr=5e-5` reaches `0.607845`, effectively the
   paper BitNet-SFT anchor but weaker than the `lr=2e-5` row. This confirms
   that the BitNet-SFT baseline is budget-viable but schedule-sensitive.
-- The Qwen3 SST2 branch now has a full-validation FP16 reference and
-  BitNet-SFT row: FP16-SFT `0.930046`, BitNet-SFT `0.799312`, paired delta
-  `-0.130734`, 95% CI `[-0.159101, -0.102367]`. This is not a reproduction
-  pass; it is another completed baseline gap.
+- The Qwen3 SST2 branch now has full-validation FP16, BitNet-SFT, and tensor
+  BitDistill rows: FP16-SFT `0.930046`, BitNet-SFT `0.799312`, and tensor
+  BitDistill `0.871560`. Tensor BitDistill improves over BitNet-SFT by
+  `+0.072248`, but the paired delta versus FP remains `-0.058486` with 95% CI
+  `[-0.080523, -0.036449]`. This is useful recovery, not a reproduction pass.
 - The unweighted LS ternary initializer is a negative transfer result under
   this Qwen2.5 MNLI recipe: it reaches `0.361895` versus matched absmean
   baseline `0.628935`, paired delta `-0.267040`, 95% CI

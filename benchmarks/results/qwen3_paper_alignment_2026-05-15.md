@@ -9,10 +9,10 @@ This audit tracks the queued Qwen3-0.6B branch. Rows remain pending until full v
 | field | value |
 | --- | --- |
 | jobs | 16 |
-| complete rows | 10 |
+| complete rows | 11 |
 | FP complete tasks | [mnli, qnli, sst2] |
 | BitNet-SFT complete tasks | [mnli, qnli, sst2] |
-| tensor BitDistill complete tasks | [mnli, qnli] |
+| tensor BitDistill complete tasks | [mnli, qnli, sst2] |
 | row BitDistill complete tasks | [mnli, qnli] |
 | gap-pass rows | 0 |
 | paper reproduction ready | false |
@@ -32,8 +32,8 @@ This audit tracks the queued Qwen3-0.6B branch. Rows remain pending until full v
 | 10048 | novelty_row_scale | qnli | bitdistill | row | retrofit-variant | -1 | not_in_squeue | true | 0.848435 | -0.072671 | [-0.081763, -0.063578] | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitdistill-row-layer-1 |
 | 10049 | paper_baseline | sst2 | fp16_sft | tensor | paper-inspired | -1 | not_in_squeue | true | 0.930046 | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/fp16_sft-tensor-layer-1 |
 | 10050 | paper_baseline | sst2 | bitnet_sft | tensor | paper-inspired | -1 | not_in_squeue | true | 0.799312 | -0.130734 | [-0.159101, -0.102367] | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitnet_sft-tensor-layer-1 |
-| 10051 | paper_baseline | sst2 | bitdistill | tensor | paper-inspired | -1 | RUNNING | false | - | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitdistill-tensor-layer-1 |
-| 10052 | novelty_row_scale | sst2 | bitdistill | row | retrofit-variant | -1 | PENDING | false | - | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitdistill-row-layer-1 |
+| 10051 | paper_baseline | sst2 | bitdistill | tensor | paper-inspired | -1 | not_in_squeue | true | 0.871560 | -0.058486 | [-0.080523, -0.036449] | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitdistill-tensor-layer-1 |
+| 10052 | novelty_row_scale | sst2 | bitdistill | row | retrofit-variant | -1 | RUNNING | false | - | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitdistill-row-layer-1 |
 | 10053 | attention_layer_sweep | mnli | bitdistill | tensor | paper-inspired | -8 | PENDING | false | - | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-8 |
 | 10054 | attention_layer_sweep | mnli | bitdistill | tensor | paper-inspired | -2 | PENDING | false | - | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-2 |
 | 10055 | attention_layer_sweep | mnli | bitdistill | tensor | paper-inspired | -4 | PENDING | false | - | - | - | false | checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-4 |
