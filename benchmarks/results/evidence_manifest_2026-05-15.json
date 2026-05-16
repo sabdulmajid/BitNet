@@ -1,5 +1,5 @@
 {
-  "artifact_count": 240,
+  "artifact_count": 242,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "75121c3a887383b5bcf1ac238841b1c4468aafab7cfcf28a3c62ed76d65a9497",
-      "size_bytes": 26305
+      "sha256": "8d00088b675432cff262a103d7f524f045d1ed2b9e1ceb5a5a8524f1d7ce46ad",
+      "size_bytes": 26407
     },
     {
       "exists": true,
@@ -409,6 +409,15 @@
     {
       "exists": true,
       "kind": "tracked_report",
+      "label": "bitdistill_training_dynamics_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_training_dynamics_2026-05-15.md",
+      "sha256": "5bc970bbd7976a38020d906869f646f5d278550de60da2e1947050938b973eca",
+      "size_bytes": 725
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
       "label": "qwen3_paper_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/qwen3_paper_alignment_2026-05-15.md",
@@ -682,8 +691,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "2f25faf783ab39ee0330ba29f192fd587d4f827d60949e3b5a5287ef680f22c7",
-      "size_bytes": 9535
+      "sha256": "39a2d7a511b04259cf8280a94c43389b9a1b81f1443dc8dbebc92cf02a901dca",
+      "size_bytes": 9799
     },
     {
       "exists": true,
@@ -2397,13 +2406,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 74,
+        "check_count": 76,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "7bf06adb31fc68923bd444eb4a268e6b7b3adf38bffd16d8080f911d73b7e8df",
-      "size_bytes": 15243
+      "sha256": "7e6b32b257844b5a10dd4b08ab629b42730c030bfe415e8bd6b667479fee901f",
+      "size_bytes": 15661
     },
     {
       "exists": true,
@@ -2517,6 +2526,15 @@
       "path": "benchmark_results/bitdistill_telemetry_coverage_2026-05-15.json",
       "sha256": "92f6cbc8605562309f6319e2844688b60e09c7f85032e22e202d2ce5995479d2",
       "size_bytes": 5077
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "bitdistill_training_dynamics_json",
+      "metrics": {},
+      "path": "benchmark_results/bitdistill_training_dynamics_2026-05-15.json",
+      "sha256": "cbeaa20bfeac9a081a22b70a1963d76192fb2feef95964585d2c8840273143b9",
+      "size_bytes": 3117
     },
     {
       "exists": true,
@@ -3103,8 +3121,8 @@
         "task_subln": 4
       },
       "path": "benchmark_results/bitdistill_smoke_contract_2026-05-15.json",
-      "sha256": "ab1025e21d4c89eb65bede783055dc6c39d1dd220673d1e5d0d0fc15ffc35956",
-      "size_bytes": 67745
+      "sha256": "7bbcbbb16376128e93b426f721db36b8d1776860c93f18e0f210b3eaac6597cc",
+      "size_bytes": 70625
     },
     {
       "exists": true,

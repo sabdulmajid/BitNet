@@ -412,6 +412,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill Stage-2 curve submission](benchmarks/results/bitdistill_stage2_curve_submission_2026-05-15.md)
 - [BitDistill controlled curve audit](benchmarks/results/bitdistill_controlled_curve_2026-05-15.md)
 - [BitDistill telemetry coverage audit](benchmarks/results/bitdistill_telemetry_coverage_2026-05-15.md)
+- [BitDistill training-dynamics audit](benchmarks/results/bitdistill_training_dynamics_2026-05-15.md)
 - [BitDistill telemetry diagnostic submission](benchmarks/results/bitdistill_telemetry_diagnostic_submission_2026-05-16.md)
 - [BitDistill root-cause audit](benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md)
 - [Qwen3 paper-alignment audit](benchmarks/results/qwen3_paper_alignment_2026-05-15.md)

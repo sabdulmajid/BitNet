@@ -440,6 +440,35 @@ def audit_bitdistill_telemetry_coverage(root: Path, checks: list[dict[str, Any]]
     )
 
 
+def audit_bitdistill_training_dynamics(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/bitdistill_training_dynamics_{DATE}.json"
+    if not path.exists():
+        add_check(checks, "BitDistill training-dynamics audit exists", False, str(path.relative_to(root)), "missing training-dynamics audit")
+        return
+    data = read_json(path)
+    status = data.get("status")
+    add_check(
+        checks,
+        "BitDistill training-dynamics audit parses materialized telemetry",
+        status in {"smoke_only", "controlled_materialized"}
+        and data.get("trace_count", 0) > 0
+        and data.get("smoke_materialized_count", 0) > 0,
+        (
+            f"status={status}, traces={data.get('trace_count')}, "
+            f"smoke={data.get('smoke_materialized_count')}, "
+            f"controlled={data.get('materialized_controlled_count')}"
+        ),
+        "training-dynamics audit must parse at least the smoke telemetry hooks",
+    )
+    add_check(
+        checks,
+        "BitDistill training-dynamics audit blocks controlled claims until real traces exist",
+        status == "controlled_materialized" or data.get("materialized_controlled_count") == 0,
+        f"status={status}, controlled={data.get('materialized_controlled_count')}",
+        "training-dynamics audit must distinguish smoke parser validation from controlled-run evidence",
+    )
+
+
 def audit_bitdistill_loss_contract(root: Path, checks: list[dict[str, Any]]) -> None:
     path = root / f"benchmark_results/bitdistill_loss_contract_{DATE}.json"
     if not path.exists():
@@ -974,6 +1003,7 @@ def main() -> None:
     audit_subln_activation_variance(root, checks)
     audit_bitdistill_root_cause(root, checks)
     audit_bitdistill_telemetry_coverage(root, checks)
+    audit_bitdistill_training_dynamics(root, checks)
     audit_bitdistill_loss_contract(root, checks)
     audit_original_benchmark_objective(root, checks)
     audit_tl2_negative_result(root, checks)

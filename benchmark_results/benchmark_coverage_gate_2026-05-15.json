@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 74,
+  "check_count": 76,
   "failed": [],
   "checks": [
     {
@@ -258,6 +258,18 @@
       "blocker": ""
     },
     {
+      "name": "BitDistill training-dynamics audit parses materialized telemetry",
+      "passed": true,
+      "evidence": "status=smoke_only, traces=2, smoke=2, controlled=0",
+      "blocker": ""
+    },
+    {
+      "name": "BitDistill training-dynamics audit blocks controlled claims until real traces exist",
+      "passed": true,
+      "evidence": "status=smoke_only, controlled=0",
+      "blocker": ""
+    },
+    {
       "name": "BitDistill loss-contract static checks pass",
       "passed": true,
       "evidence": "passed=True, checks=6, status=loss_normalization_risk",
@@ -440,7 +452,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=240, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=242, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {
