@@ -232,6 +232,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Sequence-classification native I2_SR batching audit](benchmarks/results/seqcls_native_batching_audit_2026-05-15.md)
 - [Sequence-classification native I2_SR CPU token-ID sample](benchmarks/results/seqcls_native_i2sr_cpu_mnli_64_token_ids_2026-05-15.md)
 - [Sequence-classification native full CPU submission](benchmarks/results/seqcls_native_full_cpu_submission_2026-05-15.md)
+- [Sequence-classification native full CPU progress](benchmarks/results/seqcls_native_full_progress_2026-05-15.md)
 - [CPU tradeoff frontier audit](benchmarks/results/cpu_tradeoff_frontier_2026-05-15.md)
 - [TL2 group-scale viability audit](benchmarks/results/tl2_group_scale_viability_2026-05-15.md)
 - [TL2 row-scale implementation plan](benchmarks/results/tl2_row_scale_implementation_plan_2026-05-15.md)

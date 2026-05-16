@@ -1276,6 +1276,22 @@ def audit_seqcls_native_i2sr_cpu_sample(root: Path, checks: list[dict[str, Any]]
         ),
         "batching audit should show whether the failure is a row swap or true batched-runtime drift",
     )
+    full_progress_path = root / f"benchmark_results/seqcls_native_full_progress_{DATE}.json"
+    full_progress = read_json(full_progress_path)
+    add_check(
+        checks,
+        "Sequence-classification native full CPU progress is resumable",
+        full_progress.get("status") in {"partial", "complete"}
+        and isinstance(full_progress.get("completed_examples"), int)
+        and full_progress.get("completed_examples") > 0
+        and full_progress.get("contiguous_prefix") is True
+        and full_progress.get("is_product_evidence") is False,
+        (
+            f"status={full_progress.get('status')}, completed={full_progress.get('completed_examples')}, "
+            f"contiguous={full_progress.get('contiguous_prefix')}, product={full_progress.get('is_product_evidence')}"
+        ),
+        "full native CPU run should expose a resumable progress trace without treating partial progress as product evidence",
+    )
 
 
 def audit_qwen3_paper_alignment(root: Path, checks: list[dict[str, Any]]) -> None:

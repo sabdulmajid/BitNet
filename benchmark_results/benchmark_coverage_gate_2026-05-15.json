@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 102,
+  "check_count": 103,
   "failed": [],
   "checks": [
     {
@@ -498,6 +498,12 @@
       "blocker": ""
     },
     {
+      "name": "Sequence-classification native full CPU progress is resumable",
+      "passed": true,
+      "evidence": "status=partial, completed=650, contiguous=True, product=False",
+      "blocker": ""
+    },
+    {
       "name": "Qwen3 paper-alignment audit tracks required GLUE rows",
       "passed": true,
       "evidence": "jobs=16, complete=15, ready=False",
@@ -608,7 +614,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=285, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=287, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

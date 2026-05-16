@@ -1,5 +1,5 @@
 {
-  "artifact_count": 285,
+  "artifact_count": 287,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "7ecc87a1ca5f7f56dc4a37a0f28cdec7a3d8294bddd9c11a452ee6cee8726eb1",
-      "size_bytes": 15031
+      "sha256": "d46197d89cb5735cb2f7ba15e9498a3bb09c7bf01f35df3b1247875dda468dbe",
+      "size_bytes": 15146
     },
     {
       "exists": true,
@@ -544,6 +544,15 @@
     {
       "exists": true,
       "kind": "tracked_report",
+      "label": "seqcls_native_full_progress_report",
+      "metrics": {},
+      "path": "benchmarks/results/seqcls_native_full_progress_2026-05-15.md",
+      "sha256": "7b619e229a41f1565a8df4bc60d293f5eee37e25a943bdf56186b19468ab020e",
+      "size_bytes": 732
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
       "label": "seqcls_native_mismatch_audit_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_native_mismatch_audit_2026-05-15.md",
@@ -889,8 +898,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "8b706f04d0eb5d8756fa3b092f9f823d80b5f016a077e350bb30f1764e5fd660",
-      "size_bytes": 14099
+      "sha256": "b7e83f1ef7cd89cfa3ccd52ae942e3ce376d58da303b26e6f934cc25d74ad6ac",
+      "size_bytes": 14239
     },
     {
       "exists": true,
@@ -2640,13 +2649,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 102,
+        "check_count": 103,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "92e3149c7ddef60f7090515a3c32b282f35eb72e5d7c21c9ab9a5b24ad361c86",
-      "size_bytes": 21964
+      "sha256": "c6bee8a50c0363e61b974275824ed1d6a037ac7146b947e065b6dc8066fa48b1",
+      "size_bytes": 22181
     },
     {
       "exists": true,
@@ -2985,6 +2994,15 @@
       "path": "benchmark_results/seqcls_native_i2sr_cpu_mnli_64_token_ids_batch4_2026-05-15.json",
       "sha256": "190a564f77d142e2127f2ae8515acf5f4acff4c328a5854e5058b81c282c099f",
       "size_bytes": 11404
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "seqcls_native_full_progress_json",
+      "metrics": {},
+      "path": "benchmark_results/seqcls_native_full_progress_2026-05-15.json",
+      "sha256": "4c39a4c7db1532190b8d64b335641c63b4f3acd6345415abff901517b2d8d156",
+      "size_bytes": 970
     },
     {
       "exists": true,
