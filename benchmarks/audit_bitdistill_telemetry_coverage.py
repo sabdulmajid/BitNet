@@ -67,7 +67,7 @@ def nested(data: dict[str, Any], *keys: str, default: Any = None) -> Any:
     return value
 
 
-def summarize_measured(args: argparse.Namespace, source: str) -> list[dict[str, Any]]:
+def summarize_measured(args: argparse.Namespace, source: str, launcher_source: str) -> list[dict[str, Any]]:
     loss_scale = read_json(args.loss_scale_json)
     mechanics = read_json(args.mechanics_json)
     subln = read_json(args.subln_json)
@@ -162,6 +162,27 @@ def summarize_measured(args: argparse.Namespace, source: str) -> list[dict[str, 
                 ],
             ),
         },
+        {
+            "telemetry": "Slurm launcher telemetry pass-through",
+            "status": "instrumented_not_materialized",
+            "evidence": (
+                "slurm_bitdistill_glue.sh exposes TELEMETRY_EVERY_STEPS, "
+                "TELEMETRY_COMPONENT_GRAD_NORMS, and TELEMETRY_MAX_ELEMENTS_PER_LAYER "
+                "to train_bitdistill.py."
+            ),
+            "supports": "Cluster jobs can materialize the new telemetry without hand-editing the launcher.",
+            "passed": source_has_all(
+                launcher_source,
+                [
+                    "TELEMETRY_EVERY_STEPS",
+                    "TELEMETRY_COMPONENT_GRAD_NORMS",
+                    "TELEMETRY_MAX_ELEMENTS_PER_LAYER",
+                    "--telemetry-every-steps",
+                    "--telemetry-component-grad-norms",
+                    "--telemetry-max-elements-per-layer",
+                ],
+            ),
+        },
     ]
 
 
@@ -208,7 +229,8 @@ def summarize_missing(source: str) -> list[dict[str, Any]]:
 
 def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     source = args.training_source.read_text(encoding="utf-8") if args.training_source.exists() else ""
-    measured = summarize_measured(args, source)
+    launcher_source = args.launcher_source.read_text(encoding="utf-8") if args.launcher_source.exists() else ""
+    measured = summarize_measured(args, source, launcher_source)
     missing = summarize_missing(source)
     measured_pass = sum(1 for row in measured if row["passed"])
     return {
@@ -223,7 +245,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "missing": missing,
         "verdict": (
             "Existing telemetry is sufficient for loss-scale and static-mechanics triage, "
-            "and the training script now has opt-in hooks for the next controlled wave. "
+            "and the training script plus Slurm launcher now have opt-in hooks for the next controlled wave. "
             "The completed benchmark artifacts are still not sufficient to prove update-direction "
             "causality, because materialized gradient-component, flip-rate, scale-trajectory, "
             "and activation-saturation traces do not exist yet."
@@ -273,6 +295,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--training-source", type=Path, default=Path("train_bitdistill.py"))
+    parser.add_argument("--launcher-source", type=Path, default=Path("slurm_bitdistill_glue.sh"))
     parser.add_argument("--loss-scale-json", type=Path, default=Path(f"benchmark_results/bitdistill_loss_scale_audit_{DATE}.json"))
     parser.add_argument("--mechanics-json", type=Path, default=Path(f"benchmark_results/bitnet_sft_mechanics_audit_{DATE}.json"))
     parser.add_argument("--subln-json", type=Path, default=Path(f"benchmark_results/subln_activation_variance_{DATE}.json"))

@@ -42,10 +42,17 @@
       "status": "instrumented_not_materialized",
       "supports": "Future controlled rows can record update-balance diagnostics without changing default jobs.",
       "telemetry": "opt-in training telemetry hooks"
+    },
+    {
+      "evidence": "slurm_bitdistill_glue.sh exposes TELEMETRY_EVERY_STEPS, TELEMETRY_COMPONENT_GRAD_NORMS, and TELEMETRY_MAX_ELEMENTS_PER_LAYER to train_bitdistill.py.",
+      "passed": true,
+      "status": "instrumented_not_materialized",
+      "supports": "Cluster jobs can materialize the new telemetry without hand-editing the launcher.",
+      "telemetry": "Slurm launcher telemetry pass-through"
     }
   ],
-  "measured_count": 6,
-  "measured_expected": 6,
+  "measured_count": 7,
+  "measured_expected": 7,
   "missing": [
     {
       "evidence": "Opt-in component-gradient telemetry exists, but no completed benchmark row has materialized those traces yet.",
@@ -83,5 +90,5 @@
   "schema": "bitdistill-telemetry-coverage-v1",
   "status": "partial_observability",
   "training_source": "train_bitdistill.py",
-  "verdict": "Existing telemetry is sufficient for loss-scale and static-mechanics triage, and the training script now has opt-in hooks for the next controlled wave. The completed benchmark artifacts are still not sufficient to prove update-direction causality, because materialized gradient-component, flip-rate, scale-trajectory, and activation-saturation traces do not exist yet."
+  "verdict": "Existing telemetry is sufficient for loss-scale and static-mechanics triage, and the training script plus Slurm launcher now have opt-in hooks for the next controlled wave. The completed benchmark artifacts are still not sufficient to prove update-direction causality, because materialized gradient-component, flip-rate, scale-trajectory, and activation-saturation traces do not exist yet."
 }

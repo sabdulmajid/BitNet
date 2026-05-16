@@ -2,9 +2,9 @@
 
 Overall status: **partial_observability**.
 
-Existing telemetry is sufficient for loss-scale and static-mechanics triage, and the training script now has opt-in hooks for the next controlled wave. The completed benchmark artifacts are still not sufficient to prove update-direction causality, because materialized gradient-component, flip-rate, scale-trajectory, and activation-saturation traces do not exist yet.
+Existing telemetry is sufficient for loss-scale and static-mechanics triage, and the training script plus Slurm launcher now have opt-in hooks for the next controlled wave. The completed benchmark artifacts are still not sufficient to prove update-direction causality, because materialized gradient-component, flip-rate, scale-trajectory, and activation-saturation traces do not exist yet.
 
-Measured diagnostics passing: `6/6`. Missing advanced diagnostics: `5`.
+Measured diagnostics passing: `7/7`. Missing advanced diagnostics: `5`.
 
 ## Measured
 
@@ -16,6 +16,7 @@ Measured diagnostics passing: `6/6`. Missing advanced diagnostics: `5`.
 | final checkpoint ternary code distribution | pass | measured_offline | code fractions={'-1': 0.33324317512931406, '0': 0.33317633827964027, '1': 0.33358048659104567}; entropy=1.584962. | Static export/mechanics checks, not step-by-step training dynamics. |
 | SubLN activation/logit perturbation | pass | measured_offline | inserted=48; logit relative RMS=0.768044; cosine=0.698252. | The claim that untrained SubLN surgery is not identity-preserving locally. |
 | opt-in training telemetry hooks | pass | instrumented_not_materialized | train_bitdistill.py exposes telemetry.jsonl, total grad norm, optional component grad norms, ternary code fractions, scale stats, and threshold-band fractions. | Future controlled rows can record update-balance diagnostics without changing default jobs. |
+| Slurm launcher telemetry pass-through | pass | instrumented_not_materialized | slurm_bitdistill_glue.sh exposes TELEMETRY_EVERY_STEPS, TELEMETRY_COMPONENT_GRAD_NORMS, and TELEMETRY_MAX_ELEMENTS_PER_LAYER to train_bitdistill.py. | Cluster jobs can materialize the new telemetry without hand-editing the launcher. |
 
 ## Missing Before Stronger Causal Claims
 
