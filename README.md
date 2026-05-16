@@ -405,6 +405,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Qwen side-by-side summary](benchmarks/results/qwen_side_by_side_2026-05-15.md)
 - [Benchmark matrix audit](benchmarks/results/benchmark_matrix_audit_2026-05-15.md)
 - [BitDistill reproduction gap analysis](benchmarks/results/bitdistill_reproduction_gap_analysis_2026-05-15.md)
+- [BitDistill canonical reproduction plan](benchmarks/results/bitdistill_reproduction_plan_2026-05-16.md)
 - [BitDistill Stage-2 budget curve audit](benchmarks/results/bitdistill_stage2_curve_2026-05-15.md)
 - [BitDistill Stage-2 curve submission](benchmarks/results/bitdistill_stage2_curve_submission_2026-05-15.md)
 - [BitDistill controlled curve audit](benchmarks/results/bitdistill_controlled_curve_2026-05-15.md)

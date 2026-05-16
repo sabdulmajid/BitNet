@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the BitDistill reproduction and novelty experiment matrix."""
+"""Generate the narrow BitDistill reproduction and novelty experiment matrix."""
 
 from __future__ import annotations
 
@@ -47,6 +47,9 @@ def make_command(
 
 def build_matrix(args: argparse.Namespace) -> dict[str, Any]:
     runs: list[dict[str, Any]] = []
+    tasks = [args.primary_task]
+    if args.include_secondary_tasks:
+        tasks = TASKS
     warmup_dir = f"{args.warmup_root}/{args.model.replace('/', '-')}/continued_pretrain/bitdistill-tensor"
     warmup_state = f"{warmup_dir}/custom_state_dict.pt"
     runs.append(
@@ -64,7 +67,7 @@ def build_matrix(args: argparse.Namespace) -> dict[str, Any]:
             ),
         }
     )
-    for task in TASKS:
+    for task in tasks:
         for method in BASELINES:
             runs.append(
                 {
@@ -88,60 +91,71 @@ def build_matrix(args: argparse.Namespace) -> dict[str, Any]:
                     ),
                 }
             )
-        runs.append(
-            {
-                "phase": "novelty_row_scale",
-                "task": task,
-                "method": "bitdistill",
-                "scale_mode": "row",
-                "distill_layer": -1,
-                "command": make_command(
-                    model=args.model,
-                    task=task,
-                    task_format=args.task_format,
-                    label_scheme=args.label_scheme,
-                    candidate_score=args.candidate_score,
-                    method="bitdistill",
-                    scale_mode="row",
-                    distill_layer=-1,
-                    teacher_root=args.teacher_root,
-                    warmup_state=warmup_state,
-                    max_steps=args.max_steps,
-                ),
-            }
-        )
-    for layer in args.layer_sweep:
-        runs.append(
-            {
-                "phase": "attention_layer_sweep",
-                "task": args.sweep_task,
-                "method": "bitdistill",
-                "scale_mode": "tensor",
-                "distill_layer": layer,
-                "command": make_command(
-                    model=args.model,
-                    task=args.sweep_task,
-                    task_format=args.task_format,
-                    label_scheme=args.label_scheme,
-                    candidate_score=args.candidate_score,
-                    method="bitdistill",
-                    scale_mode="tensor",
-                    distill_layer=layer,
-                    teacher_root=args.teacher_root,
-                    warmup_state=warmup_state,
-                    max_steps=args.max_steps,
-                ),
-            }
-        )
+        if args.include_row_scale:
+            runs.append(
+                {
+                    "phase": "novelty_row_scale",
+                    "task": task,
+                    "method": "bitdistill",
+                    "scale_mode": "row",
+                    "distill_layer": -1,
+                    "command": make_command(
+                        model=args.model,
+                        task=task,
+                        task_format=args.task_format,
+                        label_scheme=args.label_scheme,
+                        candidate_score=args.candidate_score,
+                        method="bitdistill",
+                        scale_mode="row",
+                        distill_layer=-1,
+                        teacher_root=args.teacher_root,
+                        warmup_state=warmup_state,
+                        max_steps=args.max_steps,
+                    ),
+                }
+            )
+    if args.include_layer_sweep:
+        for layer in args.layer_sweep:
+            runs.append(
+                {
+                    "phase": "attention_layer_sweep",
+                    "task": args.sweep_task,
+                    "method": "bitdistill",
+                    "scale_mode": "tensor",
+                    "distill_layer": layer,
+                    "command": make_command(
+                        model=args.model,
+                        task=args.sweep_task,
+                        task_format=args.task_format,
+                        label_scheme=args.label_scheme,
+                        candidate_score=args.candidate_score,
+                        method="bitdistill",
+                        scale_mode="tensor",
+                        distill_layer=layer,
+                        teacher_root=args.teacher_root,
+                        warmup_state=warmup_state,
+                        max_steps=args.max_steps,
+                    ),
+                }
+            )
     return {
         "schema": "bitdistill-reproduction-plan-v1",
         "date": DATE,
+        "plan_mode": "canonical_mnli_first",
         "model": args.model,
+        "primary_task": args.primary_task,
+        "included_tasks": tasks,
+        "deferred_axes": {
+            "secondary_tasks": not args.include_secondary_tasks,
+            "row_scale": not args.include_row_scale,
+            "attention_layer_sweep": not args.include_layer_sweep,
+        },
         "task_format": args.task_format,
-        "success_criterion": "BitDistill within 0.5-1.0 accuracy point (0.005-0.010 absolute accuracy) of FP16-SFT on MNLI/QNLI/SST2.",
-        "required_first": "Run FP16-SFT for each task; those checkpoints become task teachers for BitDistill.",
+        "success_criterion": "BitDistill within 0.5-1.0 accuracy point (0.005-0.010 absolute accuracy) of FP16-SFT on the primary task before expanding axes.",
+        "required_first": "Run FP16-SFT for each included task; those checkpoints become task teachers for BitDistill.",
         "required_warmup": f"Run continued pretraining first and pass `{warmup_state}` to every BitDistill task run.",
         "logits_kd": "Use paper-style logits KL with `LOGIT_KD_TEMPERATURE_SCALE=none`; the tau-squared convention is available only as an explicit diagnostic.",
+        "expansion_rule": "Do not add QNLI/SST2, row-scale novelty, or attention-layer sweeps until the MNLI tensor-scale BitDistill gate is interpretable.",
         "runs": runs,
     }
 
@@ -168,13 +182,17 @@ def render_markdown(plan: dict[str, Any]) -> str:
     return "\n\n".join(
         [
             f"# BitDistill Reproduction Plan, {plan['date']}",
+            f"Plan mode: `{plan['plan_mode']}`.",
             f"Model: `{plan['model']}`.",
+            f"Primary task: `{plan['primary_task']}`.",
+            f"Included tasks: `{', '.join(plan['included_tasks'])}`.",
             f"Task format: `{plan['task_format']}`.",
             f"Success criterion: {plan['success_criterion']}",
             f"Ordering constraint: {plan['required_first']}",
             f"Warmup constraint: {plan['required_warmup']}",
             f"Logits-KD constraint: {plan['logits_kd']}",
-            "This matrix separates paper reproduction from this fork's novelty claim. The paper reproduction uses tensor-scale BitDistill. The novelty run changes only the scale mode to row and then exports through the stable `I2_SR` path after quality is proven.",
+            f"Expansion rule: {plan['expansion_rule']}",
+            "This matrix keeps paper reproduction separate from this fork's novelty claim. The default plan uses tensor-scale BitDistill on MNLI first. Secondary tasks, row-scale novelty, and attention-layer sweeps require explicit opt-in flags.",
             md_table(["#", "phase", "task", "method", "scale", "layer", "command"], rows),
         ]
     ) + "\n"
@@ -188,13 +206,17 @@ def main() -> None:
     parser.add_argument("--task-format", choices=["sequence_classification", "causal_lm"], default="sequence_classification")
     parser.add_argument("--label-scheme", choices=["letters", "words"], default="letters")
     parser.add_argument("--candidate-score", choices=["mean", "sum"], default="mean")
-    parser.add_argument("--max-steps", type=int, default=1000)
+    parser.add_argument("--primary-task", default="mnli", choices=TASKS)
+    parser.add_argument("--include-secondary-tasks", action="store_true")
+    parser.add_argument("--include-row-scale", action="store_true")
+    parser.add_argument("--include-layer-sweep", action="store_true")
+    parser.add_argument("--max-steps", type=int, default=10000)
     parser.add_argument("--continued-pretrain-steps", type=int, default=5000)
     parser.add_argument("--continued-pretrain-save-every-steps", type=int, default=1000)
     parser.add_argument("--sweep-task", default="mnli", choices=TASKS)
     parser.add_argument("--layer-sweep", type=int, nargs="+", default=[-1, -2, -4, -8])
-    parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/bitdistill_reproduction_plan_2026-05-14.json"))
-    parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/bitdistill_reproduction_plan_2026-05-14.md"))
+    parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_reproduction_plan_{DATE}.json"))
+    parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/bitdistill_reproduction_plan_{DATE}.md"))
     args = parser.parse_args()
 
     plan = build_matrix(args)
