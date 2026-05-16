@@ -1,5 +1,5 @@
 {
-  "artifact_count": 244,
+  "artifact_count": 246,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "4ae9594a998c1048de941dc381a674a2af24a3651d6ba317cd2a57ca8e3c3578",
-      "size_bytes": 27555
+      "sha256": "32f316a4f6b5d4921c04849cced1204364baeb0e5df4aef8f562332c980ae221",
+      "size_bytes": 27660
     },
     {
       "exists": true,
@@ -436,6 +436,15 @@
     {
       "exists": true,
       "kind": "tracked_report",
+      "label": "bitdistill_gamma60_diagnostic_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_gamma60_diagnostic_2026-05-15.md",
+      "sha256": "78c29cd643f98ae3cc738b27eab2b97e4f1eb793dd5fb71f5d6a449606c03d99",
+      "size_bytes": 1401
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
       "label": "qwen3_paper_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/qwen3_paper_alignment_2026-05-15.md",
@@ -709,7 +718,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "0a9eeccf773ec6dbb04bdb626258de680d7438256e76f93ba95c2e9bedaf20ad",
+      "sha256": "10a32620ad9d7f9efaee600ced9ad387e470358c23dbfa4c559c8aba6b93ae01",
       "size_bytes": 9798
     },
     {
@@ -2429,7 +2438,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "0ecebd7b45bfc8eaf47e511f3275e157081a2587d51181d731fd9e9d0401f7c7",
+      "sha256": "29fc83e08395bc499af6f6710182b01d1fafb3bb97daa2d9437e5f5ac80e8330",
       "size_bytes": 15660
     },
     {
@@ -2553,6 +2562,15 @@
       "path": "benchmark_results/bitdistill_training_dynamics_2026-05-15.json",
       "sha256": "a9cc8da23c480081198e2bda3cbc60c61074c8f4502d0b51be957d1ca56881fe",
       "size_bytes": 4499
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "bitdistill_gamma60_diagnostic_json",
+      "metrics": {},
+      "path": "benchmark_results/bitdistill_gamma60_diagnostic_2026-05-15.json",
+      "sha256": "9fa95804e54dc21c34ad896431772b36bcbfb5caaa96387ff2f8998b7fccd628",
+      "size_bytes": 4136
     },
     {
       "exists": true,

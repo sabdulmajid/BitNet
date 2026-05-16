@@ -428,6 +428,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill telemetry diagnostic submission](benchmarks/results/bitdistill_telemetry_diagnostic_submission_2026-05-16.md)
 - [BitDistill fast telemetry submission](benchmarks/results/bitdistill_telemetry_fast_submission_2026-05-16.md)
 - [BitDistill gamma-60 diagnostic submission](benchmarks/results/bitdistill_gamma60_submission_2026-05-16.md)
+- [BitDistill gamma-60 diagnostic audit](benchmarks/results/bitdistill_gamma60_diagnostic_2026-05-15.md)
 - [BitDistill root-cause audit](benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md)
 - [Qwen3 paper-alignment audit](benchmarks/results/qwen3_paper_alignment_2026-05-15.md)
 - [BitNet-SFT baseline audit](benchmarks/results/bitnet_sft_baseline_audit_2026-05-15.md)

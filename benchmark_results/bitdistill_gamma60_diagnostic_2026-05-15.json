@@ -1,0 +1,105 @@
+{
+  "baseline_accuracy": 0.6911869587366276,
+  "baseline_comparison": {
+    "both_correct": 0,
+    "both_wrong": 0,
+    "candidate_accuracy": null,
+    "candidate_wins": 0,
+    "delta_vs_reference": null,
+    "errors": [
+      "missing /mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-gamma60-headinit/eval_predictions.jsonl"
+    ],
+    "matched": 0,
+    "mcnemar_exact_p": null,
+    "missing": [
+      "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-gamma60-headinit/eval_predictions.jsonl"
+    ],
+    "paired_ci95": null,
+    "reference_accuracy": null,
+    "reference_wins": 0,
+    "status": "pending"
+  },
+  "baseline_dir": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit",
+  "baseline_metrics_exists": true,
+  "baseline_predictions_exists": true,
+  "candidate_accuracy": null,
+  "candidate_dir": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-gamma60-headinit",
+  "candidate_metrics_exists": false,
+  "candidate_predictions_exists": false,
+  "date": "2026-05-15",
+  "delta_accuracy_vs_baseline_metric": null,
+  "expected_eval_examples": 9815,
+  "fp_comparison": {
+    "both_correct": 0,
+    "both_wrong": 0,
+    "candidate_accuracy": null,
+    "candidate_wins": 0,
+    "delta_vs_reference": null,
+    "errors": [
+      "missing /mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-gamma60-headinit/eval_predictions.jsonl"
+    ],
+    "matched": 0,
+    "mcnemar_exact_p": null,
+    "missing": [
+      "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-gamma60-headinit/eval_predictions.jsonl"
+    ],
+    "paired_ci95": null,
+    "reference_accuracy": null,
+    "reference_wins": 0,
+    "status": "pending"
+  },
+  "fp_predictions": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-seqcls-predtrace/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+  "improves_over_paper_gamma_baseline": false,
+  "job_id": "10077",
+  "live_log": {
+    "ce_attention_equalizing_gamma_summary": {
+      "max": 89.68279610764786,
+      "mean": 40.476793847192425,
+      "min": 11.22161595721616,
+      "p50": 36.47535081037056,
+      "p95": 74.77259576037144
+    },
+    "exists": true,
+    "latest": {
+      "attention_kd": 0.024702,
+      "ce": 0.558594,
+      "elapsed": 348.4,
+      "logit_kd": 0.022656,
+      "loss": 2.267294,
+      "lr": 1.995e-05,
+      "step": 430.0,
+      "weighted_attention_kd": 1.48214,
+      "weighted_logit_kd": 0.22656
+    },
+    "latest_step": 430,
+    "latest_weighted_attention_to_ce": 2.65334035095257,
+    "latest_weighted_logit_to_ce": 0.4055897485472454,
+    "parsed_steps": 44,
+    "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/logs/bitdistill-gamma60-10077.out",
+    "weighted_attention_to_ce_summary": {
+      "max": 5.346765545956006,
+      "mean": 1.8185658913592013,
+      "min": 0.669020821192053,
+      "p50": 1.6449744929637133,
+      "p95": 3.5763577505774022
+    },
+    "weighted_logit_to_ce_summary": {
+      "max": 1.5278685673988155,
+      "mean": 0.5659268079553924,
+      "min": 0.1453108428583083,
+      "p50": 0.5188857620253164,
+      "p95": 0.9339834857904992
+    }
+  },
+  "passes_fp_recovery_gate": false,
+  "purpose": "Test whether reducing attention-KD gamma from 100000 to 60 improves the matched 20k-warmup tensor-scale MNLI BitDistill row under local loss normalization.",
+  "schema": "bitdistill-gamma60-diagnostic-v1",
+  "squeue": {
+    "elapsed": "6:45",
+    "job_id": "10077",
+    "reason": "ece-nebula12",
+    "state": "RUNNING"
+  },
+  "status": "pending",
+  "success_delta_from_fp": -0.01
+}
