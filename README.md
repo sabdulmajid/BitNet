@@ -168,6 +168,13 @@ snapshots show code flip rate `0.165956` from step `1000` to `10000` and
 continued pretraining is actively moving the ternary codes, not merely
 repacking a fixed projection.
 
+The same saved row-scale warm-up also shows increasing latent weight mass near
+the ternary transition boundary `|W|/alpha=0.5`: the `±0.05` boundary-band
+fraction rises monotonically from `0.060531` at step `1000` to `0.075766` at
+step `20000` across `357,826,560` projection weights. This supports the paper's
+mechanistic story for this retrofit variant, but it remains row-scale evidence,
+not a tensor-scale paper-reproduction result.
+
 The controlled Stage-2 recovery audit also parses Slurm loss logs. The completed
 `40.96M`- and `163.84M`-token paper-gamma rows both end with very large
 weighted-attention/CE ratios: `4718.947626` and `5945.070866`, respectively.
@@ -430,6 +437,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill gamma-60 diagnostic submission](benchmarks/results/bitdistill_gamma60_submission_2026-05-16.md)
 - [BitDistill gamma-60 diagnostic audit](benchmarks/results/bitdistill_gamma60_diagnostic_2026-05-15.md)
 - [BitDistill root-cause audit](benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md)
+- [Ternary threshold dynamics audit](benchmarks/results/ternary_threshold_dynamics_2026-05-15.md)
 - [Qwen3 paper-alignment audit](benchmarks/results/qwen3_paper_alignment_2026-05-15.md)
 - [BitNet-SFT baseline audit](benchmarks/results/bitnet_sft_baseline_audit_2026-05-15.md)
 - [BitNet-SFT recipe alignment audit](benchmarks/results/bitnet_sft_recipe_alignment_2026-05-15.md)

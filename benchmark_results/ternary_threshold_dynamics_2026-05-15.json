@@ -1,0 +1,899 @@
+{
+  "bands": [
+    0.05,
+    0.1
+  ],
+  "date": "2026-05-15",
+  "interpretation": "The primary threshold-band fraction changed by 0.015235 from step 1000 to 20000. Monotonic non-decreasing: true. This supports the mechanism that continued pretraining keeps more latent weights close to ternary transition boundaries, at least for this saved row-scale Stage-2 run.",
+  "monotonic_non_decreasing": true,
+  "primary_band": 0.05,
+  "scale_mode": "row",
+  "schema": "ternary-threshold-dynamics-v1",
+  "snapshot_root": "checkpoints/bitdistill-glue-longwarmup-row/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-row-20k",
+  "snapshots": [
+    {
+      "families": {
+        "down_proj": {
+          "code_fractions": {
+            "-1": 0.33955396685683936,
+            "0": 0.32095554896763395,
+            "1": 0.3394904841755267
+          },
+          "elements": 104595456,
+          "nonzero_region_fraction": 0.6790444701536557,
+          "normalized_abs_mean": 0.9999999856590328,
+          "normalized_abs_std": 0.8091312819462728,
+          "scale_max": 0.04999655857682228,
+          "scale_mean": 0.014286342742187636,
+          "scale_min": 0.0031425689812749624,
+          "scale_std": 0.0026555056940260114,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.060863724328521496,
+            "0.1": 0.12064864462180842
+          },
+          "zero_region_fraction": 0.3209555298463444
+        },
+        "gate_proj": {
+          "code_fractions": {
+            "-1": 0.3407070475413387,
+            "0": 0.3174922149581718,
+            "1": 0.3418007375004895
+          },
+          "elements": 104595456,
+          "nonzero_region_fraction": 0.6825077850418282,
+          "normalized_abs_mean": 0.9999999952196776,
+          "normalized_abs_std": 0.7935270834792338,
+          "scale_max": 0.11319612711668015,
+          "scale_mean": 0.01671033189223524,
+          "scale_min": 0.004377834964543581,
+          "scale_std": 0.0036668551592431383,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.060307189635465615,
+            "0.1": 0.11972590855189733
+          },
+          "zero_region_fraction": 0.3174922149581718
+        },
+        "k_proj": {
+          "code_fractions": {
+            "-1": 0.33604685465494794,
+            "0": 0.3279030209495908,
+            "1": 0.33605012439546134
+          },
+          "elements": 2752512,
+          "nonzero_region_fraction": 0.6720969790504092,
+          "normalized_abs_mean": 1.0,
+          "normalized_abs_std": 0.8257480828294708,
+          "scale_max": 0.22735314071178436,
+          "scale_mean": 0.020066374059145648,
+          "scale_min": 0.004092222545295954,
+          "scale_std": 0.012844554649539406,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.06012544177827381,
+            "0.1": 0.11943272181919642
+          },
+          "zero_region_fraction": 0.3279030209495908
+        },
+        "o_proj": {
+          "code_fractions": {
+            "-1": 0.33400295543021896,
+            "0": 0.33203311842315053,
+            "1": 0.3339639261466305
+          },
+          "elements": 19267584,
+          "nonzero_region_fraction": 0.6679669334774926,
+          "normalized_abs_mean": 1.0000000162189508,
+          "normalized_abs_std": 0.8407792674328354,
+          "scale_max": 0.06229057163000107,
+          "scale_mean": 0.01356023931432338,
+          "scale_min": 0.0027070518117398024,
+          "scale_std": 0.004153117995079503,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.062230428059895836,
+            "0.1": 0.12309337797619048
+          },
+          "zero_region_fraction": 0.3320330665225074
+        },
+        "q_proj": {
+          "code_fractions": {
+            "-1": 0.33503012105721197,
+            "0": 0.33005544441897855,
+            "1": 0.33491443452380953
+          },
+          "elements": 19267584,
+          "nonzero_region_fraction": 0.6699446074816645,
+          "normalized_abs_mean": 0.9999999935124196,
+          "normalized_abs_std": 0.8193629773507128,
+          "scale_max": 0.35718271136283875,
+          "scale_mean": 0.01758661981494654,
+          "scale_min": 0.0015853915829211473,
+          "scale_std": 0.010615044275167204,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.059618943402556336,
+            "0.1": 0.11890400996824511
+          },
+          "zero_region_fraction": 0.33005539251833543
+        },
+        "up_proj": {
+          "code_fractions": {
+            "-1": 0.3403082539264421,
+            "0": 0.31923246264158933,
+            "1": 0.3404592834319686
+          },
+          "elements": 104595456,
+          "nonzero_region_fraction": 0.680767566040345,
+          "normalized_abs_mean": 1.0000000095606447,
+          "normalized_abs_std": 0.7936941545953888,
+          "scale_max": 0.16960500180721283,
+          "scale_mean": 0.015068185760786659,
+          "scale_min": 0.005396042484790087,
+          "scale_std": 0.0019772679397162345,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.060241096898129114,
+            "0.1": 0.1196220130251165
+          },
+          "zero_region_fraction": 0.319232433959655
+        },
+        "v_proj": {
+          "code_fractions": {
+            "-1": 0.3286194574265253,
+            "0": 0.3427363804408482,
+            "1": 0.3286441621326265
+          },
+          "elements": 2752512,
+          "nonzero_region_fraction": 0.6572636195591518,
+          "normalized_abs_mean": 1.0000000028383165,
+          "normalized_abs_std": 0.880368330777653,
+          "scale_max": 0.026434049010276794,
+          "scale_mean": 0.014829068561084569,
+          "scale_min": 0.004805163014680147,
+          "scale_std": 0.003773909527671793,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.06227184477306548,
+            "0.1": 0.12203361874534971
+          },
+          "zero_region_fraction": 0.3427363804408482
+        }
+      },
+      "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-longwarmup-row/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-row-20k/checkpoint-1000/custom_state_dict.pt",
+      "scale_mode": "row",
+      "step": 1000,
+      "total": {
+        "code_fractions": {
+          "-1": 0.33945792341406966,
+          "0": 0.32074698423727965,
+          "1": 0.3397950923486507
+        },
+        "elements": 357826560,
+        "nonzero_region_fraction": 0.6792530353252705,
+        "normalized_abs_mean": 0.9999999977511801,
+        "normalized_abs_std": 0.803115430865619,
+        "scale_max": 0.35718271136283875,
+        "scale_mean": 0.015762742692275407,
+        "scale_min": 0.0015853915829211473,
+        "scale_std": 0.004428936592807141,
+        "tensors": 168,
+        "threshold_band_fractions": {
+          "0.05": 0.06053076384268401,
+          "0.1": 0.12011782747485263
+        },
+        "zero_region_fraction": 0.3207469646747296
+      }
+    },
+    {
+      "families": {
+        "down_proj": {
+          "code_fractions": {
+            "-1": 0.339182096017632,
+            "0": 0.32169198631343987,
+            "1": 0.3391259176689282
+          },
+          "elements": 104595456,
+          "nonzero_region_fraction": 0.6783080614897841,
+          "normalized_abs_mean": 1.000000014340967,
+          "normalized_abs_std": 0.8103468462370291,
+          "scale_max": 0.04991300776600838,
+          "scale_mean": 0.01431608120245593,
+          "scale_min": 0.0032602744176983833,
+          "scale_std": 0.0026501321632881546,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.06703517789529977,
+            "0.1": 0.12623889703200875
+          },
+          "zero_region_fraction": 0.321691938510216
+        },
+        "gate_proj": {
+          "code_fractions": {
+            "-1": 0.3403633710435757,
+            "0": 0.3181907443474409,
+            "1": 0.3414458846089834
+          },
+          "elements": 104595456,
+          "nonzero_region_fraction": 0.6818092843344935,
+          "normalized_abs_mean": 0.9999999856590328,
+          "normalized_abs_std": 0.7948183144910996,
+          "scale_max": 0.11298241466283798,
+          "scale_mean": 0.016737485860000578,
+          "scale_min": 0.004540919326245785,
+          "scale_std": 0.0036545689481605886,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.06538890178938557,
+            "0.1": 0.12439714398300439
+          },
+          "zero_region_fraction": 0.31819071566550655
+        },
+        "k_proj": {
+          "code_fractions": {
+            "-1": 0.33601815359933035,
+            "0": 0.32797713506789433,
+            "1": 0.3360047113327753
+          },
+          "elements": 2752512,
+          "nonzero_region_fraction": 0.6720228649321056,
+          "normalized_abs_mean": 0.9999999971616835,
+          "normalized_abs_std": 0.8262156765092705,
+          "scale_max": 0.2281315177679062,
+          "scale_mean": 0.020298958600809176,
+          "scale_min": 0.004356541205197573,
+          "scale_std": 0.012805822897060188,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.06511760893322173,
+            "0.1": 0.12451716831752233
+          },
+          "zero_region_fraction": 0.32797713506789433
+        },
+        "o_proj": {
+          "code_fractions": {
+            "-1": 0.33349443292942177,
+            "0": 0.333056183899341,
+            "1": 0.33344938317123723
+          },
+          "elements": 19267584,
+          "nonzero_region_fraction": 0.666943816100659,
+          "normalized_abs_mean": 0.999999983781049,
+          "normalized_abs_std": 0.8422317974493515,
+          "scale_max": 0.062125615775585175,
+          "scale_mean": 0.013645865644017855,
+          "scale_min": 0.0027236316818743944,
+          "scale_std": 0.004169063664066793,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.0693743439758716,
+            "0.1": 0.13032453887316645
+          },
+          "zero_region_fraction": 0.333056183899341
+        },
+        "q_proj": {
+          "code_fractions": {
+            "-1": 0.3355217758490115,
+            "0": 0.32906118379969174,
+            "1": 0.33541704035129677
+          },
+          "elements": 19267584,
+          "nonzero_region_fraction": 0.6709388681009513,
+          "normalized_abs_mean": 1.0000000291941118,
+          "normalized_abs_std": 0.8173578025802598,
+          "scale_max": 0.3571523129940033,
+          "scale_mean": 0.01777875352473486,
+          "scale_min": 0.001983623718842864,
+          "scale_std": 0.010655349499666464,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.062175932384672616,
+            "0.1": 0.12197320639681654
+          },
+          "zero_region_fraction": 0.3290611318990487
+        },
+        "up_proj": {
+          "code_fractions": {
+            "-1": 0.3400405367514245,
+            "0": 0.3197970091549675,
+            "1": 0.34016245409360807
+          },
+          "elements": 104595456,
+          "nonzero_region_fraction": 0.6802030099663221,
+          "normalized_abs_mean": 0.9999999952196776,
+          "normalized_abs_std": 0.7947048304780596,
+          "scale_max": 0.16891643404960632,
+          "scale_mean": 0.015100712446789993,
+          "scale_min": 0.005457371938973665,
+          "scale_std": 0.0019742442071796033,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.06522725040751293,
+            "0.1": 0.1239506523113203
+          },
+          "zero_region_fraction": 0.31979699003367795
+        },
+        "v_proj": {
+          "code_fractions": {
+            "-1": 0.3276788620721726,
+            "0": 0.3446706136067708,
+            "1": 0.32765052432105657
+          },
+          "elements": 2752512,
+          "nonzero_region_fraction": 0.6553293863932291,
+          "normalized_abs_mean": 1.0,
+          "normalized_abs_std": 0.8844513918063776,
+          "scale_max": 0.032270368188619614,
+          "scale_mean": 0.014976753620430827,
+          "scale_min": 0.005388051271438599,
+          "scale_std": 0.0037351977121387763,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.07574135916573661,
+            "0.1": 0.13421267554873512
+          },
+          "zero_region_fraction": 0.3446706136067708
+        }
+      },
+      "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-longwarmup-row/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-row-20k/checkpoint-5000/custom_state_dict.pt",
+      "scale_mode": "row",
+      "step": 5000,
+      "total": {
+        "code_fractions": {
+          "-1": 0.3391621432461581,
+          "0": 0.3213484571966933,
+          "1": 0.3394893995571486
+        },
+        "elements": 357826560,
+        "nonzero_region_fraction": 0.6786515735444568,
+        "normalized_abs_mean": 0.9999999992795043,
+        "normalized_abs_std": 0.8041485380636445,
+        "scale_max": 0.3571523129940033,
+        "scale_mean": 0.015811233843209517,
+        "scale_min": 0.001983623718842864,
+        "scale_std": 0.004435109634463938,
+        "tensors": 168,
+        "threshold_band_fractions": {
+          "0.05": 0.06594201112404847,
+          "0.1": 0.125070064670437
+        },
+        "zero_region_fraction": 0.3213484264555432
+      }
+    },
+    {
+      "families": {
+        "down_proj": {
+          "code_fractions": {
+            "-1": 0.3388616232047404,
+            "0": 0.3223430279801065,
+            "1": 0.3387953488151531
+          },
+          "elements": 104595456,
+          "nonzero_region_fraction": 0.6776570007018278,
+          "normalized_abs_mean": 0.9999999808787104,
+          "normalized_abs_std": 0.8114423926879524,
+          "scale_max": 0.049815088510513306,
+          "scale_mean": 0.014351238762693746,
+          "scale_min": 0.003385998774319887,
+          "scale_std": 0.002646486282045492,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.07347422434871358,
+            "0.1": 0.1321360078969396
+          },
+          "zero_region_fraction": 0.3223429992981722
+        },
+        "gate_proj": {
+          "code_fractions": {
+            "-1": 0.34004331889905426,
+            "0": 0.3188055798523408,
+            "1": 0.3411511012486049
+          },
+          "elements": 104595456,
+          "nonzero_region_fraction": 0.6811944775115278,
+          "normalized_abs_mean": 1.0,
+          "normalized_abs_std": 0.7958709151303475,
+          "scale_max": 0.11273298412561417,
+          "scale_mean": 0.016769852097097197,
+          "scale_min": 0.004670096095651388,
+          "scale_std": 0.0036422056264170757,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.07073526215135005,
+            "0.1": 0.12927818776372083
+          },
+          "zero_region_fraction": 0.31880552248847216
+        },
+        "k_proj": {
+          "code_fractions": {
+            "-1": 0.3361820039295015,
+            "0": 0.32781982421875,
+            "1": 0.3359981718517485
+          },
+          "elements": 2752512,
+          "nonzero_region_fraction": 0.6721805390857515,
+          "normalized_abs_mean": 0.9999999971616835,
+          "normalized_abs_std": 0.8266964060770764,
+          "scale_max": 0.22868524491786957,
+          "scale_mean": 0.020493899666083355,
+          "scale_min": 0.004709894768893719,
+          "scale_std": 0.01277228483381628,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.06990923200334821,
+            "0.1": 0.12897818429129465
+          },
+          "zero_region_fraction": 0.3278194609142485
+        },
+        "o_proj": {
+          "code_fractions": {
+            "-1": 0.3331517848838754,
+            "0": 0.33379883020102574,
+            "1": 0.33304938491509883
+          },
+          "elements": 19267584,
+          "nonzero_region_fraction": 0.6662012216996174,
+          "normalized_abs_mean": 1.0000000064875805,
+          "normalized_abs_std": 0.8432810569422795,
+          "scale_max": 0.06195070594549179,
+          "scale_mean": 0.01373416039028338,
+          "scale_min": 0.002778053982183337,
+          "scale_std": 0.004182879001348349,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.0755558662674054,
+            "0.1": 0.13626903092780082
+          },
+          "zero_region_fraction": 0.3337987783003826
+        },
+        "q_proj": {
+          "code_fractions": {
+            "-1": 0.335770016624814,
+            "0": 0.32853049972430376,
+            "1": 0.3356994836508822
+          },
+          "elements": 19267584,
+          "nonzero_region_fraction": 0.6714696040769823,
+          "normalized_abs_mean": 0.9999999902686294,
+          "normalized_abs_std": 0.8162277359768562,
+          "scale_max": 0.3576961159706116,
+          "scale_mean": 0.017930697694066026,
+          "scale_min": 0.0025311538483947515,
+          "scale_std": 0.01066986484939438,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.06447601318359375,
+            "0.1": 0.12457140448953019
+          },
+          "zero_region_fraction": 0.32853039592301764
+        },
+        "up_proj": {
+          "code_fractions": {
+            "-1": 0.3397963196412663,
+            "0": 0.3203168405327283,
+            "1": 0.3398868398260054
+          },
+          "elements": 104595456,
+          "nonzero_region_fraction": 0.6796832168311403,
+          "normalized_abs_mean": 0.9999999856590328,
+          "normalized_abs_std": 0.7955686214689044,
+          "scale_max": 0.16827678680419922,
+          "scale_mean": 0.015134979170142558,
+          "scale_min": 0.005559074226766825,
+          "scale_std": 0.001972576754559026,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.07047744980432037,
+            "0.1": 0.12857850153643385
+          },
+          "zero_region_fraction": 0.32031678316885964
+        },
+        "v_proj": {
+          "code_fractions": {
+            "-1": 0.32733735584077384,
+            "0": 0.34541538783482145,
+            "1": 0.32724725632440477
+          },
+          "elements": 2752512,
+          "nonzero_region_fraction": 0.6545846121651786,
+          "normalized_abs_mean": 1.0,
+          "normalized_abs_std": 0.887917334527836,
+          "scale_max": 0.03577699139714241,
+          "scale_mean": 0.015137176417435208,
+          "scale_min": 0.006070637609809637,
+          "scale_std": 0.003690301334191016,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.0870332263764881,
+            "0.1": 0.14420790899367558
+          },
+          "zero_region_fraction": 0.34541538783482145
+        }
+      },
+      "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-longwarmup-row/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-row-20k/checkpoint-10000/custom_state_dict.pt",
+      "scale_mode": "row",
+      "step": 10000,
+      "total": {
+        "code_fractions": {
+          "-1": 0.33889707628187243,
+          "0": 0.3218863658415966,
+          "1": 0.33921655787653104
+        },
+        "elements": 357826560,
+        "nonzero_region_fraction": 0.6781136872567537,
+        "normalized_abs_mean": 0.9999999900222262,
+        "normalized_abs_std": 0.8050555136614439,
+        "scale_max": 0.3576961159706116,
+        "scale_mean": 0.015859872143110416,
+        "scale_min": 0.0025311538483947515,
+        "scale_std": 0.004436010840361171,
+        "tensors": 168,
+        "threshold_band_fractions": {
+          "0.05": 0.07150207072387248,
+          "0.1": 0.13014455103612207
+        },
+        "zero_region_fraction": 0.32188631274324636
+      }
+    },
+    {
+      "families": {
+        "down_proj": {
+          "code_fractions": {
+            "-1": 0.3387100583031064,
+            "0": 0.32263639636505814,
+            "1": 0.33865354533183545
+          },
+          "elements": 104595456,
+          "nonzero_region_fraction": 0.6773636896807448,
+          "normalized_abs_mean": 1.0000000047803224,
+          "normalized_abs_std": 0.8118704185461159,
+          "scale_max": 0.04976306110620499,
+          "scale_mean": 0.014367720910481043,
+          "scale_min": 0.0034518190659582615,
+          "scale_std": 0.0026435665164634913,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.07705237214129072,
+            "0.1": 0.13513843278239543
+          },
+          "zero_region_fraction": 0.32263631031925516
+        },
+        "gate_proj": {
+          "code_fractions": {
+            "-1": 0.33990539703751566,
+            "0": 0.31907352648283305,
+            "1": 0.3410210764796513
+          },
+          "elements": 104595456,
+          "nonzero_region_fraction": 0.6809265500023252,
+          "normalized_abs_mean": 0.9999999904393552,
+          "normalized_abs_std": 0.7962605182751472,
+          "scale_max": 0.11261601746082306,
+          "scale_mean": 0.01678506036599477,
+          "scale_min": 0.00470928056165576,
+          "scale_std": 0.003635361462789104,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.07378656105290081,
+            "0.1": 0.13184567979702674
+          },
+          "zero_region_fraction": 0.31907344999767484
+        },
+        "k_proj": {
+          "code_fractions": {
+            "-1": 0.33623795282273067,
+            "0": 0.327774411156064,
+            "1": 0.33598763602120535
+          },
+          "elements": 2752512,
+          "nonzero_region_fraction": 0.672225588843936,
+          "normalized_abs_mean": 1.0000000028383165,
+          "normalized_abs_std": 0.8266238052581368,
+          "scale_max": 0.2289225161075592,
+          "scale_mean": 0.0205872313817963,
+          "scale_min": 0.0048256004229187965,
+          "scale_std": 0.012754959392654993,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.07216789608909971,
+            "0.1": 0.13070896693638392
+          },
+          "zero_region_fraction": 0.327774411156064
+        },
+        "o_proj": {
+          "code_fractions": {
+            "-1": 0.33300028690675487,
+            "0": 0.3341189533674798,
+            "1": 0.3328807597257653
+          },
+          "elements": 19267584,
+          "nonzero_region_fraction": 0.6658811504338064,
+          "normalized_abs_mean": 1.0000000194627412,
+          "normalized_abs_std": 0.8436891856326534,
+          "scale_max": 0.06186290830373764,
+          "scale_mean": 0.013771344242351395,
+          "scale_min": 0.002810321282595396,
+          "scale_std": 0.004184688059408924,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.07880624784093325,
+            "0.1": 0.13909424243330146
+          },
+          "zero_region_fraction": 0.33411884956619364
+        },
+        "q_proj": {
+          "code_fractions": {
+            "-1": 0.3358946819694675,
+            "0": 0.32829123775975233,
+            "1": 0.3358140802707802
+          },
+          "elements": 19267584,
+          "nonzero_region_fraction": 0.6717088660415338,
+          "normalized_abs_mean": 1.0000000032437901,
+          "normalized_abs_std": 0.8156752292081427,
+          "scale_max": 0.35802704095840454,
+          "scale_mean": 0.01799853496430885,
+          "scale_min": 0.0027168479282408953,
+          "scale_std": 0.010669484565168587,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.0657400014449139,
+            "0.1": 0.12572645330104698
+          },
+          "zero_region_fraction": 0.3282911339584662
+        },
+        "up_proj": {
+          "code_fractions": {
+            "-1": 0.33968329369872435,
+            "0": 0.32053127623440925,
+            "1": 0.3397854300668664
+          },
+          "elements": 104595456,
+          "nonzero_region_fraction": 0.6794688098113937,
+          "normalized_abs_mean": 1.000000014340967,
+          "normalized_abs_std": 0.7959137306308406,
+          "scale_max": 0.16799965500831604,
+          "scale_mean": 0.01514920441989313,
+          "scale_min": 0.005599810276180506,
+          "scale_std": 0.001971178213849171,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.0733994792278548,
+            "0.1": 0.13098405536852384
+          },
+          "zero_region_fraction": 0.32053119018860626
+        },
+        "v_proj": {
+          "code_fractions": {
+            "-1": 0.3273079281761533,
+            "0": 0.34551420665922616,
+            "1": 0.32717786516462055
+          },
+          "elements": 2752512,
+          "nonzero_region_fraction": 0.6544857933407738,
+          "normalized_abs_mean": 1.0,
+          "normalized_abs_std": 0.8888794213975318,
+          "scale_max": 0.037267785519361496,
+          "scale_mean": 0.015222855222721895,
+          "scale_min": 0.006456666626036167,
+          "scale_std": 0.003671614021187501,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.09202321370442708,
+            "0.1": 0.14820098876953125
+          },
+          "zero_region_fraction": 0.34551420665922616
+        }
+      },
+      "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-longwarmup-row/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-row-20k/checkpoint-15000/custom_state_dict.pt",
+      "scale_mode": "row",
+      "step": 15000,
+      "total": {
+        "code_fractions": {
+          "-1": 0.33877817789713544,
+          "0": 0.32211788862179486,
+          "1": 0.3391039334810697
+        },
+        "elements": 357826560,
+        "nonzero_region_fraction": 0.6778821952177054,
+        "normalized_abs_mean": 1.0000000040391426,
+        "normalized_abs_std": 0.8053943722117795,
+        "scale_max": 0.35802704095840454,
+        "scale_mean": 0.01588156918472977,
+        "scale_min": 0.0027168479282408953,
+        "scale_std": 0.0044346556008661945,
+        "tensors": 168,
+        "threshold_band_fractions": {
+          "0.05": 0.07459288097563244,
+          "0.1": 0.13273419390667926
+        },
+        "zero_region_fraction": 0.3221178047822945
+      }
+    },
+    {
+      "families": {
+        "down_proj": {
+          "code_fractions": {
+            "-1": 0.3386598171148085,
+            "0": 0.322751898514597,
+            "1": 0.33858828437059446
+          },
+          "elements": 104595456,
+          "nonzero_region_fraction": 0.6772482162131402,
+          "normalized_abs_mean": 0.9999999904393552,
+          "normalized_abs_std": 0.8120029209314777,
+          "scale_max": 0.049741968512535095,
+          "scale_mean": 0.01437278508785225,
+          "scale_min": 0.0034748504403978586,
+          "scale_std": 0.0026421617731627162,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.07840919972661145,
+            "0.1": 0.13621950269044192
+          },
+          "zero_region_fraction": 0.3227517837868597
+        },
+        "gate_proj": {
+          "code_fractions": {
+            "-1": 0.3398514463190447,
+            "0": 0.31916321489147675,
+            "1": 0.34098533878947856
+          },
+          "elements": 104595456,
+          "nonzero_region_fraction": 0.6808369093969053,
+          "normalized_abs_mean": 1.000000014340967,
+          "normalized_abs_std": 0.7963730242718392,
+          "scale_max": 0.11257854849100113,
+          "scale_mean": 0.016789865925123815,
+          "scale_min": 0.004725111182779074,
+          "scale_std": 0.003632933113204197,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.07495399226520892,
+            "0.1": 0.1327881585984003
+          },
+          "zero_region_fraction": 0.31916309060309467
+        },
+        "k_proj": {
+          "code_fractions": {
+            "-1": 0.33628990536644343,
+            "0": 0.32769848051525297,
+            "1": 0.33601161411830355
+          },
+          "elements": 2752512,
+          "nonzero_region_fraction": 0.672301519484747,
+          "normalized_abs_mean": 1.0000000028383165,
+          "normalized_abs_std": 0.8265211369192479,
+          "scale_max": 0.22900469601154327,
+          "scale_mean": 0.020621294466157753,
+          "scale_min": 0.004865564871579409,
+          "scale_std": 0.012748284779493654,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.07276298886253721,
+            "0.1": 0.1312313988095238
+          },
+          "zero_region_fraction": 0.32769848051525297
+        },
+        "o_proj": {
+          "code_fractions": {
+            "-1": 0.33294568743024555,
+            "0": 0.33422394836840985,
+            "1": 0.3328303642013446
+          },
+          "elements": 19267584,
+          "nonzero_region_fraction": 0.6657764149360916,
+          "normalized_abs_mean": 1.0000000032437901,
+          "normalized_abs_std": 0.8438265634304968,
+          "scale_max": 0.06183432787656784,
+          "scale_mean": 0.013781802773120858,
+          "scale_min": 0.0028361103031784296,
+          "scale_std": 0.004183772310211976,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.08010672225433142,
+            "0.1": 0.14010656447637648
+          },
+          "zero_region_fraction": 0.33422358506390837
+        },
+        "q_proj": {
+          "code_fractions": {
+            "-1": 0.3359388494167198,
+            "0": 0.3281963114835778,
+            "1": 0.3358648390997024
+          },
+          "elements": 19267584,
+          "nonzero_region_fraction": 0.6718037923177084,
+          "normalized_abs_mean": 1.0000000097313706,
+          "normalized_abs_std": 0.8154657513716357,
+          "scale_max": 0.3582105338573456,
+          "scale_mean": 0.01802198819461323,
+          "scale_min": 0.002779776230454445,
+          "scale_std": 0.010669421304704472,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.06617020587531888,
+            "0.1": 0.1260998265272906
+          },
+          "zero_region_fraction": 0.3281962076822917
+        },
+        "up_proj": {
+          "code_fractions": {
+            "-1": 0.3396328039336623,
+            "0": 0.3206150370432918,
+            "1": 0.3397521590230459
+          },
+          "elements": 104595456,
+          "nonzero_region_fraction": 0.6793851063663798,
+          "normalized_abs_mean": 0.9999999952196776,
+          "normalized_abs_std": 0.7960249494753974,
+          "scale_max": 0.16792987287044525,
+          "scale_mean": 0.015153021143193831,
+          "scale_min": 0.0056151230819523335,
+          "scale_std": 0.001970454829288551,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.07451409743842027,
+            "0.1": 0.13184974307105654
+          },
+          "zero_region_fraction": 0.32061489363362017
+        },
+        "v_proj": {
+          "code_fractions": {
+            "-1": 0.3273072015671503,
+            "0": 0.3455083937872024,
+            "1": 0.3271844046456473
+          },
+          "elements": 2752512,
+          "nonzero_region_fraction": 0.6544923328218006,
+          "normalized_abs_mean": 1.0,
+          "normalized_abs_std": 0.8890240141743141,
+          "scale_max": 0.03771939501166344,
+          "scale_mean": 0.015254594618454576,
+          "scale_min": 0.006487934850156307,
+          "scale_std": 0.0036654461508020017,
+          "tensors": 24,
+          "threshold_band_fractions": {
+            "0.05": 0.09349205380394346,
+            "0.1": 0.14922296433221727
+          },
+          "zero_region_fraction": 0.3455076671781994
+        }
+      },
+      "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-longwarmup-row/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-row-20k/checkpoint-20000/custom_state_dict.pt",
+      "scale_mode": "row",
+      "step": 20000,
+      "total": {
+        "code_fractions": {
+          "-1": 0.33873279557559954,
+          "0": 0.32220226469494045,
+          "1": 0.33906493972946
+        },
+        "elements": 357826560,
+        "nonzero_region_fraction": 0.6777978778322101,
+        "normalized_abs_mean": 1.0000000007204957,
+        "normalized_abs_std": 0.805494802070488,
+        "scale_max": 0.3582105338573456,
+        "scale_mean": 0.015888299293634216,
+        "scale_min": 0.002779776230454445,
+        "scale_std": 0.004434165180636558,
+        "tensors": 168,
+        "threshold_band_fractions": {
+          "0.05": 0.07576561952248598,
+          "0.1": 0.1336652343526428
+        },
+        "zero_region_fraction": 0.3222021221677899
+      }
+    }
+  ],
+  "status": "measured_increase",
+  "steps": [
+    1000,
+    5000,
+    10000,
+    15000,
+    20000
+  ],
+  "threshold_band_delta_first_to_last": 0.01523485567980197
+}

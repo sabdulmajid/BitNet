@@ -596,6 +596,43 @@ def audit_ternary_flip_dynamics(root: Path, checks: list[dict[str, Any]]) -> Non
     )
 
 
+def audit_ternary_threshold_dynamics(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/ternary_threshold_dynamics_{DATE}.json"
+    if not path.exists():
+        add_check(
+            checks,
+            "Ternary threshold-dynamics audit exists",
+            False,
+            str(path.relative_to(root)),
+            "missing threshold-dynamics audit",
+        )
+        return
+    data = read_json(path)
+    snapshots = data.get("snapshots", []) if isinstance(data.get("snapshots"), list) else []
+    delta = data.get("threshold_band_delta_first_to_last")
+    final_band = None
+    if snapshots:
+        final = snapshots[-1]
+        total = final.get("total", {}) if isinstance(final.get("total"), dict) else {}
+        bands = total.get("threshold_band_fractions", {}) if isinstance(total.get("threshold_band_fractions"), dict) else {}
+        final_band = bands.get(str(data.get("primary_band")))
+    add_check(
+        checks,
+        "Ternary threshold-dynamics audit has measured boundary movement",
+        data.get("status") == "measured_increase"
+        and len(snapshots) >= 2
+        and data.get("monotonic_non_decreasing") is True
+        and isinstance(delta, (int, float))
+        and delta > 0.0
+        and isinstance(final_band, (int, float)),
+        (
+            f"status={data.get('status')}, snapshots={len(snapshots)}, "
+            f"delta={delta}, final_band={final_band}, monotonic={data.get('monotonic_non_decreasing')}"
+        ),
+        "saved Stage-2 snapshots did not show increasing mass near the ternary transition boundary",
+    )
+
+
 def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
     path = root / f"benchmark_results/seqcls_runtime_gap_{DATE}.json"
     if not path.exists():
@@ -1014,6 +1051,7 @@ def main() -> None:
     audit_original_benchmark_objective(root, checks)
     audit_tl2_negative_result(root, checks)
     audit_ternary_flip_dynamics(root, checks)
+    audit_ternary_threshold_dynamics(root, checks)
     audit_seqcls_runtime_gap(root, checks)
     audit_qwen3_paper_alignment(root, checks)
     audit_cpu_rows(root, checks)

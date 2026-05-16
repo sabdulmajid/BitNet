@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 76,
+  "check_count": 77,
   "failed": [],
   "checks": [
     {
@@ -312,6 +312,12 @@
       "blocker": ""
     },
     {
+      "name": "Ternary threshold-dynamics audit has measured boundary movement",
+      "passed": true,
+      "evidence": "status=measured_increase, snapshots=5, delta=0.01523485567980197, final_band=0.07576561952248598, monotonic=True",
+      "blocker": ""
+    },
+    {
       "name": "Sequence-classification runtime gap is narrowed but not closed",
       "passed": true,
       "evidence": "status=sidecar_qwen_contract_available_native_head_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6",
@@ -452,7 +458,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=246, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=248, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

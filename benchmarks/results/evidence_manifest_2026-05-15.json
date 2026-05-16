@@ -1,5 +1,5 @@
 {
-  "artifact_count": 246,
+  "artifact_count": 248,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "32f316a4f6b5d4921c04849cced1204364baeb0e5df4aef8f562332c980ae221",
-      "size_bytes": 27660
+      "sha256": "634ccc7934dcc5fc69c41227179ab755eaa7fa7388317c5ea6981119363ac6a1",
+      "size_bytes": 28197
     },
     {
       "exists": true,
@@ -315,6 +315,15 @@
       "path": "benchmarks/results/ternary_flip_dynamics_2026-05-15.md",
       "sha256": "d27aad9fe625e782c783041462cafac3af7913354ae449699b7268ac10660587",
       "size_bytes": 2765
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "ternary_threshold_dynamics_report",
+      "metrics": {},
+      "path": "benchmarks/results/ternary_threshold_dynamics_2026-05-15.md",
+      "sha256": "da2cd04298028b98499467bf4c392161b610701523ea1094a6e40bd040659454",
+      "size_bytes": 2265
     },
     {
       "exists": true,
@@ -718,8 +727,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "10a32620ad9d7f9efaee600ced9ad387e470358c23dbfa4c559c8aba6b93ae01",
-      "size_bytes": 9798
+      "sha256": "21aa0e32f7de58bdaae7232afde92788aadc02a1e19bd6e96019ab91dee1d620",
+      "size_bytes": 9991
     },
     {
       "exists": true,
@@ -2433,13 +2442,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 76,
+        "check_count": 77,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "29fc83e08395bc499af6f6710182b01d1fafb3bb97daa2d9437e5f5ac80e8330",
-      "size_bytes": 15660
+      "sha256": "c9656d1aeffd47da116102f5fa92a8fdf5a716d83b3f03b525768cb9a63796c3",
+      "size_bytes": 15930
     },
     {
       "exists": true,
@@ -2589,6 +2598,15 @@
       "path": "benchmark_results/ternary_flip_dynamics_2026-05-15.json",
       "sha256": "616addec33ef13d08400d57ac7fb41467c65c3adc3ae622a41bedf047827811c",
       "size_bytes": 12345
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "ternary_threshold_dynamics_json",
+      "metrics": {},
+      "path": "benchmark_results/ternary_threshold_dynamics_2026-05-15.json",
+      "sha256": "b7c0ca5be622d72e380e6f3bad47200a1be10785f124915eb5cf40c551d88af5",
+      "size_bytes": 32799
     },
     {
       "exists": true,
