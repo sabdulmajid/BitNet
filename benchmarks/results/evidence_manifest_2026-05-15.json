@@ -1,5 +1,5 @@
 {
-  "artifact_count": 289,
+  "artifact_count": 291,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "773bc152e87e2871fd04abacfe53868d8c3ee502293eab10cf52371e793c66a9",
-      "size_bytes": 15330
+      "sha256": "ddfe4d77ad5c83089a81b977b216e650ced3c94a285c0adb9f35c0c73a648070",
+      "size_bytes": 15536
     },
     {
       "exists": true,
@@ -589,6 +589,15 @@
     {
       "exists": true,
       "kind": "tracked_report",
+      "label": "seqcls_native_duplicate_batching_audit_report",
+      "metrics": {},
+      "path": "benchmarks/results/seqcls_native_duplicate_batching_audit_2026-05-15.md",
+      "sha256": "6ee7032500ce10e34775eb8bfcdef8f9f4d652b9475ae57e55ca48790daf6e0d",
+      "size_bytes": 2833
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
       "label": "bitdistill_telemetry_coverage_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_telemetry_coverage_2026-05-15.md",
@@ -907,8 +916,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "7471afa846f0d30ee1a030abebcd596290c1634bd9b0bbabe7032cd817262dd1",
-      "size_bytes": 14360
+      "sha256": "028e4ca8aa825c1ad50da3918740deb9dcf071a2fb371458c2598138918a31ce",
+      "size_bytes": 14638
     },
     {
       "exists": true,
@@ -2658,13 +2667,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 103,
+        "check_count": 104,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "ef20aa268427ec88cfd52f2277fb3c8fe11acdfd08ea07529686481b95f4c789",
-      "size_bytes": 22302
+      "sha256": "438abb5aece257df18d05f9b041cfd3040f9e50a9948aa79352f07c4822f85bf",
+      "size_bytes": 22657
     },
     {
       "exists": true,
@@ -3048,6 +3057,15 @@
       "path": "benchmark_results/seqcls_native_batching_audit_2026-05-15.json",
       "sha256": "e53bf9f73b0c2e8f202049db2149ac02da21f1f8d495292e1a3b4d487db644a3",
       "size_bytes": 10817
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "seqcls_native_duplicate_batching_audit_json",
+      "metrics": {},
+      "path": "benchmark_results/seqcls_native_duplicate_batching_audit_2026-05-15.json",
+      "sha256": "1048e9f35f1c4704350cc250bfdb1fd16d299aee69a41bc90b1b7f13685ce199",
+      "size_bytes": 11675
     },
     {
       "exists": true,

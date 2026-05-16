@@ -1299,6 +1299,29 @@ def audit_seqcls_native_i2sr_cpu_sample(root: Path, checks: list[dict[str, Any]]
         ),
         "batching audit should show whether the failure is a row swap or true batched-runtime drift",
     )
+    duplicate_path = root / f"benchmark_results/seqcls_native_duplicate_batching_audit_{DATE}.json"
+    duplicate = read_json(duplicate_path)
+    duplicate_summary = duplicate.get("summary", {}) if isinstance(duplicate.get("summary"), dict) else {}
+    add_check(
+        checks,
+        "Sequence-classification duplicate-prompt batching audit rules out prompt formatting",
+        duplicate.get("status") == "duplicate_batching_parity_mismatch"
+        and duplicate_summary.get("same_prompt_repeated") is True
+        and duplicate_summary.get("formatting_and_tokenization_ruled_out") is True
+        and duplicate_summary.get("all_logits_invariant") is False
+        and isinstance(duplicate_summary.get("max_relative_rms_vs_alone"), (int, float))
+        and duplicate_summary.get("max_relative_rms_vs_alone") > 0.05
+        and duplicate.get("ready_for_batched_product_benchmark") is False,
+        (
+            f"status={duplicate.get('status')}, same_prompt={duplicate_summary.get('same_prompt_repeated')}, "
+            f"logits_invariant={duplicate_summary.get('all_logits_invariant')}, "
+            f"predictions_invariant={duplicate_summary.get('all_predictions_invariant')}, "
+            f"changed_predictions={duplicate_summary.get('changed_prediction_count')}, "
+            f"max_rel={duplicate_summary.get('max_relative_rms_vs_alone')}, "
+            f"ready={duplicate.get('ready_for_batched_product_benchmark')}"
+        ),
+        "duplicate token-ID prompts should prove whether batching drift is independent of prompt formatting/tokenization",
+    )
     full_progress_path = root / f"benchmark_results/seqcls_native_full_progress_{DATE}.json"
     full_progress = read_json(full_progress_path)
     add_check(

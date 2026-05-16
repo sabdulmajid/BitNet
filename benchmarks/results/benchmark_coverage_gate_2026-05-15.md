@@ -86,6 +86,7 @@ Overall status: **PASS**.
 | Sequence-classification native mismatch audit isolates runtime drift | pass | status=runtime_hidden_drift, token_ids=True, text_roundtrip=False, native_sidecar=True |  |
 | Sequence-classification native batching audit blocks batched throughput | pass | status=batching_parity_mismatch, invariant=False, changed=4, ready=False |  |
 | Sequence-classification native batching audit diagnoses non-swap drift | pass | diagnosis=position_dependent_drift_not_row_swap, nearest_self=True, drifted=4 |  |
+| Sequence-classification duplicate-prompt batching audit rules out prompt formatting | pass | status=duplicate_batching_parity_mismatch, same_prompt=True, logits_invariant=False, predictions_invariant=False, changed_predictions=4, max_rel=0.30515261718676356, ready=False |  |
 | Sequence-classification native full CPU progress is resumable | pass | status=complete, completed=9815, contiguous=True, product=False |  |
 | Qwen3 paper-alignment audit tracks required GLUE rows | pass | jobs=16, complete=15, ready=False |  |
 | FP F16 CPU row is finite | pass | ppl=12.2808, prefill=114.468162, decode=5.555998 |  |
@@ -105,5 +106,5 @@ Overall status: **PASS**.
 | Research redirect gate covers required claims | pass | missing=[] |  |
 | Research redirect gate blocks overclaims | pass | blocked_statuses=['blocked', 'full_validation_batching_blocked', 'not_proven'] |  |
 | fixed I2_SR RSS has four context rows | pass | contexts=[512, 2048, 8192, 32768] |  |
-| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=289, missing=0, missing_labels=[] |  |
+| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=291, missing=0, missing_labels=[] |  |
 | productization gate passes for stable I2_SR | pass | passed=True, failed=0, stable_quality=True, layout=True |  |

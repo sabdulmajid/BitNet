@@ -1,0 +1,385 @@
+{
+  "artifacts": {
+    "checkpoint": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8",
+    "embedding_binary": "build-portable-avx2/bin/llama-embedding",
+    "gguf": "models/seqcls-native-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr_cls.gguf"
+  },
+  "date": "2026-05-15",
+  "interpretation": "Duplicate token-ID prompts are not invariant across batch positions. Because every entry in each audited batch is the exact same rendered token-ID prompt, this rules out tokenizer round-trip differences, text formatting differences, and output-row swaps as sufficient explanations. Batched sequence-classification throughput must remain blocked until this native runtime position-dependent drift is fixed.",
+  "ready_for_batched_product_benchmark": false,
+  "repeat_count": 4,
+  "schema": "seqcls_native_duplicate_batching_audit.v1",
+  "status": "duplicate_batching_parity_mismatch",
+  "summary": {
+    "all_logits_invariant": false,
+    "all_predictions_invariant": false,
+    "changed_prediction_count": 4,
+    "formatting_and_tokenization_ruled_out": true,
+    "max_relative_rms_vs_alone": 0.30515261718676356,
+    "same_prompt_repeated": true,
+    "target_indices": [
+      15,
+      35,
+      0,
+      1,
+      2
+    ]
+  },
+  "targets": [
+    {
+      "alone_logits": [
+        0.3744511902332306,
+        0.42018020153045654,
+        0.4010027050971985
+      ],
+      "alone_margin": 0.019177496433258057,
+      "alone_prediction": 1,
+      "duplicate_positions": [
+        {
+          "logits": [
+            0.3744511902332306,
+            0.42018020153045654,
+            0.4010027050971985
+          ],
+          "margin": 0.019177496433258057,
+          "matches_alone_logits": true,
+          "matches_alone_prediction": true,
+          "position": 0,
+          "prediction": 1,
+          "relative_rms_vs_alone": 0.0
+        },
+        {
+          "logits": [
+            0.45047199726104736,
+            0.41024309396743774,
+            0.394397109746933
+          ],
+          "margin": 0.04022890329360962,
+          "matches_alone_logits": false,
+          "matches_alone_prediction": false,
+          "position": 1,
+          "prediction": 0,
+          "relative_rms_vs_alone": 0.1113524347275664
+        },
+        {
+          "logits": [
+            0.3744511902332306,
+            0.42018020153045654,
+            0.4010027050971985
+          ],
+          "margin": 0.019177496433258057,
+          "matches_alone_logits": true,
+          "matches_alone_prediction": true,
+          "position": 2,
+          "prediction": 1,
+          "relative_rms_vs_alone": 0.0
+        },
+        {
+          "logits": [
+            0.45047199726104736,
+            0.41024309396743774,
+            0.394397109746933
+          ],
+          "margin": 0.04022890329360962,
+          "matches_alone_logits": false,
+          "matches_alone_prediction": false,
+          "position": 3,
+          "prediction": 0,
+          "relative_rms_vs_alone": 0.1113524347275664
+        }
+      ],
+      "prompt_input": "token_ids",
+      "runtime": {
+        "alone_elapsed_seconds": 1.4059557470027357,
+        "alone_prompt_eval_tokens_per_second": 115.4,
+        "duplicate_elapsed_seconds": 1.4509133570827544,
+        "duplicate_prompt_eval_tokens_per_second": 376.69
+      },
+      "target_index": 15
+    },
+    {
+      "alone_logits": [
+        0.5183258056640625,
+        0.39393091201782227,
+        0.1691482961177826
+      ],
+      "alone_margin": 0.12439489364624023,
+      "alone_prediction": 0,
+      "duplicate_positions": [
+        {
+          "logits": [
+            0.5183258056640625,
+            0.39393091201782227,
+            0.1691482961177826
+          ],
+          "margin": 0.12439489364624023,
+          "matches_alone_logits": true,
+          "matches_alone_prediction": true,
+          "position": 0,
+          "prediction": 0,
+          "relative_rms_vs_alone": 0.0
+        },
+        {
+          "logits": [
+            0.3677279055118561,
+            0.524132490158081,
+            0.21914349496364594
+          ],
+          "margin": 0.15640458464622498,
+          "matches_alone_logits": false,
+          "matches_alone_prediction": false,
+          "position": 1,
+          "prediction": 1,
+          "relative_rms_vs_alone": 0.30515261718676356
+        },
+        {
+          "logits": [
+            0.42677849531173706,
+            0.5112348198890686,
+            0.16284890472888947
+          ],
+          "margin": 0.08445632457733154,
+          "matches_alone_logits": false,
+          "matches_alone_prediction": false,
+          "position": 2,
+          "prediction": 1,
+          "relative_rms_vs_alone": 0.22141202841467506
+        },
+        {
+          "logits": [
+            0.455583393573761,
+            0.4505730867385864,
+            0.19020609557628632
+          ],
+          "margin": 0.0050103068351745605,
+          "matches_alone_logits": false,
+          "matches_alone_prediction": true,
+          "position": 3,
+          "prediction": 0,
+          "relative_rms_vs_alone": 0.12950515907084859
+        }
+      ],
+      "prompt_input": "token_ids",
+      "runtime": {
+        "alone_elapsed_seconds": 1.4004528590012342,
+        "alone_prompt_eval_tokens_per_second": 438.75,
+        "duplicate_elapsed_seconds": 1.7647375839296728,
+        "duplicate_prompt_eval_tokens_per_second": 578.46
+      },
+      "target_index": 35
+    },
+    {
+      "alone_logits": [
+        -0.5463041067123413,
+        1.5163328647613525,
+        0.17090030014514923
+      ],
+      "alone_margin": 1.3454325646162033,
+      "alone_prediction": 1,
+      "duplicate_positions": [
+        {
+          "logits": [
+            -0.5463041067123413,
+            1.5163328647613525,
+            0.17090030014514923
+          ],
+          "margin": 1.3454325646162033,
+          "matches_alone_logits": true,
+          "matches_alone_prediction": true,
+          "position": 0,
+          "prediction": 1,
+          "relative_rms_vs_alone": 0.0
+        },
+        {
+          "logits": [
+            -0.5640503168106079,
+            1.537818193435669,
+            0.22182700037956238
+          ],
+          "margin": 1.3159911930561066,
+          "matches_alone_logits": false,
+          "matches_alone_prediction": true,
+          "position": 1,
+          "prediction": 1,
+          "relative_rms_vs_alone": 0.03581759278992772
+        },
+        {
+          "logits": [
+            -0.5563691854476929,
+            1.487623929977417,
+            0.2096633017063141
+          ],
+          "margin": 1.277960628271103,
+          "matches_alone_logits": false,
+          "matches_alone_prediction": true,
+          "position": 2,
+          "prediction": 1,
+          "relative_rms_vs_alone": 0.030402405642926247
+        },
+        {
+          "logits": [
+            -0.5476989150047302,
+            1.5481433868408203,
+            0.22867469489574432
+          ],
+          "margin": 1.319468691945076,
+          "matches_alone_logits": false,
+          "matches_alone_prediction": true,
+          "position": 3,
+          "prediction": 1,
+          "relative_rms_vs_alone": 0.04070125350964185
+        }
+      ],
+      "prompt_input": "token_ids",
+      "runtime": {
+        "alone_elapsed_seconds": 1.39458964811638,
+        "alone_prompt_eval_tokens_per_second": 82.43,
+        "duplicate_elapsed_seconds": 1.4423525659367442,
+        "duplicate_prompt_eval_tokens_per_second": 248.46
+      },
+      "target_index": 0
+    },
+    {
+      "alone_logits": [
+        -1.4871422052383423,
+        0.9743350744247437,
+        3.046990394592285
+      ],
+      "alone_margin": 2.0726553201675415,
+      "alone_prediction": 2,
+      "duplicate_positions": [
+        {
+          "logits": [
+            -1.4871422052383423,
+            0.9743350744247437,
+            3.046990394592285
+          ],
+          "margin": 2.0726553201675415,
+          "matches_alone_logits": true,
+          "matches_alone_prediction": true,
+          "position": 0,
+          "prediction": 2,
+          "relative_rms_vs_alone": 0.0
+        },
+        {
+          "logits": [
+            -1.5009279251098633,
+            1.0050580501556396,
+            3.058049440383911
+          ],
+          "margin": 2.0529913902282715,
+          "matches_alone_logits": false,
+          "matches_alone_prediction": true,
+          "position": 1,
+          "prediction": 2,
+          "relative_rms_vs_alone": 0.01004706726768323
+        },
+        {
+          "logits": [
+            -1.5094404220581055,
+            1.0017898082733154,
+            3.0555129051208496
+          ],
+          "margin": 2.053723096847534,
+          "matches_alone_logits": false,
+          "matches_alone_prediction": true,
+          "position": 2,
+          "prediction": 2,
+          "relative_rms_vs_alone": 0.01031289702993817
+        },
+        {
+          "logits": [
+            -1.5206692218780518,
+            0.9937052726745605,
+            3.059734344482422
+          ],
+          "margin": 2.0660290718078613,
+          "matches_alone_logits": false,
+          "matches_alone_prediction": true,
+          "position": 3,
+          "prediction": 2,
+          "relative_rms_vs_alone": 0.011555112482557858
+        }
+      ],
+      "prompt_input": "token_ids",
+      "runtime": {
+        "alone_elapsed_seconds": 1.3690956321079284,
+        "alone_prompt_eval_tokens_per_second": 239.59,
+        "duplicate_elapsed_seconds": 1.446195871103555,
+        "duplicate_prompt_eval_tokens_per_second": 626.04
+      },
+      "target_index": 1
+    },
+    {
+      "alone_logits": [
+        0.1926816999912262,
+        1.1598310470581055,
+        -0.10884910076856613
+      ],
+      "alone_margin": 0.9671493470668793,
+      "alone_prediction": 1,
+      "duplicate_positions": [
+        {
+          "logits": [
+            0.1926816999912262,
+            1.1598310470581055,
+            -0.10884910076856613
+          ],
+          "margin": 0.9671493470668793,
+          "matches_alone_logits": true,
+          "matches_alone_prediction": true,
+          "position": 0,
+          "prediction": 1,
+          "relative_rms_vs_alone": 0.0
+        },
+        {
+          "logits": [
+            0.12525500357151031,
+            1.1737569570541382,
+            -0.16268660128116608
+          ],
+          "margin": 1.0485019534826279,
+          "matches_alone_logits": false,
+          "matches_alone_prediction": true,
+          "position": 1,
+          "prediction": 1,
+          "relative_rms_vs_alone": 0.07402046774483731
+        },
+        {
+          "logits": [
+            0.10243549942970276,
+            1.2240408658981323,
+            -0.12815040349960327
+          ],
+          "margin": 1.1216053664684296,
+          "matches_alone_logits": false,
+          "matches_alone_prediction": true,
+          "position": 2,
+          "prediction": 1,
+          "relative_rms_vs_alone": 0.09521614759678869
+        },
+        {
+          "logits": [
+            0.12188660353422165,
+            1.198631763458252,
+            -0.1462963968515396
+          ],
+          "margin": 1.0767451599240303,
+          "matches_alone_logits": false,
+          "matches_alone_prediction": true,
+          "position": 3,
+          "prediction": 1,
+          "relative_rms_vs_alone": 0.0753695105970724
+        }
+      ],
+      "prompt_input": "token_ids",
+      "runtime": {
+        "alone_elapsed_seconds": 1.438379329862073,
+        "alone_prompt_eval_tokens_per_second": 244.97,
+        "duplicate_elapsed_seconds": 1.5501832698937505,
+        "duplicate_prompt_eval_tokens_per_second": 610.63
+      },
+      "target_index": 2
+    }
+  ]
+}

@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 103,
+  "check_count": 104,
   "failed": [],
   "checks": [
     {
@@ -498,6 +498,12 @@
       "blocker": ""
     },
     {
+      "name": "Sequence-classification duplicate-prompt batching audit rules out prompt formatting",
+      "passed": true,
+      "evidence": "status=duplicate_batching_parity_mismatch, same_prompt=True, logits_invariant=False, predictions_invariant=False, changed_predictions=4, max_rel=0.30515261718676356, ready=False",
+      "blocker": ""
+    },
+    {
       "name": "Sequence-classification native full CPU progress is resumable",
       "passed": true,
       "evidence": "status=complete, completed=9815, contiguous=True, product=False",
@@ -614,7 +620,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=289, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=291, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

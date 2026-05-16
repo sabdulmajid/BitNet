@@ -200,6 +200,7 @@ python benchmarks/build_seqcls_runtime_implementation_plan.py
 python benchmarks/audit_seqcls_native_i2sr_smoke.py
 python benchmarks/audit_seqcls_native_mismatch.py --prompt-input token_ids
 python benchmarks/audit_seqcls_native_batching.py
+python benchmarks/audit_seqcls_native_duplicate_batching.py
 python benchmarks/benchmark_seqcls_native_i2sr_cpu.py --max-samples 64 --prompt-input token_ids \
   --output-json benchmark_results/seqcls_native_i2sr_cpu_mnli_64_token_ids_2026-05-15.json \
   --output-md benchmarks/results/seqcls_native_i2sr_cpu_mnli_64_token_ids_2026-05-15.md
@@ -231,6 +232,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Sequence-classification native I2_SR smoke](benchmarks/results/seqcls_native_i2sr_smoke_2026-05-15.md)
 - [Sequence-classification native I2_SR mismatch audit](benchmarks/results/seqcls_native_mismatch_audit_2026-05-15.md)
 - [Sequence-classification native I2_SR batching audit](benchmarks/results/seqcls_native_batching_audit_2026-05-15.md)
+- [Sequence-classification native I2_SR duplicate-prompt batching audit](benchmarks/results/seqcls_native_duplicate_batching_audit_2026-05-15.md)
 - [Sequence-classification native I2_SR CPU token-ID sample](benchmarks/results/seqcls_native_i2sr_cpu_mnli_64_token_ids_2026-05-15.md)
 - [Sequence-classification native I2_SR full CPU token-ID validation](benchmarks/results/seqcls_native_i2sr_cpu_mnli_full_token_ids_2026-05-15.md)
 - [Sequence-classification native full CPU submission](benchmarks/results/seqcls_native_full_cpu_submission_2026-05-15.md)
