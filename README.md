@@ -41,7 +41,7 @@ packed CPU path faithful to the trained checkpoint.
 | --- | --- | --- |
 | One-click arbitrary FP/BF16 to ternary conversion works | **No** | Qwen2.5-1.5B naive PTQ drops ten-task mean from `0.644169` to `0.348671`; WikiText PPL jumps from `13.901` to `3,813,121.803`. |
 | QAT/distillation can recover useful signal | **Partially** | Best dense row-scale QAT reaches ten-task mean `0.499459`, improving over naive PTQ by `+0.150788` paired mean accuracy but remaining `-0.144710` behind FP. |
-| BitDistill paper-level GLUE reproduction is complete | **No** | Local Qwen2.5 FP16-SFT MNLI is close to the paper anchor (`0.807641` vs `0.799100`), and a tensor-scale CE-only BitNet-SFT budget sweep can clear the weaker paper BitNet-SFT anchor (`0.628935` vs `0.608000`). That is not BitDistill recovery: controlled BitDistill and Qwen3 paper-alignment rows remain below FP quality. Qwen3 tensor BitDistill recovers strongly over BitNet-SFT on QNLI (`0.861065` vs `0.587040`) and SST2 (`0.871560` vs `0.799312`), but still trails FP by paired deltas `-0.060040` and `-0.058486`. Qwen3 row-scale SST2 reaches `0.877294`, but still trails FP by `-0.052752`. The first MNLI layer sweep improves layer `-8` over layer `-1` by paired `+0.028528`, but remains `-0.077738` behind FP. |
+| BitDistill paper-level GLUE reproduction is complete | **No** | Local Qwen2.5 FP16-SFT MNLI is close to the paper anchor (`0.807641` vs `0.799100`), and a tensor-scale CE-only BitNet-SFT budget sweep can clear the weaker paper BitNet-SFT anchor (`0.628935` vs `0.608000`). That is not BitDistill recovery: controlled BitDistill and Qwen3 paper-alignment rows remain below FP quality. Qwen3 tensor BitDistill recovers strongly over BitNet-SFT on QNLI (`0.861065` vs `0.587040`) and SST2 (`0.871560` vs `0.799312`), but still trails FP by paired deltas `-0.060040` and `-0.058486`. Qwen3 row-scale SST2 reaches `0.877294`, but still trails FP by `-0.052752`. MNLI layer selection matters: layer `-8` beats layer `-1` by paired `+0.028528`, but remains `-0.077738` behind FP. |
 | Row-scale semantics matter | **Yes** | TL2 one-scale relative output RMS error is `1.904230`; exact FP16 row scales reduce it to `0.000197`. |
 | Packed row-scale CPU inference works for compatible causal artifacts | **Yes, audited path only** | `I2_SR` Qwen2.5-1.5B row-scale run on Xeon Silver 4116: PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, file `1211.3 MiB`. |
 | Packed sequence-classification deployment is solved | **No, native plumbing only** | Native single-artifact `bitnet-qwen` GGUF classifier-head execution matches the sidecar path. A repaired 64-example MNLI CPU sample using direct token IDs reaches saved-PyTorch agreement `0.96875`, accuracy `0.59375`, and RSS `950.64 MiB`, but it is still sample-only and not product-ready. |
@@ -66,10 +66,12 @@ top-level evidence is intentionally short:
   Row-scale SST2 reaches `0.877294`. These are real task recoveries, but they
   still trail their FP references by paired deltas `-0.060040`, `-0.058486`,
   and `-0.052752`, respectively.
-- **Layer-selection signal:** the first Qwen3 MNLI attention-layer sweep
-  improves tensor BitDistill from `0.723484` at layer `-1` to `0.752012` at
-  layer `-8`, paired delta `+0.028528` with CI `[0.022008, 0.035048]`. It
-  still trails FP `0.829750` by `-0.077738`.
+- **Layer-selection signal:** the Qwen3 MNLI attention-layer sweep confirms
+  that single-layer attention distillation is sensitive to layer choice. Layer
+  `-8` is best at `0.752012`, paired `+0.028528` over layer `-1`; layer `-4`
+  is a smaller lift at `+0.009883`; layer `-2` is slightly lower than `-1`
+  with CI crossing zero. The best layer still trails FP `0.829750` by
+  `-0.077738`.
 - **Row-scale caution:** row-scale is a runtime-contract contribution, not a
   universal accuracy win. On completed Qwen3 paper-gamma rows it is lower than
   tensor-scale on MNLI (`-0.027305` paired delta) and QNLI (`-0.012630`). On

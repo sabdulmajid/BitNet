@@ -3,6 +3,48 @@
     {
       "baseline_accuracy": 0.7234844625573102,
       "baseline_layer": "-1",
+      "candidate_accuracy": 0.71777890983189,
+      "candidate_layer": "-2",
+      "paired": {
+        "baseline_only": 501,
+        "both_correct": 6600,
+        "both_wrong": 2269,
+        "candidate_only": 445,
+        "ci95": [
+          -0.011846736964839334,
+          0.00043563151399878333
+        ],
+        "delta_candidate_minus_baseline": -0.005705552725420275,
+        "errors": [],
+        "matched": 9815,
+        "status": "pass"
+      },
+      "task": "mnli"
+    },
+    {
+      "baseline_accuracy": 0.7234844625573102,
+      "baseline_layer": "-1",
+      "candidate_accuracy": 0.733367294956699,
+      "candidate_layer": "-4",
+      "paired": {
+        "baseline_only": 392,
+        "both_correct": 6709,
+        "both_wrong": 2225,
+        "candidate_only": 489,
+        "ci95": [
+          0.0039586086166180316,
+          0.01580705618215935
+        ],
+        "delta_candidate_minus_baseline": 0.009882832399388692,
+        "errors": [],
+        "matched": 9815,
+        "status": "pass"
+      },
+      "task": "mnli"
+    },
+    {
+      "baseline_accuracy": 0.7234844625573102,
+      "baseline_layer": "-1",
       "candidate_accuracy": 0.7520122261844117,
       "candidate_layer": "-8",
       "paired": {
@@ -27,7 +69,7 @@
     "qnli",
     "sst2"
   ],
-  "complete_count": 13,
+  "complete_count": 15,
   "date": "2026-05-15",
   "expected_examples": {
     "mnli": 9815,
@@ -685,73 +727,105 @@
       "task": "mnli"
     },
     {
-      "accuracy": null,
-      "complete": false,
+      "accuracy": 0.71777890983189,
+      "complete": true,
       "dependency": "afterok:10040:10041",
-      "eval_examples": null,
+      "eval_examples": 9815.0,
       "evidence_label": "paper-inspired",
       "expected_examples": 9815,
       "job_id": "10054",
-      "last_ce": null,
+      "last_ce": 0.50390625,
       "layer": "-2",
       "method": "bitdistill",
-      "metrics_exists": false,
+      "metrics_exists": true,
       "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-2/metrics.json",
       "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-2",
       "paired": {
-        "errors": [
-          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-2/eval_predictions.jsonl"
+        "both_correct": 6560,
+        "both_wrong": 1186,
+        "candidate_accuracy": 0.71777890983189,
+        "candidate_only": 485,
+        "ci95": [
+          -0.12078084543926239,
+          -0.1031620990334834
         ],
-        "status": "pending"
+        "delta_vs_fp": -0.1119714722363729,
+        "fp_only": 1584,
+        "matched": 9815,
+        "reference_accuracy": 0.8297503820682629,
+        "status": "pass"
       },
       "passes_fp_gap": false,
       "phase": "attention_layer_sweep",
-      "predictions_exists": false,
+      "predictions_exists": true,
       "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-2/eval_predictions.jsonl",
-      "preparation": {},
+      "preparation": {
+        "activation_quantization": true,
+        "bitlinear_replaced": 196,
+        "subln_inserted": 56,
+        "ternary_init": {
+          "applied": false,
+          "mode": "absmean"
+        },
+        "untied_output_embeddings": false
+      },
       "queue": {
-        "elapsed": "1:48",
         "job_id": "10054",
-        "reason": "ece-nebula10",
-        "state": "RUNNING"
+        "state": "not_in_squeue"
       },
       "scale": "tensor",
-      "steps": null,
+      "steps": 1000,
       "task": "mnli"
     },
     {
-      "accuracy": null,
-      "complete": false,
+      "accuracy": 0.733367294956699,
+      "complete": true,
       "dependency": "afterok:10040:10041",
-      "eval_examples": null,
+      "eval_examples": 9815.0,
       "evidence_label": "paper-inspired",
       "expected_examples": 9815,
       "job_id": "10055",
-      "last_ce": null,
+      "last_ce": 0.515625,
       "layer": "-4",
       "method": "bitdistill",
-      "metrics_exists": false,
+      "metrics_exists": true,
       "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-4/metrics.json",
       "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-4",
       "paired": {
-        "errors": [
-          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-4/eval_predictions.jsonl"
+        "both_correct": 6710,
+        "both_wrong": 1183,
+        "candidate_accuracy": 0.733367294956699,
+        "candidate_only": 488,
+        "ci95": [
+          -0.10492790725724976,
+          -0.0878382669658781
         ],
-        "status": "pending"
+        "delta_vs_fp": -0.09638308711156393,
+        "fp_only": 1434,
+        "matched": 9815,
+        "reference_accuracy": 0.8297503820682629,
+        "status": "pass"
       },
       "passes_fp_gap": false,
       "phase": "attention_layer_sweep",
-      "predictions_exists": false,
+      "predictions_exists": true,
       "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-4/eval_predictions.jsonl",
-      "preparation": {},
+      "preparation": {
+        "activation_quantization": true,
+        "bitlinear_replaced": 196,
+        "subln_inserted": 56,
+        "ternary_init": {
+          "applied": false,
+          "mode": "absmean"
+        },
+        "untied_output_embeddings": false
+      },
       "queue": {
-        "elapsed": "0:00",
         "job_id": "10055",
-        "reason": "(Resources)",
-        "state": "PENDING"
+        "state": "not_in_squeue"
       },
       "scale": "tensor",
-      "steps": null,
+      "steps": 1000,
       "task": "mnli"
     }
   ],
