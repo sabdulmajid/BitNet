@@ -56,6 +56,30 @@ def load_architecture(checkpoint_dir: Path) -> str:
     return str(architectures[0])
 
 
+def load_config(checkpoint_dir: Path) -> dict[str, Any]:
+    return json.loads((checkpoint_dir / "config.json").read_text(encoding="utf-8"))
+
+
+def classifier_label_count(state: dict[str, torch.Tensor], config: dict[str, Any]) -> int | None:
+    for key in ("score.weight", "classifier.weight"):
+        tensor = state.get(key)
+        if tensor is not None and tensor.ndim == 2:
+            return int(tensor.shape[0])
+    value = config.get("num_labels")
+    return int(value) if isinstance(value, int) and value > 0 else None
+
+
+def classifier_labels(config: dict[str, Any], label_count: int | None) -> list[str]:
+    id2label = config.get("id2label")
+    if isinstance(id2label, dict):
+        labels: list[str] = []
+        for idx in range(label_count or len(id2label)):
+            value = id2label.get(str(idx), id2label.get(idx))
+            labels.append(str(value) if value is not None else str(idx))
+        return labels
+    return [str(idx) for idx in range(label_count or 0)]
+
+
 def normalize_bitdistill_subln_name(name: str) -> str:
     """Map this repo's SubLNLinear wrapper keys to llama.cpp BitNet tensor names."""
     return (
@@ -173,8 +197,11 @@ def make_i2s_model_class(
     summary: dict[str, Any],
     i2_s_dtype: Any,
     i2_sr_dtype: Any,
+    config: dict[str, Any],
 ) -> type:
     gguf = converter.gguf
+    label_count = classifier_label_count(state, config)
+    labels = classifier_labels(config, label_count)
 
     class StaticTernaryI2SModel(base_cls):  # type: ignore[misc, valid-type]
         model_arch = getattr(args, "_model_arch_override", None) or base_cls.model_arch
@@ -187,6 +214,26 @@ def make_i2s_model_class(
                     self.hparams["rope_theta"] = rope_theta
                     summary["rope_theta_from_rope_parameters"] = float(rope_theta)
             super().set_gguf_parameters()
+            if args.classifier_head_gguf:
+                if label_count is None:
+                    raise ValueError("--classifier-head-gguf requires score.weight/classifier.weight or config.num_labels")
+                if hasattr(self.gguf_writer, "add_classifier_label_count"):
+                    self.gguf_writer.add_classifier_label_count(label_count)
+                else:
+                    self.gguf_writer.add_uint32(f"{self.gguf_writer.arch}.classifier_label_count", label_count)
+                if hasattr(gguf.PoolingType, "LAST"):
+                    self.gguf_writer.add_pooling_type(gguf.PoolingType.LAST)
+                else:
+                    self.gguf_writer.add_uint32(f"{self.gguf_writer.arch}.pooling_type", 3)
+                self.gguf_writer.add_string("bitnet.sequence_classification.head", "cls")
+                self.gguf_writer.add_string("bitnet.sequence_classification.pooling", "last")
+                self.gguf_writer.add_string(
+                    "bitnet.sequence_classification.problem_type",
+                    str(config.get("problem_type") or "single_label_classification"),
+                )
+                self.gguf_writer.add_array("bitnet.sequence_classification.labels", labels)
+                summary["classifier_label_count"] = label_count
+                summary["classifier_labels"] = labels
 
         def set_vocab(self):  # type: ignore[no-untyped-def]
             if args.synthetic_vocab_for_smoke:
@@ -216,6 +263,7 @@ def make_i2s_model_class(
             row_scale_packed = 0
             packed_bytes = 0
             classifier_tensors: dict[str, np.ndarray] = {}
+            classifier_gguf_tensors: list[str] = []
             try:
                 output_tensor_name = self.format_tensor_name(gguf.MODEL_TENSOR.OUTPUT)
             except ValueError:
@@ -225,12 +273,27 @@ def make_i2s_model_class(
                 if key.endswith(".weight_scale"):
                     continue
                 if key in {"score.weight", "score.bias", "classifier.weight", "classifier.bias"}:
-                    if args.classifier_head_npz is None:
+                    if args.classifier_head_npz is None and not args.classifier_head_gguf:
                         raise ValueError(
                             f"{key} is a sequence-classification head tensor; pass "
-                            "--classifier-head-npz to export it as a sidecar"
+                            "--classifier-head-npz, --classifier-head-gguf, or both"
                         )
-                    classifier_tensors[key.replace(".", "_")] = tensor.to(dtype=torch.float32).cpu().numpy()
+                    data = tensor.to(dtype=torch.float32).cpu().numpy()
+                    if args.classifier_head_npz is not None:
+                        classifier_tensors[key.replace(".", "_")] = data
+                    if args.classifier_head_gguf:
+                        gguf_name = {
+                            "score.weight": "cls.weight",
+                            "score.bias": "cls.bias",
+                            "classifier.weight": "cls.weight",
+                            "classifier.bias": "cls.bias",
+                        }[key]
+                        self.gguf_writer.add_tensor(
+                            gguf_name,
+                            data,
+                            raw_dtype=gguf.GGMLQuantizationType.F32,
+                        )
+                        classifier_gguf_tensors.append(gguf_name)
                     continue
 
                 if key.endswith(".ternary_weight"):
@@ -299,6 +362,8 @@ def make_i2s_model_class(
                     "copied_tensors": copied_tensors,
                     "classifier_head_sidecar": str(args.classifier_head_npz) if classifier_tensors else None,
                     "classifier_head_tensors": sorted(classifier_tensors),
+                    "classifier_head_gguf": bool(classifier_gguf_tensors),
+                    "classifier_head_gguf_tensors": sorted(classifier_gguf_tensors),
                     "output_f16_tensors": output_f16,
                     "row_scale_rejected": row_scale_rejected,
                     "packed_i2s_bytes": packed_bytes,
@@ -331,8 +396,16 @@ def main() -> None:
         type=Path,
         default=None,
         help=(
-            "Export sequence-classification head tensors such as score.weight to an NPZ sidecar instead of GGUF. "
+            "Export sequence-classification head tensors such as score.weight to an NPZ sidecar. "
             "The current llama.cpp path can then run the packed backbone in embedding/last-pooling mode while an external evaluator applies the dense head."
+        ),
+    )
+    parser.add_argument(
+        "--classifier-head-gguf",
+        action="store_true",
+        help=(
+            "Persist sequence-classification score/classifier head tensors and label metadata directly in GGUF "
+            "as cls.weight/cls.bias. This requires the bitnet-qwen runtime classifier path in this fork."
         ),
     )
     parser.add_argument("--validate-codes", action="store_true")
@@ -377,6 +450,8 @@ def main() -> None:
     args = parser.parse_args()
     if args.row_scale_prototype and args.row_scale_qtype is not None:
         raise SystemExit("--row-scale-prototype and --row-scale-qtype are mutually exclusive")
+    if args.classifier_head_gguf and args.gguf_arch != "bitnet-qwen":
+        raise SystemExit("--classifier-head-gguf currently requires --gguf-arch bitnet-qwen")
 
     ternary_state = args.ternary_state or args.checkpoint_dir / "ternary_state_dict.pt"
     converter = load_converter(args.converter)
@@ -388,6 +463,7 @@ def main() -> None:
         has_native_i2s_constants,
         has_native_i2sr_constants,
     ) = get_gguf_i2s_types(converter.gguf, row_scale_qtype=args.row_scale_qtype)
+    config = load_config(args.checkpoint_dir)
     architecture = load_architecture(args.checkpoint_dir)
     converter_architecture = args.source_architecture_alias or architecture
     base_cls = converter.Model.from_model_architecture(converter_architecture)
@@ -427,6 +503,7 @@ def main() -> None:
             "Row-scale prototype mode requires a matching experimental runtime layout and overloads I2_S.",
             "Row-scale i2_sr mode requires a runtime with a stable I2_SR qtype.",
             "Keeps output.weight in F16 by default to match llama-quantize policy.",
+            "Native GGUF classifier heads are supported only for the fork's bitnet-qwen path.",
         ],
         "row_scale_prototype": bool(args.row_scale_prototype),
         "row_scale_qtype": args.row_scale_qtype,
@@ -434,9 +511,10 @@ def main() -> None:
         "bitdistill_subln": bool(args.bitdistill_subln),
         "synthetic_vocab_for_smoke": bool(args.synthetic_vocab_for_smoke),
         "classifier_head_npz": str(args.classifier_head_npz) if args.classifier_head_npz is not None else None,
+        "classifier_head_gguf_requested": bool(args.classifier_head_gguf),
     }
 
-    model_cls = make_i2s_model_class(base_cls, state, converter, args, summary, i2_s_dtype, i2_sr_dtype)
+    model_cls = make_i2s_model_class(base_cls, state, converter, args, summary, i2_s_dtype, i2_sr_dtype, config)
     output_ftype = mostly_i2_sr_ftype if args.row_scale_qtype == "i2_sr" else mostly_i2_s_ftype
     summary["output_ftype"] = int(output_ftype)
     summary["output_ftype_name"] = getattr(output_ftype, "name", str(output_ftype))

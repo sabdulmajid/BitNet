@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 92,
+  "check_count": 94,
   "failed": [],
   "checks": [
     {
@@ -398,7 +398,7 @@
     {
       "name": "Sequence-classification runtime gap is narrowed but not closed",
       "passed": true,
-      "evidence": "status=sidecar_qwen_contract_available_native_head_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6",
+      "evidence": "status=native_classifier_smoke_available_full_validation_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6",
       "blocker": ""
     },
     {
@@ -435,6 +435,18 @@
       "name": "Sequence-classification runtime implementation plan has source-owned steps",
       "passed": true,
       "evidence": "step_count=5",
+      "blocker": ""
+    },
+    {
+      "name": "Sequence-classification native I2_SR smoke passes",
+      "passed": true,
+      "evidence": "status=pass, single_artifact=True, returncode=0, logits=3, prediction=2, sidecar_prediction=2, rel_rms=1.0342961243324147e-07",
+      "blocker": ""
+    },
+    {
+      "name": "Sequence-classification native I2_SR smoke keeps product blocked",
+      "passed": true,
+      "evidence": "full_validation=False, ready=False, prompt_tok_s=128.05",
       "blocker": ""
     },
     {
@@ -548,7 +560,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=267, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=270, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

@@ -1,0 +1,53 @@
+{
+  "architecture": "Qwen2ForSequenceClassification",
+  "bitdistill_subln": true,
+  "checkpoint_dir": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8",
+  "classifier_head_gguf": true,
+  "classifier_head_gguf_requested": true,
+  "classifier_head_gguf_tensors": [
+    "cls.weight"
+  ],
+  "classifier_head_npz": null,
+  "classifier_head_sidecar": null,
+  "classifier_head_tensors": [],
+  "classifier_label_count": 3,
+  "classifier_labels": [
+    "LABEL_0",
+    "LABEL_1",
+    "LABEL_2"
+  ],
+  "converter": "3rdparty/llama.cpp/convert_hf_to_gguf.py",
+  "converter_architecture": "Qwen2ForCausalLM",
+  "copied_tensors": 170,
+  "format_scope": "scalar-scale I2_S by default; row-scale only with --row-scale-prototype or --row-scale-qtype=i2_sr",
+  "gguf_arch": "bitnet-qwen",
+  "has_native_i2s_gguf_python_constants": true,
+  "has_native_i2sr_gguf_python_constants": true,
+  "i2_s_dtype": 36,
+  "i2_sr_dtype": 40,
+  "limitations": [
+    "Rejects row-scale checkpoints unless --row-scale-prototype or --row-scale-qtype=i2_sr is passed.",
+    "Scalar mode uses the existing tensor-scale I2_S layout.",
+    "Row-scale prototype mode requires a matching experimental runtime layout and overloads I2_S.",
+    "Row-scale i2_sr mode requires a runtime with a stable I2_SR qtype.",
+    "Keeps output.weight in F16 by default to match llama-quantize policy.",
+    "Native GGUF classifier heads are supported only for the fork's bitnet-qwen path."
+  ],
+  "mostly_i2_s_file_type": 40,
+  "mostly_i2_sr_file_type": 41,
+  "outfile": "models/seqcls-native-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr_cls.gguf",
+  "outfile_size_bytes": 369746176,
+  "output_f16_tensors": 0,
+  "output_ftype": 41,
+  "output_ftype_name": "MOSTLY_I2_SR",
+  "output_tensors": 338,
+  "packed_i2s_bytes": 90678528,
+  "rope_theta_from_rope_parameters": 1000000.0,
+  "row_scale_i2s_packed": 168,
+  "row_scale_prototype": false,
+  "row_scale_qtype": "i2_sr",
+  "row_scale_rejected": 0,
+  "synthetic_vocab_for_smoke": false,
+  "ternary_i2s_packed": 168,
+  "ternary_state": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/ternary_state_dict.pt"
+}

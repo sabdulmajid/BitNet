@@ -69,13 +69,15 @@ Overall status: **PASS**.
 | BitNet-SFT diag-LS init submission changes only initializer | pass | status=submitted, changed_axis=ternary_init_mode_only, init=diag_ls, cal=8, method=bitnet_sft, task=mnli |  |
 | BitNet-SFT diag-LS init submission has matched absmean baseline | pass | baseline=checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5, steps=10000, lr=2e-05 |  |
 | BitNet-SFT diag-LS init result audit is pending or complete | pass | status=pending, baseline=0.6289353031074886, candidate=None, quality_proven=False |  |
-| Sequence-classification runtime gap is narrowed but not closed | pass | status=sidecar_qwen_contract_available_native_head_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6 |  |
+| Sequence-classification runtime gap is narrowed but not closed | pass | status=native_classifier_smoke_available_full_validation_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6 |  |
 | Sequence-classification I2_SR sidecar smoke passes | pass | status=prototype_smoke_passed, returncode=0, head_shape=[3, 896], finite_logits=True |  |
 | Sequence-classification sidecar CPU quality mismatch is recorded | pass | status=quality_mismatch, examples=128, agreement=0.9140625, accuracy=0.609375 |  |
 | Sequence-classification hidden contract is near but not exact | pass | status=hidden_contract_mismatch, token_match=True, hidden_rel_rms=0.10866150519771632, hidden_cosine=0.9940905307837791, logit_rel_rms=0.09191836414090784 |  |
 | Sequence-classification architecture contract is identified and repaired | pass | status=bitnet_qwen_contract_available, hidden_act=silu, bitnet25_activation=relu_sqr, bitnet_qwen={'available': True, 'dispatch_line': 16898, 'ffn_activation': 'silu', 'loader_has_qkv_bias': True, 'silu_branch_line': 15544}, projection_biases=72, checks={'activation_mismatch': True, 'bitnet25_has_bias_slots': True, 'bitnet_qwen_contract_available': True, 'plain_bitnet_bias_contract_gap': True, 'plain_bitnet_has_silu_graph': True} |  |
 | Sequence-classification runtime implementation plan keeps product blocked | pass | same_artifact=False, ready=False, seqcls_exportable=0 |  |
 | Sequence-classification runtime implementation plan has source-owned steps | pass | step_count=5 |  |
+| Sequence-classification native I2_SR smoke passes | pass | status=pass, single_artifact=True, returncode=0, logits=3, prediction=2, sidecar_prediction=2, rel_rms=1.0342961243324147e-07 |  |
+| Sequence-classification native I2_SR smoke keeps product blocked | pass | full_validation=False, ready=False, prompt_tok_s=128.05 |  |
 | Qwen3 paper-alignment audit tracks required GLUE rows | pass | jobs=16, complete=0, ready=False |  |
 | FP F16 CPU row is finite | pass | ppl=12.2808, prefill=114.468162, decode=5.555998 |  |
 | FP Q8_0 CPU row is finite | pass | ppl=12.3056, prefill=124.864246, decode=10.131914 |  |
@@ -94,5 +96,5 @@ Overall status: **PASS**.
 | Research redirect gate covers required claims | pass | missing=[] |  |
 | Research redirect gate blocks overclaims | pass | blocked_statuses=['blocked', 'not_proven', 'prototype_only'] |  |
 | fixed I2_SR RSS has four context rows | pass | contexts=[512, 2048, 8192, 32768] |  |
-| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=267, missing=0, missing_labels=[] |  |
+| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=270, missing=0, missing_labels=[] |  |
 | productization gate passes for stable I2_SR | pass | passed=True, failed=0, stable_quality=True, layout=True |  |

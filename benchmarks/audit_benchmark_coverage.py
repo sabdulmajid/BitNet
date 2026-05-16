@@ -986,6 +986,7 @@ def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
             "blocked_by_classifier_runtime",
             "sidecar_prototype_available_native_runtime_blocked",
             "sidecar_qwen_contract_available_native_head_blocked",
+            "native_classifier_smoke_available_full_validation_blocked",
         }
         and data.get("same_artifact_quality_cpu_ready") is False
         and seqcls.get("sequence_classification", 0) > 0
@@ -1114,6 +1115,53 @@ def audit_seqcls_runtime_implementation_plan(root: Path, checks: list[dict[str, 
         and all(step.get("exit_gate") for step in steps if isinstance(step, dict)),
         f"step_count={len(steps)}",
         "seqcls runtime plan should list source ownership and exit gates",
+    )
+
+
+def audit_seqcls_native_i2sr_smoke(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/seqcls_native_i2sr_smoke_{DATE}.json"
+    if not path.exists():
+        add_check(
+            checks,
+            "Sequence-classification native I2_SR smoke exists",
+            False,
+            str(path.relative_to(root)),
+            "missing native seqcls I2_SR smoke audit",
+        )
+        return
+    data = read_json(path)
+    runtime = data.get("runtime", {}) if isinstance(data.get("runtime"), dict) else {}
+    add_check(
+        checks,
+        "Sequence-classification native I2_SR smoke passes",
+        data.get("status") == "pass"
+        and data.get("single_artifact") is True
+        and data.get("returncode") == 0
+        and data.get("logit_count") == 3
+        and data.get("prediction") == data.get("sidecar_prediction")
+        and isinstance(data.get("relative_rms_logit_delta"), (int, float))
+        and data.get("relative_rms_logit_delta") < 1e-5,
+        (
+            f"status={data.get('status')}, single_artifact={data.get('single_artifact')}, "
+            f"returncode={data.get('returncode')}, logits={data.get('logit_count')}, "
+            f"prediction={data.get('prediction')}, sidecar_prediction={data.get('sidecar_prediction')}, "
+            f"rel_rms={data.get('relative_rms_logit_delta')}"
+        ),
+        "native GGUF classifier-head smoke did not match the sidecar reference logits",
+    )
+    add_check(
+        checks,
+        "Sequence-classification native I2_SR smoke keeps product blocked",
+        data.get("full_validation_complete") is False
+        and data.get("ready_to_productize") is False
+        and isinstance(runtime.get("prompt_eval_tokens_per_second"), (int, float))
+        and runtime.get("prompt_eval_tokens_per_second") > 0,
+        (
+            f"full_validation={data.get('full_validation_complete')}, "
+            f"ready={data.get('ready_to_productize')}, "
+            f"prompt_tok_s={runtime.get('prompt_eval_tokens_per_second')}"
+        ),
+        "single-prompt smoke must not be promoted to a full quality/runtime product claim",
     )
 
 
@@ -1423,6 +1471,7 @@ def main() -> None:
     audit_bitnet_sft_diag_ls_init_result(root, checks)
     audit_seqcls_runtime_gap(root, checks)
     audit_seqcls_runtime_implementation_plan(root, checks)
+    audit_seqcls_native_i2sr_smoke(root, checks)
     audit_qwen3_paper_alignment(root, checks)
     audit_cpu_rows(root, checks)
     audit_cpu_tradeoff_frontier(root, checks)

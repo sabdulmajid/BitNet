@@ -170,6 +170,25 @@ def load_arch_contract(path: Path) -> dict[str, Any]:
     }
 
 
+def load_native_smoke(path: Path) -> dict[str, Any]:
+    data = read_json(path)
+    runtime = data.get("runtime", {}) if isinstance(data.get("runtime"), dict) else {}
+    return {
+        "path": str(path),
+        "exists": path.exists(),
+        "status": data.get("status"),
+        "passed": data.get("status") == "pass",
+        "single_artifact": data.get("single_artifact"),
+        "logit_count": data.get("logit_count"),
+        "prediction": data.get("prediction"),
+        "sidecar_prediction": data.get("sidecar_prediction"),
+        "relative_rms_logit_delta": data.get("relative_rms_logit_delta"),
+        "full_validation_complete": data.get("full_validation_complete"),
+        "ready_to_productize": data.get("ready_to_productize"),
+        "prompt_eval_tokens_per_second": runtime.get("prompt_eval_tokens_per_second"),
+    }
+
+
 def fmt(value: Any) -> str:
     if value is None:
         return "-"
@@ -208,10 +227,12 @@ def render_markdown(result: dict[str, Any]) -> str:
     sidecar_cpu = result["seqcls_sidecar_cpu_benchmark"]
     hidden_contract = result["seqcls_hidden_contract"]
     arch_contract = result["seqcls_arch_contract"]
+    native_smoke = result["seqcls_native_smoke"]
     headline_rows = [
         ["status", result["status"]],
         ["same artifact quality+CPU ready", result["same_artifact_quality_cpu_ready"]],
         ["sidecar prototype smoke", smoke["status"]],
+        ["native GGUF classifier smoke", native_smoke["status"]],
         ["sidecar sampled CPU quality", sidecar_cpu["status"]],
         ["sidecar hidden contract", hidden_contract["status"]],
         ["sidecar architecture contract", arch_contract["status"]],
@@ -233,10 +254,9 @@ def render_markdown(result: dict[str, Any]) -> str:
             md_table(["architecture", "count"], seq_arch_rows),
             (
                 "These checkpoints are the strict GLUE reproduction artifacts. They use "
-                "`Qwen2ForSequenceClassification`. The standard causal export path still does "
-                "not implement a native sequence-classification head, but the sidecar smoke below "
-                "shows that a Qwen-compatible packed decoder backbone plus dense score-head sidecar "
-                "is now loadable."
+                "`Qwen2ForSequenceClassification`. The standard causal export path is still not a "
+                "full classifier evaluator, but the native smoke below shows that a Qwen-compatible "
+                "packed GGUF can now carry the dense score head and emit classifier logits."
             ),
             "## Sidecar Prototype",
             md_table(
@@ -268,6 +288,21 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["Q/K/V projection bias tensors", arch_contract["projection_bias_count"]],
                 ],
             ),
+            "## Native GGUF Classifier Smoke",
+            md_table(
+                ["field", "value"],
+                [
+                    ["status", native_smoke["status"]],
+                    ["single artifact", native_smoke["single_artifact"]],
+                    ["logit count", native_smoke["logit_count"]],
+                    ["prediction", native_smoke["prediction"]],
+                    ["sidecar prediction", native_smoke["sidecar_prediction"]],
+                    ["relative RMS logit delta", native_smoke["relative_rms_logit_delta"]],
+                    ["prompt tok/s", native_smoke["prompt_eval_tokens_per_second"]],
+                    ["full validation complete", native_smoke["full_validation_complete"]],
+                    ["ready to productize", native_smoke["ready_to_productize"]],
+                ],
+            ),
             "## Causal Runtime Path",
             md_table(["architecture", "count"], causal_arch_rows),
             (
@@ -284,8 +319,8 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["PyTorch pooled hidden state matches llama.cpp embedding", "near pass on audited sample, not exact"],
                     ["Packed graph matches Qwen2 SiLU/SwiGLU semantics", "implemented via bitnet-qwen"],
                     ["Packed loader supports Qwen2 Q/K/V projection biases", "implemented via bitnet-qwen"],
-                    ["GGUF writer persists classifier/score head tensors and label metadata", "not implemented"],
-                    ["llama.cpp pools the last non-padding token for Qwen sequence classification", "not implemented"],
+                    ["GGUF writer persists classifier/score head tensors and label metadata", "single-prompt smoke implemented"],
+                    ["llama.cpp pools and applies the Qwen sequence-classification head", "single-prompt smoke implemented"],
                     ["CPU evaluator reports GLUE accuracy from the packed classifier artifact", "not implemented"],
                     ["Quality, RSS, and throughput measured on the same deployed artifact", "blocked"],
                 ],
@@ -294,11 +329,9 @@ def render_markdown(result: dict[str, Any]) -> str:
             (
                 "The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. "
                 "It now also has a prototype sequence-classification backbone path through `bitnet-qwen` I2_SR plus "
-                "an external dense head sidecar. The new graph fixes the dominant architecture mismatch: the packed "
-                "hidden vector now has high cosine agreement with PyTorch on the audited MNLI sample, and the sampled "
-                "sidecar probe mostly agrees with saved PyTorch predictions. This is still not a deployable classifier: "
-                "the classifier head is not native GGUF metadata/runtime code, the hidden contract is not bit-exact, "
-                "and full-split CPU quality/RSS/throughput have not been measured on a single native artifact."
+                "an external dense head sidecar, and a native single-artifact GGUF smoke that matches the sidecar "
+                "logits for one prompt. This is still not a deployable classifier: full-split CPU quality, batching "
+                "parity, RSS, and throughput have not been measured on the native artifact."
             ),
         ]
     )
@@ -340,6 +373,11 @@ def main() -> None:
         type=Path,
         default=Path(f"benchmark_results/seqcls_i2sr_arch_contract_{DATE}.json"),
     )
+    parser.add_argument(
+        "--seqcls-native-smoke",
+        type=Path,
+        default=Path(f"benchmark_results/seqcls_native_i2sr_smoke_{DATE}.json"),
+    )
     parser.add_argument("--llama-cpp", type=Path, default=Path("3rdparty/llama.cpp"))
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/seqcls_runtime_gap_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/seqcls_runtime_gap_{DATE}.md"))
@@ -360,6 +398,7 @@ def main() -> None:
     sidecar_cpu = load_sidecar_cpu_benchmark(root / args.seqcls_sidecar_cpu_benchmark)
     hidden_contract = load_hidden_contract(root / args.seqcls_hidden_contract)
     arch_contract = load_arch_contract(root / args.seqcls_arch_contract)
+    native_smoke = load_native_smoke(root / args.seqcls_native_smoke)
     same_artifact_ready = (
         seqcls_summary["causal_export_compatible"] > 0
         and export_summary["exported"] > 0
@@ -367,6 +406,8 @@ def main() -> None:
     )
     if same_artifact_ready:
         status = "ready"
+    elif native_smoke["passed"]:
+        status = "native_classifier_smoke_available_full_validation_blocked"
     elif (
         sidecar_smoke["passed"]
         and isinstance(sidecar_cpu.get("agreement_with_saved_pytorch_predictions"), (int, float))
@@ -390,6 +431,7 @@ def main() -> None:
         "seqcls_sidecar_cpu_benchmark": sidecar_cpu,
         "seqcls_hidden_contract": hidden_contract,
         "seqcls_arch_contract": arch_contract,
+        "seqcls_native_smoke": native_smoke,
         "exporter_rejects_non_causal": "architecture.endswith(\"ForCausalLM\")"
         in (root / "benchmarks/export_bitdistill_i2sr_suite.py").read_text(encoding="utf-8"),
         "llama_cpp": {
