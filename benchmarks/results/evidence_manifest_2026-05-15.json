@@ -115,8 +115,8 @@
       "label": "original_benchmark_objective_audit",
       "metrics": {},
       "path": "benchmarks/results/original_benchmark_objective_audit_2026-05-15.md",
-      "sha256": "934b60e732828641439ff51d69d22ceafa488a16333807586cf415c14ddc5cf9",
-      "size_bytes": 3678
+      "sha256": "548bfae221eae9a5e4b8c9381c87b1030773e37713c3bba038f4d8754e5a1807",
+      "size_bytes": 3679
     },
     {
       "exists": true,
@@ -826,7 +826,7 @@
       "label": "bitdistill_active_goal_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_active_goal_audit_2026-05-15.md",
-      "sha256": "77102dd11fbb287183e01e0d345fdb5978aaa70de2ba36874397cb33d175c6e0",
+      "sha256": "76bb88c81fd41228123e024dc54751e6db309620bba49862058b5c315e937733",
       "size_bytes": 4255
     },
     {
@@ -907,8 +907,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "42e8fe1a83a000f6d3d8e4e45b5eb0f46e59690d8f30d072cae5d348d2303c4b",
-      "size_bytes": 14376
+      "sha256": "7471afa846f0d30ee1a030abebcd596290c1634bd9b0bbabe7032cd817262dd1",
+      "size_bytes": 14360
     },
     {
       "exists": true,
@@ -2659,14 +2659,12 @@
       "label": "benchmark_coverage_gate_json",
       "metrics": {
         "check_count": 103,
-        "failed": [
-          "Sequence-classification runtime gap is narrowed but not closed"
-        ],
-        "passed": false
+        "failed": [],
+        "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "62b2f96df756ee9fc07854c73fa5c2b500ccb171843730cc9c75e13e70b54e3a",
-      "size_bytes": 22392
+      "sha256": "ef20aa268427ec88cfd52f2277fb3c8fe11acdfd08ea07529686481b95f4c789",
+      "size_bytes": 22302
     },
     {
       "exists": true,
@@ -2692,8 +2690,8 @@
       "label": "original_benchmark_objective_audit_json",
       "metrics": {},
       "path": "benchmark_results/original_benchmark_objective_audit_2026-05-15.json",
-      "sha256": "2916929b09b3d8a563dd003fda0ed251b8c9a32d0c46952f76afdaad983fabae",
-      "size_bytes": 4278
+      "sha256": "733275491ab88e6adfbf8ecfb246e86551f2e286bfe0c76cd77432d180c2f51e",
+      "size_bytes": 4279
     },
     {
       "exists": true,
@@ -3506,7 +3504,7 @@
         "warmup_step": 20000
       },
       "path": "benchmark_results/bitdistill_active_goal_audit_2026-05-15.json",
-      "sha256": "4b4d53475ee478693b0920bf92315312824020c974d43525e86ef68799fd9b06",
+      "sha256": "a1323c7deefed6ee7831b6ed58e06ca6158836ef79cead823db1accc3fcce36a",
       "size_bytes": 6919
     },
     {

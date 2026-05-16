@@ -994,29 +994,48 @@ def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
         if isinstance(data.get("seqcls_hidden_contract"), dict)
         else {}
     )
+    native_cpu = (
+        data.get("seqcls_native_cpu_benchmark", {})
+        if isinstance(data.get("seqcls_native_cpu_benchmark"), dict)
+        else {}
+    )
+    gap_status = data.get("status")
+    accepted_gap_statuses = {
+        "blocked_by_classifier_runtime",
+        "sidecar_prototype_available_native_runtime_blocked",
+        "sidecar_qwen_contract_available_native_head_blocked",
+        "native_classifier_smoke_available_full_validation_blocked",
+        "native_classifier_sample_quality_mismatch_full_validation_blocked",
+        "native_classifier_sample_available_full_validation_blocked",
+        "native_classifier_full_validation_batching_blocked",
+    }
+    full_validation_status = gap_status == "native_classifier_full_validation_batching_blocked"
     add_check(
         checks,
         "Sequence-classification runtime gap is narrowed but not closed",
-        data.get("status")
-        in {
-            "blocked_by_classifier_runtime",
-            "sidecar_prototype_available_native_runtime_blocked",
-            "sidecar_qwen_contract_available_native_head_blocked",
-            "native_classifier_smoke_available_full_validation_blocked",
-            "native_classifier_sample_quality_mismatch_full_validation_blocked",
-            "native_classifier_sample_available_full_validation_blocked",
-        }
+        gap_status in accepted_gap_statuses
         and data.get("same_artifact_quality_cpu_ready") is False
         and seqcls.get("sequence_classification", 0) > 0
         and seqcls.get("causal_export_compatible") == 0
         and causal.get("causal_export_compatible", 0) > 0
-        and export.get("exported", 0) > 0,
-        (
-            f"status={data.get('status')}, seqcls={seqcls.get('sequence_classification')}, "
-            f"seqcls_exportable={seqcls.get('causal_export_compatible')}, "
-            f"causal_exportable={causal.get('causal_export_compatible')}, exports={export.get('exported')}"
+        and export.get("exported", 0) > 0
+        and (
+            not full_validation_status
+            or (
+                native_cpu.get("full_validation_complete") is True
+                and native_cpu.get("batching_parity_ready") is False
+                and native_cpu.get("ready_to_productize") is False
+                and native_cpu.get("examples") == 9815
+            )
         ),
-        "quality path and packed runtime path were not cleanly separated",
+        (
+            f"status={gap_status}, seqcls={seqcls.get('sequence_classification')}, "
+            f"seqcls_exportable={seqcls.get('causal_export_compatible')}, "
+            f"causal_exportable={causal.get('causal_export_compatible')}, exports={export.get('exported')}, "
+            f"native_full={native_cpu.get('full_validation_complete')}, "
+            f"batching={native_cpu.get('batching_parity_ready')}, ready={native_cpu.get('ready_to_productize')}"
+        ),
+        "sequence-classification runtime status must remain blocked unless full validation and batching parity are both product-ready",
     )
     add_check(
         checks,

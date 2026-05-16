@@ -1,11 +1,9 @@
 {
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
-  "passed": false,
+  "passed": true,
   "check_count": 103,
-  "failed": [
-    "Sequence-classification runtime gap is narrowed but not closed"
-  ],
+  "failed": [],
   "checks": [
     {
       "name": "FP has ten selected lm-eval tasks",
@@ -417,9 +415,9 @@
     },
     {
       "name": "Sequence-classification runtime gap is narrowed but not closed",
-      "passed": false,
-      "evidence": "status=native_classifier_full_validation_batching_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6",
-      "blocker": "quality path and packed runtime path were not cleanly separated"
+      "passed": true,
+      "evidence": "status=native_classifier_full_validation_batching_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6, native_full=True, batching=False, ready=False",
+      "blocker": ""
     },
     {
       "name": "Sequence-classification I2_SR sidecar smoke passes",
