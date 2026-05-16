@@ -105,8 +105,14 @@ class StepMetrics:
     ce: float = 0.0
     logit_kd: float = 0.0
     attention_kd: float = 0.0
+    attention_q_kd: float = 0.0
+    attention_k_kd: float = 0.0
+    attention_v_kd: float = 0.0
     weighted_logit_kd: float = 0.0
     weighted_attention_kd: float = 0.0
+    weighted_attention_q_kd: float = 0.0
+    weighted_attention_k_kd: float = 0.0
+    weighted_attention_v_kd: float = 0.0
     grad_norm: float = 0.0
     lr: float = 0.0
 
@@ -503,7 +509,7 @@ def relation_rows(values: torch.Tensor, attention_mask: torch.Tensor, *, split_h
     return probs.reshape(batch * split_heads * seq_len, seq_len)[query_mask]
 
 
-def attention_relation_distillation_loss(
+def attention_relation_distillation_components(
     student_qkv: dict[str, torch.Tensor],
     teacher_qkv: dict[str, torch.Tensor],
     attention_mask: torch.Tensor,
@@ -511,20 +517,32 @@ def attention_relation_distillation_loss(
     split_heads: int,
     temperature: float,
     qkv_reduction: str,
-) -> torch.Tensor:
-    losses: list[torch.Tensor] = []
+) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+    losses: dict[str, torch.Tensor] = {}
     for key in ("q", "k", "v"):
         if key not in student_qkv or key not in teacher_qkv:
             raise RuntimeError(f"missing captured {key}-projection state for attention distillation")
         student_rows = relation_rows(student_qkv[key], attention_mask, split_heads=split_heads, temperature=temperature)
         teacher_rows = relation_rows(teacher_qkv[key], attention_mask, split_heads=split_heads, temperature=temperature)
-        losses.append(F.kl_div(torch.log(student_rows), teacher_rows, reduction="batchmean", log_target=False))
-    stacked = torch.stack(losses)
+        losses[key] = F.kl_div(torch.log(student_rows), teacher_rows, reduction="batchmean", log_target=False)
+    stacked = torch.stack([losses[key] for key in ("q", "k", "v")])
     if qkv_reduction == "sum":
-        return stacked.sum()
+        return stacked.sum(), losses
     if qkv_reduction == "mean":
-        return stacked.mean()
+        return stacked.mean(), losses
     raise ValueError(f"unsupported qkv_reduction={qkv_reduction}")
+
+
+def attention_component_weights(
+    components: dict[str, torch.Tensor],
+    *,
+    attention_kd_weight: float,
+    qkv_reduction: str,
+) -> dict[str, torch.Tensor]:
+    divisor = 3.0 if qkv_reduction == "mean" else 1.0
+    if qkv_reduction not in {"sum", "mean"}:
+        raise ValueError(f"unsupported qkv_reduction={qkv_reduction}")
+    return {key: (attention_kd_weight / divisor) * value for key, value in components.items()}
 
 
 def logits_kd_loss(
@@ -1444,7 +1462,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                         temperature_scale=args.logit_kd_temperature_scale,
                     )
                 if need_attention_kd:
-                    attention_kd = attention_relation_distillation_loss(
+                    attention_kd, attention_kd_components = attention_relation_distillation_components(
                         student_qkv,
                         teacher_qkv,
                         batch["attention_mask"],
@@ -1454,30 +1472,52 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                     )
                 else:
                     attention_kd = student_outputs.logits.new_zeros(())
+                    attention_kd_components = {
+                        "q": student_outputs.logits.new_zeros(()),
+                        "k": student_outputs.logits.new_zeros(()),
+                        "v": student_outputs.logits.new_zeros(()),
+                    }
                 weighted_logit_kd = args.logit_kd_weight * logit_kd
                 weighted_attention_kd = args.attention_kd_weight * attention_kd
+                weighted_attention_components = attention_component_weights(
+                    attention_kd_components,
+                    attention_kd_weight=args.attention_kd_weight,
+                    qkv_reduction=args.attention_qkv_reduction,
+                )
                 loss = ce + weighted_logit_kd + weighted_attention_kd
             else:
                 student_outputs = student(**batch)
                 ce = student_outputs.loss
                 logit_kd = student_outputs.logits.new_zeros(())
                 attention_kd = student_outputs.logits.new_zeros(())
+                attention_kd_components = {
+                    "q": student_outputs.logits.new_zeros(()),
+                    "k": student_outputs.logits.new_zeros(()),
+                    "v": student_outputs.logits.new_zeros(()),
+                }
                 weighted_logit_kd = student_outputs.logits.new_zeros(())
                 weighted_attention_kd = student_outputs.logits.new_zeros(())
+                weighted_attention_components = dict(attention_kd_components)
                 loss = ce
 
             next_step = step + 1
             emit_telemetry = should_emit_telemetry(args, next_step) and (batch_index + 1) % args.grad_accum_steps == 0
-            component_norms = (
-                component_grad_norms(
+            grad_components = {
+                "ce": ce,
+                "weighted_logit_kd": weighted_logit_kd,
+                "weighted_attention_kd": weighted_attention_kd,
+                "total": loss,
+            }
+            if args.method == "bitdistill" and emit_telemetry and args.telemetry_component_grad_norms:
+                grad_components.update(
                     {
-                        "ce": ce,
-                        "weighted_logit_kd": weighted_logit_kd,
-                        "weighted_attention_kd": weighted_attention_kd,
-                        "total": loss,
-                    },
-                    trainable_parameters,
+                        "weighted_attention_q_kd": weighted_attention_components["q"],
+                        "weighted_attention_k_kd": weighted_attention_components["k"],
+                        "weighted_attention_v_kd": weighted_attention_components["v"],
+                    }
                 )
+            component_norms = (
+                component_grad_norms(grad_components, trainable_parameters)
                 if emit_telemetry and args.telemetry_component_grad_norms
                 else {}
             )
@@ -1500,8 +1540,14 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                 ce=float(ce.detach().cpu()),
                 logit_kd=float(logit_kd.detach().cpu()),
                 attention_kd=float(attention_kd.detach().cpu()),
+                attention_q_kd=float(attention_kd_components["q"].detach().cpu()),
+                attention_k_kd=float(attention_kd_components["k"].detach().cpu()),
+                attention_v_kd=float(attention_kd_components["v"].detach().cpu()),
                 weighted_logit_kd=float(weighted_logit_kd.detach().cpu()),
                 weighted_attention_kd=float(weighted_attention_kd.detach().cpu()),
+                weighted_attention_q_kd=float(weighted_attention_components["q"].detach().cpu()),
+                weighted_attention_k_kd=float(weighted_attention_components["k"].detach().cpu()),
+                weighted_attention_v_kd=float(weighted_attention_components["v"].detach().cpu()),
                 grad_norm=grad_norm,
                 lr=lr,
             )

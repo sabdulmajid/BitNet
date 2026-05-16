@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "d79ddcdffac828338a9a41f8ccd1c2092e6768f0a5219e7b004bcd2eff061dbb",
-      "size_bytes": 25677
+      "sha256": "b6f3c48fda80f698008fcc3ce5bb3ab9f22c68fe3002a515ba4bba89584d20d4",
+      "size_bytes": 26106
     },
     {
       "exists": true,
@@ -403,8 +403,8 @@
       "label": "bitdistill_telemetry_coverage_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_telemetry_coverage_2026-05-15.md",
-      "sha256": "d4e793af8b8adff2f4721f1c583b35c932f5a6e15dd401a002d8f82163e98dc6",
-      "size_bytes": 3603
+      "sha256": "ea363bf4367c2411fc647dd6f01286d4a6af787b92997630c58ae648e053364f",
+      "size_bytes": 4067
     },
     {
       "exists": true,
@@ -619,8 +619,8 @@
       "label": "bitdistill_smoke_contract_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_smoke_contract_2026-05-15.md",
-      "sha256": "1b50a231dd44762993b4e98f70d20150c82869a577300e911eda9b30b8e72ea8",
-      "size_bytes": 3957
+      "sha256": "fbc1e159ff05aa9c39731715d469031d4dd1c3829614df44934f5528e7068c19",
+      "size_bytes": 4574
     },
     {
       "exists": true,
@@ -682,8 +682,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "e10298940ea377cf8424238503b21176b7b430b3e3072f3e32731527e360f612",
-      "size_bytes": 9597
+      "sha256": "8fdbd65b8f20db1b9ab539e0a949cef158a57a5f368ab6b2b02df669eceebe79",
+      "size_bytes": 9570
     },
     {
       "exists": true,
@@ -2402,8 +2402,8 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "a9e633553896f0b8da484c3019af3fe7f81a5ce9e43e5818174d901ac0fd4baa",
-      "size_bytes": 15305
+      "sha256": "c05a7c6773f6624a59c3b87e4c086467a843fb6ffe17c43e05897168a942a2d8",
+      "size_bytes": 15278
     },
     {
       "exists": true,
@@ -2515,8 +2515,8 @@
       "label": "bitdistill_telemetry_coverage_json",
       "metrics": {},
       "path": "benchmark_results/bitdistill_telemetry_coverage_2026-05-15.json",
-      "sha256": "6c64f574d217fbe5769fa1b57f28b082fd875a059ba550e53a0835fb9ccfe8c9",
-      "size_bytes": 4522
+      "sha256": "43fd68e1b44ecb92bb8750429fbb18af4bdf8860b8a96eb7c1e6d7dbef67f60f",
+      "size_bytes": 5105
     },
     {
       "exists": true,
@@ -3093,8 +3093,8 @@
       "kind": "bitdistill_smoke_contract_json",
       "label": "bitdistill_smoke_contract_json",
       "metrics": {
-        "check_count": 40,
-        "checks": 40,
+        "check_count": 45,
+        "checks": 45,
         "continued_bitlinear": 15,
         "continued_subln": 4,
         "failed_count": 0,
@@ -3103,8 +3103,8 @@
         "task_subln": 4
       },
       "path": "benchmark_results/bitdistill_smoke_contract_2026-05-15.json",
-      "sha256": "f62058de909ea1a46e0223d11319569a5834e911ac750392aba68914f423fd2e",
-      "size_bytes": 37355
+      "sha256": "74604ca7e148eb9b53702c7cd82bcec91bd0924f89817428b52ef0878a99a6bf",
+      "size_bytes": 42053
     },
     {
       "exists": true,

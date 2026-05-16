@@ -49,10 +49,17 @@
       "status": "instrumented_not_materialized",
       "supports": "Cluster jobs can materialize the new telemetry without hand-editing the launcher.",
       "telemetry": "Slurm launcher telemetry pass-through"
+    },
+    {
+      "evidence": "train_bitdistill.py records raw and weighted attention_q_kd, attention_k_kd, and attention_v_kd fields, and optional component-gradient telemetry can include the weighted Q/K/V terms.",
+      "passed": true,
+      "status": "instrumented_not_materialized",
+      "supports": "Future controlled rows can identify which attention-relation term dominates.",
+      "telemetry": "Q/K/V relation KD split"
     }
   ],
-  "measured_count": 7,
-  "measured_expected": 7,
+  "measured_count": 8,
+  "measured_expected": 8,
   "missing": [
     {
       "evidence": "Opt-in component-gradient telemetry exists, but no completed benchmark row has materialized those traces yet.",
@@ -77,15 +84,9 @@
       "risk": "Cannot rule out activation clipping/saturation as a hidden quality limiter.",
       "status": "missing",
       "telemetry": "activation int8 saturation rate"
-    },
-    {
-      "evidence": "The saved metric records aggregate attention KD, not separate Q, K, and V relation losses.",
-      "risk": "Cannot identify which attention relation term is failing or dominating.",
-      "status": "missing",
-      "telemetry": "Q/K/V relation KD split"
     }
   ],
-  "missing_count": 5,
+  "missing_count": 4,
   "safe_next_step": "After the active queued jobs finish, launch the next controlled rows with --telemetry-every-steps and --telemetry-component-grad-norms enabled on a sparse cadence.",
   "schema": "bitdistill-telemetry-coverage-v1",
   "status": "partial_observability",

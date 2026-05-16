@@ -248,13 +248,13 @@
     {
       "name": "BitDistill telemetry coverage audit measures current loss diagnostics",
       "passed": true,
-      "evidence": "status=partial_observability, measured=7/7",
+      "evidence": "status=partial_observability, measured=8/8",
       "blocker": ""
     },
     {
       "name": "BitDistill telemetry coverage audit keeps advanced causality claims blocked",
       "passed": true,
-      "evidence": "missing=['Q/K/V relation KD split', 'activation int8 saturation rate', 'gradient norm by loss component', 'scale trajectory per layer', 'ternary flip rate per step/layer']",
+      "evidence": "missing=['activation int8 saturation rate', 'gradient norm by loss component', 'scale trajectory per layer', 'ternary flip rate per step/layer']",
       "blocker": ""
     },
     {

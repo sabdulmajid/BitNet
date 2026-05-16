@@ -183,6 +183,27 @@ def summarize_measured(args: argparse.Namespace, source: str, launcher_source: s
                 ],
             ),
         },
+        {
+            "telemetry": "Q/K/V relation KD split",
+            "status": "instrumented_not_materialized",
+            "evidence": (
+                "train_bitdistill.py records raw and weighted attention_q_kd, "
+                "attention_k_kd, and attention_v_kd fields, and optional "
+                "component-gradient telemetry can include the weighted Q/K/V terms."
+            ),
+            "supports": "Future controlled rows can identify which attention-relation term dominates.",
+            "passed": source_has_all(
+                source,
+                [
+                    "attention_q_kd",
+                    "attention_k_kd",
+                    "attention_v_kd",
+                    "weighted_attention_q_kd",
+                    "weighted_attention_k_kd",
+                    "weighted_attention_v_kd",
+                ],
+            ),
+        },
     ]
 
 
@@ -217,12 +238,6 @@ def summarize_missing(source: str) -> list[dict[str, Any]]:
             "status": "missing",
             "evidence": "A8 code path is audited statically; runtime saturation statistics are not recorded.",
             "risk": "Cannot rule out activation clipping/saturation as a hidden quality limiter.",
-        },
-        {
-            "telemetry": "Q/K/V relation KD split",
-            "status": "missing",
-            "evidence": "The saved metric records aggregate attention KD, not separate Q, K, and V relation losses.",
-            "risk": "Cannot identify which attention relation term is failing or dominating.",
         },
     ]
 

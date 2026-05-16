@@ -415,7 +415,6 @@ def audit_bitdistill_telemetry_coverage(root: Path, checks: list[dict[str, Any]]
         "ternary flip rate per step/layer",
         "scale trajectory per layer",
         "activation int8 saturation rate",
-        "Q/K/V relation KD split",
     }
     add_check(
         checks,

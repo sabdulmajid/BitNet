@@ -57,6 +57,33 @@ def finite(value: Any) -> bool:
     return isinstance(value, (int, float)) and math.isfinite(float(value))
 
 
+def qkv_split_is_finite(metrics: dict[str, Any]) -> bool:
+    return all(
+        finite(metrics.get(key))
+        for key in (
+            "attention_q_kd",
+            "attention_k_kd",
+            "attention_v_kd",
+            "weighted_attention_q_kd",
+            "weighted_attention_k_kd",
+            "weighted_attention_v_kd",
+        )
+    )
+
+
+def qkv_weighted_sum_matches(metrics: dict[str, Any], *, tolerance: float = 1e-4) -> bool:
+    if not finite(metrics.get("weighted_attention_kd")):
+        return False
+    pieces = [
+        metrics.get("weighted_attention_q_kd"),
+        metrics.get("weighted_attention_k_kd"),
+        metrics.get("weighted_attention_v_kd"),
+    ]
+    if not all(finite(value) for value in pieces):
+        return False
+    return abs(sum(float(value) for value in pieces) - float(metrics["weighted_attention_kd"])) <= tolerance
+
+
 def inspect_ternary_state(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {"exists": False}
@@ -318,6 +345,23 @@ def main() -> None:
         "default attention_qkv_reduction=sum",
         "attention relation KD default no longer matches the BitDistill Q/K/V summation",
     )
+    add_check(
+        checks,
+        "attention relation KD exposes Q/K/V components",
+        all(
+            snippet in train_source
+            for snippet in (
+                "attention_q_kd",
+                "attention_k_kd",
+                "attention_v_kd",
+                "weighted_attention_q_kd",
+                "weighted_attention_k_kd",
+                "weighted_attention_v_kd",
+            )
+        ),
+        "raw and weighted Q/K/V attention KD fields are present",
+        "attention KD telemetry cannot isolate Q, K, and V relation terms",
+    )
     for name, run in runs.items():
         add_check(checks, f"{name} command exits zero", run["returncode"] == 0, f"returncode={run['returncode']}", "command failed")
 
@@ -401,6 +445,26 @@ def main() -> None:
     add_check(checks, "task-sft attention KD is finite", finite(task_last.get("weighted_attention_kd")), f"weighted_attention_kd={task_last.get('weighted_attention_kd')}", "non-finite attention KD")
     add_check(
         checks,
+        "task-sft Q/K/V attention KD split is finite",
+        qkv_split_is_finite(task_last),
+        (
+            f"q={task_last.get('attention_q_kd')}, k={task_last.get('attention_k_kd')}, "
+            f"v={task_last.get('attention_v_kd')}"
+        ),
+        "missing or non-finite Q/K/V attention KD split",
+    )
+    add_check(
+        checks,
+        "task-sft weighted Q/K/V split sums to aggregate",
+        qkv_weighted_sum_matches(task_last),
+        (
+            f"sum={sum(float(task_last.get(key, 0.0)) for key in ('weighted_attention_q_kd', 'weighted_attention_k_kd', 'weighted_attention_v_kd'))}, "
+            f"aggregate={task_last.get('weighted_attention_kd')}"
+        ),
+        "weighted Q/K/V attention KD terms do not match aggregate attention KD",
+    )
+    add_check(
+        checks,
         "task-sft records paper-style Q/K/V reduction",
         task.get("loss_weights", {}).get("attention_qkv_reduction") == "sum",
         f"attention_qkv_reduction={task.get('loss_weights', {}).get('attention_qkv_reduction')}",
@@ -439,6 +503,26 @@ def main() -> None:
     )
     add_check(checks, "row task-sft logits KD is finite", finite(row_task_last.get("weighted_logit_kd")), f"weighted_logit_kd={row_task_last.get('weighted_logit_kd')}", "non-finite logits KD")
     add_check(checks, "row task-sft attention KD is finite", finite(row_task_last.get("weighted_attention_kd")), f"weighted_attention_kd={row_task_last.get('weighted_attention_kd')}", "non-finite attention KD")
+    add_check(
+        checks,
+        "row task-sft Q/K/V attention KD split is finite",
+        qkv_split_is_finite(row_task_last),
+        (
+            f"q={row_task_last.get('attention_q_kd')}, k={row_task_last.get('attention_k_kd')}, "
+            f"v={row_task_last.get('attention_v_kd')}"
+        ),
+        "missing or non-finite row Q/K/V attention KD split",
+    )
+    add_check(
+        checks,
+        "row task-sft weighted Q/K/V split sums to aggregate",
+        qkv_weighted_sum_matches(row_task_last),
+        (
+            f"sum={sum(float(row_task_last.get(key, 0.0)) for key in ('weighted_attention_q_kd', 'weighted_attention_k_kd', 'weighted_attention_v_kd'))}, "
+            f"aggregate={row_task_last.get('weighted_attention_kd')}"
+        ),
+        "weighted row Q/K/V attention KD terms do not match aggregate attention KD",
+    )
     add_check(
         checks,
         "row task-sft records paper-style Q/K/V reduction",
