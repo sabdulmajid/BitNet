@@ -115,6 +115,10 @@ not beat Q4_K_M on quality/storage for the current artifact.
   head, currently proven only as plumbing. The evaluator now supports direct
   token-ID prompts because decoding Qwen sentence-pair token IDs back to text
   is not lossless at some BPE boundaries.
+- A native batching audit that prevents overclaiming batched seqcls throughput:
+  audited low-margin rows change logits and predictions with sequence position
+  inside a multi-prompt embedding batch, so batched numbers are blocked until
+  the runtime contract is fixed.
 - Explicit product gates that prevent fast but unusable artifacts from being
   reported as successful LLMs.
 
@@ -165,7 +169,8 @@ The next work is deliberately narrow:
 4. Close the product gap by upgrading the native sequence-classification token-ID
    sample into a faithful full-validation evaluator. The current 64-example
    sample has high agreement with saved PyTorch predictions but still shows
-   residual packed-runtime drift, so full product claims remain premature.
+   residual packed-runtime drift, and batching parity currently fails, so full
+   product claims remain premature.
 5. Keep MoE/Kimi as future work until the dense case is solved.
 
 Detailed current status and next steps are in
@@ -200,6 +205,7 @@ python benchmarks/audit_seqcls_runtime_gap.py
 python benchmarks/build_seqcls_runtime_implementation_plan.py
 python benchmarks/audit_seqcls_native_i2sr_smoke.py
 python benchmarks/audit_seqcls_native_mismatch.py --prompt-input token_ids
+python benchmarks/audit_seqcls_native_batching.py
 python benchmarks/benchmark_seqcls_native_i2sr_cpu.py --max-samples 64 --prompt-input token_ids \
   --output-json benchmark_results/seqcls_native_i2sr_cpu_mnli_64_token_ids_2026-05-15.json \
   --output-md benchmarks/results/seqcls_native_i2sr_cpu_mnli_64_token_ids_2026-05-15.md
@@ -230,6 +236,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Sequence-classification runtime implementation plan](benchmarks/results/seqcls_runtime_implementation_plan_2026-05-15.md)
 - [Sequence-classification native I2_SR smoke](benchmarks/results/seqcls_native_i2sr_smoke_2026-05-15.md)
 - [Sequence-classification native I2_SR mismatch audit](benchmarks/results/seqcls_native_mismatch_audit_2026-05-15.md)
+- [Sequence-classification native I2_SR batching audit](benchmarks/results/seqcls_native_batching_audit_2026-05-15.md)
 - [Sequence-classification native I2_SR CPU token-ID sample](benchmarks/results/seqcls_native_i2sr_cpu_mnli_64_token_ids_2026-05-15.md)
 - [CPU tradeoff frontier audit](benchmarks/results/cpu_tradeoff_frontier_2026-05-15.md)
 - [TL2 group-scale viability audit](benchmarks/results/tl2_group_scale_viability_2026-05-15.md)

@@ -1,9 +1,9 @@
 # Evidence Manifest, 2026-05-15
-Artifacts: `278`. Missing: `0`.
+Artifacts: `284`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 13591 | 6ecde701b8e9 |  |
-| current_research_plan_report | tracked_report | yes | 10935 | a6a03ddadf40 |  |
+| README | tracked_report | yes | 14070 | b855f3309b66 |  |
+| current_research_plan_report | tracked_report | yes | 11585 | 1fc220c6b1d8 |  |
 | research_redirect_report | tracked_report | yes | 11367 | f3ffc42da781 |  |
 | research_redirect_claims_report | tracked_report | yes | 2392 | 0a0d290f728d |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
@@ -46,7 +46,7 @@ Artifacts: `278`. Missing: `0`.
 | bitnet_sft_diag_ls_init_submission_report | tracked_report | yes | 1587 | b30a9fe27efc |  |
 | bitnet_sft_diag_ls_init_submission_table | tracked_report | yes | 472 | 06ac894c4524 |  |
 | bitnet_sft_diag_ls_init_audit_report | tracked_report | yes | 981 | fd84aa8a13de |  |
-| seqcls_runtime_gap_report | tracked_report | yes | 4722 | 4c2893fd0e43 |  |
+| seqcls_runtime_gap_report | tracked_report | yes | 5256 | 861cfa31830f |  |
 | seqcls_backbone_i2sr_smoke_report | tracked_report | yes | 1655 | 0bf9e8770821 |  |
 | seqcls_backbone_i2sr_qwen_conversion_json | generic_json | yes | 2134 | 2456fe0b65fa |  |
 | seqcls_i2sr_sidecar_cpu_mnli64_report | tracked_report | yes | 920 | ac54bd3d3a18 |  |
@@ -60,7 +60,10 @@ Artifacts: `278`. Missing: `0`.
 | seqcls_native_i2sr_cpu_mnli16_report | tracked_report | yes | 1100 | f085b1e9a42a |  |
 | seqcls_native_i2sr_cpu_mnli16_token_ids_report | tracked_report | yes | 1129 | 0a0fc9b97fe4 |  |
 | seqcls_native_i2sr_cpu_mnli64_token_ids_report | tracked_report | yes | 1124 | b690c71635bc |  |
+| seqcls_native_i2sr_cpu_mnli64_token_ids_batch4_report | tracked_report | yes | 1124 | 3044b89bb306 |  |
 | seqcls_native_mismatch_audit_report | tracked_report | yes | 1723 | 23061853e2c8 |  |
+| seqcls_native_mismatch_audit_fp32_report | tracked_report | yes | 1723 | bc40829d586a |  |
+| seqcls_native_batching_audit_report | tracked_report | yes | 1469 | 71ab9932c0f1 |  |
 | bitdistill_telemetry_coverage_report | tracked_report | yes | 3618 | 2c821f4cf395 |  |
 | bitdistill_training_dynamics_report | tracked_report | yes | 803 | f4b4b7e6d4c1 |  |
 | bitdistill_telemetry_fast_submission_report | tracked_report | yes | 2109 | 804cb1051565 |  |
@@ -96,7 +99,7 @@ Artifacts: `278`. Missing: `0`.
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 1824 | 5d992b3c9a1c |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 13241 | f2c1816ae830 |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 13402 | 247455aa5311 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2569 | 51da6738be9d |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -193,7 +196,7 @@ Artifacts: `278`. Missing: `0`.
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
 | benchmark_matrix_audit_json | generic_json | yes | 16721 | d93ae3f74ea3 |  |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 20720 | 17d431b8d75c | passed=True, checks=97, failed=0 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 20958 | 275467f7cd8e | passed=True, checks=98, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | bb6912119dfc | achieved=False, status=not_complete, complete=7/9, open=2 |
 | original_benchmark_objective_audit_json | generic_json | yes | 4278 | 1ebdde389503 |  |
 | product_scope_gate_json | product_scope_gate_json | yes | 5770 | d0101b25bd20 | scope=research_mvp_only, supported=5, unsupported=4 |
@@ -215,7 +218,7 @@ Artifacts: `278`. Missing: `0`.
 | bitnet_sft_ls_init_audit_json | generic_json | yes | 2400 | cdfb530ec27b |  |
 | bitnet_sft_diag_ls_init_submission_json | generic_json | yes | 1170 | f36ba408a674 |  |
 | bitnet_sft_diag_ls_init_audit_json | generic_json | yes | 2522 | 0cca56666211 |  |
-| seqcls_runtime_gap_json | generic_json | yes | 14568 | e74c94ada2ee |  |
+| seqcls_runtime_gap_json | generic_json | yes | 14961 | f8c9815db32a |  |
 | seqcls_backbone_i2sr_smoke_json | generic_json | yes | 22648 | 5851d3f13f36 |  |
 | seqcls_i2sr_sidecar_cpu_mnli64_json | generic_json | yes | 4875 | 70048e13bc76 |  |
 | seqcls_i2sr_sidecar_cpu_mnli128_json | generic_json | yes | 5397 | 43bdb0c81ad2 |  |
@@ -229,7 +232,10 @@ Artifacts: `278`. Missing: `0`.
 | seqcls_native_i2sr_cpu_mnli16_json | generic_json | yes | 10050 | 952153d950e5 |  |
 | seqcls_native_i2sr_cpu_mnli16_token_ids_json | generic_json | yes | 10203 | 12673485e91a |  |
 | seqcls_native_i2sr_cpu_mnli64_token_ids_json | generic_json | yes | 11425 | f8766f33d337 |  |
+| seqcls_native_i2sr_cpu_mnli64_token_ids_batch4_json | generic_json | yes | 11404 | 190a564f77d1 |  |
 | seqcls_native_mismatch_audit_json | generic_json | yes | 26269 | d2bc8823e18b |  |
+| seqcls_native_mismatch_audit_fp32_json | generic_json | yes | 26370 | 4c6eaf38f6e8 |  |
+| seqcls_native_batching_audit_json | generic_json | yes | 7034 | 0eb02b28ee84 |  |
 | qwen3_paper_alignment_json | generic_json | yes | 22177 | f50be12bf085 |  |
 | qwen3_postprocess_submission_json | generic_json | yes | 405 | aefafcfc80ef |  |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 32197 | c581499edff4 | present=34/36, examples=34, full_eval=34, ci95=34, paper_complete=True, paper_passed=False, row_complete=True, row_passed=False, confidence=0.95 |

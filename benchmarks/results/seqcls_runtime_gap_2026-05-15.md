@@ -85,6 +85,16 @@ These checkpoints are the strict GLUE reproduction artifacts. They use `Qwen2For
 | full validation complete | false |
 | ready to productize | false |
 
+## Native GGUF Batching Audit
+
+| field | value |
+| --- | --- |
+| status | batching_parity_mismatch |
+| all predictions invariant | false |
+| changed cases | 4 |
+| max relative RMS vs alone | 0.305153 |
+| ready for batched product benchmark | false |
+
 ## Causal Runtime Path
 
 | architecture | count |
@@ -106,8 +116,9 @@ These checkpoints are export-compatible with the current GGUF/I2_SR path, but th
 | GGUF writer persists classifier/score head tensors and label metadata | single-prompt smoke implemented |
 | llama.cpp pools and applies the Qwen sequence-classification head | single-prompt smoke implemented |
 | CPU evaluator reports GLUE accuracy from the packed classifier artifact | 64-row token-ID sample implemented |
-| Quality, RSS, and throughput measured on the same deployed artifact | sample only; full validation blocked |
+| Batched embedding/classifier parity | blocked: audited rows change logits/predictions by batch position |
+| Quality, RSS, and throughput measured on the same deployed artifact | single-prompt sample only; full validation blocked |
 
 ## Interpretation
 
-The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. It now also has a prototype sequence-classification backbone path through `bitnet-qwen` I2_SR plus an external dense head sidecar, and a native single-artifact GGUF smoke that matches the sidecar logits for one prompt. A 64-row native CPU sample using direct token IDs is measurable and reaches high agreement with saved PyTorch predictions, but it remains sample-only and still has residual packed-runtime drift. Full-split CPU quality, batching parity, RSS, and throughput have not been measured on a faithful native artifact.
+The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. It now also has a prototype sequence-classification backbone path through `bitnet-qwen` I2_SR plus an external dense head sidecar, and a native single-artifact GGUF smoke that matches the sidecar logits for one prompt. A 64-row native CPU sample using direct token IDs is measurable and reaches high agreement with saved PyTorch predictions, but it remains sample-only and still has residual packed-runtime drift. A separate batching audit shows that logits can change with sequence position inside a multi-prompt embedding batch, so batched throughput must not be promoted. Full-split CPU quality, batching parity, RSS, and throughput have not been measured on a faithful native artifact.

@@ -1,0 +1,271 @@
+{
+  "artifacts": {
+    "checkpoint": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8",
+    "embedding_binary": "build-portable-avx2/bin/llama-embedding",
+    "gguf": "models/seqcls-native-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr_cls.gguf"
+  },
+  "date": "2026-05-15",
+  "interpretation": "Native batched logits are not invariant for the audited rows. Do not promote batched throughput or full-validation numbers until the llama.cpp sequence embedding path has a stable batching contract.",
+  "ready_for_batched_product_benchmark": false,
+  "schema": "seqcls_native_batching_audit.v1",
+  "status": "batching_parity_mismatch",
+  "summary": {
+    "all_predictions_invariant": false,
+    "changed_case_count": 4,
+    "changed_cases": [
+      [
+        15,
+        "pos1"
+      ],
+      [
+        15,
+        "pos3"
+      ],
+      [
+        35,
+        "pos2"
+      ],
+      [
+        35,
+        "pos3"
+      ]
+    ],
+    "max_relative_rms_vs_alone": 0.30515261718676356,
+    "target_indices": [
+      15,
+      35
+    ]
+  },
+  "targets": [
+    {
+      "alone_prediction": 1,
+      "cases": [
+        {
+          "case": "alone",
+          "indices": [
+            15
+          ],
+          "logits": [
+            0.3744511902332306,
+            0.42018020153045654,
+            0.4010027050971985
+          ],
+          "margin": 0.019177496433258057,
+          "prediction": 1,
+          "relative_rms_vs_alone": 0.0,
+          "runtime": {
+            "elapsed_seconds": 1.4217402399517596,
+            "prompt_eval_tokens_per_second": 107.97
+          },
+          "target_position": 0
+        },
+        {
+          "case": "pos0",
+          "indices": [
+            15,
+            16,
+            17,
+            18
+          ],
+          "logits": [
+            0.3744511902332306,
+            0.42018020153045654,
+            0.4010027050971985
+          ],
+          "margin": 0.019177496433258057,
+          "prediction": 1,
+          "relative_rms_vs_alone": 0.0,
+          "runtime": {
+            "elapsed_seconds": 1.454983226954937,
+            "prompt_eval_tokens_per_second": 561.08
+          },
+          "target_position": 0
+        },
+        {
+          "case": "pos1",
+          "indices": [
+            14,
+            15,
+            16,
+            17
+          ],
+          "logits": [
+            0.4229620099067688,
+            0.37101659178733826,
+            0.43344900012016296
+          ],
+          "margin": 0.010486990213394165,
+          "prediction": 2,
+          "relative_rms_vs_alone": 0.11042317301335369,
+          "runtime": {
+            "elapsed_seconds": 1.592941353097558,
+            "prompt_eval_tokens_per_second": 563.51
+          },
+          "target_position": 1
+        },
+        {
+          "case": "pos2",
+          "indices": [
+            13,
+            14,
+            15,
+            16
+          ],
+          "logits": [
+            0.3744511902332306,
+            0.42018020153045654,
+            0.4010027050971985
+          ],
+          "margin": 0.019177496433258057,
+          "prediction": 1,
+          "relative_rms_vs_alone": 0.0,
+          "runtime": {
+            "elapsed_seconds": 1.5413163639605045,
+            "prompt_eval_tokens_per_second": 559.14
+          },
+          "target_position": 2
+        },
+        {
+          "case": "pos3",
+          "indices": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "logits": [
+            0.4229488968849182,
+            0.36239510774612427,
+            0.42447328567504883
+          ],
+          "margin": 0.0015243887901306152,
+          "prediction": 2,
+          "relative_rms_vs_alone": 0.11432589143680794,
+          "runtime": {
+            "elapsed_seconds": 1.6601161530707031,
+            "prompt_eval_tokens_per_second": 575.34
+          },
+          "target_position": 3
+        }
+      ],
+      "max_relative_rms_vs_alone": 0.11432589143680794,
+      "predictions_invariant": false,
+      "target_index": 15
+    },
+    {
+      "alone_prediction": 0,
+      "cases": [
+        {
+          "case": "alone",
+          "indices": [
+            35
+          ],
+          "logits": [
+            0.5183258056640625,
+            0.39393091201782227,
+            0.1691482961177826
+          ],
+          "margin": 0.12439489364624023,
+          "prediction": 0,
+          "relative_rms_vs_alone": 0.0,
+          "runtime": {
+            "elapsed_seconds": 1.4213570228312165,
+            "prompt_eval_tokens_per_second": 407.25
+          },
+          "target_position": 0
+        },
+        {
+          "case": "pos0",
+          "indices": [
+            35,
+            36,
+            37,
+            38
+          ],
+          "logits": [
+            0.5183258056640625,
+            0.39393091201782227,
+            0.1691482961177826
+          ],
+          "margin": 0.12439489364624023,
+          "prediction": 0,
+          "relative_rms_vs_alone": 0.0,
+          "runtime": {
+            "elapsed_seconds": 1.6010199079755694,
+            "prompt_eval_tokens_per_second": 600.54
+          },
+          "target_position": 0
+        },
+        {
+          "case": "pos1",
+          "indices": [
+            34,
+            35,
+            36,
+            37
+          ],
+          "logits": [
+            0.5183258056640625,
+            0.39393091201782227,
+            0.1691482961177826
+          ],
+          "margin": 0.12439489364624023,
+          "prediction": 0,
+          "relative_rms_vs_alone": 0.0,
+          "runtime": {
+            "elapsed_seconds": 1.5892899530008435,
+            "prompt_eval_tokens_per_second": 577.37
+          },
+          "target_position": 1
+        },
+        {
+          "case": "pos2",
+          "indices": [
+            33,
+            34,
+            35,
+            36
+          ],
+          "logits": [
+            0.3677279055118561,
+            0.524132490158081,
+            0.21914349496364594
+          ],
+          "margin": 0.15640458464622498,
+          "prediction": 1,
+          "relative_rms_vs_alone": 0.30515261718676356,
+          "runtime": {
+            "elapsed_seconds": 1.5750963459722698,
+            "prompt_eval_tokens_per_second": 576.7
+          },
+          "target_position": 2
+        },
+        {
+          "case": "pos3",
+          "indices": [
+            32,
+            33,
+            34,
+            35
+          ],
+          "logits": [
+            0.42677849531173706,
+            0.5112348198890686,
+            0.16284890472888947
+          ],
+          "margin": 0.08445632457733154,
+          "prediction": 1,
+          "relative_rms_vs_alone": 0.22141202841467506,
+          "runtime": {
+            "elapsed_seconds": 1.5577872190624475,
+            "prompt_eval_tokens_per_second": 582.16
+          },
+          "target_position": 3
+        }
+      ],
+      "max_relative_rms_vs_alone": 0.30515261718676356,
+      "predictions_invariant": false,
+      "target_index": 35
+    }
+  ]
+}

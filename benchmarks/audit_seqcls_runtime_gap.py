@@ -209,6 +209,20 @@ def load_native_cpu_benchmark(path: Path) -> dict[str, Any]:
     }
 
 
+def load_native_batching_audit(path: Path) -> dict[str, Any]:
+    data = read_json(path)
+    summary = data.get("summary", {}) if isinstance(data.get("summary"), dict) else {}
+    return {
+        "path": str(path),
+        "exists": path.exists(),
+        "status": data.get("status"),
+        "all_predictions_invariant": summary.get("all_predictions_invariant"),
+        "changed_case_count": summary.get("changed_case_count"),
+        "max_relative_rms_vs_alone": summary.get("max_relative_rms_vs_alone"),
+        "ready_for_batched_product_benchmark": data.get("ready_for_batched_product_benchmark"),
+    }
+
+
 def fmt(value: Any) -> str:
     if value is None:
         return "-"
@@ -249,6 +263,7 @@ def render_markdown(result: dict[str, Any]) -> str:
     arch_contract = result["seqcls_arch_contract"]
     native_smoke = result["seqcls_native_smoke"]
     native_cpu = result["seqcls_native_cpu_benchmark"]
+    native_batching = result["seqcls_native_batching_audit"]
     headline_rows = [
         ["status", result["status"]],
         ["same artifact quality+CPU ready", result["same_artifact_quality_cpu_ready"]],
@@ -341,6 +356,17 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["ready to productize", native_cpu["ready_to_productize"]],
                 ],
             ),
+            "## Native GGUF Batching Audit",
+            md_table(
+                ["field", "value"],
+                [
+                    ["status", native_batching["status"]],
+                    ["all predictions invariant", native_batching["all_predictions_invariant"]],
+                    ["changed cases", native_batching["changed_case_count"]],
+                    ["max relative RMS vs alone", native_batching["max_relative_rms_vs_alone"]],
+                    ["ready for batched product benchmark", native_batching["ready_for_batched_product_benchmark"]],
+                ],
+            ),
             "## Causal Runtime Path",
             md_table(["architecture", "count"], causal_arch_rows),
             (
@@ -360,7 +386,8 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["GGUF writer persists classifier/score head tensors and label metadata", "single-prompt smoke implemented"],
                     ["llama.cpp pools and applies the Qwen sequence-classification head", "single-prompt smoke implemented"],
                     ["CPU evaluator reports GLUE accuracy from the packed classifier artifact", "64-row token-ID sample implemented"],
-                    ["Quality, RSS, and throughput measured on the same deployed artifact", "sample only; full validation blocked"],
+                    ["Batched embedding/classifier parity", "blocked: audited rows change logits/predictions by batch position"],
+                    ["Quality, RSS, and throughput measured on the same deployed artifact", "single-prompt sample only; full validation blocked"],
                 ],
             ),
             "## Interpretation",
@@ -370,8 +397,9 @@ def render_markdown(result: dict[str, Any]) -> str:
                 "an external dense head sidecar, and a native single-artifact GGUF smoke that matches the sidecar "
                 "logits for one prompt. A 64-row native CPU sample using direct token IDs is measurable and reaches "
                 "high agreement with saved PyTorch predictions, but it remains sample-only and still has residual "
-                "packed-runtime drift. Full-split CPU quality, batching parity, RSS, and throughput have not been "
-                "measured on a faithful native artifact."
+                "packed-runtime drift. A separate batching audit shows that logits can change with sequence position "
+                "inside a multi-prompt embedding batch, so batched throughput must not be promoted. Full-split CPU "
+                "quality, batching parity, RSS, and throughput have not been measured on a faithful native artifact."
             ),
         ]
     )
@@ -423,6 +451,11 @@ def main() -> None:
         type=Path,
         default=Path(f"benchmark_results/seqcls_native_i2sr_cpu_mnli_64_token_ids_{DATE}.json"),
     )
+    parser.add_argument(
+        "--seqcls-native-batching-audit",
+        type=Path,
+        default=Path(f"benchmark_results/seqcls_native_batching_audit_{DATE}.json"),
+    )
     parser.add_argument("--llama-cpp", type=Path, default=Path("3rdparty/llama.cpp"))
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/seqcls_runtime_gap_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/seqcls_runtime_gap_{DATE}.md"))
@@ -445,6 +478,7 @@ def main() -> None:
     arch_contract = load_arch_contract(root / args.seqcls_arch_contract)
     native_smoke = load_native_smoke(root / args.seqcls_native_smoke)
     native_cpu = load_native_cpu_benchmark(root / args.seqcls_native_cpu_benchmark)
+    native_batching = load_native_batching_audit(root / args.seqcls_native_batching_audit)
     same_artifact_ready = (
         seqcls_summary["causal_export_compatible"] > 0
         and export_summary["exported"] > 0
@@ -481,6 +515,7 @@ def main() -> None:
         "seqcls_arch_contract": arch_contract,
         "seqcls_native_smoke": native_smoke,
         "seqcls_native_cpu_benchmark": native_cpu,
+        "seqcls_native_batching_audit": native_batching,
         "exporter_rejects_non_causal": "architecture.endswith(\"ForCausalLM\")"
         in (root / "benchmarks/export_bitdistill_i2sr_suite.py").read_text(encoding="utf-8"),
         "llama_cpp": {

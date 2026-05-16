@@ -1,0 +1,348 @@
+{
+  "artifacts": {
+    "embedding_binary": "build-portable-avx2/bin/llama-embedding",
+    "gguf": "models/seqcls-native-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr_cls.gguf"
+  },
+  "batch_size": 4096,
+  "checkpoint": {
+    "path": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8",
+    "prediction_trace": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/eval_predictions.jsonl",
+    "stored_accuracy": 0.6535914416709119,
+    "stored_eval_examples": 9815.0
+  },
+  "date": "2026-05-15",
+  "expected_examples": 9815,
+  "full_validation_complete": false,
+  "limitations": [
+    "This uses llama-embedding JSON output as the classifier-logit transport.",
+    "The faithful path uses direct token IDs because text decode/re-tokenize is not lossless for all Qwen pair prompts.",
+    "The smoke is product-ready only after full validation and batching parity pass.",
+    "The child RSS value is a process-level peak from resource.getrusage on Linux."
+  ],
+  "max_samples": 64,
+  "prediction_sha256": "14b58d5a620871ab6fe265d1b723aaa63ad966d3e34a74606e8b21ebf54b2651",
+  "predictions": [
+    1,
+    2,
+    1,
+    1,
+    2,
+    2,
+    2,
+    1,
+    0,
+    1,
+    0,
+    2,
+    2,
+    0,
+    0,
+    2,
+    1,
+    0,
+    1,
+    2,
+    2,
+    1,
+    1,
+    1,
+    0,
+    2,
+    2,
+    2,
+    1,
+    2,
+    0,
+    0,
+    0,
+    0,
+    2,
+    1,
+    1,
+    1,
+    0,
+    2,
+    1,
+    2,
+    1,
+    2,
+    2,
+    0,
+    0,
+    1,
+    2,
+    0,
+    2,
+    0,
+    1,
+    1,
+    2,
+    1,
+    0,
+    2,
+    0,
+    1,
+    1,
+    1,
+    1,
+    0
+  ],
+  "prompt_batch_size": 4,
+  "prompt_input": "token_ids",
+  "ready_to_productize": false,
+  "runtime": {
+    "child_peak_rss_kib": 974256,
+    "child_peak_rss_mib": 951.421875,
+    "examples_per_second": 2.639401693012435,
+    "load_time_ms": 17963.88,
+    "prompt_eval_ms": 4343.87,
+    "prompt_eval_tokens": 2502,
+    "prompt_eval_tokens_per_second": 575.9840879215999,
+    "subprocesses": 16,
+    "total_time_ms": 4372.47,
+    "wall_seconds": 24.247919583227485
+  },
+  "sample_predictions": [
+    {
+      "index": 0,
+      "label": 1,
+      "logits": [
+        -0.5463041067123413,
+        1.5163328647613525,
+        0.17090030014514923
+      ],
+      "prediction": 1,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 1,
+      "label": 2,
+      "logits": [
+        -1.5348873138427734,
+        1.0628899335861206,
+        2.9620280265808105
+      ],
+      "prediction": 2,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 2,
+      "label": 0,
+      "logits": [
+        0.12525500357151031,
+        1.1737569570541382,
+        -0.16268660128116608
+      ],
+      "prediction": 1,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 3,
+      "label": 2,
+      "logits": [
+        -1.7986664772033691,
+        2.0268020629882812,
+        1.2321083545684814
+      ],
+      "prediction": 1,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 4,
+      "label": 2,
+      "logits": [
+        -0.2992353141307831,
+        -0.24617239832878113,
+        2.3527259826660156
+      ],
+      "prediction": 2,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 5,
+      "label": 2,
+      "logits": [
+        -0.1052756980061531,
+        0.21817900240421295,
+        0.936591625213623
+      ],
+      "prediction": 2,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 6,
+      "label": 2,
+      "logits": [
+        -0.9067600965499878,
+        0.7795872092247009,
+        2.048438310623169
+      ],
+      "prediction": 2,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 7,
+      "label": 1,
+      "logits": [
+        0.2674640119075775,
+        1.2001796960830688,
+        -0.8201609253883362
+      ],
+      "prediction": 1,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 8,
+      "label": 2,
+      "logits": [
+        1.038619875907898,
+        0.12424539774656296,
+        -0.07804659754037857
+      ],
+      "prediction": 0,
+      "saved_pytorch_prediction": 0
+    },
+    {
+      "index": 9,
+      "label": 1,
+      "logits": [
+        -0.9158037900924683,
+        1.6340739727020264,
+        0.9542996287345886
+      ],
+      "prediction": 1,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 10,
+      "label": 2,
+      "logits": [
+        0.7248154878616333,
+        0.07888530194759369,
+        0.2613014876842499
+      ],
+      "prediction": 0,
+      "saved_pytorch_prediction": 0
+    },
+    {
+      "index": 11,
+      "label": 2,
+      "logits": [
+        -0.3425995111465454,
+        0.5783764719963074,
+        1.1385116577148438
+      ],
+      "prediction": 2,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 12,
+      "label": 2,
+      "logits": [
+        -0.4029250144958496,
+        -0.16641849279403687,
+        2.155704975128174
+      ],
+      "prediction": 2,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 13,
+      "label": 0,
+      "logits": [
+        2.112043619155884,
+        -1.0092957019805908,
+        -0.19175170361995697
+      ],
+      "prediction": 0,
+      "saved_pytorch_prediction": 0
+    },
+    {
+      "index": 14,
+      "label": 1,
+      "logits": [
+        1.1580419540405273,
+        -0.9574512839317322,
+        0.98476642370224
+      ],
+      "prediction": 0,
+      "saved_pytorch_prediction": 0
+    },
+    {
+      "index": 15,
+      "label": 0,
+      "logits": [
+        0.4229488968849182,
+        0.36239510774612427,
+        0.42447328567504883
+      ],
+      "prediction": 2,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 16,
+      "label": 0,
+      "logits": [
+        -0.06362830102443695,
+        1.1093209981918335,
+        0.2514623999595642
+      ],
+      "prediction": 1,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 17,
+      "label": 0,
+      "logits": [
+        1.002469539642334,
+        -0.02226489968597889,
+        0.1027195006608963
+      ],
+      "prediction": 0,
+      "saved_pytorch_prediction": 0
+    },
+    {
+      "index": 18,
+      "label": 1,
+      "logits": [
+        -0.5043389797210693,
+        1.0670037269592285,
+        0.5135505199432373
+      ],
+      "prediction": 1,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 19,
+      "label": 2,
+      "logits": [
+        0.20708410441875458,
+        0.6357597708702087,
+        0.8114637732505798
+      ],
+      "prediction": 2,
+      "saved_pytorch_prediction": 2
+    }
+  ],
+  "schema": "seqcls_native_i2sr_cpu.v1",
+  "status": "sample_only",
+  "stderr_tail": "\nllm_load_print_meta: rope type        = 2\nllm_load_print_meta: rope scaling     = linear\nllm_load_print_meta: freq_base_train  = 1000000.0\nllm_load_print_meta: freq_scale_train = 1\nllm_load_print_meta: n_ctx_orig_yarn  = 32768\nllm_load_print_meta: rope_finetuned   = unknown\nllm_load_print_meta: ssm_d_conv       = 0\nllm_load_print_meta: ssm_d_inner      = 0\nllm_load_print_meta: ssm_d_state      = 0\nllm_load_print_meta: ssm_dt_rank      = 0\nllm_load_print_meta: ssm_dt_b_c_rms   = 0\nllm_load_print_meta: model type       = 700M\nllm_load_print_meta: model ftype      = I2_SR - 2 bpw ternary row-scale\nllm_load_print_meta: model params     = 494.17 M\nllm_load_print_meta: model size       = 346.94 MiB (5.89 BPW) \nllm_load_print_meta: general.name     = Bitdistill Longwarmup Row Layer 8\nllm_load_print_meta: BOS token        = 151643 '<|endoftext|>'\nllm_load_print_meta: EOS token        = 151643 '<|endoftext|>'\nllm_load_print_meta: EOT token        = 151645 '<|im_end|>'\nllm_load_print_meta: PAD token        = 151643 '<|endoftext|>'\nllm_load_print_meta: LF token         = 148848 '\u00c4\u012c'\nllm_load_print_meta: FIM PRE token    = 151659 '<|fim_prefix|>'\nllm_load_print_meta: FIM SUF token    = 151661 '<|fim_suffix|>'\nllm_load_print_meta: FIM MID token    = 151660 '<|fim_middle|>'\nllm_load_print_meta: FIM PAD token    = 151662 '<|fim_pad|>'\nllm_load_print_meta: FIM REP token    = 151663 '<|repo_name|>'\nllm_load_print_meta: FIM SEP token    = 151664 '<|file_sep|>'\nllm_load_print_meta: EOG token        = 151643 '<|endoftext|>'\nllm_load_print_meta: EOG token        = 151645 '<|im_end|>'\nllm_load_print_meta: EOG token        = 151662 '<|fim_pad|>'\nllm_load_print_meta: EOG token        = 151663 '<|repo_name|>'\nllm_load_print_meta: EOG token        = 151664 '<|file_sep|>'\nllm_load_print_meta: max token length = 256\nllm_load_tensors: ggml ctx size =    0.14 MiB\nllm_load_tensors:        CPU buffer size =   346.94 MiB\n.................\nllama_new_context_with_model: n_ctx      = 512\nllama_new_context_with_model: n_batch    = 512\nllama_new_context_with_model: n_ubatch   = 512\nllama_new_context_with_model: flash_attn = 0\nllama_new_context_with_model: freq_base  = 1000000.0\nllama_new_context_with_model: freq_scale = 1\nllama_kv_cache_init:        CPU KV buffer size =     6.00 MiB\nllama_new_context_with_model: KV self size  =    6.00 MiB, K (f16):    3.00 MiB, V (f16):    3.00 MiB\nllama_new_context_with_model:        CPU  output buffer size =     0.00 MiB\nllama_new_context_with_model:        CPU compute buffer size =   301.26 MiB\nllama_new_context_with_model: graph nodes  = 944\nllama_new_context_with_model: graph splits = 1\ncommon_init_from_params: warming up the model with an empty run - please wait ... (--no-warmup to disable)\n\nsystem_info: n_threads = 24 (n_threads_batch = 24) / 24 | AVX = 1 | AVX_VNNI = 0 | AVX2 = 1 | AVX512 = 0 | AVX512_VBMI = 0 | AVX512_VNNI = 0 | AVX512_BF16 = 0 | FMA = 1 | NEON = 0 | SVE = 0 | ARM_FMA = 0 | F16C = 1 | FP16_VA = 0 | RISCV_VECT = 0 | WASM_SIMD = 0 | BLAS = 0 | SSE3 = 1 | SSSE3 = 1 | VSX = 0 | MATMUL_INT8 = 0 | LLAMAFILE = 1 | \nmain: last token in the prompt is not SEP\nmain: 'tokenizer.ggml.add_eos_token' should be set to 'true' in the GGUF header\nmain: last token in the prompt is not SEP\nmain: 'tokenizer.ggml.add_eos_token' should be set to 'true' in the GGUF header\nmain: last token in the prompt is not SEP\nmain: 'tokenizer.ggml.add_eos_token' should be set to 'true' in the GGUF header\nmain: last token in the prompt is not SEP\nmain: 'tokenizer.ggml.add_eos_token' should be set to 'true' in the GGUF header\nbatch_decode: n_tokens = 76, n_seq = 4\nllama_perf_context_print:        load time =    1121.90 ms\nllama_perf_context_print: prompt eval time =     185.80 ms /    76 tokens (    2.44 ms per token,   409.05 tokens per second)\nllama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)\nllama_perf_context_print:       total time =     187.62 ms /    77 tokens\n",
+  "summary": {
+    "accuracy": 0.609375,
+    "accuracy_ci95_wilson": [
+      0.4869191788027247,
+      0.7194443081175993
+    ],
+    "agreement_with_saved_pytorch_predictions": 1.0,
+    "correct": 39,
+    "disagreements_with_saved_pytorch_predictions": 0,
+    "examples": 64,
+    "first_saved_prediction_mismatch_indices": [],
+    "label_agreement_with_saved_trace": 1.0,
+    "saved_trace_predictions": 64,
+    "saved_trace_scores": 64
+  },
+  "task": "mnli",
+  "ubatch_size": 512,
+  "verdict": "Native same-artifact classifier execution is measurable, but the product gate remains blocked until full validation, batching parity, RSS, and throughput are audited."
+}

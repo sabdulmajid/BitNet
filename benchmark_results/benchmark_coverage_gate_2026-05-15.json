@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 97,
+  "check_count": 98,
   "failed": [],
   "checks": [
     {
@@ -465,6 +465,12 @@
       "name": "Sequence-classification native mismatch audit isolates runtime drift",
       "passed": true,
       "evidence": "status=runtime_hidden_drift, token_ids=True, text_roundtrip=False, native_sidecar=True",
+      "blocker": ""
+    },
+    {
+      "name": "Sequence-classification native batching audit blocks batched throughput",
+      "passed": true,
+      "evidence": "status=batching_parity_mismatch, invariant=False, changed=4, ready=False",
       "blocker": ""
     },
     {

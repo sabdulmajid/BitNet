@@ -1228,6 +1228,23 @@ def audit_seqcls_native_i2sr_cpu_sample(root: Path, checks: list[dict[str, Any]]
         ),
         "mismatch audit should prove token-ID repair and isolate residual packed-runtime drift",
     )
+    batching_path = root / f"benchmark_results/seqcls_native_batching_audit_{DATE}.json"
+    batching = read_json(batching_path)
+    batching_summary = batching.get("summary", {}) if isinstance(batching.get("summary"), dict) else {}
+    add_check(
+        checks,
+        "Sequence-classification native batching audit blocks batched throughput",
+        batching.get("status") == "batching_parity_mismatch"
+        and batching_summary.get("all_predictions_invariant") is False
+        and isinstance(batching_summary.get("changed_case_count"), int)
+        and batching_summary.get("changed_case_count") > 0
+        and batching.get("ready_for_batched_product_benchmark") is False,
+        (
+            f"status={batching.get('status')}, invariant={batching_summary.get('all_predictions_invariant')}, "
+            f"changed={batching_summary.get('changed_case_count')}, ready={batching.get('ready_for_batched_product_benchmark')}"
+        ),
+        "batched native seqcls timing should remain blocked until logits are batch-invariant",
+    )
 
 
 def audit_qwen3_paper_alignment(root: Path, checks: list[dict[str, Any]]) -> None:

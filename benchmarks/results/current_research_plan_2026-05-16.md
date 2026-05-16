@@ -31,6 +31,7 @@ result.
 | TL2 group/tile-scale compromise is enough | Rejected for strict fidelity | Best available fp16 group-scale row is `0.098692` relative output RMS; exact fp16 row scales are `0.000197`. |
 | `I2_SR` can preserve row-scale ternary semantics in packed CPU inference | Proven for compatible causal-LM artifacts | Qwen2.5-1.5B `I2_SR` runs on Xeon Silver 4116 with PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
 | Native packed sequence-classification product is solved | No, native plumbing only | A single-artifact `bitnet-qwen` GGUF carries the classifier head and matches the sidecar path. Direct token-ID evaluation fixes a Qwen BPE pair-boundary artifact; the repaired 64-example MNLI CPU sample reaches saved-PyTorch agreement `0.96875`, accuracy `0.59375`, and RSS `950.64 MiB`, but remains sample-only. |
+| Native seqcls batching is product-ready | Rejected for now | Low-margin rows `15` and `35` change logits/predictions depending on sequence position inside a batch; max relative RMS vs alone is `0.305153`. |
 | Kimi/MoE product viability is proven | Not proven | Current MoE work is tiny-fixture plumbing only. |
 
 ## What Changed In The Research Question
@@ -142,6 +143,11 @@ re-tokenized losslessly. The repaired native MNLI CPU sample is measurable but
 still sample-only: 64 examples, accuracy `0.59375`, saved-prediction agreement
 `0.96875`, child peak RSS `950.64 MiB`.
 
+A faster batch-4 sample reaches `2.639` examples/sec and happens to agree with
+the saved PyTorch predictions on the first 64 examples, but it is not a valid
+product benchmark yet. The batching audit shows that the same low-margin rows
+can change logits and predictions with sequence position inside the batch.
+
 A credible product needs one artifact that carries both:
 
 ```text
@@ -214,6 +220,7 @@ relative RMS delta: 0.000000103
 prompt eval:        finite single-prompt smoke timing only; not a benchmark
 64-example MNLI:    accuracy 0.59375, saved-prediction agreement 0.96875
 token IDs:          direct-token path required; text round-trip is not lossless
+batching parity:    failed; max relative RMS vs alone 0.305153 on audited rows
 ```
 
 Missing before product claims:
@@ -225,6 +232,7 @@ RSS measurement
 throughput distribution
 comparison against FP16 and Q4 task artifacts
 residual packed-runtime drift analysis for the remaining disagreements
+batch-invariant native embedding/classifier logits
 ```
 
 ### Gate E: TL2 Row-Scale Contract

@@ -304,6 +304,15 @@
     "status": "hidden_contract_mismatch",
     "token_id_match": true
   },
+  "seqcls_native_batching_audit": {
+    "all_predictions_invariant": false,
+    "changed_case_count": 4,
+    "exists": true,
+    "max_relative_rms_vs_alone": 0.30515261718676356,
+    "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/seqcls_native_batching_audit_2026-05-15.json",
+    "ready_for_batched_product_benchmark": false,
+    "status": "batching_parity_mismatch"
+  },
   "seqcls_native_cpu_benchmark": {
     "accuracy": 0.59375,
     "agreement_with_saved_pytorch_predictions": 0.96875,
