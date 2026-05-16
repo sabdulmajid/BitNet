@@ -34,6 +34,18 @@ DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date()
 LOG_VALUE_RE = re.compile(r"([a-zA-Z_]+)=([-+0-9.eE]+)")
 
 
+def claim_label(job: dict[str, Any]) -> str:
+    """Public claim label for controlled curve rows.
+
+    These jobs test a BitDistill-like Stage-2 budget curve under local budget
+    and normalization choices. They are diagnostics for paper alignment, not
+    completed paper-scale reproductions.
+    """
+    if str(job.get("scale", "")).lower() == "row":
+        return "retrofit-variant"
+    return "paper-inspired"
+
+
 def summarize_values(values: list[float]) -> dict[str, float | None]:
     finite_values = sorted(value for value in values if isinstance(value, (int, float)))
     if not finite_values:
@@ -121,7 +133,10 @@ def squeue_state(job_id: str) -> dict[str, str]:
     except FileNotFoundError:
         return {"state": "squeue_unavailable"}
     if result.returncode != 0:
-        return {"state": "squeue_error", "stderr": result.stderr.strip()}
+        stderr = result.stderr.strip()
+        if "Invalid job id" in stderr or "Invalid job id specified" in stderr:
+            return {"job_id": job_id, "state": "not_in_squeue"}
+        return {"state": "squeue_error", "stderr": stderr}
     line = result.stdout.strip()
     if not line:
         return {"job_id": job_id, "state": "not_in_squeue"}
@@ -160,6 +175,7 @@ def summarize_job(job: dict[str, Any], reference_predictions: Path) -> dict[str,
     return {
         "job_id": str(job.get("job_id", "")),
         "label": job.get("label", ""),
+        "claim_label": claim_label(job),
         "dependency": job.get("dependency", ""),
         "partition": job.get("partition", ""),
         "output_dir": str(output_dir),
@@ -245,6 +261,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
             [
                 row["job_id"],
                 row["label"],
+                row["claim_label"],
                 row["squeue"].get("state"),
                 row["stage2_token_presentations"],
                 row["paper_stage2_fraction"],
@@ -303,6 +320,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 [
                     "job",
                     "label",
+                    "claim",
                     "state",
                     "Stage-2 tokens",
                     "paper fraction",

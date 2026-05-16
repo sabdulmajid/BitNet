@@ -24,7 +24,7 @@ result.
 | --- | --- | --- |
 | Blind PTQ collapse | Proven for tested dense Qwen setup | Qwen2.5-1.5B ten-task mean falls from `0.644169` FP to `0.348671` naive PTQ; WikiText PPL rises from `13.901` to `3,813,121.803`. |
 | Training under ternary constraints helps | Proven partially | Best row-scale QAT improves ten-task mean by `+0.150788` over naive PTQ, but remains `-0.144710` behind FP. |
-| BitNet-SFT baseline can clear the paper anchor | Proven for one local MNLI row | CE-only Qwen2.5-0.5B BitNet-SFT reaches `0.628935` vs paper BitNet-SFT anchor `0.608000`. |
+| BitNet-SFT baseline can clear the paper anchor | Proven for one Qwen2.5 MNLI tensor-scale schedule/budget row | CE-only Qwen2.5-0.5B BitNet-SFT reaches `0.628935` vs paper BitNet-SFT anchor `0.608000`. This is a baseline sanity check, not BitDistill recovery and not a general Qwen3 result. |
 | BitDistill FP recovery is not reproduced | Proven not yet complete | Controlled BitDistill rows reach `0.616607` and `0.691187`, still far from local FP16-SFT `0.807641`. |
 | Loss-normalized attention KD helps | Proven for one matched diagnostic | Gamma-60 reaches MNLI `0.738462`, improving over the matched paper-gamma row by `+0.047275`, but still remains `-0.069689` behind FP16. |
 | Qwen3 paper-alignment MNLI is not reproduced | Proven for completed MNLI rows | Qwen3-0.6B-Base MNLI FP16-SFT is `0.829750`; BitNet-SFT is `0.477127`; tensor BitDistill improves to `0.723484` but remains `-0.106266` paired delta behind FP. Row BitDistill is lower at `0.696179`. |
@@ -66,7 +66,7 @@ At the last local check:
 
 | Job | Partition / node | Purpose | Status |
 | ---: | --- | --- | --- |
-| `10045` | `dualcard / ece-nebula10` | Qwen3 QNLI FP16-SFT row | running at last check |
+| `10046` | `dualcard / ece-nebula10` | Qwen3 QNLI BitNet-SFT tensor row | running at last check |
 | `10079` | `midcard / ece-nebula12` | unweighted LS BitNet-SFT initializer benchmark | running at last check |
 | `10070` | `dualcard` | controlled 327.68M Stage-2 row | pending |
 | `10080` | `midcard` | calibrated diag-LS BitNet-SFT initializer benchmark | pending |
@@ -78,16 +78,19 @@ materialize JSON and Markdown reports.
 
 ### 1. The weak early BitNet-SFT result was not final
 
-The original local BitNet-SFT MNLI result was `0.487621`, far below the paper
-anchor `0.608000`. Longer CE-only budget changed that:
+The original local Qwen2.5 BitNet-SFT MNLI result was `0.487621`, far below
+the paper anchor `0.608000`. A tensor-scale CE-only schedule/budget sweep
+changed that:
 
 ```text
 best completed CE-only BitNet-SFT: 0.628935
 paper BitNet-SFT anchor:          0.608000
 ```
 
-This means the low early baseline was mostly undertraining/schedule, not proof
-that the BitLinear replacement was fundamentally broken.
+This means the low early Qwen2.5 baseline was mostly undertraining/schedule,
+not proof that the BitLinear replacement was fundamentally broken. It does not
+explain the Qwen3 paper-alignment failure, where the completed MNLI BitNet-SFT
+row is still only `0.477127` against local FP16-SFT `0.829750`.
 
 ### 2. The current blocker is BitDistill recovery, not BitNet-SFT viability
 
@@ -259,7 +262,8 @@ Decision:
 
 ## Immediate Work Plan
 
-1. Postprocess jobs `10040`, `10077`, `10079`, `10080`, and `10070` when they
+1. Postprocess jobs `10046`, `10047`, `10048`, `10049`, `10050`, `10051`,
+   `10052`, `10053`, `10054`, `10055`, `10070`, `10079`, and `10080` when they
    finish. Commit only audited JSON/Markdown, not raw log assumptions.
 2. Keep the top-level README as a claim ledger, not a dense experiment dump.
 3. Update reports with a strict label on every row:

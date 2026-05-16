@@ -195,6 +195,18 @@ def load_jobs(tsv_path: Path) -> list[dict[str, str]]:
         return [dict(row) for row in csv.DictReader(handle, delimiter="\t")]
 
 
+def evidence_label(job: dict[str, str]) -> str:
+    """Return the public claim label for this row.
+
+    The Qwen3 queue is a paper-alignment branch, not a completed paper-scale
+    reproduction: token budget and remaining task coverage are still pending.
+    Row-scale entries are fork-specific runtime/quality variants by definition.
+    """
+    if job.get("scale") == "row" or job.get("phase") == "novelty_row_scale":
+        return "retrofit-variant"
+    return "paper-inspired"
+
+
 def summarize_job(job: dict[str, str], fp_predictions_by_task: dict[str, Path]) -> dict[str, Any]:
     output_dir = Path(job.get("output_dir", ""))
     metrics_path = output_dir / "metrics.json"
@@ -220,6 +232,7 @@ def summarize_job(job: dict[str, str], fp_predictions_by_task: dict[str, Path]) 
         "task": task,
         "method": job.get("method"),
         "scale": job.get("scale"),
+        "evidence_label": evidence_label(job),
         "layer": job.get("layer"),
         "job_id": job.get("job_id"),
         "dependency": job.get("dependency"),
@@ -306,6 +319,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
             row["task"],
             row["method"],
             row["scale"],
+            row["evidence_label"],
             row["layer"],
             row["queue"].get("state"),
             row["complete"],
@@ -346,6 +360,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
                     "task",
                     "method",
                     "scale",
+                    "label",
                     "layer",
                     "queue",
                     "complete",

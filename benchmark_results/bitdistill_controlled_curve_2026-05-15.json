@@ -8,6 +8,7 @@
   "reference_predictions": "checkpoints/bitdistill-glue-seqcls-predtrace/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
   "rows": [
     {
+      "claim_label": "paper-inspired",
       "dependency": "afterany:10067",
       "job_id": "10069",
       "label": "5k-warmup downstream control",
@@ -90,6 +91,7 @@
       "steps": 10000
     },
     {
+      "claim_label": "paper-inspired",
       "dependency": "afterany:10067",
       "job_id": "10068",
       "label": "20k-warmup downstream control",
@@ -165,13 +167,14 @@
       "predictions_exists": true,
       "predictions_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
       "squeue": {
-        "state": "squeue_error",
-        "stderr": "slurm_load_jobs error: Invalid job id specified"
+        "job_id": "10068",
+        "state": "not_in_squeue"
       },
       "stage2_token_presentations": 163840000,
       "steps": 10000
     },
     {
+      "claim_label": "paper-inspired",
       "dependency": "afterok:10070",
       "job_id": "10071",
       "label": "40k-warmup downstream control",

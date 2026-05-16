@@ -11,11 +11,11 @@ Pending: at least one controlled Stage-2 curve row lacks metrics or prediction t
 
 ## Rows
 
-| job | label | state | Stage-2 tokens | paper fraction | metrics | predictions | accuracy | delta vs FP16 | paired CI95 | passes gate | errors |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 10069 | 5k-warmup downstream control | not_in_squeue | 40960000 | 0.004096 | true | true | 0.616607 | -0.191544 | [-0.201893, -0.181194] | false |  |
-| 10068 | 20k-warmup downstream control | squeue_error | 163840000 | 0.016384 | true | true | 0.691187 | -0.116964 | [-0.126110, -0.107817] | false |  |
-| 10071 | 40k-warmup downstream control | PENDING | 327680000 | 0.032768 | false | false | - | - | - | false | missing checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl |
+| job | label | claim | state | Stage-2 tokens | paper fraction | metrics | predictions | accuracy | delta vs FP16 | paired CI95 | passes gate | errors |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 10069 | 5k-warmup downstream control | paper-inspired | not_in_squeue | 40960000 | 0.004096 | true | true | 0.616607 | -0.191544 | [-0.201893, -0.181194] | false |  |
+| 10068 | 20k-warmup downstream control | paper-inspired | not_in_squeue | 163840000 | 0.016384 | true | true | 0.691187 | -0.116964 | [-0.126110, -0.107817] | false |  |
+| 10071 | 40k-warmup downstream control | paper-inspired | PENDING | 327680000 | 0.032768 | false | false | - | - | - | false | missing checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl |
 
 ## Loss Components
 

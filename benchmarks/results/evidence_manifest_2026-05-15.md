@@ -2,9 +2,9 @@
 Artifacts: `284`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 14755 | 425537501aa4 |  |
-| current_research_plan_report | tracked_report | yes | 12159 | 7a0b7656d1b1 |  |
-| research_redirect_report | tracked_report | yes | 11367 | f3ffc42da781 |  |
+| README | tracked_report | yes | 14999 | 5a699ad72f56 |  |
+| current_research_plan_report | tracked_report | yes | 12557 | 004e81cca614 |  |
+| research_redirect_report | tracked_report | yes | 11597 | 34244df59d50 |  |
 | research_redirect_claims_report | tracked_report | yes | 2392 | 0a0d290f728d |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
 | benchmark_matrix_audit_report | tracked_report | yes | 2739 | baf684c33814 |  |
@@ -24,7 +24,7 @@ Artifacts: `284`. Missing: `0`.
 | bitdistill_stage2_curve_report | tracked_report | yes | 4201 | b735d1907cf2 |  |
 | bitdistill_stage2_curve_submission_report | tracked_report | yes | 1512 | 77354c56b3ed |  |
 | bitdistill_controlled_postprocess_submission_report | tracked_report | yes | 710 | 8e1b74096b71 |  |
-| bitdistill_controlled_curve_report | tracked_report | yes | 2481 | 9e84e8c0b03b |  |
+| bitdistill_controlled_curve_report | tracked_report | yes | 2547 | 7af53077e4a1 |  |
 | bitdistill_reproduction_gate_report | tracked_report | yes | 12908 | fa3178597d19 |  |
 | bitdistill_paired_predictions_report | tracked_report | yes | 8123 | c9107324629d |  |
 | bitdistill_task_formulation_report | tracked_report | yes | 11647 | cb03c36274ba |  |
@@ -69,7 +69,7 @@ Artifacts: `284`. Missing: `0`.
 | bitdistill_telemetry_fast_submission_report | tracked_report | yes | 2109 | 804cb1051565 |  |
 | bitdistill_gamma60_submission_report | tracked_report | yes | 1804 | 506b9fea2704 |  |
 | bitdistill_gamma60_diagnostic_report | tracked_report | yes | 1445 | 9e8c76f28a07 |  |
-| qwen3_paper_alignment_report | tracked_report | yes | 4206 | 4a053f87118f |  |
+| qwen3_paper_alignment_report | tracked_report | yes | 4498 | 0f48fe564506 |  |
 | qwen3_postprocess_submission_report | tracked_report | yes | 798 | 096508f537cf |  |
 | bitdistill_cpu_benchmark_report | tracked_report | yes | 10840 | dd84bc0eee97 |  |
 | bitdistill_cpu_gate_report | tracked_report | yes | 7636 | 7e27a5c68783 |  |
@@ -205,7 +205,7 @@ Artifacts: `284`. Missing: `0`.
 | bitdistill_stage2_curve_json | generic_json | yes | 20912 | 502368d7737b |  |
 | bitdistill_stage2_curve_submission_json | generic_json | yes | 2131 | ae9d0a82341e |  |
 | bitdistill_controlled_postprocess_submission_json | generic_json | yes | 341 | 0eece5b559b7 |  |
-| bitdistill_controlled_curve_json | generic_json | yes | 8777 | efbec706a9a3 |  |
+| bitdistill_controlled_curve_json | generic_json | yes | 8853 | b3370e088453 |  |
 | bitdistill_root_cause_audit_json | generic_json | yes | 11884 | 8d0c8b71d95f |  |
 | bitdistill_telemetry_coverage_json | generic_json | yes | 4568 | 4bb42ada4d90 |  |
 | bitdistill_training_dynamics_json | generic_json | yes | 4499 | a9cc8da23c48 |  |
@@ -236,7 +236,7 @@ Artifacts: `284`. Missing: `0`.
 | seqcls_native_mismatch_audit_json | generic_json | yes | 26269 | d2bc8823e18b |  |
 | seqcls_native_mismatch_audit_fp32_json | generic_json | yes | 26370 | 4c6eaf38f6e8 |  |
 | seqcls_native_batching_audit_json | generic_json | yes | 7034 | 0eb02b28ee84 |  |
-| qwen3_paper_alignment_json | generic_json | yes | 22236 | cff26042da6a |  |
+| qwen3_paper_alignment_json | generic_json | yes | 22914 | bdd8c5a5262a |  |
 | qwen3_postprocess_submission_json | generic_json | yes | 405 | aefafcfc80ef |  |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 32197 | c581499edff4 | present=34/36, examples=34, full_eval=34, ci95=34, paper_complete=True, paper_passed=False, row_complete=True, row_passed=False, confidence=0.95 |
 | bitnet_sft_baseline_audit_json | generic_json | yes | 48829 | 57c5584b4206 |  |

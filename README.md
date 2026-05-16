@@ -41,7 +41,7 @@ packed CPU path faithful to the trained checkpoint.
 | --- | --- | --- |
 | One-click arbitrary FP/BF16 to ternary conversion works | **No** | Qwen2.5-1.5B naive PTQ drops ten-task mean from `0.644169` to `0.348671`; WikiText PPL jumps from `13.901` to `3,813,121.803`. |
 | QAT/distillation can recover useful signal | **Partially** | Best dense row-scale QAT reaches ten-task mean `0.499459`, improving over naive PTQ by `+0.150788` paired mean accuracy but remaining `-0.144710` behind FP. |
-| BitDistill paper-level GLUE reproduction is complete | **No** | Local FP16-SFT MNLI is close to the paper anchor (`0.807641` vs `0.799100`), and CE-only BitNet-SFT now clears the paper BitNet-SFT anchor (`0.628935` vs `0.608000`), but BitDistill has not recovered to FP quality. |
+| BitDistill paper-level GLUE reproduction is complete | **No** | Local Qwen2.5 FP16-SFT MNLI is close to the paper anchor (`0.807641` vs `0.799100`), and a tensor-scale CE-only BitNet-SFT budget sweep can clear the weaker paper BitNet-SFT anchor (`0.628935` vs `0.608000`). That is not BitDistill recovery: controlled BitDistill and Qwen3 paper-alignment rows remain below FP quality. |
 | Row-scale semantics matter | **Yes** | TL2 one-scale relative output RMS error is `1.904230`; exact FP16 row scales reduce it to `0.000197`. |
 | Packed row-scale CPU inference works for compatible causal artifacts | **Yes, audited path only** | `I2_SR` Qwen2.5-1.5B row-scale run on Xeon Silver 4116: PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, file `1211.3 MiB`. |
 | Packed sequence-classification deployment is solved | **No, native plumbing only** | Native single-artifact `bitnet-qwen` GGUF classifier-head execution matches the sidecar path. A repaired 64-example MNLI CPU sample using direct token IDs reaches saved-PyTorch agreement `0.96875`, accuracy `0.59375`, and RSS `950.64 MiB`, but it is still sample-only and not product-ready. |
@@ -72,7 +72,7 @@ validation splits: MNLI `9815`, QNLI `5463`, SST2 `872`.
 | --- | ---: | ---: |
 | Qwen2.5-0.5B MNLI FP16-SFT | `0.807641` | `0.799100` |
 | Qwen2.5-0.5B MNLI BitNet-SFT default short run | `0.487621` | `0.608000` |
-| Qwen2.5-0.5B MNLI BitNet-SFT best completed budget row | `0.628935` | `0.608000` |
+| Qwen2.5-0.5B MNLI BitNet-SFT tensor schedule/budget sweep, best completed row | `0.628935` | `0.608000` |
 | Qwen2.5-0.5B controlled BitDistill, 40.96M Stage-2 tokens | `0.616607` | FP recovery target |
 | Qwen2.5-0.5B controlled BitDistill, 163.84M Stage-2 tokens | `0.691187` | FP recovery target |
 | Qwen2.5-0.5B gamma-60 diagnostic, matched 163.84M control | `0.738462` | improves over paper-gamma by `+0.047275`, still below FP |
@@ -82,11 +82,13 @@ validation splits: MNLI `9815`, QNLI `5463`, SST2 `872`.
 | Qwen3-0.6B-Base MNLI row BitDistill | `0.696179` | `retrofit-variant`; `-0.133571` paired delta vs local FP |
 
 The baseline problem has narrowed. Short CE-only BitNet-SFT was undertrained;
-the longer CE-only row clears the paper BitNet-SFT anchor. The remaining
-question is whether BitDistill-style continued pretraining and distillation can
-move toward the local FP16 task model. The completed gamma-60 diagnostic is
-evidence that loss normalization/update balance matters: it improves over the
-matched paper-gamma row but still misses FP recovery.
+the longer tensor-scale CE-only schedule/budget sweep clears the paper
+BitNet-SFT anchor on Qwen2.5 MNLI. That is only a baseline sanity check, not a
+BitDistill reproduction. The remaining question is whether BitDistill-style
+continued pretraining and distillation can move toward the local FP16 task
+model. The completed gamma-60 diagnostic is evidence that loss
+normalization/update balance matters: it improves over the matched paper-gamma
+row but still misses FP recovery.
 
 The Qwen3-0.6B-Base MNLI branch is also not a paper-level reproduction pass.
 Tensor BitDistill improves strongly over local BitNet-SFT, but it remains more
