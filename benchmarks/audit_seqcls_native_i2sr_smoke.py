@@ -8,6 +8,7 @@ import json
 import math
 import os
 import re
+import signal
 import subprocess
 import time
 from datetime import datetime, timezone
@@ -27,6 +28,31 @@ PROMPT_EVAL_RE = re.compile(
     r"prompt eval time =\s+(?P<ms>[0-9.]+) ms /\s+(?P<tokens>[0-9]+) tokens.*?"
     r"(?P<tps>[0-9.]+) tokens per second"
 )
+
+
+def run_clean(command: list[str], timeout: int) -> subprocess.CompletedProcess[str]:
+    proc = subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        start_new_session=True,
+    )
+    try:
+        stdout, stderr = proc.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        os.killpg(proc.pid, signal.SIGTERM)
+        try:
+            stdout, stderr = proc.communicate(timeout=10)
+        except subprocess.TimeoutExpired:
+            os.killpg(proc.pid, signal.SIGKILL)
+            stdout, stderr = proc.communicate()
+    finally:
+        try:
+            os.killpg(proc.pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+    return subprocess.CompletedProcess(command, proc.returncode, stdout, stderr)
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -168,7 +194,7 @@ def main() -> None:
         str(args.ctx_size),
     ]
     started = time.perf_counter()
-    completed = subprocess.run(command, check=False, capture_output=True, text=True, timeout=300)
+    completed = run_clean(command, timeout=300)
     elapsed = time.perf_counter() - started
     if completed.returncode == 0:
         logits = parse_stdout(completed.stdout)

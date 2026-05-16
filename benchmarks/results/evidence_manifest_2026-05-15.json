@@ -1,5 +1,5 @@
 {
-  "artifact_count": 270,
+  "artifact_count": 272,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "cc119bf9cd0c2c3b1daca63ea9989385433433e237afd411375445cb6fa88cce",
-      "size_bytes": 12449
+      "sha256": "37997ce8e21d8c3cd12658415711dbba45f2028506053134d5aa5114f04395a2",
+      "size_bytes": 12917
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "current_research_plan_report",
       "metrics": {},
       "path": "benchmarks/results/current_research_plan_2026-05-16.md",
-      "sha256": "b1ac4327f12ccf15a7b098c8b9dc0a0de27a4388bb95e986dc789010032d75bd",
-      "size_bytes": 10082
+      "sha256": "18efd1b1953463d0e9319048657d645a2f4d6fbe45455500754c707c6e8a45ff",
+      "size_bytes": 10353
     },
     {
       "exists": true,
@@ -403,8 +403,8 @@
       "label": "seqcls_runtime_gap_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_runtime_gap_2026-05-15.md",
-      "sha256": "438e5811ea291ae450bb6c1bd41b926e41af522f673f0abd89b0f0dc8e82cc43",
-      "size_bytes": 4086
+      "sha256": "4666375ef5df74b7d6752b26d8fec8d55fcbb1cfa892d9844d112aaf9a7fd759",
+      "size_bytes": 4597
     },
     {
       "exists": true,
@@ -493,8 +493,17 @@
       "label": "seqcls_native_i2sr_smoke_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_native_i2sr_smoke_2026-05-15.md",
-      "sha256": "9f21e058c801907d46c467adab54032d70122e7a9d3bd43da135b5f037537624",
+      "sha256": "cfc618f7b58677900c88064d824da8c7f25553e0a47d7c5cad9e161f5b555635",
       "size_bytes": 833
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "seqcls_native_i2sr_cpu_mnli16_report",
+      "metrics": {},
+      "path": "benchmarks/results/seqcls_native_i2sr_cpu_mnli_16_2026-05-15.md",
+      "sha256": "f085b1e9a42a07ae03bb5e42952b8fd455fcf4b7091accc353d061fe0f0cf8e3",
+      "size_bytes": 1100
     },
     {
       "exists": true,
@@ -817,8 +826,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "260f0f3aa32ae03c4dca1f9e866dfc3cc5935c5dcd79ee8d2eb79cd8b2a8ad1f",
-      "size_bytes": 12704
+      "sha256": "663ba2ff7e46f1f571e22a2db4a252c314b0951cb81c705c3b4509c35913f0ce",
+      "size_bytes": 13046
     },
     {
       "exists": true,
@@ -2568,13 +2577,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 94,
+        "check_count": 96,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "862eb6831c7e0f74232e38900b9628320ef91a6de004ef8580ed17bc0b0ccdfc",
-      "size_bytes": 19952
+      "sha256": "1de099d637e0f4edb481c40272b58b68a8c02a053874fc178a7800b9ad5e4f46",
+      "size_bytes": 20448
     },
     {
       "exists": true,
@@ -2785,8 +2794,8 @@
       "label": "seqcls_runtime_gap_json",
       "metrics": {},
       "path": "benchmark_results/seqcls_runtime_gap_2026-05-15.json",
-      "sha256": "eb7332a5f56f6992006db4a2c395b63866576f92a11be36409e8babd92911447",
-      "size_bytes": 14037
+      "sha256": "846041d858d727a7c020d8458ff448efa2f45bfcafa616df102e2f13e96e6534",
+      "size_bytes": 14536
     },
     {
       "exists": true,
@@ -2875,8 +2884,17 @@
       "label": "seqcls_native_i2sr_smoke_json",
       "metrics": {},
       "path": "benchmark_results/seqcls_native_i2sr_smoke_2026-05-15.json",
-      "sha256": "a6249ff56fb0da8c471cff6ebe9aa792805104f2b50dbfad5f74ea80ffac66c0",
-      "size_bytes": 5881
+      "sha256": "46567e78bc3ab519da6514d4ba2b878e01be1db7021ebac5278cb353f798f2b0",
+      "size_bytes": 5877
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "seqcls_native_i2sr_cpu_mnli16_json",
+      "metrics": {},
+      "path": "benchmark_results/seqcls_native_i2sr_cpu_mnli_16_2026-05-15.json",
+      "sha256": "952153d950e54727a449a7439a440567f51c26256646d47dfc4e96a7a85ca846",
+      "size_bytes": 10050
     },
     {
       "exists": true,

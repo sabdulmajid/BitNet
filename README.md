@@ -44,7 +44,7 @@ packed CPU path faithful to the trained checkpoint.
 | BitDistill paper-level GLUE reproduction is complete | **No** | Local FP16-SFT MNLI is close to the paper anchor (`0.807641` vs `0.799100`), and CE-only BitNet-SFT now clears the paper BitNet-SFT anchor (`0.628935` vs `0.608000`), but BitDistill has not recovered to FP quality. |
 | Row-scale semantics matter | **Yes** | TL2 one-scale relative output RMS error is `1.904230`; exact FP16 row scales reduce it to `0.000197`. |
 | Packed row-scale CPU inference works for compatible causal artifacts | **Yes, audited path only** | `I2_SR` Qwen2.5-1.5B row-scale run on Xeon Silver 4116: PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, file `1211.3 MiB`. |
-| Packed sequence-classification deployment is solved | **Smoke only, not product-ready** | Native single-artifact `bitnet-qwen` GGUF classifier-head execution now emits finite 3-way logits and matches the prior sidecar smoke logits with relative RMS delta `0.000000103`; full MNLI validation, batching parity, RSS, and throughput are still missing. |
+| Packed sequence-classification deployment is solved | **No, native plumbing only** | Native single-artifact `bitnet-qwen` GGUF classifier-head execution matches the prior sidecar smoke logits with relative RMS delta `0.000000103`, but a 16-example MNLI native CPU sample is `quality_mismatch`: accuracy `0.5625`, agreement with saved PyTorch predictions `0.875`. |
 | Kimi/MoE retrofit is proven | **No** | Tiny Qwen2MoE fixtures prove converter/runtime plumbing only. No trained MoE quality, Kimi mapping, expert-locality, or CPU product result is proven. |
 
 ## Key Results
@@ -110,7 +110,8 @@ not beat Q4_K_M on quality/storage for the current artifact.
 - A Qwen-compatible `bitnet-qwen` packed graph prototype for preserving Qwen
   SiLU/SwiGLU semantics and Q/K/V bias slots.
 - Native GGUF metadata and loader support for a dense Qwen sequence-classifier
-  head, currently proven only by a single-prompt smoke test.
+  head, currently proven only as plumbing; the first native MNLI CPU sample
+  still mismatches PyTorch predictions.
 - Explicit product gates that prevent fast but unusable artifacts from being
   reported as successful LLMs.
 
@@ -159,8 +160,8 @@ The next work is deliberately narrow:
 3. Keep paper-style tensor-scale BitDistill separate from row-scale
    `retrofit-variant` results.
 4. Close the product gap by upgrading the native sequence-classification smoke
-   into full validation, batching, RSS, and throughput measurements from the
-   same packed GGUF.
+   into a faithful evaluator; the first 16-example native sample is measurable
+   but mismatches PyTorch, so full validation would be premature.
 5. Keep MoE/Kimi as future work until the dense case is solved.
 
 Detailed current status and next steps are in
@@ -194,6 +195,9 @@ python benchmarks/audit_research_redirect_claims.py
 python benchmarks/audit_seqcls_runtime_gap.py
 python benchmarks/build_seqcls_runtime_implementation_plan.py
 python benchmarks/audit_seqcls_native_i2sr_smoke.py
+python benchmarks/benchmark_seqcls_native_i2sr_cpu.py --max-samples 16 \
+  --output-json benchmark_results/seqcls_native_i2sr_cpu_mnli_16_2026-05-15.json \
+  --output-md benchmarks/results/seqcls_native_i2sr_cpu_mnli_16_2026-05-15.md
 python benchmarks/audit_tl2_negative_result.py
 python benchmarks/audit_benchmark_coverage.py
 python benchmarks/build_evidence_manifest.py \
@@ -220,6 +224,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Sequence-classification runtime gap audit](benchmarks/results/seqcls_runtime_gap_2026-05-15.md)
 - [Sequence-classification runtime implementation plan](benchmarks/results/seqcls_runtime_implementation_plan_2026-05-15.md)
 - [Sequence-classification native I2_SR smoke](benchmarks/results/seqcls_native_i2sr_smoke_2026-05-15.md)
+- [Sequence-classification native I2_SR CPU sample](benchmarks/results/seqcls_native_i2sr_cpu_mnli_16_2026-05-15.md)
 - [CPU tradeoff frontier audit](benchmarks/results/cpu_tradeoff_frontier_2026-05-15.md)
 - [TL2 group-scale viability audit](benchmarks/results/tl2_group_scale_viability_2026-05-15.md)
 - [TL2 row-scale implementation plan](benchmarks/results/tl2_row_scale_implementation_plan_2026-05-15.md)

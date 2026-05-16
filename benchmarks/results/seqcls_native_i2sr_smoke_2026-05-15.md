@@ -11,7 +11,7 @@ This is a single-prompt native GGUF smoke test. It proves that the packed BitNet
 | sidecar prediction | 2 |
 | max abs logit delta | 0.000000 |
 | relative RMS logit delta | 0.000000 |
-| prompt tok/s | 128.050000 |
+| prompt tok/s | 265.900000 |
 | full validation complete | false |
 | ready to productize | false |
 

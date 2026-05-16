@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 94,
+  "check_count": 96,
   "failed": [],
   "checks": [
     {
@@ -398,7 +398,7 @@
     {
       "name": "Sequence-classification runtime gap is narrowed but not closed",
       "passed": true,
-      "evidence": "status=native_classifier_smoke_available_full_validation_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6",
+      "evidence": "status=native_classifier_sample_quality_mismatch_full_validation_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6",
       "blocker": ""
     },
     {
@@ -446,7 +446,19 @@
     {
       "name": "Sequence-classification native I2_SR smoke keeps product blocked",
       "passed": true,
-      "evidence": "full_validation=False, ready=False, prompt_tok_s=128.05",
+      "evidence": "full_validation=False, ready=False, prompt_tok_s=265.9",
+      "blocker": ""
+    },
+    {
+      "name": "Sequence-classification native I2_SR CPU sample records mismatch",
+      "passed": true,
+      "evidence": "status=quality_mismatch, examples=16, accuracy=0.5625, agreement=0.875",
+      "blocker": ""
+    },
+    {
+      "name": "Sequence-classification native I2_SR CPU sample keeps product blocked",
+      "passed": true,
+      "evidence": "full_validation=False, ready=False, examples_per_second=0.7098795621057228, rss_mib=952.37890625",
       "blocker": ""
     },
     {

@@ -189,6 +189,25 @@ def load_native_smoke(path: Path) -> dict[str, Any]:
     }
 
 
+def load_native_cpu_benchmark(path: Path) -> dict[str, Any]:
+    data = read_json(path)
+    summary = data.get("summary", {}) if isinstance(data.get("summary"), dict) else {}
+    runtime = data.get("runtime", {}) if isinstance(data.get("runtime"), dict) else {}
+    return {
+        "path": str(path),
+        "exists": path.exists(),
+        "status": data.get("status"),
+        "task": data.get("task"),
+        "examples": summary.get("examples"),
+        "accuracy": summary.get("accuracy"),
+        "agreement_with_saved_pytorch_predictions": summary.get("agreement_with_saved_pytorch_predictions"),
+        "examples_per_second": runtime.get("examples_per_second"),
+        "child_peak_rss_mib": runtime.get("child_peak_rss_mib"),
+        "full_validation_complete": data.get("full_validation_complete"),
+        "ready_to_productize": data.get("ready_to_productize"),
+    }
+
+
 def fmt(value: Any) -> str:
     if value is None:
         return "-"
@@ -228,11 +247,13 @@ def render_markdown(result: dict[str, Any]) -> str:
     hidden_contract = result["seqcls_hidden_contract"]
     arch_contract = result["seqcls_arch_contract"]
     native_smoke = result["seqcls_native_smoke"]
+    native_cpu = result["seqcls_native_cpu_benchmark"]
     headline_rows = [
         ["status", result["status"]],
         ["same artifact quality+CPU ready", result["same_artifact_quality_cpu_ready"]],
         ["sidecar prototype smoke", smoke["status"]],
         ["native GGUF classifier smoke", native_smoke["status"]],
+        ["native sampled CPU quality", native_cpu["status"]],
         ["sidecar sampled CPU quality", sidecar_cpu["status"]],
         ["sidecar hidden contract", hidden_contract["status"]],
         ["sidecar architecture contract", arch_contract["status"]],
@@ -303,6 +324,21 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["ready to productize", native_smoke["ready_to_productize"]],
                 ],
             ),
+            "## Native GGUF CPU Sample",
+            md_table(
+                ["field", "value"],
+                [
+                    ["status", native_cpu["status"]],
+                    ["task", native_cpu["task"]],
+                    ["examples", native_cpu["examples"]],
+                    ["accuracy", native_cpu["accuracy"]],
+                    ["agreement with saved PyTorch predictions", native_cpu["agreement_with_saved_pytorch_predictions"]],
+                    ["examples/sec", native_cpu["examples_per_second"]],
+                    ["child peak RSS MiB", native_cpu["child_peak_rss_mib"]],
+                    ["full validation complete", native_cpu["full_validation_complete"]],
+                    ["ready to productize", native_cpu["ready_to_productize"]],
+                ],
+            ),
             "## Causal Runtime Path",
             md_table(["architecture", "count"], causal_arch_rows),
             (
@@ -321,7 +357,7 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["Packed loader supports Qwen2 Q/K/V projection biases", "implemented via bitnet-qwen"],
                     ["GGUF writer persists classifier/score head tensors and label metadata", "single-prompt smoke implemented"],
                     ["llama.cpp pools and applies the Qwen sequence-classification head", "single-prompt smoke implemented"],
-                    ["CPU evaluator reports GLUE accuracy from the packed classifier artifact", "not implemented"],
+                    ["CPU evaluator reports GLUE accuracy from the packed classifier artifact", "sample implemented; quality mismatch"],
                     ["Quality, RSS, and throughput measured on the same deployed artifact", "blocked"],
                 ],
             ),
@@ -330,8 +366,9 @@ def render_markdown(result: dict[str, Any]) -> str:
                 "The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. "
                 "It now also has a prototype sequence-classification backbone path through `bitnet-qwen` I2_SR plus "
                 "an external dense head sidecar, and a native single-artifact GGUF smoke that matches the sidecar "
-                "logits for one prompt. This is still not a deployable classifier: full-split CPU quality, batching "
-                "parity, RSS, and throughput have not been measured on the native artifact."
+                "logits for one prompt. A small native CPU sample is measurable, but it currently disagrees with "
+                "saved PyTorch predictions enough to block product claims. Full-split CPU quality, batching parity, "
+                "RSS, and throughput have not been measured on a faithful native artifact."
             ),
         ]
     )
@@ -378,6 +415,11 @@ def main() -> None:
         type=Path,
         default=Path(f"benchmark_results/seqcls_native_i2sr_smoke_{DATE}.json"),
     )
+    parser.add_argument(
+        "--seqcls-native-cpu-benchmark",
+        type=Path,
+        default=Path(f"benchmark_results/seqcls_native_i2sr_cpu_mnli_16_{DATE}.json"),
+    )
     parser.add_argument("--llama-cpp", type=Path, default=Path("3rdparty/llama.cpp"))
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/seqcls_runtime_gap_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/seqcls_runtime_gap_{DATE}.md"))
@@ -399,6 +441,7 @@ def main() -> None:
     hidden_contract = load_hidden_contract(root / args.seqcls_hidden_contract)
     arch_contract = load_arch_contract(root / args.seqcls_arch_contract)
     native_smoke = load_native_smoke(root / args.seqcls_native_smoke)
+    native_cpu = load_native_cpu_benchmark(root / args.seqcls_native_cpu_benchmark)
     same_artifact_ready = (
         seqcls_summary["causal_export_compatible"] > 0
         and export_summary["exported"] > 0
@@ -406,6 +449,8 @@ def main() -> None:
     )
     if same_artifact_ready:
         status = "ready"
+    elif native_cpu.get("status") == "quality_mismatch":
+        status = "native_classifier_sample_quality_mismatch_full_validation_blocked"
     elif native_smoke["passed"]:
         status = "native_classifier_smoke_available_full_validation_blocked"
     elif (
@@ -432,6 +477,7 @@ def main() -> None:
         "seqcls_hidden_contract": hidden_contract,
         "seqcls_arch_contract": arch_contract,
         "seqcls_native_smoke": native_smoke,
+        "seqcls_native_cpu_benchmark": native_cpu,
         "exporter_rejects_non_causal": "architecture.endswith(\"ForCausalLM\")"
         in (root / "benchmarks/export_bitdistill_i2sr_suite.py").read_text(encoding="utf-8"),
         "llama_cpp": {

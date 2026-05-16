@@ -29,7 +29,7 @@ result.
 | Row-scale runtime contract matters | Proven by output audit | One-scale TL2 relative output RMS error `1.904230`; exact row scales `0.000197`. |
 | TL2 group/tile-scale compromise is enough | Rejected for strict fidelity | Best available fp16 group-scale row is `0.098692` relative output RMS; exact fp16 row scales are `0.000197`. |
 | `I2_SR` can preserve row-scale ternary semantics in packed CPU inference | Proven for compatible causal-LM artifacts | Qwen2.5-1.5B `I2_SR` runs on Xeon Silver 4116 with PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
-| Native packed sequence-classification product is solved | Smoke only, not product-ready | A single-artifact `bitnet-qwen` GGUF now carries the classifier head and matches the sidecar smoke logits with relative RMS delta `0.000000103`; full MNLI validation, batching parity, RSS, and throughput are still missing. |
+| Native packed sequence-classification product is solved | No, native plumbing only | A single-artifact `bitnet-qwen` GGUF carries the classifier head and matches the sidecar smoke logits with relative RMS delta `0.000000103`, but a 16-example native MNLI CPU sample is `quality_mismatch`: accuracy `0.5625`, agreement with saved PyTorch predictions `0.875`. |
 | Kimi/MoE product viability is proven | Not proven | Current MoE work is tiny-fixture plumbing only. |
 
 ## What Changed In The Research Question
@@ -134,8 +134,9 @@ absmean quantization in its baseline equations.
 The strongest quality path is sequence classification. The strongest packed
 runtime path was causal-LM `I2_SR`; the new `bitnet-qwen` native classifier
 smoke proves that a single GGUF can carry the dense classifier head and emit
-matching logits for one prompt. That is an implementation milestone, not a
-quality result.
+matching logits for one prompt. The first native MNLI CPU sample is measurable
+but not faithful enough: 16 examples, accuracy `0.5625`, saved-prediction
+agreement `0.875`.
 
 A credible product needs one artifact that carries both:
 
@@ -143,9 +144,9 @@ A credible product needs one artifact that carries both:
 quality evidence + CPU runtime evidence
 ```
 
-The next source-owned work is to run full MNLI from that same GGUF, prove
-batching parity, and measure RSS and throughput before promoting product
-claims.
+The next source-owned work is not a broad full split run yet. It is to explain
+the remaining native-vs-PyTorch mismatch, then rerun full MNLI only after the
+sample gate reaches high agreement.
 
 ## Next Decision Gates
 
@@ -199,7 +200,7 @@ Decision:
 ### Gate D: Runtime Product Path
 
 The deployable task formulation is now native packed sequence classification,
-but only at smoke-test maturity.
+but only at plumbing maturity.
 
 Current proof:
 
@@ -207,11 +208,13 @@ Current proof:
 single-prompt native GGUF logits match sidecar logits
 relative RMS delta: 0.000000103
 prompt eval:        finite single-prompt smoke timing only; not a benchmark
+16-example MNLI:    accuracy 0.5625, saved-prediction agreement 0.875
 ```
 
 Missing before product claims:
 
 ```text
+root-cause native-vs-PyTorch mismatch
 full MNLI validation
 batched inference parity
 RSS measurement
@@ -244,8 +247,8 @@ Decision:
    `paper-reproduction`, `paper-inspired`, or `retrofit-variant`.
 4. Do not run new broad sweeps until the controlled Stage-2 curve and gamma-60
    diagnostic are materialized.
-5. Upgrade the native seqcls smoke into a full same-artifact quality/runtime
-   benchmark, then keep MoE/Kimi in future work until dense Qwen has one
+5. Debug the native seqcls sample mismatch before running full same-artifact
+   validation, then keep MoE/Kimi in future work until dense Qwen has one
    deployed artifact.
 
 ## Publishable Framing
