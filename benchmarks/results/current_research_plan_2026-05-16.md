@@ -76,7 +76,10 @@ At the latest local check:
 | `10053` | `dualcard / ece-nebula10` | Qwen3 MNLI attention-layer sweep, layer `-8` | complete; accuracy `0.752012`; paired delta vs layer `-1` `+0.028528` |
 | `10054` | `dualcard / ece-nebula10` | Qwen3 MNLI attention-layer sweep, layer `-2` | complete; accuracy `0.717779`; paired delta vs layer `-1` `-0.005706` |
 | `10055` | `dualcard / ece-nebula10` | Qwen3 MNLI attention-layer sweep, layer `-4` | complete; accuracy `0.733367`; paired delta vs layer `-1` `+0.009883` |
-| `10070` | `dualcard / ece-nebula10` | controlled 327.68M Stage-2 row | running |
+| `10070` | `dualcard / ece-nebula10` | controlled 327.68M Stage-2 row | running; live health audit at step `29620/40000`, progress `0.740500`, latest CE `3.954908`, ETA `5.25h` at the committed 2026-05-16 audit point |
+| `10071` | `midcard / ece-nebula12` | 40k-warmup downstream control | pending on `afterok:10070`; no metrics or prediction trace yet |
+| `10072` | `midcard / ece-nebula12` | controlled postprocess | pending on `afterany:10067:10068:10069:10070:10071`; should materialize the controlled curve after producers terminate |
+| `10075` | `midcard / ece-nebula12` | telemetry diagnostic | pending on `afterany:10072` |
 | `10080` | `midcard / ece-nebula12` | calibrated diag-LS BitNet-SFT initializer benchmark | complete; negative transfer vs absmean, accuracy `0.350993` |
 | `10083` | `midcard / ece-nebula12` | native single-artifact MNLI full validation in safe prompt-batch-size-1 mode | complete; accuracy `0.652165`, saved-PyTorch agreement `0.976668`, `2.724140` examples/sec, RSS `1021.296875 MiB`, product-ready `false` |
 
@@ -208,7 +211,7 @@ Finish the fixed-recipe tensor-scale rows:
 | ---: | --- |
 | `40.96M` | complete, MNLI `0.616607` |
 | `163.84M` | complete, MNLI `0.691187` |
-| `327.68M` | pending |
+| `327.68M` | live Stage-2 warm-up `10070` is healthy but incomplete; downstream job `10071` has no metrics yet |
 
 Decision:
 
@@ -299,8 +302,9 @@ Decision:
 
 ## Immediate Work Plan
 
-1. Postprocess jobs `10070` and `10080` when they
-   finish. Commit only audited JSON/Markdown, not raw log assumptions.
+1. Let `10070` finish, then let dependent jobs `10071`, `10072`, and `10075`
+   materialize the 327.68M controlled row and telemetry. Commit only audited
+   JSON/Markdown, not raw log assumptions.
 2. Keep the top-level README as a claim ledger, not a dense experiment dump.
 3. Update reports with a strict label on every row:
    `paper-reproduction`, `paper-inspired`, or `retrofit-variant`.

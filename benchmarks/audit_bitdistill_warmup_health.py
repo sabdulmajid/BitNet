@@ -261,13 +261,22 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         monitor_agrees = (not monitor_job_id or monitor_job_id == job_id) and (
             not monitor_log_path or Path(monitor_log_path).resolve() == log_path.resolve()
         )
+        explicit_log_override = args.log_path is not None
         add_check(
             checks,
             "monitor identifies same warm-up job",
-            monitor_agrees,
-            f"monitor_job={monitor_job_id or '-'}, parsed_job={job_id or '-'}",
+            monitor_agrees or explicit_log_override,
+            (
+                f"monitor_job={monitor_job_id or '-'}, parsed_job={job_id or '-'}, "
+                f"explicit_log_override={explicit_log_override}"
+            ),
             "The monitor JSON points at a different warm-up job or log path.",
         )
+        if explicit_log_override and not monitor_agrees:
+            warnings.append(
+                "The monitor JSON points at a different warm-up job, but an explicit log path was supplied; "
+                "the explicit log is treated as authoritative for this live health audit."
+            )
 
     if save_every_steps <= 0 and not final_exists:
         warnings.append("SAVE_EVERY_STEPS is 0 and no final state exists yet; a job failure would lose current warm-up progress.")

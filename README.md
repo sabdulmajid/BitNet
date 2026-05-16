@@ -170,7 +170,9 @@ with active work on `i2sr-row-scale-runtime`.
 The next work is deliberately narrow:
 
 1. Finish and postprocess the controlled Qwen2.5-0.5B MNLI Stage-2 token-budget
-   curve.
+   curve. The 327.68M-token Stage-2 producer is still running in the latest
+   live audit; downstream metrics are not claimed until its dependent jobs
+   finish and the controlled curve report materializes prediction traces.
 2. Audit BitDistill loss/update balance, especially attention-KD normalization
    and gamma scaling.
 3. Keep paper-style tensor-scale BitDistill separate from row-scale
@@ -251,6 +253,9 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 ## Primary Reports
 
 - [Current Research Plan](benchmarks/results/current_research_plan_2026-05-16.md)
+- [Live Stage-2 warm-up health](benchmarks/results/bitdistill_warmup_health_2026-05-16.md)
+- [Stage-2 budget curve, current pending row](benchmarks/results/bitdistill_stage2_curve_2026-05-16.md)
+- [Controlled Stage-2 curve, current pending row](benchmarks/results/bitdistill_controlled_curve_2026-05-16.md)
 - [Research redirect](benchmarks/results/research_redirect_2026-05-15.md)
 - [Research redirect claim gate](benchmarks/results/research_redirect_claims_2026-05-15.md)
 - [Qwen side-by-side summary](benchmarks/results/qwen_side_by_side_2026-05-15.md)

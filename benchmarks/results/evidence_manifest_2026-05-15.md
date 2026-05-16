@@ -1,9 +1,12 @@
 # Evidence Manifest, 2026-05-15
-Artifacts: `297`. Missing: `0`.
+Artifacts: `300`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 18823 | 0c705fd430fc |  |
-| current_research_plan_report | tracked_report | yes | 16889 | 31cbfbe43d14 |  |
+| README | tracked_report | yes | 19345 | 67d13846a349 |  |
+| current_research_plan_report | tracked_report | yes | 17605 | 0ac4c01e15b2 |  |
+| bitdistill_live_warmup_health_report | tracked_report | yes | 1964 | e727411550af |  |
+| bitdistill_stage2_curve_current_report | tracked_report | yes | 4201 | 4e21073b79f9 |  |
+| bitdistill_controlled_curve_current_report | tracked_report | yes | 2547 | a52b591358e5 |  |
 | research_redirect_report | tracked_report | yes | 14112 | c08964dc39df |  |
 | research_redirect_claims_report | tracked_report | yes | 2419 | 67224a5a5ebf |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |

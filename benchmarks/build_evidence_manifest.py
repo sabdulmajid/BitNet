@@ -39,6 +39,21 @@ ARTIFACTS: list[dict[str, str]] = [
         "kind": "tracked_report",
         "path": "benchmarks/results/current_research_plan_2026-05-16.md",
     },
+    {
+        "label": "bitdistill_live_warmup_health_report",
+        "kind": "tracked_report",
+        "path": "benchmarks/results/bitdistill_warmup_health_2026-05-16.md",
+    },
+    {
+        "label": "bitdistill_stage2_curve_current_report",
+        "kind": "tracked_report",
+        "path": "benchmarks/results/bitdistill_stage2_curve_2026-05-16.md",
+    },
+    {
+        "label": "bitdistill_controlled_curve_current_report",
+        "kind": "tracked_report",
+        "path": "benchmarks/results/bitdistill_controlled_curve_2026-05-16.md",
+    },
     {"label": "research_redirect_report", "kind": "tracked_report", "path": f"benchmarks/results/research_redirect_{DATE}.md"},
     {"label": "research_redirect_claims_report", "kind": "tracked_report", "path": f"benchmarks/results/research_redirect_claims_{DATE}.md"},
     {"label": "side_by_side_report", "kind": "tracked_report", "path": f"benchmarks/results/qwen_side_by_side_{DATE}.md"},

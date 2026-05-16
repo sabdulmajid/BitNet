@@ -1,0 +1,154 @@
+{
+  "checks": [
+    {
+      "blocker": "",
+      "evidence": "logs/bitdistill-glue-10070.out",
+      "name": "warm-up log exists",
+      "passed": true
+    },
+    {
+      "blocker": "",
+      "evidence": "observations=2963, required=10",
+      "name": "warm-up has enough observations",
+      "passed": true
+    },
+    {
+      "blocker": "",
+      "evidence": "first=1, latest=29620, observations=2963",
+      "name": "step numbers are strictly increasing",
+      "passed": true
+    },
+    {
+      "blocker": "",
+      "evidence": "nonfinite=0, latest_ce=3.954908",
+      "name": "CE values are finite",
+      "passed": true
+    },
+    {
+      "blocker": "",
+      "evidence": "latest=29620, max_steps=40000, progress=0.7405",
+      "name": "latest progress is within target",
+      "passed": true
+    },
+    {
+      "blocker": "",
+      "evidence": "age_seconds=2.3",
+      "name": "log is fresh while job is active",
+      "passed": true
+    },
+    {
+      "blocker": "",
+      "evidence": "seconds_per_step=1.8225286968264687, eta_seconds=18917.847873058745",
+      "name": "ETA is finite",
+      "passed": true
+    },
+    {
+      "blocker": "",
+      "evidence": "monitor_job=9894, parsed_job=10070, explicit_log_override=True",
+      "name": "monitor identifies same warm-up job",
+      "passed": true
+    }
+  ],
+  "date": "2026-05-16",
+  "env": {
+    "ACTIVATION_QUANTIZATION": "1",
+    "ATTENTION_KD_WEIGHT": "100.0",
+    "ATTENTION_SPLIT_HEADS": "8",
+    "ATTENTION_TEMPERATURE": "1.0",
+    "CANDIDATE_SCORE": "sum",
+    "DISTILL_LAYER": "-1",
+    "EXCLUDE_LINEAR_REGEX": "score|classifier",
+    "GRAD_ACCUM_STEPS": "4",
+    "INIT_OUTPUT_HEAD_FROM_TEACHER": "0",
+    "INIT_STATE_DICT": "none",
+    "LABEL_SCHEME": "words",
+    "LOGIT_KD_TEMPERATURE_SCALE": "none",
+    "LOGIT_KD_WEIGHT": "10.0",
+    "LOGIT_TEMPERATURE": "5.0",
+    "LR": "2e-5",
+    "MAX_SEQ_LEN": "512",
+    "MAX_STEPS": "40000",
+    "METHOD": "bitdistill",
+    "MODEL": "Qwen/Qwen2.5-0.5B",
+    "MODEL_SLUG": "Qwen-Qwen2.5-0.5B",
+    "OUTPUT_DIR": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-40k",
+    "PER_DEVICE_BATCH_SIZE": "4",
+    "SAVE_EVERY_STEPS": "10000",
+    "SAVE_MODEL_ARTIFACTS": "0",
+    "SCALE_MODE": "tensor",
+    "SLURM_JOB_ID": "10070",
+    "STAGE": "continued_pretrain",
+    "TASK_FORMAT": "sequence_classification",
+    "TASK_NAME": "mnli",
+    "TEACHER_MODEL": "none",
+    "USE_SUBLN": "1"
+  },
+  "eta_seconds": 18917.847873058745,
+  "failed": [],
+  "final_state": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-40k/custom_state_dict.pt",
+  "final_state_exists": false,
+  "first_step": {
+    "ce": 12.656072,
+    "elapsed_seconds": 1.9,
+    "lr": 2e-07,
+    "step": 1
+  },
+  "first_window": {
+    "count": 100,
+    "max": 12.656072,
+    "mean": 5.93411111,
+    "min": 4.973175,
+    "std": 0.9474269176748558
+  },
+  "job_id": "10070",
+  "last_minus_first_ce_mean": -2.00163295,
+  "last_window": {
+    "count": 100,
+    "max": 4.506945,
+    "mean": 3.93247816,
+    "min": 3.474982,
+    "std": 0.23068672444849186
+  },
+  "latest_snapshot": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-40k/checkpoint-20000",
+  "latest_step": {
+    "ce": 3.954908,
+    "elapsed_seconds": 53983.3,
+    "lr": 4.842e-06,
+    "step": 29620
+  },
+  "log_age_seconds": 2.31807804107666,
+  "log_path": "logs/bitdistill-glue-10070.out",
+  "max_steps": 40000,
+  "monitor_json": "benchmark_results/bitdistill_job_monitor_2026-05-15.json",
+  "monitor_warmup_path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/logs/bitdistill-glue-9894.out",
+  "observations": 2963,
+  "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-40k",
+  "passed": true,
+  "progress": 0.7405,
+  "save_every_steps": 10000,
+  "schema": "bitdistill-warmup-health-v1",
+  "script_provenance": {
+    "current_script": "slurm_bitdistill_glue.sh",
+    "current_script_has_snapshot_guard": true,
+    "current_sha256": "6e86e849d5febc7d8583113d346aacba68f96e7db1a38876fad5d2e965c67a6e",
+    "stored_script_available": true,
+    "stored_script_error": "",
+    "stored_script_has_snapshot_guard": true,
+    "stored_script_matches_current": false,
+    "stored_sha256": "33dc357be7c44b461cdfc4a40f46f235d325a4898463b6090c8b819c749c0e76"
+  },
+  "seconds_per_step": 1.8225286968264687,
+  "snapshot_count": 2,
+  "squeue": {
+    "elapsed": "15:05:09",
+    "job_id": "10070",
+    "node_or_reason": "ece-nebula10",
+    "state": "RUNNING",
+    "time_limit": "1-00:00:00"
+  },
+  "warning_count": 2,
+  "warnings": [
+    "The monitor JSON points at a different warm-up job, but an explicit log path was supplied; the explicit log is treated as authoritative for this live health audit.",
+    "The running warm-up was submitted from an older batch script than the current checked-in launcher; current future launches have stricter snapshot guards, but this active job retains its submitted script."
+  ]
+}

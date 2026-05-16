@@ -1,5 +1,5 @@
 {
-  "artifact_count": 297,
+  "artifact_count": 300,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "0c705fd430fc75d23b5ea92613512e1db725205b7ba186886eea225c5e80fc36",
-      "size_bytes": 18823
+      "sha256": "67d13846a349e3faf82087676373e2182ac206db952d9980769c42b0a01a091a",
+      "size_bytes": 19345
     },
     {
       "exists": true,
@@ -16,8 +16,35 @@
       "label": "current_research_plan_report",
       "metrics": {},
       "path": "benchmarks/results/current_research_plan_2026-05-16.md",
-      "sha256": "31cbfbe43d14babf56e2fcc916a8adfd357c112a5565210ba8407fb337096364",
-      "size_bytes": 16889
+      "sha256": "0ac4c01e15b2e743dce770d91943ae07021f90ef042afbe236ac86cec0dea294",
+      "size_bytes": 17605
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_live_warmup_health_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_warmup_health_2026-05-16.md",
+      "sha256": "e727411550af082fcc531dcc0f2e82df5a4fdf5ec3b399b17d1fb03f930b50d9",
+      "size_bytes": 1964
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_stage2_curve_current_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_stage2_curve_2026-05-16.md",
+      "sha256": "4e21073b79f99cf08efe45e508672ad8f55143d2b1b7c8d70c1c022b90efb237",
+      "size_bytes": 4201
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitdistill_controlled_curve_current_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitdistill_controlled_curve_2026-05-16.md",
+      "sha256": "a52b591358e547f2c84cbbcd3b06e23b9aa1a9512b2eb3c3cea32dbada94ce31",
+      "size_bytes": 2547
     },
     {
       "exists": true,
