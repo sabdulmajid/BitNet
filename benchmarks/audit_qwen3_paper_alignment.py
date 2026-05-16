@@ -327,6 +327,56 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                 },
             }
         )
+    attention_layer_comparisons: list[dict[str, Any]] = []
+    for task in sorted(EXPECTED_EXAMPLES):
+        expected = EXPECTED_EXAMPLES[task]
+        baseline_rows = [
+            row
+            for row in rows
+            if row["task"] == task
+            and row["method"] == "bitdistill"
+            and row["scale"] == "tensor"
+            and row["phase"] == "paper_baseline"
+            and row["layer"] == "-1"
+            and row["complete"]
+        ]
+        if not baseline_rows:
+            continue
+        baseline = baseline_rows[0]
+        sweep_rows = sorted(
+            [
+                row
+                for row in rows
+                if row["task"] == task
+                and row["method"] == "bitdistill"
+                and row["scale"] == "tensor"
+                and row["phase"] == "attention_layer_sweep"
+                and row["complete"]
+            ],
+            key=lambda item: str(item["layer"]),
+        )
+        for sweep in sweep_rows:
+            paired = compare_predictions(Path(baseline["predictions_path"]), Path(sweep["predictions_path"]), expected)
+            attention_layer_comparisons.append(
+                {
+                    "task": task,
+                    "baseline_layer": baseline["layer"],
+                    "candidate_layer": sweep["layer"],
+                    "baseline_accuracy": baseline["accuracy"],
+                    "candidate_accuracy": sweep["accuracy"],
+                    "paired": {
+                        "status": paired.get("status"),
+                        "matched": paired.get("matched"),
+                        "delta_candidate_minus_baseline": paired.get("delta_vs_fp"),
+                        "ci95": paired.get("ci95"),
+                        "baseline_only": paired.get("fp_only"),
+                        "candidate_only": paired.get("candidate_only"),
+                        "both_correct": paired.get("both_correct"),
+                        "both_wrong": paired.get("both_wrong"),
+                        "errors": paired.get("errors", []),
+                    },
+                }
+            )
     return {
         "schema": "qwen3-paper-alignment-audit-v1",
         "date": DATE,
@@ -341,6 +391,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "tensor_bitdistill_complete_tasks": tensor_bitdistill_complete,
         "row_bitdistill_complete_tasks": row_bitdistill_complete,
         "scale_comparisons": scale_comparisons,
+        "attention_layer_comparisons": attention_layer_comparisons,
         "gap_pass_count": len(gap_pass_rows),
         "paper_reproduction_ready": (
             set(fp_complete) == set(EXPECTED_EXAMPLES)
@@ -396,6 +447,19 @@ def render_markdown(summary: dict[str, Any]) -> str:
         ]
         for row in summary.get("scale_comparisons", [])
     ]
+    attention_table = [
+        [
+            row["task"],
+            row["baseline_layer"],
+            row["candidate_layer"],
+            row["baseline_accuracy"],
+            row["candidate_accuracy"],
+            row["paired"].get("delta_candidate_minus_baseline"),
+            row["paired"].get("ci95"),
+            row["paired"].get("matched"),
+        ]
+        for row in summary.get("attention_layer_comparisons", [])
+    ]
     status = "ready" if summary["paper_reproduction_ready"] else "pending"
     sections = [
         f"# Qwen3 Paper-Alignment Audit, {summary['date']}",
@@ -414,6 +478,25 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 md_table(
                     ["task", "tensor accuracy", "row accuracy", "row minus tensor", "CI95", "matched"],
                     scale_table,
+                ),
+            ]
+        )
+    if attention_table:
+        sections.extend(
+            [
+                "## Attention-Layer Sweep",
+                md_table(
+                    [
+                        "task",
+                        "baseline layer",
+                        "candidate layer",
+                        "baseline accuracy",
+                        "candidate accuracy",
+                        "candidate minus baseline",
+                        "CI95",
+                        "matched",
+                    ],
+                    attention_table,
                 ),
             ]
         )
