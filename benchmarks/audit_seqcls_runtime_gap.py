@@ -206,6 +206,7 @@ def load_native_cpu_benchmark(path: Path) -> dict[str, Any]:
         "child_peak_rss_mib": runtime.get("child_peak_rss_mib"),
         "full_validation_complete": data.get("full_validation_complete"),
         "ready_to_productize": data.get("ready_to_productize"),
+        "batching_parity_ready": data.get("batching_parity_ready"),
     }
 
 
@@ -270,6 +271,7 @@ def render_markdown(result: dict[str, Any]) -> str:
         ["sidecar prototype smoke", smoke["status"]],
         ["native GGUF classifier smoke", native_smoke["status"]],
         ["native sampled CPU quality", native_cpu["status"]],
+        ["native CPU benchmark path", native_cpu["path"]],
         ["sidecar sampled CPU quality", sidecar_cpu["status"]],
         ["sidecar hidden contract", hidden_contract["status"]],
         ["sidecar architecture contract", arch_contract["status"]],
@@ -344,6 +346,7 @@ def render_markdown(result: dict[str, Any]) -> str:
             md_table(
                 ["field", "value"],
                 [
+                    ["path", native_cpu["path"]],
                     ["status", native_cpu["status"]],
                     ["task", native_cpu["task"]],
                     ["prompt input", native_cpu["prompt_input"]],
@@ -353,6 +356,7 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["examples/sec", native_cpu["examples_per_second"]],
                     ["child peak RSS MiB", native_cpu["child_peak_rss_mib"]],
                     ["full validation complete", native_cpu["full_validation_complete"]],
+                    ["batching parity ready", native_cpu["batching_parity_ready"]],
                     ["ready to productize", native_cpu["ready_to_productize"]],
                 ],
             ),
@@ -449,7 +453,7 @@ def main() -> None:
     parser.add_argument(
         "--seqcls-native-cpu-benchmark",
         type=Path,
-        default=Path(f"benchmark_results/seqcls_native_i2sr_cpu_mnli_64_token_ids_{DATE}.json"),
+        default=None,
     )
     parser.add_argument(
         "--seqcls-native-batching-audit",
@@ -477,7 +481,14 @@ def main() -> None:
     hidden_contract = load_hidden_contract(root / args.seqcls_hidden_contract)
     arch_contract = load_arch_contract(root / args.seqcls_arch_contract)
     native_smoke = load_native_smoke(root / args.seqcls_native_smoke)
-    native_cpu = load_native_cpu_benchmark(root / args.seqcls_native_cpu_benchmark)
+    if args.seqcls_native_cpu_benchmark is None:
+        full_native_cpu = root / f"benchmark_results/seqcls_native_i2sr_cpu_mnli_full_token_ids_{DATE}.json"
+        sample_native_cpu = root / f"benchmark_results/seqcls_native_i2sr_cpu_mnli_64_token_ids_{DATE}.json"
+        native_cpu_path = full_native_cpu if full_native_cpu.exists() else sample_native_cpu
+    else:
+        native_cpu_path = args.seqcls_native_cpu_benchmark
+        native_cpu_path = native_cpu_path if native_cpu_path.is_absolute() else root / native_cpu_path
+    native_cpu = load_native_cpu_benchmark(native_cpu_path)
     native_batching = load_native_batching_audit(root / args.seqcls_native_batching_audit)
     same_artifact_ready = (
         seqcls_summary["causal_export_compatible"] > 0

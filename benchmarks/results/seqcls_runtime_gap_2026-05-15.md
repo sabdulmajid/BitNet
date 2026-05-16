@@ -9,6 +9,7 @@ This audit separates the best GLUE quality path from the packed CPU runtime path
 | sidecar prototype smoke | prototype_smoke_passed |
 | native GGUF classifier smoke | pass |
 | native sampled CPU quality | sample_only |
+| native CPU benchmark path | /mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/seqcls_native_i2sr_cpu_mnli_64_token_ids_2026-05-15.json |
 | sidecar sampled CPU quality | quality_mismatch |
 | sidecar hidden contract | hidden_contract_mismatch |
 | sidecar architecture contract | bitnet_qwen_contract_available |
@@ -74,6 +75,7 @@ These checkpoints are the strict GLUE reproduction artifacts. They use `Qwen2For
 
 | field | value |
 | --- | --- |
+| path | /mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/seqcls_native_i2sr_cpu_mnli_64_token_ids_2026-05-15.json |
 | status | sample_only |
 | task | mnli |
 | prompt input | token_ids |
@@ -83,6 +85,7 @@ These checkpoints are the strict GLUE reproduction artifacts. They use `Qwen2For
 | examples/sec | 0.717335 |
 | child peak RSS MiB | 950.640625 |
 | full validation complete | false |
+| batching parity ready | - |
 | ready to productize | false |
 
 ## Native GGUF Batching Audit

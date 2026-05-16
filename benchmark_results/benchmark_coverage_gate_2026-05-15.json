@@ -500,7 +500,7 @@
     {
       "name": "Sequence-classification native full CPU progress is resumable",
       "passed": true,
-      "evidence": "status=partial, completed=650, contiguous=True, product=False",
+      "evidence": "status=partial, completed=795, contiguous=True, product=False",
       "blocker": ""
     },
     {

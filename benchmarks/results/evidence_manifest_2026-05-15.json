@@ -403,8 +403,8 @@
       "label": "seqcls_runtime_gap_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_runtime_gap_2026-05-15.md",
-      "sha256": "861cfa31830f361cda29e0a146e683710659782b8401759882c17e8248e7fe43",
-      "size_bytes": 5256
+      "sha256": "d6f4f9ad5a1234d8ee210800787957c5ca3b01e50598e0a7925af6f6a50d3a09",
+      "size_bytes": 5559
     },
     {
       "exists": true,
@@ -898,7 +898,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "b7e83f1ef7cd89cfa3ccd52ae942e3ce376d58da303b26e6f934cc25d74ad6ac",
+      "sha256": "c4369db44be0e3013e059c89ffd4c505931b1000fecfb2293f822d9abd18c211",
       "size_bytes": 14239
     },
     {
@@ -2654,7 +2654,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "c6bee8a50c0363e61b974275824ed1d6a037ac7146b947e065b6dc8066fa48b1",
+      "sha256": "fdb32a1f0747f365bff6bab9ffa544aac7429e85d3b39b1dff06fbaa53303f8a",
       "size_bytes": 22181
     },
     {
@@ -2866,8 +2866,8 @@
       "label": "seqcls_runtime_gap_json",
       "metrics": {},
       "path": "benchmark_results/seqcls_runtime_gap_2026-05-15.json",
-      "sha256": "f8c9815db32a5cc16e0e99e283be18634fd8ad06fe9b75862ee11833cee207e7",
-      "size_bytes": 14961
+      "sha256": "1ac312182a861d00ad7515d0c4dffca17962ca5c0d17b87c13ed0c6d30a8feab",
+      "size_bytes": 14996
     },
     {
       "exists": true,

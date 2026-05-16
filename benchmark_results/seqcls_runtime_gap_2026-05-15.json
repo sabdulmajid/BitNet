@@ -316,6 +316,7 @@
   "seqcls_native_cpu_benchmark": {
     "accuracy": 0.59375,
     "agreement_with_saved_pytorch_predictions": 0.96875,
+    "batching_parity_ready": null,
     "child_peak_rss_mib": 950.640625,
     "examples": 64,
     "examples_per_second": 0.7173345972905404,

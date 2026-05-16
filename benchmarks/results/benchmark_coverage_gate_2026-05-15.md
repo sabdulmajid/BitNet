@@ -86,7 +86,7 @@ Overall status: **PASS**.
 | Sequence-classification native mismatch audit isolates runtime drift | pass | status=runtime_hidden_drift, token_ids=True, text_roundtrip=False, native_sidecar=True |  |
 | Sequence-classification native batching audit blocks batched throughput | pass | status=batching_parity_mismatch, invariant=False, changed=4, ready=False |  |
 | Sequence-classification native batching audit diagnoses non-swap drift | pass | diagnosis=position_dependent_drift_not_row_swap, nearest_self=True, drifted=4 |  |
-| Sequence-classification native full CPU progress is resumable | pass | status=partial, completed=650, contiguous=True, product=False |  |
+| Sequence-classification native full CPU progress is resumable | pass | status=partial, completed=795, contiguous=True, product=False |  |
 | Qwen3 paper-alignment audit tracks required GLUE rows | pass | jobs=16, complete=15, ready=False |  |
 | FP F16 CPU row is finite | pass | ppl=12.2808, prefill=114.468162, decode=5.555998 |  |
 | FP Q8_0 CPU row is finite | pass | ppl=12.3056, prefill=124.864246, decode=10.131914 |  |

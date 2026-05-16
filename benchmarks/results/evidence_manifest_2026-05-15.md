@@ -46,7 +46,7 @@ Artifacts: `287`. Missing: `0`.
 | bitnet_sft_diag_ls_init_submission_report | tracked_report | yes | 1587 | b30a9fe27efc |  |
 | bitnet_sft_diag_ls_init_submission_table | tracked_report | yes | 472 | 06ac894c4524 |  |
 | bitnet_sft_diag_ls_init_audit_report | tracked_report | yes | 1022 | c6852f01ea66 |  |
-| seqcls_runtime_gap_report | tracked_report | yes | 5256 | 861cfa31830f |  |
+| seqcls_runtime_gap_report | tracked_report | yes | 5559 | d6f4f9ad5a12 |  |
 | seqcls_backbone_i2sr_smoke_report | tracked_report | yes | 1655 | 0bf9e8770821 |  |
 | seqcls_backbone_i2sr_qwen_conversion_json | generic_json | yes | 2134 | 2456fe0b65fa |  |
 | seqcls_i2sr_sidecar_cpu_mnli64_report | tracked_report | yes | 920 | ac54bd3d3a18 |  |
@@ -101,7 +101,7 @@ Artifacts: `287`. Missing: `0`.
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 1824 | 5d992b3c9a1c |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 14239 | b7e83f1ef7cd |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 14239 | c4369db44be0 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2569 | 51da6738be9d |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -198,7 +198,7 @@ Artifacts: `287`. Missing: `0`.
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
 | benchmark_matrix_audit_json | generic_json | yes | 16721 | d93ae3f74ea3 |  |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 22181 | c6bee8a50c03 | passed=True, checks=103, failed=0 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 22181 | fdb32a1f0747 | passed=True, checks=103, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | bb6912119dfc | achieved=False, status=not_complete, complete=7/9, open=2 |
 | original_benchmark_objective_audit_json | generic_json | yes | 4278 | 2916929b09b3 |  |
 | product_scope_gate_json | product_scope_gate_json | yes | 5770 | d0101b25bd20 | scope=research_mvp_only, supported=5, unsupported=4 |
@@ -220,7 +220,7 @@ Artifacts: `287`. Missing: `0`.
 | bitnet_sft_ls_init_audit_json | generic_json | yes | 3127 | 0e0ed7e987de |  |
 | bitnet_sft_diag_ls_init_submission_json | generic_json | yes | 1170 | f36ba408a674 |  |
 | bitnet_sft_diag_ls_init_audit_json | generic_json | yes | 3533 | 113cb30cfa6a |  |
-| seqcls_runtime_gap_json | generic_json | yes | 14961 | f8c9815db32a |  |
+| seqcls_runtime_gap_json | generic_json | yes | 14996 | 1ac312182a86 |  |
 | seqcls_backbone_i2sr_smoke_json | generic_json | yes | 22648 | 5851d3f13f36 |  |
 | seqcls_i2sr_sidecar_cpu_mnli64_json | generic_json | yes | 4875 | 70048e13bc76 |  |
 | seqcls_i2sr_sidecar_cpu_mnli128_json | generic_json | yes | 5397 | 43bdb0c81ad2 |  |
