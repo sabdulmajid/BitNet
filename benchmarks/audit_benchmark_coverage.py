@@ -728,6 +728,47 @@ def audit_second_order_ternary_init(root: Path, checks: list[dict[str, Any]]) ->
     )
 
 
+def audit_bitnet_sft_ls_init_submission(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/bitnet_sft_ls_init_submission_{DATE}.json"
+    if not path.exists():
+        add_check(
+            checks,
+            "BitNet-SFT LS-init submission exists",
+            False,
+            str(path.relative_to(root)),
+            "missing BitNet-SFT LS-init submission record",
+        )
+        return
+    data = read_json(path)
+    add_check(
+        checks,
+        "BitNet-SFT LS-init submission changes only initializer",
+        data.get("status") == "submitted"
+        and data.get("changed_axis") == "ternary_init_mode_only"
+        and data.get("ternary_init_mode") == "ls"
+        and data.get("method") == "bitnet_sft"
+        and data.get("task") == "mnli",
+        (
+            f"status={data.get('status')}, changed_axis={data.get('changed_axis')}, "
+            f"init={data.get('ternary_init_mode')}, method={data.get('method')}, task={data.get('task')}"
+        ),
+        "LS-init submission should be a controlled MNLI BitNet-SFT initializer-only comparison",
+    )
+    add_check(
+        checks,
+        "BitNet-SFT LS-init submission has matched absmean baseline",
+        bool(data.get("baseline_output_dir"))
+        and (root / str(data.get("baseline_output_dir")) / "metrics.json").exists()
+        and int(data.get("steps") or 0) == 10000
+        and float(data.get("learning_rate") or 0.0) == 2e-5,
+        (
+            f"baseline={data.get('baseline_output_dir')}, "
+            f"steps={data.get('steps')}, lr={data.get('learning_rate')}"
+        ),
+        "LS-init submission should compare against the existing matched 10000-step absmean baseline",
+    )
+
+
 def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
     path = root / f"benchmark_results/seqcls_runtime_gap_{DATE}.json"
     if not path.exists():
@@ -1149,6 +1190,7 @@ def main() -> None:
     audit_ternary_flip_dynamics(root, checks)
     audit_ternary_threshold_dynamics(root, checks)
     audit_second_order_ternary_init(root, checks)
+    audit_bitnet_sft_ls_init_submission(root, checks)
     audit_seqcls_runtime_gap(root, checks)
     audit_qwen3_paper_alignment(root, checks)
     audit_cpu_rows(root, checks)

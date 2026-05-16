@@ -1,0 +1,2 @@
+phase	task	method	scale	ternary_init_mode	ternary_init_iterations	steps	lr	job_id	output_dir	activation_quantization	use_subln	max_train_samples	max_eval_samples	per_device_batch_size	grad_accum_steps	save_model_artifacts
+bitnet_sft_budget_sweep	mnli	bitnet_sft	tensor	ls	8	10000	2e-5	10079	checkpoints/bitdistill-glue-seqcls-bitnet-sft-init/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-initls-steps10000-lr2em5	1	0	0	0	4	4	0

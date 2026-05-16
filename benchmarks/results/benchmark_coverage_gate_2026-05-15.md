@@ -61,6 +61,8 @@ Overall status: **PASS**.
 | Ternary threshold-dynamics audit has measured boundary movement | pass | status=measured_increase, snapshots=5, delta=0.01523485567980197, final_band=0.07576561952248598, monotonic=True |  |
 | Second-order ternary init audit improves synthetic reconstruction | pass | status=synthetic_promising_ls_integrated_diag_calibration_pending, deltas=[-0.0775993565718333, -0.094802921017011] |  |
 | Second-order ternary init audit blocks quality overclaim | pass | quality_proven=False, ls_integrated=True, diag_integrated=False |  |
+| BitNet-SFT LS-init submission changes only initializer | pass | status=submitted, changed_axis=ternary_init_mode_only, init=ls, method=bitnet_sft, task=mnli |  |
+| BitNet-SFT LS-init submission has matched absmean baseline | pass | baseline=checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5, steps=10000, lr=2e-05 |  |
 | Sequence-classification runtime gap is narrowed but not closed | pass | status=sidecar_qwen_contract_available_native_head_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6 |  |
 | Sequence-classification I2_SR sidecar smoke passes | pass | status=prototype_smoke_passed, returncode=0, head_shape=[3, 896], finite_logits=True |  |
 | Sequence-classification sidecar CPU quality mismatch is recorded | pass | status=quality_mismatch, examples=128, agreement=0.9140625, accuracy=0.609375 |  |
@@ -84,5 +86,5 @@ Overall status: **PASS**.
 | Research redirect gate covers required claims | pass | missing=[] |  |
 | Research redirect gate blocks overclaims | pass | blocked_statuses=['blocked', 'not_proven', 'prototype_only'] |  |
 | fixed I2_SR RSS has four context rows | pass | contexts=[512, 2048, 8192, 32768] |  |
-| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=252, missing=0, missing_labels=[] |  |
+| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=255, missing=0, missing_labels=[] |  |
 | productization gate passes for stable I2_SR | pass | passed=True, failed=0, stable_quality=True, layout=True |  |
