@@ -84,6 +84,22 @@ def qkv_weighted_sum_matches(metrics: dict[str, Any], *, tolerance: float = 1e-4
     return abs(sum(float(value) for value in pieces) - float(metrics["weighted_attention_kd"])) <= tolerance
 
 
+def activation_telemetry_is_finite(rows: list[dict[str, Any]]) -> bool:
+    if not rows:
+        return False
+    activation = rows[-1].get("activation_quantization")
+    if not isinstance(activation, dict):
+        return False
+    return (
+        int(activation.get("activation_quantized_modules") or 0) > 0
+        and int(activation.get("total_values") or 0) > 0
+        and finite(activation.get("clipped_fraction"))
+        and finite(activation.get("int8_edge_fraction"))
+        and finite(activation.get("scale_mean"))
+        and finite(activation.get("absmax_mean"))
+    )
+
+
 def inspect_ternary_state(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {"exists": False}
@@ -239,6 +255,8 @@ def main() -> None:
             "32",
             "--log-every-steps",
             "1",
+            "--telemetry-every-steps",
+            "1",
             "--output-dir",
             str(work_dir / "task_sft"),
         ],
@@ -264,6 +282,8 @@ def main() -> None:
             "32",
             "--log-every-steps",
             "1",
+            "--telemetry-every-steps",
+            "1",
             "--output-dir",
             str(work_dir / "task_sft_row"),
         ],
@@ -273,6 +293,8 @@ def main() -> None:
     continued_row = read_json(work_dir / "continued_pretrain_row" / "metrics.json")
     task = read_json(work_dir / "task_sft" / "metrics.json")
     row_task = read_json(work_dir / "task_sft_row" / "metrics.json")
+    task_telemetry = read_jsonl(work_dir / "task_sft" / "telemetry.jsonl")
+    row_task_telemetry = read_jsonl(work_dir / "task_sft_row" / "telemetry.jsonl")
     continued_ternary = inspect_ternary_state(work_dir / "continued_pretrain" / "ternary_state_dict.pt")
     continued_row_ternary = inspect_ternary_state(work_dir / "continued_pretrain_row" / "ternary_state_dict.pt")
     task_ternary = inspect_ternary_state(work_dir / "task_sft" / "ternary_state_dict.pt")
@@ -361,6 +383,21 @@ def main() -> None:
         ),
         "raw and weighted Q/K/V attention KD fields are present",
         "attention KD telemetry cannot isolate Q, K, and V relation terms",
+    )
+    add_check(
+        checks,
+        "BitLinear activation quantization telemetry is implemented",
+        all(
+            snippet in train_source
+            for snippet in (
+                "capture_bitlinear_activation_quantization",
+                "clipped_fraction",
+                "int8_edge_fraction",
+                "activation_quantization",
+            )
+        ),
+        "activation A8 clipping, edge occupancy, scale, and absmax fields are present",
+        "activation quantization telemetry cannot diagnose A8 saturation",
     )
     for name, run in runs.items():
         add_check(checks, f"{name} command exits zero", run["returncode"] == 0, f"returncode={run['returncode']}", "command failed")
@@ -487,6 +524,13 @@ def main() -> None:
         f"codes={task_ternary.get('code_keys')}, tensor_scales={task_ternary.get('tensor_scale_keys')}, row_scales={task_ternary.get('row_scale_keys')}",
         "invalid tensor-scale ternary export",
     )
+    add_check(
+        checks,
+        "task-sft activation telemetry is finite",
+        activation_telemetry_is_finite(task_telemetry),
+        f"telemetry_rows={len(task_telemetry)}, last={task_telemetry[-1].get('activation_quantization') if task_telemetry else {}}",
+        "missing or non-finite task-sft activation quantization telemetry",
+    )
 
     row_task_prep = row_task.get("preparation", {}) if isinstance(row_task.get("preparation"), dict) else {}
     row_task_last = row_task.get("last", {}) if isinstance(row_task.get("last"), dict) else {}
@@ -547,6 +591,13 @@ def main() -> None:
         f"codes={row_task_ternary.get('code_keys')}, tensor_scales={row_task_ternary.get('tensor_scale_keys')}, row_scales={row_task_ternary.get('row_scale_keys')}",
         "invalid row-scale ternary export",
     )
+    add_check(
+        checks,
+        "row task-sft activation telemetry is finite",
+        activation_telemetry_is_finite(row_task_telemetry),
+        f"telemetry_rows={len(row_task_telemetry)}, last={row_task_telemetry[-1].get('activation_quantization') if row_task_telemetry else {}}",
+        "missing or non-finite row task-sft activation quantization telemetry",
+    )
 
     result = {
         "schema": "bitdistill-smoke-contract-v1",
@@ -562,6 +613,8 @@ def main() -> None:
         "continued_pretrain_row_metrics": continued_row,
         "task_sft_metrics": task,
         "task_sft_row_metrics": row_task,
+        "task_sft_telemetry": task_telemetry,
+        "task_sft_row_telemetry": row_task_telemetry,
         "continued_pretrain_ternary": continued_ternary,
         "continued_pretrain_row_ternary": continued_row_ternary,
         "task_sft_ternary": task_ternary,

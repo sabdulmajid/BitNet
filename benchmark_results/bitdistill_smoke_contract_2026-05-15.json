@@ -1,5 +1,5 @@
 {
-  "check_count": 45,
+  "check_count": 48,
   "checks": [
     {
       "blocker": "",
@@ -17,6 +17,12 @@
       "blocker": "",
       "evidence": "raw and weighted Q/K/V attention KD fields are present",
       "name": "attention relation KD exposes Q/K/V components",
+      "passed": true
+    },
+    {
+      "blocker": "",
+      "evidence": "activation A8 clipping, edge occupancy, scale, and absmax fields are present",
+      "name": "BitLinear activation quantization telemetry is implemented",
       "passed": true
     },
     {
@@ -207,6 +213,12 @@
     },
     {
       "blocker": "",
+      "evidence": "telemetry_rows=2, last={'absmax_max': 6.895327091217041, 'absmax_mean': 3.0311591625213623, 'activation_quantized_modules': 15, 'clipped_fraction': 0.0, 'clipped_values': 0, 'int8_edge_fraction': 0.0049217267552182165, 'int8_edge_values': 332, 'module_count': 15, 'negative_edge_fraction': 0.0, 'positive_edge_fraction': 0.0049217267552182165, 'scale_count': 465, 'scale_max': 0.0542939156293869, 'scale_mean': 0.023867396637797356, 'scale_min': 0.015457858331501484, 'scale_std': 0.006082689855247736, 'total_values': 67456}",
+      "name": "task-sft activation telemetry is finite",
+      "passed": true
+    },
+    {
+      "blocker": "",
       "evidence": "benchmark_results/bitdistill-smoke-contract-2026-05-15/task_sft_row/metrics.json",
       "name": "row task-sft writes metrics",
       "passed": true
@@ -270,6 +282,12 @@
       "evidence": "codes=15, tensor_scales=0, row_scales=15",
       "name": "row task-sft row-scale ternary export is valid",
       "passed": true
+    },
+    {
+      "blocker": "",
+      "evidence": "telemetry_rows=2, last={'absmax_max': 7.610891819000244, 'absmax_mean': 3.0551750659942627, 'activation_quantized_modules': 15, 'clipped_fraction': 0.0, 'clipped_values': 0, 'int8_edge_fraction': 0.005336812144212524, 'int8_edge_values': 360, 'module_count': 15, 'negative_edge_fraction': 0.0, 'positive_edge_fraction': 0.005336812144212524, 'scale_count': 465, 'scale_max': 0.0599282830953598, 'scale_mean': 0.02405649796128273, 'scale_min': 0.01609511487185955, 'scale_std': 0.0073115406557917595, 'total_values': 67456}",
+      "name": "row task-sft activation telemetry is finite",
+      "passed": true
     }
   ],
   "continued_pretrain_i2s_export": {
@@ -323,7 +341,7 @@
       "split": "train"
     },
     "effective_train_token_presentations": 64,
-    "elapsed_seconds": 0.08274412155151367,
+    "elapsed_seconds": 0.08332300186157227,
     "exclude_linear_regex": "score|classifier",
     "last": {
       "attention_k_kd": 0.0,
@@ -415,7 +433,7 @@
       "split": "train"
     },
     "effective_train_token_presentations": 64,
-    "elapsed_seconds": 0.08312749862670898,
+    "elapsed_seconds": 0.08361387252807617,
     "exclude_linear_regex": "score|classifier",
     "last": {
       "attention_k_kd": 0.0,
@@ -500,7 +518,7 @@
         "--summary-json",
         "benchmark_results/bitdistill-smoke-contract-2026-05-15/continued_pretrain_i2s_smoke.json"
       ],
-      "output_tail": "\nWriting:   0%|          | 0.00/213k [00:00<?, ?byte/s]\nWriting: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 213k/213k [00:00<00:00, 194Mbyte/s]\n{\n  \"architecture\": \"Qwen2ForCausalLM\",\n  \"bitdistill_subln\": true,\n  \"checkpoint_dir\": \"benchmark_results/bitdistill-smoke-contract-2026-05-15/continued_pretrain\",\n  \"classifier_head_npz\": null,\n  \"classifier_head_sidecar\": null,\n  \"classifier_head_tensors\": [],\n  \"converter\": \"3rdparty/llama.cpp/convert_hf_to_gguf.py\",\n  \"converter_architecture\": \"Qwen2ForCausalLM\",\n  \"copied_tensors\": 16,\n  \"format_scope\": \"scalar-scale I2_S by default; row-scale only with --row-scale-prototype or --row-scale-qtype=i2_sr\",\n  \"gguf_arch\": \"bitnet-25\",\n  \"has_native_i2s_gguf_python_constants\": true,\n  \"has_native_i2sr_gguf_python_constants\": true,\n  \"i2_s_dtype\": 36,\n  \"i2_sr_dtype\": 40,\n  \"limitations\": [\n    \"Rejects row-scale checkpoints unless --row-scale-prototype or --row-scale-qtype=i2_sr is passed.\",\n    \"Scalar mode uses the existing tensor-scale I2_S layout.\",\n    \"Row-scale prototype mode requires a matching experimental runtime layout and overloads I2_S.\",\n    \"Row-scale i2_sr mode requires a runtime with a stable I2_SR qtype.\",\n    \"Keeps output.weight in F16 by default to match llama-quantize policy.\"\n  ],\n  \"mostly_i2_s_file_type\": 40,\n  \"mostly_i2_sr_file_type\": 41,\n  \"outfile\": \"benchmark_results/bitdistill-smoke-contract-2026-05-15/continued_pretrain_i2s_smoke.gguf\",\n  \"outfile_size_bytes\": 221184,\n  \"output_f16_tensors\": 1,\n  \"output_ftype\": 40,\n  \"output_ftype_name\": \"MOSTLY_I2_S\",\n  \"output_tensors\": 31,\n  \"packed_i2s_bytes\": 74176,\n  \"rope_theta_from_rope_parameters\": 10000.0,\n  \"row_scale_i2s_packed\": 0,\n  \"row_scale_prototype\": false,\n  \"row_scale_qtype\": null,\n  \"row_scale_rejected\": 0,\n  \"synthetic_vocab_for_smoke\": true,\n  \"synthetic_vocab_size\": 257,\n  \"ternary_i2s_packed\": 14,\n  \"ternary_state\": \"benchmark_results/bitdistill-smoke-contract-2026-05-15/continued_pretrain/ternary_state_dict.pt\"\n}\n",
+      "output_tail": "\nWriting:   0%|          | 0.00/213k [00:00<?, ?byte/s]\nWriting: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 213k/213k [00:00<00:00, 179Mbyte/s]\n{\n  \"architecture\": \"Qwen2ForCausalLM\",\n  \"bitdistill_subln\": true,\n  \"checkpoint_dir\": \"benchmark_results/bitdistill-smoke-contract-2026-05-15/continued_pretrain\",\n  \"classifier_head_npz\": null,\n  \"classifier_head_sidecar\": null,\n  \"classifier_head_tensors\": [],\n  \"converter\": \"3rdparty/llama.cpp/convert_hf_to_gguf.py\",\n  \"converter_architecture\": \"Qwen2ForCausalLM\",\n  \"copied_tensors\": 16,\n  \"format_scope\": \"scalar-scale I2_S by default; row-scale only with --row-scale-prototype or --row-scale-qtype=i2_sr\",\n  \"gguf_arch\": \"bitnet-25\",\n  \"has_native_i2s_gguf_python_constants\": true,\n  \"has_native_i2sr_gguf_python_constants\": true,\n  \"i2_s_dtype\": 36,\n  \"i2_sr_dtype\": 40,\n  \"limitations\": [\n    \"Rejects row-scale checkpoints unless --row-scale-prototype or --row-scale-qtype=i2_sr is passed.\",\n    \"Scalar mode uses the existing tensor-scale I2_S layout.\",\n    \"Row-scale prototype mode requires a matching experimental runtime layout and overloads I2_S.\",\n    \"Row-scale i2_sr mode requires a runtime with a stable I2_SR qtype.\",\n    \"Keeps output.weight in F16 by default to match llama-quantize policy.\"\n  ],\n  \"mostly_i2_s_file_type\": 40,\n  \"mostly_i2_sr_file_type\": 41,\n  \"outfile\": \"benchmark_results/bitdistill-smoke-contract-2026-05-15/continued_pretrain_i2s_smoke.gguf\",\n  \"outfile_size_bytes\": 221184,\n  \"output_f16_tensors\": 1,\n  \"output_ftype\": 40,\n  \"output_ftype_name\": \"MOSTLY_I2_S\",\n  \"output_tensors\": 31,\n  \"packed_i2s_bytes\": 74176,\n  \"rope_theta_from_rope_parameters\": 10000.0,\n  \"row_scale_i2s_packed\": 0,\n  \"row_scale_prototype\": false,\n  \"row_scale_qtype\": null,\n  \"row_scale_rejected\": 0,\n  \"synthetic_vocab_for_smoke\": true,\n  \"synthetic_vocab_size\": 257,\n  \"ternary_i2s_packed\": 14,\n  \"ternary_state\": \"benchmark_results/bitdistill-smoke-contract-2026-05-15/continued_pretrain/ternary_state_dict.pt\"\n}\n",
       "returncode": 0
     },
     "continued_pretrain_row_i2sr_export": {
@@ -527,7 +545,7 @@
         "--summary-json",
         "benchmark_results/bitdistill-smoke-contract-2026-05-15/continued_pretrain_row_i2sr_smoke.json"
       ],
-      "output_tail": "\nWriting:   0%|          | 0.00/222k [00:00<?, ?byte/s]\nWriting: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 222k/222k [00:00<00:00, 204Mbyte/s]\n{\n  \"architecture\": \"Qwen2ForCausalLM\",\n  \"bitdistill_subln\": true,\n  \"checkpoint_dir\": \"benchmark_results/bitdistill-smoke-contract-2026-05-15/continued_pretrain_row\",\n  \"classifier_head_npz\": null,\n  \"classifier_head_sidecar\": null,\n  \"classifier_head_tensors\": [],\n  \"converter\": \"3rdparty/llama.cpp/convert_hf_to_gguf.py\",\n  \"converter_architecture\": \"Qwen2ForCausalLM\",\n  \"copied_tensors\": 16,\n  \"format_scope\": \"scalar-scale I2_S by default; row-scale only with --row-scale-prototype or --row-scale-qtype=i2_sr\",\n  \"gguf_arch\": \"bitnet-25\",\n  \"has_native_i2s_gguf_python_constants\": true,\n  \"has_native_i2sr_gguf_python_constants\": true,\n  \"i2_s_dtype\": 36,\n  \"i2_sr_dtype\": 40,\n  \"limitations\": [\n    \"Rejects row-scale checkpoints unless --row-scale-prototype or --row-scale-qtype=i2_sr is passed.\",\n    \"Scalar mode uses the existing tensor-scale I2_S layout.\",\n    \"Row-scale prototype mode requires a matching experimental runtime layout and overloads I2_S.\",\n    \"Row-scale i2_sr mode requires a runtime with a stable I2_SR qtype.\",\n    \"Keeps output.weight in F16 by default to match llama-quantize policy.\"\n  ],\n  \"mostly_i2_s_file_type\": 40,\n  \"mostly_i2_sr_file_type\": 41,\n  \"outfile\": \"benchmark_results/bitdistill-smoke-contract-2026-05-15/continued_pretrain_row_i2sr_smoke.gguf\",\n  \"outfile_size_bytes\": 229376,\n  \"output_f16_tensors\": 1,\n  \"output_ftype\": 41,\n  \"output_ftype_name\": \"MOSTLY_I2_SR\",\n  \"output_tensors\": 31,\n  \"packed_i2s_bytes\": 82368,\n  \"rope_theta_from_rope_parameters\": 10000.0,\n  \"row_scale_i2s_packed\": 14,\n  \"row_scale_prototype\": false,\n  \"row_scale_qtype\": \"i2_sr\",\n  \"row_scale_rejected\": 0,\n  \"synthetic_vocab_for_smoke\": true,\n  \"synthetic_vocab_size\": 257,\n  \"ternary_i2s_packed\": 14,\n  \"ternary_state\": \"benchmark_results/bitdistill-smoke-contract-2026-05-15/continued_pretrain_row/ternary_state_dict.pt\"\n}\n",
+      "output_tail": "\nWriting:   0%|          | 0.00/222k [00:00<?, ?byte/s]\nWriting: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 222k/222k [00:00<00:00, 200Mbyte/s]\n{\n  \"architecture\": \"Qwen2ForCausalLM\",\n  \"bitdistill_subln\": true,\n  \"checkpoint_dir\": \"benchmark_results/bitdistill-smoke-contract-2026-05-15/continued_pretrain_row\",\n  \"classifier_head_npz\": null,\n  \"classifier_head_sidecar\": null,\n  \"classifier_head_tensors\": [],\n  \"converter\": \"3rdparty/llama.cpp/convert_hf_to_gguf.py\",\n  \"converter_architecture\": \"Qwen2ForCausalLM\",\n  \"copied_tensors\": 16,\n  \"format_scope\": \"scalar-scale I2_S by default; row-scale only with --row-scale-prototype or --row-scale-qtype=i2_sr\",\n  \"gguf_arch\": \"bitnet-25\",\n  \"has_native_i2s_gguf_python_constants\": true,\n  \"has_native_i2sr_gguf_python_constants\": true,\n  \"i2_s_dtype\": 36,\n  \"i2_sr_dtype\": 40,\n  \"limitations\": [\n    \"Rejects row-scale checkpoints unless --row-scale-prototype or --row-scale-qtype=i2_sr is passed.\",\n    \"Scalar mode uses the existing tensor-scale I2_S layout.\",\n    \"Row-scale prototype mode requires a matching experimental runtime layout and overloads I2_S.\",\n    \"Row-scale i2_sr mode requires a runtime with a stable I2_SR qtype.\",\n    \"Keeps output.weight in F16 by default to match llama-quantize policy.\"\n  ],\n  \"mostly_i2_s_file_type\": 40,\n  \"mostly_i2_sr_file_type\": 41,\n  \"outfile\": \"benchmark_results/bitdistill-smoke-contract-2026-05-15/continued_pretrain_row_i2sr_smoke.gguf\",\n  \"outfile_size_bytes\": 229376,\n  \"output_f16_tensors\": 1,\n  \"output_ftype\": 41,\n  \"output_ftype_name\": \"MOSTLY_I2_SR\",\n  \"output_tensors\": 31,\n  \"packed_i2s_bytes\": 82368,\n  \"rope_theta_from_rope_parameters\": 10000.0,\n  \"row_scale_i2s_packed\": 14,\n  \"row_scale_prototype\": false,\n  \"row_scale_qtype\": \"i2_sr\",\n  \"row_scale_rejected\": 0,\n  \"synthetic_vocab_for_smoke\": true,\n  \"synthetic_vocab_size\": 257,\n  \"ternary_i2s_packed\": 14,\n  \"ternary_state\": \"benchmark_results/bitdistill-smoke-contract-2026-05-15/continued_pretrain_row/ternary_state_dict.pt\"\n}\n",
       "returncode": 0
     }
   },
@@ -556,7 +574,7 @@
         "--output-dir",
         "benchmark_results/bitdistill-smoke-contract-2026-05-15/continued_pretrain"
       ],
-      "output_tail": "step=1 ce=5.542487 lr=2.000e-07 elapsed=0.0s\nstep=2 ce=5.597682 lr=4.000e-07 elapsed=0.1s\n\nWriting model shards:   0%|          | 0/1 [00:00<?, ?it/s]\nWriting model shards: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 227.80it/s]\n",
+      "output_tail": "step=1 ce=5.542487 lr=2.000e-07 elapsed=0.0s\nstep=2 ce=5.597682 lr=4.000e-07 elapsed=0.1s\n\nWriting model shards:   0%|          | 0/1 [00:00<?, ?it/s]\nWriting model shards: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 230.53it/s]\n",
       "returncode": 0
     },
     "continued_pretrain_row": {
@@ -583,7 +601,7 @@
         "--output-dir",
         "benchmark_results/bitdistill-smoke-contract-2026-05-15/continued_pretrain_row"
       ],
-      "output_tail": "step=1 ce=5.551783 lr=2.000e-07 elapsed=0.0s\nstep=2 ce=5.601590 lr=4.000e-07 elapsed=0.1s\n\nWriting model shards:   0%|          | 0/1 [00:00<?, ?it/s]\nWriting model shards: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 227.17it/s]\n",
+      "output_tail": "step=1 ce=5.551783 lr=2.000e-07 elapsed=0.0s\nstep=2 ce=5.601590 lr=4.000e-07 elapsed=0.1s\n\nWriting model shards:   0%|          | 0/1 [00:00<?, ?it/s]\nWriting model shards: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 234.58it/s]\n",
       "returncode": 0
     },
     "help": {
@@ -626,10 +644,12 @@
         "32",
         "--log-every-steps",
         "1",
+        "--telemetry-every-steps",
+        "1",
         "--output-dir",
         "benchmark_results/bitdistill-smoke-contract-2026-05-15/task_sft"
       ],
-      "output_tail": "step=1 loss=15.684550 ce=5.633593 logit_kd=0.000825 attention_kd=0.100427 weighted_logit_kd=0.008245 weighted_attention_kd=10.042712 lr=2.000e-07 elapsed=0.1s\nstep=2 loss=17.490580 ce=5.606065 logit_kd=0.000939 attention_kd=0.118751 weighted_logit_kd=0.009389 weighted_attention_kd=11.875126 lr=4.000e-07 elapsed=0.1s\n{\n  \"attention_split_heads\": 4,\n  \"candidate_score\": \"sum\",\n  \"distill_layer\": -1,\n  \"elapsed_seconds\": 0.3063504695892334,\n  \"eval\": {\n    \"accuracy\": 0.5,\n    \"causal_eval_mode\": \"candidate_sequence\",\n    \"eval_examples\": 8.0,\n    \"prediction_path\": \"benchmark_results/bitdistill-smoke-contract-2026-05-15/task_sft/eval_predictions.jsonl\",\n    \"prediction_schema\": \"bitdistill-glue-predictions-v1\"\n  },\n  \"exclude_linear_regex\": \"score|classifier\",\n  \"label_scheme\": \"words\",\n  \"last\": {\n    \"attention_k_kd\": 0.04242571443319321,\n    \"attention_kd\": 0.11875125765800476,\n    \"attention_q_kd\": 0.03362368792295456,\n    \"attention_v_kd\": 0.04270185902714729,\n    \"ce\": 5.606065273284912,\n    \"grad_norm\": 230.33755493164062,\n    \"logit_kd\": 0.00093889981508255,\n    \"loss\": 17.49057960510254,\n    \"lr\": 4.0000000000000003e-07,\n    \"weighted_attention_k_kd\": 4.2425713539123535,\n    \"weighted_attention_kd\": 11.875125885009766,\n    \"weighted_attention_q_kd\": 3.3623688220977783,\n    \"weighted_attention_v_kd\": 4.270185947418213,\n    \"weighted_logit_kd\": 0.0093889981508255\n  },\n  \"loss_weights\": {\n    \"attention_kd_weight\": 100.0,\n    \"attention_qkv_reduction\": \"sum\",\n    \"attention_temperature\": 1.0,\n    \"logit_kd_temperature_scale\": \"none\",\n    \"logit_kd_weight\": 10.0,\n    \"logit_temperature\": 5.0\n  },\n  \"method\": \"bitdistill\",\n  \"output_head_init\": {\n    \"copied\": false\n  },\n  \"preparation\": {\n    \"activation_quantization\": true,\n    \"bitlinear_replaced\": 15,\n    \"subln_inserted\": 4,\n    \"untied_output_embeddings\": false\n  },\n  \"scale_mode\": \"tensor\",\n  \"stage\": \"task_sft\",\n  \"state_load\": {\n    \"loaded\": false\n  },\n  \"steps\": 2,\n  \"student_model\": \"Qwen/Qwen2.5-0.5B\",\n  \"task\": \"sst2\",\n  \"task_format\": \"causal_lm\",\n  \"teacher_model\": \"\",\n  \"telemetry\": {\n    \"component_grad_norms\": false,\n    \"enabled\": false,\n    \"every_steps\": 0,\n    \"last\": null,\n    \"max_elements_per_layer\": 65536\n  },\n  \"training_budget\": {\n    \"effective_train_token_presentations_upper_bound\": 64,\n    \"grad_accum_steps\": 1,\n    \"max_eval_samples\": 0,\n    \"max_seq_len\": 32,\n    \"max_steps\": 2,\n    \"max_train_samples\": 0,\n    \"per_device_batch_size\": 1\n  }\n}\n\nWriting model shards:   0%|          | 0/1 [00:00<?, ?it/s]\nWriting model shards: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 263.13it/s]\n",
+      "output_tail": "step=1 loss=15.684550 ce=5.633593 logit_kd=0.000825 attention_kd=0.100427 weighted_logit_kd=0.008245 weighted_attention_kd=10.042712 grad_norm=261.481079 lr=2.000e-07 elapsed=0.1s\nstep=2 loss=17.490580 ce=5.606065 logit_kd=0.000939 attention_kd=0.118751 weighted_logit_kd=0.009389 weighted_attention_kd=11.875126 grad_norm=230.337555 lr=4.000e-07 elapsed=0.2s\n{\n  \"attention_split_heads\": 4,\n  \"candidate_score\": \"sum\",\n  \"distill_layer\": -1,\n  \"elapsed_seconds\": 0.3596174716949463,\n  \"eval\": {\n    \"accuracy\": 0.5,\n    \"causal_eval_mode\": \"candidate_sequence\",\n    \"eval_examples\": 8.0,\n    \"prediction_path\": \"benchmark_results/bitdistill-smoke-contract-2026-05-15/task_sft/eval_predictions.jsonl\",\n    \"prediction_schema\": \"bitdistill-glue-predictions-v1\"\n  },\n  \"exclude_linear_regex\": \"score|classifier\",\n  \"label_scheme\": \"words\",\n  \"last\": {\n    \"attention_k_kd\": 0.04242571443319321,\n    \"attention_kd\": 0.11875125765800476,\n    \"attention_q_kd\": 0.03362368792295456,\n    \"attention_v_kd\": 0.04270185902714729,\n    \"ce\": 5.606065273284912,\n    \"grad_norm\": 230.33755493164062,\n    \"logit_kd\": 0.00093889981508255,\n    \"loss\": 17.49057960510254,\n    \"lr\": 4.0000000000000003e-07,\n    \"weighted_attention_k_kd\": 4.2425713539123535,\n    \"weighted_attention_kd\": 11.875125885009766,\n    \"weighted_attention_q_kd\": 3.3623688220977783,\n    \"weighted_attention_v_kd\": 4.270185947418213,\n    \"weighted_logit_kd\": 0.0093889981508255\n  },\n  \"loss_weights\": {\n    \"attention_kd_weight\": 100.0,\n    \"attention_qkv_reduction\": \"sum\",\n    \"attention_temperature\": 1.0,\n    \"logit_kd_temperature_scale\": \"none\",\n    \"logit_kd_weight\": 10.0,\n    \"logit_temperature\": 5.0\n  },\n  \"method\": \"bitdistill\",\n  \"output_head_init\": {\n    \"copied\": false\n  },\n  \"preparation\": {\n    \"activation_quantization\": true,\n    \"bitlinear_replaced\": 15,\n    \"subln_inserted\": 4,\n    \"untied_output_embeddings\": false\n  },\n  \"scale_mode\": \"tensor\",\n  \"stage\": \"task_sft\",\n  \"state_load\": {\n    \"loaded\": false\n  },\n  \"steps\": 2,\n  \"student_model\": \"Qwen/Qwen2.5-0.5B\",\n  \"task\": \"sst2\",\n  \"task_format\": \"causal_lm\",\n  \"teacher_model\": \"\",\n  \"telemetry\": {\n    \"component_grad_norms\": false,\n    \"enabled\": true,\n    \"every_steps\": 1,\n    \"last\": {\n      \"activation_quantization\": {\n        \"absmax_max\": 6.895327091217041,\n        \"absmax_mean\": 3.0311591625213623,\n        \"activation_quantized_modules\": 15,\n        \"clipped_fraction\": 0.0,\n        \"clipped_values\": 0,\n        \"int8_edge_fraction\": 0.0049217267552182165,\n        \"int8_edge_values\": 332,\n        \"module_count\": 15,\n        \"negative_edge_fraction\": 0.0,\n        \"positive_edge_fraction\": 0.0049217267552182165,\n        \"scale_count\": 465,\n        \"scale_max\": 0.0542939156293869,\n        \"scale_mean\": 0.023867396637797356,\n        \"scale_min\": 0.015457858331501484,\n        \"scale_std\": 0.006082689855247736,\n        \"total_values\": 67456\n      },\n      \"component_grad_norms_microbatch\": {},\n      \"elapsed_seconds\": 0.15227532386779785,\n      \"loss\": {\n        \"attention_k_kd\": 0.04242571443319321,\n        \"attention_kd\": 0.11875125765800476,\n        \"attention_q_kd\": 0.03362368792295456,\n        \"attention_v_kd\": 0.04270185902714729,\n        \"ce\": 5.606065273284912,\n        \"grad_norm\": 230.33755493164062,\n        \"logit_kd\": 0.00093889981508255,\n        \"loss\": 17.49057960510254,\n        \"lr\": 4.0000000000000003e-07,\n        \"weighted_attention_k_kd\": 4.2425713539123535,\n        \"weighted_attention_kd\": 11.875125885009766,\n        \"weighted_attention_q_kd\": 3.3623688220977783,\n        \"weighted_attention_v_kd\": 4.270185947418213,\n        \"weighted_logit_kd\": 0.0093889981508255\n      },\n      \"method\": \"bitdistill\",\n      \"quantization\": {\n        \"code_counts\": {\n          \"-1\": 112890,\n          \"0\": 101935,\n          \"1\": 112983\n        },\n        \"code_entropy_bits\": 1.5833183436928309,\n        \"code_fractions\": {\n          \"-1\": 0.34437841663412727,\n          \"0\": 0.3109594640765326,\n          \"1\": 0.3446621192893401\n        },\n        \"module_count\": 15,\n        \"row_scale_modules\": 0,\n        \"sampled_values\": 327808,\n        \"scale_count\": 15,\n        \"scale_max\": 0.016096487641334534,\n        \"scale_mean\": 0.01594228856265545,\n        \"scale_min\": 0.015766732394695282,\n        \"scale_std\": 7.988084689714015e-05,\n        \"tensor_scale_modules\": 15,\n        \"threshold_band_0p05_fraction\": 0.05844884810620851,\n        \"total_values\": 327808\n      },\n      \"stage\": \"task_sft\",\n      \"step\": 2\n    },\n    \"max_elements_per_layer\": 65536\n  },\n  \"training_budget\": {\n    \"effective_train_token_presentations_upper_bound\": 64,\n    \"grad_accum_steps\": 1,\n    \"max_eval_samples\": 0,\n    \"max_seq_len\": 32,\n    \"max_steps\": 2,\n    \"max_train_samples\": 0,\n    \"per_device_batch_size\": 1\n  }\n}\n\nWriting model shards:   0%|          | 0/1 [00:00<?, ?it/s]\nWriting model shards: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 257.87it/s]\n",
       "returncode": 0
     },
     "task_sft_row": {
@@ -655,10 +675,12 @@
         "32",
         "--log-every-steps",
         "1",
+        "--telemetry-every-steps",
+        "1",
         "--output-dir",
         "benchmark_results/bitdistill-smoke-contract-2026-05-15/task_sft_row"
       ],
-      "output_tail": "step=1 loss=16.357101 ce=5.616163 logit_kd=0.000916 attention_kd=0.107318 weighted_logit_kd=0.009160 weighted_attention_kd=10.731779 lr=2.000e-07 elapsed=0.1s\nstep=2 loss=17.383217 ce=5.568280 logit_kd=0.000905 attention_kd=0.118059 weighted_logit_kd=0.009046 weighted_attention_kd=11.805890 lr=4.000e-07 elapsed=0.1s\n{\n  \"attention_split_heads\": 4,\n  \"candidate_score\": \"sum\",\n  \"distill_layer\": -1,\n  \"elapsed_seconds\": 0.3233354091644287,\n  \"eval\": {\n    \"accuracy\": 0.5,\n    \"causal_eval_mode\": \"candidate_sequence\",\n    \"eval_examples\": 8.0,\n    \"prediction_path\": \"benchmark_results/bitdistill-smoke-contract-2026-05-15/task_sft_row/eval_predictions.jsonl\",\n    \"prediction_schema\": \"bitdistill-glue-predictions-v1\"\n  },\n  \"exclude_linear_regex\": \"score|classifier\",\n  \"label_scheme\": \"words\",\n  \"last\": {\n    \"attention_k_kd\": 0.041941218078136444,\n    \"attention_kd\": 0.11805890500545502,\n    \"attention_q_kd\": 0.033562831580638885,\n    \"attention_v_kd\": 0.042554859071969986,\n    \"ce\": 5.568280220031738,\n    \"grad_norm\": 258.4146728515625,\n    \"logit_kd\": 0.0009045824408531189,\n    \"loss\": 17.383216857910156,\n    \"lr\": 4.0000000000000003e-07,\n    \"weighted_attention_k_kd\": 4.194121837615967,\n    \"weighted_attention_kd\": 11.805890083312988,\n    \"weighted_attention_q_kd\": 3.356283187866211,\n    \"weighted_attention_v_kd\": 4.255486011505127,\n    \"weighted_logit_kd\": 0.009045824408531189\n  },\n  \"loss_weights\": {\n    \"attention_kd_weight\": 100.0,\n    \"attention_qkv_reduction\": \"sum\",\n    \"attention_temperature\": 1.0,\n    \"logit_kd_temperature_scale\": \"none\",\n    \"logit_kd_weight\": 10.0,\n    \"logit_temperature\": 5.0\n  },\n  \"method\": \"bitdistill\",\n  \"output_head_init\": {\n    \"copied\": false\n  },\n  \"preparation\": {\n    \"activation_quantization\": true,\n    \"bitlinear_replaced\": 15,\n    \"subln_inserted\": 4,\n    \"untied_output_embeddings\": false\n  },\n  \"scale_mode\": \"row\",\n  \"stage\": \"task_sft\",\n  \"state_load\": {\n    \"loaded\": false\n  },\n  \"steps\": 2,\n  \"student_model\": \"Qwen/Qwen2.5-0.5B\",\n  \"task\": \"sst2\",\n  \"task_format\": \"causal_lm\",\n  \"teacher_model\": \"\",\n  \"telemetry\": {\n    \"component_grad_norms\": false,\n    \"enabled\": false,\n    \"every_steps\": 0,\n    \"last\": null,\n    \"max_elements_per_layer\": 65536\n  },\n  \"training_budget\": {\n    \"effective_train_token_presentations_upper_bound\": 64,\n    \"grad_accum_steps\": 1,\n    \"max_eval_samples\": 0,\n    \"max_seq_len\": 32,\n    \"max_steps\": 2,\n    \"max_train_samples\": 0,\n    \"per_device_batch_size\": 1\n  }\n}\n\nWriting model shards:   0%|          | 0/1 [00:00<?, ?it/s]\nWriting model shards: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 265.46it/s]\n",
+      "output_tail": "step=1 loss=16.357101 ce=5.616163 logit_kd=0.000916 attention_kd=0.107318 weighted_logit_kd=0.009160 weighted_attention_kd=10.731779 grad_norm=331.398499 lr=2.000e-07 elapsed=0.1s\nstep=2 loss=17.383217 ce=5.568280 logit_kd=0.000905 attention_kd=0.118059 weighted_logit_kd=0.009046 weighted_attention_kd=11.805890 grad_norm=258.414673 lr=4.000e-07 elapsed=0.2s\n{\n  \"attention_split_heads\": 4,\n  \"candidate_score\": \"sum\",\n  \"distill_layer\": -1,\n  \"elapsed_seconds\": 0.36637330055236816,\n  \"eval\": {\n    \"accuracy\": 0.5,\n    \"causal_eval_mode\": \"candidate_sequence\",\n    \"eval_examples\": 8.0,\n    \"prediction_path\": \"benchmark_results/bitdistill-smoke-contract-2026-05-15/task_sft_row/eval_predictions.jsonl\",\n    \"prediction_schema\": \"bitdistill-glue-predictions-v1\"\n  },\n  \"exclude_linear_regex\": \"score|classifier\",\n  \"label_scheme\": \"words\",\n  \"last\": {\n    \"attention_k_kd\": 0.041941218078136444,\n    \"attention_kd\": 0.11805890500545502,\n    \"attention_q_kd\": 0.033562831580638885,\n    \"attention_v_kd\": 0.042554859071969986,\n    \"ce\": 5.568280220031738,\n    \"grad_norm\": 258.4146728515625,\n    \"logit_kd\": 0.0009045824408531189,\n    \"loss\": 17.383216857910156,\n    \"lr\": 4.0000000000000003e-07,\n    \"weighted_attention_k_kd\": 4.194121837615967,\n    \"weighted_attention_kd\": 11.805890083312988,\n    \"weighted_attention_q_kd\": 3.356283187866211,\n    \"weighted_attention_v_kd\": 4.255486011505127,\n    \"weighted_logit_kd\": 0.009045824408531189\n  },\n  \"loss_weights\": {\n    \"attention_kd_weight\": 100.0,\n    \"attention_qkv_reduction\": \"sum\",\n    \"attention_temperature\": 1.0,\n    \"logit_kd_temperature_scale\": \"none\",\n    \"logit_kd_weight\": 10.0,\n    \"logit_temperature\": 5.0\n  },\n  \"method\": \"bitdistill\",\n  \"output_head_init\": {\n    \"copied\": false\n  },\n  \"preparation\": {\n    \"activation_quantization\": true,\n    \"bitlinear_replaced\": 15,\n    \"subln_inserted\": 4,\n    \"untied_output_embeddings\": false\n  },\n  \"scale_mode\": \"row\",\n  \"stage\": \"task_sft\",\n  \"state_load\": {\n    \"loaded\": false\n  },\n  \"steps\": 2,\n  \"student_model\": \"Qwen/Qwen2.5-0.5B\",\n  \"task\": \"sst2\",\n  \"task_format\": \"causal_lm\",\n  \"teacher_model\": \"\",\n  \"telemetry\": {\n    \"component_grad_norms\": false,\n    \"enabled\": true,\n    \"every_steps\": 1,\n    \"last\": {\n      \"activation_quantization\": {\n        \"absmax_max\": 7.610891819000244,\n        \"absmax_mean\": 3.0551750659942627,\n        \"activation_quantized_modules\": 15,\n        \"clipped_fraction\": 0.0,\n        \"clipped_values\": 0,\n        \"int8_edge_fraction\": 0.005336812144212524,\n        \"int8_edge_values\": 360,\n        \"module_count\": 15,\n        \"negative_edge_fraction\": 0.0,\n        \"positive_edge_fraction\": 0.005336812144212524,\n        \"scale_count\": 465,\n        \"scale_max\": 0.0599282830953598,\n        \"scale_mean\": 0.02405649796128273,\n        \"scale_min\": 0.01609511487185955,\n        \"scale_std\": 0.0073115406557917595,\n        \"total_values\": 67456\n      },\n      \"component_grad_norms_microbatch\": {},\n      \"elapsed_seconds\": 0.15624237060546875,\n      \"loss\": {\n        \"attention_k_kd\": 0.041941218078136444,\n        \"attention_kd\": 0.11805890500545502,\n        \"attention_q_kd\": 0.033562831580638885,\n        \"attention_v_kd\": 0.042554859071969986,\n        \"ce\": 5.568280220031738,\n        \"grad_norm\": 258.4146728515625,\n        \"logit_kd\": 0.0009045824408531189,\n        \"loss\": 17.383216857910156,\n        \"lr\": 4.0000000000000003e-07,\n        \"weighted_attention_k_kd\": 4.194121837615967,\n        \"weighted_attention_kd\": 11.805890083312988,\n        \"weighted_attention_q_kd\": 3.356283187866211,\n        \"weighted_attention_v_kd\": 4.255486011505127,\n        \"weighted_logit_kd\": 0.009045824408531189\n      },\n      \"method\": \"bitdistill\",\n      \"quantization\": {\n        \"code_counts\": {\n          \"-1\": 113017,\n          \"0\": 101632,\n          \"1\": 113159\n        },\n        \"code_entropy_bits\": 1.5831786815132314,\n        \"code_fractions\": {\n          \"-1\": 0.34476583853963294,\n          \"0\": 0.3100351425224522,\n          \"1\": 0.3451990189379149\n        },\n        \"module_count\": 15,\n        \"row_scale_modules\": 15,\n        \"sampled_values\": 327808,\n        \"scale_count\": 2305,\n        \"scale_max\": 0.01913955807685852,\n        \"scale_mean\": 0.01595076359808445,\n        \"scale_min\": 0.01258634589612484,\n        \"scale_std\": 0.001044606207869947,\n        \"tensor_scale_modules\": 0,\n        \"threshold_band_0p05_fraction\": 0.05896744435767278,\n        \"total_values\": 327808\n      },\n      \"stage\": \"task_sft\",\n      \"step\": 2\n    },\n    \"max_elements_per_layer\": 65536\n  },\n  \"training_budget\": {\n    \"effective_train_token_presentations_upper_bound\": 64,\n    \"grad_accum_steps\": 1,\n    \"max_eval_samples\": 0,\n    \"max_seq_len\": 32,\n    \"max_steps\": 2,\n    \"max_train_samples\": 0,\n    \"per_device_batch_size\": 1\n  }\n}\n\nWriting model shards:   0%|          | 0/1 [00:00<?, ?it/s]\nWriting model shards: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 267.14it/s]\n",
       "returncode": 0
     }
   },
@@ -667,7 +689,7 @@
     "attention_split_heads": 4,
     "candidate_score": "sum",
     "distill_layer": -1,
-    "elapsed_seconds": 0.3063504695892334,
+    "elapsed_seconds": 0.3596174716949463,
     "eval": {
       "accuracy": 0.5,
       "causal_eval_mode": "candidate_sequence",
@@ -723,9 +745,73 @@
     "teacher_model": "",
     "telemetry": {
       "component_grad_norms": false,
-      "enabled": false,
-      "every_steps": 0,
-      "last": null,
+      "enabled": true,
+      "every_steps": 1,
+      "last": {
+        "activation_quantization": {
+          "absmax_max": 6.895327091217041,
+          "absmax_mean": 3.0311591625213623,
+          "activation_quantized_modules": 15,
+          "clipped_fraction": 0.0,
+          "clipped_values": 0,
+          "int8_edge_fraction": 0.0049217267552182165,
+          "int8_edge_values": 332,
+          "module_count": 15,
+          "negative_edge_fraction": 0.0,
+          "positive_edge_fraction": 0.0049217267552182165,
+          "scale_count": 465,
+          "scale_max": 0.0542939156293869,
+          "scale_mean": 0.023867396637797356,
+          "scale_min": 0.015457858331501484,
+          "scale_std": 0.006082689855247736,
+          "total_values": 67456
+        },
+        "component_grad_norms_microbatch": {},
+        "elapsed_seconds": 0.15227532386779785,
+        "loss": {
+          "attention_k_kd": 0.04242571443319321,
+          "attention_kd": 0.11875125765800476,
+          "attention_q_kd": 0.03362368792295456,
+          "attention_v_kd": 0.04270185902714729,
+          "ce": 5.606065273284912,
+          "grad_norm": 230.33755493164062,
+          "logit_kd": 0.00093889981508255,
+          "loss": 17.49057960510254,
+          "lr": 4.0000000000000003e-07,
+          "weighted_attention_k_kd": 4.2425713539123535,
+          "weighted_attention_kd": 11.875125885009766,
+          "weighted_attention_q_kd": 3.3623688220977783,
+          "weighted_attention_v_kd": 4.270185947418213,
+          "weighted_logit_kd": 0.0093889981508255
+        },
+        "method": "bitdistill",
+        "quantization": {
+          "code_counts": {
+            "-1": 112890,
+            "0": 101935,
+            "1": 112983
+          },
+          "code_entropy_bits": 1.5833183436928309,
+          "code_fractions": {
+            "-1": 0.34437841663412727,
+            "0": 0.3109594640765326,
+            "1": 0.3446621192893401
+          },
+          "module_count": 15,
+          "row_scale_modules": 0,
+          "sampled_values": 327808,
+          "scale_count": 15,
+          "scale_max": 0.016096487641334534,
+          "scale_mean": 0.01594228856265545,
+          "scale_min": 0.015766732394695282,
+          "scale_std": 7.988084689714015e-05,
+          "tensor_scale_modules": 15,
+          "threshold_band_0p05_fraction": 0.05844884810620851,
+          "total_values": 327808
+        },
+        "stage": "task_sft",
+        "step": 2
+      },
       "max_elements_per_layer": 65536
     },
     "training_budget": {
@@ -742,7 +828,7 @@
     "attention_split_heads": 4,
     "candidate_score": "sum",
     "distill_layer": -1,
-    "elapsed_seconds": 0.3233354091644287,
+    "elapsed_seconds": 0.36637330055236816,
     "eval": {
       "accuracy": 0.5,
       "causal_eval_mode": "candidate_sequence",
@@ -798,9 +884,73 @@
     "teacher_model": "",
     "telemetry": {
       "component_grad_norms": false,
-      "enabled": false,
-      "every_steps": 0,
-      "last": null,
+      "enabled": true,
+      "every_steps": 1,
+      "last": {
+        "activation_quantization": {
+          "absmax_max": 7.610891819000244,
+          "absmax_mean": 3.0551750659942627,
+          "activation_quantized_modules": 15,
+          "clipped_fraction": 0.0,
+          "clipped_values": 0,
+          "int8_edge_fraction": 0.005336812144212524,
+          "int8_edge_values": 360,
+          "module_count": 15,
+          "negative_edge_fraction": 0.0,
+          "positive_edge_fraction": 0.005336812144212524,
+          "scale_count": 465,
+          "scale_max": 0.0599282830953598,
+          "scale_mean": 0.02405649796128273,
+          "scale_min": 0.01609511487185955,
+          "scale_std": 0.0073115406557917595,
+          "total_values": 67456
+        },
+        "component_grad_norms_microbatch": {},
+        "elapsed_seconds": 0.15624237060546875,
+        "loss": {
+          "attention_k_kd": 0.041941218078136444,
+          "attention_kd": 0.11805890500545502,
+          "attention_q_kd": 0.033562831580638885,
+          "attention_v_kd": 0.042554859071969986,
+          "ce": 5.568280220031738,
+          "grad_norm": 258.4146728515625,
+          "logit_kd": 0.0009045824408531189,
+          "loss": 17.383216857910156,
+          "lr": 4.0000000000000003e-07,
+          "weighted_attention_k_kd": 4.194121837615967,
+          "weighted_attention_kd": 11.805890083312988,
+          "weighted_attention_q_kd": 3.356283187866211,
+          "weighted_attention_v_kd": 4.255486011505127,
+          "weighted_logit_kd": 0.009045824408531189
+        },
+        "method": "bitdistill",
+        "quantization": {
+          "code_counts": {
+            "-1": 113017,
+            "0": 101632,
+            "1": 113159
+          },
+          "code_entropy_bits": 1.5831786815132314,
+          "code_fractions": {
+            "-1": 0.34476583853963294,
+            "0": 0.3100351425224522,
+            "1": 0.3451990189379149
+          },
+          "module_count": 15,
+          "row_scale_modules": 15,
+          "sampled_values": 327808,
+          "scale_count": 2305,
+          "scale_max": 0.01913955807685852,
+          "scale_mean": 0.01595076359808445,
+          "scale_min": 0.01258634589612484,
+          "scale_std": 0.001044606207869947,
+          "tensor_scale_modules": 0,
+          "threshold_band_0p05_fraction": 0.05896744435767278,
+          "total_values": 327808
+        },
+        "stage": "task_sft",
+        "step": 2
+      },
       "max_elements_per_layer": 65536
     },
     "training_budget": {
@@ -813,6 +963,138 @@
       "per_device_batch_size": 1
     }
   },
+  "task_sft_row_telemetry": [
+    {
+      "activation_quantization": {
+        "absmax_max": 7.04422664642334,
+        "absmax_mean": 3.091231107711792,
+        "activation_quantized_modules": 15,
+        "clipped_fraction": 0.0,
+        "clipped_values": 0,
+        "int8_edge_fraction": 0.004877253320683112,
+        "int8_edge_values": 329,
+        "module_count": 15,
+        "negative_edge_fraction": 0.0,
+        "positive_edge_fraction": 0.004877253320683112,
+        "scale_count": 465,
+        "scale_max": 0.05546635016798973,
+        "scale_mean": 0.024340404197573662,
+        "scale_min": 0.015829937532544136,
+        "scale_std": 0.005627508275210857,
+        "total_values": 67456
+      },
+      "component_grad_norms_microbatch": {},
+      "elapsed_seconds": 0.07939839363098145,
+      "loss": {
+        "attention_k_kd": 0.0410764142870903,
+        "attention_kd": 0.10731779038906097,
+        "attention_q_kd": 0.027234409004449844,
+        "attention_v_kd": 0.03900695964694023,
+        "ce": 5.6161627769470215,
+        "grad_norm": 331.39849853515625,
+        "logit_kd": 0.0009159557521343231,
+        "loss": 16.357101440429688,
+        "lr": 2.0000000000000002e-07,
+        "weighted_attention_k_kd": 4.107641220092773,
+        "weighted_attention_kd": 10.731779098510742,
+        "weighted_attention_q_kd": 2.7234408855438232,
+        "weighted_attention_v_kd": 3.900696039199829,
+        "weighted_logit_kd": 0.009159557521343231
+      },
+      "method": "bitdistill",
+      "quantization": {
+        "code_counts": {
+          "-1": 113016,
+          "0": 101633,
+          "1": 113159
+        },
+        "code_entropy_bits": 1.5831791487733224,
+        "code_fractions": {
+          "-1": 0.3447627879734479,
+          "0": 0.3100381930886372,
+          "1": 0.3451990189379149
+        },
+        "module_count": 15,
+        "row_scale_modules": 15,
+        "sampled_values": 327808,
+        "scale_count": 2305,
+        "scale_max": 0.019139554351568222,
+        "scale_mean": 0.0159507617354393,
+        "scale_min": 0.012586351484060287,
+        "scale_std": 0.0010446064407005906,
+        "tensor_scale_modules": 0,
+        "threshold_band_0p05_fraction": 0.05895524209293245,
+        "total_values": 327808
+      },
+      "stage": "task_sft",
+      "step": 1
+    },
+    {
+      "activation_quantization": {
+        "absmax_max": 7.610891819000244,
+        "absmax_mean": 3.0551750659942627,
+        "activation_quantized_modules": 15,
+        "clipped_fraction": 0.0,
+        "clipped_values": 0,
+        "int8_edge_fraction": 0.005336812144212524,
+        "int8_edge_values": 360,
+        "module_count": 15,
+        "negative_edge_fraction": 0.0,
+        "positive_edge_fraction": 0.005336812144212524,
+        "scale_count": 465,
+        "scale_max": 0.0599282830953598,
+        "scale_mean": 0.02405649796128273,
+        "scale_min": 0.01609511487185955,
+        "scale_std": 0.0073115406557917595,
+        "total_values": 67456
+      },
+      "component_grad_norms_microbatch": {},
+      "elapsed_seconds": 0.15624237060546875,
+      "loss": {
+        "attention_k_kd": 0.041941218078136444,
+        "attention_kd": 0.11805890500545502,
+        "attention_q_kd": 0.033562831580638885,
+        "attention_v_kd": 0.042554859071969986,
+        "ce": 5.568280220031738,
+        "grad_norm": 258.4146728515625,
+        "logit_kd": 0.0009045824408531189,
+        "loss": 17.383216857910156,
+        "lr": 4.0000000000000003e-07,
+        "weighted_attention_k_kd": 4.194121837615967,
+        "weighted_attention_kd": 11.805890083312988,
+        "weighted_attention_q_kd": 3.356283187866211,
+        "weighted_attention_v_kd": 4.255486011505127,
+        "weighted_logit_kd": 0.009045824408531189
+      },
+      "method": "bitdistill",
+      "quantization": {
+        "code_counts": {
+          "-1": 113017,
+          "0": 101632,
+          "1": 113159
+        },
+        "code_entropy_bits": 1.5831786815132314,
+        "code_fractions": {
+          "-1": 0.34476583853963294,
+          "0": 0.3100351425224522,
+          "1": 0.3451990189379149
+        },
+        "module_count": 15,
+        "row_scale_modules": 15,
+        "sampled_values": 327808,
+        "scale_count": 2305,
+        "scale_max": 0.01913955807685852,
+        "scale_mean": 0.01595076359808445,
+        "scale_min": 0.01258634589612484,
+        "scale_std": 0.001044606207869947,
+        "tensor_scale_modules": 0,
+        "threshold_band_0p05_fraction": 0.05896744435767278,
+        "total_values": 327808
+      },
+      "stage": "task_sft",
+      "step": 2
+    }
+  ],
   "task_sft_row_ternary": {
     "code_keys": 15,
     "exists": true,
@@ -823,6 +1105,138 @@
     "tensor_scale_keys": 0,
     "valid": true
   },
+  "task_sft_telemetry": [
+    {
+      "activation_quantization": {
+        "absmax_max": 7.088063716888428,
+        "absmax_mean": 3.0510122776031494,
+        "activation_quantized_modules": 15,
+        "clipped_fraction": 0.0,
+        "clipped_values": 0,
+        "int8_edge_fraction": 0.005440583491461101,
+        "int8_edge_values": 367,
+        "module_count": 15,
+        "negative_edge_fraction": 0.0,
+        "positive_edge_fraction": 0.005440583491461101,
+        "scale_count": 465,
+        "scale_max": 0.055811524391174316,
+        "scale_mean": 0.024023713544011116,
+        "scale_min": 0.01599368080496788,
+        "scale_std": 0.005910027306526899,
+        "total_values": 67456
+      },
+      "component_grad_norms_microbatch": {},
+      "elapsed_seconds": 0.08000493049621582,
+      "loss": {
+        "attention_k_kd": 0.03752059489488602,
+        "attention_kd": 0.10042712092399597,
+        "attention_q_kd": 0.025272179394960403,
+        "attention_v_kd": 0.037634339183568954,
+        "ce": 5.6335930824279785,
+        "grad_norm": 261.4810791015625,
+        "logit_kd": 0.0008245036005973816,
+        "loss": 15.684550285339355,
+        "lr": 2.0000000000000002e-07,
+        "weighted_attention_k_kd": 3.7520594596862793,
+        "weighted_attention_kd": 10.042712211608887,
+        "weighted_attention_q_kd": 2.5272178649902344,
+        "weighted_attention_v_kd": 3.7634339332580566,
+        "weighted_logit_kd": 0.008245036005973816
+      },
+      "method": "bitdistill",
+      "quantization": {
+        "code_counts": {
+          "-1": 112892,
+          "0": 101933,
+          "1": 112983
+        },
+        "code_entropy_bits": 1.5833174450257248,
+        "code_fractions": {
+          "-1": 0.3443845177664975,
+          "0": 0.3109533629441624,
+          "1": 0.3446621192893401
+        },
+        "module_count": 15,
+        "row_scale_modules": 0,
+        "sampled_values": 327808,
+        "scale_count": 15,
+        "scale_max": 0.016096487641334534,
+        "scale_mean": 0.01594228856265545,
+        "scale_min": 0.015766732394695282,
+        "scale_std": 7.988118886714801e-05,
+        "tensor_scale_modules": 15,
+        "threshold_band_0p05_fraction": 0.05844884810620851,
+        "total_values": 327808
+      },
+      "stage": "task_sft",
+      "step": 1
+    },
+    {
+      "activation_quantization": {
+        "absmax_max": 6.895327091217041,
+        "absmax_mean": 3.0311591625213623,
+        "activation_quantized_modules": 15,
+        "clipped_fraction": 0.0,
+        "clipped_values": 0,
+        "int8_edge_fraction": 0.0049217267552182165,
+        "int8_edge_values": 332,
+        "module_count": 15,
+        "negative_edge_fraction": 0.0,
+        "positive_edge_fraction": 0.0049217267552182165,
+        "scale_count": 465,
+        "scale_max": 0.0542939156293869,
+        "scale_mean": 0.023867396637797356,
+        "scale_min": 0.015457858331501484,
+        "scale_std": 0.006082689855247736,
+        "total_values": 67456
+      },
+      "component_grad_norms_microbatch": {},
+      "elapsed_seconds": 0.15227532386779785,
+      "loss": {
+        "attention_k_kd": 0.04242571443319321,
+        "attention_kd": 0.11875125765800476,
+        "attention_q_kd": 0.03362368792295456,
+        "attention_v_kd": 0.04270185902714729,
+        "ce": 5.606065273284912,
+        "grad_norm": 230.33755493164062,
+        "logit_kd": 0.00093889981508255,
+        "loss": 17.49057960510254,
+        "lr": 4.0000000000000003e-07,
+        "weighted_attention_k_kd": 4.2425713539123535,
+        "weighted_attention_kd": 11.875125885009766,
+        "weighted_attention_q_kd": 3.3623688220977783,
+        "weighted_attention_v_kd": 4.270185947418213,
+        "weighted_logit_kd": 0.0093889981508255
+      },
+      "method": "bitdistill",
+      "quantization": {
+        "code_counts": {
+          "-1": 112890,
+          "0": 101935,
+          "1": 112983
+        },
+        "code_entropy_bits": 1.5833183436928309,
+        "code_fractions": {
+          "-1": 0.34437841663412727,
+          "0": 0.3109594640765326,
+          "1": 0.3446621192893401
+        },
+        "module_count": 15,
+        "row_scale_modules": 0,
+        "sampled_values": 327808,
+        "scale_count": 15,
+        "scale_max": 0.016096487641334534,
+        "scale_mean": 0.01594228856265545,
+        "scale_min": 0.015766732394695282,
+        "scale_std": 7.988084689714015e-05,
+        "tensor_scale_modules": 15,
+        "threshold_band_0p05_fraction": 0.05844884810620851,
+        "total_values": 327808
+      },
+      "stage": "task_sft",
+      "step": 2
+    }
+  ],
   "task_sft_ternary": {
     "code_keys": 15,
     "exists": true,

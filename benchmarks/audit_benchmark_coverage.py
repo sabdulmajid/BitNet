@@ -414,7 +414,11 @@ def audit_bitdistill_telemetry_coverage(root: Path, checks: list[dict[str, Any]]
         "gradient norm by loss component",
         "ternary flip rate per step/layer",
         "scale trajectory per layer",
-        "activation int8 saturation rate",
+    }
+    measured_names = {
+        str(row.get("telemetry", ""))
+        for row in measured
+        if isinstance(row, dict)
     }
     add_check(
         checks,
@@ -428,9 +432,9 @@ def audit_bitdistill_telemetry_coverage(root: Path, checks: list[dict[str, Any]]
     add_check(
         checks,
         "BitDistill telemetry coverage audit keeps advanced causality claims blocked",
-        required_missing.issubset(missing_names),
-        f"missing={sorted(missing_names)}",
-        "telemetry audit must explicitly block update-direction claims until advanced diagnostics are logged",
+        required_missing.issubset(missing_names) and "BitLinear activation int8 saturation" in measured_names,
+        f"missing={sorted(missing_names)}, measured_activation={'BitLinear activation int8 saturation' in measured_names}",
+        "telemetry audit must block update-direction claims while recording activation saturation as instrumented",
     )
 
 

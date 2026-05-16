@@ -349,6 +349,85 @@ def bitlinear_quantization_summary(model: nn.Module, *, max_elements_per_layer: 
     }
 
 
+class BitLinearActivationCapture:
+    def __init__(self) -> None:
+        self.module_count = 0
+        self.activation_quantized_modules = 0
+        self.total_values = 0
+        self.clipped_values = 0
+        self.edge_values = 0
+        self.positive_edge_values = 0
+        self.negative_edge_values = 0
+        self.scales: list[torch.Tensor] = []
+        self.absmax_values: list[torch.Tensor] = []
+
+    def observe(self, module: BitLinear, x: torch.Tensor) -> None:
+        self.module_count += 1
+        if not module.activation_quantization:
+            return
+        self.activation_quantized_modules += 1
+        with torch.no_grad():
+            x_float = x.detach().float()
+            absmax = x_float.abs().amax(dim=-1, keepdim=True).clamp_min(module.eps)
+            scale = absmax / 127.0
+            rounded = torch.round(x_float / scale)
+            q = rounded.clamp(-128, 127)
+            self.total_values += int(q.numel())
+            self.clipped_values += int(((rounded < -128) | (rounded > 127)).sum().item())
+            self.positive_edge_values += int((q >= 127).sum().item())
+            self.negative_edge_values += int((q <= -128).sum().item())
+            self.edge_values += int(((q >= 127) | (q <= -128)).sum().item())
+            self.scales.append(scale.reshape(-1).detach().cpu())
+            self.absmax_values.append(absmax.reshape(-1).detach().cpu())
+
+    def summary(self) -> dict[str, Any]:
+        scale_tensor = torch.cat(self.scales) if self.scales else torch.empty(0)
+        absmax_tensor = torch.cat(self.absmax_values) if self.absmax_values else torch.empty(0)
+        return {
+            "module_count": self.module_count,
+            "activation_quantized_modules": self.activation_quantized_modules,
+            "total_values": self.total_values,
+            "clipped_values": self.clipped_values,
+            "clipped_fraction": self.clipped_values / self.total_values if self.total_values else 0.0,
+            "int8_edge_values": self.edge_values,
+            "int8_edge_fraction": self.edge_values / self.total_values if self.total_values else 0.0,
+            "positive_edge_fraction": self.positive_edge_values / self.total_values if self.total_values else 0.0,
+            "negative_edge_fraction": self.negative_edge_values / self.total_values if self.total_values else 0.0,
+            "scale_count": int(scale_tensor.numel()),
+            "scale_mean": float(scale_tensor.mean().item()) if scale_tensor.numel() else 0.0,
+            "scale_std": float(scale_tensor.std(unbiased=False).item()) if scale_tensor.numel() else 0.0,
+            "scale_min": float(scale_tensor.min().item()) if scale_tensor.numel() else 0.0,
+            "scale_max": float(scale_tensor.max().item()) if scale_tensor.numel() else 0.0,
+            "absmax_mean": float(absmax_tensor.mean().item()) if absmax_tensor.numel() else 0.0,
+            "absmax_max": float(absmax_tensor.max().item()) if absmax_tensor.numel() else 0.0,
+        }
+
+
+@contextmanager
+def capture_bitlinear_activation_quantization(model: nn.Module, *, enabled: bool) -> Iterator[BitLinearActivationCapture]:
+    capture = BitLinearActivationCapture()
+    if not enabled:
+        yield capture
+        return
+    handles = []
+
+    def make_hook(module: BitLinear):
+        def hook(_module: nn.Module, inputs: tuple[Any, ...]) -> None:
+            if inputs and isinstance(inputs[0], torch.Tensor):
+                capture.observe(module, inputs[0])
+
+        return hook
+
+    for module in model.modules():
+        if isinstance(module, BitLinear):
+            handles.append(module.register_forward_pre_hook(make_hook(module)))
+    try:
+        yield capture
+    finally:
+        for handle in handles:
+            handle.remove()
+
+
 def should_emit_telemetry(args: argparse.Namespace, step: int) -> bool:
     return args.telemetry_every_steps > 0 and (step == 1 or step % args.telemetry_every_steps == 0)
 
@@ -1283,10 +1362,11 @@ def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
     while step < args.max_steps:
         for batch_index, batch in enumerate(loader):
             batch = move_batch(batch, device)
-            outputs = student(**batch)
-            raw_loss = outputs.loss
             next_step = step + 1
             emit_telemetry = should_emit_telemetry(args, next_step) and (batch_index + 1) % args.grad_accum_steps == 0
+            with capture_bitlinear_activation_quantization(student, enabled=emit_telemetry) as activation_capture:
+                outputs = student(**batch)
+            raw_loss = outputs.loss
             component_norms = (
                 component_grad_norms({"ce": raw_loss}, trainable_parameters)
                 if emit_telemetry and args.telemetry_component_grad_norms
@@ -1323,6 +1403,7 @@ def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
                         student,
                         max_elements_per_layer=args.telemetry_max_elements_per_layer,
                     ),
+                    "activation_quantization": activation_capture.summary(),
                     "elapsed_seconds": time.time() - start,
                 }
                 append_telemetry(args, telemetry_last)
@@ -1423,6 +1504,8 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
     while step < args.max_steps:
         for batch_index, batch in enumerate(train_loader):
             batch = move_batch(batch, device)
+            next_step = step + 1
+            emit_telemetry = should_emit_telemetry(args, next_step) and (batch_index + 1) % args.grad_accum_steps == 0
             if args.method == "bitdistill":
                 if teacher is None:
                     raise RuntimeError("BitDistill task stage requires a teacher model")
@@ -1432,11 +1515,13 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                     with torch.no_grad():
                         with capture_qkv(teacher, layer_index=args.distill_layer) as teacher_qkv:
                             teacher_outputs = teacher(**batch)
-                    with capture_qkv(student, layer_index=args.distill_layer) as student_qkv:
-                        student_outputs = student(**batch)
+                    with capture_bitlinear_activation_quantization(student, enabled=emit_telemetry) as activation_capture:
+                        with capture_qkv(student, layer_index=args.distill_layer) as student_qkv:
+                            student_outputs = student(**batch)
                 else:
                     teacher_qkv = {}
-                    student_outputs = student(**batch)
+                    with capture_bitlinear_activation_quantization(student, enabled=emit_telemetry) as activation_capture:
+                        student_outputs = student(**batch)
                     teacher_outputs = None
                     if need_logit_kd:
                         with torch.no_grad():
@@ -1486,7 +1571,8 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                 )
                 loss = ce + weighted_logit_kd + weighted_attention_kd
             else:
-                student_outputs = student(**batch)
+                with capture_bitlinear_activation_quantization(student, enabled=emit_telemetry) as activation_capture:
+                    student_outputs = student(**batch)
                 ce = student_outputs.loss
                 logit_kd = student_outputs.logits.new_zeros(())
                 attention_kd = student_outputs.logits.new_zeros(())
@@ -1500,8 +1586,6 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                 weighted_attention_components = dict(attention_kd_components)
                 loss = ce
 
-            next_step = step + 1
-            emit_telemetry = should_emit_telemetry(args, next_step) and (batch_index + 1) % args.grad_accum_steps == 0
             grad_components = {
                 "ce": ce,
                 "weighted_logit_kd": weighted_logit_kd,
@@ -1562,6 +1646,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                         student,
                         max_elements_per_layer=args.telemetry_max_elements_per_layer,
                     ),
+                    "activation_quantization": activation_capture.summary(),
                     "elapsed_seconds": time.time() - start,
                 }
                 append_telemetry(args, telemetry_last)

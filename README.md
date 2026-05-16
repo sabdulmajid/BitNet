@@ -147,10 +147,11 @@ triage: CE, logits KD, attention KD, and weighted KD terms are logged for
 materialized BitDistill rows. The training script and Slurm launcher also expose
 opt-in telemetry for total gradient norm, per-component gradient norms, ternary
 code fractions, scale statistics, threshold-band occupancy, and Q/K/V-split
-attention-relation KD terms. This is still not enough for stronger causal
-claims about update direction, because those new traces have not yet been
-materialized in completed controlled benchmark rows, and activation int8
-saturation is still missing.
+attention-relation KD terms. BitLinear activation A8 telemetry is now also
+instrumented for clipping, int8 edge occupancy, per-token scales, and absmax
+statistics. This is still not enough for stronger causal claims about update
+direction, because the new gradient-component, Q/K/V, and activation traces
+have not yet been materialized in completed controlled benchmark rows.
 
 Offline Stage-2 snapshot telemetry is now available for the existing
 Qwen2.5-0.5B row-scale warm-up. Across `493,961,216` ternary elements, saved

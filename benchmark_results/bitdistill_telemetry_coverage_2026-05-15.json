@@ -56,10 +56,17 @@
       "status": "instrumented_not_materialized",
       "supports": "Future controlled rows can identify which attention-relation term dominates.",
       "telemetry": "Q/K/V relation KD split"
+    },
+    {
+      "evidence": "train_bitdistill.py records per-telemetry-step activation A8 clipping, edge occupancy, per-token scale statistics, and absmax statistics for BitLinear student forwards.",
+      "passed": true,
+      "status": "instrumented_not_materialized",
+      "supports": "Future controlled rows can rule activation clipping/saturation in or out as a quality limiter.",
+      "telemetry": "BitLinear activation int8 saturation"
     }
   ],
-  "measured_count": 8,
-  "measured_expected": 8,
+  "measured_count": 9,
+  "measured_expected": 9,
   "missing": [
     {
       "evidence": "Opt-in component-gradient telemetry exists, but no completed benchmark row has materialized those traces yet.",
@@ -78,18 +85,12 @@
       "risk": "Cannot directly verify whether Stage-2 learns BitNet-like scale semantics over time.",
       "status": "missing_materialized_run",
       "telemetry": "scale trajectory per layer"
-    },
-    {
-      "evidence": "A8 code path is audited statically; runtime saturation statistics are not recorded.",
-      "risk": "Cannot rule out activation clipping/saturation as a hidden quality limiter.",
-      "status": "missing",
-      "telemetry": "activation int8 saturation rate"
     }
   ],
-  "missing_count": 4,
+  "missing_count": 3,
   "safe_next_step": "After the active queued jobs finish, launch the next controlled rows with --telemetry-every-steps and --telemetry-component-grad-norms enabled on a sparse cadence.",
   "schema": "bitdistill-telemetry-coverage-v1",
   "status": "partial_observability",
   "training_source": "train_bitdistill.py",
-  "verdict": "Existing telemetry is sufficient for loss-scale and static-mechanics triage, and the training script plus Slurm launcher now have opt-in hooks for the next controlled wave. The completed benchmark artifacts are still not sufficient to prove update-direction causality, because materialized gradient-component, flip-rate, scale-trajectory, and activation-saturation traces do not exist yet."
+  "verdict": "Existing telemetry is sufficient for loss-scale and static-mechanics triage, and the training script plus Slurm launcher now have opt-in hooks for the next controlled wave. The completed benchmark artifacts are still not sufficient to prove update-direction causality, because materialized gradient-component, flip-rate, and scale-trajectory traces do not exist yet. Activation-saturation telemetry is instrumented for future controlled rows."
 }

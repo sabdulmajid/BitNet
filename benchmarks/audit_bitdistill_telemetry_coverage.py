@@ -204,6 +204,25 @@ def summarize_measured(args: argparse.Namespace, source: str, launcher_source: s
                 ],
             ),
         },
+        {
+            "telemetry": "BitLinear activation int8 saturation",
+            "status": "instrumented_not_materialized",
+            "evidence": (
+                "train_bitdistill.py records per-telemetry-step activation A8 clipping, "
+                "edge occupancy, per-token scale statistics, and absmax statistics for "
+                "BitLinear student forwards."
+            ),
+            "supports": "Future controlled rows can rule activation clipping/saturation in or out as a quality limiter.",
+            "passed": source_has_all(
+                source,
+                [
+                    "capture_bitlinear_activation_quantization",
+                    "clipped_fraction",
+                    "int8_edge_fraction",
+                    "activation_quantization",
+                ],
+            ),
+        },
     ]
 
 
@@ -233,12 +252,6 @@ def summarize_missing(source: str) -> list[dict[str, Any]]:
             "evidence": "Final scale histograms and opt-in scale telemetry exist; per-step tensor/row scale drift is not materialized for completed benchmark rows.",
             "risk": "Cannot directly verify whether Stage-2 learns BitNet-like scale semantics over time.",
         },
-        {
-            "telemetry": "activation int8 saturation rate",
-            "status": "missing",
-            "evidence": "A8 code path is audited statically; runtime saturation statistics are not recorded.",
-            "risk": "Cannot rule out activation clipping/saturation as a hidden quality limiter.",
-        },
     ]
 
 
@@ -262,8 +275,9 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
             "Existing telemetry is sufficient for loss-scale and static-mechanics triage, "
             "and the training script plus Slurm launcher now have opt-in hooks for the next controlled wave. "
             "The completed benchmark artifacts are still not sufficient to prove update-direction "
-            "causality, because materialized gradient-component, flip-rate, scale-trajectory, "
-            "and activation-saturation traces do not exist yet."
+            "causality, because materialized gradient-component, flip-rate, and scale-trajectory "
+            "traces do not exist yet. Activation-saturation telemetry is instrumented for "
+            "future controlled rows."
         ),
         "safe_next_step": (
             "After the active queued jobs finish, launch the next controlled rows with "

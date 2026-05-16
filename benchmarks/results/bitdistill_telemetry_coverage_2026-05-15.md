@@ -2,9 +2,9 @@
 
 Overall status: **partial_observability**.
 
-Existing telemetry is sufficient for loss-scale and static-mechanics triage, and the training script plus Slurm launcher now have opt-in hooks for the next controlled wave. The completed benchmark artifacts are still not sufficient to prove update-direction causality, because materialized gradient-component, flip-rate, scale-trajectory, and activation-saturation traces do not exist yet.
+Existing telemetry is sufficient for loss-scale and static-mechanics triage, and the training script plus Slurm launcher now have opt-in hooks for the next controlled wave. The completed benchmark artifacts are still not sufficient to prove update-direction causality, because materialized gradient-component, flip-rate, and scale-trajectory traces do not exist yet. Activation-saturation telemetry is instrumented for future controlled rows.
 
-Measured diagnostics passing: `8/8`. Missing advanced diagnostics: `4`.
+Measured diagnostics passing: `9/9`. Missing advanced diagnostics: `3`.
 
 ## Measured
 
@@ -18,6 +18,7 @@ Measured diagnostics passing: `8/8`. Missing advanced diagnostics: `4`.
 | opt-in training telemetry hooks | pass | instrumented_not_materialized | train_bitdistill.py exposes telemetry.jsonl, total grad norm, optional component grad norms, ternary code fractions, scale stats, and threshold-band fractions. | Future controlled rows can record update-balance diagnostics without changing default jobs. |
 | Slurm launcher telemetry pass-through | pass | instrumented_not_materialized | slurm_bitdistill_glue.sh exposes TELEMETRY_EVERY_STEPS, TELEMETRY_COMPONENT_GRAD_NORMS, and TELEMETRY_MAX_ELEMENTS_PER_LAYER to train_bitdistill.py. | Cluster jobs can materialize the new telemetry without hand-editing the launcher. |
 | Q/K/V relation KD split | pass | instrumented_not_materialized | train_bitdistill.py records raw and weighted attention_q_kd, attention_k_kd, and attention_v_kd fields, and optional component-gradient telemetry can include the weighted Q/K/V terms. | Future controlled rows can identify which attention-relation term dominates. |
+| BitLinear activation int8 saturation | pass | instrumented_not_materialized | train_bitdistill.py records per-telemetry-step activation A8 clipping, edge occupancy, per-token scale statistics, and absmax statistics for BitLinear student forwards. | Future controlled rows can rule activation clipping/saturation in or out as a quality limiter. |
 
 ## Missing Before Stronger Causal Claims
 
@@ -26,7 +27,6 @@ Measured diagnostics passing: `8/8`. Missing advanced diagnostics: `4`.
 | gradient norm by loss component | missing_materialized_run | Opt-in component-gradient telemetry exists, but no completed benchmark row has materialized those traces yet. | Cannot prove which objective term dominates the update direction. |
 | ternary flip rate per step/layer | missing_materialized_run | Final ternary code fractions are audited and opt-in code telemetry exists, but consecutive-step code transitions are not materialized for completed benchmark rows. | Cannot tell whether continued pretraining is moving codes or only tuning dense residual/head parameters. |
 | scale trajectory per layer | missing_materialized_run | Final scale histograms and opt-in scale telemetry exist; per-step tensor/row scale drift is not materialized for completed benchmark rows. | Cannot directly verify whether Stage-2 learns BitNet-like scale semantics over time. |
-| activation int8 saturation rate | missing | A8 code path is audited statically; runtime saturation statistics are not recorded. | Cannot rule out activation clipping/saturation as a hidden quality limiter. |
 
 ## Next Step
 
