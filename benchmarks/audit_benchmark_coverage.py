@@ -1482,7 +1482,8 @@ def audit_research_redirect_claims(root: Path, checks: list[dict[str, Any]]) -> 
     add_check(
         checks,
         "Research redirect gate blocks overclaims",
-        {"not_proven", "blocked", "prototype_only"} <= blocked_statuses,
+        {"not_proven", "blocked"} <= blocked_statuses
+        and bool({"prototype_only", "full_validation_batching_blocked"} & blocked_statuses),
         f"blocked_statuses={sorted(str(item) for item in blocked_statuses)}",
         "paper reproduction, TL2, native classifier, or Kimi/MoE overclaim is not blocked",
     )

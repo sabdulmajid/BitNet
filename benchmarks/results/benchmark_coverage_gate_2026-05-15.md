@@ -1,6 +1,6 @@
 # Benchmark Coverage Gate, 2026-05-15
 
-Overall status: **PASS**.
+Overall status: **FAIL**.
 
 | check | status | evidence | blocker |
 | --- | --- | --- | --- |
@@ -72,7 +72,7 @@ Overall status: **PASS**.
 | BitNet-SFT diag-LS init submission has matched absmean baseline | pass | baseline=checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5, steps=10000, lr=2e-05 |  |
 | BitNet-SFT diag-LS init result audit is pending or complete | pass | status=complete, baseline=0.6289353031074886, candidate=0.3509933774834437, quality_proven=False |  |
 | BitNet-SFT diag-LS complete result has paired MNLI statistics | pass | matched=9815, ci=[-0.2908559087154853, -0.2650279425326044], delta=-0.27794192562404485 |  |
-| Sequence-classification runtime gap is narrowed but not closed | pass | status=native_classifier_sample_available_full_validation_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6 |  |
+| Sequence-classification runtime gap is narrowed but not closed | fail | status=native_classifier_full_validation_batching_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6 | quality path and packed runtime path were not cleanly separated |
 | Sequence-classification I2_SR sidecar smoke passes | pass | status=prototype_smoke_passed, returncode=0, head_shape=[3, 896], finite_logits=True |  |
 | Sequence-classification sidecar CPU quality mismatch is recorded | pass | status=quality_mismatch, examples=128, agreement=0.9140625, accuracy=0.609375 |  |
 | Sequence-classification hidden contract is near but not exact | pass | status=hidden_contract_mismatch, token_match=True, hidden_rel_rms=0.10866150519771632, hidden_cosine=0.9940905307837791, logit_rel_rms=0.09191836414090784 |  |
@@ -81,12 +81,12 @@ Overall status: **PASS**.
 | Sequence-classification runtime implementation plan has source-owned steps | pass | step_count=5 |  |
 | Sequence-classification native I2_SR smoke passes | pass | status=pass, single_artifact=True, returncode=0, logits=3, prediction=2, sidecar_prediction=2, rel_rms=1.0342961243324147e-07 |  |
 | Sequence-classification native I2_SR smoke keeps product blocked | pass | full_validation=False, ready=False, prompt_tok_s=265.9 |  |
-| Sequence-classification native I2_SR CPU token-ID result records agreement | pass | status=sample_only, prompt_input=token_ids, examples=64, accuracy=0.59375, agreement=0.96875 |  |
-| Sequence-classification native I2_SR CPU result keeps product blocked until batching parity passes | pass | full_validation=False, ready=False, batching=None, examples_per_second=0.7173345972905404, rss_mib=950.640625 |  |
+| Sequence-classification native I2_SR CPU token-ID result records agreement | pass | status=pass, prompt_input=token_ids, examples=9815, accuracy=0.6521650534895568, agreement=0.9766683647478349 |  |
+| Sequence-classification native I2_SR CPU result keeps product blocked until batching parity passes | pass | full_validation=True, ready=False, batching=False, examples_per_second=2.7241397945095303, rss_mib=1021.296875 |  |
 | Sequence-classification native mismatch audit isolates runtime drift | pass | status=runtime_hidden_drift, token_ids=True, text_roundtrip=False, native_sidecar=True |  |
 | Sequence-classification native batching audit blocks batched throughput | pass | status=batching_parity_mismatch, invariant=False, changed=4, ready=False |  |
 | Sequence-classification native batching audit diagnoses non-swap drift | pass | diagnosis=position_dependent_drift_not_row_swap, nearest_self=True, drifted=4 |  |
-| Sequence-classification native full CPU progress is resumable | pass | status=partial, completed=795, contiguous=True, product=False |  |
+| Sequence-classification native full CPU progress is resumable | pass | status=complete, completed=9815, contiguous=True, product=False |  |
 | Qwen3 paper-alignment audit tracks required GLUE rows | pass | jobs=16, complete=15, ready=False |  |
 | FP F16 CPU row is finite | pass | ppl=12.2808, prefill=114.468162, decode=5.555998 |  |
 | FP Q8_0 CPU row is finite | pass | ppl=12.3056, prefill=124.864246, decode=10.131914 |  |
@@ -103,7 +103,7 @@ Overall status: **PASS**.
 | Benchmark matrix audit keeps TL2 row-scale excluded | pass | tl2_ready=False, failed=9 |  |
 | Research redirect claim gate passes | pass | status=claim_guardrail_passed, supported=7/7 |  |
 | Research redirect gate covers required claims | pass | missing=[] |  |
-| Research redirect gate blocks overclaims | pass | blocked_statuses=['blocked', 'not_proven', 'prototype_only'] |  |
+| Research redirect gate blocks overclaims | pass | blocked_statuses=['blocked', 'full_validation_batching_blocked', 'not_proven'] |  |
 | fixed I2_SR RSS has four context rows | pass | contexts=[512, 2048, 8192, 32768] |  |
-| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=287, missing=0, missing_labels=[] |  |
+| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=289, missing=0, missing_labels=[] |  |
 | productization gate passes for stable I2_SR | pass | passed=True, failed=0, stable_quality=True, layout=True |  |

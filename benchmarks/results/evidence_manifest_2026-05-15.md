@@ -1,11 +1,11 @@
 # Evidence Manifest, 2026-05-15
-Artifacts: `287`. Missing: `0`.
+Artifacts: `289`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 15146 | d46197d89cb5 |  |
-| current_research_plan_report | tracked_report | yes | 15820 | 54963f978268 |  |
-| research_redirect_report | tracked_report | yes | 14285 | 26f2f5bda19e |  |
-| research_redirect_claims_report | tracked_report | yes | 2392 | 0a0d290f728d |  |
+| README | tracked_report | yes | 15330 | 773bc152e87e |  |
+| current_research_plan_report | tracked_report | yes | 15809 | 37e91e24128b |  |
+| research_redirect_report | tracked_report | yes | 14112 | c08964dc39df |  |
+| research_redirect_claims_report | tracked_report | yes | 2419 | 67224a5a5ebf |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
 | benchmark_matrix_audit_report | tracked_report | yes | 2739 | baf684c33814 |  |
 | paired_row_minus_fp_report | tracked_report | yes | 1311 | 21aa1b85402f |  |
@@ -46,7 +46,7 @@ Artifacts: `287`. Missing: `0`.
 | bitnet_sft_diag_ls_init_submission_report | tracked_report | yes | 1587 | b30a9fe27efc |  |
 | bitnet_sft_diag_ls_init_submission_table | tracked_report | yes | 472 | 06ac894c4524 |  |
 | bitnet_sft_diag_ls_init_audit_report | tracked_report | yes | 1022 | c6852f01ea66 |  |
-| seqcls_runtime_gap_report | tracked_report | yes | 5559 | d6f4f9ad5a12 |  |
+| seqcls_runtime_gap_report | tracked_report | yes | 5314 | 407d9ff45e34 |  |
 | seqcls_backbone_i2sr_smoke_report | tracked_report | yes | 1655 | 0bf9e8770821 |  |
 | seqcls_backbone_i2sr_qwen_conversion_json | generic_json | yes | 2134 | 2456fe0b65fa |  |
 | seqcls_i2sr_sidecar_cpu_mnli64_report | tracked_report | yes | 920 | ac54bd3d3a18 |  |
@@ -61,8 +61,9 @@ Artifacts: `287`. Missing: `0`.
 | seqcls_native_i2sr_cpu_mnli16_token_ids_report | tracked_report | yes | 1129 | 0a0fc9b97fe4 |  |
 | seqcls_native_i2sr_cpu_mnli64_token_ids_report | tracked_report | yes | 1124 | b690c71635bc |  |
 | seqcls_native_i2sr_cpu_mnli64_token_ids_batch4_report | tracked_report | yes | 1124 | 3044b89bb306 |  |
+| seqcls_native_i2sr_cpu_mnli_full_token_ids_report | tracked_report | yes | 1270 | 404f4ed18957 |  |
 | seqcls_native_full_cpu_submission_report | tracked_report | yes | 1612 | 0118a0468e11 |  |
-| seqcls_native_full_progress_report | tracked_report | yes | 732 | 7b619e229a41 |  |
+| seqcls_native_full_progress_report | tracked_report | yes | 713 | 0ea0b92b14f9 |  |
 | seqcls_native_mismatch_audit_report | tracked_report | yes | 1723 | 23061853e2c8 |  |
 | seqcls_native_mismatch_audit_fp32_report | tracked_report | yes | 1723 | bc40829d586a |  |
 | seqcls_native_batching_audit_report | tracked_report | yes | 2183 | 13a609b787f6 |  |
@@ -101,7 +102,7 @@ Artifacts: `287`. Missing: `0`.
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 1824 | 5d992b3c9a1c |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 14283 | ff518748f9e9 |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 14376 | 42e8fe1a83a0 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2569 | 51da6738be9d |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -198,7 +199,7 @@ Artifacts: `287`. Missing: `0`.
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
 | benchmark_matrix_audit_json | generic_json | yes | 16721 | d93ae3f74ea3 |  |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 22225 | 633c0a117026 | passed=True, checks=103, failed=0 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 22392 | 62b2f96df756 | passed=False, checks=103, failed=1 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | bb6912119dfc | achieved=False, status=not_complete, complete=7/9, open=2 |
 | original_benchmark_objective_audit_json | generic_json | yes | 4278 | 2916929b09b3 |  |
 | product_scope_gate_json | product_scope_gate_json | yes | 5770 | d0101b25bd20 | scope=research_mvp_only, supported=5, unsupported=4 |
@@ -220,7 +221,7 @@ Artifacts: `287`. Missing: `0`.
 | bitnet_sft_ls_init_audit_json | generic_json | yes | 3127 | 0e0ed7e987de |  |
 | bitnet_sft_diag_ls_init_submission_json | generic_json | yes | 1170 | f36ba408a674 |  |
 | bitnet_sft_diag_ls_init_audit_json | generic_json | yes | 3533 | 113cb30cfa6a |  |
-| seqcls_runtime_gap_json | generic_json | yes | 14996 | 1ac312182a86 |  |
+| seqcls_runtime_gap_json | generic_json | yes | 15008 | d1082c4e87fc |  |
 | seqcls_backbone_i2sr_smoke_json | generic_json | yes | 22648 | 5851d3f13f36 |  |
 | seqcls_i2sr_sidecar_cpu_mnli64_json | generic_json | yes | 4875 | 70048e13bc76 |  |
 | seqcls_i2sr_sidecar_cpu_mnli128_json | generic_json | yes | 5397 | 43bdb0c81ad2 |  |
@@ -235,7 +236,8 @@ Artifacts: `287`. Missing: `0`.
 | seqcls_native_i2sr_cpu_mnli16_token_ids_json | generic_json | yes | 10203 | 12673485e91a |  |
 | seqcls_native_i2sr_cpu_mnli64_token_ids_json | generic_json | yes | 11425 | f8766f33d337 |  |
 | seqcls_native_i2sr_cpu_mnli64_token_ids_batch4_json | generic_json | yes | 11404 | 190a564f77d1 |  |
-| seqcls_native_full_progress_json | generic_json | yes | 970 | 4c39a4c7db15 |  |
+| seqcls_native_i2sr_cpu_mnli_full_token_ids_json | generic_json | yes | 81457 | e432a3dc54fa |  |
+| seqcls_native_full_progress_json | generic_json | yes | 944 | 7da27b3664b2 |  |
 | seqcls_native_mismatch_audit_json | generic_json | yes | 26269 | d2bc8823e18b |  |
 | seqcls_native_mismatch_audit_fp32_json | generic_json | yes | 26370 | 4c6eaf38f6e8 |  |
 | seqcls_native_batching_audit_json | generic_json | yes | 10817 | e53bf9f73b0c |  |
@@ -288,4 +290,4 @@ Artifacts: `287`. Missing: `0`.
 | tl2_generic_summary | gguf_summary_json | yes | 4494 | 306a682203b2 | rows=4, failed=2, nan=1, catastrophic=0, max_ppl=18.8044 |
 | tl2_avx512_summary | gguf_summary_json | yes | 4573 | 6ec820472f37 | rows=4, failed=0, nan=2, catastrophic=0, max_ppl=18.8239 |
 | ptq_math | math_json | yes | 14010 | 8cedd88658e0 | trials=10, rel_error=0.512542 |
-| research_redirect_claims_json | generic_json | yes | 3205 | f6a1dd5fd4c2 |  |
+| research_redirect_claims_json | generic_json | yes | 3232 | 32ea30fd56fc |  |

@@ -314,18 +314,18 @@
     "status": "batching_parity_mismatch"
   },
   "seqcls_native_cpu_benchmark": {
-    "accuracy": 0.59375,
-    "agreement_with_saved_pytorch_predictions": 0.96875,
-    "batching_parity_ready": null,
-    "child_peak_rss_mib": 950.640625,
-    "examples": 64,
-    "examples_per_second": 0.7173345972905404,
+    "accuracy": 0.6521650534895568,
+    "agreement_with_saved_pytorch_predictions": 0.9766683647478349,
+    "batching_parity_ready": false,
+    "child_peak_rss_mib": 1021.296875,
+    "examples": 9815,
+    "examples_per_second": 2.7241397945095303,
     "exists": true,
-    "full_validation_complete": false,
-    "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/seqcls_native_i2sr_cpu_mnli_64_token_ids_2026-05-15.json",
+    "full_validation_complete": true,
+    "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/seqcls_native_i2sr_cpu_mnli_full_token_ids_2026-05-15.json",
     "prompt_input": "token_ids",
     "ready_to_productize": false,
-    "status": "sample_only",
+    "status": "pass",
     "task": "mnli"
   },
   "seqcls_native_smoke": {
@@ -387,5 +387,5 @@
     ],
     "ternary_checkpoints": 12
   },
-  "status": "native_classifier_sample_available_full_validation_blocked"
+  "status": "native_classifier_full_validation_batching_blocked"
 }

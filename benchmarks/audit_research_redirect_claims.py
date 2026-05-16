@@ -148,6 +148,11 @@ def build_gate(root: Path) -> dict[str, Any]:
         if isinstance(seqcls.get("seqcls_sidecar_cpu_benchmark"), dict)
         else {}
     )
+    native_cpu = (
+        seqcls.get("seqcls_native_cpu_benchmark", {})
+        if isinstance(seqcls.get("seqcls_native_cpu_benchmark"), dict)
+        else {}
+    )
     moe = read_json(root / f"benchmark_results/moe_support_audit_{DATE}.json")
     moe_gates = moe.get("productization_gates", []) if isinstance(moe.get("productization_gates"), list) else []
     moe_failed = [gate for gate in moe_gates if isinstance(gate, dict) and not gate.get("passed")]
@@ -228,16 +233,19 @@ def build_gate(root: Path) -> dict[str, Any]:
     add_claim(
         claims,
         "Native packed sequence-classification deployment",
-        "prototype_only",
+        "full_validation_batching_blocked",
         seqcls.get("same_artifact_quality_cpu_ready") is False
-        and sidecar.get("status") == "quality_mismatch",
+        and native_cpu.get("status") == "pass"
+        and native_cpu.get("full_validation_complete") is True
+        and native_cpu.get("ready_to_productize") is False,
         (
             f"same artifact ready={fmt(seqcls.get('same_artifact_quality_cpu_ready'))}; "
-            f"sidecar examples={fmt(sidecar.get('examples'))}; "
-            f"sidecar accuracy={fmt(sidecar.get('accuracy'))}; "
-            f"agreement={fmt(sidecar.get('agreement_with_saved_pytorch_predictions'))}."
+            f"native examples={fmt(native_cpu.get('examples'))}; "
+            f"native accuracy={fmt(native_cpu.get('accuracy'))}; "
+            f"agreement={fmt(native_cpu.get('agreement_with_saved_pytorch_predictions'))}; "
+            f"batching_ready={fmt(native_cpu.get('batching_parity_ready'))}."
         ),
-        "Implement native classifier head metadata/runtime before product claims.",
+        "Fix native batching parity before product throughput claims.",
     )
     add_claim(
         claims,

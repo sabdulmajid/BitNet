@@ -17,7 +17,7 @@ This audit turns the redirected research framing into a machine-checkable claim 
 | Paper-level BitDistill reproduction | not_proven | Keep labeled as paper-inspired until full controlled rows close the FP gap. | controlled rows complete=2/3; passed FP recovery=0; best controlled accuracy=0.691187; best paired delta vs FP=-0.116964. |  |
 | Row-scale I2_SR runtime semantics | supported_as_retrofit_variant | Claim runtime/scale-contract viability, not a Q4 quality/storage win. | I2_SR/Q4 prefill=2.298818x; decode=1.190617x; file=1.288133x; PPL=3.032323x. |  |
 | TL2 row-scale runtime readiness | blocked | Use I2_SR until TL2 has explicit row/group-scale metadata and kernels. | runtime_ready=false; current row-scale error=1.904230; exact row-scale design error=0.000197; finite TL2 quality=false. |  |
-| Native packed sequence-classification deployment | prototype_only | Implement native classifier head metadata/runtime before product claims. | same artifact ready=false; sidecar examples=128; sidecar accuracy=0.609375; agreement=0.914062. |  |
+| Native packed sequence-classification deployment | full_validation_batching_blocked | Fix native batching parity before product throughput claims. | same artifact ready=false; native examples=9815; native accuracy=0.652165; agreement=0.976668; batching_ready=false. |  |
 | Kimi/MoE product support | not_proven | Keep MoE/Kimi in future work until trained quality, routing locality, and runtime are measured. | Kimi config supported=false; local Kimi artifacts=0; failed MoE gates=3/9. |  |
 
 ## Safe Public Summary

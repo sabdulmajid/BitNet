@@ -1,9 +1,11 @@
 {
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
-  "passed": true,
+  "passed": false,
   "check_count": 103,
-  "failed": [],
+  "failed": [
+    "Sequence-classification runtime gap is narrowed but not closed"
+  ],
   "checks": [
     {
       "name": "FP has ten selected lm-eval tasks",
@@ -415,9 +417,9 @@
     },
     {
       "name": "Sequence-classification runtime gap is narrowed but not closed",
-      "passed": true,
-      "evidence": "status=native_classifier_sample_available_full_validation_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6",
-      "blocker": ""
+      "passed": false,
+      "evidence": "status=native_classifier_full_validation_batching_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6",
+      "blocker": "quality path and packed runtime path were not cleanly separated"
     },
     {
       "name": "Sequence-classification I2_SR sidecar smoke passes",
@@ -470,13 +472,13 @@
     {
       "name": "Sequence-classification native I2_SR CPU token-ID result records agreement",
       "passed": true,
-      "evidence": "status=sample_only, prompt_input=token_ids, examples=64, accuracy=0.59375, agreement=0.96875",
+      "evidence": "status=pass, prompt_input=token_ids, examples=9815, accuracy=0.6521650534895568, agreement=0.9766683647478349",
       "blocker": ""
     },
     {
       "name": "Sequence-classification native I2_SR CPU result keeps product blocked until batching parity passes",
       "passed": true,
-      "evidence": "full_validation=False, ready=False, batching=None, examples_per_second=0.7173345972905404, rss_mib=950.640625",
+      "evidence": "full_validation=True, ready=False, batching=False, examples_per_second=2.7241397945095303, rss_mib=1021.296875",
       "blocker": ""
     },
     {
@@ -500,7 +502,7 @@
     {
       "name": "Sequence-classification native full CPU progress is resumable",
       "passed": true,
-      "evidence": "status=partial, completed=795, contiguous=True, product=False",
+      "evidence": "status=complete, completed=9815, contiguous=True, product=False",
       "blocker": ""
     },
     {
@@ -602,7 +604,7 @@
     {
       "name": "Research redirect gate blocks overclaims",
       "passed": true,
-      "evidence": "blocked_statuses=['blocked', 'not_proven', 'prototype_only']",
+      "evidence": "blocked_statuses=['blocked', 'full_validation_batching_blocked', 'not_proven']",
       "blocker": ""
     },
     {
@@ -614,7 +616,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=287, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=289, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

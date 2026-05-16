@@ -1,25 +1,25 @@
 {
   "accuracy_ci95_wilson": [
-    0.6203535853630371,
-    0.6863405618857628
+    0.6426846298418173,
+    0.6615264130319473
   ],
-  "accuracy_so_far": 0.6540880503144654,
-  "agreement_with_saved_pytorch_predictions_so_far": 0.9761006289308176,
-  "completed_examples": 795,
+  "accuracy_so_far": 0.6521650534895568,
+  "agreement_with_saved_pytorch_predictions_so_far": 0.9766683647478349,
+  "completed_examples": 9815,
   "contiguous_prefix": true,
-  "correct_so_far": 520,
+  "correct_so_far": 6401,
   "date": "2026-05-15",
-  "elapsed_seconds": 290.4671308398247,
-  "eta_seconds": 3295.614490786438,
-  "examples_per_second": 2.7369706090373276,
+  "elapsed_seconds": 3602.9464878067374,
+  "eta_seconds": 0.0,
+  "examples_per_second": 2.7241592494410862,
   "expected_examples": 9815,
-  "interpretation": "This is partial progress evidence only. It is useful for monitoring/resume, not for final quality claims.",
+  "interpretation": "Full validation progress is complete; ingest the final benchmark JSON for product claims.",
   "is_product_evidence": false,
-  "last_index": 794,
+  "last_index": 9814,
   "progress_path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/seqcls_native_i2sr_cpu_mnli_full_token_ids_2026-05-15.progress.jsonl",
-  "remaining_examples": 9020,
-  "saved_pytorch_prediction_agreements": 776,
-  "saved_pytorch_prediction_rows": 795,
+  "remaining_examples": 0,
+  "saved_pytorch_prediction_agreements": 9586,
+  "saved_pytorch_prediction_rows": 9815,
   "schema": "seqcls_native_full_progress.v1",
-  "status": "partial"
+  "status": "complete"
 }

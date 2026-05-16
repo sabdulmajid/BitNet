@@ -1,5 +1,5 @@
 {
-  "artifact_count": 287,
+  "artifact_count": 289,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "d46197d89cb5735cb2f7ba15e9498a3bb09c7bf01f35df3b1247875dda468dbe",
-      "size_bytes": 15146
+      "sha256": "773bc152e87e2871fd04abacfe53868d8c3ee502293eab10cf52371e793c66a9",
+      "size_bytes": 15330
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "current_research_plan_report",
       "metrics": {},
       "path": "benchmarks/results/current_research_plan_2026-05-16.md",
-      "sha256": "54963f978268ea0f02b0d6748b0b38be37ceb8841e75b32c3a2922e90478f943",
-      "size_bytes": 15820
+      "sha256": "37e91e24128bb6dc6f3255b63ad5a328c13f00b3f4bffaee458f778ce22eee93",
+      "size_bytes": 15809
     },
     {
       "exists": true,
@@ -25,8 +25,8 @@
       "label": "research_redirect_report",
       "metrics": {},
       "path": "benchmarks/results/research_redirect_2026-05-15.md",
-      "sha256": "26f2f5bda19e100041e4383033f5401b61e8ec8e1a149c47fc4071d0f936ca8f",
-      "size_bytes": 14285
+      "sha256": "c08964dc39df199c2d6416b06b45933d907b6dde011a3b1f28b186bfe988bebe",
+      "size_bytes": 14112
     },
     {
       "exists": true,
@@ -34,8 +34,8 @@
       "label": "research_redirect_claims_report",
       "metrics": {},
       "path": "benchmarks/results/research_redirect_claims_2026-05-15.md",
-      "sha256": "0a0d290f728d2dd48c10ed78692009d567a5c172c90a7c0c87c38f36fe266a3a",
-      "size_bytes": 2392
+      "sha256": "67224a5a5ebf39e33e9025efb2aed87891d0b64060616ca99a0fb5540bede5bd",
+      "size_bytes": 2419
     },
     {
       "exists": true,
@@ -403,8 +403,8 @@
       "label": "seqcls_runtime_gap_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_runtime_gap_2026-05-15.md",
-      "sha256": "d6f4f9ad5a1234d8ee210800787957c5ca3b01e50598e0a7925af6f6a50d3a09",
-      "size_bytes": 5559
+      "sha256": "407d9ff45e34262d75e2cf6ec5779fe3e556a6f3d09badf998b4c1d0879631fb",
+      "size_bytes": 5314
     },
     {
       "exists": true,
@@ -535,6 +535,15 @@
     {
       "exists": true,
       "kind": "tracked_report",
+      "label": "seqcls_native_i2sr_cpu_mnli_full_token_ids_report",
+      "metrics": {},
+      "path": "benchmarks/results/seqcls_native_i2sr_cpu_mnli_full_token_ids_2026-05-15.md",
+      "sha256": "404f4ed189577c7d935c54cc2610eb07d0ecab56e4fd9ebeed5a802d11a490cf",
+      "size_bytes": 1270
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
       "label": "seqcls_native_full_cpu_submission_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_native_full_cpu_submission_2026-05-15.md",
@@ -547,8 +556,8 @@
       "label": "seqcls_native_full_progress_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_native_full_progress_2026-05-15.md",
-      "sha256": "7b619e229a41f1565a8df4bc60d293f5eee37e25a943bdf56186b19468ab020e",
-      "size_bytes": 732
+      "sha256": "0ea0b92b14f9713a65313ae76985ae50be0808d5af585f4c7d5dc96c61a85d97",
+      "size_bytes": 713
     },
     {
       "exists": true,
@@ -898,8 +907,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "ff518748f9e9210ce0b90ccdf602f5d57d7d0a9e23c0b9c2ec612680943a76c1",
-      "size_bytes": 14283
+      "sha256": "42e8fe1a83a000f6d3d8e4e45b5eb0f46e59690d8f30d072cae5d348d2303c4b",
+      "size_bytes": 14376
     },
     {
       "exists": true,
@@ -2650,12 +2659,14 @@
       "label": "benchmark_coverage_gate_json",
       "metrics": {
         "check_count": 103,
-        "failed": [],
-        "passed": true
+        "failed": [
+          "Sequence-classification runtime gap is narrowed but not closed"
+        ],
+        "passed": false
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "633c0a117026af95e309bfe8584475ed34783b10da5b1c420addc6cd3e8626bb",
-      "size_bytes": 22225
+      "sha256": "62b2f96df756ee9fc07854c73fa5c2b500ccb171843730cc9c75e13e70b54e3a",
+      "size_bytes": 22392
     },
     {
       "exists": true,
@@ -2866,8 +2877,8 @@
       "label": "seqcls_runtime_gap_json",
       "metrics": {},
       "path": "benchmark_results/seqcls_runtime_gap_2026-05-15.json",
-      "sha256": "1ac312182a861d00ad7515d0c4dffca17962ca5c0d17b87c13ed0c6d30a8feab",
-      "size_bytes": 14996
+      "sha256": "d1082c4e87fc124d24e57510489b4a65c63b224aad227a9c0436980d6664d374",
+      "size_bytes": 15008
     },
     {
       "exists": true,
@@ -2998,11 +3009,20 @@
     {
       "exists": true,
       "kind": "generic_json",
+      "label": "seqcls_native_i2sr_cpu_mnli_full_token_ids_json",
+      "metrics": {},
+      "path": "benchmark_results/seqcls_native_i2sr_cpu_mnli_full_token_ids_2026-05-15.json",
+      "sha256": "e432a3dc54fa106ee9a1a18485fa0830c16a7a9522fe0fa86a8bcc464772bb8c",
+      "size_bytes": 81457
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
       "label": "seqcls_native_full_progress_json",
       "metrics": {},
       "path": "benchmark_results/seqcls_native_full_progress_2026-05-15.json",
-      "sha256": "4c39a4c7db1532190b8d64b335641c63b4f3acd6345415abff901517b2d8d156",
-      "size_bytes": 970
+      "sha256": "7da27b3664b244f7a1b5db222f8a1970eeddacc3477d7c15b0692891e503e881",
+      "size_bytes": 944
     },
     {
       "exists": true,
@@ -3959,8 +3979,8 @@
       "label": "research_redirect_claims_json",
       "metrics": {},
       "path": "benchmark_results/research_redirect_claims_2026-05-15.json",
-      "sha256": "f6a1dd5fd4c25a9ab04e1b35f3085c870a1235b7dd74f682bc5616d848668156",
-      "size_bytes": 3205
+      "sha256": "32ea30fd56fce87cc6457440605910e417f5d4bdfac2212adae8a475bbd469f1",
+      "size_bytes": 3232
     }
   ],
   "missing": [],

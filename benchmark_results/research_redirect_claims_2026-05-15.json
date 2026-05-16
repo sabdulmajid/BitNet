@@ -47,10 +47,10 @@
     },
     {
       "name": "Native packed sequence-classification deployment",
-      "status": "prototype_only",
+      "status": "full_validation_batching_blocked",
       "supported": true,
-      "public_label": "Implement native classifier head metadata/runtime before product claims.",
-      "evidence": "same artifact ready=false; sidecar examples=128; sidecar accuracy=0.609375; agreement=0.914062.",
+      "public_label": "Fix native batching parity before product throughput claims.",
+      "evidence": "same artifact ready=false; native examples=9815; native accuracy=0.652165; agreement=0.976668; batching_ready=false.",
       "next_gate": ""
     },
     {

@@ -44,7 +44,7 @@ packed CPU path faithful to the trained checkpoint.
 | BitDistill paper-level GLUE reproduction is complete | **No** | Local Qwen2.5 FP16-SFT MNLI is close to the paper anchor (`0.807641` vs `0.799100`), and a tensor-scale CE-only BitNet-SFT budget sweep can clear the weaker paper BitNet-SFT anchor (`0.628935` vs `0.608000`). That is not BitDistill recovery: controlled BitDistill and Qwen3 paper-alignment rows remain below FP quality. Qwen3 tensor BitDistill recovers strongly over BitNet-SFT on QNLI (`0.861065` vs `0.587040`) and SST2 (`0.871560` vs `0.799312`), but still trails FP by paired deltas `-0.060040` and `-0.058486`. Qwen3 row-scale SST2 reaches `0.877294`, but still trails FP by `-0.052752`. MNLI layer selection matters: layer `-8` beats layer `-1` by paired `+0.028528`, but remains `-0.077738` behind FP. |
 | Row-scale semantics matter | **Yes** | TL2 one-scale relative output RMS error is `1.904230`; exact FP16 row scales reduce it to `0.000197`. |
 | Packed row-scale CPU inference works for compatible causal artifacts | **Yes, audited path only** | `I2_SR` Qwen2.5-1.5B row-scale run on Xeon Silver 4116: PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, file `1211.3 MiB`. |
-| Packed sequence-classification deployment is solved | **No, native plumbing only** | Native single-artifact `bitnet-qwen` GGUF classifier-head execution matches the sidecar path. A repaired 64-example MNLI CPU sample using direct token IDs reaches saved-PyTorch agreement `0.96875`, accuracy `0.59375`, and RSS `950.64 MiB`, but it is still sample-only and not product-ready. |
+| Packed sequence-classification deployment is solved | **No, full single-prompt validation only** | Native single-artifact `bitnet-qwen` GGUF classifier-head execution now completes full MNLI validation with direct token IDs: accuracy `0.652165`, saved-PyTorch agreement `0.976668`, `2.724140` examples/sec, and RSS `1021.296875 MiB`. It remains not product-ready because batched parity fails. |
 | Kimi/MoE retrofit is proven | **No** | Tiny Qwen2MoE fixtures prove converter/runtime plumbing only. No trained MoE quality, Kimi mapping, expert-locality, or CPU product result is proven. |
 
 ## Evidence Snapshot
@@ -109,6 +109,10 @@ top-level evidence is intentionally short:
   the drifted rows remain closest to their own single-prompt logits, so this is
   not a simple output-row swap. Batched numbers are blocked until the runtime
   contract is fixed.
+- Full native same-artifact MNLI validation for one `bitnet-qwen` sequence
+  classifier in the safe single-prompt path: accuracy `0.652165`, agreement
+  with saved PyTorch predictions `0.976668`, `2.724140` examples/sec, and
+  `1021.296875 MiB` child peak RSS.
 - Explicit product gates that prevent fast but unusable artifacts from being
   reported as successful LLMs.
 
@@ -157,13 +161,10 @@ The next work is deliberately narrow:
 3. Keep paper-style tensor-scale BitDistill separate from row-scale
    `retrofit-variant` results.
 4. Close the product gap by upgrading the native sequence-classification token-ID
-   sample into a faithful full-validation evaluator. The current 64-example
-   sample has high agreement with saved PyTorch predictions but still shows
-   residual packed-runtime drift. Batching parity currently fails through
-   position-dependent drift rather than row swapping, so batched/full product
-   claims remain premature. A full MNLI native CPU validation job has been
-   submitted in the safe prompt-batch-size-1 mode; it is a quality/completion
-   gate, not a batched throughput claim.
+   sample into a faithful full-validation evaluator. Full MNLI now runs in the
+   safe prompt-batch-size-1 mode, but batching parity still fails through
+   position-dependent drift rather than row swapping, so product throughput
+   claims remain premature.
 5. Keep MoE/Kimi as future work until the dense case is solved.
 
 Detailed current status and next steps are in
@@ -231,6 +232,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Sequence-classification native I2_SR mismatch audit](benchmarks/results/seqcls_native_mismatch_audit_2026-05-15.md)
 - [Sequence-classification native I2_SR batching audit](benchmarks/results/seqcls_native_batching_audit_2026-05-15.md)
 - [Sequence-classification native I2_SR CPU token-ID sample](benchmarks/results/seqcls_native_i2sr_cpu_mnli_64_token_ids_2026-05-15.md)
+- [Sequence-classification native I2_SR full CPU token-ID validation](benchmarks/results/seqcls_native_i2sr_cpu_mnli_full_token_ids_2026-05-15.md)
 - [Sequence-classification native full CPU submission](benchmarks/results/seqcls_native_full_cpu_submission_2026-05-15.md)
 - [Sequence-classification native full CPU progress](benchmarks/results/seqcls_native_full_progress_2026-05-15.md)
 - [CPU tradeoff frontier audit](benchmarks/results/cpu_tradeoff_frontier_2026-05-15.md)

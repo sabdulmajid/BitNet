@@ -32,7 +32,7 @@ result.
 | Row-scale runtime contract matters | Proven by output audit | One-scale TL2 relative output RMS error `1.904230`; exact row scales `0.000197`. |
 | TL2 group/tile-scale compromise is enough | Rejected for strict fidelity | Best available fp16 group-scale row is `0.098692` relative output RMS; exact fp16 row scales are `0.000197`. |
 | `I2_SR` can preserve row-scale ternary semantics in packed CPU inference | Proven for compatible causal-LM artifacts | Qwen2.5-1.5B `I2_SR` runs on Xeon Silver 4116 with PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
-| Native packed sequence-classification product is solved | No, native plumbing only | A single-artifact `bitnet-qwen` GGUF carries the classifier head and matches the sidecar path. Direct token-ID evaluation fixes a Qwen BPE pair-boundary artifact; the repaired 64-example MNLI CPU sample reaches saved-PyTorch agreement `0.96875`, accuracy `0.59375`, and RSS `950.64 MiB`, but remains sample-only. |
+| Native packed sequence-classification product is solved | No, full single-prompt validation only | A single-artifact `bitnet-qwen` GGUF carries the classifier head and completes full MNLI validation in the safe direct-token single-prompt path: accuracy `0.652165`, saved-PyTorch agreement `0.976668`, `2.724140` examples/sec, and RSS `1021.296875 MiB`. It remains product-blocked by batching parity. |
 | Native seqcls batching is product-ready | Rejected for now | Low-margin rows `15` and `35` change logits/predictions depending on sequence position inside a batch; max relative RMS vs alone is `0.305153`. |
 | Kimi/MoE product viability is proven | Not proven | Current MoE work is tiny-fixture plumbing only. |
 
@@ -77,7 +77,7 @@ At the latest local check:
 | `10055` | `dualcard / ece-nebula10` | Qwen3 MNLI attention-layer sweep, layer `-4` | complete; accuracy `0.733367`; paired delta vs layer `-1` `+0.009883` |
 | `10070` | `dualcard / ece-nebula10` | controlled 327.68M Stage-2 row | running |
 | `10080` | `midcard / ece-nebula12` | calibrated diag-LS BitNet-SFT initializer benchmark | complete; negative transfer vs absmean, accuracy `0.350993` |
-| `10083` | `midcard / ece-nebula12` | native single-artifact MNLI full validation in safe prompt-batch-size-1 mode | running; resubmitted with batching-parity readiness gating and resumable per-example progress trace |
+| `10083` | `midcard / ece-nebula12` | native single-artifact MNLI full validation in safe prompt-batch-size-1 mode | complete; accuracy `0.652165`, saved-PyTorch agreement `0.976668`, `2.724140` examples/sec, RSS `1021.296875 MiB`, product-ready `false` |
 
 No ternary quality claim should be made from the running or pending rows until
 their postprocess audits materialize JSON and Markdown reports.
@@ -165,12 +165,10 @@ paper-gamma/loss-normalization contract.
 
 The strongest quality path is sequence classification. The strongest packed
 runtime path was causal-LM `I2_SR`; the new `bitnet-qwen` native classifier
-smoke proves that a single GGUF can carry the dense classifier head and emit
-matching logits. A direct-token input path was added to `llama-embedding`
-because Qwen sentence-pair token IDs cannot always be decoded to text and
-re-tokenized losslessly. The repaired native MNLI CPU sample is measurable but
-still sample-only: 64 examples, accuracy `0.59375`, saved-prediction agreement
-`0.96875`, child peak RSS `950.64 MiB`.
+path proves that a single GGUF can carry the dense classifier head and complete
+full MNLI validation in a safe direct-token single-prompt mode. The full native
+CPU result is accuracy `0.652165`, saved-prediction agreement `0.976668`,
+`2.724140` examples/sec, and child peak RSS `1021.296875 MiB`.
 
 A faster batch-4 sample reaches `2.639` examples/sec and happens to agree with
 the saved PyTorch predictions on the first 64 examples, but it is not a valid
@@ -254,7 +252,8 @@ Current proof:
 single-prompt native GGUF logits match sidecar logits
 relative RMS delta: 0.000000103
 prompt eval:        finite single-prompt smoke timing only; not a benchmark
-64-example MNLI:    accuracy 0.59375, saved-prediction agreement 0.96875
+full MNLI:          accuracy 0.652165, saved-prediction agreement 0.976668
+full MNLI runtime:  2.724140 examples/sec, 1021.296875 MiB child peak RSS
 token IDs:          direct-token path required; text round-trip is not lossless
 batching parity:    failed; max relative RMS vs alone 0.305153 on audited rows
 batching diagnosis: position-dependent drift, not simple output-row swap

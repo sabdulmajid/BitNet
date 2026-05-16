@@ -25,7 +25,7 @@ result.
 | Row-scale semantics matter | proven for current best row-scale checkpoint | TL2 one-scale relative output RMS error `1.904230`; exact FP16 row scales `0.000197` with only `1.230469 MiB` scale overhead. |
 | Packed row-scale CPU runtime is feasible | proven for dense causal artifact | `I2_SR` Xeon result: PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, file `1211.3 MiB`. |
 | TL2 row-scale packed runtime is ready | not proven; explicitly blocked | The current TL2 runtime contract has `11` checks and remains `false`: converter scale collapse, missing row-scale TL2 storage, one-scale transform metadata, generated `Scales[0]` qgemm, unoffset x86 dispatch, missing loader sidecars, and no passing row-scale TL2 benchmark. |
-| Sequence-classification packed path is possible | prototype only; native plumbing incomplete | MNLI long-warmup row-scale checkpoint (`0.653591` PyTorch accuracy) exports as a `352.6 MiB` `I2_SR` backbone plus `10.8 KiB` dense head sidecar. A Qwen-compatible `bitnet-qwen` graph repairs the dominant runtime mismatch: hidden cosine is `0.994091`, hidden relative RMS is `0.108662`, and the 128-example sidecar CPU probe reaches `0.609375` accuracy with `0.914063` agreement against saved PyTorch predictions. A native single-artifact classifier-head smoke now matches the sidecar path, and a repaired 64-example direct-token CPU sample reaches saved-PyTorch agreement `0.96875`; full-split CPU validation and batching parity are still blocked. |
+| Sequence-classification packed path is possible | full single-prompt validation only; batching blocked | MNLI long-warmup row-scale checkpoint (`0.653591` PyTorch accuracy) exports as a `352.6 MiB` `I2_SR` backbone plus dense head. A Qwen-compatible `bitnet-qwen` graph repairs the dominant runtime mismatch. The native single-artifact direct-token CPU run now completes full MNLI validation: accuracy `0.652165`, saved-PyTorch agreement `0.976668`, `2.724140` examples/sec, and RSS `1021.296875 MiB`. Product readiness remains blocked because batching parity fails. |
 | Paper-level BitDistill is reproduced | not proven | FP16-SFT MNLI is close to paper (`0.807641` vs `0.799100`), and a tensor-scale CE-only BitNet-SFT schedule/budget row clears its paper anchor (`0.628935` vs `0.608000`). This is not yet BitDistill or FP16-level recovery. Qwen3 QNLI tensor BitDistill recovers from `0.587040` BitNet-SFT to `0.861065`, but still trails FP `0.921106` by paired delta `-0.060040`; Qwen3 SST2 tensor BitDistill recovers from `0.799312` BitNet-SFT to `0.871560`, and row-scale SST2 reaches `0.877294`, but both still trail FP `0.930046` by paired deltas `-0.058486` and `-0.052752`. The Qwen3 MNLI layer sweep finds layer `-8` best at `0.752012`, but it remains `-0.077738` behind FP. |
 | Kimi/MoE works | not proven | Tiny Qwen2MoE fixtures prove routing/packing smoke only; no Kimi mapping or trained MoE quality exists. |
 
@@ -176,10 +176,11 @@ hidden relative RMS is `0.108662`, and score-logit relative RMS is `0.091918`.
 On a 128-example CPU sidecar probe, accuracy is `0.609375` and agreement with
 saved PyTorch predictions is `0.914063`. A native single-artifact GGUF smoke
 now carries the classifier head and matches sidecar logits, and a repaired
-64-example direct-token native CPU sample reaches saved-PyTorch agreement
-`0.96875`, accuracy `0.59375`, and RSS `950.64 MiB`. This is useful plumbing,
-but not a deployable classifier: full-split CPU quality/RSS/throughput and
-batching parity have not been proven on one native artifact. The batching
+full direct-token native CPU validation reaches saved-PyTorch agreement
+`0.976668`, accuracy `0.652165`, `2.724140` examples/sec, and RSS
+`1021.296875 MiB`. This is useful runtime-fidelity evidence, but not a
+deployable classifier: batching parity has not been proven on one native
+artifact. The batching
 audit now diagnoses the failure as position-dependent drift rather than a
 simple output-row mapping error: every drifted target row remains closest to
 its own single-prompt logits.

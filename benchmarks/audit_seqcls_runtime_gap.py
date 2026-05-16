@@ -270,7 +270,7 @@ def render_markdown(result: dict[str, Any]) -> str:
         ["same artifact quality+CPU ready", result["same_artifact_quality_cpu_ready"]],
         ["sidecar prototype smoke", smoke["status"]],
         ["native GGUF classifier smoke", native_smoke["status"]],
-        ["native sampled CPU quality", native_cpu["status"]],
+        ["native CPU quality", native_cpu["status"]],
         ["native CPU benchmark path", native_cpu["path"]],
         ["sidecar sampled CPU quality", sidecar_cpu["status"]],
         ["sidecar hidden contract", hidden_contract["status"]],
@@ -342,7 +342,7 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["ready to productize", native_smoke["ready_to_productize"]],
                 ],
             ),
-            "## Native GGUF CPU Sample",
+            "## Native GGUF CPU Benchmark",
             md_table(
                 ["field", "value"],
                 [
@@ -389,23 +389,55 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["Packed loader supports Qwen2 Q/K/V projection biases", "implemented via bitnet-qwen"],
                     ["GGUF writer persists classifier/score head tensors and label metadata", "single-prompt smoke implemented"],
                     ["llama.cpp pools and applies the Qwen sequence-classification head", "single-prompt smoke implemented"],
-                    ["CPU evaluator reports GLUE accuracy from the packed classifier artifact", "64-row token-ID sample implemented"],
+                    [
+                        "CPU evaluator reports GLUE accuracy from the packed classifier artifact",
+                        (
+                            "full token-ID MNLI validation implemented"
+                            if native_cpu.get("full_validation_complete") is True
+                            else "64-row token-ID sample implemented"
+                        ),
+                    ],
                     ["Batched embedding/classifier parity", "blocked: audited rows change logits/predictions by batch position"],
-                    ["Quality, RSS, and throughput measured on the same deployed artifact", "single-prompt sample only; full validation blocked"],
+                    [
+                        "Quality, RSS, and throughput measured on the same deployed artifact",
+                        (
+                            "full single-prompt validation measured; product still blocked by batching parity"
+                            if native_cpu.get("full_validation_complete") is True
+                            else "single-prompt sample only; full validation blocked"
+                        ),
+                    ],
                 ],
             ),
             "## Interpretation",
-            (
-                "The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. "
-                "It now also has a prototype sequence-classification backbone path through `bitnet-qwen` I2_SR plus "
-                "an external dense head sidecar, and a native single-artifact GGUF smoke that matches the sidecar "
-                "logits for one prompt. A 64-row native CPU sample using direct token IDs is measurable and reaches "
-                "high agreement with saved PyTorch predictions, but it remains sample-only and still has residual "
-                "packed-runtime drift. A separate batching audit shows that logits can change with sequence position "
-                "inside a multi-prompt embedding batch, so batched throughput must not be promoted. Full-split CPU "
-                "quality, batching parity, RSS, and throughput have not been measured on a faithful native artifact."
-            ),
+            interpretation(result),
         ]
+    )
+
+
+def interpretation(result: dict[str, Any]) -> str:
+    native_cpu = result["seqcls_native_cpu_benchmark"]
+    native_batching = result["seqcls_native_batching_audit"]
+    if native_cpu.get("full_validation_complete") is True:
+        return (
+            "The current repository now has full-split native CPU validation for one packed "
+            "`bitnet-qwen` sequence-classification artifact. The run uses direct token IDs and "
+            f"reports MNLI accuracy `{fmt(native_cpu.get('accuracy'))}`, saved-PyTorch prediction "
+            f"agreement `{fmt(native_cpu.get('agreement_with_saved_pytorch_predictions'))}`, "
+            f"`{fmt(native_cpu.get('examples_per_second'))}` examples/sec, and "
+            f"`{fmt(native_cpu.get('child_peak_rss_mib'))}` MiB child peak RSS. This is useful "
+            "runtime-fidelity evidence for the checkpoint, not a product-ready classifier: batching "
+            f"parity remains `{native_batching.get('status')}`, and the checkpoint accuracy is still "
+            "well below the FP16 task model."
+        )
+    return (
+        "The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. "
+        "It now also has a prototype sequence-classification backbone path through `bitnet-qwen` I2_SR plus "
+        "an external dense head sidecar, and a native single-artifact GGUF smoke that matches the sidecar "
+        "logits for one prompt. A 64-row native CPU sample using direct token IDs is measurable and reaches "
+        "high agreement with saved PyTorch predictions, but it remains sample-only and still has residual "
+        "packed-runtime drift. A separate batching audit shows that logits can change with sequence position "
+        "inside a multi-prompt embedding batch, so batched throughput must not be promoted. Full-split CPU "
+        "quality, batching parity, RSS, and throughput have not been measured on a faithful native artifact."
     )
 
 
@@ -497,6 +529,12 @@ def main() -> None:
     )
     if same_artifact_ready:
         status = "ready"
+    elif (
+        native_cpu.get("status") == "pass"
+        and native_cpu.get("full_validation_complete") is True
+        and native_cpu.get("ready_to_productize") is False
+    ):
+        status = "native_classifier_full_validation_batching_blocked"
     elif native_cpu.get("status") in {"sample_only", "quality_mismatch"}:
         status = "native_classifier_sample_available_full_validation_blocked"
     elif native_smoke["passed"]:

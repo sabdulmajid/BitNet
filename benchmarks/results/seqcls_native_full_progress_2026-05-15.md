@@ -4,19 +4,19 @@ This report summarizes the resumable per-example progress trace for the native s
 
 | field | value |
 | --- | --- |
-| status | partial |
-| completed examples | 795 |
+| status | complete |
+| completed examples | 9815 |
 | expected examples | 9815 |
-| remaining examples | 9020 |
+| remaining examples | 0 |
 | contiguous prefix | true |
-| accuracy so far | 0.654088 |
-| accuracy CI95 so far | [0.620354, 0.686341] |
-| agreement with saved PyTorch predictions so far | 0.976101 |
-| examples/sec | 2.736971 |
-| elapsed seconds | 290.467131 |
-| ETA seconds | 3295.614491 |
+| accuracy so far | 0.652165 |
+| accuracy CI95 so far | [0.642685, 0.661526] |
+| agreement with saved PyTorch predictions so far | 0.976668 |
+| examples/sec | 2.724159 |
+| elapsed seconds | 3602.946488 |
+| ETA seconds | 0.000000 |
 | product evidence | false |
 
 ## Interpretation
 
-This is partial progress evidence only. It is useful for monitoring/resume, not for final quality claims.
+Full validation progress is complete; ingest the final benchmark JSON for product claims.
