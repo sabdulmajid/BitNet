@@ -248,7 +248,7 @@
     {
       "name": "BitDistill telemetry coverage audit measures current loss diagnostics",
       "passed": true,
-      "evidence": "status=partial_observability, measured=6/6",
+      "evidence": "status=partial_observability, measured=7/7",
       "blocker": ""
     },
     {
