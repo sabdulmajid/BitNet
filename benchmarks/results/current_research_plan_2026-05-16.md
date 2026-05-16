@@ -141,6 +141,11 @@ A credible product needs one artifact that carries both:
 quality evidence + CPU runtime evidence
 ```
 
+The sequence-classification implementation plan now makes this source-owned:
+persist the score head and labels in GGUF, add native Qwen classifier pooling
+and head execution, run full GLUE on the packed artifact, and prove batching
+parity before promoting product claims.
+
 ## Next Decision Gates
 
 ### Gate A: Controlled Stage-2 Curve

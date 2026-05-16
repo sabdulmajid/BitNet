@@ -1,0 +1,68 @@
+{
+  "bitnet_qwen_available": true,
+  "date": "2026-05-15",
+  "hidden_cosine": 0.9940905307837791,
+  "hidden_relative_rms": 0.10866150519771632,
+  "implementation_steps": [
+    {
+      "exit_gate": "GGUF reader lists classifier head tensors and metadata without requiring sidecar files.",
+      "files": [
+        "benchmarks/convert_static_ternary_to_i2s_gguf.py",
+        "3rdparty/llama.cpp/gguf-py/gguf/constants.py",
+        "3rdparty/llama.cpp/src/llama.cpp"
+      ],
+      "step": "1. Define classifier GGUF contract",
+      "work": "Persist score-head tensors and label metadata in GGUF instead of an NPZ sidecar. Record num_labels, label order, pooling policy, and problem type."
+    },
+    {
+      "exit_gate": "Single-sample logits match PyTorch/sidecar logits within a strict relative RMS threshold.",
+      "files": [
+        "3rdparty/llama.cpp/src/llama.cpp",
+        "3rdparty/llama.cpp/src/llama-model.cpp",
+        "3rdparty/llama.cpp/src/llama-graph.cpp"
+      ],
+      "step": "2. Add native Qwen sequence-classification graph path",
+      "work": "Reuse the audited `bitnet-qwen` decoder semantics, then pool the last non-padding token and apply the dense score head in the runtime."
+    },
+    {
+      "exit_gate": "Full MNLI validation runs from one native GGUF artifact and reports accuracy, RSS, and examples/sec.",
+      "files": [
+        "benchmarks/benchmark_seqcls_i2sr_sidecar_cpu.py",
+        "benchmarks/benchmark_bitdistill_glue_cpu.py",
+        "3rdparty/llama.cpp/examples"
+      ],
+      "step": "3. Implement a CPU GLUE classifier evaluator",
+      "work": "Replace the Python sidecar loop with native GGUF classifier inference and preserve the same prompt/tokenization contract used by PyTorch validation."
+    },
+    {
+      "exit_gate": "Batch-size 1 and production batch size have identical predictions on a fixed validation subset.",
+      "files": [
+        "benchmarks/audit_seqcls_i2sr_sidecar_batching.py",
+        "benchmarks/audit_seqcls_runtime_gap.py"
+      ],
+      "step": "4. Prove batching parity",
+      "work": "Native batching must preserve predictions relative to batch size 1. Existing separator batching changed `3/64` sidecar predictions, so it is not a safe semantic reference."
+    },
+    {
+      "exit_gate": "same_artifact_quality_cpu_ready=true and coverage gate passes with native classifier rows.",
+      "files": [
+        "benchmarks/audit_seqcls_runtime_gap.py",
+        "benchmarks/audit_benchmark_coverage.py",
+        "README.md"
+      ],
+      "step": "5. Promote quality/runtime gate",
+      "work": "Only after native logits, full-split accuracy, RSS, and throughput are present should the sequence-classification product status move from prototype to deployed artifact."
+    }
+  ],
+  "ready_to_productize": false,
+  "runtime_gap_json": "benchmark_results/seqcls_runtime_gap_2026-05-15.json",
+  "same_artifact_quality_cpu_ready": false,
+  "schema": "seqcls-runtime-implementation-plan-v1",
+  "seqcls_causal_export_compatible": 0,
+  "seqcls_configs": 15,
+  "sidecar_agreement": 0.9140625,
+  "sidecar_sampled_accuracy": 0.609375,
+  "sidecar_status": "prototype_smoke_passed",
+  "status": "sidecar_qwen_contract_available_native_head_blocked",
+  "verdict": "Do not call the sequence-classification artifact deployed yet. The sidecar proves the path is plausible, but native GGUF score-head metadata, runtime pooling/head execution, full validation accuracy, RSS, and batching parity are still required."
+}

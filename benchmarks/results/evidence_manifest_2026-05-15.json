@@ -1,5 +1,5 @@
 {
-  "artifact_count": 265,
+  "artifact_count": 267,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "c9dd6dc178879707f715cc185a4d39e89f5cd3df63f870c113891fdb92b872c5",
-      "size_bytes": 11793
+      "sha256": "de37da6ee6a74e9f9fac9dcd0671daec84f68368238be3a1ae0a0ecebe2ef7f5",
+      "size_bytes": 11980
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "current_research_plan_report",
       "metrics": {},
       "path": "benchmarks/results/current_research_plan_2026-05-16.md",
-      "sha256": "5beeb545d04a73a8e1dee6bbb169f6aa3b0973b3c720720a1d116facdaf1add0",
-      "size_bytes": 9340
+      "sha256": "f034b2dc1ebec1848b7e16b4e4c626ce92eee38a6655ced37812a953f539415d",
+      "size_bytes": 9613
     },
     {
       "exists": true,
@@ -481,6 +481,15 @@
     {
       "exists": true,
       "kind": "tracked_report",
+      "label": "seqcls_runtime_implementation_plan_report",
+      "metrics": {},
+      "path": "benchmarks/results/seqcls_runtime_implementation_plan_2026-05-15.md",
+      "sha256": "44f375cd464d86abca16cc2d9a7836092335014ea813ffb57123ecab34374e2b",
+      "size_bytes": 3213
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
       "label": "bitdistill_telemetry_coverage_report",
       "metrics": {},
       "path": "benchmarks/results/bitdistill_telemetry_coverage_2026-05-15.md",
@@ -799,8 +808,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "43aeb3824f74f37514f8207553fc8b398849d239218240e98af2da9a89d29169",
-      "size_bytes": 12121
+      "sha256": "247dd640324c46454652a125ae2a3eeccb8a19e89964cb10c120cfe8dde3d448",
+      "size_bytes": 12369
     },
     {
       "exists": true,
@@ -2550,13 +2559,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 90,
+        "check_count": 92,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "2962dccd76e6fcd59d8e0ddc4955960a735cdccb66cfa153a3c1746498fa5474",
-      "size_bytes": 19061
+      "sha256": "afa644a357c2ce4278b6648eb51a0c15fc9d2c56a1f849f8bf6cc50753b64a1c",
+      "size_bytes": 19463
     },
     {
       "exists": true,
@@ -2832,6 +2841,15 @@
       "path": "benchmark_results/seqcls_i2sr_sidecar_batching_2026-05-15.json",
       "sha256": "674182154e42dfed0946746fae48d2a88de2fcd0697ccfe2d871abd73bfbeb66",
       "size_bytes": 1592
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "seqcls_runtime_implementation_plan_json",
+      "metrics": {},
+      "path": "benchmark_results/seqcls_runtime_implementation_plan_2026-05-15.json",
+      "sha256": "90e9f72d92ddf3f322e9a6ee307ae5011208f6360e088354b2490d9ba275a590",
+      "size_bytes": 3480
     },
     {
       "exists": true,

@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 90,
+  "check_count": 92,
   "failed": [],
   "checks": [
     {
@@ -426,6 +426,18 @@
       "blocker": ""
     },
     {
+      "name": "Sequence-classification runtime implementation plan keeps product blocked",
+      "passed": true,
+      "evidence": "same_artifact=False, ready=False, seqcls_exportable=0",
+      "blocker": ""
+    },
+    {
+      "name": "Sequence-classification runtime implementation plan has source-owned steps",
+      "passed": true,
+      "evidence": "step_count=5",
+      "blocker": ""
+    },
+    {
       "name": "Qwen3 paper-alignment audit tracks required GLUE rows",
       "passed": true,
       "evidence": "jobs=16, complete=0, ready=False",
@@ -536,7 +548,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=265, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=267, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

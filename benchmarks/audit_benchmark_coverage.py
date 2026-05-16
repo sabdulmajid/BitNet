@@ -1080,6 +1080,43 @@ def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
     )
 
 
+def audit_seqcls_runtime_implementation_plan(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/seqcls_runtime_implementation_plan_{DATE}.json"
+    if not path.exists():
+        add_check(
+            checks,
+            "Sequence-classification runtime implementation plan exists",
+            False,
+            str(path.relative_to(root)),
+            "missing seqcls runtime implementation plan",
+        )
+        return
+    data = read_json(path)
+    steps = data.get("implementation_steps", []) if isinstance(data.get("implementation_steps"), list) else []
+    add_check(
+        checks,
+        "Sequence-classification runtime implementation plan keeps product blocked",
+        data.get("same_artifact_quality_cpu_ready") is False
+        and data.get("ready_to_productize") is False
+        and data.get("seqcls_causal_export_compatible") == 0,
+        (
+            f"same_artifact={data.get('same_artifact_quality_cpu_ready')}, "
+            f"ready={data.get('ready_to_productize')}, "
+            f"seqcls_exportable={data.get('seqcls_causal_export_compatible')}"
+        ),
+        "implementation plan should not promote sequence-classification product status before native runtime evidence",
+    )
+    add_check(
+        checks,
+        "Sequence-classification runtime implementation plan has source-owned steps",
+        len(steps) >= 5
+        and all(isinstance(step.get("files"), list) and step.get("files") for step in steps if isinstance(step, dict))
+        and all(step.get("exit_gate") for step in steps if isinstance(step, dict)),
+        f"step_count={len(steps)}",
+        "seqcls runtime plan should list source ownership and exit gates",
+    )
+
+
 def audit_qwen3_paper_alignment(root: Path, checks: list[dict[str, Any]]) -> None:
     path = root / f"benchmark_results/qwen3_paper_alignment_{DATE}.json"
     if not path.exists():
@@ -1385,6 +1422,7 @@ def main() -> None:
     audit_bitnet_sft_diag_ls_init_submission(root, checks)
     audit_bitnet_sft_diag_ls_init_result(root, checks)
     audit_seqcls_runtime_gap(root, checks)
+    audit_seqcls_runtime_implementation_plan(root, checks)
     audit_qwen3_paper_alignment(root, checks)
     audit_cpu_rows(root, checks)
     audit_cpu_tradeoff_frontier(root, checks)

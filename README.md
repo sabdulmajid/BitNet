@@ -188,6 +188,7 @@ python benchmarks/audit_bitdistill_gamma60_diagnostic.py
 python benchmarks/audit_bitdistill_root_cause.py
 python benchmarks/audit_research_redirect_claims.py
 python benchmarks/audit_seqcls_runtime_gap.py
+python benchmarks/build_seqcls_runtime_implementation_plan.py
 python benchmarks/audit_tl2_negative_result.py
 python benchmarks/audit_benchmark_coverage.py
 python benchmarks/build_evidence_manifest.py \
@@ -212,6 +213,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitDistill controlled curve audit](benchmarks/results/bitdistill_controlled_curve_2026-05-15.md)
 - [BitNet-SFT budget sweep audit](benchmarks/results/bitnet_sft_budget_sweep_2026-05-15.md)
 - [Sequence-classification runtime gap audit](benchmarks/results/seqcls_runtime_gap_2026-05-15.md)
+- [Sequence-classification runtime implementation plan](benchmarks/results/seqcls_runtime_implementation_plan_2026-05-15.md)
 - [CPU tradeoff frontier audit](benchmarks/results/cpu_tradeoff_frontier_2026-05-15.md)
 - [TL2 group-scale viability audit](benchmarks/results/tl2_group_scale_viability_2026-05-15.md)
 - [TL2 row-scale implementation plan](benchmarks/results/tl2_row_scale_implementation_plan_2026-05-15.md)
