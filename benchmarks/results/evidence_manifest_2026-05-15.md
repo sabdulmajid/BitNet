@@ -2,9 +2,9 @@
 Artifacts: `284`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 13697 | 3fdf27e692dd |  |
-| current_research_plan_report | tracked_report | yes | 13876 | 13fbc67c0772 |  |
-| research_redirect_report | tracked_report | yes | 13268 | a3745c943af1 |  |
+| README | tracked_report | yes | 13904 | 90ca90b0518a |  |
+| current_research_plan_report | tracked_report | yes | 14032 | cf5e58bf0804 |  |
+| research_redirect_report | tracked_report | yes | 13471 | 2f6332402a58 |  |
 | research_redirect_claims_report | tracked_report | yes | 2392 | 0a0d290f728d |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
 | benchmark_matrix_audit_report | tracked_report | yes | 2739 | baf684c33814 |  |
@@ -69,7 +69,7 @@ Artifacts: `284`. Missing: `0`.
 | bitdistill_telemetry_fast_submission_report | tracked_report | yes | 2109 | 804cb1051565 |  |
 | bitdistill_gamma60_submission_report | tracked_report | yes | 1804 | 506b9fea2704 |  |
 | bitdistill_gamma60_diagnostic_report | tracked_report | yes | 1445 | 9e8c76f28a07 |  |
-| qwen3_paper_alignment_report | tracked_report | yes | 4752 | 120c475f5fe3 |  |
+| qwen3_paper_alignment_report | tracked_report | yes | 5183 | 7ffaf134c349 |  |
 | qwen3_postprocess_submission_report | tracked_report | yes | 798 | 096508f537cf |  |
 | bitdistill_cpu_benchmark_report | tracked_report | yes | 10840 | dd84bc0eee97 |  |
 | bitdistill_cpu_gate_report | tracked_report | yes | 7636 | 7e27a5c68783 |  |
@@ -99,7 +99,7 @@ Artifacts: `284`. Missing: `0`.
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 1824 | 5d992b3c9a1c |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 13587 | c07f10718de7 |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 13587 | 17d7863ed0d1 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2569 | 51da6738be9d |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -196,7 +196,7 @@ Artifacts: `284`. Missing: `0`.
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
 | benchmark_matrix_audit_json | generic_json | yes | 16721 | d93ae3f74ea3 |  |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 21220 | 732e70a2de37 | passed=True, checks=99, failed=0 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 21220 | 915b63a3cbde | passed=True, checks=99, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | bb6912119dfc | achieved=False, status=not_complete, complete=7/9, open=2 |
 | original_benchmark_objective_audit_json | generic_json | yes | 4278 | 2916929b09b3 |  |
 | product_scope_gate_json | product_scope_gate_json | yes | 5770 | d0101b25bd20 | scope=research_mvp_only, supported=5, unsupported=4 |
@@ -236,7 +236,7 @@ Artifacts: `284`. Missing: `0`.
 | seqcls_native_mismatch_audit_json | generic_json | yes | 26269 | d2bc8823e18b |  |
 | seqcls_native_mismatch_audit_fp32_json | generic_json | yes | 26370 | 4c6eaf38f6e8 |  |
 | seqcls_native_batching_audit_json | generic_json | yes | 7034 | 0eb02b28ee84 |  |
-| qwen3_paper_alignment_json | generic_json | yes | 24573 | 8bf8ca4b8691 |  |
+| qwen3_paper_alignment_json | generic_json | yes | 26453 | 79d01e9e5d0e |  |
 | qwen3_postprocess_submission_json | generic_json | yes | 405 | aefafcfc80ef |  |
 | bitdistill_reproduction_gate_json | bitdistill_reproduction_gate_json | yes | 32197 | c581499edff4 | present=34/36, examples=34, full_eval=34, ci95=34, paper_complete=True, paper_passed=False, row_complete=True, row_passed=False, confidence=0.95 |
 | bitnet_sft_baseline_audit_json | generic_json | yes | 48829 | 57c5584b4206 |  |

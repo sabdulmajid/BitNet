@@ -284,6 +284,49 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         for row in rows
         if row["method"] == "bitdistill" and row["scale"] == "row" and row["complete"]
     )
+    scale_comparisons: list[dict[str, Any]] = []
+    for task in sorted(EXPECTED_EXAMPLES):
+        expected = EXPECTED_EXAMPLES[task]
+        tensor_rows = [
+            row
+            for row in rows
+            if row["task"] == task
+            and row["method"] == "bitdistill"
+            and row["scale"] == "tensor"
+            and row["phase"] == "paper_baseline"
+            and row["complete"]
+        ]
+        row_rows = [
+            row
+            for row in rows
+            if row["task"] == task
+            and row["method"] == "bitdistill"
+            and row["scale"] == "row"
+            and row["complete"]
+        ]
+        if not tensor_rows or not row_rows:
+            continue
+        tensor_row = tensor_rows[0]
+        row_row = row_rows[0]
+        paired = compare_predictions(Path(tensor_row["predictions_path"]), Path(row_row["predictions_path"]), expected)
+        scale_comparisons.append(
+            {
+                "task": task,
+                "tensor_accuracy": tensor_row["accuracy"],
+                "row_accuracy": row_row["accuracy"],
+                "paired": {
+                    "status": paired.get("status"),
+                    "matched": paired.get("matched"),
+                    "delta_row_minus_tensor": paired.get("delta_vs_fp"),
+                    "ci95": paired.get("ci95"),
+                    "tensor_only": paired.get("fp_only"),
+                    "row_only": paired.get("candidate_only"),
+                    "both_correct": paired.get("both_correct"),
+                    "both_wrong": paired.get("both_wrong"),
+                    "errors": paired.get("errors", []),
+                },
+            }
+        )
     return {
         "schema": "qwen3-paper-alignment-audit-v1",
         "date": DATE,
@@ -297,6 +340,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "bitnet_complete_tasks": bitnet_complete,
         "tensor_bitdistill_complete_tasks": tensor_bitdistill_complete,
         "row_bitdistill_complete_tasks": row_bitdistill_complete,
+        "scale_comparisons": scale_comparisons,
         "gap_pass_count": len(gap_pass_rows),
         "paper_reproduction_ready": (
             set(fp_complete) == set(EXPECTED_EXAMPLES)
@@ -341,17 +385,40 @@ def render_markdown(summary: dict[str, Any]) -> str:
         ["gap-pass rows", summary["gap_pass_count"]],
         ["paper reproduction ready", summary["paper_reproduction_ready"]],
     ]
-    status = "ready" if summary["paper_reproduction_ready"] else "pending"
-    return "\n\n".join(
+    scale_table = [
         [
-            f"# Qwen3 Paper-Alignment Audit, {summary['date']}",
-            f"Overall status: **{status}**.",
-            (
-                "This audit tracks the queued Qwen3-0.6B branch. Rows remain "
-                "pending until full validation metrics and prediction traces exist."
-            ),
-            "## Headline",
-            md_table(["field", "value"], headline),
+            row["task"],
+            row["tensor_accuracy"],
+            row["row_accuracy"],
+            row["paired"].get("delta_row_minus_tensor"),
+            row["paired"].get("ci95"),
+            row["paired"].get("matched"),
+        ]
+        for row in summary.get("scale_comparisons", [])
+    ]
+    status = "ready" if summary["paper_reproduction_ready"] else "pending"
+    sections = [
+        f"# Qwen3 Paper-Alignment Audit, {summary['date']}",
+        f"Overall status: **{status}**.",
+        (
+            "This audit tracks the queued Qwen3-0.6B branch. Rows remain "
+            "pending until full validation metrics and prediction traces exist."
+        ),
+        "## Headline",
+        md_table(["field", "value"], headline),
+    ]
+    if scale_table:
+        sections.extend(
+            [
+                "## Row-Scale Versus Tensor-Scale BitDistill",
+                md_table(
+                    ["task", "tensor accuracy", "row accuracy", "row minus tensor", "CI95", "matched"],
+                    scale_table,
+                ),
+            ]
+        )
+    sections.extend(
+        [
             "## Rows",
             md_table(
                 [
@@ -373,7 +440,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 row_table,
             ),
         ]
-    ) + "\n"
+    )
+    return "\n\n".join(sections) + "\n"
 
 
 def main() -> None:

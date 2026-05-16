@@ -4,7 +4,7 @@
     "qnli",
     "sst2"
   ],
-  "complete_count": 11,
+  "complete_count": 12,
   "date": "2026-05-15",
   "expected_examples": {
     "mnli": 9815,
@@ -22,7 +22,8 @@
   "paper_reproduction_ready": false,
   "row_bitdistill_complete_tasks": [
     "mnli",
-    "qnli"
+    "qnli",
+    "sst2"
   ],
   "rows": [
     {
@@ -559,38 +560,54 @@
       "task": "sst2"
     },
     {
-      "accuracy": null,
-      "complete": false,
+      "accuracy": 0.8772935779816514,
+      "complete": true,
       "dependency": "afterok:10040:10049",
-      "eval_examples": null,
+      "eval_examples": 872.0,
       "evidence_label": "retrofit-variant",
       "expected_examples": 872,
       "job_id": "10052",
-      "last_ce": null,
+      "last_ce": 0.045166015625,
       "layer": "-1",
       "method": "bitdistill",
-      "metrics_exists": false,
+      "metrics_exists": true,
       "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitdistill-row-layer-1/metrics.json",
       "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitdistill-row-layer-1",
       "paired": {
-        "errors": [
-          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitdistill-row-layer-1/eval_predictions.jsonl"
+        "both_correct": 747,
+        "both_wrong": 43,
+        "candidate_accuracy": 0.8772935779816514,
+        "candidate_only": 18,
+        "ci95": [
+          -0.07281385415407889,
+          -0.03269073300188442
         ],
-        "status": "pending"
+        "delta_vs_fp": -0.052752293577981654,
+        "fp_only": 64,
+        "matched": 872,
+        "reference_accuracy": 0.930045871559633,
+        "status": "pass"
       },
       "passes_fp_gap": false,
       "phase": "novelty_row_scale",
-      "predictions_exists": false,
+      "predictions_exists": true,
       "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/sst2/bitdistill-row-layer-1/eval_predictions.jsonl",
-      "preparation": {},
+      "preparation": {
+        "activation_quantization": true,
+        "bitlinear_replaced": 196,
+        "subln_inserted": 56,
+        "ternary_init": {
+          "applied": false,
+          "mode": "absmean"
+        },
+        "untied_output_embeddings": false
+      },
       "queue": {
-        "elapsed": "0:57",
         "job_id": "10052",
-        "reason": "ece-nebula10",
-        "state": "RUNNING"
+        "state": "not_in_squeue"
       },
       "scale": "row",
-      "steps": null,
+      "steps": 1000,
       "task": "sst2"
     },
     {
@@ -619,10 +636,10 @@
       "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/mnli/bitdistill-tensor-layer-8/eval_predictions.jsonl",
       "preparation": {},
       "queue": {
-        "elapsed": "0:00",
+        "elapsed": "1:32",
         "job_id": "10053",
-        "reason": "(Resources)",
-        "state": "PENDING"
+        "reason": "ece-nebula10",
+        "state": "RUNNING"
       },
       "scale": "tensor",
       "steps": null,
@@ -656,7 +673,7 @@
       "queue": {
         "elapsed": "0:00",
         "job_id": "10054",
-        "reason": "(Priority)",
+        "reason": "(Resources)",
         "state": "PENDING"
       },
       "scale": "tensor",
@@ -697,6 +714,65 @@
       "scale": "tensor",
       "steps": null,
       "task": "mnli"
+    }
+  ],
+  "scale_comparisons": [
+    {
+      "paired": {
+        "both_correct": 6389,
+        "both_wrong": 2270,
+        "ci95": [
+          -0.03407344926306402,
+          -0.02053684110881575
+        ],
+        "delta_row_minus_tensor": -0.027305145185939888,
+        "errors": [],
+        "matched": 9815,
+        "row_only": 444,
+        "status": "pass",
+        "tensor_only": 712
+      },
+      "row_accuracy": 0.6961793173713704,
+      "task": "mnli",
+      "tensor_accuracy": 0.7234844625573102
+    },
+    {
+      "paired": {
+        "both_correct": 4468,
+        "both_wrong": 592,
+        "ci95": [
+          -0.019825559888575706,
+          -0.005435285800606062
+        ],
+        "delta_row_minus_tensor": -0.012630422844590884,
+        "errors": [],
+        "matched": 5463,
+        "row_only": 167,
+        "status": "pass",
+        "tensor_only": 236
+      },
+      "row_accuracy": 0.8484349258649094,
+      "task": "qnli",
+      "tensor_accuracy": 0.8610653487095002
+    },
+    {
+      "paired": {
+        "both_correct": 733,
+        "both_wrong": 80,
+        "ci95": [
+          -0.011536408798068776,
+          0.023004298706325657
+        ],
+        "delta_row_minus_tensor": 0.005733944954128441,
+        "errors": [],
+        "matched": 872,
+        "row_only": 32,
+        "status": "pass",
+        "tensor_only": 27
+      },
+      "row_accuracy": 0.8772935779816514,
+      "task": "sst2",
+      "tensor_accuracy": 0.8715596330275229
     }
   ],
   "schema": "qwen3-paper-alignment-audit-v1",
