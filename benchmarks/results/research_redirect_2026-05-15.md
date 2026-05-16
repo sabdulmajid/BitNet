@@ -87,11 +87,12 @@ Completed controls rule out several simple causes:
   `+0.009883` with CI `[0.003959, 0.015807]`; layer `-2` is slightly negative
   with CI crossing zero. The best layer still trails FP16-SFT `0.829750` by
   paired delta `-0.077738`, so this narrows but does not close the Qwen3 gap.
-- The unweighted LS ternary initializer is a negative transfer result under
-  this Qwen2.5 MNLI recipe: it reaches `0.361895` versus matched absmean
-  baseline `0.628935`, paired delta `-0.267040`, 95% CI
-  `[-0.279907, -0.254174]`. Synthetic row-wise reconstruction improvement is
-  therefore not sufficient evidence to promote an initializer.
+- LS-style ternary initializers are negative transfer results under this
+  Qwen2.5 MNLI recipe. Unweighted LS reaches `0.361895`; calibrated diag-LS
+  reaches `0.350993`; the matched absmean baseline is `0.628935`. The diag-LS
+  paired delta is `-0.277942`, 95% CI `[-0.290856, -0.265028]`. Synthetic
+  row-wise reconstruction improvement is therefore not sufficient evidence to
+  promote an initializer.
 - Against the saved FP16 prediction trace, the paired candidate-minus-FP16
   delta is `-0.179215`, 95% CI `[-0.189580, -0.168851]`, McNemar
   `p=3.438389e-240`.
@@ -143,8 +144,8 @@ Decision rule:
 - Finish the controlled Stage-2 token-budget curve before adding new sweep axes.
 - Treat the completed `163.84M` row as positive movement, not a reproduction.
 - Treat row-scale as a separate `retrofit-variant`, not a paper-reproduction row.
-- Do not promote unweighted LS initialization; wait for the calibrated diag-LS
-  diagnostic before deciding whether initializer work remains worth pursuing.
+- Do not promote LS or calibrated diag-LS initialization; both are task-quality
+  negative under the matched BitNet-SFT recipe.
 
 ## Product Framing
 
@@ -209,8 +210,8 @@ The plausible contribution is:
    token presentations.
 2. Use the cleared CE-only BitNet-SFT anchor as the controlled baseline for the
    next BitDistill interpretation.
-3. Keep the unweighted LS initializer as a recorded negative result; only the
-   calibrated diag-LS diagnostic remains pending on the initializer axis.
+3. Keep the unweighted LS and calibrated diag-LS initializers as recorded
+   negative task-quality results under the matched BitNet-SFT recipe.
 4. If the controlled curve remains weak, audit loss normalization, SubLN placement/timing,
    dense-head treatment, optimizer schedule, and ternary code/scale dynamics.
 5. Ingest the queued telemetry diagnostic before adding broad sweeps; the

@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 99,
+  "check_count": 100,
   "failed": [],
   "checks": [
     {
@@ -398,7 +398,13 @@
     {
       "name": "BitNet-SFT diag-LS init result audit is pending or complete",
       "passed": true,
-      "evidence": "status=pending, baseline=0.6289353031074886, candidate=None, quality_proven=False",
+      "evidence": "status=complete, baseline=0.6289353031074886, candidate=0.3509933774834437, quality_proven=False",
+      "blocker": ""
+    },
+    {
+      "name": "BitNet-SFT diag-LS complete result has paired MNLI statistics",
+      "passed": true,
+      "evidence": "matched=9815, ci=[-0.2908559087154853, -0.2650279425326044], delta=-0.27794192562404485",
       "blocker": ""
     },
     {

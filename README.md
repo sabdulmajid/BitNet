@@ -77,10 +77,11 @@ top-level evidence is intentionally short:
   tensor-scale on MNLI (`-0.027305` paired delta) and QNLI (`-0.012630`). On
   SST2 it is slightly higher (`+0.005734`), but the CI crosses zero:
   `[-0.011536, 0.023004]`.
-- **Initializer caution:** the unweighted LS ternary initializer is a negative
-  transfer result on Qwen2.5 MNLI: `0.361895` vs matched absmean baseline
-  `0.628935`, paired delta `-0.267040` with CI
-  `[-0.279907, -0.254174]`.
+- **Initializer caution:** least-squares ternary initializers are negative
+  transfer results on Qwen2.5 MNLI under the current BitNet-SFT recipe.
+  Unweighted LS reaches `0.361895`; calibrated diag-LS reaches `0.350993`;
+  the matched absmean baseline is `0.628935`. The diag-LS paired delta is
+  `-0.277942` with CI `[-0.290856, -0.265028]`.
 - **CPU runtime:** row-scale `I2_SR` runs on the Xeon Silver 4116 with PPL
   `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, and file size
   `1211.3 MiB`. This proves a compatible packed path, not a Q4_K_M quality or

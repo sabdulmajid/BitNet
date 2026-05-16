@@ -27,7 +27,7 @@ result.
 | BitNet-SFT baseline can clear the paper anchor | Proven for one Qwen2.5 MNLI tensor-scale schedule/budget row | CE-only Qwen2.5-0.5B BitNet-SFT reaches `0.628935` vs paper BitNet-SFT anchor `0.608000`. This is a baseline sanity check, not BitDistill recovery and not a general Qwen3 result. |
 | BitDistill FP recovery is not reproduced | Proven not yet complete | Controlled BitDistill rows reach `0.616607` and `0.691187`, still far from local FP16-SFT `0.807641`. |
 | Loss-normalized attention KD helps | Proven for one matched diagnostic | Gamma-60 reaches MNLI `0.738462`, improving over the matched paper-gamma row by `+0.047275`, but still remains `-0.069689` behind FP16. |
-| Unweighted LS ternary initialization improves task quality | Rejected for current Qwen2.5 MNLI recipe | LS init reaches `0.361895` vs matched absmean baseline `0.628935`; paired delta `-0.267040`, CI `[-0.279907, -0.254174]`. |
+| LS or diag-LS ternary initialization improves task quality | Rejected for current Qwen2.5 MNLI recipe | Unweighted LS reaches `0.361895`; calibrated diag-LS reaches `0.350993`; both trail the matched absmean baseline `0.628935`. Diag-LS paired delta is `-0.277942`, CI `[-0.290856, -0.265028]`. |
 | Qwen3 paper-alignment is not reproduced | Proven for completed MNLI/QNLI/SST2 rows | Qwen3-0.6B-Base MNLI FP16-SFT is `0.829750`; BitNet-SFT is `0.477127`; tensor BitDistill layer `-1` improves to `0.723484` but remains `-0.106266` paired delta behind FP. The MNLI layer sweep confirms sensitivity: layer `-8` reaches `0.752012` and is best, paired `+0.028528` over layer `-1`, but still remains `-0.077738` behind FP; layer `-4` is `+0.009883` over `-1`; layer `-2` is not useful. QNLI FP16-SFT is `0.921106`; BitNet-SFT is `0.587040`; tensor BitDistill improves to `0.861065` but remains `-0.060040` paired delta behind FP. SST2 FP16-SFT is `0.930046`; BitNet-SFT is `0.799312`; tensor BitDistill improves to `0.871560` and row BitDistill to `0.877294`, but both remain behind FP by paired deltas `-0.058486` and `-0.052752`. |
 | Row-scale runtime contract matters | Proven by output audit | One-scale TL2 relative output RMS error `1.904230`; exact row scales `0.000197`. |
 | TL2 group/tile-scale compromise is enough | Rejected for strict fidelity | Best available fp16 group-scale row is `0.098692` relative output RMS; exact fp16 row scales are `0.000197`. |
@@ -76,7 +76,7 @@ At the latest local check:
 | `10054` | `dualcard / ece-nebula10` | Qwen3 MNLI attention-layer sweep, layer `-2` | complete; accuracy `0.717779`; paired delta vs layer `-1` `-0.005706` |
 | `10055` | `dualcard / ece-nebula10` | Qwen3 MNLI attention-layer sweep, layer `-4` | complete; accuracy `0.733367`; paired delta vs layer `-1` `+0.009883` |
 | `10070` | `dualcard / ece-nebula10` | controlled 327.68M Stage-2 row | running |
-| `10080` | `midcard / ece-nebula12` | calibrated diag-LS BitNet-SFT initializer benchmark | running |
+| `10080` | `midcard / ece-nebula12` | calibrated diag-LS BitNet-SFT initializer benchmark | complete; negative transfer vs absmean, accuracy `0.350993` |
 
 No ternary quality claim should be made from the running or pending rows until
 their postprocess audits materialize JSON and Markdown reports.
@@ -233,9 +233,11 @@ Decision:
 
 - Unweighted LS initialization does not transfer to task quality under the
   current Qwen2.5 MNLI BitNet-SFT recipe: `0.361895` vs absmean `0.628935`.
-  Do not promote it into the main recipe.
-- Keep the calibrated diag-LS run as a separate pending diagnostic because it
-  changes the initializer calibration, not the downstream training recipe.
+- Calibrated diag-LS is worse under the same recipe: `0.350993` vs absmean
+  `0.628935`, paired delta `-0.277942` with CI
+  `[-0.290856, -0.265028]`.
+- Do not promote LS-style ternary initialization into the main recipe. The
+  synthetic reconstruction gains are not translating into task quality.
 
 ### Gate D: Runtime Product Path
 

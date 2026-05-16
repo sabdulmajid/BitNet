@@ -69,7 +69,8 @@ Overall status: **PASS**.
 | BitNet-SFT LS-init complete result has paired MNLI statistics | pass | matched=9815, ci=[-0.27990675734690423, -0.25417373170047225], delta=-0.26704024452368824 |  |
 | BitNet-SFT diag-LS init submission changes only initializer | pass | status=submitted, changed_axis=ternary_init_mode_only, init=diag_ls, cal=8, method=bitnet_sft, task=mnli |  |
 | BitNet-SFT diag-LS init submission has matched absmean baseline | pass | baseline=checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5, steps=10000, lr=2e-05 |  |
-| BitNet-SFT diag-LS init result audit is pending or complete | pass | status=pending, baseline=0.6289353031074886, candidate=None, quality_proven=False |  |
+| BitNet-SFT diag-LS init result audit is pending or complete | pass | status=complete, baseline=0.6289353031074886, candidate=0.3509933774834437, quality_proven=False |  |
+| BitNet-SFT diag-LS complete result has paired MNLI statistics | pass | matched=9815, ci=[-0.2908559087154853, -0.2650279425326044], delta=-0.27794192562404485 |  |
 | Sequence-classification runtime gap is narrowed but not closed | pass | status=native_classifier_sample_available_full_validation_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6 |  |
 | Sequence-classification I2_SR sidecar smoke passes | pass | status=prototype_smoke_passed, returncode=0, head_shape=[3, 896], finite_logits=True |  |
 | Sequence-classification sidecar CPU quality mismatch is recorded | pass | status=quality_mismatch, examples=128, agreement=0.9140625, accuracy=0.609375 |  |
