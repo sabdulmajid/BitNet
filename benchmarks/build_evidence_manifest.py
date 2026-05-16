@@ -80,6 +80,7 @@ ARTIFACTS: list[dict[str, str]] = [
     {"label": "bitdistill_telemetry_coverage_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_telemetry_coverage_{DATE}.md"},
     {"label": "bitdistill_training_dynamics_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_training_dynamics_{DATE}.md"},
     {"label": "bitdistill_telemetry_fast_submission_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_telemetry_fast_submission_2026-05-16.md"},
+    {"label": "bitdistill_gamma60_submission_report", "kind": "tracked_report", "path": "benchmarks/results/bitdistill_gamma60_submission_2026-05-16.md"},
     {"label": "qwen3_paper_alignment_report", "kind": "tracked_report", "path": f"benchmarks/results/qwen3_paper_alignment_{DATE}.md"},
     {"label": "qwen3_postprocess_submission_report", "kind": "tracked_report", "path": f"benchmarks/results/qwen3_postprocess_submission_{DATE}.md"},
     {"label": "bitdistill_cpu_benchmark_report", "kind": "tracked_report", "path": f"benchmarks/results/bitdistill_glue_cpu_{DATE}.md"},
