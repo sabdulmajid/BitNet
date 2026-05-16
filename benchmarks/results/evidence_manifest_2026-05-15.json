@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "bdf5322b61518d35741704eafe1cc02ea0d2b90716ebbff83b087dd69e119b8f",
-      "size_bytes": 15767
+      "sha256": "d02de4fda58e35dab018b9be8ea2b27614fb016b0831c9e23399359e3bddf798",
+      "size_bytes": 13379
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "current_research_plan_report",
       "metrics": {},
       "path": "benchmarks/results/current_research_plan_2026-05-16.md",
-      "sha256": "831a46e3d288c518a1a5231c7ca9a768e1135a3e23e345567e992d0fecdc9105",
-      "size_bytes": 12907
+      "sha256": "8d5c46215b23d3d4d561edbd9ceecd1ba7748ab24e0b69c3174c2d18f772fe24",
+      "size_bytes": 13223
     },
     {
       "exists": true,
@@ -610,8 +610,8 @@
       "label": "qwen3_paper_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/qwen3_paper_alignment_2026-05-15.md",
-      "sha256": "69581b6e6808e1e3d53e4e046768a8763317030da58954ed6f219dbaf83fc9c1",
-      "size_bytes": 4639
+      "sha256": "5f75ebefefcfa304b2fa019ddfe0c8ceb540ea122bec7a2dc6ab6a07696a770e",
+      "size_bytes": 4657
     },
     {
       "exists": true,
@@ -880,7 +880,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "86606ac36a04c65ccc6045c682afc2cb6506b7d97f6fff0b3e28ba8fff87f53f",
+      "sha256": "79f5a23e497c14b08a05f3bedff1fe9138f20e9c6976ced1cba6e03d73a713df",
       "size_bytes": 13402
     },
     {
@@ -2636,7 +2636,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "311a196764fc5381efcb52726aca4b16443a31be8450c6b4db53f97bf4eef8b9",
+      "sha256": "9f8c77d368cc9620c905d480fa000bc55865ebc6f6506b9cab18a23521e41429",
       "size_bytes": 20958
     },
     {
@@ -3010,8 +3010,8 @@
       "label": "qwen3_paper_alignment_json",
       "metrics": {},
       "path": "benchmark_results/qwen3_paper_alignment_2026-05-15.json",
-      "sha256": "5f45b4780144362b8c14f0853cceaa06c2be7d66e9aabc7d3173668a0cbdea6a",
-      "size_bytes": 24157
+      "sha256": "b8086b14f09fd5323606bf33e7259154c393cd212aa9cba82b3f1f107dccef59",
+      "size_bytes": 23748
     },
     {
       "exists": true,

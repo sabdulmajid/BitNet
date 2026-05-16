@@ -62,17 +62,21 @@ converter story. It is a training, evaluation, and runtime-contract story.
 
 ## Current Active Runs
 
-At the last local check:
+At the latest local check:
 
 | Job | Partition / node | Purpose | Status |
 | ---: | --- | --- | --- |
-| `10048` | `dualcard / ece-nebula10` | Qwen3 QNLI row-scale BitDistill row | running at last check |
+| `10049` | `dualcard / ece-nebula10` | Qwen3 SST2 FP16-SFT reference | complete; accuracy `0.930046` |
+| `10050` | `dualcard / ece-nebula10` | Qwen3 SST2 BitNet-SFT | running |
 | `10079` | `midcard / ece-nebula12` | unweighted LS BitNet-SFT initializer benchmark | running at last check |
+| `10051` | `dualcard` | Qwen3 SST2 tensor BitDistill | pending on dependencies |
+| `10052` | `dualcard` | Qwen3 SST2 row BitDistill | pending on dependencies |
+| `10053`-`10055` | `dualcard` | Qwen3 MNLI attention-layer sweeps | pending |
 | `10070` | `dualcard` | controlled 327.68M Stage-2 row | pending |
 | `10080` | `midcard` | calibrated diag-LS BitNet-SFT initializer benchmark | pending |
 
-No quality claim should be made from these rows until their postprocess audits
-materialize JSON and Markdown reports.
+No ternary quality claim should be made from the running or pending rows until
+their postprocess audits materialize JSON and Markdown reports.
 
 ## Critical Interpretation
 
@@ -264,9 +268,9 @@ Decision:
 
 ## Immediate Work Plan
 
-1. Postprocess jobs `10046`, `10047`, `10048`, `10049`, `10050`, `10051`,
-   `10052`, `10053`, `10054`, `10055`, `10070`, `10079`, and `10080` when they
-   finish. Commit only audited JSON/Markdown, not raw log assumptions.
+1. Postprocess jobs `10049`, `10050`, `10051`, `10052`, `10053`, `10054`,
+   `10055`, `10070`, `10079`, and `10080` when they finish. Commit only audited
+   JSON/Markdown, not raw log assumptions.
 2. Keep the top-level README as a claim ledger, not a dense experiment dump.
 3. Update reports with a strict label on every row:
    `paper-reproduction`, `paper-inspired`, or `retrofit-variant`.
