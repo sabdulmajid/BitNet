@@ -4,12 +4,12 @@
   "baseline_metrics_path": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5/metrics.json",
   "baseline_root": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5",
   "blockers": [
-    "missing candidate metrics: checkpoints/bitdistill-glue-seqcls-bitnet-sft-init/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-initls-steps10000-lr2em5/metrics.json"
+    "missing candidate metrics: checkpoints/bitdistill-glue-seqcls-bitnet-sft-init/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-initdiag_ls-cal8-steps10000-lr2em5/metrics.json"
   ],
   "candidate_accuracy": null,
   "candidate_eval_examples": null,
-  "candidate_metrics_path": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-init/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-initls-steps10000-lr2em5/metrics.json",
-  "candidate_root": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-init/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-initls-steps10000-lr2em5",
+  "candidate_metrics_path": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-init/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-initdiag_ls-cal8-steps10000-lr2em5/metrics.json",
+  "candidate_root": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-init/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-initdiag_ls-cal8-steps10000-lr2em5",
   "candidate_ternary_init": {},
   "date": "2026-05-15",
   "delta_vs_absmean_baseline": null,
@@ -22,24 +22,25 @@
     "changed_axis": "ternary_init_mode_only",
     "date": "2026-05-15",
     "grad_accum_steps": 4,
-    "job_id": 10079,
-    "job_table": "benchmark_results/bitnet_sft_ls_init_submission_2026-05-15.tsv",
+    "job_id": 10080,
+    "job_table": "benchmark_results/bitnet_sft_diag_ls_init_submission_2026-05-15.tsv",
     "learning_rate": 2e-05,
     "method": "bitnet_sft",
     "model": "Qwen/Qwen2.5-0.5B",
-    "output_dir": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-init/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-initls-steps10000-lr2em5",
+    "output_dir": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-init/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-initdiag_ls-cal8-steps10000-lr2em5",
     "partition": "midcard",
     "per_device_batch_size": 4,
     "scale_mode": "tensor",
-    "schema": "bitnet-sft-ls-init-submission-v1",
+    "schema": "bitnet-sft-diag-ls-init-submission-v1",
     "status": "submitted",
     "steps": 10000,
-    "success_gate": "full MNLI validation accuracy and paired predictions improve over the matched absmean run without changing task formulation, optimizer budget, activation quantization, SubLN setting, or classifier-head treatment",
+    "success_gate": "full MNLI validation accuracy and paired predictions improve over the matched absmean and unweighted-LS runs without changing task formulation, optimizer budget, activation quantization, SubLN setting, or classifier-head treatment",
     "task": "mnli",
     "task_format": "sequence_classification",
+    "ternary_init_calibration_batches": 8,
     "ternary_init_iterations": 8,
-    "ternary_init_mode": "ls"
+    "ternary_init_mode": "diag_ls"
   },
-  "submission_json": "benchmark_results/bitnet_sft_ls_init_submission_2026-05-15.json",
+  "submission_json": "benchmark_results/bitnet_sft_diag_ls_init_submission_2026-05-15.json",
   "verdict": "Pending Slurm output."
 }

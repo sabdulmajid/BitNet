@@ -821,6 +821,97 @@ def audit_bitnet_sft_ls_init_result(root: Path, checks: list[dict[str, Any]]) ->
         )
 
 
+def audit_bitnet_sft_diag_ls_init_submission(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/bitnet_sft_diag_ls_init_submission_{DATE}.json"
+    if not path.exists():
+        add_check(
+            checks,
+            "BitNet-SFT diag-LS init submission exists",
+            False,
+            str(path.relative_to(root)),
+            "missing BitNet-SFT diag-LS init submission record",
+        )
+        return
+    data = read_json(path)
+    add_check(
+        checks,
+        "BitNet-SFT diag-LS init submission changes only initializer",
+        data.get("status") == "submitted"
+        and data.get("changed_axis") == "ternary_init_mode_only"
+        and data.get("ternary_init_mode") == "diag_ls"
+        and data.get("ternary_init_calibration_batches") == 8
+        and data.get("method") == "bitnet_sft"
+        and data.get("task") == "mnli",
+        (
+            f"status={data.get('status')}, changed_axis={data.get('changed_axis')}, "
+            f"init={data.get('ternary_init_mode')}, cal={data.get('ternary_init_calibration_batches')}, "
+            f"method={data.get('method')}, task={data.get('task')}"
+        ),
+        "diag-LS submission should be a controlled MNLI BitNet-SFT initializer-only comparison",
+    )
+    add_check(
+        checks,
+        "BitNet-SFT diag-LS init submission has matched absmean baseline",
+        bool(data.get("baseline_output_dir"))
+        and (root / str(data.get("baseline_output_dir")) / "metrics.json").exists()
+        and int(data.get("steps") or 0) == 10000
+        and float(data.get("learning_rate") or 0.0) == 2e-5,
+        (
+            f"baseline={data.get('baseline_output_dir')}, "
+            f"steps={data.get('steps')}, lr={data.get('learning_rate')}"
+        ),
+        "diag-LS submission should compare against the existing matched 10000-step absmean baseline",
+    )
+
+
+def audit_bitnet_sft_diag_ls_init_result(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/bitnet_sft_diag_ls_init_audit_{DATE}.json"
+    if not path.exists():
+        add_check(
+            checks,
+            "BitNet-SFT diag-LS init result audit exists",
+            False,
+            str(path.relative_to(root)),
+            "missing BitNet-SFT diag-LS init result audit",
+        )
+        return
+    data = read_json(path)
+    status = data.get("status")
+    add_check(
+        checks,
+        "BitNet-SFT diag-LS init result audit is pending or complete",
+        status in {
+            "pending",
+            "complete",
+            "complete_incomplete_eval",
+            "complete_init_contract_failed",
+            "complete_prediction_contract_failed",
+        }
+        and data.get("baseline_accuracy") is not None
+        and data.get("quality_proven") in {False, True},
+        (
+            f"status={status}, baseline={data.get('baseline_accuracy')}, "
+            f"candidate={data.get('candidate_accuracy')}, quality_proven={data.get('quality_proven')}"
+        ),
+        "diag-LS result audit should either explicitly wait for Slurm output or report a complete comparison",
+    )
+    if status == "complete":
+        paired = data.get("paired", {}) if isinstance(data.get("paired"), dict) else {}
+        add_check(
+            checks,
+            "BitNet-SFT diag-LS complete result has paired MNLI statistics",
+            paired.get("status") == "pass"
+            and paired.get("matched") == 9815
+            and isinstance(paired.get("paired_ci95"), list)
+            and isinstance(data.get("delta_vs_absmean_baseline"), (int, float)),
+            (
+                f"matched={paired.get('matched')}, ci={paired.get('paired_ci95')}, "
+                f"delta={data.get('delta_vs_absmean_baseline')}"
+            ),
+            "complete diag-LS audit should include full paired MNLI statistics",
+        )
+
+
 def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
     path = root / f"benchmark_results/seqcls_runtime_gap_{DATE}.json"
     if not path.exists():
@@ -1244,6 +1335,8 @@ def main() -> None:
     audit_second_order_ternary_init(root, checks)
     audit_bitnet_sft_ls_init_submission(root, checks)
     audit_bitnet_sft_ls_init_result(root, checks)
+    audit_bitnet_sft_diag_ls_init_submission(root, checks)
+    audit_bitnet_sft_diag_ls_init_result(root, checks)
     audit_seqcls_runtime_gap(root, checks)
     audit_qwen3_paper_alignment(root, checks)
     audit_cpu_rows(root, checks)

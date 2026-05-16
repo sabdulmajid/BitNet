@@ -1,5 +1,5 @@
 {
-  "artifact_count": 257,
+  "artifact_count": 262,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "fa1b0c3d95b56101233c5f145bbcc01363818ed9ffdf6323917ac4bc2542237f",
-      "size_bytes": 29707
+      "sha256": "da4d17b9b852a328509d352b324f3ee8ef1b1323b861afe296ad8762a620248f",
+      "size_bytes": 29913
     },
     {
       "exists": true,
@@ -360,6 +360,33 @@
       "path": "benchmarks/results/bitnet_sft_ls_init_audit_2026-05-15.md",
       "sha256": "49d5b323171d0df01da792ac89bcfbaa695154b7e8fb6be1882347a5c31ae2c0",
       "size_bytes": 951
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitnet_sft_diag_ls_init_submission_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitnet_sft_diag_ls_init_submission_2026-05-15.md",
+      "sha256": "b30a9fe27efc0f0e1c92efe772f3c8fad7bcfdf32ad650f12e97e0ba7b21d774",
+      "size_bytes": 1587
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitnet_sft_diag_ls_init_submission_table",
+      "metrics": {},
+      "path": "benchmark_results/bitnet_sft_diag_ls_init_submission_2026-05-15.tsv",
+      "sha256": "06ac894c45241937c9c5593491d07db64811cfced27ede5fb59f0fd5e1cfe82e",
+      "size_bytes": 472
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "bitnet_sft_diag_ls_init_audit_report",
+      "metrics": {},
+      "path": "benchmarks/results/bitnet_sft_diag_ls_init_audit_2026-05-15.md",
+      "sha256": "fd84aa8a13de2e5d9df3824669645aa493ca2ea607c09fcbba68c02098a961f1",
+      "size_bytes": 981
     },
     {
       "exists": true,
@@ -763,8 +790,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "63b1d09e4484e90e7ee5194498395f0f7f0190fcd1db0655b153b46ce10080f1",
-      "size_bytes": 11235
+      "sha256": "18c0d45108aac124e44b3f1c5bfbcb5b0239a77d0c23ffbabb0a310c9980946d",
+      "size_bytes": 11798
     },
     {
       "exists": true,
@@ -2496,13 +2523,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 85,
+        "check_count": 88,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "d10818d5bf801694d71c50698eaf1cfdbafd68c70349f7a02bd93c66ec11344b",
-      "size_bytes": 17790
+      "sha256": "078d348df64940305a3e2030df52989dd4150f30e8e4348053189cc5d83d96d8",
+      "size_bytes": 18584
     },
     {
       "exists": true,
@@ -2686,8 +2713,26 @@
       "label": "bitnet_sft_ls_init_audit_json",
       "metrics": {},
       "path": "benchmark_results/bitnet_sft_ls_init_audit_2026-05-15.json",
-      "sha256": "7236bcd731898c93142db206b3c40f2fd940c0e5ed22470ba80c318b3e18dfb9",
-      "size_bytes": 2395
+      "sha256": "cdfb530ec27b1a0de74ad9cbbcef7160910228a6e7567a6ab64f5cfe1a78d82f",
+      "size_bytes": 2400
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "bitnet_sft_diag_ls_init_submission_json",
+      "metrics": {},
+      "path": "benchmark_results/bitnet_sft_diag_ls_init_submission_2026-05-15.json",
+      "sha256": "f36ba408a6743dbd219bcdbd203bd5df93c5726b36a0dbb5b40d5048ab2e2245",
+      "size_bytes": 1170
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
+      "label": "bitnet_sft_diag_ls_init_audit_json",
+      "metrics": {},
+      "path": "benchmark_results/bitnet_sft_diag_ls_init_audit_2026-05-15.json",
+      "sha256": "0cca566662115495750d0510f7fd238d983afe720163cc46c581ac7a60d8ab09",
+      "size_bytes": 2522
     },
     {
       "exists": true,

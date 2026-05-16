@@ -245,7 +245,11 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     elif candidate_examples != EXPECTED_MNLI:
         status = "complete_incomplete_eval"
         blockers.append(f"candidate examples={candidate_examples}, expected={EXPECTED_MNLI}")
-    elif not isinstance(ternary_init, dict) or ternary_init.get("mode") != "ls" or ternary_init.get("applied") is not True:
+    elif (
+        not isinstance(ternary_init, dict)
+        or ternary_init.get("mode") != args.expected_mode
+        or ternary_init.get("applied") is not True
+    ):
         status = "complete_init_contract_failed"
         blockers.append(f"candidate ternary_init={ternary_init}")
     else:
@@ -264,7 +268,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         else None
     )
     return {
-        "schema": "bitnet-sft-ls-init-audit-v1",
+        "schema": "bitnet-sft-ternary-init-audit-v1",
         "date": DATE,
         "status": status,
         "quality_proven": status == "complete" and isinstance(delta_vs_baseline, float),
@@ -285,14 +289,14 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "verdict": (
             "Pending Slurm output."
             if status == "pending"
-            else "LS initialization has a complete paired MNLI comparison."
+            else f"{args.expected_mode} initialization has a complete paired MNLI comparison."
             if status == "complete"
-            else "LS initialization comparison is not valid yet; see blockers."
+            else f"{args.expected_mode} initialization comparison is not valid yet; see blockers."
         ),
     }
 
 
-def render_markdown(summary: dict[str, Any]) -> str:
+def render_markdown(summary: dict[str, Any], *, title: str) -> str:
     paired = summary.get("paired", {}) if isinstance(summary.get("paired"), dict) else {}
     rows = [
         ["status", summary.get("status")],
@@ -309,7 +313,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
     blockers = summary.get("blockers", []) if isinstance(summary.get("blockers"), list) else []
     return "\n\n".join(
         [
-            f"# BitNet-SFT LS-Init Audit, {summary['date']}",
+            f"# {title}, {summary['date']}",
             str(summary.get("verdict", "")),
             "## Summary",
             md_table(["field", "value"], rows),
@@ -333,14 +337,16 @@ def main() -> None:
     parser.add_argument("--submission-json", type=Path, default=Path(f"benchmark_results/bitnet_sft_ls_init_submission_{DATE}.json"))
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitnet_sft_ls_init_audit_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/bitnet_sft_ls_init_audit_{DATE}.md"))
+    parser.add_argument("--expected-mode", default="ls")
+    parser.add_argument("--title", default="BitNet-SFT LS-Init Audit")
     args = parser.parse_args()
 
     summary = build_summary(args)
     args.output_json.parent.mkdir(parents=True, exist_ok=True)
     args.output_md.parent.mkdir(parents=True, exist_ok=True)
     args.output_json.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    args.output_md.write_text(render_markdown(summary), encoding="utf-8")
-    print(render_markdown(summary))
+    args.output_md.write_text(render_markdown(summary, title=args.title), encoding="utf-8")
+    print(render_markdown(summary, title=args.title))
 
 
 if __name__ == "__main__":
