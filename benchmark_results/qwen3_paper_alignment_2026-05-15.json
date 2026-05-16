@@ -2,7 +2,7 @@
   "bitnet_complete_tasks": [
     "mnli"
   ],
-  "complete_count": 4,
+  "complete_count": 5,
   "date": "2026-05-15",
   "expected_examples": {
     "mnli": 9815,
@@ -10,7 +10,8 @@
     "sst2": 872
   },
   "fp_complete_tasks": [
-    "mnli"
+    "mnli",
+    "qnli"
   ],
   "gap_pass_count": 0,
   "job_count": 16,
@@ -232,32 +233,33 @@
       "task": "mnli"
     },
     {
-      "accuracy": null,
-      "complete": false,
+      "accuracy": 0.9211056196229178,
+      "complete": true,
       "dependency": "none",
-      "eval_examples": null,
+      "eval_examples": 5463.0,
       "expected_examples": 5463,
       "job_id": "10045",
-      "last_ce": null,
+      "last_ce": 0.0308837890625,
       "layer": "-1",
       "method": "fp16_sft",
-      "metrics_exists": false,
+      "metrics_exists": true,
       "metrics_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/fp16_sft-tensor-layer-1/metrics.json",
       "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/fp16_sft-tensor-layer-1",
       "paired": {},
       "passes_fp_gap": false,
       "phase": "paper_baseline",
-      "predictions_exists": false,
+      "predictions_exists": true,
       "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
-      "preparation": {},
+      "preparation": {
+        "bitlinear_replaced": 0,
+        "subln_inserted": 0
+      },
       "queue": {
-        "elapsed": "1:36",
         "job_id": "10045",
-        "reason": "ece-nebula10",
-        "state": "RUNNING"
+        "state": "not_in_squeue"
       },
       "scale": "tensor",
-      "steps": null,
+      "steps": 1000,
       "task": "qnli"
     },
     {
@@ -275,7 +277,6 @@
       "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitnet_sft-tensor-layer-1",
       "paired": {
         "errors": [
-          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
           "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitnet_sft-tensor-layer-1/eval_predictions.jsonl"
         ],
         "status": "pending"
@@ -286,10 +287,10 @@
       "predictions_path": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitnet_sft-tensor-layer-1/eval_predictions.jsonl",
       "preparation": {},
       "queue": {
-        "elapsed": "0:00",
+        "elapsed": "0:57",
         "job_id": "10046",
-        "reason": "(Resources)",
-        "state": "PENDING"
+        "reason": "ece-nebula10",
+        "state": "RUNNING"
       },
       "scale": "tensor",
       "steps": null,
@@ -310,7 +311,6 @@
       "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitdistill-tensor-layer-1",
       "paired": {
         "errors": [
-          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
           "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitdistill-tensor-layer-1/eval_predictions.jsonl"
         ],
         "status": "pending"
@@ -323,7 +323,7 @@
       "queue": {
         "elapsed": "0:00",
         "job_id": "10047",
-        "reason": "(Dependency)",
+        "reason": "(Resources)",
         "state": "PENDING"
       },
       "scale": "tensor",
@@ -345,7 +345,6 @@
       "output_dir": "checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitdistill-row-layer-1",
       "paired": {
         "errors": [
-          "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
           "missing checkpoints/bitdistill-glue-qwen3base-seqcls-papergamma/Qwen-Qwen3-0.6B-Base/qnli/bitdistill-row-layer-1/eval_predictions.jsonl"
         ],
         "status": "pending"
@@ -358,7 +357,7 @@
       "queue": {
         "elapsed": "0:00",
         "job_id": "10048",
-        "reason": "(Dependency)",
+        "reason": "(Priority)",
         "state": "PENDING"
       },
       "scale": "row",
