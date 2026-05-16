@@ -121,6 +121,7 @@ def load_batching_audit(path: Path) -> dict[str, Any]:
             "exists": False,
             "status": "missing",
             "ready_for_batched_product_benchmark": False,
+            "ready_for_sequence_isolated_product_benchmark": False,
         }
     data = read_json(path)
     return {
@@ -128,6 +129,10 @@ def load_batching_audit(path: Path) -> dict[str, Any]:
         "exists": True,
         "status": data.get("status"),
         "ready_for_batched_product_benchmark": data.get("ready_for_batched_product_benchmark") is True,
+        "ready_for_sequence_isolated_product_benchmark": data.get(
+            "ready_for_sequence_isolated_product_benchmark"
+        )
+        is True,
         "summary": data.get("summary", {}) if isinstance(data.get("summary"), dict) else {},
     }
 
@@ -188,6 +193,7 @@ def run_native_classifier(
     batch_size: int,
     ubatch_size: int,
     timeout_seconds: int,
+    embedding_sequential: bool = False,
 ) -> tuple[np.ndarray, dict[str, Any]]:
     if any(separator in prompt for prompt in prompts):
         raise ValueError("separator occurs inside a prompt")
@@ -221,6 +227,8 @@ def run_native_classifier(
         "-ub",
         str(ubatch_size),
     ]
+    if embedding_sequential:
+        command.append("--embd-sequential")
     before_rss_kib = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss
     started = time.perf_counter()
     try:
@@ -244,6 +252,7 @@ def run_native_classifier(
         "stdout_bytes": len(result.stdout.encode("utf-8")),
         "stderr_bytes": len(result.stderr.encode("utf-8")),
         "perf": parse_perf(result.stderr),
+        "embedding_sequential": embedding_sequential,
         "child_peak_rss_kib_before": before_rss_kib,
         "child_peak_rss_kib_after": after_rss_kib,
         "stderr_tail": result.stderr[-4000:],
@@ -343,7 +352,7 @@ def render_markdown(result: dict[str, Any]) -> str:
             (
                 "This benchmark evaluates one native GGUF artifact that contains the packed I2_SR "
                 "backbone and dense classifier head. It is the same-artifact runtime path, but it "
-                "is not product-ready unless full validation, batching parity, RSS, and throughput "
+                "is not product-ready unless full validation, runtime parity, RSS, and throughput "
                 "gates pass."
             ),
             md_table(
@@ -361,7 +370,10 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["label agreement with saved trace", summary["label_agreement_with_saved_trace"]],
                     ["prompt input", result["prompt_input"]],
                     ["prompt batch size", result["prompt_batch_size"]],
+                    ["embedding sequential", result["embedding_sequential"]],
                     ["batching parity ready", result["batching_parity_ready"]],
+                    ["sequence-isolated parity ready", result["sequence_isolated_parity_ready"]],
+                    ["runtime parity ready", result["runtime_parity_ready"]],
                     ["llama batch size", result["batch_size"]],
                     ["ubatch size", result["ubatch_size"]],
                     ["wall seconds", runtime["wall_seconds"]],
@@ -396,6 +408,15 @@ def main() -> None:
     )
     parser.add_argument("--batch-size", type=int, default=4096)
     parser.add_argument("--ubatch-size", type=int, default=512)
+    parser.add_argument(
+        "--embedding-sequential",
+        action="store_true",
+        help=(
+            "Pass --embd-sequential to llama-embedding. This evaluates each prompt as its own "
+            "sequence inside one loaded process, avoiding known multi-prompt I2_SR drift while "
+            "still amortizing model load over --prompt-batch-size prompts."
+        ),
+    )
     parser.add_argument("--threads", type=int, default=24)
     parser.add_argument("--ctx-size", type=int, default=512)
     parser.add_argument("--timeout-seconds", type=int, default=7200)
@@ -458,6 +479,8 @@ def main() -> None:
     batching_audit_path = args.batching_audit_json if args.batching_audit_json.is_absolute() else root / args.batching_audit_json
     batching_audit = load_batching_audit(batching_audit_path)
     batching_parity_ready = batching_audit.get("ready_for_batched_product_benchmark") is True
+    sequence_isolated_ready = batching_audit.get("ready_for_sequence_isolated_product_benchmark") is True
+    runtime_parity_ready = sequence_isolated_ready if args.embedding_sequential else batching_parity_ready
     tokenizer = AutoTokenizer.from_pretrained(checkpoint_dir, trust_remote_code=True)
     rows = load_rows(args.task, args.max_samples)
     prompts = [render_prompt(tokenizer, args.task, row, prompt_input=args.prompt_input) for row in rows]
@@ -502,6 +525,7 @@ def main() -> None:
             batch_size=args.batch_size,
             ubatch_size=args.ubatch_size,
             timeout_seconds=args.timeout_seconds,
+            embedding_sequential=args.embedding_sequential,
         )
         metas.append(meta)
         progress_batch_rows: list[dict[str, Any]] = []
@@ -520,6 +544,7 @@ def main() -> None:
                     "elapsed_seconds": time.perf_counter() - started,
                     "prompt_batch_size": args.prompt_batch_size,
                     "prompt_input": args.prompt_input,
+                    "embedding_sequential": args.embedding_sequential,
                 }
             )
         if progress_path is not None:
@@ -589,13 +614,28 @@ def main() -> None:
     ready_to_productize = (
         status == "pass"
         and full_validation_complete
-        and batching_parity_ready
+        and runtime_parity_ready
         and trace_agreement is not None
         and trace_agreement >= 0.99
         and runtime["child_peak_rss_mib"] is not None
         and runtime["examples_per_second"] is not None
         and runtime["examples_per_second"] > 0
     )
+    product_gate_blockers: list[str] = []
+    if status != "pass":
+        product_gate_blockers.append(f"status={status}")
+    if not full_validation_complete:
+        product_gate_blockers.append("full_validation_incomplete")
+    if not runtime_parity_ready:
+        product_gate_blockers.append("runtime_parity_not_ready")
+    if trace_agreement is None:
+        product_gate_blockers.append("missing_saved_pytorch_agreement")
+    elif trace_agreement < 0.99:
+        product_gate_blockers.append(f"saved_pytorch_agreement={trace_agreement:.6f}<0.99")
+    if runtime["child_peak_rss_mib"] is None:
+        product_gate_blockers.append("missing_rss")
+    if runtime["examples_per_second"] is None or runtime["examples_per_second"] <= 0:
+        product_gate_blockers.append("missing_positive_throughput")
     prediction_json = json.dumps(predictions, separators=(",", ":"))
     result = {
         "schema": "seqcls_native_i2sr_cpu.v1",
@@ -606,7 +646,10 @@ def main() -> None:
         "expected_examples": expected_examples,
         "full_validation_complete": full_validation_complete,
         "ready_to_productize": ready_to_productize,
+        "product_gate_blockers": product_gate_blockers,
         "batching_parity_ready": batching_parity_ready,
+        "sequence_isolated_parity_ready": sequence_isolated_ready,
+        "runtime_parity_ready": runtime_parity_ready,
         "batching_audit": batching_audit,
         "progress": {
             "path": maybe_relative(progress_path, root) if progress_path is not None else None,
@@ -616,6 +659,7 @@ def main() -> None:
         },
         "prompt_input": args.prompt_input,
         "prompt_batch_size": args.prompt_batch_size,
+        "embedding_sequential": args.embedding_sequential,
         "batch_size": args.batch_size,
         "ubatch_size": args.ubatch_size,
         "checkpoint": {
@@ -647,15 +691,16 @@ def main() -> None:
         "limitations": [
             "This uses llama-embedding JSON output as the classifier-logit transport.",
             "The faithful path uses direct token IDs because text decode/re-tokenize is not lossless for all Qwen pair prompts.",
-            "The smoke is product-ready only after full validation and batching parity pass.",
+            "The result is product-ready only after full validation, runtime parity, quality agreement, RSS, and throughput gates pass.",
             "The child RSS value is a process-level peak from resource.getrusage on Linux.",
         ],
         "verdict": (
             "Native same-artifact classifier validation passed the configured product gate."
             if ready_to_productize
-            else "Native same-artifact classifier execution is measurable, but the product gate remains blocked "
-            "until full validation, batching parity, RSS, and throughput are audited. Batching parity is a "
-            "hard gate because the current multi-prompt native classifier path changes low-margin logits."
+            else "Native same-artifact classifier execution is measurable, but the product gate remains blocked by: "
+            + ", ".join(product_gate_blockers)
+            + ". Multi-prompt batched I2_SR remains blocked by position-dependent drift; sequence-isolated mode is "
+            "a separate mitigation."
         ),
         "stderr_tail": metas[-1]["stderr_tail"] if metas else "",
     }

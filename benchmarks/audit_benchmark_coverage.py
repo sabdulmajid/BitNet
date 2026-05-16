@@ -1348,6 +1348,100 @@ def audit_seqcls_native_i2sr_cpu_sample(root: Path, checks: list[dict[str, Any]]
         ),
         "duplicate batching controls should distinguish generic FP16 pooled-embedding drift from BitNet/I2_SR drift",
     )
+    seq_iso_duplicate_path = root / f"benchmark_results/seqcls_native_duplicate_sequence_isolated_audit_{DATE}.json"
+    seq_iso_duplicate = read_json(seq_iso_duplicate_path)
+    seq_iso_summary = (
+        seq_iso_duplicate.get("summary", {}) if isinstance(seq_iso_duplicate.get("summary"), dict) else {}
+    )
+    add_check(
+        checks,
+        "Sequence-classification sequence-isolated duplicate audit fixes prompt-position drift",
+        seq_iso_duplicate.get("status") == "pass"
+        and seq_iso_duplicate.get("embedding_sequential") is True
+        and seq_iso_duplicate.get("ready_for_batched_product_benchmark") is False
+        and seq_iso_duplicate.get("ready_for_sequence_isolated_product_benchmark") is True
+        and seq_iso_summary.get("all_logits_invariant") is True
+        and seq_iso_summary.get("all_predictions_invariant") is True
+        and seq_iso_summary.get("changed_prediction_count") == 0
+        and seq_iso_summary.get("max_relative_rms_vs_alone") == 0.0,
+        (
+            f"status={seq_iso_duplicate.get('status')}, sequential={seq_iso_duplicate.get('embedding_sequential')}, "
+            f"logits_invariant={seq_iso_summary.get('all_logits_invariant')}, "
+            f"changed={seq_iso_summary.get('changed_prediction_count')}, "
+            f"max_rel={seq_iso_summary.get('max_relative_rms_vs_alone')}, "
+            f"seq_ready={seq_iso_duplicate.get('ready_for_sequence_isolated_product_benchmark')}, "
+            f"batch_ready={seq_iso_duplicate.get('ready_for_batched_product_benchmark')}"
+        ),
+        "sequence-isolated embedding mode should preserve single-prompt logits without promoting batched I2_SR",
+    )
+    seq_iso_sample_path = root / f"benchmark_results/seqcls_native_i2sr_cpu_mnli_64_token_ids_sequence_isolated_{DATE}.json"
+    seq_iso_sample = read_json(seq_iso_sample_path)
+    seq_iso_sample_summary = (
+        seq_iso_sample.get("summary", {}) if isinstance(seq_iso_sample.get("summary"), dict) else {}
+    )
+    seq_iso_runtime = seq_iso_sample.get("runtime", {}) if isinstance(seq_iso_sample.get("runtime"), dict) else {}
+    add_check(
+        checks,
+        "Sequence-classification sequence-isolated CPU sample amortizes model load",
+        seq_iso_sample.get("status") == "sample_only"
+        and seq_iso_sample.get("embedding_sequential") is True
+        and seq_iso_sample.get("prompt_batch_size") == 64
+        and seq_iso_sample.get("runtime_parity_ready") is True
+        and seq_iso_sample.get("ready_to_productize") is False
+        and seq_iso_sample_summary.get("examples") == 64
+        and isinstance(seq_iso_sample_summary.get("agreement_with_saved_pytorch_predictions"), (int, float))
+        and seq_iso_sample_summary.get("agreement_with_saved_pytorch_predictions") >= 0.95
+        and seq_iso_runtime.get("subprocesses") == 1
+        and isinstance(seq_iso_runtime.get("examples_per_second"), (int, float))
+        and seq_iso_runtime.get("examples_per_second") > 1.0,
+        (
+            f"status={seq_iso_sample.get('status')}, sequential={seq_iso_sample.get('embedding_sequential')}, "
+            f"prompt_batch={seq_iso_sample.get('prompt_batch_size')}, "
+            f"runtime_ready={seq_iso_sample.get('runtime_parity_ready')}, "
+            f"examples={seq_iso_sample_summary.get('examples')}, "
+            f"agreement={seq_iso_sample_summary.get('agreement_with_saved_pytorch_predictions')}, "
+            f"subprocesses={seq_iso_runtime.get('subprocesses')}, "
+            f"examples_per_second={seq_iso_runtime.get('examples_per_second')}"
+        ),
+        "sequence-isolated CPU sample should amortize load in one process while remaining sample-only evidence",
+    )
+    seq_iso_full_path = root / f"benchmark_results/seqcls_native_i2sr_cpu_mnli_full_token_ids_sequence_isolated_{DATE}.json"
+    seq_iso_full = read_json(seq_iso_full_path)
+    seq_iso_full_summary = (
+        seq_iso_full.get("summary", {}) if isinstance(seq_iso_full.get("summary"), dict) else {}
+    )
+    seq_iso_full_runtime = (
+        seq_iso_full.get("runtime", {}) if isinstance(seq_iso_full.get("runtime"), dict) else {}
+    )
+    add_check(
+        checks,
+        "Sequence-classification sequence-isolated full CPU validation passes runtime parity",
+        seq_iso_full.get("status") == "pass"
+        and seq_iso_full.get("full_validation_complete") is True
+        and seq_iso_full.get("embedding_sequential") is True
+        and seq_iso_full.get("prompt_batch_size") == 512
+        and seq_iso_full.get("runtime_parity_ready") is True
+        and seq_iso_full.get("ready_to_productize") is False
+        and seq_iso_full_summary.get("examples") == 9815
+        and isinstance(seq_iso_full_summary.get("accuracy"), (int, float))
+        and abs(seq_iso_full_summary.get("accuracy") - 0.6521650534895568) < 1e-12
+        and isinstance(seq_iso_full_summary.get("agreement_with_saved_pytorch_predictions"), (int, float))
+        and seq_iso_full_summary.get("agreement_with_saved_pytorch_predictions") >= 0.97
+        and isinstance(seq_iso_full_runtime.get("examples_per_second"), (int, float))
+        and seq_iso_full_runtime.get("examples_per_second") > 5.0
+        and seq_iso_full_runtime.get("subprocesses") < 100,
+        (
+            f"status={seq_iso_full.get('status')}, full={seq_iso_full.get('full_validation_complete')}, "
+            f"sequential={seq_iso_full.get('embedding_sequential')}, "
+            f"runtime_ready={seq_iso_full.get('runtime_parity_ready')}, "
+            f"accuracy={seq_iso_full_summary.get('accuracy')}, "
+            f"agreement={seq_iso_full_summary.get('agreement_with_saved_pytorch_predictions')}, "
+            f"examples_per_second={seq_iso_full_runtime.get('examples_per_second')}, "
+            f"subprocesses={seq_iso_full_runtime.get('subprocesses')}, "
+            f"ready={seq_iso_full.get('ready_to_productize')}"
+        ),
+        "sequence-isolated full CPU validation should preserve quality while improving load amortization, but not productize weak quality",
+    )
     full_progress_path = root / f"benchmark_results/seqcls_native_full_progress_{DATE}.json"
     full_progress = read_json(full_progress_path)
     add_check(

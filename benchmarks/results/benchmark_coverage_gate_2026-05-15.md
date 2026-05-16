@@ -88,6 +88,9 @@ Overall status: **PASS**.
 | Sequence-classification native batching audit diagnoses non-swap drift | pass | diagnosis=position_dependent_drift_not_row_swap, nearest_self=True, drifted=4 |  |
 | Sequence-classification duplicate-prompt batching audit rules out prompt formatting | pass | status=duplicate_batching_parity_mismatch, same_prompt=True, logits_invariant=False, predictions_invariant=False, changed_predictions=4, max_rel=0.30515261718676356, ready=False |  |
 | Sequence-classification duplicate-prompt controls isolate BitNet/I2_SR drift | pass | fp_max_rel=0.0005771210893230367, fp_logits_invariant=False, bitnet_backbone_max_rel=0.07428541742772618, bitnet_backbone_logits_invariant=False |  |
+| Sequence-classification sequence-isolated duplicate audit fixes prompt-position drift | pass | status=pass, sequential=True, logits_invariant=True, changed=0, max_rel=0.0, seq_ready=True, batch_ready=False |  |
+| Sequence-classification sequence-isolated CPU sample amortizes model load | pass | status=sample_only, sequential=True, prompt_batch=64, runtime_ready=True, examples=64, agreement=0.96875, subprocesses=1, examples_per_second=5.49881156856233 |  |
+| Sequence-classification sequence-isolated full CPU validation passes runtime parity | pass | status=pass, full=True, sequential=True, runtime_ready=True, accuracy=0.6521650534895568, agreement=0.9766683647478349, examples_per_second=7.456204234199212, subprocesses=20, ready=False |  |
 | Sequence-classification native full CPU progress is resumable | pass | status=complete, completed=9815, contiguous=True, product=False |  |
 | Qwen3 paper-alignment audit tracks required GLUE rows | pass | jobs=16, complete=15, ready=False |  |
 | FP F16 CPU row is finite | pass | ppl=12.2808, prefill=114.468162, decode=5.555998 |  |
@@ -107,5 +110,5 @@ Overall status: **PASS**.
 | Research redirect gate covers required claims | pass | missing=[] |  |
 | Research redirect gate blocks overclaims | pass | blocked_statuses=['blocked', 'full_validation_batching_blocked', 'not_proven'] |  |
 | fixed I2_SR RSS has four context rows | pass | contexts=[512, 2048, 8192, 32768] |  |
-| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=291, missing=0, missing_labels=[] |  |
+| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=297, missing=0, missing_labels=[] |  |
 | productization gate passes for stable I2_SR | pass | passed=True, failed=0, stable_quality=True, layout=True |  |

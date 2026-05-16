@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 105,
+  "check_count": 108,
   "failed": [],
   "checks": [
     {
@@ -510,6 +510,24 @@
       "blocker": ""
     },
     {
+      "name": "Sequence-classification sequence-isolated duplicate audit fixes prompt-position drift",
+      "passed": true,
+      "evidence": "status=pass, sequential=True, logits_invariant=True, changed=0, max_rel=0.0, seq_ready=True, batch_ready=False",
+      "blocker": ""
+    },
+    {
+      "name": "Sequence-classification sequence-isolated CPU sample amortizes model load",
+      "passed": true,
+      "evidence": "status=sample_only, sequential=True, prompt_batch=64, runtime_ready=True, examples=64, agreement=0.96875, subprocesses=1, examples_per_second=5.49881156856233",
+      "blocker": ""
+    },
+    {
+      "name": "Sequence-classification sequence-isolated full CPU validation passes runtime parity",
+      "passed": true,
+      "evidence": "status=pass, full=True, sequential=True, runtime_ready=True, accuracy=0.6521650534895568, agreement=0.9766683647478349, examples_per_second=7.456204234199212, subprocesses=20, ready=False",
+      "blocker": ""
+    },
+    {
       "name": "Sequence-classification native full CPU progress is resumable",
       "passed": true,
       "evidence": "status=complete, completed=9815, contiguous=True, product=False",
@@ -626,7 +644,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=291, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=297, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

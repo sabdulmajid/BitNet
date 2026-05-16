@@ -124,6 +124,7 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["status", result["status"]],
                     ["targets", result["summary"]["target_indices"]],
                     ["repeat count", result["repeat_count"]],
+                    ["embedding sequential", result["embedding_sequential"]],
                     ["same prompt repeated", result["summary"]["same_prompt_repeated"]],
                     ["all logits invariant", result["summary"]["all_logits_invariant"]],
                     ["all predictions invariant", result["summary"]["all_predictions_invariant"]],
@@ -131,6 +132,7 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["max relative RMS vs alone", result["summary"]["max_relative_rms_vs_alone"]],
                     ["formatting/tokenization ruled out", result["summary"]["formatting_and_tokenization_ruled_out"]],
                     ["ready for batched product benchmark", result["ready_for_batched_product_benchmark"]],
+                    ["ready for sequence-isolated product benchmark", result["ready_for_sequence_isolated_product_benchmark"]],
                 ],
             ),
             "## Duplicate Positions",
@@ -173,6 +175,7 @@ def audit_duplicate_model(
     batch_size: int,
     ubatch_size: int,
     timeout_seconds: int,
+    embedding_sequential: bool,
     logit_atol: float,
 ) -> dict[str, Any]:
     target_results: list[dict[str, Any]] = []
@@ -193,6 +196,7 @@ def audit_duplicate_model(
             batch_size=batch_size,
             ubatch_size=ubatch_size,
             timeout_seconds=timeout_seconds,
+            embedding_sequential=embedding_sequential,
         )
         duplicate_logits, duplicate_meta = run_native_classifier(
             binary=binary,
@@ -204,6 +208,7 @@ def audit_duplicate_model(
             batch_size=batch_size,
             ubatch_size=ubatch_size,
             timeout_seconds=timeout_seconds,
+            embedding_sequential=embedding_sequential,
         )
 
         alone = alone_logits[0].astype(np.float32)
@@ -309,14 +314,27 @@ def main() -> None:
     parser.add_argument("--ctx-size", type=int, default=512)
     parser.add_argument("--batch-size", type=int, default=4096)
     parser.add_argument("--ubatch-size", type=int, default=512)
+    parser.add_argument(
+        "--embedding-sequential",
+        action="store_true",
+        help=(
+            "Pass --embd-sequential to llama-embedding. This keeps one loaded process but "
+            "evaluates each duplicate prompt as its own sequence-isolated decode."
+        ),
+    )
     parser.add_argument("--timeout-seconds", type=int, default=600)
     parser.add_argument("--separator", default="<#BITNET_DUPLICATE_BATCH_PARITY#>")
     parser.add_argument("--logit-atol", type=float, default=1.0e-4)
     parser.add_argument(
         "--control-gguf",
         action="append",
-        default=[f"{label}={path}" for label, path in DEFAULT_CONTROL_GGUFS],
+        default=[],
         help="Optional duplicate-batching control model as LABEL=PATH. Repeat to add controls.",
+    )
+    parser.add_argument(
+        "--no-default-controls",
+        action="store_true",
+        help="Skip the default FP16 and I2_SR-backbone control GGUFs.",
     )
     parser.add_argument(
         "--output-json",
@@ -332,6 +350,8 @@ def main() -> None:
 
     if args.repeat_count < 2:
         raise SystemExit("--repeat-count must be at least 2")
+    control_specs = [] if args.no_default_controls else [f"{label}={path}" for label, path in DEFAULT_CONTROL_GGUFS]
+    control_specs.extend(args.control_gguf)
 
     root = args.repo_root.resolve()
     checkpoint_dir = args.checkpoint_dir if args.checkpoint_dir.is_absolute() else root / args.checkpoint_dir
@@ -363,10 +383,11 @@ def main() -> None:
         batch_size=args.batch_size,
         ubatch_size=args.ubatch_size,
         timeout_seconds=args.timeout_seconds,
+        embedding_sequential=args.embedding_sequential,
         logit_atol=args.logit_atol,
     )
     control_models = []
-    for label, control_path in (parse_labeled_path(item) for item in args.control_gguf):
+    for label, control_path in (parse_labeled_path(item) for item in control_specs):
         control_models.append(
             compact_control_model(
                 audit_duplicate_model(
@@ -382,6 +403,7 @@ def main() -> None:
                     batch_size=args.batch_size,
                     ubatch_size=args.ubatch_size,
                     timeout_seconds=args.timeout_seconds,
+                    embedding_sequential=args.embedding_sequential,
                     logit_atol=args.logit_atol,
                 )
             )
@@ -399,6 +421,7 @@ def main() -> None:
         "date": DATE,
         "status": status,
         "repeat_count": args.repeat_count,
+        "embedding_sequential": args.embedding_sequential,
         "artifacts": {
             "checkpoint": maybe_relative(checkpoint_dir, root),
             "gguf": maybe_relative(gguf, root),
@@ -415,9 +438,16 @@ def main() -> None:
         },
         "targets": primary["targets"],
         "control_models": control_models,
-        "ready_for_batched_product_benchmark": status == "pass",
+        "ready_for_batched_product_benchmark": status == "pass" and not args.embedding_sequential,
+        "ready_for_sequence_isolated_product_benchmark": status == "pass" and args.embedding_sequential,
         "interpretation": (
-            "Duplicate token-ID prompts are invariant across batch positions."
+            (
+                "Duplicate token-ID prompts are invariant when evaluated with --embd-sequential. "
+                "This is a sequence-isolated mitigation, not proof that the multi-prompt batched "
+                "I2_SR path is safe."
+            )
+            if status == "pass" and args.embedding_sequential
+            else "Duplicate token-ID prompts are invariant across batch positions."
             if status == "pass"
             else (
                 "Duplicate token-ID prompts are not invariant across batch positions. Because every "

@@ -32,8 +32,9 @@ result.
 | Row-scale runtime contract matters | Proven by output audit | One-scale TL2 relative output RMS error `1.904230`; exact row scales `0.000197`. |
 | TL2 group/tile-scale compromise is enough | Rejected for strict fidelity | Best available fp16 group-scale row is `0.098692` relative output RMS; exact fp16 row scales are `0.000197`. |
 | `I2_SR` can preserve row-scale ternary semantics in packed CPU inference | Proven for compatible causal-LM artifacts | Qwen2.5-1.5B `I2_SR` runs on Xeon Silver 4116 with PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
-| Native packed sequence-classification product is solved | No, full single-prompt validation only | A single-artifact `bitnet-qwen` GGUF carries the classifier head and completes full MNLI validation in the safe direct-token single-prompt path: accuracy `0.652165`, saved-PyTorch agreement `0.976668`, `2.724140` examples/sec, and RSS `1021.296875 MiB`. It remains product-blocked by batching parity. |
+| Native packed sequence-classification product is solved | No, but the safe runtime path is clearer | A single-artifact `bitnet-qwen` GGUF carries the classifier head and completes full MNLI validation in the safe direct-token sequence-isolated path: accuracy `0.652165`, saved-PyTorch agreement `0.976668`, `7.456204` examples/sec, and RSS `960.152344 MiB`. Multi-prompt batching remains product-blocked by parity failure. |
 | Native seqcls batching is product-ready | Rejected for now | Low-margin rows `15` and `35` change logits/predictions depending on sequence position inside a batch; max relative RMS vs alone is `0.305153`. |
+| Sequence-isolated native seqcls evaluation is a valid mitigation | Proven for duplicate audit and full MNLI validation | `--embd-sequential` evaluates prompts one at a time inside one loaded `llama-embedding` process. Duplicate token-ID prompts are invariant (`0.000000` max relative RMS, `0` prediction changes), and full MNLI improves from `2.724140` to `7.456204` examples/sec by reducing subprocesses from `9815` to `20`, while preserving the exact same accuracy and saved-PyTorch agreement as the older single-prompt path. |
 | Kimi/MoE product viability is proven | Not proven | Current MoE work is tiny-fixture plumbing only. |
 
 ## What Changed In The Research Question
@@ -172,11 +173,18 @@ CPU result is accuracy `0.652165`, saved-prediction agreement `0.976668`,
 
 A faster batch-4 sample reaches `2.639` examples/sec and happens to agree with
 the saved PyTorch predictions on the first 64 examples, but it is not a valid
-product benchmark yet. The batching audit shows that the same low-margin rows
-can change logits and predictions with sequence position inside the batch.
-The nearest-single-logit probe shows every drifted target row remains closest
-to its own single-prompt logits, so the failure is not explained by a simple
+product benchmark. The batching audit shows that the same low-margin rows can
+change logits and predictions with sequence position inside the batch. The
+nearest-single-logit probe shows every drifted target row remains closest to
+its own single-prompt logits, so the failure is not explained by a simple
 output-row swap.
+
+The new `--embd-sequential` mode is the current mitigation: it keeps one
+process and one loaded model per prompt chunk, but decodes each prompt as
+`seq_id=0` in its own cleared batch. The duplicate-prompt audit passes exactly
+(`0.000000` relative RMS drift), and full MNLI runs at `7.456204` examples/sec
+with `20` subprocesses instead of `9815`. It does not fix or certify the
+batched `I2_SR` kernel path.
 
 A credible product needs one artifact that carries both:
 
@@ -184,9 +192,11 @@ A credible product needs one artifact that carries both:
 quality evidence + CPU runtime evidence
 ```
 
-The next source-owned work is not a broad full split run yet. It is to explain
-the remaining native-vs-PyTorch mismatch, then rerun full MNLI only after the
-sample gate reaches high agreement.
+The next source-owned work is a tighter native-vs-PyTorch mismatch audit and
+better checkpoint training. Product status remains blocked because the same
+artifact now has stable runtime parity, RSS, and throughput, but not enough
+quality: MNLI accuracy is only `0.652165` and saved-PyTorch agreement is
+`0.976668`.
 
 ## Next Decision Gates
 

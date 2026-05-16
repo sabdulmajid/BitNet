@@ -44,7 +44,7 @@ packed CPU path faithful to the trained checkpoint.
 | BitDistill paper-level GLUE reproduction is complete | **No** | Local Qwen2.5 FP16-SFT MNLI is close to the paper anchor (`0.807641` vs `0.799100`), and a tensor-scale CE-only BitNet-SFT budget sweep can clear the weaker paper BitNet-SFT anchor (`0.628935` vs `0.608000`). That is not BitDistill recovery: controlled BitDistill and Qwen3 paper-alignment rows remain below FP quality. Qwen3 tensor BitDistill recovers strongly over BitNet-SFT on QNLI (`0.861065` vs `0.587040`) and SST2 (`0.871560` vs `0.799312`), but still trails FP by paired deltas `-0.060040` and `-0.058486`. Qwen3 row-scale SST2 reaches `0.877294`, but still trails FP by `-0.052752`. MNLI layer selection matters: layer `-8` beats layer `-1` by paired `+0.028528`, but remains `-0.077738` behind FP. |
 | Row-scale semantics matter | **Yes** | TL2 one-scale relative output RMS error is `1.904230`; exact FP16 row scales reduce it to `0.000197`. |
 | Packed row-scale CPU inference works for compatible causal artifacts | **Yes, audited path only** | `I2_SR` Qwen2.5-1.5B row-scale run on Xeon Silver 4116: PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, file `1211.3 MiB`. |
-| Packed sequence-classification deployment is solved | **No, full single-prompt validation only** | Native single-artifact `bitnet-qwen` GGUF classifier-head execution now completes full MNLI validation with direct token IDs: accuracy `0.652165`, saved-PyTorch agreement `0.976668`, `2.724140` examples/sec, and RSS `1021.296875 MiB`. It remains not product-ready because batched parity fails. |
+| Packed sequence-classification deployment is solved | **No, but the safe CPU path is clearer** | Native single-artifact `bitnet-qwen` GGUF classifier-head execution completes full MNLI validation with direct token IDs: accuracy `0.652165`, saved-PyTorch agreement `0.976668`, and RSS below `1 GiB` in the sequence-isolated path. Multi-prompt batched parity still fails. The new sequence-isolated embedding mode passes duplicate-token-ID parity with `0.000000` relative RMS drift and improves full validation from `2.724140` to `7.456204` examples/sec by reducing subprocesses from `9815` to `20`. It is still not product-ready because the checkpoint quality/agreement gate is weak. |
 | Kimi/MoE retrofit is proven | **No** | Tiny Qwen2MoE fixtures prove converter/runtime plumbing only. No trained MoE quality, Kimi mapping, expert-locality, or CPU product result is proven. |
 
 ## Evidence Snapshot
@@ -86,6 +86,14 @@ top-level evidence is intentionally short:
   `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, and file size
   `1211.3 MiB`. This proves a compatible packed path, not a Q4_K_M quality or
   storage win.
+- **Sequence-classification CPU mitigation:** the batched `I2_SR` classifier
+  path remains invalid for product throughput because duplicate token-ID prompts
+  drift by batch position. The new `--embd-sequential` path evaluates each
+  prompt as its own decode inside one loaded `llama-embedding` process. It
+  passes the duplicate-prompt parity audit with `0.000000` relative RMS drift
+  and improves full MNLI validation from `2.724140` examples/sec (`9815`
+  subprocesses) to `7.456204` examples/sec (`20` subprocesses), with identical
+  accuracy `0.652165` and saved-PyTorch agreement `0.976668`.
 
 ## What This Fork Adds
 
@@ -109,10 +117,14 @@ top-level evidence is intentionally short:
   the drifted rows remain closest to their own single-prompt logits, so this is
   not a simple output-row swap. Batched numbers are blocked until the runtime
   contract is fixed.
+- A sequence-isolated `llama-embedding` mode (`--embd-sequential`) that keeps
+  one model loaded while evaluating prompts one at a time. This is a mitigation
+  for reliable native classifier measurement, not proof that the batched I2_SR
+  kernel path is safe.
 - Full native same-artifact MNLI validation for one `bitnet-qwen` sequence
-  classifier in the safe single-prompt path: accuracy `0.652165`, agreement
-  with saved PyTorch predictions `0.976668`, `2.724140` examples/sec, and
-  `1021.296875 MiB` child peak RSS.
+  classifier in the safe sequence-isolated path: accuracy `0.652165`,
+  agreement with saved PyTorch predictions `0.976668`, `7.456204` examples/sec,
+  and `960.152344 MiB` child peak RSS.
 - Explicit product gates that prevent fast but unusable artifacts from being
   reported as successful LLMs.
 
@@ -138,7 +150,10 @@ with active work on `i2sr-row-scale-runtime`.
 - Paper-level BitDistill reproduction.
 - FP-quality 1.58-bit Qwen from this retrofit recipe.
 - Full native packed `Qwen2ForSequenceClassification` product validation:
-  full GLUE quality, batching parity, RSS, and throughput from the same GGUF.
+  stable runtime parity, RSS, and throughput now exist for the same GGUF in
+  sequence-isolated mode, but model quality is still weak (`0.652165` MNLI
+  accuracy, `0.976668` agreement with saved PyTorch predictions). Multi-prompt
+  batched parity still fails and is not product-safe.
 - General-LM quality for task-distilled causal prompt-scoring exports.
 - Kimi or trained MoE quality, speed, memory, routing locality, or CPU product
   viability.
@@ -160,11 +175,11 @@ The next work is deliberately narrow:
    and gamma scaling.
 3. Keep paper-style tensor-scale BitDistill separate from row-scale
    `retrofit-variant` results.
-4. Close the product gap by upgrading the native sequence-classification token-ID
-   sample into a faithful full-validation evaluator. Full MNLI now runs in the
-   safe prompt-batch-size-1 mode, but batching parity still fails through
-   position-dependent drift rather than row swapping, so product throughput
-   claims remain premature.
+4. Close the product gap by improving checkpoint quality/agreement, not by
+   claiming batched throughput. Full MNLI now runs through the sequence-isolated
+   native evaluator at `7.456204` examples/sec, but the model is still too weak
+   for a publishable product claim. The multi-prompt batched path remains
+   invalid because of position-dependent drift.
 5. Keep MoE/Kimi as future work until the dense case is solved.
 
 Detailed current status and next steps are in
@@ -201,9 +216,23 @@ python benchmarks/audit_seqcls_native_i2sr_smoke.py
 python benchmarks/audit_seqcls_native_mismatch.py --prompt-input token_ids
 python benchmarks/audit_seqcls_native_batching.py
 python benchmarks/audit_seqcls_native_duplicate_batching.py
+python benchmarks/audit_seqcls_native_duplicate_batching.py --embedding-sequential --no-default-controls \
+  --output-json benchmark_results/seqcls_native_duplicate_sequence_isolated_audit_2026-05-15.json \
+  --output-md benchmarks/results/seqcls_native_duplicate_sequence_isolated_audit_2026-05-15.md
 python benchmarks/benchmark_seqcls_native_i2sr_cpu.py --max-samples 64 --prompt-input token_ids \
   --output-json benchmark_results/seqcls_native_i2sr_cpu_mnli_64_token_ids_2026-05-15.json \
   --output-md benchmarks/results/seqcls_native_i2sr_cpu_mnli_64_token_ids_2026-05-15.md
+python benchmarks/benchmark_seqcls_native_i2sr_cpu.py --max-samples 64 --prompt-batch-size 64 \
+  --embedding-sequential \
+  --batching-audit-json benchmark_results/seqcls_native_duplicate_sequence_isolated_audit_2026-05-15.json \
+  --output-json benchmark_results/seqcls_native_i2sr_cpu_mnli_64_token_ids_sequence_isolated_2026-05-15.json \
+  --output-md benchmarks/results/seqcls_native_i2sr_cpu_mnli_64_token_ids_sequence_isolated_2026-05-15.md
+python benchmarks/benchmark_seqcls_native_i2sr_cpu.py --max-samples 0 --prompt-batch-size 512 \
+  --embedding-sequential \
+  --batching-audit-json benchmark_results/seqcls_native_duplicate_sequence_isolated_audit_2026-05-15.json \
+  --progress-jsonl benchmark_results/seqcls_native_i2sr_cpu_mnli_full_token_ids_sequence_isolated_progress_2026-05-15.jsonl \
+  --output-json benchmark_results/seqcls_native_i2sr_cpu_mnli_full_token_ids_sequence_isolated_2026-05-15.json \
+  --output-md benchmarks/results/seqcls_native_i2sr_cpu_mnli_full_token_ids_sequence_isolated_2026-05-15.md
 python benchmarks/audit_tl2_negative_result.py
 python benchmarks/audit_benchmark_coverage.py
 python benchmarks/build_evidence_manifest.py \
@@ -214,8 +243,9 @@ python benchmarks/build_evidence_manifest.py \
 Runtime smoke:
 
 ```bash
-cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexity llama-quantize -j 12
+cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexity llama-quantize llama-embedding -j 12
 ./build-portable-avx2/bin/llama-quantize --help | rg "I2_SR|I2_S"
+./build-portable-avx2/bin/llama-embedding --help | rg "embd-sequential"
 ```
 
 ## Primary Reports
@@ -233,8 +263,11 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Sequence-classification native I2_SR mismatch audit](benchmarks/results/seqcls_native_mismatch_audit_2026-05-15.md)
 - [Sequence-classification native I2_SR batching audit](benchmarks/results/seqcls_native_batching_audit_2026-05-15.md)
 - [Sequence-classification native I2_SR duplicate-prompt batching audit](benchmarks/results/seqcls_native_duplicate_batching_audit_2026-05-15.md)
+- [Sequence-classification native I2_SR sequence-isolated duplicate audit](benchmarks/results/seqcls_native_duplicate_sequence_isolated_audit_2026-05-15.md)
 - [Sequence-classification native I2_SR CPU token-ID sample](benchmarks/results/seqcls_native_i2sr_cpu_mnli_64_token_ids_2026-05-15.md)
+- [Sequence-classification native I2_SR CPU sequence-isolated sample](benchmarks/results/seqcls_native_i2sr_cpu_mnli_64_token_ids_sequence_isolated_2026-05-15.md)
 - [Sequence-classification native I2_SR full CPU token-ID validation](benchmarks/results/seqcls_native_i2sr_cpu_mnli_full_token_ids_2026-05-15.md)
+- [Sequence-classification native I2_SR full CPU sequence-isolated validation](benchmarks/results/seqcls_native_i2sr_cpu_mnli_full_token_ids_sequence_isolated_2026-05-15.md)
 - [Sequence-classification native full CPU submission](benchmarks/results/seqcls_native_full_cpu_submission_2026-05-15.md)
 - [Sequence-classification native full CPU progress](benchmarks/results/seqcls_native_full_progress_2026-05-15.md)
 - [CPU tradeoff frontier audit](benchmarks/results/cpu_tradeoff_frontier_2026-05-15.md)
