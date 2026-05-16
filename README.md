@@ -464,6 +464,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Product scope gate](benchmarks/results/product_scope_gate_2026-05-15.md)
 - [Evidence manifest](benchmarks/results/evidence_manifest_2026-05-15.md)
 - [TL2 row-scale runtime contract](benchmarks/results/tl2_row_scale_runtime_contract_2026-05-15.md)
+- [TL2 row-scale implementation plan](benchmarks/results/tl2_row_scale_implementation_plan_2026-05-15.md)
 - [TL2 negative-result audit](benchmarks/results/tl2_negative_result_2026-05-15.md)
 - [Kimi config feasibility audit](benchmarks/results/kimi_config_feasibility_2026-05-15.md)
 

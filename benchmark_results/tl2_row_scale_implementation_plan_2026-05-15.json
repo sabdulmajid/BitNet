@@ -1,0 +1,115 @@
+{
+  "blockers": [
+    {
+      "blocker": "Existing TL2 collapses learned row scales to one scale and exceeds the allowed relative output RMS error.",
+      "check": "Existing TL2 one-scale error is below product threshold",
+      "evidence": "design_json=benchmark_results/tl2_row_scale_design_2026-05-13.json; current_error=1.9042302114103853; threshold=0.01"
+    },
+    {
+      "blocker": "`transform_to_tl2` is data-only and recomputes a scalar scale instead of carrying checkpoint row/group scales.",
+      "check": "TL2 converter accepts learned row/group scale metadata",
+      "evidence": "transform_to_tl2_line=711; accepts_scale=False; passes_scale_metadata=False; has_scale_map=True"
+    },
+    {
+      "blocker": "The converter still derives one scalar `np.max(abs(x))` scale and writes a single sidecar scale tensor.",
+      "check": "TL2 converter no longer recomputes one scalar max scale",
+      "evidence": "uses_np_max_abs=True; returns_single_scale=True; emits_scale_sidecar=True"
+    },
+    {
+      "blocker": "`GGML_TYPE_TL2` storage has no explicit row/group-scale count or dedicated row-scale TL2 qtype.",
+      "check": "ggml TL2 storage accounts for row/group-scale sidecar",
+      "evidence": "ggml_nbytes_line=3490; nbytes_has_row_scale_sidecar=False; dedicated_row_tl2_type=False"
+    },
+    {
+      "blocker": "`ggml_bitnet_transform_tensor` still builds metadata for one scale, not one scale per row or row group.",
+      "check": "TL2 transform metadata is row/group-scale aware",
+      "evidence": "bitnet_transform_line=1124; kernel_source=preset_kernels/bitnet_b1_58-large/bitnet-lut-kernels-tl2.h; uses_all_rows=False; single_scale_metadata=True"
+    },
+    {
+      "blocker": "Generated TL2 qgemm multiplies by `Scales[0]`; row-scale support needs kernels that index the learned output-row or row-group scale.",
+      "check": "Generated TL2 qgemm applies output-row or row-group scales",
+      "evidence": "kernel_source=preset_kernels/bitnet_b1_58-large/bitnet-lut-kernels-tl2.h; generated_uses_Scales0=True; codegen_emits_Scales0=True; kernel_mentions_row_scale=False; codegen_mentions_row_scale=False"
+    },
+    {
+      "blocker": "The x86 TL2 dispatch passes the same `wt->scales` pointer into every generated qgemm call, matching the one-scale kernel contract.",
+      "check": "x86 TL2 matmul dispatch offsets scale metadata per output tile/row group",
+      "evidence": "mul_mat_tl2_line=12780; passes_unoffset_wt_scales=True; dedicated_row_tl2_type=False"
+    },
+    {
+      "blocker": "The active BitNet/Qwen TL2 loader path does not create learned row-scale sidecar tensors; TL2 expects scale metadata inside the packed tensor/kernel path.",
+      "check": "BitNet/Qwen TL2 loader exposes learned scale sidecars when required",
+      "evidence": "bitnet_scale_sidecars_disabled_for_tl2=True; qwen_bitnet_loader_has_scale_sidecars=False"
+    },
+    {
+      "blocker": "No row-scale TL2 GGUF has passed PPL, throughput, and RSS-style evidence.",
+      "check": "Row-scale TL2 has quality and speed benchmark evidence",
+      "evidence": "row_scale_tl2_rows=0; finite_quality_rows=0"
+    }
+  ],
+  "contract_json": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/tl2_row_scale_runtime_contract_2026-05-15.json",
+  "current_one_scale_error": 1.9042302114103853,
+  "current_ready": false,
+  "date": "2026-05-15",
+  "design_json": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/tl2_row_scale_design_2026-05-13.json",
+  "exact_row_fp16_error": 0.00019744640689756221,
+  "failed_check_count": 9,
+  "implementation_steps": [
+    {
+      "exit_gate": "ggml row-size/nbytes can represent packed codes plus row/group scales without undercounting bytes.",
+      "files": [
+        "3rdparty/llama.cpp/ggml/include/ggml.h",
+        "3rdparty/llama.cpp/gguf-py/gguf/constants.py"
+      ],
+      "step": "1. Define a row/group-scale TL2 representation",
+      "work": "Add either a dedicated row-scale TL2 qtype or explicit metadata for the number and layout of learned scales. Reusing GGML_TYPE_TL2 without changing byte-size semantics is unsafe."
+    },
+    {
+      "exit_gate": "A row-scale checkpoint exports learned scales byte-for-byte and scalar TL2 continues to export unchanged.",
+      "files": [
+        "utils/convert-hf-to-gguf-bitnet.py",
+        "benchmarks/convert_static_ternary_to_i2s_gguf.py"
+      ],
+      "step": "2. Make the converter sidecar-aware for TL2",
+      "work": "Thread checkpoint `weight_scale` tensors into TL2 export instead of recomputing a single `np.max(abs(x))` scale. Reject ambiguous row-scale exports unless the new qtype/metadata is active."
+    },
+    {
+      "exit_gate": "Static audit shows no generated row-scale path multiplies by `Scales[0]` for every output row.",
+      "files": [
+        "utils/codegen_tl2.py",
+        "preset_kernels/bitnet_b1_58-large/bitnet-lut-kernels-tl2.h",
+        "include/bitnet-lut-kernels.h"
+      ],
+      "step": "3. Regenerate TL2 transform metadata for multiple scales",
+      "work": "Replace the one-scale `lut_scales_size = 1` contract with row/group-scale metadata and regenerate kernels. Generated qgemm must index the output row or row group, not `Scales[0]`."
+    },
+    {
+      "exit_gate": "Layer-level relative output RMS error falls below 0.01 on the row-scale Qwen1.5B design audit.",
+      "files": [
+        "3rdparty/llama.cpp/ggml/src/ggml.c"
+      ],
+      "step": "4. Offset scales in x86 TL2 matmul dispatch",
+      "work": "Pass the correct scale slice into each generated qgemm call, or pass a base pointer plus row offset. The dispatch must match the kernel's row/group-scale indexing contract."
+    },
+    {
+      "exit_gate": "Converted GGUF loads without missing scale tensors and without silently falling back to scalar TL2.",
+      "files": [
+        "3rdparty/llama.cpp/src/llama.cpp"
+      ],
+      "step": "5. Expose learned scale sidecars in the BitNet/Qwen loader",
+      "work": "Load learned scale tensors for the Qwen-compatible BitNet graph when the model uses row/group-scale TL2. The current TL2 path hides scale sidecars behind packed tensor metadata."
+    },
+    {
+      "exit_gate": "Row-scale TL2 has finite PPL near the I2_SR row-scale artifact, benchmark rows include prefill/decode throughput and RSS, and the runtime contract audit passes.",
+      "files": [
+        "benchmarks/audit_tl2_row_scale_runtime_contract.py",
+        "benchmarks/audit_tl2_negative_result.py",
+        "benchmarks/build_qwen_side_by_side.py"
+      ],
+      "step": "6. Run CPU quality, speed, and RSS gates",
+      "work": "Convert the row-scale Qwen1.5B checkpoint, run perplexity/throughput/RSS on the Xeon, and compare against I2_SR, TQ2_0, Q4_K_M, and FP16."
+    }
+  ],
+  "row_scale_storage_mib": 1.23046875,
+  "schema": "tl2-row-scale-implementation-plan-v1",
+  "verdict": "Do not productize TL2 for learned row-scale checkpoints yet. The required work is a new row/group-scale runtime contract, not a benchmark rerun."
+}

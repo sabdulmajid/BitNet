@@ -1,5 +1,5 @@
 {
-  "artifact_count": 248,
+  "artifact_count": 250,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "634ccc7934dcc5fc69c41227179ab755eaa7fa7388317c5ea6981119363ac6a1",
-      "size_bytes": 28197
+      "sha256": "fb2262d99086180dfa6ed495f4b9433898a486494b403042f0992237ff7bb3db",
+      "size_bytes": 28303
     },
     {
       "exists": true,
@@ -727,8 +727,8 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "21aa0e32f7de58bdaae7232afde92788aadc02a1e19bd6e96019ab91dee1d620",
-      "size_bytes": 9991
+      "sha256": "e5b3c1b40ae3ffcbf347f52106987d5a9e1245bc8578b63df267f8d6bdc16b1b",
+      "size_bytes": 10360
     },
     {
       "exists": true,
@@ -810,6 +810,15 @@
       "path": "benchmarks/results/tl2_row_scale_runtime_contract_2026-05-15.md",
       "sha256": "038dec0e468f21608d2adf15245d03cf37a651348d62d8a20101142496af1726",
       "size_bytes": 5946
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "tl2_row_scale_implementation_plan_report",
+      "metrics": {},
+      "path": "benchmarks/results/tl2_row_scale_implementation_plan_2026-05-15.md",
+      "sha256": "310d2374ef907cc40d98ab625eb99380eef2e806997ce34362a64f519b7450fd",
+      "size_bytes": 6008
     },
     {
       "exists": true,
@@ -2307,6 +2316,15 @@
     {
       "exists": true,
       "kind": "generic_json",
+      "label": "tl2_row_scale_implementation_plan_json",
+      "metrics": {},
+      "path": "benchmark_results/tl2_row_scale_implementation_plan_2026-05-15.json",
+      "sha256": "df7bba4f7b425c37261651cb5ac7a935ef51a891790a58c6871bc5cf88557c4a",
+      "size_bytes": 6991
+    },
+    {
+      "exists": true,
+      "kind": "generic_json",
       "label": "tl2_negative_result_json",
       "metrics": {},
       "path": "benchmark_results/tl2_negative_result_2026-05-15.json",
@@ -2442,13 +2460,13 @@
       "kind": "benchmark_coverage_gate_json",
       "label": "benchmark_coverage_gate_json",
       "metrics": {
-        "check_count": 77,
+        "check_count": 80,
         "failed": [],
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "c9656d1aeffd47da116102f5fa92a8fdf5a716d83b3f03b525768cb9a63796c3",
-      "size_bytes": 15930
+      "sha256": "99762aa8a7493d316c74a42a1ca8b96e8dd7fb7c424d8dcc97add7f2b4bfc6c0",
+      "size_bytes": 16530
     },
     {
       "exists": true,

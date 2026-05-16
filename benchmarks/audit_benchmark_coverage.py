@@ -573,6 +573,58 @@ def audit_tl2_negative_result(root: Path, checks: list[dict[str, Any]]) -> None:
     )
 
 
+def audit_tl2_implementation_plan(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/tl2_row_scale_implementation_plan_{DATE}.json"
+    if not path.exists():
+        add_check(
+            checks,
+            "TL2 row-scale implementation plan exists",
+            False,
+            str(path.relative_to(root)),
+            "missing TL2 row-scale implementation plan",
+        )
+        return
+    data = read_json(path)
+    steps = data.get("implementation_steps", []) if isinstance(data.get("implementation_steps"), list) else []
+    blockers = data.get("blockers", []) if isinstance(data.get("blockers"), list) else []
+    add_check(
+        checks,
+        "TL2 row-scale implementation plan keeps runtime blocked",
+        data.get("current_ready") is False
+        and int(data.get("failed_check_count") or 0) >= 1
+        and len(blockers) >= 1,
+        (
+            f"ready={data.get('current_ready')}, "
+            f"failed_checks={data.get('failed_check_count')}, blockers={len(blockers)}"
+        ),
+        "TL2 implementation plan should preserve the blocked status until the row-scale runtime contract passes",
+    )
+    add_check(
+        checks,
+        "TL2 row-scale implementation plan has source-mapped patch sequence",
+        len(steps) >= 6
+        and all(isinstance(step.get("files"), list) and step.get("files") for step in steps if isinstance(step, dict))
+        and all(step.get("exit_gate") for step in steps if isinstance(step, dict)),
+        f"step_count={len(steps)}",
+        "TL2 implementation plan should list file ownership and exit gates for every required patch phase",
+    )
+    add_check(
+        checks,
+        "TL2 row-scale implementation plan carries scale-error proof",
+        isinstance(data.get("current_one_scale_error"), (int, float))
+        and data.get("current_one_scale_error") > 1.0
+        and isinstance(data.get("exact_row_fp16_error"), (int, float))
+        and data.get("exact_row_fp16_error") < 0.01
+        and isinstance(data.get("row_scale_storage_mib"), (int, float)),
+        (
+            f"one_scale={data.get('current_one_scale_error')}, "
+            f"row_fp16={data.get('exact_row_fp16_error')}, "
+            f"scale_mib={data.get('row_scale_storage_mib')}"
+        ),
+        "TL2 implementation plan should cite the row-scale mismatch math, not just a prose TODO",
+    )
+
+
 def audit_ternary_flip_dynamics(root: Path, checks: list[dict[str, Any]]) -> None:
     path = root / f"benchmark_results/ternary_flip_dynamics_{DATE}.json"
     if not path.exists():
@@ -1050,6 +1102,7 @@ def main() -> None:
     audit_bitdistill_loss_contract(root, checks)
     audit_original_benchmark_objective(root, checks)
     audit_tl2_negative_result(root, checks)
+    audit_tl2_implementation_plan(root, checks)
     audit_ternary_flip_dynamics(root, checks)
     audit_ternary_threshold_dynamics(root, checks)
     audit_seqcls_runtime_gap(root, checks)

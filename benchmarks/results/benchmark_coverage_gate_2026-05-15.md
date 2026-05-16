@@ -54,6 +54,9 @@ Overall status: **PASS**.
 | Original benchmark objective audit keeps TL2 row-scale blocker explicit | pass | partial_rows=1, partial=5. Convert repaired checkpoints into GGUF/TL2/I2_S and run CPU inference Dense GGUF and row-scale I2_SR/I2_S CPU inference exist, but TL2 is not quality-preserving for learned row-scale checkpoints until row/group-scale metadata and kernels |  |
 | TL2 negative-result audit has CPU probe evidence | pass | cpu_executed=True, finite_quality=False |  |
 | TL2 negative-result audit proves row-scale mismatch | pass | supported=True, current=1.9042302114103853, row_fp16=0.00019744640689756221, failed_checks=9 |  |
+| TL2 row-scale implementation plan keeps runtime blocked | pass | ready=False, failed_checks=9, blockers=9 |  |
+| TL2 row-scale implementation plan has source-mapped patch sequence | pass | step_count=6 |  |
+| TL2 row-scale implementation plan carries scale-error proof | pass | one_scale=1.9042302114103853, row_fp16=0.00019744640689756221, scale_mib=1.23046875 |  |
 | Ternary flip-dynamics audit has nonzero saved-snapshot flips | pass | status=pass, pairs=2, min_flip=0.06454656755885871, max_flip=0.1659562863332169 |  |
 | Ternary threshold-dynamics audit has measured boundary movement | pass | status=measured_increase, snapshots=5, delta=0.01523485567980197, final_band=0.07576561952248598, monotonic=True |  |
 | Sequence-classification runtime gap is narrowed but not closed | pass | status=sidecar_qwen_contract_available_native_head_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6 |  |
@@ -79,5 +82,5 @@ Overall status: **PASS**.
 | Research redirect gate covers required claims | pass | missing=[] |  |
 | Research redirect gate blocks overclaims | pass | blocked_statuses=['blocked', 'not_proven', 'prototype_only'] |  |
 | fixed I2_SR RSS has four context rows | pass | contexts=[512, 2048, 8192, 32768] |  |
-| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=248, missing=0, missing_labels=[] |  |
+| evidence manifest has no missing artifacts | pass | path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=250, missing=0, missing_labels=[] |  |
 | productization gate passes for stable I2_SR | pass | passed=True, failed=0, stable_quality=True, layout=True |  |

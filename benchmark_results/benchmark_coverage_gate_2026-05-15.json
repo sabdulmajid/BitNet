@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 77,
+  "check_count": 80,
   "failed": [],
   "checks": [
     {
@@ -306,6 +306,24 @@
       "blocker": ""
     },
     {
+      "name": "TL2 row-scale implementation plan keeps runtime blocked",
+      "passed": true,
+      "evidence": "ready=False, failed_checks=9, blockers=9",
+      "blocker": ""
+    },
+    {
+      "name": "TL2 row-scale implementation plan has source-mapped patch sequence",
+      "passed": true,
+      "evidence": "step_count=6",
+      "blocker": ""
+    },
+    {
+      "name": "TL2 row-scale implementation plan carries scale-error proof",
+      "passed": true,
+      "evidence": "one_scale=1.9042302114103853, row_fp16=0.00019744640689756221, scale_mib=1.23046875",
+      "blocker": ""
+    },
+    {
       "name": "Ternary flip-dynamics audit has nonzero saved-snapshot flips",
       "passed": true,
       "evidence": "status=pass, pairs=2, min_flip=0.06454656755885871, max_flip=0.1659562863332169",
@@ -458,7 +476,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=248, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=250, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {
