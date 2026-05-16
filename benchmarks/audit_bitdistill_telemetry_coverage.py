@@ -143,6 +143,25 @@ def summarize_measured(args: argparse.Namespace, source: str) -> list[dict[str, 
             "supports": "The claim that untrained SubLN surgery is not identity-preserving locally.",
             "passed": finite(subln.get("logit_relative_rms")) and finite(subln.get("logit_cosine")),
         },
+        {
+            "telemetry": "opt-in training telemetry hooks",
+            "status": "instrumented_not_materialized",
+            "evidence": (
+                "train_bitdistill.py exposes telemetry.jsonl, total grad norm, optional component "
+                "grad norms, ternary code fractions, scale stats, and threshold-band fractions."
+            ),
+            "supports": "Future controlled rows can record update-balance diagnostics without changing default jobs.",
+            "passed": source_has_all(
+                source,
+                [
+                    "--telemetry-every-steps",
+                    "--telemetry-component-grad-norms",
+                    "component_grad_norms_microbatch",
+                    "threshold_band_0p05_fraction",
+                    "telemetry.jsonl",
+                ],
+            ),
+        },
     ]
 
 
@@ -151,25 +170,25 @@ def summarize_missing(source: str) -> list[dict[str, Any]]:
     return [
         {
             "telemetry": "gradient norm by loss component",
-            "status": "missing",
+            "status": "missing_materialized_run",
             "evidence": (
-                "The script clips total gradients"
-                if has_clip_norm
-                else "No gradient norm capture found"
+                "Opt-in component-gradient telemetry exists"
+                if "component_grad_norms_microbatch" in source
+                else ("The script clips total gradients" if has_clip_norm else "No gradient norm capture found")
             )
-            + ", but does not log separate CE, logits-KD, and attention-KD gradient norms.",
+            + ", but no completed benchmark row has materialized those traces yet.",
             "risk": "Cannot prove which objective term dominates the update direction.",
         },
         {
             "telemetry": "ternary flip rate per step/layer",
-            "status": "missing",
-            "evidence": "Final ternary code fractions are audited, but consecutive-step code transitions are not recorded.",
+            "status": "missing_materialized_run",
+            "evidence": "Final ternary code fractions are audited and opt-in code telemetry exists, but consecutive-step code transitions are not materialized for completed benchmark rows.",
             "risk": "Cannot tell whether continued pretraining is moving codes or only tuning dense residual/head parameters.",
         },
         {
             "telemetry": "scale trajectory per layer",
-            "status": "missing",
-            "evidence": "Final scale histograms exist; per-step tensor/row scale drift is not logged.",
+            "status": "missing_materialized_run",
+            "evidence": "Final scale histograms and opt-in scale telemetry exist; per-step tensor/row scale drift is not materialized for completed benchmark rows.",
             "risk": "Cannot directly verify whether Stage-2 learns BitNet-like scale semantics over time.",
         },
         {
@@ -204,13 +223,14 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "missing": missing,
         "verdict": (
             "Existing telemetry is sufficient for loss-scale and static-mechanics triage, "
-            "but not sufficient to prove update-direction causality. Stronger BitDistill "
-            "root-cause claims require gradient-component, flip-rate, scale-trajectory, "
-            "and activation-saturation instrumentation."
+            "and the training script now has opt-in hooks for the next controlled wave. "
+            "The completed benchmark artifacts are still not sufficient to prove update-direction "
+            "causality, because materialized gradient-component, flip-rate, scale-trajectory, "
+            "and activation-saturation traces do not exist yet."
         ),
         "safe_next_step": (
-            "Do not modify the active training script while queued jobs are pending. After "
-            "those jobs finish, add opt-in telemetry flags before launching the next sweep."
+            "After the active queued jobs finish, launch the next controlled rows with "
+            "--telemetry-every-steps and --telemetry-component-grad-norms enabled on a sparse cadence."
         ),
     }
 

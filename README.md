@@ -215,6 +215,9 @@ the Q4-normalized `I2_SR` speedup intervals remain above `1.0`: prefill
   Stage-2 continued pretraining, Stage-3 CE + logits KL + Q/K/V
   attention-relation distillation, attention-layer sweep support, and strict
   task-formulation gates.
+- Opt-in BitDistill telemetry for future controlled runs: total gradient norm,
+  component gradient norms, ternary code fractions, scale statistics, and
+  quantization-threshold band occupancy.
 - MoE/Kimi feasibility audits that separate generic routing support from real
   Kimi or trained-MoE evidence.
 

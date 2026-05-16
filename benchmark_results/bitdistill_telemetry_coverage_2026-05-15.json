@@ -35,27 +35,34 @@
       "status": "measured_offline",
       "supports": "The claim that untrained SubLN surgery is not identity-preserving locally.",
       "telemetry": "SubLN activation/logit perturbation"
+    },
+    {
+      "evidence": "train_bitdistill.py exposes telemetry.jsonl, total grad norm, optional component grad norms, ternary code fractions, scale stats, and threshold-band fractions.",
+      "passed": true,
+      "status": "instrumented_not_materialized",
+      "supports": "Future controlled rows can record update-balance diagnostics without changing default jobs.",
+      "telemetry": "opt-in training telemetry hooks"
     }
   ],
-  "measured_count": 5,
-  "measured_expected": 5,
+  "measured_count": 6,
+  "measured_expected": 6,
   "missing": [
     {
-      "evidence": "The script clips total gradients, but does not log separate CE, logits-KD, and attention-KD gradient norms.",
+      "evidence": "Opt-in component-gradient telemetry exists, but no completed benchmark row has materialized those traces yet.",
       "risk": "Cannot prove which objective term dominates the update direction.",
-      "status": "missing",
+      "status": "missing_materialized_run",
       "telemetry": "gradient norm by loss component"
     },
     {
-      "evidence": "Final ternary code fractions are audited, but consecutive-step code transitions are not recorded.",
+      "evidence": "Final ternary code fractions are audited and opt-in code telemetry exists, but consecutive-step code transitions are not materialized for completed benchmark rows.",
       "risk": "Cannot tell whether continued pretraining is moving codes or only tuning dense residual/head parameters.",
-      "status": "missing",
+      "status": "missing_materialized_run",
       "telemetry": "ternary flip rate per step/layer"
     },
     {
-      "evidence": "Final scale histograms exist; per-step tensor/row scale drift is not logged.",
+      "evidence": "Final scale histograms and opt-in scale telemetry exist; per-step tensor/row scale drift is not materialized for completed benchmark rows.",
       "risk": "Cannot directly verify whether Stage-2 learns BitNet-like scale semantics over time.",
-      "status": "missing",
+      "status": "missing_materialized_run",
       "telemetry": "scale trajectory per layer"
     },
     {
@@ -72,9 +79,9 @@
     }
   ],
   "missing_count": 5,
-  "safe_next_step": "Do not modify the active training script while queued jobs are pending. After those jobs finish, add opt-in telemetry flags before launching the next sweep.",
+  "safe_next_step": "After the active queued jobs finish, launch the next controlled rows with --telemetry-every-steps and --telemetry-component-grad-norms enabled on a sparse cadence.",
   "schema": "bitdistill-telemetry-coverage-v1",
   "status": "partial_observability",
   "training_source": "train_bitdistill.py",
-  "verdict": "Existing telemetry is sufficient for loss-scale and static-mechanics triage, but not sufficient to prove update-direction causality. Stronger BitDistill root-cause claims require gradient-component, flip-rate, scale-trajectory, and activation-saturation instrumentation."
+  "verdict": "Existing telemetry is sufficient for loss-scale and static-mechanics triage, and the training script now has opt-in hooks for the next controlled wave. The completed benchmark artifacts are still not sufficient to prove update-direction causality, because materialized gradient-component, flip-rate, scale-trajectory, and activation-saturation traces do not exist yet."
 }

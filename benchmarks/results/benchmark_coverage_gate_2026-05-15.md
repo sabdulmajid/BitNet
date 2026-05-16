@@ -44,7 +44,7 @@ Overall status: **PASS**.
 | BitDistill root-cause audit has required claim statuses | pass | claims=7, mismatches={} |  |
 | BitDistill root-cause audit marks controlled recovery incomplete | pass | controlled=1/3, all=False |  |
 | BitDistill root-cause audit carries Q4-vs-I2_SR boundary ratios | pass | q4_vs_i2sr={'decode_speedup': 1.19061682213809, 'file_ratio': 1.2881333039180543, 'ppl_ratio': 3.0323232796303237, 'prefill_speedup': 2.298817760610607, 'rss512_ratio': 1.2685742155747033} |  |
-| BitDistill telemetry coverage audit measures current loss diagnostics | pass | status=partial_observability, measured=5/5 |  |
+| BitDistill telemetry coverage audit measures current loss diagnostics | pass | status=partial_observability, measured=6/6 |  |
 | BitDistill telemetry coverage audit keeps advanced causality claims blocked | pass | missing=['Q/K/V relation KD split', 'activation int8 saturation rate', 'gradient norm by loss component', 'scale trajectory per layer', 'ternary flip rate per step/layer'] |  |
 | BitDistill loss-contract static checks pass | pass | passed=True, checks=6, status=loss_normalization_risk |  |
 | BitDistill loss-contract records paper-gamma dominance risk | pass | status=loss_normalization_risk, max_attn_ce=37819.64134227373 |  |

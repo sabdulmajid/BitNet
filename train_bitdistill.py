@@ -107,6 +107,7 @@ class StepMetrics:
     attention_kd: float = 0.0
     weighted_logit_kd: float = 0.0
     weighted_attention_kd: float = 0.0
+    grad_norm: float = 0.0
     lr: float = 0.0
 
 
@@ -237,6 +238,122 @@ def make_scheduler(optimizer: torch.optim.Optimizer, args: argparse.Namespace) -
         return min_ratio + (1.0 - min_ratio) * cosine
 
     return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=scale)
+
+
+def total_grad_norm(parameters: Iterator[nn.Parameter] | list[nn.Parameter]) -> float:
+    total = 0.0
+    for parameter in parameters:
+        if parameter.grad is None:
+            continue
+        grad = parameter.grad.detach().float()
+        total += float(torch.sum(grad * grad).cpu())
+    return math.sqrt(total)
+
+
+def component_grad_norms(components: dict[str, torch.Tensor], parameters: list[nn.Parameter]) -> dict[str, float]:
+    norms: dict[str, float] = {}
+    for name, value in components.items():
+        if not value.requires_grad:
+            norms[name] = 0.0
+            continue
+        grads = torch.autograd.grad(value, parameters, retain_graph=True, allow_unused=True)
+        total = 0.0
+        for grad in grads:
+            if grad is None:
+                continue
+            grad_f = grad.detach().float()
+            total += float(torch.sum(grad_f * grad_f).cpu())
+        norms[name] = math.sqrt(total)
+    return norms
+
+
+def sampled_weight_matrix(weight: torch.Tensor, max_elements: int) -> tuple[torch.Tensor, torch.Tensor | None]:
+    if max_elements <= 0 or weight.numel() <= max_elements:
+        return weight.detach().float(), None
+    rows, cols = weight.shape
+    sampled_rows = min(rows, max(1, int(math.sqrt(max_elements * rows / max(cols, 1)))))
+    sampled_cols = min(cols, max(1, max_elements // sampled_rows))
+    row_idx = torch.linspace(0, rows - 1, sampled_rows, device=weight.device).round().long()
+    col_idx = torch.linspace(0, cols - 1, sampled_cols, device=weight.device).round().long()
+    sampled = weight.detach().index_select(0, row_idx).index_select(1, col_idx).float()
+    return sampled, row_idx
+
+
+def bitlinear_quantization_summary(model: nn.Module, *, max_elements_per_layer: int) -> dict[str, Any]:
+    counts = {-1: 0, 0: 0, 1: 0}
+    total_values = 0
+    sampled_values = 0
+    threshold_band_hits = 0
+    scales: list[torch.Tensor] = []
+    module_count = 0
+    row_scale_modules = 0
+    tensor_scale_modules = 0
+    with torch.no_grad():
+        for module in model.modules():
+            if not isinstance(module, BitLinear):
+                continue
+            module_count += 1
+            weight = module.weight.detach()
+            if module.scale_mode == "row":
+                alpha_full = weight.float().abs().mean(dim=1, keepdim=True).clamp_min(module.eps)
+                row_scale_modules += 1
+            else:
+                alpha_full = weight.float().abs().mean().clamp_min(module.eps)
+                tensor_scale_modules += 1
+            scales.append(alpha_full.reshape(-1).detach().float().cpu())
+
+            sample, row_idx = sampled_weight_matrix(weight, max_elements_per_layer)
+            if module.scale_mode == "row":
+                if row_idx is None:
+                    alpha = alpha_full
+                else:
+                    alpha = alpha_full.index_select(0, row_idx)
+            else:
+                alpha = alpha_full
+            normalized = sample / alpha
+            q = torch.round(normalized).clamp(-1, 1)
+            counts[-1] += int((q == -1).sum().item())
+            counts[0] += int((q == 0).sum().item())
+            counts[1] += int((q == 1).sum().item())
+            threshold_band_hits += int(((normalized.abs() - 0.5).abs() <= 0.05).sum().item())
+            total_values += int(weight.numel())
+            sampled_values += int(q.numel())
+
+    scale_tensor = torch.cat(scales) if scales else torch.empty(0)
+    fractions = {str(key): (counts[key] / sampled_values if sampled_values else 0.0) for key in (-1, 0, 1)}
+    entropy = 0.0
+    for fraction in fractions.values():
+        if fraction > 0:
+            entropy -= fraction * math.log2(fraction)
+    return {
+        "module_count": module_count,
+        "tensor_scale_modules": tensor_scale_modules,
+        "row_scale_modules": row_scale_modules,
+        "total_values": total_values,
+        "sampled_values": sampled_values,
+        "code_counts": {str(key): counts[key] for key in (-1, 0, 1)},
+        "code_fractions": fractions,
+        "code_entropy_bits": entropy,
+        "threshold_band_0p05_fraction": threshold_band_hits / sampled_values if sampled_values else 0.0,
+        "scale_count": int(scale_tensor.numel()),
+        "scale_mean": float(scale_tensor.mean().item()) if scale_tensor.numel() else 0.0,
+        "scale_std": float(scale_tensor.std(unbiased=False).item()) if scale_tensor.numel() else 0.0,
+        "scale_min": float(scale_tensor.min().item()) if scale_tensor.numel() else 0.0,
+        "scale_max": float(scale_tensor.max().item()) if scale_tensor.numel() else 0.0,
+    }
+
+
+def should_emit_telemetry(args: argparse.Namespace, step: int) -> bool:
+    return args.telemetry_every_steps > 0 and (step == 1 or step % args.telemetry_every_steps == 0)
+
+
+def append_telemetry(args: argparse.Namespace, record: dict[str, Any]) -> None:
+    if not args.output_dir:
+        return
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    with (output_dir / "telemetry.jsonl").open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record, sort_keys=True) + "\n")
 
 
 def freeze(model: nn.Module) -> None:
@@ -1141,26 +1258,59 @@ def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
     step = 0
     start = time.time()
     last = StepMetrics(loss=0.0)
+    telemetry_last: dict[str, Any] | None = None
+    trainable_parameters = [parameter for parameter in student.parameters() if parameter.requires_grad]
     optimizer.zero_grad(set_to_none=True)
 
     while step < args.max_steps:
         for batch_index, batch in enumerate(loader):
             batch = move_batch(batch, device)
             outputs = student(**batch)
-            loss = outputs.loss / args.grad_accum_steps
+            raw_loss = outputs.loss
+            next_step = step + 1
+            emit_telemetry = should_emit_telemetry(args, next_step) and (batch_index + 1) % args.grad_accum_steps == 0
+            component_norms = (
+                component_grad_norms({"ce": raw_loss}, trainable_parameters)
+                if emit_telemetry and args.telemetry_component_grad_norms
+                else {}
+            )
+            loss = raw_loss / args.grad_accum_steps
             loss.backward()
             if (batch_index + 1) % args.grad_accum_steps:
                 continue
             if args.max_grad_norm > 0:
-                torch.nn.utils.clip_grad_norm_(student.parameters(), args.max_grad_norm)
+                grad_norm = float(torch.nn.utils.clip_grad_norm_(trainable_parameters, args.max_grad_norm).detach().cpu())
+            elif args.telemetry_every_steps > 0:
+                grad_norm = total_grad_norm(trainable_parameters)
+            else:
+                grad_norm = 0.0
             optimizer.step()
             step += 1
             lr = optimizer.param_groups[0]["lr"]
             scheduler.step()
             optimizer.zero_grad(set_to_none=True)
-            last = StepMetrics(loss=float((loss * args.grad_accum_steps).detach().cpu()), ce=float((loss * args.grad_accum_steps).detach().cpu()), lr=lr)
+            last = StepMetrics(
+                loss=float(raw_loss.detach().cpu()),
+                ce=float(raw_loss.detach().cpu()),
+                grad_norm=grad_norm,
+                lr=lr,
+            )
+            if emit_telemetry:
+                telemetry_last = {
+                    "step": step,
+                    "stage": args.stage,
+                    "loss": last.__dict__,
+                    "component_grad_norms_microbatch": component_norms,
+                    "quantization": bitlinear_quantization_summary(
+                        student,
+                        max_elements_per_layer=args.telemetry_max_elements_per_layer,
+                    ),
+                    "elapsed_seconds": time.time() - start,
+                }
+                append_telemetry(args, telemetry_last)
             if step == 1 or step % args.log_every_steps == 0:
-                print(f"step={step} ce={last.ce:.6f} lr={lr:.3e} elapsed={time.time() - start:.1f}s", flush=True)
+                telemetry_suffix = f" grad_norm={last.grad_norm:.6f}" if args.telemetry_every_steps > 0 else ""
+                print(f"step={step} ce={last.ce:.6f}{telemetry_suffix} lr={lr:.3e} elapsed={time.time() - start:.1f}s", flush=True)
             if args.save_every_steps > 0 and step % args.save_every_steps == 0:
                 snapshot_metrics = {
                     "stage": args.stage,
@@ -1206,6 +1356,13 @@ def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
         "state_load": state_load,
         "elapsed_seconds": time.time() - start,
         "save_every_steps": args.save_every_steps,
+        "telemetry": {
+            "enabled": args.telemetry_every_steps > 0,
+            "every_steps": args.telemetry_every_steps,
+            "component_grad_norms": args.telemetry_component_grad_norms,
+            "max_elements_per_layer": args.telemetry_max_elements_per_layer,
+            "last": telemetry_last,
+        },
     }
     save_outputs(student, tokenizer, args, metrics)
     return metrics
@@ -1241,6 +1398,8 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
     step = 0
     start = time.time()
     last = StepMetrics(loss=0.0)
+    telemetry_last: dict[str, Any] | None = None
+    trainable_parameters = [parameter for parameter in student.parameters() if parameter.requires_grad]
     optimizer.zero_grad(set_to_none=True)
 
     while step < args.max_steps:
@@ -1307,11 +1466,30 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                 weighted_attention_kd = student_outputs.logits.new_zeros(())
                 loss = ce
 
+            next_step = step + 1
+            emit_telemetry = should_emit_telemetry(args, next_step) and (batch_index + 1) % args.grad_accum_steps == 0
+            component_norms = (
+                component_grad_norms(
+                    {
+                        "ce": ce,
+                        "weighted_logit_kd": weighted_logit_kd,
+                        "weighted_attention_kd": weighted_attention_kd,
+                        "total": loss,
+                    },
+                    trainable_parameters,
+                )
+                if emit_telemetry and args.telemetry_component_grad_norms
+                else {}
+            )
             (loss / args.grad_accum_steps).backward()
             if (batch_index + 1) % args.grad_accum_steps:
                 continue
             if args.max_grad_norm > 0:
-                torch.nn.utils.clip_grad_norm_(student.parameters(), args.max_grad_norm)
+                grad_norm = float(torch.nn.utils.clip_grad_norm_(trainable_parameters, args.max_grad_norm).detach().cpu())
+            elif args.telemetry_every_steps > 0:
+                grad_norm = total_grad_norm(trainable_parameters)
+            else:
+                grad_norm = 0.0
             optimizer.step()
             step += 1
             lr = optimizer.param_groups[0]["lr"]
@@ -1324,14 +1502,30 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                 attention_kd=float(attention_kd.detach().cpu()),
                 weighted_logit_kd=float(weighted_logit_kd.detach().cpu()),
                 weighted_attention_kd=float(weighted_attention_kd.detach().cpu()),
+                grad_norm=grad_norm,
                 lr=lr,
             )
+            if emit_telemetry:
+                telemetry_last = {
+                    "step": step,
+                    "stage": args.stage,
+                    "method": args.method,
+                    "loss": last.__dict__,
+                    "component_grad_norms_microbatch": component_norms,
+                    "quantization": bitlinear_quantization_summary(
+                        student,
+                        max_elements_per_layer=args.telemetry_max_elements_per_layer,
+                    ),
+                    "elapsed_seconds": time.time() - start,
+                }
+                append_telemetry(args, telemetry_last)
             if step == 1 or step % args.log_every_steps == 0:
+                telemetry_suffix = f" grad_norm={last.grad_norm:.6f}" if args.telemetry_every_steps > 0 else ""
                 print(
                     f"step={step} loss={last.loss:.6f} ce={last.ce:.6f} "
                     f"logit_kd={last.logit_kd:.6f} attention_kd={last.attention_kd:.6f} "
                     f"weighted_logit_kd={last.weighted_logit_kd:.6f} "
-                    f"weighted_attention_kd={last.weighted_attention_kd:.6f} "
+                    f"weighted_attention_kd={last.weighted_attention_kd:.6f}{telemetry_suffix} "
                     f"lr={lr:.3e} elapsed={time.time() - start:.1f}s",
                     flush=True,
                 )
@@ -1383,6 +1577,13 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
             "attention_qkv_reduction": args.attention_qkv_reduction,
         },
         "elapsed_seconds": time.time() - start,
+        "telemetry": {
+            "enabled": args.telemetry_every_steps > 0,
+            "every_steps": args.telemetry_every_steps,
+            "component_grad_norms": args.telemetry_component_grad_norms,
+            "max_elements_per_layer": args.telemetry_max_elements_per_layer,
+            "last": telemetry_last,
+        },
     }
     print(json.dumps(metrics, indent=2, sort_keys=True), flush=True)
     save_outputs(student, tokenizer, args, metrics)
@@ -1450,6 +1651,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", default="")
     parser.add_argument("--device", default="")
     parser.add_argument("--log-every-steps", type=int, default=10)
+    parser.add_argument("--telemetry-every-steps", type=int, default=0)
+    parser.add_argument("--telemetry-component-grad-norms", action=argparse.BooleanOptionalAction, default=False)
+    parser.add_argument("--telemetry-max-elements-per-layer", type=int, default=65536)
     parser.add_argument("--save-every-steps", type=int, default=0)
     parser.add_argument("--save-model-artifacts", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--seed", type=int, default=1234)
