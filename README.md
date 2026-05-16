@@ -440,6 +440,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Ternary threshold dynamics audit](benchmarks/results/ternary_threshold_dynamics_2026-05-15.md)
 - [Second-order ternary initialization audit](benchmarks/results/second_order_ternary_init_2026-05-15.md)
 - [BitNet-SFT LS-init submission](benchmarks/results/bitnet_sft_ls_init_submission_2026-05-15.md)
+- [BitNet-SFT LS-init audit](benchmarks/results/bitnet_sft_ls_init_audit_2026-05-15.md)
 - [Qwen3 paper-alignment audit](benchmarks/results/qwen3_paper_alignment_2026-05-15.md)
 - [BitNet-SFT baseline audit](benchmarks/results/bitnet_sft_baseline_audit_2026-05-15.md)
 - [BitNet-SFT recipe alignment audit](benchmarks/results/bitnet_sft_recipe_alignment_2026-05-15.md)

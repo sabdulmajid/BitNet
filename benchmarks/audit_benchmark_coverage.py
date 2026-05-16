@@ -769,6 +769,54 @@ def audit_bitnet_sft_ls_init_submission(root: Path, checks: list[dict[str, Any]]
     )
 
 
+def audit_bitnet_sft_ls_init_result(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/bitnet_sft_ls_init_audit_{DATE}.json"
+    if not path.exists():
+        add_check(
+            checks,
+            "BitNet-SFT LS-init result audit exists",
+            False,
+            str(path.relative_to(root)),
+            "missing BitNet-SFT LS-init result audit",
+        )
+        return
+    data = read_json(path)
+    status = data.get("status")
+    add_check(
+        checks,
+        "BitNet-SFT LS-init result audit is pending or complete",
+        status in {
+            "pending",
+            "complete",
+            "complete_incomplete_eval",
+            "complete_init_contract_failed",
+            "complete_prediction_contract_failed",
+        }
+        and data.get("baseline_accuracy") is not None
+        and data.get("quality_proven") in {False, True},
+        (
+            f"status={status}, baseline={data.get('baseline_accuracy')}, "
+            f"candidate={data.get('candidate_accuracy')}, quality_proven={data.get('quality_proven')}"
+        ),
+        "LS-init result audit should either explicitly wait for Slurm output or report a complete comparison",
+    )
+    if status == "complete":
+        paired = data.get("paired", {}) if isinstance(data.get("paired"), dict) else {}
+        add_check(
+            checks,
+            "BitNet-SFT LS-init complete result has paired MNLI statistics",
+            paired.get("status") == "pass"
+            and paired.get("matched") == 9815
+            and isinstance(paired.get("paired_ci95"), list)
+            and isinstance(data.get("delta_vs_absmean_baseline"), (int, float)),
+            (
+                f"matched={paired.get('matched')}, ci={paired.get('paired_ci95')}, "
+                f"delta={data.get('delta_vs_absmean_baseline')}"
+            ),
+            "complete LS-init audit should include full paired MNLI statistics",
+        )
+
+
 def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
     path = root / f"benchmark_results/seqcls_runtime_gap_{DATE}.json"
     if not path.exists():
@@ -1191,6 +1239,7 @@ def main() -> None:
     audit_ternary_threshold_dynamics(root, checks)
     audit_second_order_ternary_init(root, checks)
     audit_bitnet_sft_ls_init_submission(root, checks)
+    audit_bitnet_sft_ls_init_result(root, checks)
     audit_seqcls_runtime_gap(root, checks)
     audit_qwen3_paper_alignment(root, checks)
     audit_cpu_rows(root, checks)

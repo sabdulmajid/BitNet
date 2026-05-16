@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 84,
+  "check_count": 85,
   "failed": [],
   "checks": [
     {
@@ -360,6 +360,12 @@
       "blocker": ""
     },
     {
+      "name": "BitNet-SFT LS-init result audit is pending or complete",
+      "passed": true,
+      "evidence": "status=pending, baseline=0.6289353031074886, candidate=None, quality_proven=False",
+      "blocker": ""
+    },
+    {
       "name": "Sequence-classification runtime gap is narrowed but not closed",
       "passed": true,
       "evidence": "status=sidecar_qwen_contract_available_native_head_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6",
@@ -500,7 +506,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=255, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=257, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {
