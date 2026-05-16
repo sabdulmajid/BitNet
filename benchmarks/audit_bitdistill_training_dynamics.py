@@ -317,6 +317,7 @@ def main() -> None:
             f"benchmark_results/bitdistill-smoke-contract-{DATE}/task_sft/telemetry.jsonl",
             f"benchmark_results/bitdistill-smoke-contract-{DATE}/task_sft_row/telemetry.jsonl",
             "checkpoints/bitdistill-glue-seqcls-telemetry/**/telemetry.jsonl",
+            "checkpoints/bitdistill-glue-seqcls-telemetry-fast/**/telemetry.jsonl",
         ],
     )
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_training_dynamics_{DATE}.json"))

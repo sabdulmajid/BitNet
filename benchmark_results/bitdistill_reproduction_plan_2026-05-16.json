@@ -1,4 +1,13 @@
 {
+  "baseline_mismatch_audit": [
+    "Hold the sequence-classification formulation fixed and compare FP16-SFT, BitNet-SFT, and BitDistill on full MNLI validation.",
+    "Verify q/k/v/o/gate/up/down replacement counts and keep embeddings, norms, and classifier heads dense.",
+    "Run W1.58-only and W1.58A8 controls to isolate activation quantization damage.",
+    "Record ternary code fractions, threshold-band occupancy, scale distributions, A8 clipping, and int8 edge occupancy.",
+    "Materialize component-gradient telemetry so CE, logits KD, and attention KD update magnitudes are comparable.",
+    "Treat row-scale, QNLI/SST2, and attention-layer sweeps as blocked until the tensor-scale MNLI gate is interpretable."
+  ],
+  "blocking_question": "Does tensor-scale BitDistill move monotonically toward the local FP16-SFT task model as Stage-2 tokens increase, or does it saturate far below FP16 despite a viable CE-only BitNet-SFT baseline?",
   "date": "2026-05-16",
   "deferred_axes": {
     "attention_layer_sweep": true,
@@ -50,6 +59,15 @@
     }
   ],
   "schema": "bitdistill-reproduction-plan-v1",
+  "stage2_budget_curve": [
+    "0",
+    "40.96M",
+    "163.84M",
+    "327.68M",
+    "640M+",
+    "2.5B+",
+    "10B target"
+  ],
   "success_criterion": "BitDistill within 0.5-1.0 accuracy point (0.005-0.010 absolute accuracy) of FP16-SFT on the primary task before expanding axes.",
   "task_format": "sequence_classification"
 }

@@ -20,7 +20,22 @@ Logits-KD constraint: Use paper-style logits KL with `LOGIT_KD_TEMPERATURE_SCALE
 
 Expansion rule: Do not add QNLI/SST2, row-scale novelty, or attention-layer sweeps until the MNLI tensor-scale BitDistill gate is interpretable.
 
+Blocking question: Does tensor-scale BitDistill move monotonically toward the local FP16-SFT task model as Stage-2 tokens increase, or does it saturate far below FP16 despite a viable CE-only BitNet-SFT baseline?
+
 This matrix keeps paper reproduction separate from this fork's novelty claim. The default plan uses tensor-scale BitDistill on MNLI first. Secondary tasks, row-scale novelty, and attention-layer sweeps require explicit opt-in flags.
+
+Baseline mismatch audit:
+
+- Hold the sequence-classification formulation fixed and compare FP16-SFT, BitNet-SFT, and BitDistill on full MNLI validation.
+- Verify q/k/v/o/gate/up/down replacement counts and keep embeddings, norms, and classifier heads dense.
+- Run W1.58-only and W1.58A8 controls to isolate activation quantization damage.
+- Record ternary code fractions, threshold-band occupancy, scale distributions, A8 clipping, and int8 edge occupancy.
+- Materialize component-gradient telemetry so CE, logits KD, and attention KD update magnitudes are comparable.
+- Treat row-scale, QNLI/SST2, and attention-layer sweeps as blocked until the tensor-scale MNLI gate is interpretable.
+
+Stage-2 budget curve:
+
+`0`, `40.96M`, `163.84M`, `327.68M`, `640M+`, `2.5B+`, `10B target`
 
 | # | phase | task | method | scale | layer | command |
 | --- | --- | --- | --- | --- | --- | --- |

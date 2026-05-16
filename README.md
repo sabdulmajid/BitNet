@@ -221,8 +221,9 @@ the Q4-normalized `I2_SR` speedup intervals remain above `1.0`: prefill
   attention-relation distillation, attention-layer sweep support, and strict
   task-formulation gates.
 - Opt-in BitDistill telemetry for future controlled runs: total gradient norm,
-  component gradient norms, ternary code fractions, scale statistics, and
-  quantization-threshold band occupancy.
+  component gradient norms, Q/K/V attention-KD splits, ternary code fractions,
+  scale statistics, quantization-threshold band occupancy, BitLinear A8
+  clipping/edge occupancy, ternary flip rates, and scale drift.
 - MoE/Kimi feasibility audits that separate generic routing support from real
   Kimi or trained-MoE evidence.
 
@@ -325,6 +326,9 @@ Decision rule:
   mechanics.
 - Row-scale results should be reported as a separate runtime/retrofit
   contribution, not as a BitDistill reproduction.
+- Do not add more broad sweeps until the tensor-scale MNLI baseline mismatch is
+  explained with loss/update telemetry, activation-saturation telemetry, and
+  the fixed Stage-2 token-budget curve.
 
 Immediate gate:
 

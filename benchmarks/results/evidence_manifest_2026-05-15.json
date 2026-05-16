@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "5b675df758af7548e88d81fd5cb624c634260a998da8864615702c29a097bab3",
-      "size_bytes": 26519
+      "sha256": "b2d3a78b2a33ed65445abe2fb27c2d4d097f1d7d9ec8dd86f72c07002aaa10b5",
+      "size_bytes": 26816
     },
     {
       "exists": true,
@@ -700,7 +700,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "5be690ed3622bcdd9b2b633d15169d7b1c9ddf1acfa37a6761772d1fff6bd521",
+      "sha256": "f9bafdae7915ce9c956fd086690dc513f87ce4772202a0ccbf898b16eb9c50c2",
       "size_bytes": 9799
     },
     {
@@ -2420,7 +2420,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "871346a10b1d7bd78a69b29d85321312ccc97f0217dca5d713f039bef563b1cb",
+      "sha256": "57e1fa578024201026dd59c292d5aaac56c1fd04f1e54ca23c93ba220f019782",
       "size_bytes": 15661
     },
     {
