@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 88,
+  "check_count": 90,
   "failed": [],
   "checks": [
     {
@@ -324,6 +324,18 @@
       "blocker": ""
     },
     {
+      "name": "TL2 group-scale viability audit has group sweep",
+      "passed": true,
+      "evidence": "groups=10, best_group=0.0986922473661489, exact_row=0.00019744640689756221",
+      "blocker": ""
+    },
+    {
+      "name": "TL2 group-scale viability keeps strict row-scale blocker",
+      "passed": true,
+      "evidence": "strict_viable=False, best_group=0.0986922473661489, exact_row=0.00019744640689756221, ratio=499.84321779707915",
+      "blocker": ""
+    },
+    {
       "name": "Ternary flip-dynamics audit has nonzero saved-snapshot flips",
       "passed": true,
       "evidence": "status=pass, pairs=2, min_flip=0.06454656755885871, max_flip=0.1659562863332169",
@@ -524,7 +536,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=263, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=265, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

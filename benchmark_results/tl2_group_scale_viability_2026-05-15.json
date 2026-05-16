@@ -1,0 +1,126 @@
+{
+  "best_group_fp16": {
+    "dtype": "fp16",
+    "expected_relative_output_rms_error": 0.0986922473661489,
+    "group_size": 2,
+    "name": "group2_l2_optimal_fp16",
+    "scale_mib": 0.615234375
+  },
+  "best_group_to_exact_row_error_ratio": 499.84321779707915,
+  "best_one_tensor_l2_scale": {
+    "expected_relative_output_rms_error": 0.1611730201316774,
+    "name": "tensor_l2_optimal_fp32",
+    "scale_mib": 0.00037384033203125
+  },
+  "current_one_scale": {
+    "expected_relative_output_rms_error": 1.9042302114103853,
+    "name": "current_tl2_tensor_max_fp32",
+    "scale_mib": 0.00037384033203125
+  },
+  "date": "2026-05-15",
+  "design_json": "benchmark_results/tl2_row_scale_design_2026-05-13.json",
+  "exact_row_fp16": {
+    "expected_relative_output_rms_error": 0.00019744640689756221,
+    "name": "row_exact_fp16",
+    "scale_mib": 1.23046875
+  },
+  "exact_row_required_for_strict_fidelity": true,
+  "group_fp16_rows": [
+    {
+      "dtype": "fp16",
+      "expected_relative_output_rms_error": 0.0986922473661489,
+      "group_size": 2,
+      "name": "group2_l2_optimal_fp16",
+      "scale_mib": 0.615234375
+    },
+    {
+      "dtype": "fp16",
+      "expected_relative_output_rms_error": 0.12076885107484374,
+      "group_size": 4,
+      "name": "group4_l2_optimal_fp16",
+      "scale_mib": 0.3076171875
+    },
+    {
+      "dtype": "fp16",
+      "expected_relative_output_rms_error": 0.13067669899949638,
+      "group_size": 8,
+      "name": "group8_l2_optimal_fp16",
+      "scale_mib": 0.15380859375
+    },
+    {
+      "dtype": "fp16",
+      "expected_relative_output_rms_error": 0.13689365127600447,
+      "group_size": 16,
+      "name": "group16_l2_optimal_fp16",
+      "scale_mib": 0.076904296875
+    },
+    {
+      "dtype": "fp16",
+      "expected_relative_output_rms_error": 0.1428438042225288,
+      "group_size": 32,
+      "name": "group32_l2_optimal_fp16",
+      "scale_mib": 0.0384521484375
+    },
+    {
+      "dtype": "fp16",
+      "expected_relative_output_rms_error": 0.15396004624030402,
+      "group_size": 64,
+      "name": "group64_l2_optimal_fp16",
+      "scale_mib": 0.01922607421875
+    },
+    {
+      "dtype": "fp16",
+      "expected_relative_output_rms_error": 0.15439184302055323,
+      "group_size": 128,
+      "name": "group128_l2_optimal_fp16",
+      "scale_mib": 0.009613037109375
+    },
+    {
+      "dtype": "fp16",
+      "expected_relative_output_rms_error": 0.158025932954932,
+      "group_size": 256,
+      "name": "group256_l2_optimal_fp16",
+      "scale_mib": 0.0048065185546875
+    },
+    {
+      "dtype": "fp16",
+      "expected_relative_output_rms_error": 0.15953690111035773,
+      "group_size": 512,
+      "name": "group512_l2_optimal_fp16",
+      "scale_mib": 0.00251007080078125
+    },
+    {
+      "dtype": "fp16",
+      "expected_relative_output_rms_error": 0.1600279943254663,
+      "group_size": 1024,
+      "name": "group1024_l2_optimal_fp16",
+      "scale_mib": 0.0013885498046875
+    }
+  ],
+  "loose_error_threshold": 0.1,
+  "loose_group_scale_viable": true,
+  "recommendation": "Do not implement group/tile-scale TL2 as the quality-preserving row-scale path; the best available fp16 group-scale row still misses the strict output-fidelity gate.",
+  "row_label": "qwen15b_row_scale",
+  "schema": "tl2-group-scale-viability-v1",
+  "smallest_group_meeting_loose_threshold": {
+    "dtype": "fp16",
+    "expected_relative_output_rms_error": 0.0986922473661489,
+    "group_size": 2,
+    "name": "group2_l2_optimal_fp16",
+    "scale_mib": 0.615234375
+  },
+  "smallest_group_meeting_strict_threshold": null,
+  "strict_error_threshold": 0.01,
+  "strict_group_scale_viable": false,
+  "tensor_label": "qwen15b_tensor_scale",
+  "tensor_scale_current": {
+    "expected_relative_output_rms_error": 0.0,
+    "name": "current_tl2_tensor_max_fp32",
+    "scale_mib": 0.0003757476806640625
+  },
+  "tensor_scale_exact_row_fp16": {
+    "expected_relative_output_rms_error": 0.00017500793684525103,
+    "name": "row_exact_fp16",
+    "scale_mib": 1.520263671875
+  }
+}

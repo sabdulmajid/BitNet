@@ -27,6 +27,7 @@ result.
 | BitNet-SFT baseline can clear the paper anchor | Proven for one local MNLI row | CE-only Qwen2.5-0.5B BitNet-SFT reaches `0.628935` vs paper BitNet-SFT anchor `0.608000`. |
 | BitDistill FP recovery is not reproduced | Proven not yet complete | Controlled BitDistill rows reach `0.616607` and `0.691187`, still far from local FP16-SFT `0.807641`. |
 | Row-scale runtime contract matters | Proven by output audit | One-scale TL2 relative output RMS error `1.904230`; exact row scales `0.000197`. |
+| TL2 group/tile-scale compromise is enough | Rejected for strict fidelity | Best available fp16 group-scale row is `0.098692` relative output RMS; exact fp16 row scales are `0.000197`. |
 | `I2_SR` can preserve row-scale ternary semantics in packed CPU inference | Proven for compatible causal-LM artifacts | Qwen2.5-1.5B `I2_SR` runs on Xeon Silver 4116 with PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
 | Native packed sequence-classification product is solved | Not proven | Current classifier path is a Python sidecar over an `I2_SR` backbone, not native GGUF inference. |
 | Kimi/MoE product viability is proven | Not proven | Current MoE work is tiny-fixture plumbing only. |
@@ -198,6 +199,22 @@ Pick one deployable task formulation:
 
 Until that choice is made, quality and runtime are proven on related but not
 identical artifacts.
+
+### Gate E: TL2 Row-Scale Contract
+
+The new group-scale viability audit prevents a premature kernel detour:
+
+```text
+current one-scale TL2 error: 1.904230
+best fp16 group-scale error: 0.098692
+exact fp16 row-scale error:  0.000197
+```
+
+Decision:
+
+- Do not treat group/tile-scale TL2 as the quality-preserving row-scale fix.
+- Exact row-scale metadata, or a different scale model with audited fidelity,
+  is required before TL2 can close the objective blocker.
 
 ## Immediate Work Plan
 

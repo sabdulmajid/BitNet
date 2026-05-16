@@ -625,6 +625,52 @@ def audit_tl2_implementation_plan(root: Path, checks: list[dict[str, Any]]) -> N
     )
 
 
+def audit_tl2_group_scale_viability(root: Path, checks: list[dict[str, Any]]) -> None:
+    path = root / f"benchmark_results/tl2_group_scale_viability_{DATE}.json"
+    if not path.exists():
+        add_check(
+            checks,
+            "TL2 group-scale viability audit exists",
+            False,
+            str(path.relative_to(root)),
+            "missing TL2 group-scale viability audit",
+        )
+        return
+    data = read_json(path)
+    best_group = data.get("best_group_fp16", {}) if isinstance(data.get("best_group_fp16"), dict) else {}
+    exact_row = data.get("exact_row_fp16", {}) if isinstance(data.get("exact_row_fp16"), dict) else {}
+    group_rows = data.get("group_fp16_rows", []) if isinstance(data.get("group_fp16_rows"), list) else []
+    best_error = best_group.get("expected_relative_output_rms_error")
+    exact_error = exact_row.get("expected_relative_output_rms_error")
+    ratio = data.get("best_group_to_exact_row_error_ratio")
+    add_check(
+        checks,
+        "TL2 group-scale viability audit has group sweep",
+        len(group_rows) >= 10
+        and isinstance(best_error, (int, float))
+        and isinstance(exact_error, (int, float)),
+        f"groups={len(group_rows)}, best_group={best_error}, exact_row={exact_error}",
+        "group-scale viability should quantify the row-group error frontier",
+    )
+    add_check(
+        checks,
+        "TL2 group-scale viability keeps strict row-scale blocker",
+        data.get("strict_group_scale_viable") is False
+        and data.get("exact_row_required_for_strict_fidelity") is True
+        and isinstance(best_error, (int, float))
+        and best_error > 0.05
+        and isinstance(exact_error, (int, float))
+        and exact_error < 0.01
+        and isinstance(ratio, (int, float))
+        and ratio > 100,
+        (
+            f"strict_viable={data.get('strict_group_scale_viable')}, "
+            f"best_group={best_error}, exact_row={exact_error}, ratio={ratio}"
+        ),
+        "group-scale TL2 should not be allowed to close the row-scale objective blocker unless it meets strict fidelity",
+    )
+
+
 def audit_ternary_flip_dynamics(root: Path, checks: list[dict[str, Any]]) -> None:
     path = root / f"benchmark_results/ternary_flip_dynamics_{DATE}.json"
     if not path.exists():
@@ -1330,6 +1376,7 @@ def main() -> None:
     audit_original_benchmark_objective(root, checks)
     audit_tl2_negative_result(root, checks)
     audit_tl2_implementation_plan(root, checks)
+    audit_tl2_group_scale_viability(root, checks)
     audit_ternary_flip_dynamics(root, checks)
     audit_ternary_threshold_dynamics(root, checks)
     audit_second_order_ternary_init(root, checks)

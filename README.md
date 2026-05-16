@@ -140,6 +140,10 @@ with active work on `i2sr-row-scale-runtime`.
 - TL2 support for row-scale Qwen. Current TL2 uses one scalar scale; generated
   x86 TL2 qgemm multiplies by `Scales[0]`. Use `I2_SR` for row-scale
   checkpoints until a new TL2 row/group-scale contract is implemented.
+  A grouped-scale audit also shows that the best available fp16 group-scale
+  row (`group2`) still has `0.098692` relative output RMS error, while exact
+  fp16 row scales reach `0.000197`; group/tile scales should not close the
+  strict TL2 blocker without new quality evidence.
 
 ## Current Plan
 
@@ -209,6 +213,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [BitNet-SFT budget sweep audit](benchmarks/results/bitnet_sft_budget_sweep_2026-05-15.md)
 - [Sequence-classification runtime gap audit](benchmarks/results/seqcls_runtime_gap_2026-05-15.md)
 - [CPU tradeoff frontier audit](benchmarks/results/cpu_tradeoff_frontier_2026-05-15.md)
+- [TL2 group-scale viability audit](benchmarks/results/tl2_group_scale_viability_2026-05-15.md)
 - [TL2 row-scale implementation plan](benchmarks/results/tl2_row_scale_implementation_plan_2026-05-15.md)
 - [TL2 negative-result audit](benchmarks/results/tl2_negative_result_2026-05-15.md)
 - [Product scope gate](benchmarks/results/product_scope_gate_2026-05-15.md)
