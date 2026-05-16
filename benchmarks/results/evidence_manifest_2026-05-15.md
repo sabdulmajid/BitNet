@@ -1,9 +1,9 @@
 # Evidence Manifest, 2026-05-15
-Artifacts: `284`. Missing: `0`.
+Artifacts: `285`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 14742 | 6bd3791498b6 |  |
-| current_research_plan_report | tracked_report | yes | 15600 | 43717c596eec |  |
+| README | tracked_report | yes | 15031 | 7ecc87a1ca5f |  |
+| current_research_plan_report | tracked_report | yes | 15728 | 05fec5f173ed |  |
 | research_redirect_report | tracked_report | yes | 14285 | 26f2f5bda19e |  |
 | research_redirect_claims_report | tracked_report | yes | 2392 | 0a0d290f728d |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
@@ -61,6 +61,7 @@ Artifacts: `284`. Missing: `0`.
 | seqcls_native_i2sr_cpu_mnli16_token_ids_report | tracked_report | yes | 1129 | 0a0fc9b97fe4 |  |
 | seqcls_native_i2sr_cpu_mnli64_token_ids_report | tracked_report | yes | 1124 | b690c71635bc |  |
 | seqcls_native_i2sr_cpu_mnli64_token_ids_batch4_report | tracked_report | yes | 1124 | 3044b89bb306 |  |
+| seqcls_native_full_cpu_submission_report | tracked_report | yes | 1037 | 8bfb97266acf |  |
 | seqcls_native_mismatch_audit_report | tracked_report | yes | 1723 | 23061853e2c8 |  |
 | seqcls_native_mismatch_audit_fp32_report | tracked_report | yes | 1723 | bc40829d586a |  |
 | seqcls_native_batching_audit_report | tracked_report | yes | 2183 | 13a609b787f6 |  |
@@ -99,7 +100,7 @@ Artifacts: `284`. Missing: `0`.
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 1824 | 5d992b3c9a1c |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 14099 | 0012c55b3f0f |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 14099 | 8b706f04d0eb |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2569 | 51da6738be9d |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -196,7 +197,7 @@ Artifacts: `284`. Missing: `0`.
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
 | benchmark_matrix_audit_json | generic_json | yes | 16721 | d93ae3f74ea3 |  |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 21964 | 47215e1a6757 | passed=True, checks=102, failed=0 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 21964 | 92e3149c7dde | passed=True, checks=102, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | bb6912119dfc | achieved=False, status=not_complete, complete=7/9, open=2 |
 | original_benchmark_objective_audit_json | generic_json | yes | 4278 | 2916929b09b3 |  |
 | product_scope_gate_json | product_scope_gate_json | yes | 5770 | d0101b25bd20 | scope=research_mvp_only, supported=5, unsupported=4 |

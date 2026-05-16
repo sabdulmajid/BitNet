@@ -1,5 +1,5 @@
 {
-  "artifact_count": 284,
+  "artifact_count": 285,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "6bd3791498b6f69cfe51488525eb17fe18a5f4c3e5f2ed9a57fdf21398ffc789",
-      "size_bytes": 14742
+      "sha256": "7ecc87a1ca5f7f56dc4a37a0f28cdec7a3d8294bddd9c11a452ee6cee8726eb1",
+      "size_bytes": 15031
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "current_research_plan_report",
       "metrics": {},
       "path": "benchmarks/results/current_research_plan_2026-05-16.md",
-      "sha256": "43717c596eec2767923682615c203a43e0d9143f83ac96940333ff06ae473dd2",
-      "size_bytes": 15600
+      "sha256": "05fec5f173edd8af3f5adbfb4fcb769bf9909622758c36d8fca0eed9b1c4753a",
+      "size_bytes": 15728
     },
     {
       "exists": true,
@@ -535,6 +535,15 @@
     {
       "exists": true,
       "kind": "tracked_report",
+      "label": "seqcls_native_full_cpu_submission_report",
+      "metrics": {},
+      "path": "benchmarks/results/seqcls_native_full_cpu_submission_2026-05-15.md",
+      "sha256": "8bfb97266acf5db6f28adc7ce041dcff99b93741f093665010e606d824673f5f",
+      "size_bytes": 1037
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
       "label": "seqcls_native_mismatch_audit_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_native_mismatch_audit_2026-05-15.md",
@@ -880,7 +889,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "0012c55b3f0fc9568358c8027e68132985712ed327062f4258d050f7be7ac1c7",
+      "sha256": "8b706f04d0eb5d8756fa3b092f9f823d80b5f016a077e350bb30f1764e5fd660",
       "size_bytes": 14099
     },
     {
@@ -2636,7 +2645,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "47215e1a6757345b07d8742d125186f261ba70250ed6b8ea5262a90efb496865",
+      "sha256": "92e3149c7ddef60f7090515a3c32b282f35eb72e5d7c21c9ab9a5b24ad361c86",
       "size_bytes": 21964
     },
     {

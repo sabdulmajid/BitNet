@@ -161,7 +161,9 @@ The next work is deliberately narrow:
    sample has high agreement with saved PyTorch predictions but still shows
    residual packed-runtime drift. Batching parity currently fails through
    position-dependent drift rather than row swapping, so batched/full product
-   claims remain premature.
+   claims remain premature. A full MNLI native CPU validation job has been
+   submitted in the safe prompt-batch-size-1 mode; it is a quality/completion
+   gate, not a batched throughput claim.
 5. Keep MoE/Kimi as future work until the dense case is solved.
 
 Detailed current status and next steps are in
@@ -229,6 +231,7 @@ cmake --build build-portable-avx2 --target llama-cli llama-bench llama-perplexit
 - [Sequence-classification native I2_SR mismatch audit](benchmarks/results/seqcls_native_mismatch_audit_2026-05-15.md)
 - [Sequence-classification native I2_SR batching audit](benchmarks/results/seqcls_native_batching_audit_2026-05-15.md)
 - [Sequence-classification native I2_SR CPU token-ID sample](benchmarks/results/seqcls_native_i2sr_cpu_mnli_64_token_ids_2026-05-15.md)
+- [Sequence-classification native full CPU submission](benchmarks/results/seqcls_native_full_cpu_submission_2026-05-15.md)
 - [CPU tradeoff frontier audit](benchmarks/results/cpu_tradeoff_frontier_2026-05-15.md)
 - [TL2 group-scale viability audit](benchmarks/results/tl2_group_scale_viability_2026-05-15.md)
 - [TL2 row-scale implementation plan](benchmarks/results/tl2_row_scale_implementation_plan_2026-05-15.md)
