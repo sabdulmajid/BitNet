@@ -148,7 +148,8 @@ def summarize_measured(args: argparse.Namespace, source: str, launcher_source: s
             "status": "instrumented_not_materialized",
             "evidence": (
                 "train_bitdistill.py exposes telemetry.jsonl, total grad norm, optional component "
-                "grad norms, ternary code fractions, scale stats, and threshold-band fractions."
+                "grad norms, ternary code fractions, scale stats, threshold-band fractions, "
+                "flip-rate telemetry, and scale-drift telemetry."
             ),
             "supports": "Future controlled rows can record update-balance diagnostics without changing default jobs.",
             "passed": source_has_all(
@@ -158,6 +159,7 @@ def summarize_measured(args: argparse.Namespace, source: str, launcher_source: s
                     "--telemetry-component-grad-norms",
                     "component_grad_norms_microbatch",
                     "threshold_band_0p05_fraction",
+                    "quantization_dynamics",
                     "telemetry.jsonl",
                 ],
             ),
@@ -223,34 +225,38 @@ def summarize_measured(args: argparse.Namespace, source: str, launcher_source: s
                 ],
             ),
         },
+        {
+            "telemetry": "ternary flip-rate and scale trajectory",
+            "status": "instrumented_not_materialized",
+            "evidence": (
+                "train_bitdistill.py records sampled ternary code flip fractions and "
+                "scale absolute-delta statistics between emitted telemetry steps."
+            ),
+            "supports": "Future controlled rows can show whether continued pretraining is moving ternary codes and scale semantics.",
+            "passed": source_has_all(
+                source,
+                [
+                    "BitLinearDynamicsTracker",
+                    "flip_fraction",
+                    "scale_abs_delta_mean",
+                    "quantization_dynamics",
+                ],
+            ),
+        },
     ]
 
 
 def summarize_missing(source: str) -> list[dict[str, Any]]:
-    has_clip_norm = "clip_grad_norm_" in source
     return [
         {
-            "telemetry": "gradient norm by loss component",
+            "telemetry": "materialized training-dynamics telemetry rows",
             "status": "missing_materialized_run",
             "evidence": (
-                "Opt-in component-gradient telemetry exists"
-                if "component_grad_norms_microbatch" in source
-                else ("The script clips total gradients" if has_clip_norm else "No gradient norm capture found")
-            )
-            + ", but no completed benchmark row has materialized those traces yet.",
-            "risk": "Cannot prove which objective term dominates the update direction.",
-        },
-        {
-            "telemetry": "ternary flip rate per step/layer",
-            "status": "missing_materialized_run",
-            "evidence": "Final ternary code fractions are audited and opt-in code telemetry exists, but consecutive-step code transitions are not materialized for completed benchmark rows.",
-            "risk": "Cannot tell whether continued pretraining is moving codes or only tuning dense residual/head parameters.",
-        },
-        {
-            "telemetry": "scale trajectory per layer",
-            "status": "missing_materialized_run",
-            "evidence": "Final scale histograms and opt-in scale telemetry exist; per-step tensor/row scale drift is not materialized for completed benchmark rows.",
-            "risk": "Cannot directly verify whether Stage-2 learns BitNet-like scale semantics over time.",
+                "Component-gradient, Q/K/V, activation-saturation, flip-rate, and scale-drift "
+                "hooks exist, but completed controlled benchmark rows have not materialized "
+                "the new traces yet."
+            ),
+            "risk": "Cannot yet make causal claims from completed rows about update direction, A8 saturation, or Stage-2 ternary dynamics.",
         },
     ]
 
@@ -275,9 +281,8 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
             "Existing telemetry is sufficient for loss-scale and static-mechanics triage, "
             "and the training script plus Slurm launcher now have opt-in hooks for the next controlled wave. "
             "The completed benchmark artifacts are still not sufficient to prove update-direction "
-            "causality, because materialized gradient-component, flip-rate, and scale-trajectory "
-            "traces do not exist yet. Activation-saturation telemetry is instrumented for "
-            "future controlled rows."
+            "causality, because materialized component-gradient, flip-rate, scale-trajectory, "
+            "and activation-saturation traces do not exist yet."
         ),
         "safe_next_step": (
             "After the active queued jobs finish, launch the next controlled rows with "

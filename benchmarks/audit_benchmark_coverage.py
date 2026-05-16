@@ -410,11 +410,7 @@ def audit_bitdistill_telemetry_coverage(root: Path, checks: list[dict[str, Any]]
         for row in missing
         if isinstance(row, dict)
     }
-    required_missing = {
-        "gradient norm by loss component",
-        "ternary flip rate per step/layer",
-        "scale trajectory per layer",
-    }
+    required_missing = {"materialized training-dynamics telemetry rows"}
     measured_names = {
         str(row.get("telemetry", ""))
         for row in measured
@@ -432,9 +428,15 @@ def audit_bitdistill_telemetry_coverage(root: Path, checks: list[dict[str, Any]]
     add_check(
         checks,
         "BitDistill telemetry coverage audit keeps advanced causality claims blocked",
-        required_missing.issubset(missing_names) and "BitLinear activation int8 saturation" in measured_names,
-        f"missing={sorted(missing_names)}, measured_activation={'BitLinear activation int8 saturation' in measured_names}",
-        "telemetry audit must block update-direction claims while recording activation saturation as instrumented",
+        required_missing.issubset(missing_names)
+        and "BitLinear activation int8 saturation" in measured_names
+        and "ternary flip-rate and scale trajectory" in measured_names,
+        (
+            f"missing={sorted(missing_names)}, "
+            f"measured_activation={'BitLinear activation int8 saturation' in measured_names}, "
+            f"measured_dynamics={'ternary flip-rate and scale trajectory' in measured_names}"
+        ),
+        "telemetry audit must block completed-row causal claims while recording new hooks as instrumented",
     )
 
 

@@ -100,6 +100,23 @@ def activation_telemetry_is_finite(rows: list[dict[str, Any]]) -> bool:
     )
 
 
+def quantization_dynamics_is_finite(rows: list[dict[str, Any]]) -> bool:
+    if len(rows) < 2:
+        return False
+    dynamics = rows[-1].get("quantization_dynamics")
+    if not isinstance(dynamics, dict):
+        return False
+    return (
+        dynamics.get("has_previous") is True
+        and int(dynamics.get("tracked_modules") or 0) > 0
+        and int(dynamics.get("compared_modules") or 0) > 0
+        and int(dynamics.get("sampled_code_values") or 0) > 0
+        and finite(dynamics.get("flip_fraction"))
+        and finite(dynamics.get("scale_abs_delta_mean"))
+        and finite(dynamics.get("scale_abs_delta_max"))
+    )
+
+
 def inspect_ternary_state(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {"exists": False}
@@ -399,6 +416,21 @@ def main() -> None:
         "activation A8 clipping, edge occupancy, scale, and absmax fields are present",
         "activation quantization telemetry cannot diagnose A8 saturation",
     )
+    add_check(
+        checks,
+        "BitLinear quantization dynamics telemetry is implemented",
+        all(
+            snippet in train_source
+            for snippet in (
+                "BitLinearDynamicsTracker",
+                "quantization_dynamics",
+                "flip_fraction",
+                "scale_abs_delta_mean",
+            )
+        ),
+        "sampled ternary flip-rate and scale-drift fields are present",
+        "quantization telemetry cannot diagnose ternary code motion or scale drift",
+    )
     for name, run in runs.items():
         add_check(checks, f"{name} command exits zero", run["returncode"] == 0, f"returncode={run['returncode']}", "command failed")
 
@@ -531,6 +563,13 @@ def main() -> None:
         f"telemetry_rows={len(task_telemetry)}, last={task_telemetry[-1].get('activation_quantization') if task_telemetry else {}}",
         "missing or non-finite task-sft activation quantization telemetry",
     )
+    add_check(
+        checks,
+        "task-sft quantization dynamics telemetry is finite",
+        quantization_dynamics_is_finite(task_telemetry),
+        f"telemetry_rows={len(task_telemetry)}, last={task_telemetry[-1].get('quantization_dynamics') if task_telemetry else {}}",
+        "missing or non-finite task-sft quantization dynamics telemetry",
+    )
 
     row_task_prep = row_task.get("preparation", {}) if isinstance(row_task.get("preparation"), dict) else {}
     row_task_last = row_task.get("last", {}) if isinstance(row_task.get("last"), dict) else {}
@@ -597,6 +636,13 @@ def main() -> None:
         activation_telemetry_is_finite(row_task_telemetry),
         f"telemetry_rows={len(row_task_telemetry)}, last={row_task_telemetry[-1].get('activation_quantization') if row_task_telemetry else {}}",
         "missing or non-finite row task-sft activation quantization telemetry",
+    )
+    add_check(
+        checks,
+        "row task-sft quantization dynamics telemetry is finite",
+        quantization_dynamics_is_finite(row_task_telemetry),
+        f"telemetry_rows={len(row_task_telemetry)}, last={row_task_telemetry[-1].get('quantization_dynamics') if row_task_telemetry else {}}",
+        "missing or non-finite row task-sft quantization dynamics telemetry",
     )
 
     result = {

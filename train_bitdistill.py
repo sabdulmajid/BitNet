@@ -349,6 +349,89 @@ def bitlinear_quantization_summary(model: nn.Module, *, max_elements_per_layer: 
     }
 
 
+def bitlinear_quantization_state(
+    model: nn.Module,
+    *,
+    max_elements_per_layer: int,
+) -> tuple[dict[str, torch.Tensor], dict[str, torch.Tensor]]:
+    codes: dict[str, torch.Tensor] = {}
+    scales: dict[str, torch.Tensor] = {}
+    with torch.no_grad():
+        for name, module in model.named_modules():
+            if not isinstance(module, BitLinear):
+                continue
+            weight = module.weight.detach()
+            if module.scale_mode == "row":
+                alpha_full = weight.float().abs().mean(dim=1, keepdim=True).clamp_min(module.eps)
+            else:
+                alpha_full = weight.float().abs().mean().clamp_min(module.eps)
+
+            sample, row_idx = sampled_weight_matrix(weight, max_elements_per_layer)
+            if module.scale_mode == "row":
+                alpha = alpha_full if row_idx is None else alpha_full.index_select(0, row_idx)
+            else:
+                alpha = alpha_full
+            q = torch.round(sample / alpha).clamp(-1, 1).to(torch.int8)
+            codes[name] = q.reshape(-1).detach().cpu()
+            scales[name] = alpha_full.reshape(-1).detach().float().cpu()
+    return codes, scales
+
+
+class BitLinearDynamicsTracker:
+    def __init__(self) -> None:
+        self.previous_step: int | None = None
+        self.previous_codes: dict[str, torch.Tensor] = {}
+        self.previous_scales: dict[str, torch.Tensor] = {}
+
+    def observe(self, model: nn.Module, *, step: int, max_elements_per_layer: int) -> dict[str, Any]:
+        codes, scales = bitlinear_quantization_state(model, max_elements_per_layer=max_elements_per_layer)
+        compared_modules = 0
+        sampled_code_values = 0
+        flipped_values = 0
+        scale_modules = 0
+        scale_delta_count = 0
+        scale_abs_delta_sum = 0.0
+        scale_abs_delta_max = 0.0
+
+        if self.previous_step is not None:
+            for name, current in codes.items():
+                previous = self.previous_codes.get(name)
+                if previous is None or previous.shape != current.shape:
+                    continue
+                compared_modules += 1
+                sampled_code_values += int(current.numel())
+                flipped_values += int((current != previous).sum().item())
+            for name, current_scale in scales.items():
+                previous_scale = self.previous_scales.get(name)
+                if previous_scale is None or previous_scale.shape != current_scale.shape:
+                    continue
+                delta = (current_scale - previous_scale).abs()
+                scale_modules += 1
+                scale_delta_count += int(delta.numel())
+                scale_abs_delta_sum += float(delta.sum().item())
+                if delta.numel():
+                    scale_abs_delta_max = max(scale_abs_delta_max, float(delta.max().item()))
+
+        result = {
+            "has_previous": self.previous_step is not None,
+            "previous_step": self.previous_step,
+            "steps_since_previous": step - self.previous_step if self.previous_step is not None else None,
+            "tracked_modules": len(codes),
+            "compared_modules": compared_modules,
+            "sampled_code_values": sampled_code_values,
+            "flipped_values": flipped_values,
+            "flip_fraction": flipped_values / sampled_code_values if sampled_code_values else None,
+            "scale_modules": scale_modules,
+            "scale_delta_count": scale_delta_count,
+            "scale_abs_delta_mean": scale_abs_delta_sum / scale_delta_count if scale_delta_count else None,
+            "scale_abs_delta_max": scale_abs_delta_max if scale_delta_count else None,
+        }
+        self.previous_step = step
+        self.previous_codes = codes
+        self.previous_scales = scales
+        return result
+
+
 class BitLinearActivationCapture:
     def __init__(self) -> None:
         self.module_count = 0
@@ -1356,6 +1439,7 @@ def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
     start = time.time()
     last = StepMetrics(loss=0.0)
     telemetry_last: dict[str, Any] | None = None
+    quantization_dynamics = BitLinearDynamicsTracker()
     trainable_parameters = [parameter for parameter in student.parameters() if parameter.requires_grad]
     optimizer.zero_grad(set_to_none=True)
 
@@ -1394,13 +1478,19 @@ def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
                 lr=lr,
             )
             if emit_telemetry:
+                quantization_summary = bitlinear_quantization_summary(
+                    student,
+                    max_elements_per_layer=args.telemetry_max_elements_per_layer,
+                )
                 telemetry_last = {
                     "step": step,
                     "stage": args.stage,
                     "loss": last.__dict__,
                     "component_grad_norms_microbatch": component_norms,
-                    "quantization": bitlinear_quantization_summary(
+                    "quantization": quantization_summary,
+                    "quantization_dynamics": quantization_dynamics.observe(
                         student,
+                        step=step,
                         max_elements_per_layer=args.telemetry_max_elements_per_layer,
                     ),
                     "activation_quantization": activation_capture.summary(),
@@ -1498,6 +1588,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
     start = time.time()
     last = StepMetrics(loss=0.0)
     telemetry_last: dict[str, Any] | None = None
+    quantization_dynamics = BitLinearDynamicsTracker()
     trainable_parameters = [parameter for parameter in student.parameters() if parameter.requires_grad]
     optimizer.zero_grad(set_to_none=True)
 
@@ -1636,14 +1727,20 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                 lr=lr,
             )
             if emit_telemetry:
+                quantization_summary = bitlinear_quantization_summary(
+                    student,
+                    max_elements_per_layer=args.telemetry_max_elements_per_layer,
+                )
                 telemetry_last = {
                     "step": step,
                     "stage": args.stage,
                     "method": args.method,
                     "loss": last.__dict__,
                     "component_grad_norms_microbatch": component_norms,
-                    "quantization": bitlinear_quantization_summary(
+                    "quantization": quantization_summary,
+                    "quantization_dynamics": quantization_dynamics.observe(
                         student,
+                        step=step,
                         max_elements_per_layer=args.telemetry_max_elements_per_layer,
                     ),
                     "activation_quantization": activation_capture.summary(),

@@ -37,7 +37,7 @@
       "telemetry": "SubLN activation/logit perturbation"
     },
     {
-      "evidence": "train_bitdistill.py exposes telemetry.jsonl, total grad norm, optional component grad norms, ternary code fractions, scale stats, and threshold-band fractions.",
+      "evidence": "train_bitdistill.py exposes telemetry.jsonl, total grad norm, optional component grad norms, ternary code fractions, scale stats, threshold-band fractions, flip-rate telemetry, and scale-drift telemetry.",
       "passed": true,
       "status": "instrumented_not_materialized",
       "supports": "Future controlled rows can record update-balance diagnostics without changing default jobs.",
@@ -63,34 +63,29 @@
       "status": "instrumented_not_materialized",
       "supports": "Future controlled rows can rule activation clipping/saturation in or out as a quality limiter.",
       "telemetry": "BitLinear activation int8 saturation"
+    },
+    {
+      "evidence": "train_bitdistill.py records sampled ternary code flip fractions and scale absolute-delta statistics between emitted telemetry steps.",
+      "passed": true,
+      "status": "instrumented_not_materialized",
+      "supports": "Future controlled rows can show whether continued pretraining is moving ternary codes and scale semantics.",
+      "telemetry": "ternary flip-rate and scale trajectory"
     }
   ],
-  "measured_count": 9,
-  "measured_expected": 9,
+  "measured_count": 10,
+  "measured_expected": 10,
   "missing": [
     {
-      "evidence": "Opt-in component-gradient telemetry exists, but no completed benchmark row has materialized those traces yet.",
-      "risk": "Cannot prove which objective term dominates the update direction.",
+      "evidence": "Component-gradient, Q/K/V, activation-saturation, flip-rate, and scale-drift hooks exist, but completed controlled benchmark rows have not materialized the new traces yet.",
+      "risk": "Cannot yet make causal claims from completed rows about update direction, A8 saturation, or Stage-2 ternary dynamics.",
       "status": "missing_materialized_run",
-      "telemetry": "gradient norm by loss component"
-    },
-    {
-      "evidence": "Final ternary code fractions are audited and opt-in code telemetry exists, but consecutive-step code transitions are not materialized for completed benchmark rows.",
-      "risk": "Cannot tell whether continued pretraining is moving codes or only tuning dense residual/head parameters.",
-      "status": "missing_materialized_run",
-      "telemetry": "ternary flip rate per step/layer"
-    },
-    {
-      "evidence": "Final scale histograms and opt-in scale telemetry exist; per-step tensor/row scale drift is not materialized for completed benchmark rows.",
-      "risk": "Cannot directly verify whether Stage-2 learns BitNet-like scale semantics over time.",
-      "status": "missing_materialized_run",
-      "telemetry": "scale trajectory per layer"
+      "telemetry": "materialized training-dynamics telemetry rows"
     }
   ],
-  "missing_count": 3,
+  "missing_count": 1,
   "safe_next_step": "After the active queued jobs finish, launch the next controlled rows with --telemetry-every-steps and --telemetry-component-grad-norms enabled on a sparse cadence.",
   "schema": "bitdistill-telemetry-coverage-v1",
   "status": "partial_observability",
   "training_source": "train_bitdistill.py",
-  "verdict": "Existing telemetry is sufficient for loss-scale and static-mechanics triage, and the training script plus Slurm launcher now have opt-in hooks for the next controlled wave. The completed benchmark artifacts are still not sufficient to prove update-direction causality, because materialized gradient-component, flip-rate, and scale-trajectory traces do not exist yet. Activation-saturation telemetry is instrumented for future controlled rows."
+  "verdict": "Existing telemetry is sufficient for loss-scale and static-mechanics triage, and the training script plus Slurm launcher now have opt-in hooks for the next controlled wave. The completed benchmark artifacts are still not sufficient to prove update-direction causality, because materialized component-gradient, flip-rate, scale-trajectory, and activation-saturation traces do not exist yet."
 }
