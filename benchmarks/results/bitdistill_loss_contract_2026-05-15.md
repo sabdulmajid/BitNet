@@ -8,18 +8,18 @@ This audit is not a quality result. It checks whether the local implementation a
 
 | check | status | evidence | blocker |
 | --- | --- | --- | --- |
-| SubLN wraps projection inputs before BitLinear replacement | pass | first_line=309, second_line=311 |  |
-| Attention relation KD uses batchmean KL | pass | line=404, needle=F.kl_div(torch.log(student_rows), teacher_rows, reduction="batchmean", log_target=False) |  |
-| Attention Q/K/V reduction defaults to sum | pass | line=1443, needle=parser.add_argument("--attention-qkv-reduction", choices=["sum", "mean"], default="sum") |  |
-| Logits KD temperature scaling defaults to none | pass | line=1439, needle=parser.add_argument("--logit-kd-temperature-scale", choices=["none", "square"], default="none") |  |
-| Stage-3 loss is direct weighted sum | pass | line=1300, needle=loss = ce + weighted_logit_kd + weighted_attention_kd |  |
-| Attention weight default is local-safe, not paper gamma | pass | line=1441, needle=parser.add_argument("--attention-kd-weight", type=float, default=100.0) |  |
+| SubLN wraps projection inputs before BitLinear replacement | pass | first_line=594, second_line=596 |  |
+| Attention relation KD uses batchmean KL | pass | line=689, needle=F.kl_div(torch.log(student_rows), teacher_rows, reduction="batchmean", log_target=False) |  |
+| Attention Q/K/V reduction defaults to sum | pass | line=1872, needle=parser.add_argument("--attention-qkv-reduction", choices=["sum", "mean"], default="sum") |  |
+| Logits KD temperature scaling defaults to none | pass | line=1868, needle=parser.add_argument("--logit-kd-temperature-scale", choices=["none", "square"], default="none") |  |
+| Stage-3 loss is direct weighted sum | pass | line=1663, needle=loss = ce + weighted_logit_kd + weighted_attention_kd |  |
+| Attention weight default is local-safe, not paper gamma | pass | line=1870, needle=parser.add_argument("--attention-kd-weight", type=float, default=100.0) |  |
 
 ## Live Loss Balance
 
 | job | label | state | step | CE | attention KD | weighted attention KD | weighted attention / CE | max weighted attention / CE | median weighted attention / CE | p95 weighted attention / CE | median CE/attention gamma | p95 CE/attention gamma | parsed steps |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 10069 | 5k-warmup downstream control | RUNNING | 4510 | 0.394531 | 0.013724 | 1372.391602 | 3478.539334 | 7687.767893 | 1740.111484 | 3579.526028 | 57.467710 | 104.128565 | 452 |
+| 10069 | 5k-warmup downstream control | not_in_squeue | 10000 | 0.279297 | 0.013180 | 1317.987915 | 4718.947626 | 15427.580675 | 1637.956123 | 3908.755310 | 61.052380 | 120.050236 | 1001 |
 | 10068 | 20k-warmup downstream control | squeue_error | 10000 | 0.200195 | 0.011902 | 1190.173462 | 5945.070866 | 37819.641342 | 1729.105844 | 6080.253825 | 57.831811 | 135.086455 | 1001 |
 
 ## Interpretation

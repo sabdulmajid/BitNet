@@ -143,7 +143,7 @@
       "stage2_token_presentations": 163840000,
       "steps": 10000
     },
-    "controlled_complete": 1,
+    "controlled_complete": 2,
     "controlled_expected": 3,
     "controlled_passed_fp_recovery_gate": 0
   },
@@ -190,7 +190,7 @@
     },
     {
       "claim": "BitDistill paper-level recovery has not been locally reproduced.",
-      "evidence": "best tensor BitDistill MNLI=0.641671 (delta vs FP -0.166480); controlled rows complete=1/3, best controlled MNLI=0.691187 (delta vs FP -0.116964).",
+      "evidence": "best tensor BitDistill MNLI=0.641671 (delta vs FP -0.166480); controlled rows complete=2/3, best controlled MNLI=0.691187 (delta vs FP -0.116964).",
       "next_gate": "Finish the fixed-recipe 5k/20k/40k Stage-2 curve and require a full-validation paired trace within the FP recovery gate.",
       "status": "not_proven"
     },

@@ -236,7 +236,7 @@
     {
       "name": "BitDistill root-cause audit marks controlled recovery incomplete",
       "passed": true,
-      "evidence": "controlled=1/3, all=False",
+      "evidence": "controlled=2/3, all=False",
       "blocker": ""
     },
     {
@@ -248,25 +248,25 @@
     {
       "name": "BitDistill telemetry coverage audit measures current loss diagnostics",
       "passed": true,
-      "evidence": "status=partial_observability, measured=10/10",
+      "evidence": "status=controlled_observability, measured=10/10",
       "blocker": ""
     },
     {
-      "name": "BitDistill telemetry coverage audit keeps advanced causality claims blocked",
+      "name": "BitDistill telemetry coverage audit handles advanced telemetry materialization",
       "passed": true,
-      "evidence": "missing=['materialized training-dynamics telemetry rows'], measured_activation=True, measured_dynamics=True",
+      "evidence": "missing=[], controlled=1, measured_activation=True, measured_dynamics=True",
       "blocker": ""
     },
     {
       "name": "BitDistill training-dynamics audit parses materialized telemetry",
       "passed": true,
-      "evidence": "status=smoke_only, traces=2, smoke=2, controlled=0",
+      "evidence": "status=controlled_materialized, traces=3, smoke=2, controlled=1",
       "blocker": ""
     },
     {
       "name": "BitDistill training-dynamics audit blocks controlled claims until real traces exist",
       "passed": true,
-      "evidence": "status=smoke_only, controlled=0",
+      "evidence": "status=controlled_materialized, controlled=1",
       "blocker": ""
     },
     {

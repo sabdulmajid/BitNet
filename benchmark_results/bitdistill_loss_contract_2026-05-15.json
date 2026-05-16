@@ -11,37 +11,37 @@
     {
       "name": "SubLN wraps projection inputs before BitLinear replacement",
       "passed": true,
-      "evidence": "first_line=309, second_line=311",
+      "evidence": "first_line=594, second_line=596",
       "blocker": ""
     },
     {
       "name": "Attention relation KD uses batchmean KL",
       "passed": true,
-      "evidence": "line=404, needle=F.kl_div(torch.log(student_rows), teacher_rows, reduction=\"batchmean\", log_target=False)",
+      "evidence": "line=689, needle=F.kl_div(torch.log(student_rows), teacher_rows, reduction=\"batchmean\", log_target=False)",
       "blocker": ""
     },
     {
       "name": "Attention Q/K/V reduction defaults to sum",
       "passed": true,
-      "evidence": "line=1443, needle=parser.add_argument(\"--attention-qkv-reduction\", choices=[\"sum\", \"mean\"], default=\"sum\")",
+      "evidence": "line=1872, needle=parser.add_argument(\"--attention-qkv-reduction\", choices=[\"sum\", \"mean\"], default=\"sum\")",
       "blocker": ""
     },
     {
       "name": "Logits KD temperature scaling defaults to none",
       "passed": true,
-      "evidence": "line=1439, needle=parser.add_argument(\"--logit-kd-temperature-scale\", choices=[\"none\", \"square\"], default=\"none\")",
+      "evidence": "line=1868, needle=parser.add_argument(\"--logit-kd-temperature-scale\", choices=[\"none\", \"square\"], default=\"none\")",
       "blocker": ""
     },
     {
       "name": "Stage-3 loss is direct weighted sum",
       "passed": true,
-      "evidence": "line=1300, needle=loss = ce + weighted_logit_kd + weighted_attention_kd",
+      "evidence": "line=1663, needle=loss = ce + weighted_logit_kd + weighted_attention_kd",
       "blocker": ""
     },
     {
       "name": "Attention weight default is local-safe, not paper gamma",
       "passed": true,
-      "evidence": "line=1441, needle=parser.add_argument(\"--attention-kd-weight\", type=float, default=100.0)",
+      "evidence": "line=1870, needle=parser.add_argument(\"--attention-kd-weight\", type=float, default=100.0)",
       "blocker": ""
     }
   ],
@@ -50,18 +50,18 @@
       {
         "job_id": "10069",
         "label": "5k-warmup downstream control",
-        "state": "RUNNING",
-        "latest_step": 4510,
-        "latest_ce": 0.394531,
-        "latest_attention_kd": 0.013724,
-        "latest_weighted_attention_kd": 1372.391602,
-        "latest_weighted_attention_to_ce": 3478.5393340447263,
-        "max_weighted_attention_to_ce": 7687.767893397639,
-        "median_weighted_attention_to_ce": 1740.1114843521718,
-        "p95_weighted_attention_to_ce": 3579.5260282555732,
-        "median_ce_attention_equalizing_gamma": 57.46770972666182,
-        "p95_ce_attention_equalizing_gamma": 104.1285649827926,
-        "parsed_steps": 452
+        "state": "not_in_squeue",
+        "latest_step": 10000,
+        "latest_ce": 0.279297,
+        "latest_attention_kd": 0.01318,
+        "latest_weighted_attention_kd": 1317.987915,
+        "latest_weighted_attention_to_ce": 4718.947625645817,
+        "max_weighted_attention_to_ce": 15427.580674846628,
+        "median_weighted_attention_to_ce": 1637.9561225478212,
+        "p95_weighted_attention_to_ce": 3908.7553095913177,
+        "median_ce_attention_equalizing_gamma": 61.05237961137708,
+        "p95_ce_attention_equalizing_gamma": 120.05023640661938,
+        "parsed_steps": 1001
       },
       {
         "job_id": "10068",

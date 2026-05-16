@@ -134,13 +134,15 @@ The existing rows also change attention-loss normalization details, so they
 support a budget-sensitivity hypothesis but are not a clean proof that token
 budget alone explains the remaining BitDistill gap.
 Controlled recovery rows now hold the Stage-3 recipe fixed across `40.96M`,
-`163.84M`, and `327.68M` Stage-2 token presentations. The `163.84M` row has
-completed: MNLI accuracy `0.691187`, delta vs local FP16 `-0.116964`, paired
-95% CI `[-0.126110, -0.107817]`. That is a real improvement over the earlier
-short-budget BitDistill rows, but it is still far outside the paper-style
-success gate of matching FP16 within about `0.5-1.0` accuracy point. The `40.96M`
-and `327.68M` controlled rows are still in flight or pending, so the token-budget
-curve is not complete.
+`163.84M`, and `327.68M` Stage-2 token presentations. The `40.96M` and
+`163.84M` rows have completed: the `40.96M` row reaches MNLI `0.616607`, delta
+vs local FP16 `-0.191544`, paired 95% CI `[-0.201893, -0.181194]`; the
+`163.84M` row reaches MNLI `0.691187`, delta vs local FP16 `-0.116964`, paired
+95% CI `[-0.126110, -0.107817]`. The larger completed row is a real improvement
+over the earlier short-budget BitDistill rows, but it is still far outside the
+paper-style success gate of matching FP16 within about `0.5-1.0` accuracy point.
+The `327.68M` controlled row is still pending, so the token-budget curve is not
+complete.
 
 Loss-component telemetry is now sufficient for finite-run and normalization
 triage: CE, logits KD, attention KD, and weighted KD terms are logged for
@@ -150,9 +152,13 @@ code fractions, scale statistics, threshold-band occupancy, and Q/K/V-split
 attention-relation KD terms. BitLinear activation A8 telemetry is instrumented
 for clipping, int8 edge occupancy, per-token scales, and absmax statistics; the
 same telemetry stream now records sampled ternary flip rates and scale drift
-between emitted steps. This is still not enough for stronger causal claims
-about update direction, because those new training-dynamics traces have not yet
-been materialized in completed controlled benchmark rows.
+between emitted steps. A fast controlled telemetry diagnostic has now
+materialized those traces on a concrete MNLI BitDistill run: final
+weighted-attention/CE gradient-norm ratio `221.384986`, max A8 clipped fraction
+`0.000000`, max int8 edge fraction `0.000362`, mean sampled ternary flip
+fraction `0.002593`, and max scale delta `8.845e-06`. That supports the claim
+that the current paper-gamma setup is update-dominated by attention KD while A8
+saturation is not the immediate failure mode in that diagnostic trace.
 
 Offline Stage-2 snapshot telemetry is now available for the existing
 Qwen2.5-0.5B row-scale warm-up. Across `493,961,216` ternary elements, saved
@@ -163,13 +169,12 @@ continued pretraining is actively moving the ternary codes, not merely
 repacking a fixed projection.
 
 The controlled Stage-2 recovery audit also parses Slurm loss logs. The completed
-`163.84M`-token paper-gamma row ends at step `10000` with
-weighted-attention/CE ratio `5945.070866`, median ratio `1729.105844`, p95 ratio
-`6080.253825`, and max observed ratio `37819.641342`. The same log implies a
-median raw CE/attention equalizing gamma of only `57.831811`. This is a
-loss-normalization warning: the paper's `gamma=100000` coefficient is
-numerically dominating CE under the local implementation even when the final
-accuracy improves.
+`40.96M`- and `163.84M`-token paper-gamma rows both end with very large
+weighted-attention/CE ratios: `4718.947626` and `5945.070866`, respectively.
+Their median raw CE/attention equalizing gammas are only `61.052380` and
+`57.831811`, not `100000`. This is a loss-normalization warning: the paper's
+`gamma=100000` coefficient is numerically dominating CE under the local
+implementation even when the final accuracy improves.
 
 The current root-cause ledger is generated in
 [`benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md`](benchmarks/results/bitdistill_root_cause_audit_2026-05-15.md).
@@ -311,6 +316,9 @@ Current lanes:
 
 - Qwen2.5-0.5B controlled recovery: hold Stage-3 fixed and isolate Stage-2
   token budget across `40.96M`, `163.84M`, and `327.68M` token presentations.
+  The first two rows are complete and both miss the FP-recovery gate; the
+  `327.68M` row is the remaining curve point before deciding whether to scale
+  Stage-2 or stop and fix loss normalization/update balance.
 - Qwen3-0.6B paper-alignment branch: track FP16-SFT, BitNet-SFT, tensor
   BitDistill, row BitDistill, and MNLI attention-layer sweep rows for MNLI,
   QNLI, and SST2. This branch is pending and has no quality claim yet.

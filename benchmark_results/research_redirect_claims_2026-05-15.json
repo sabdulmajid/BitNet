@@ -26,7 +26,7 @@
       "status": "not_proven",
       "supported": true,
       "public_label": "Keep labeled as paper-inspired until full controlled rows close the FP gap.",
-      "evidence": "controlled rows complete=1/3; passed FP recovery=0; best controlled accuracy=0.691187; best paired delta vs FP=-0.116964.",
+      "evidence": "controlled rows complete=2/3; passed FP recovery=0; best controlled accuracy=0.691187; best paired delta vs FP=-0.116964.",
       "next_gate": ""
     },
     {

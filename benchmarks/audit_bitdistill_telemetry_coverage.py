@@ -246,7 +246,9 @@ def summarize_measured(args: argparse.Namespace, source: str, launcher_source: s
     ]
 
 
-def summarize_missing(source: str) -> list[dict[str, Any]]:
+def summarize_missing(materialized_controlled_count: int) -> list[dict[str, Any]]:
+    if materialized_controlled_count > 0:
+        return []
     return [
         {
             "telemetry": "materialized training-dynamics telemetry rows",
@@ -264,29 +266,58 @@ def summarize_missing(source: str) -> list[dict[str, Any]]:
 def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     source = args.training_source.read_text(encoding="utf-8") if args.training_source.exists() else ""
     launcher_source = args.launcher_source.read_text(encoding="utf-8") if args.launcher_source.exists() else ""
+    training_dynamics = read_json(args.training_dynamics_json)
+    materialized_controlled_count = int(training_dynamics.get("materialized_controlled_count") or 0)
     measured = summarize_measured(args, source, launcher_source)
-    missing = summarize_missing(source)
+    if materialized_controlled_count > 0:
+        materialized_names = {
+            "opt-in training telemetry hooks",
+            "Q/K/V relation KD split",
+            "BitLinear activation int8 saturation",
+            "ternary flip-rate and scale trajectory",
+        }
+        for row in measured:
+            if row["telemetry"] in materialized_names:
+                row["status"] = "measured_controlled_trace"
+                row["evidence"] = (
+                    f"{row['evidence']} Controlled traces materialized: "
+                    f"{materialized_controlled_count}."
+                )
+    missing = summarize_missing(materialized_controlled_count)
     measured_pass = sum(1 for row in measured if row["passed"])
+    status = "controlled_observability" if materialized_controlled_count > 0 else "partial_observability"
     return {
         "schema": "bitdistill-telemetry-coverage-v1",
         "date": DATE,
         "training_source": str(args.training_source),
-        "status": "partial_observability",
+        "status": status,
         "measured_count": measured_pass,
         "measured_expected": len(measured),
         "missing_count": len(missing),
+        "materialized_controlled_count": materialized_controlled_count,
         "measured": measured,
         "missing": missing,
         "verdict": (
-            "Existing telemetry is sufficient for loss-scale and static-mechanics triage, "
-            "and the training script plus Slurm launcher now have opt-in hooks for the next controlled wave. "
-            "The completed benchmark artifacts are still not sufficient to prove update-direction "
-            "causality, because materialized component-gradient, flip-rate, scale-trajectory, "
-            "and activation-saturation traces do not exist yet."
+            "Controlled training-dynamics telemetry is now materialized, so the repo can audit "
+            "component-gradient balance, activation saturation, ternary flip rates, and scale drift "
+            "on at least one concrete controlled run."
+            if materialized_controlled_count > 0
+            else (
+                "Existing telemetry is sufficient for loss-scale and static-mechanics triage, "
+                "and the training script plus Slurm launcher now have opt-in hooks for the next controlled wave. "
+                "The completed benchmark artifacts are still not sufficient to prove update-direction "
+                "causality, because materialized component-gradient, flip-rate, scale-trajectory, "
+                "and activation-saturation traces do not exist yet."
+            )
         ),
         "safe_next_step": (
-            "After the active queued jobs finish, launch the next controlled rows with "
-            "--telemetry-every-steps and --telemetry-component-grad-norms enabled on a sparse cadence."
+            "Use the controlled trace to compare CE, logits-KD, and attention-KD update magnitudes "
+            "before launching another broad sweep."
+            if materialized_controlled_count > 0
+            else (
+                "After the active queued jobs finish, launch the next controlled rows with "
+                "--telemetry-every-steps and --telemetry-component-grad-norms enabled on a sparse cadence."
+            )
         ),
     }
 
@@ -334,6 +365,7 @@ def main() -> None:
     parser.add_argument("--mechanics-json", type=Path, default=Path(f"benchmark_results/bitnet_sft_mechanics_audit_{DATE}.json"))
     parser.add_argument("--subln-json", type=Path, default=Path(f"benchmark_results/subln_activation_variance_{DATE}.json"))
     parser.add_argument("--stage2-json", type=Path, default=Path(f"benchmark_results/bitdistill_stage2_curve_{DATE}.json"))
+    parser.add_argument("--training-dynamics-json", type=Path, default=Path(f"benchmark_results/bitdistill_training_dynamics_{DATE}.json"))
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_telemetry_coverage_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/bitdistill_telemetry_coverage_{DATE}.md"))
     args = parser.parse_args()

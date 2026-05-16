@@ -8,7 +8,7 @@ The current evidence supports a negative PTQ result and a positive row-scale run
 | --- | --- | --- | --- |
 | Blind ternary PTQ is not a viable universal retrofit for tested Qwen. | supported_for_tested_setup | WikiText PPL 13.901475 -> 3.813e+06; ten-task mean 0.644169 -> 0.348671 (delta -0.295498). | None for the tested dense-Qwen setup; this is already a negative result. |
 | The early weak BitNet-SFT baseline was not just broken mechanics. | supported | mechanics passed=true; best 10k CE-only MNLI=0.628935, paper anchor delta=0.020935, FP paired delta=-0.179215. | Treat CE-only BitNet-SFT as budget-viable but schedule-sensitive; use it as the baseline for BitDistill recovery, not as a success claim. |
-| BitDistill paper-level recovery has not been locally reproduced. | not_proven | best tensor BitDistill MNLI=0.641671 (delta vs FP -0.166480); controlled rows complete=1/3, best controlled MNLI=0.691187 (delta vs FP -0.116964). | Finish the fixed-recipe 5k/20k/40k Stage-2 curve and require a full-validation paired trace within the FP recovery gate. |
+| BitDistill paper-level recovery has not been locally reproduced. | not_proven | best tensor BitDistill MNLI=0.641671 (delta vs FP -0.166480); controlled rows complete=2/3, best controlled MNLI=0.691187 (delta vs FP -0.116964). | Finish the fixed-recipe 5k/20k/40k Stage-2 curve and require a full-validation paired trace within the FP recovery gate. |
 | Loss normalization is a live reproduction risk. | supported | projected paper-gamma attention/CE range 890.466502 to 1.578e+04; materialized rows=22. | For new jobs, compare CE/logit-KD/attention-KD magnitudes before interpreting gamma sweeps. |
 | Local SubLN surgery is not identity-preserving before adaptation. | supported | inserted=48; logit relative RMS drift=0.768044; cosine=0.698252; top1 agreement=0.000000. | Treat SubLN timing/init as part of the training recipe, not as harmless module insertion. |
 | Row-scale I2_SR is a runtime-semantics contribution, not a Q4 quality/storage win. | supported | row-scale ten-task mean=0.499459 (delta vs FP -0.144710); I2_SR/Q4 prefill=2.298818x, decode=1.190617x, file=1.288133x, PPL=3.032323x. | Keep claims scoped to speed and scale-contract fidelity until quality improves. |
@@ -46,7 +46,7 @@ Finish the fixed-recipe tensor-scale BitDistill Stage-2 curve. If accuracy rises
 | best tensor delta vs FP | -0.166480 |
 | best row retrofit MNLI | 0.653591 |
 | best row retrofit delta vs FP | -0.154559 |
-| controlled rows complete | 1/3 |
+| controlled rows complete | 2/3 |
 | controlled all complete | false |
 | controlled rows passing FP gate | 0 |
 | best controlled job | 10068 |

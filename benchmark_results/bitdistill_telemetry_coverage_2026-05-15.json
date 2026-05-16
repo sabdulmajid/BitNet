@@ -1,5 +1,6 @@
 {
   "date": "2026-05-15",
+  "materialized_controlled_count": 1,
   "measured": [
     {
       "evidence": "StepMetrics fields present and 22 materialized BitDistill rows record CE, logit KD, attention KD, and weighted KD terms.",
@@ -37,9 +38,9 @@
       "telemetry": "SubLN activation/logit perturbation"
     },
     {
-      "evidence": "train_bitdistill.py exposes telemetry.jsonl, total grad norm, optional component grad norms, ternary code fractions, scale stats, threshold-band fractions, flip-rate telemetry, and scale-drift telemetry.",
+      "evidence": "train_bitdistill.py exposes telemetry.jsonl, total grad norm, optional component grad norms, ternary code fractions, scale stats, threshold-band fractions, flip-rate telemetry, and scale-drift telemetry. Controlled traces materialized: 1.",
       "passed": true,
-      "status": "instrumented_not_materialized",
+      "status": "measured_controlled_trace",
       "supports": "Future controlled rows can record update-balance diagnostics without changing default jobs.",
       "telemetry": "opt-in training telemetry hooks"
     },
@@ -51,41 +52,34 @@
       "telemetry": "Slurm launcher telemetry pass-through"
     },
     {
-      "evidence": "train_bitdistill.py records raw and weighted attention_q_kd, attention_k_kd, and attention_v_kd fields, and optional component-gradient telemetry can include the weighted Q/K/V terms.",
+      "evidence": "train_bitdistill.py records raw and weighted attention_q_kd, attention_k_kd, and attention_v_kd fields, and optional component-gradient telemetry can include the weighted Q/K/V terms. Controlled traces materialized: 1.",
       "passed": true,
-      "status": "instrumented_not_materialized",
+      "status": "measured_controlled_trace",
       "supports": "Future controlled rows can identify which attention-relation term dominates.",
       "telemetry": "Q/K/V relation KD split"
     },
     {
-      "evidence": "train_bitdistill.py records per-telemetry-step activation A8 clipping, edge occupancy, per-token scale statistics, and absmax statistics for BitLinear student forwards.",
+      "evidence": "train_bitdistill.py records per-telemetry-step activation A8 clipping, edge occupancy, per-token scale statistics, and absmax statistics for BitLinear student forwards. Controlled traces materialized: 1.",
       "passed": true,
-      "status": "instrumented_not_materialized",
+      "status": "measured_controlled_trace",
       "supports": "Future controlled rows can rule activation clipping/saturation in or out as a quality limiter.",
       "telemetry": "BitLinear activation int8 saturation"
     },
     {
-      "evidence": "train_bitdistill.py records sampled ternary code flip fractions and scale absolute-delta statistics between emitted telemetry steps.",
+      "evidence": "train_bitdistill.py records sampled ternary code flip fractions and scale absolute-delta statistics between emitted telemetry steps. Controlled traces materialized: 1.",
       "passed": true,
-      "status": "instrumented_not_materialized",
+      "status": "measured_controlled_trace",
       "supports": "Future controlled rows can show whether continued pretraining is moving ternary codes and scale semantics.",
       "telemetry": "ternary flip-rate and scale trajectory"
     }
   ],
   "measured_count": 10,
   "measured_expected": 10,
-  "missing": [
-    {
-      "evidence": "Component-gradient, Q/K/V, activation-saturation, flip-rate, and scale-drift hooks exist, but completed controlled benchmark rows have not materialized the new traces yet.",
-      "risk": "Cannot yet make causal claims from completed rows about update direction, A8 saturation, or Stage-2 ternary dynamics.",
-      "status": "missing_materialized_run",
-      "telemetry": "materialized training-dynamics telemetry rows"
-    }
-  ],
-  "missing_count": 1,
-  "safe_next_step": "After the active queued jobs finish, launch the next controlled rows with --telemetry-every-steps and --telemetry-component-grad-norms enabled on a sparse cadence.",
+  "missing": [],
+  "missing_count": 0,
+  "safe_next_step": "Use the controlled trace to compare CE, logits-KD, and attention-KD update magnitudes before launching another broad sweep.",
   "schema": "bitdistill-telemetry-coverage-v1",
-  "status": "partial_observability",
+  "status": "controlled_observability",
   "training_source": "train_bitdistill.py",
-  "verdict": "Existing telemetry is sufficient for loss-scale and static-mechanics triage, and the training script plus Slurm launcher now have opt-in hooks for the next controlled wave. The completed benchmark artifacts are still not sufficient to prove update-direction causality, because materialized component-gradient, flip-rate, scale-trajectory, and activation-saturation traces do not exist yet."
+  "verdict": "Controlled training-dynamics telemetry is now materialized, so the repo can audit component-gradient balance, activation saturation, ternary flip rates, and scale drift on at least one concrete controlled run."
 }

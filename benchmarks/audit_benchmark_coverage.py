@@ -416,10 +416,11 @@ def audit_bitdistill_telemetry_coverage(root: Path, checks: list[dict[str, Any]]
         for row in measured
         if isinstance(row, dict)
     }
+    materialized_controlled_count = int(data.get("materialized_controlled_count") or 0)
     add_check(
         checks,
         "BitDistill telemetry coverage audit measures current loss diagnostics",
-        data.get("status") == "partial_observability"
+        data.get("status") in {"partial_observability", "controlled_observability"}
         and data.get("measured_count") == data.get("measured_expected")
         and data.get("measured_count", 0) >= 5,
         f"status={data.get('status')}, measured={data.get('measured_count')}/{data.get('measured_expected')}",
@@ -427,16 +428,21 @@ def audit_bitdistill_telemetry_coverage(root: Path, checks: list[dict[str, Any]]
     )
     add_check(
         checks,
-        "BitDistill telemetry coverage audit keeps advanced causality claims blocked",
-        required_missing.issubset(missing_names)
+        "BitDistill telemetry coverage audit handles advanced telemetry materialization",
+        (
+            required_missing.issubset(missing_names)
+            if materialized_controlled_count == 0
+            else not missing_names
+        )
         and "BitLinear activation int8 saturation" in measured_names
         and "ternary flip-rate and scale trajectory" in measured_names,
         (
             f"missing={sorted(missing_names)}, "
+            f"controlled={materialized_controlled_count}, "
             f"measured_activation={'BitLinear activation int8 saturation' in measured_names}, "
             f"measured_dynamics={'ternary flip-rate and scale trajectory' in measured_names}"
         ),
-        "telemetry audit must block completed-row causal claims while recording new hooks as instrumented",
+        "telemetry audit must either block missing controlled traces or record that controlled telemetry has materialized",
     )
 
 
