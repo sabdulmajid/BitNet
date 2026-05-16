@@ -281,22 +281,34 @@ def initialize_bitlinear_least_squares(
     model: nn.Module,
     *,
     iterations: int,
+    diag_hessians: dict[str, torch.Tensor] | None = None,
+    mode: str = "ls",
 ) -> dict[str, float | int | str]:
     """Initialize BitLinear master weights from least-squares ternary codes."""
 
     module_count = 0
+    diag_hessian_modules = 0
+    missing_diag_hessian_modules = 0
     total_values = 0
     zero_values = 0
     scale_values: list[torch.Tensor] = []
     with torch.no_grad():
-        for module in model.modules():
+        for name, module in model.named_modules():
             if not isinstance(module, BitLinear):
                 continue
+            diag_hessian = None
+            if diag_hessians is not None:
+                diag_hessian = diag_hessians.get(name)
+                if diag_hessian is None:
+                    missing_diag_hessian_modules += 1
+                else:
+                    diag_hessian_modules += 1
             codes, scale = least_squares_ternary_codes_and_scale(
                 module.weight,
                 scale_mode=module.scale_mode,
                 eps=module.eps,
                 iterations=iterations,
+                diag_hessian=diag_hessian,
             )
             master = master_weight_from_ternary_codes(
                 codes,
@@ -312,9 +324,11 @@ def initialize_bitlinear_least_squares(
 
     scales = torch.cat(scale_values) if scale_values else torch.empty(0)
     return {
-        "mode": "ls",
+        "mode": mode,
         "modules": module_count,
         "iterations": int(iterations),
+        "diag_hessian_modules": diag_hessian_modules,
+        "missing_diag_hessian_modules": missing_diag_hessian_modules,
         "total_values": total_values,
         "zero_fraction": zero_values / total_values if total_values else 0.0,
         "scale_count": int(scales.numel()),

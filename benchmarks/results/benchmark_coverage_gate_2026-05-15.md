@@ -59,8 +59,8 @@ Overall status: **PASS**.
 | TL2 row-scale implementation plan carries scale-error proof | pass | one_scale=1.9042302114103853, row_fp16=0.00019744640689756221, scale_mib=1.23046875 |  |
 | Ternary flip-dynamics audit has nonzero saved-snapshot flips | pass | status=pass, pairs=2, min_flip=0.06454656755885871, max_flip=0.1659562863332169 |  |
 | Ternary threshold-dynamics audit has measured boundary movement | pass | status=measured_increase, snapshots=5, delta=0.01523485567980197, final_band=0.07576561952248598, monotonic=True |  |
-| Second-order ternary init audit improves synthetic reconstruction | pass | status=synthetic_promising_ls_integrated_diag_calibration_pending, deltas=[-0.0775993565718333, -0.094802921017011] |  |
-| Second-order ternary init audit blocks quality overclaim | pass | quality_proven=False, ls_integrated=True, diag_integrated=False |  |
+| Second-order ternary init audit improves synthetic reconstruction | pass | status=synthetic_promising_diag_calibration_integrated_quality_pending, deltas=[-0.0775993565718333, -0.094802921017011] |  |
+| Second-order ternary init audit blocks quality overclaim | pass | quality_proven=False, ls_integrated=True, diag_integrated=True |  |
 | BitNet-SFT LS-init submission changes only initializer | pass | status=submitted, changed_axis=ternary_init_mode_only, init=ls, method=bitnet_sft, task=mnli |  |
 | BitNet-SFT LS-init submission has matched absmean baseline | pass | baseline=checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5, steps=10000, lr=2e-05 |  |
 | BitNet-SFT LS-init result audit is pending or complete | pass | status=pending, baseline=0.6289353031074886, candidate=None, quality_proven=False |  |

@@ -187,15 +187,21 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         {
             "check": "BitDistill CLI exposes opt-in init mode",
             "passed": "--ternary-init-mode" in train_bitdistill
-            and "choices=[\"absmean\", \"ls\"]" in train_bitdistill,
+            and "choices=[\"absmean\", \"ls\", \"diag_ls\"]" in train_bitdistill,
         },
         {
             "check": "trained checkpoint loads are not reinitialized",
             "passed": "init_state_dict_will_load_trained_weights" in train_bitdistill,
         },
+        {
+            "check": "diagonal-Hessian calibration hook exists",
+            "passed": "def collect_bitlinear_input_diag_hessians" in train_bitdistill
+            and "--ternary-init-calibration-batches" in train_bitdistill
+            and "diag_hessians=hessians" in train_bitdistill,
+        },
     ]
-    ls_training_integrated = all(check["passed"] for check in source_checks)
-    diag_hessian_training_integrated = False
+    ls_training_integrated = all(check["passed"] for check in source_checks[:3])
+    diag_hessian_training_integrated = all(check["passed"] for check in source_checks)
 
     profiles = ["isotropic", "lognormal_diag"]
     trials = [
@@ -237,7 +243,9 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "schema": "second-order-ternary-init-audit-v1",
         "date": DATE,
         "status": (
-            "synthetic_promising_ls_integrated_diag_calibration_pending"
+            "synthetic_promising_diag_calibration_integrated_quality_pending"
+            if set(win_profiles) == set(profiles) and diag_hessian_training_integrated
+            else "synthetic_promising_ls_integrated_diag_calibration_pending"
             if set(win_profiles) == set(profiles) and ls_training_integrated
             else "synthetic_mixed"
         ),
@@ -254,14 +262,14 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "profiles": by_profile,
         "verdict": (
             "Diagonal-Hessian weighted ternary least-squares reduces synthetic output reconstruction error versus "
-            "absmean row-scale initialization, so it is a credible next training initializer. The current training "
-            "hook exposes the unweighted least-squares fixed-point initializer; activation-calibrated diagonal "
-            "Hessian collection remains a separate implementation step. This is not a GLUE or language-model "
-            "quality claim until a full BitNet-SFT/BitDistill run uses it."
+            "absmean row-scale initialization, so it is a credible next training initializer. The training hook now "
+            "exposes both unweighted least-squares initialization and opt-in activation-calibrated diagonal-Hessian "
+            "initialization. This is not a GLUE or language-model quality claim until a full BitNet-SFT/BitDistill "
+            "run uses it."
         ),
         "next_gate": (
-            "Run MNLI BitNet-SFT with --ternary-init-mode ls against the absmean baseline, then add calibration "
-            "activation collection for the diagonal-Hessian variant and repeat the paired full-validation comparison."
+            "Run MNLI BitNet-SFT with --ternary-init-mode diag_ls against the matched absmean and unweighted-LS "
+            "baselines, then compare full-validation paired predictions."
         ),
     }
 

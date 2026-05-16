@@ -706,7 +706,11 @@ def audit_second_order_ternary_init(root: Path, checks: list[dict[str, Any]]) ->
     add_check(
         checks,
         "Second-order ternary init audit improves synthetic reconstruction",
-        data.get("status") == "synthetic_promising_ls_integrated_diag_calibration_pending"
+        data.get("status")
+        in {
+            "synthetic_promising_ls_integrated_diag_calibration_pending",
+            "synthetic_promising_diag_calibration_integrated_quality_pending",
+        }
         and len(deltas) >= 2
         and all(delta.get("mean", 0.0) < -0.02 for delta in deltas)
         and all(delta.get("wins") == delta.get("trials") for delta in deltas),
@@ -718,13 +722,13 @@ def audit_second_order_ternary_init(root: Path, checks: list[dict[str, Any]]) ->
         "Second-order ternary init audit blocks quality overclaim",
         data.get("quality_proven") is False
         and data.get("training_integrated") is True
-        and data.get("diag_hessian_training_integrated") is False,
+        and isinstance(data.get("diag_hessian_training_integrated"), bool),
         (
             f"quality_proven={data.get('quality_proven')}, "
             f"ls_integrated={data.get('training_integrated')}, "
             f"diag_integrated={data.get('diag_hessian_training_integrated')}"
         ),
-        "audit should distinguish synthetic reconstruction, unweighted LS integration, and missing calibrated Hessian training",
+        "audit should distinguish synthetic reconstruction and initializer integration from real model quality",
     )
 
 

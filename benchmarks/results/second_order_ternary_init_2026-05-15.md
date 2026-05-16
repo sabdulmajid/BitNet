@@ -1,6 +1,6 @@
 # Second-Order Ternary Initialization Audit, 2026-05-15
 
-Diagonal-Hessian weighted ternary least-squares reduces synthetic output reconstruction error versus absmean row-scale initialization, so it is a credible next training initializer. The current training hook exposes the unweighted least-squares fixed-point initializer; activation-calibrated diagonal Hessian collection remains a separate implementation step. This is not a GLUE or language-model quality claim until a full BitNet-SFT/BitDistill run uses it.
+Diagonal-Hessian weighted ternary least-squares reduces synthetic output reconstruction error versus absmean row-scale initialization, so it is a credible next training initializer. The training hook now exposes both unweighted least-squares initialization and opt-in activation-calibrated diagonal-Hessian initialization. This is not a GLUE or language-model quality claim until a full BitNet-SFT/BitDistill run uses it.
 
 ## Setup
 
@@ -13,7 +13,7 @@ Diagonal-Hessian weighted ternary least-squares reduces synthetic output reconst
 | coordinate-descent iterations | 8 |
 | quality proven | false |
 | unweighted LS training integrated | true |
-| diagonal-Hessian training integrated | false |
+| diagonal-Hessian training integrated | true |
 
 ## Reconstruction Results
 
@@ -44,6 +44,7 @@ Negative values mean the diagonal-Hessian row-scale initializer had lower recons
 | least-squares initializer helper exists | pass |
 | BitDistill CLI exposes opt-in init mode | pass |
 | trained checkpoint loads are not reinitialized | pass |
+| diagonal-Hessian calibration hook exists | pass |
 
 ## Math
 
@@ -51,4 +52,4 @@ For diagonal activation covariance `H=diag(h)`, each output row minimizes `sum_j
 
 ## Next Gate
 
-Run MNLI BitNet-SFT with --ternary-init-mode ls against the absmean baseline, then add calibration activation collection for the diagonal-Hessian variant and repeat the paired full-validation comparison.
+Run MNLI BitNet-SFT with --ternary-init-mode diag_ls against the matched absmean and unweighted-LS baselines, then compare full-validation paired predictions.

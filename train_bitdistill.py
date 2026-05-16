@@ -605,14 +605,17 @@ def prepare_bitnet_student(model: nn.Module, args: argparse.Namespace) -> dict[s
     if replaced == 0:
         raise RuntimeError("no nn.Linear modules were replaced with BitLinear")
     ternary_init = {"mode": args.ternary_init_mode, "applied": False}
-    if args.ternary_init_mode == "ls":
+    if args.ternary_init_mode in {"ls", "diag_ls"}:
         if args.init_state_dict:
             ternary_init["skip_reason"] = "init_state_dict_will_load_trained_weights"
+        elif args.ternary_init_mode == "diag_ls":
+            ternary_init["pending_calibration"] = True
         else:
             ternary_init = {
                 **initialize_bitlinear_least_squares(
                     model,
                     iterations=args.ternary_init_iterations,
+                    mode="ls",
                 ),
                 "applied": True,
             }
@@ -623,6 +626,115 @@ def prepare_bitnet_student(model: nn.Module, args: argparse.Namespace) -> dict[s
         "untied_output_embeddings": untied_output_embeddings,
         "activation_quantization": args.activation_quantization,
         "ternary_init": ternary_init,
+    }
+
+
+def collect_bitlinear_input_diag_hessians(
+    model: nn.Module,
+    loader: DataLoader,
+    device: torch.device,
+    *,
+    max_batches: int,
+    eps: float,
+) -> tuple[dict[str, torch.Tensor], dict[str, Any]]:
+    """Collect per-input second moments for BitLinear calibration.
+
+    The resulting vector approximates diag(E[x x^T]) for each BitLinear input.
+    It is used only for initialization; the training forward path remains the
+    same absmean BitLinear STE path.
+    """
+
+    modules = {name: module for name, module in model.named_modules() if isinstance(module, BitLinear)}
+    stats = {
+        name: {
+            "sum": torch.zeros(module.in_features, dtype=torch.float64),
+            "count": 0,
+        }
+        for name, module in modules.items()
+    }
+    hooks = []
+
+    def make_hook(name: str):
+        def hook(_module: nn.Module, inputs: tuple[torch.Tensor, ...]) -> None:
+            if not inputs:
+                return
+            x = inputs[0]
+            if not isinstance(x, torch.Tensor) or x.shape[-1] != stats[name]["sum"].numel():
+                return
+            values = x.detach().float().reshape(-1, x.shape[-1])
+            stats[name]["sum"].add_((values * values).sum(dim=0).double().cpu())
+            stats[name]["count"] += int(values.shape[0])
+
+        return hook
+
+    for name, module in modules.items():
+        hooks.append(module.register_forward_pre_hook(make_hook(name)))
+
+    was_training = model.training
+    model.eval()
+    batches_seen = 0
+    try:
+        with torch.no_grad():
+            for batch in loader:
+                if batches_seen >= max(max_batches, 1):
+                    break
+                model(**move_batch(batch, device))
+                batches_seen += 1
+    finally:
+        for hook in hooks:
+            hook.remove()
+        model.train(was_training)
+
+    hessians: dict[str, torch.Tensor] = {}
+    counts: list[int] = []
+    means: list[float] = []
+    for name, stat in stats.items():
+        count = int(stat["count"])
+        counts.append(count)
+        if count <= 0:
+            continue
+        hessian = (stat["sum"] / count).float().clamp_min(eps)
+        hessians[name] = hessian
+        means.append(float(hessian.mean().item()))
+
+    missing = sorted(name for name in modules if name not in hessians)
+    return hessians, {
+        "batches": batches_seen,
+        "modules_expected": len(modules),
+        "modules_observed": len(hessians),
+        "missing_modules": missing[:20],
+        "missing_module_count": len(missing),
+        "min_observation_count": min(counts) if counts else 0,
+        "max_observation_count": max(counts) if counts else 0,
+        "hessian_mean": float(sum(means) / len(means)) if means else 0.0,
+    }
+
+
+def maybe_apply_calibrated_ternary_init(
+    model: nn.Module,
+    loader: DataLoader,
+    args: argparse.Namespace,
+    device: torch.device,
+    preparation: dict[str, Any],
+) -> None:
+    if args.ternary_init_mode != "diag_ls" or args.init_state_dict:
+        return
+    hessians, calibration = collect_bitlinear_input_diag_hessians(
+        model,
+        loader,
+        device,
+        max_batches=args.ternary_init_calibration_batches,
+        eps=args.quant_eps,
+    )
+    preparation["ternary_init"] = {
+        **initialize_bitlinear_least_squares(
+            model,
+            iterations=args.ternary_init_iterations,
+            diag_hessians=hessians,
+            mode="diag_ls",
+        ),
+        "applied": True,
+        "calibration": calibration,
     }
 
 
@@ -1446,6 +1558,7 @@ def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
 
     device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
     student.to(device)
+    maybe_apply_calibrated_ternary_init(student, loader, args, device, prep)
     optimizer = make_optimizer(student, args)
     scheduler = make_scheduler(optimizer, args)
     student.train()
@@ -1593,6 +1706,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
 
     device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
     student.to(device)
+    maybe_apply_calibrated_ternary_init(student, train_loader, args, device, prep)
     if teacher is not None:
         teacher.to(device)
     optimizer = make_optimizer(student, args)
@@ -1873,8 +1987,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--master-weight-dtype", default="fp32", choices=["bf16", "bfloat16", "fp32", "float32"])
     parser.add_argument("--scale-mode", choices=["tensor", "row"], default="tensor")
     parser.add_argument("--quant-eps", type=float, default=1e-5)
-    parser.add_argument("--ternary-init-mode", choices=["absmean", "ls"], default="absmean")
+    parser.add_argument("--ternary-init-mode", choices=["absmean", "ls", "diag_ls"], default="absmean")
     parser.add_argument("--ternary-init-iterations", type=int, default=8)
+    parser.add_argument("--ternary-init-calibration-batches", type=int, default=8)
     parser.add_argument("--activation-quantization", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--use-subln", action=argparse.BooleanOptionalAction, default=None)
     parser.add_argument("--subln-eps", type=float, default=1e-5)

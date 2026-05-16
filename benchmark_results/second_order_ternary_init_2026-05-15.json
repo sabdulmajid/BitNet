@@ -5,9 +5,9 @@
   ],
   "cols": 512,
   "date": "2026-05-15",
-  "diag_hessian_training_integrated": false,
+  "diag_hessian_training_integrated": true,
   "iterations": 8,
-  "next_gate": "Run MNLI BitNet-SFT with --ternary-init-mode ls against the absmean baseline, then add calibration activation collection for the diagonal-Hessian variant and repeat the paired full-validation comparison.",
+  "next_gate": "Run MNLI BitNet-SFT with --ternary-init-mode diag_ls against the matched absmean and unweighted-LS baselines, then compare full-validation paired predictions.",
   "profiles": {
     "isotropic": {
       "methods": {
@@ -164,10 +164,14 @@
     {
       "check": "trained checkpoint loads are not reinitialized",
       "passed": true
+    },
+    {
+      "check": "diagonal-Hessian calibration hook exists",
+      "passed": true
     }
   ],
-  "status": "synthetic_promising_ls_integrated_diag_calibration_pending",
+  "status": "synthetic_promising_diag_calibration_integrated_quality_pending",
   "training_integrated": true,
   "trials_per_profile": 12,
-  "verdict": "Diagonal-Hessian weighted ternary least-squares reduces synthetic output reconstruction error versus absmean row-scale initialization, so it is a credible next training initializer. The current training hook exposes the unweighted least-squares fixed-point initializer; activation-calibrated diagonal Hessian collection remains a separate implementation step. This is not a GLUE or language-model quality claim until a full BitNet-SFT/BitDistill run uses it."
+  "verdict": "Diagonal-Hessian weighted ternary least-squares reduces synthetic output reconstruction error versus absmean row-scale initialization, so it is a credible next training initializer. The training hook now exposes both unweighted least-squares initialization and opt-in activation-calibrated diagonal-Hessian initialization. This is not a GLUE or language-model quality claim until a full BitNet-SFT/BitDistill run uses it."
 }

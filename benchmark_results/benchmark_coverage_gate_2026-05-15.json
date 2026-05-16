@@ -338,13 +338,13 @@
     {
       "name": "Second-order ternary init audit improves synthetic reconstruction",
       "passed": true,
-      "evidence": "status=synthetic_promising_ls_integrated_diag_calibration_pending, deltas=[-0.0775993565718333, -0.094802921017011]",
+      "evidence": "status=synthetic_promising_diag_calibration_integrated_quality_pending, deltas=[-0.0775993565718333, -0.094802921017011]",
       "blocker": ""
     },
     {
       "name": "Second-order ternary init audit blocks quality overclaim",
       "passed": true,
-      "evidence": "quality_proven=False, ls_integrated=True, diag_integrated=False",
+      "evidence": "quality_proven=False, ls_integrated=True, diag_integrated=True",
       "blocker": ""
     },
     {

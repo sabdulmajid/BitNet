@@ -2,7 +2,7 @@
 Artifacts: `257`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 28595 | 97210a5a3e63 |  |
+| README | tracked_report | yes | 29707 | fa1b0c3d95b5 |  |
 | research_redirect_report | tracked_report | yes | 11367 | f3ffc42da781 |  |
 | research_redirect_claims_report | tracked_report | yes | 2392 | 0a0d290f728d |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
@@ -38,7 +38,7 @@ Artifacts: `257`. Missing: `0`.
 | bitdistill_loss_contract_report | tracked_report | yes | 2451 | d397ea499cb8 |  |
 | ternary_flip_dynamics_report | tracked_report | yes | 2765 | d27aad9fe625 |  |
 | ternary_threshold_dynamics_report | tracked_report | yes | 2265 | da2cd0429802 |  |
-| second_order_ternary_init_report | tracked_report | yes | 2653 | 65d70635bf04 |  |
+| second_order_ternary_init_report | tracked_report | yes | 2622 | 4f84bb20d7e9 |  |
 | bitnet_sft_ls_init_submission_report | tracked_report | yes | 1314 | a63465043fdb |  |
 | bitnet_sft_ls_init_submission_table | tracked_report | yes | 422 | 2907bac34aa9 |  |
 | bitnet_sft_ls_init_audit_report | tracked_report | yes | 951 | 49d5b323171d |  |
@@ -86,7 +86,7 @@ Artifacts: `257`. Missing: `0`.
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 1824 | 5d992b3c9a1c |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 11231 | 349c6007c41c |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 11235 | 63b1d09e4484 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2569 | 51da6738be9d |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -181,7 +181,7 @@ Artifacts: `257`. Missing: `0`.
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
 | benchmark_matrix_audit_json | generic_json | yes | 16721 | d93ae3f74ea3 |  |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 17786 | 70b538153773 | passed=True, checks=85, failed=0 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 17790 | d10818d5bf80 | passed=True, checks=85, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | bb6912119dfc | achieved=False, status=not_complete, complete=7/9, open=2 |
 | original_benchmark_objective_audit_json | generic_json | yes | 4278 | 1ebdde389503 |  |
 | product_scope_gate_json | product_scope_gate_json | yes | 5770 | d0101b25bd20 | scope=research_mvp_only, supported=5, unsupported=4 |
@@ -198,7 +198,7 @@ Artifacts: `257`. Missing: `0`.
 | bitdistill_loss_contract_json | generic_json | yes | 3208 | 9739e9701451 |  |
 | ternary_flip_dynamics_json | generic_json | yes | 12345 | 616addec33ef |  |
 | ternary_threshold_dynamics_json | generic_json | yes | 32799 | b7c0ca5be622 |  |
-| second_order_ternary_init_json | generic_json | yes | 5668 | 5e0bbf03bcc4 |  |
+| second_order_ternary_init_json | generic_json | yes | 5683 | 9695ef6898af |  |
 | bitnet_sft_ls_init_submission_json | generic_json | yes | 1085 | c1004cec0443 |  |
 | bitnet_sft_ls_init_audit_json | generic_json | yes | 2395 | 7236bcd73189 |  |
 | seqcls_runtime_gap_json | generic_json | yes | 13549 | 07b29d7ae44f |  |
