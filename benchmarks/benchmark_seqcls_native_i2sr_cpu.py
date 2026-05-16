@@ -101,6 +101,24 @@ def read_prediction_trace(path: Path, limit: int) -> list[dict[str, Any]]:
     return rows
 
 
+def load_batching_audit(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {
+            "path": str(path),
+            "exists": False,
+            "status": "missing",
+            "ready_for_batched_product_benchmark": False,
+        }
+    data = read_json(path)
+    return {
+        "path": str(path),
+        "exists": True,
+        "status": data.get("status"),
+        "ready_for_batched_product_benchmark": data.get("ready_for_batched_product_benchmark") is True,
+        "summary": data.get("summary", {}) if isinstance(data.get("summary"), dict) else {},
+    }
+
+
 def maybe_relative(path: Path, root: Path) -> str:
     try:
         return str(path.resolve().relative_to(root.resolve()))
@@ -321,6 +339,7 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["label agreement with saved trace", summary["label_agreement_with_saved_trace"]],
                     ["prompt input", result["prompt_input"]],
                     ["prompt batch size", result["prompt_batch_size"]],
+                    ["batching parity ready", result["batching_parity_ready"]],
                     ["llama batch size", result["batch_size"]],
                     ["ubatch size", result["ubatch_size"]],
                     ["wall seconds", runtime["wall_seconds"]],
@@ -360,6 +379,15 @@ def main() -> None:
     parser.add_argument("--timeout-seconds", type=int, default=7200)
     parser.add_argument("--separator", default="<#BITNET_NATIVE_EVAL_SEP#>")
     parser.add_argument(
+        "--batching-audit-json",
+        type=Path,
+        default=Path(f"benchmark_results/seqcls_native_batching_audit_{DATE}.json"),
+        help=(
+            "Native batching parity audit. Product readiness remains false unless "
+            "this audit exists and marks batched classifier inference ready."
+        ),
+    )
+    parser.add_argument(
         "--prompt-input",
         choices=["token_ids", "text_roundtrip"],
         default="token_ids",
@@ -393,6 +421,9 @@ def main() -> None:
     eval_metrics = metrics.get("eval", {}) if isinstance(metrics.get("eval"), dict) else {}
     prediction_trace_path = eval_metrics.get("prediction_path") or str(checkpoint_dir / "eval_predictions.jsonl")
     prediction_trace = read_prediction_trace(root / prediction_trace_path, args.max_samples)
+    batching_audit_path = args.batching_audit_json if args.batching_audit_json.is_absolute() else root / args.batching_audit_json
+    batching_audit = load_batching_audit(batching_audit_path)
+    batching_parity_ready = batching_audit.get("ready_for_batched_product_benchmark") is True
     tokenizer = AutoTokenizer.from_pretrained(checkpoint_dir, trust_remote_code=True)
     rows = load_rows(args.task, args.max_samples)
     prompts = [render_prompt(tokenizer, args.task, row, prompt_input=args.prompt_input) for row in rows]
@@ -454,6 +485,7 @@ def main() -> None:
     ready_to_productize = (
         status == "pass"
         and full_validation_complete
+        and batching_parity_ready
         and trace_agreement is not None
         and trace_agreement >= 0.99
         and runtime["child_peak_rss_mib"] is not None
@@ -470,6 +502,8 @@ def main() -> None:
         "expected_examples": expected_examples,
         "full_validation_complete": full_validation_complete,
         "ready_to_productize": ready_to_productize,
+        "batching_parity_ready": batching_parity_ready,
+        "batching_audit": batching_audit,
         "prompt_input": args.prompt_input,
         "prompt_batch_size": args.prompt_batch_size,
         "batch_size": args.batch_size,
@@ -510,7 +544,8 @@ def main() -> None:
             "Native same-artifact classifier validation passed the configured product gate."
             if ready_to_productize
             else "Native same-artifact classifier execution is measurable, but the product gate remains blocked "
-            "until full validation, batching parity, RSS, and throughput are audited."
+            "until full validation, batching parity, RSS, and throughput are audited. Batching parity is a "
+            "hard gate because the current multi-prompt native classifier path changes low-margin logits."
         ),
         "stderr_tail": metas[-1]["stderr_tail"] if metas else "",
     }

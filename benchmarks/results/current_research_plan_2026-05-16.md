@@ -77,7 +77,7 @@ At the latest local check:
 | `10055` | `dualcard / ece-nebula10` | Qwen3 MNLI attention-layer sweep, layer `-4` | complete; accuracy `0.733367`; paired delta vs layer `-1` `+0.009883` |
 | `10070` | `dualcard / ece-nebula10` | controlled 327.68M Stage-2 row | running |
 | `10080` | `midcard / ece-nebula12` | calibrated diag-LS BitNet-SFT initializer benchmark | complete; negative transfer vs absmean, accuracy `0.350993` |
-| `10081` | `midcard / ece-nebula12` | native single-artifact MNLI full validation in safe prompt-batch-size-1 mode | running |
+| `10082` | `midcard / ece-nebula12` | native single-artifact MNLI full validation in safe prompt-batch-size-1 mode | running; resubmitted after making batching parity a hard product-readiness gate |
 
 No ternary quality claim should be made from the running or pending rows until
 their postprocess audits materialize JSON and Markdown reports.
