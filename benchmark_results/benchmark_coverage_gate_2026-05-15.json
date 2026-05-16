@@ -468,15 +468,15 @@
       "blocker": ""
     },
     {
-      "name": "Sequence-classification native I2_SR CPU token-ID sample records agreement",
+      "name": "Sequence-classification native I2_SR CPU token-ID result records agreement",
       "passed": true,
       "evidence": "status=sample_only, prompt_input=token_ids, examples=64, accuracy=0.59375, agreement=0.96875",
       "blocker": ""
     },
     {
-      "name": "Sequence-classification native I2_SR CPU sample keeps product blocked",
+      "name": "Sequence-classification native I2_SR CPU result keeps product blocked until batching parity passes",
       "passed": true,
-      "evidence": "full_validation=False, ready=False, examples_per_second=0.7173345972905404, rss_mib=950.640625",
+      "evidence": "full_validation=False, ready=False, batching=None, examples_per_second=0.7173345972905404, rss_mib=950.640625",
       "blocker": ""
     },
     {

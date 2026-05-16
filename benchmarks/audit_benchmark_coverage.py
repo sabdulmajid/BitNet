@@ -1184,11 +1184,14 @@ def audit_seqcls_native_i2sr_smoke(root: Path, checks: list[dict[str, Any]]) -> 
 
 
 def audit_seqcls_native_i2sr_cpu_sample(root: Path, checks: list[dict[str, Any]]) -> None:
-    path = root / f"benchmark_results/seqcls_native_i2sr_cpu_mnli_64_token_ids_{DATE}.json"
+    full_path = root / f"benchmark_results/seqcls_native_i2sr_cpu_mnli_full_token_ids_{DATE}.json"
+    sample_path = root / f"benchmark_results/seqcls_native_i2sr_cpu_mnli_64_token_ids_{DATE}.json"
+    path = full_path if full_path.exists() else sample_path
+    expected_examples = 9815 if path == full_path else 64
     if not path.exists():
         add_check(
             checks,
-            "Sequence-classification native I2_SR CPU sample exists",
+            "Sequence-classification native I2_SR CPU result exists",
             False,
             str(path.relative_to(root)),
             "missing native seqcls I2_SR CPU sample",
@@ -1199,10 +1202,10 @@ def audit_seqcls_native_i2sr_cpu_sample(root: Path, checks: list[dict[str, Any]]
     runtime = data.get("runtime", {}) if isinstance(data.get("runtime"), dict) else {}
     add_check(
         checks,
-        "Sequence-classification native I2_SR CPU token-ID sample records agreement",
-        data.get("status") in {"sample_only", "quality_mismatch"}
+        "Sequence-classification native I2_SR CPU token-ID result records agreement",
+        data.get("status") in {"pass", "sample_only", "quality_mismatch"}
         and data.get("prompt_input") == "token_ids"
-        and summary.get("examples") == 64
+        and summary.get("examples") == expected_examples
         and isinstance(summary.get("agreement_with_saved_pytorch_predictions"), (int, float))
         and summary.get("agreement_with_saved_pytorch_predictions") >= 0.95
         and isinstance(summary.get("accuracy"), (int, float)),
@@ -1214,18 +1217,19 @@ def audit_seqcls_native_i2sr_cpu_sample(root: Path, checks: list[dict[str, Any]]
     )
     add_check(
         checks,
-        "Sequence-classification native I2_SR CPU sample keeps product blocked",
-        data.get("full_validation_complete") is False
-        and data.get("ready_to_productize") is False
+        "Sequence-classification native I2_SR CPU result keeps product blocked until batching parity passes",
+        data.get("ready_to_productize") is False
+        and data.get("batching_parity_ready") is not True
         and isinstance(runtime.get("examples_per_second"), (int, float))
         and runtime.get("examples_per_second") > 0
         and isinstance(runtime.get("child_peak_rss_mib"), (int, float))
         and runtime.get("child_peak_rss_mib") > 0,
         (
             f"full_validation={data.get('full_validation_complete')}, ready={data.get('ready_to_productize')}, "
-            f"examples_per_second={runtime.get('examples_per_second')}, rss_mib={runtime.get('child_peak_rss_mib')}"
+            f"batching={data.get('batching_parity_ready')}, examples_per_second={runtime.get('examples_per_second')}, "
+            f"rss_mib={runtime.get('child_peak_rss_mib')}"
         ),
-        "native sampled classifier result should include runtime/RSS evidence and remain blocked",
+        "native classifier result should include runtime/RSS evidence and remain blocked until batching parity passes",
     )
     mismatch_path = root / f"benchmark_results/seqcls_native_mismatch_audit_{DATE}.json"
     mismatch = read_json(mismatch_path)

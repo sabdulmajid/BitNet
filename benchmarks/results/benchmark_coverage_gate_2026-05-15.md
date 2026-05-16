@@ -81,8 +81,8 @@ Overall status: **PASS**.
 | Sequence-classification runtime implementation plan has source-owned steps | pass | step_count=5 |  |
 | Sequence-classification native I2_SR smoke passes | pass | status=pass, single_artifact=True, returncode=0, logits=3, prediction=2, sidecar_prediction=2, rel_rms=1.0342961243324147e-07 |  |
 | Sequence-classification native I2_SR smoke keeps product blocked | pass | full_validation=False, ready=False, prompt_tok_s=265.9 |  |
-| Sequence-classification native I2_SR CPU token-ID sample records agreement | pass | status=sample_only, prompt_input=token_ids, examples=64, accuracy=0.59375, agreement=0.96875 |  |
-| Sequence-classification native I2_SR CPU sample keeps product blocked | pass | full_validation=False, ready=False, examples_per_second=0.7173345972905404, rss_mib=950.640625 |  |
+| Sequence-classification native I2_SR CPU token-ID result records agreement | pass | status=sample_only, prompt_input=token_ids, examples=64, accuracy=0.59375, agreement=0.96875 |  |
+| Sequence-classification native I2_SR CPU result keeps product blocked until batching parity passes | pass | full_validation=False, ready=False, batching=None, examples_per_second=0.7173345972905404, rss_mib=950.640625 |  |
 | Sequence-classification native mismatch audit isolates runtime drift | pass | status=runtime_hidden_drift, token_ids=True, text_roundtrip=False, native_sidecar=True |  |
 | Sequence-classification native batching audit blocks batched throughput | pass | status=batching_parity_mismatch, invariant=False, changed=4, ready=False |  |
 | Sequence-classification native batching audit diagnoses non-swap drift | pass | diagnosis=position_dependent_drift_not_row_swap, nearest_self=True, drifted=4 |  |
