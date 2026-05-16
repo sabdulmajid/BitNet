@@ -39,7 +39,7 @@ Artifacts: `284`. Missing: `0`.
 | bitdistill_loss_contract_report | tracked_report | yes | 2451 | d397ea499cb8 |  |
 | ternary_flip_dynamics_report | tracked_report | yes | 2765 | d27aad9fe625 |  |
 | ternary_threshold_dynamics_report | tracked_report | yes | 2265 | da2cd0429802 |  |
-| second_order_ternary_init_report | tracked_report | yes | 2622 | 4f84bb20d7e9 |  |
+| second_order_ternary_init_report | tracked_report | yes | 2927 | 3499044b0486 |  |
 | bitnet_sft_ls_init_submission_report | tracked_report | yes | 1314 | a63465043fdb |  |
 | bitnet_sft_ls_init_submission_table | tracked_report | yes | 422 | 2907bac34aa9 |  |
 | bitnet_sft_ls_init_audit_report | tracked_report | yes | 997 | 18e7f41a267f |  |
@@ -99,7 +99,7 @@ Artifacts: `284`. Missing: `0`.
 | bitdistill_glue3_summary_report | tracked_report | yes | 4352 | 73e1b7b6396d |  |
 | bitdistill_mnli_diagnostic_report | tracked_report | yes | 6593 | 9f7ade51c3d9 |  |
 | i2sr_submodule_promotion_audit | tracked_report | yes | 1824 | 5d992b3c9a1c |  |
-| benchmark_coverage_gate_report | tracked_report | yes | 13587 | 701a2ac4b5af |  |
+| benchmark_coverage_gate_report | tracked_report | yes | 13768 | 929a2cef2ee7 |  |
 | direct_static_ternary_gguf_report | tracked_report | yes | 2072 | ff830f6c1d72 |  |
 | direct_packed_gguf_support_report | tracked_report | yes | 2569 | 51da6738be9d |  |
 | direct_i2s_scalar_gguf_report | tracked_report | yes | 6338 | b4ea3c5c6f68 |  |
@@ -196,7 +196,7 @@ Artifacts: `284`. Missing: `0`.
 | i2sr_promotion_handoff_json | i2sr_promotion_handoff_json | yes | 4901 | cf5aa0d11481 | ready=True, root_clean=True, submodule_clean=True, root_patch=True, submodule_patch=True, fork_reachable=True, blockers=0 |
 | i2s_packing_layout_verify_json | packing_verify_json | yes | 3409 | 88fee552ba2e | passed=True, checked=5, passed_tensors=5 |
 | benchmark_matrix_audit_json | generic_json | yes | 16721 | d93ae3f74ea3 |  |
-| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 21479 | 83a786b875fe | passed=True, checks=100, failed=0 |
+| benchmark_coverage_gate_json | benchmark_coverage_gate_json | yes | 21722 | ce6706f85ae3 | passed=True, checks=101, failed=0 |
 | objective_completion_audit_json | objective_completion_audit_json | yes | 16035 | bb6912119dfc | achieved=False, status=not_complete, complete=7/9, open=2 |
 | original_benchmark_objective_audit_json | generic_json | yes | 4278 | 2916929b09b3 |  |
 | product_scope_gate_json | product_scope_gate_json | yes | 5770 | d0101b25bd20 | scope=research_mvp_only, supported=5, unsupported=4 |
@@ -213,7 +213,7 @@ Artifacts: `284`. Missing: `0`.
 | bitdistill_loss_contract_json | generic_json | yes | 3208 | 9739e9701451 |  |
 | ternary_flip_dynamics_json | generic_json | yes | 12345 | 616addec33ef |  |
 | ternary_threshold_dynamics_json | generic_json | yes | 32799 | b7c0ca5be622 |  |
-| second_order_ternary_init_json | generic_json | yes | 5683 | 9695ef6898af |  |
+| second_order_ternary_init_json | generic_json | yes | 6929 | 838a3013ee5b |  |
 | bitnet_sft_ls_init_submission_json | generic_json | yes | 1085 | c1004cec0443 |  |
 | bitnet_sft_ls_init_audit_json | generic_json | yes | 3127 | 0e0ed7e987de |  |
 | bitnet_sft_diag_ls_init_submission_json | generic_json | yes | 1170 | f36ba408a674 |  |

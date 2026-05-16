@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 100,
+  "check_count": 101,
   "failed": [],
   "checks": [
     {
@@ -350,7 +350,13 @@
     {
       "name": "Second-order ternary init audit improves synthetic reconstruction",
       "passed": true,
-      "evidence": "status=synthetic_promising_diag_calibration_integrated_quality_pending, deltas=[-0.0775993565718333, -0.094802921017011]",
+      "evidence": "status=synthetic_promising_task_quality_rejected, deltas=[-0.0775993565718333, -0.094802921017011]",
+      "blocker": ""
+    },
+    {
+      "name": "Second-order ternary init audit ingests diag-LS task-quality result",
+      "passed": true,
+      "evidence": "status=synthetic_promising_task_quality_rejected, diag_status=complete, diag_delta=-0.27794192562404485",
       "blocker": ""
     },
     {

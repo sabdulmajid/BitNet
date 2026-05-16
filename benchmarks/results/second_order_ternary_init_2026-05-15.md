@@ -1,6 +1,6 @@
 # Second-Order Ternary Initialization Audit, 2026-05-15
 
-Diagonal-Hessian weighted ternary least-squares reduces synthetic output reconstruction error versus absmean row-scale initialization, so it is a credible next training initializer. The training hook now exposes both unweighted least-squares initialization and opt-in activation-calibrated diagonal-Hessian initialization. This is not a GLUE or language-model quality claim until a full BitNet-SFT/BitDistill run uses it.
+Diagonal-Hessian weighted ternary least-squares reduces synthetic output reconstruction error, but both completed MNLI BitNet-SFT initializer audits are negative versus the matched absmean baseline. Synthetic reconstruction gains are not sufficient evidence for task quality.
 
 ## Setup
 
@@ -46,10 +46,17 @@ Negative values mean the diagonal-Hessian row-scale initializer had lower recons
 | trained checkpoint loads are not reinitialized | pass |
 | diagonal-Hessian calibration hook exists | pass |
 
+## Task Quality Follow-Up
+
+| initializer | status | absmean accuracy | candidate accuracy | delta | matched | CI95 | improves absmean |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| ls | complete | 0.628935 | 0.361895 | -0.267040 | 9815 | [-0.27990675734690423, -0.25417373170047225] | false |
+| diag_ls | complete | 0.628935 | 0.350993 | -0.277942 | 9815 | [-0.2908559087154853, -0.2650279425326044] | false |
+
 ## Math
 
 For diagonal activation covariance `H=diag(h)`, each output row minimizes `sum_j h_j (w_j - s t_j)^2` with `t_j in {-1,0,+1}`. For fixed `s`, the optimal code is nonzero when `|w_j| > s/2`. For fixed codes, the optimal row scale is `s = sum_j h_j |w_j| 1(|w_j|>s/2) / sum_j h_j 1(|w_j|>s/2)`. The script iterates these two closed-form steps.
 
 ## Next Gate
 
-Run MNLI BitNet-SFT with --ternary-init-mode diag_ls against the matched absmean and unweighted-LS baselines, then compare full-validation paired predictions.
+Do not promote LS or diag-LS initialization in the main recipe. Further initializer work needs a new hypothesis and must clear a full-validation paired task audit before being used in claims.

@@ -756,6 +756,8 @@ def audit_second_order_ternary_init(root: Path, checks: list[dict[str, Any]]) ->
         in {
             "synthetic_promising_ls_integrated_diag_calibration_pending",
             "synthetic_promising_diag_calibration_integrated_quality_pending",
+            "synthetic_promising_task_quality_rejected",
+            "synthetic_promising_task_quality_supported",
         }
         and len(deltas) >= 2
         and all(delta.get("mean", 0.0) < -0.02 for delta in deltas)
@@ -763,6 +765,20 @@ def audit_second_order_ternary_init(root: Path, checks: list[dict[str, Any]]) ->
         f"status={data.get('status')}, deltas={[delta.get('mean') for delta in deltas]}",
         "diagonal-Hessian LS should beat row absmean in the synthetic reconstruction audit before promotion",
     )
+    task_quality_audits = data.get("task_quality_audits", {})
+    diag_audit = task_quality_audits.get("diag_ls", {}) if isinstance(task_quality_audits, dict) else {}
+    if diag_audit.get("status") == "complete":
+        add_check(
+            checks,
+            "Second-order ternary init audit ingests diag-LS task-quality result",
+            data.get("status") in {"synthetic_promising_task_quality_rejected", "synthetic_promising_task_quality_supported"}
+            and diag_audit.get("candidate_improves_absmean_baseline") is False,
+            (
+                f"status={data.get('status')}, diag_status={diag_audit.get('status')}, "
+                f"diag_delta={diag_audit.get('delta_vs_absmean_baseline')}"
+            ),
+            "completed diag-LS quality audit should update the second-order initializer status instead of remaining pending",
+        )
     add_check(
         checks,
         "Second-order ternary init audit blocks quality overclaim",

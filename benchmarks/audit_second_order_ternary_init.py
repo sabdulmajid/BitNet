@@ -132,6 +132,32 @@ def summarize(values: list[float]) -> dict[str, float]:
     }
 
 
+def load_json_or_none(path: Path) -> dict[str, Any] | None:
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def summarize_task_quality_audit(path: Path) -> dict[str, Any]:
+    data = load_json_or_none(path)
+    if data is None:
+        return {"path": str(path), "exists": False, "status": "missing"}
+    paired = data.get("paired", {}) if isinstance(data.get("paired"), dict) else {}
+    return {
+        "path": str(path),
+        "exists": True,
+        "status": data.get("status"),
+        "comparison_valid": data.get("comparison_valid"),
+        "candidate_improves_absmean_baseline": data.get("candidate_improves_absmean_baseline"),
+        "baseline_accuracy": data.get("baseline_accuracy"),
+        "candidate_accuracy": data.get("candidate_accuracy"),
+        "delta_vs_absmean_baseline": data.get("delta_vs_absmean_baseline"),
+        "paired_matched": paired.get("matched"),
+        "paired_ci95": paired.get("paired_ci95"),
+        "verdict": data.get("verdict"),
+    }
+
+
 def run_trial(args: argparse.Namespace, *, profile: str, seed: int) -> dict[str, Any]:
     generator = torch.Generator().manual_seed(seed)
     weight = torch.randn(args.rows, args.cols, generator=generator)
@@ -238,21 +264,82 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         if data["row_diag_hessian_ls_minus_row_absmean"]["mean"] < -0.02
         and data["row_diag_hessian_ls_minus_row_absmean"]["wins"] == data["row_diag_hessian_ls_minus_row_absmean"]["trials"]
     ]
+    synthetic_promising = set(win_profiles) == set(profiles)
+
+    task_quality_audits = {
+        "ls": summarize_task_quality_audit(root / f"benchmark_results/bitnet_sft_ls_init_audit_{DATE}.json"),
+        "diag_ls": summarize_task_quality_audit(root / f"benchmark_results/bitnet_sft_diag_ls_init_audit_{DATE}.json"),
+    }
+    complete_quality_audits = [
+        audit
+        for audit in task_quality_audits.values()
+        if audit.get("status") == "complete" and audit.get("comparison_valid") is True
+    ]
+    completed_quality_rejected = (
+        len(complete_quality_audits) >= 2
+        and all(audit.get("candidate_improves_absmean_baseline") is False for audit in complete_quality_audits)
+    )
+    completed_quality_improved = any(
+        audit.get("candidate_improves_absmean_baseline") is True for audit in complete_quality_audits
+    )
+
+    if synthetic_promising and completed_quality_improved:
+        status = "synthetic_promising_task_quality_supported"
+        quality_proven = True
+        verdict = (
+            "Diagonal-Hessian weighted ternary least-squares reduces synthetic output reconstruction error and "
+            "has at least one completed task-quality audit that improves over the matched absmean baseline."
+        )
+        next_gate = "Promote only the task-quality-supported initializer variant and re-test under BitDistill."
+    elif synthetic_promising and completed_quality_rejected:
+        status = "synthetic_promising_task_quality_rejected"
+        quality_proven = False
+        verdict = (
+            "Diagonal-Hessian weighted ternary least-squares reduces synthetic output reconstruction error, but "
+            "both completed MNLI BitNet-SFT initializer audits are negative versus the matched absmean baseline. "
+            "Synthetic reconstruction gains are not sufficient evidence for task quality."
+        )
+        next_gate = (
+            "Do not promote LS or diag-LS initialization in the main recipe. Further initializer work needs a "
+            "new hypothesis and must clear a full-validation paired task audit before being used in claims."
+        )
+    elif synthetic_promising and diag_hessian_training_integrated:
+        status = "synthetic_promising_diag_calibration_integrated_quality_pending"
+        quality_proven = False
+        verdict = (
+            "Diagonal-Hessian weighted ternary least-squares reduces synthetic output reconstruction error versus "
+            "absmean row-scale initialization, so it is a credible next training initializer. The training hook now "
+            "exposes both unweighted least-squares initialization and opt-in activation-calibrated diagonal-Hessian "
+            "initialization. This is not a GLUE or language-model quality claim until a full BitNet-SFT/BitDistill "
+            "run uses it."
+        )
+        next_gate = (
+            "Run MNLI BitNet-SFT with --ternary-init-mode diag_ls against the matched absmean and unweighted-LS "
+            "baselines, then compare full-validation paired predictions."
+        )
+    elif synthetic_promising and ls_training_integrated:
+        status = "synthetic_promising_ls_integrated_diag_calibration_pending"
+        quality_proven = False
+        verdict = (
+            "Diagonal-Hessian weighted ternary least-squares reduces synthetic output reconstruction error, but "
+            "the activation-calibrated training hook is not fully integrated yet."
+        )
+        next_gate = "Integrate the diag-LS training hook before any task-quality run."
+    else:
+        status = "synthetic_mixed"
+        quality_proven = False
+        verdict = "The synthetic reconstruction audit is mixed and should not drive a task-quality claim."
+        next_gate = "Do not promote this initializer without a better synthetic and task-quality result."
 
     return {
         "schema": "second-order-ternary-init-audit-v1",
         "date": DATE,
-        "status": (
-            "synthetic_promising_diag_calibration_integrated_quality_pending"
-            if set(win_profiles) == set(profiles) and diag_hessian_training_integrated
-            else "synthetic_promising_ls_integrated_diag_calibration_pending"
-            if set(win_profiles) == set(profiles) and ls_training_integrated
-            else "synthetic_mixed"
-        ),
-        "quality_proven": False,
+        "status": status,
+        "quality_proven": quality_proven,
         "training_integrated": ls_training_integrated,
         "diag_hessian_training_integrated": diag_hessian_training_integrated,
         "source_checks": source_checks,
+        "task_quality_audits": task_quality_audits,
         "rows": args.rows,
         "cols": args.cols,
         "samples": args.samples,
@@ -260,17 +347,8 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "iterations": args.iterations,
         "activation_profiles": profiles,
         "profiles": by_profile,
-        "verdict": (
-            "Diagonal-Hessian weighted ternary least-squares reduces synthetic output reconstruction error versus "
-            "absmean row-scale initialization, so it is a credible next training initializer. The training hook now "
-            "exposes both unweighted least-squares initialization and opt-in activation-calibrated diagonal-Hessian "
-            "initialization. This is not a GLUE or language-model quality claim until a full BitNet-SFT/BitDistill "
-            "run uses it."
-        ),
-        "next_gate": (
-            "Run MNLI BitNet-SFT with --ternary-init-mode diag_ls against the matched absmean and unweighted-LS "
-            "baselines, then compare full-validation paired predictions."
-        ),
+        "verdict": verdict,
+        "next_gate": next_gate,
     }
 
 
@@ -284,6 +362,21 @@ def render_markdown(summary: dict[str, Any]) -> str:
             rows.append([profile, method, err["mean"], err["std"], zero["mean"]])
         delta = profile_data["row_diag_hessian_ls_minus_row_absmean"]
         delta_rows.append([profile, delta["mean"], delta["std"], delta["wins"], delta["trials"]])
+
+    task_quality_rows = []
+    for name, audit in summary.get("task_quality_audits", {}).items():
+        task_quality_rows.append(
+            [
+                name,
+                audit.get("status"),
+                audit.get("baseline_accuracy"),
+                audit.get("candidate_accuracy"),
+                audit.get("delta_vs_absmean_baseline"),
+                audit.get("paired_matched"),
+                audit.get("paired_ci95"),
+                audit.get("candidate_improves_absmean_baseline"),
+            ]
+        )
 
     return "\n\n".join(
         [
@@ -315,6 +408,20 @@ def render_markdown(summary: dict[str, Any]) -> str:
                     [row["check"], "pass" if row["passed"] else "fail"]
                     for row in summary["source_checks"]
                 ],
+            ),
+            "## Task Quality Follow-Up",
+            md_table(
+                [
+                    "initializer",
+                    "status",
+                    "absmean accuracy",
+                    "candidate accuracy",
+                    "delta",
+                    "matched",
+                    "CI95",
+                    "improves absmean",
+                ],
+                task_quality_rows,
             ),
             "## Math",
             (

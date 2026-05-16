@@ -7,7 +7,7 @@
   "date": "2026-05-15",
   "diag_hessian_training_integrated": true,
   "iterations": 8,
-  "next_gate": "Run MNLI BitNet-SFT with --ternary-init-mode diag_ls against the matched absmean and unweighted-LS baselines, then compare full-validation paired predictions.",
+  "next_gate": "Do not promote LS or diag-LS initialization in the main recipe. Further initializer work needs a new hypothesis and must clear a full-validation paired task audit before being used in claims.",
   "profiles": {
     "isotropic": {
       "methods": {
@@ -170,8 +170,42 @@
       "passed": true
     }
   ],
-  "status": "synthetic_promising_diag_calibration_integrated_quality_pending",
+  "status": "synthetic_promising_task_quality_rejected",
+  "task_quality_audits": {
+    "diag_ls": {
+      "baseline_accuracy": 0.6289353031074886,
+      "candidate_accuracy": 0.3509933774834437,
+      "candidate_improves_absmean_baseline": false,
+      "comparison_valid": true,
+      "delta_vs_absmean_baseline": -0.27794192562404485,
+      "exists": true,
+      "paired_ci95": [
+        -0.2908559087154853,
+        -0.2650279425326044
+      ],
+      "paired_matched": 9815,
+      "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/bitnet_sft_diag_ls_init_audit_2026-05-15.json",
+      "status": "complete",
+      "verdict": "diag_ls initialization has a complete paired MNLI comparison but does not improve the matched absmean baseline."
+    },
+    "ls": {
+      "baseline_accuracy": 0.6289353031074886,
+      "candidate_accuracy": 0.36189505858380033,
+      "candidate_improves_absmean_baseline": false,
+      "comparison_valid": true,
+      "delta_vs_absmean_baseline": -0.26704024452368824,
+      "exists": true,
+      "paired_ci95": [
+        -0.27990675734690423,
+        -0.25417373170047225
+      ],
+      "paired_matched": 9815,
+      "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/bitnet_sft_ls_init_audit_2026-05-15.json",
+      "status": "complete",
+      "verdict": "ls initialization has a complete paired MNLI comparison but does not improve the matched absmean baseline."
+    }
+  },
   "training_integrated": true,
   "trials_per_profile": 12,
-  "verdict": "Diagonal-Hessian weighted ternary least-squares reduces synthetic output reconstruction error versus absmean row-scale initialization, so it is a credible next training initializer. The training hook now exposes both unweighted least-squares initialization and opt-in activation-calibrated diagonal-Hessian initialization. This is not a GLUE or language-model quality claim until a full BitNet-SFT/BitDistill run uses it."
+  "verdict": "Diagonal-Hessian weighted ternary least-squares reduces synthetic output reconstruction error, but both completed MNLI BitNet-SFT initializer audits are negative versus the matched absmean baseline. Synthetic reconstruction gains are not sufficient evidence for task quality."
 }
