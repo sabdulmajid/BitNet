@@ -1,5 +1,5 @@
 {
-  "artifact_count": 262,
+  "artifact_count": 263,
   "entries": [
     {
       "exists": true,
@@ -7,8 +7,17 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "da4d17b9b852a328509d352b324f3ee8ef1b1323b861afe296ad8762a620248f",
-      "size_bytes": 29913
+      "sha256": "73a54c4cf82abdc3b86296c1f52fb09ac9d36f825596d615e432df3e08641e20",
+      "size_bytes": 11418
+    },
+    {
+      "exists": true,
+      "kind": "tracked_report",
+      "label": "current_research_plan_report",
+      "metrics": {},
+      "path": "benchmarks/results/current_research_plan_2026-05-16.md",
+      "sha256": "1e649b504db25bc7ae0aad6cfd0362259ccb4c6c64329cd2516859680b58c6f2",
+      "size_bytes": 8691
     },
     {
       "exists": true,

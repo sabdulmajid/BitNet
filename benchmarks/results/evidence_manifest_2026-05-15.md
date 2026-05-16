@@ -1,8 +1,9 @@
 # Evidence Manifest, 2026-05-15
-Artifacts: `262`. Missing: `0`.
+Artifacts: `263`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
-| README | tracked_report | yes | 29913 | da4d17b9b852 |  |
+| README | tracked_report | yes | 11418 | 73a54c4cf82a |  |
+| current_research_plan_report | tracked_report | yes | 8691 | 1e649b504db2 |  |
 | research_redirect_report | tracked_report | yes | 11367 | f3ffc42da781 |  |
 | research_redirect_claims_report | tracked_report | yes | 2392 | 0a0d290f728d |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
