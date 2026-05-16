@@ -26,7 +26,7 @@ result.
 | Packed row-scale CPU runtime is feasible | proven for dense causal artifact | `I2_SR` Xeon result: PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, file `1211.3 MiB`. |
 | TL2 row-scale packed runtime is ready | not proven; explicitly blocked | The current TL2 runtime contract has `11` checks and remains `false`: converter scale collapse, missing row-scale TL2 storage, one-scale transform metadata, generated `Scales[0]` qgemm, unoffset x86 dispatch, missing loader sidecars, and no passing row-scale TL2 benchmark. |
 | Sequence-classification packed path is possible | prototype only; native plumbing incomplete | MNLI long-warmup row-scale checkpoint (`0.653591` PyTorch accuracy) exports as a `352.6 MiB` `I2_SR` backbone plus `10.8 KiB` dense head sidecar. A Qwen-compatible `bitnet-qwen` graph repairs the dominant runtime mismatch: hidden cosine is `0.994091`, hidden relative RMS is `0.108662`, and the 128-example sidecar CPU probe reaches `0.609375` accuracy with `0.914063` agreement against saved PyTorch predictions. A native single-artifact classifier-head smoke now matches the sidecar path, and a repaired 64-example direct-token CPU sample reaches saved-PyTorch agreement `0.96875`; full-split CPU validation and batching parity are still blocked. |
-| Paper-level BitDistill is reproduced | not proven | FP16-SFT MNLI is close to paper (`0.807641` vs `0.799100`), and a tensor-scale CE-only BitNet-SFT schedule/budget row clears its paper anchor (`0.628935` vs `0.608000`). This is not yet BitDistill or FP16-level recovery. Qwen3 QNLI tensor BitDistill recovers from `0.587040` BitNet-SFT to `0.861065`, but still trails FP `0.921106` by paired delta `-0.060040`; row-scale QNLI is lower at `0.848435`. |
+| Paper-level BitDistill is reproduced | not proven | FP16-SFT MNLI is close to paper (`0.807641` vs `0.799100`), and a tensor-scale CE-only BitNet-SFT schedule/budget row clears its paper anchor (`0.628935` vs `0.608000`). This is not yet BitDistill or FP16-level recovery. Qwen3 QNLI tensor BitDistill recovers from `0.587040` BitNet-SFT to `0.861065`, but still trails FP `0.921106` by paired delta `-0.060040`; row-scale QNLI is lower at `0.848435`; Qwen3 SST2 BitNet-SFT is `0.799312` vs FP `0.930046`. |
 | Kimi/MoE works | not proven | Tiny Qwen2MoE fixtures prove routing/packing smoke only; no Kimi mapping or trained MoE quality exists. |
 
 ## Baseline Status
@@ -72,6 +72,15 @@ Completed controls rule out several simple causes:
 - The second 10000-step row at `lr=5e-5` reaches `0.607845`, effectively the
   paper BitNet-SFT anchor but weaker than the `lr=2e-5` row. This confirms
   that the BitNet-SFT baseline is budget-viable but schedule-sensitive.
+- The Qwen3 SST2 branch now has a full-validation FP16 reference and
+  BitNet-SFT row: FP16-SFT `0.930046`, BitNet-SFT `0.799312`, paired delta
+  `-0.130734`, 95% CI `[-0.159101, -0.102367]`. This is not a reproduction
+  pass; it is another completed baseline gap.
+- The unweighted LS ternary initializer is a negative transfer result under
+  this Qwen2.5 MNLI recipe: it reaches `0.361895` versus matched absmean
+  baseline `0.628935`, paired delta `-0.267040`, 95% CI
+  `[-0.279907, -0.254174]`. Synthetic row-wise reconstruction improvement is
+  therefore not sufficient evidence to promote an initializer.
 - Against the saved FP16 prediction trace, the paired candidate-minus-FP16
   delta is `-0.179215`, 95% CI `[-0.189580, -0.168851]`, McNemar
   `p=3.438389e-240`.
@@ -123,6 +132,8 @@ Decision rule:
 - Finish the controlled Stage-2 token-budget curve before adding new sweep axes.
 - Treat the completed `163.84M` row as positive movement, not a reproduction.
 - Treat row-scale as a separate `retrofit-variant`, not a paper-reproduction row.
+- Do not promote unweighted LS initialization; wait for the calibrated diag-LS
+  diagnostic before deciding whether initializer work remains worth pursuing.
 
 ## Product Framing
 
@@ -187,16 +198,18 @@ The plausible contribution is:
    token presentations.
 2. Use the cleared CE-only BitNet-SFT anchor as the controlled baseline for the
    next BitDistill interpretation.
-3. If the controlled curve remains weak, audit loss normalization, SubLN placement/timing,
+3. Keep the unweighted LS initializer as a recorded negative result; only the
+   calibrated diag-LS diagnostic remains pending on the initializer axis.
+4. If the controlled curve remains weak, audit loss normalization, SubLN placement/timing,
    dense-head treatment, optimizer schedule, and ternary code/scale dynamics.
-4. Ingest the queued telemetry diagnostic before adding broad sweeps; the
+5. Ingest the queued telemetry diagnostic before adding broad sweeps; the
    training script and Slurm path already expose gradient-component,
    flip-rate, scale-trajectory, activation-saturation, and Q/K/V-split
    telemetry hooks.
-5. Keep Qwen3/Qwen2.5 paper-alignment jobs labeled as partial until full
+6. Keep Qwen3/Qwen2.5 paper-alignment jobs labeled as partial until full
    validation rows close the FP16 gap.
-6. Promote the native `bitnet-qwen` sequence-classification smoke to a faithful
+7. Promote the native `bitnet-qwen` sequence-classification smoke to a faithful
    full-validation CPU evaluator once the sample and batching-parity gates pass.
-7. Keep row-scale `I2_SR` as a separate systems contribution.
-8. Move real Kimi/MoE claims to future work until trained quality and routing
+8. Keep row-scale `I2_SR` as a separate systems contribution.
+9. Move real Kimi/MoE claims to future work until trained quality and routing
    locality are measured.

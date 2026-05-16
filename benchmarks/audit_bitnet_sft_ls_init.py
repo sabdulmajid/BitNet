@@ -267,11 +267,24 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         if candidate_accuracy is not None and baseline_accuracy is not None
         else None
     )
+    comparison_valid = status == "complete" and isinstance(delta_vs_baseline, float)
+    paired_ci = paired.get("paired_ci95") if isinstance(paired, dict) else None
+    candidate_improves = (
+        comparison_valid
+        and isinstance(delta_vs_baseline, float)
+        and delta_vs_baseline > 0.0
+        and isinstance(paired_ci, list)
+        and len(paired_ci) == 2
+        and isinstance(paired_ci[0], (int, float))
+        and float(paired_ci[0]) > 0.0
+    )
     return {
         "schema": "bitnet-sft-ternary-init-audit-v1",
         "date": DATE,
         "status": status,
-        "quality_proven": status == "complete" and isinstance(delta_vs_baseline, float),
+        "comparison_valid": comparison_valid,
+        "candidate_improves_absmean_baseline": candidate_improves,
+        "quality_proven": candidate_improves,
         "submission_json": str(args.submission_json),
         "submission": submission,
         "candidate_root": str(candidate_root),
@@ -289,7 +302,9 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "verdict": (
             "Pending Slurm output."
             if status == "pending"
-            else f"{args.expected_mode} initialization has a complete paired MNLI comparison."
+            else f"{args.expected_mode} initialization improves the matched absmean baseline."
+            if candidate_improves
+            else f"{args.expected_mode} initialization has a complete paired MNLI comparison but does not improve the matched absmean baseline."
             if status == "complete"
             else f"{args.expected_mode} initialization comparison is not valid yet; see blockers."
         ),
@@ -300,7 +315,8 @@ def render_markdown(summary: dict[str, Any], *, title: str) -> str:
     paired = summary.get("paired", {}) if isinstance(summary.get("paired"), dict) else {}
     rows = [
         ["status", summary.get("status")],
-        ["quality proven", summary.get("quality_proven")],
+        ["comparison valid", summary.get("comparison_valid")],
+        ["candidate improves absmean baseline", summary.get("candidate_improves_absmean_baseline")],
         ["baseline accuracy", summary.get("baseline_accuracy")],
         ["candidate accuracy", summary.get("candidate_accuracy")],
         ["delta vs absmean baseline", summary.get("delta_vs_absmean_baseline")],

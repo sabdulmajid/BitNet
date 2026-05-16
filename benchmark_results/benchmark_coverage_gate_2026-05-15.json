@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 98,
+  "check_count": 99,
   "failed": [],
   "checks": [
     {
@@ -374,7 +374,13 @@
     {
       "name": "BitNet-SFT LS-init result audit is pending or complete",
       "passed": true,
-      "evidence": "status=pending, baseline=0.6289353031074886, candidate=None, quality_proven=False",
+      "evidence": "status=complete, baseline=0.6289353031074886, candidate=0.36189505858380033, quality_proven=False",
+      "blocker": ""
+    },
+    {
+      "name": "BitNet-SFT LS-init complete result has paired MNLI statistics",
+      "passed": true,
+      "evidence": "matched=9815, ci=[-0.27990675734690423, -0.25417373170047225], delta=-0.26704024452368824",
       "blocker": ""
     },
     {
@@ -476,7 +482,7 @@
     {
       "name": "Qwen3 paper-alignment audit tracks required GLUE rows",
       "passed": true,
-      "evidence": "jobs=16, complete=9, ready=False",
+      "evidence": "jobs=16, complete=10, ready=False",
       "blocker": ""
     },
     {

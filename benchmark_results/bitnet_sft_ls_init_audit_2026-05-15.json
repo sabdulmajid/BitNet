@@ -3,20 +3,46 @@
   "baseline_eval_examples": 9815.0,
   "baseline_metrics_path": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5/metrics.json",
   "baseline_root": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5",
-  "blockers": [
-    "missing candidate metrics: checkpoints/bitdistill-glue-seqcls-bitnet-sft-init/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-initls-steps10000-lr2em5/metrics.json"
-  ],
-  "candidate_accuracy": null,
-  "candidate_eval_examples": null,
+  "blockers": [],
+  "candidate_accuracy": 0.36189505858380033,
+  "candidate_eval_examples": 9815.0,
+  "candidate_improves_absmean_baseline": false,
   "candidate_metrics_path": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-init/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-initls-steps10000-lr2em5/metrics.json",
   "candidate_root": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-init/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-initls-steps10000-lr2em5",
-  "candidate_ternary_init": {},
+  "candidate_ternary_init": {
+    "applied": true,
+    "diag_hessian_modules": 0,
+    "iterations": 8,
+    "missing_diag_hessian_modules": 0,
+    "mode": "ls",
+    "modules": 168,
+    "scale_count": 168,
+    "scale_mean": 0.028053967282176018,
+    "scale_std": 0.011536911129951477,
+    "total_values": 357826560,
+    "zero_fraction": 0.5098943214276771
+  },
+  "comparison_valid": true,
   "date": "2026-05-15",
-  "delta_vs_absmean_baseline": null,
-  "paired": {},
+  "delta_vs_absmean_baseline": -0.26704024452368824,
+  "paired": {
+    "candidate_accuracy": 0.36189505858380033,
+    "candidate_wins": 1115,
+    "delta_vs_reference": -0.26704024452368824,
+    "errors": [],
+    "matched": 9815,
+    "mcnemar_exact_p": 0.0,
+    "paired_ci95": [
+      -0.27990675734690423,
+      -0.25417373170047225
+    ],
+    "reference_accuracy": 0.6289353031074886,
+    "reference_wins": 3736,
+    "status": "pass"
+  },
   "quality_proven": false,
   "schema": "bitnet-sft-ternary-init-audit-v1",
-  "status": "pending",
+  "status": "complete",
   "submission": {
     "baseline_output_dir": "checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5",
     "changed_axis": "ternary_init_mode_only",
@@ -41,5 +67,5 @@
     "ternary_init_mode": "ls"
   },
   "submission_json": "benchmark_results/bitnet_sft_ls_init_submission_2026-05-15.json",
-  "verdict": "Pending Slurm output."
+  "verdict": "ls initialization has a complete paired MNLI comparison but does not improve the matched absmean baseline."
 }

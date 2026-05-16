@@ -63,11 +63,16 @@ top-level evidence is intentionally short:
   below FP (`0.691187` at 163.84M Stage-2 tokens; `0.738462` in the gamma-60
   diagnostic). Qwen3 QNLI tensor BitDistill recovers from `0.587040` BitNet-SFT
   to `0.861065`, but still trails FP `0.921106`. Qwen3 SST2 now has an FP16
-  reference at `0.930046`; the ternary SST2 rows are still running or queued.
+  reference at `0.930046`, and SST2 BitNet-SFT reaches `0.799312`, paired
+  delta `-0.130734` with CI `[-0.159101, -0.102367]`.
 - **Row-scale caution:** row-scale is a runtime-contract contribution, not a
   universal accuracy win. On completed Qwen3 paper-gamma rows it is lower than
   tensor-scale on both MNLI (`0.696179` vs `0.723484`) and QNLI (`0.848435` vs
   `0.861065`).
+- **Initializer caution:** the unweighted LS ternary initializer is a negative
+  transfer result on Qwen2.5 MNLI: `0.361895` vs matched absmean baseline
+  `0.628935`, paired delta `-0.267040` with CI
+  `[-0.279907, -0.254174]`.
 - **CPU runtime:** row-scale `I2_SR` runs on the Xeon Silver 4116 with PPL
   `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`, and file size
   `1211.3 MiB`. This proves a compatible packed path, not a Q4_K_M quality or

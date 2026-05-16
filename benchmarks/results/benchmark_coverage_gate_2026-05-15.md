@@ -65,7 +65,8 @@ Overall status: **PASS**.
 | Second-order ternary init audit blocks quality overclaim | pass | quality_proven=False, ls_integrated=True, diag_integrated=True |  |
 | BitNet-SFT LS-init submission changes only initializer | pass | status=submitted, changed_axis=ternary_init_mode_only, init=ls, method=bitnet_sft, task=mnli |  |
 | BitNet-SFT LS-init submission has matched absmean baseline | pass | baseline=checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5, steps=10000, lr=2e-05 |  |
-| BitNet-SFT LS-init result audit is pending or complete | pass | status=pending, baseline=0.6289353031074886, candidate=None, quality_proven=False |  |
+| BitNet-SFT LS-init result audit is pending or complete | pass | status=complete, baseline=0.6289353031074886, candidate=0.36189505858380033, quality_proven=False |  |
+| BitNet-SFT LS-init complete result has paired MNLI statistics | pass | matched=9815, ci=[-0.27990675734690423, -0.25417373170047225], delta=-0.26704024452368824 |  |
 | BitNet-SFT diag-LS init submission changes only initializer | pass | status=submitted, changed_axis=ternary_init_mode_only, init=diag_ls, cal=8, method=bitnet_sft, task=mnli |  |
 | BitNet-SFT diag-LS init submission has matched absmean baseline | pass | baseline=checkpoints/bitdistill-glue-seqcls-bitnet-sft-budget/Qwen-Qwen2.5-0.5B/mnli/bitnet_sft-tensor-steps10000-lr2em5, steps=10000, lr=2e-05 |  |
 | BitNet-SFT diag-LS init result audit is pending or complete | pass | status=pending, baseline=0.6289353031074886, candidate=None, quality_proven=False |  |
@@ -82,7 +83,7 @@ Overall status: **PASS**.
 | Sequence-classification native I2_SR CPU sample keeps product blocked | pass | full_validation=False, ready=False, examples_per_second=0.7173345972905404, rss_mib=950.640625 |  |
 | Sequence-classification native mismatch audit isolates runtime drift | pass | status=runtime_hidden_drift, token_ids=True, text_roundtrip=False, native_sidecar=True |  |
 | Sequence-classification native batching audit blocks batched throughput | pass | status=batching_parity_mismatch, invariant=False, changed=4, ready=False |  |
-| Qwen3 paper-alignment audit tracks required GLUE rows | pass | jobs=16, complete=9, ready=False |  |
+| Qwen3 paper-alignment audit tracks required GLUE rows | pass | jobs=16, complete=10, ready=False |  |
 | FP F16 CPU row is finite | pass | ppl=12.2808, prefill=114.468162, decode=5.555998 |  |
 | FP Q8_0 CPU row is finite | pass | ppl=12.3056, prefill=124.864246, decode=10.131914 |  |
 | FP Q4_K_M CPU row is finite | pass | ppl=12.8112, prefill=92.077037, decode=16.013125 |  |
