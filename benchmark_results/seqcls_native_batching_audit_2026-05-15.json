@@ -5,7 +5,7 @@
     "gguf": "models/seqcls-native-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr_cls.gguf"
   },
   "date": "2026-05-15",
-  "interpretation": "Native batched logits are not invariant for the audited rows. Do not promote batched throughput or full-validation numbers until the llama.cpp sequence embedding path has a stable batching contract.",
+  "interpretation": "Native batched logits are not invariant for the audited rows. The nearest-single-logit diagnostic compares each drifted target row against the single-prompt logits for the examples in that batch. In this audit the drifted target rows remain closest to their own single-prompt logits, so the failure is not explained by a simple output-row swap. Do not promote batched throughput or full-validation numbers until the llama.cpp sequence embedding path has a stable batching contract.",
   "ready_for_batched_product_benchmark": false,
   "schema": "seqcls_native_batching_audit.v1",
   "status": "batching_parity_mismatch",
@@ -30,7 +30,33 @@
         "pos3"
       ]
     ],
+    "drifted_case_count": 4,
+    "drifted_cases": [
+      [
+        15,
+        "pos1",
+        15
+      ],
+      [
+        15,
+        "pos3",
+        15
+      ],
+      [
+        35,
+        "pos2",
+        35
+      ],
+      [
+        35,
+        "pos3",
+        35
+      ]
+    ],
+    "drifted_rows_nearest_self": true,
+    "mapping_diagnosis": "position_dependent_drift_not_row_swap",
     "max_relative_rms_vs_alone": 0.30515261718676356,
+    "possible_row_mapping_cases": [],
     "target_indices": [
       15,
       35
@@ -41,6 +67,9 @@
       "alone_prediction": 1,
       "cases": [
         {
+          "candidate_alone_relative_rms": {
+            "15": 0.0
+          },
           "case": "alone",
           "indices": [
             15
@@ -51,15 +80,24 @@
             0.4010027050971985
           ],
           "margin": 0.019177496433258057,
+          "nearest_alone_index": 15,
+          "nearest_alone_is_target": true,
+          "nearest_alone_relative_rms": 0.0,
           "prediction": 1,
           "relative_rms_vs_alone": 0.0,
           "runtime": {
-            "elapsed_seconds": 1.4217402399517596,
-            "prompt_eval_tokens_per_second": 107.97
+            "elapsed_seconds": 1.362290269928053,
+            "prompt_eval_tokens_per_second": 155.22
           },
           "target_position": 0
         },
         {
+          "candidate_alone_relative_rms": {
+            "15": 0.0,
+            "16": 0.7287077078025893,
+            "17": 0.8617151012337008,
+            "18": 0.8684551358377911
+          },
           "case": "pos0",
           "indices": [
             15,
@@ -73,15 +111,24 @@
             0.4010027050971985
           ],
           "margin": 0.019177496433258057,
+          "nearest_alone_index": 15,
+          "nearest_alone_is_target": true,
+          "nearest_alone_relative_rms": 0.0,
           "prediction": 1,
           "relative_rms_vs_alone": 0.0,
           "runtime": {
-            "elapsed_seconds": 1.454983226954937,
-            "prompt_eval_tokens_per_second": 561.08
+            "elapsed_seconds": 1.4549010649789125,
+            "prompt_eval_tokens_per_second": 577.48
           },
           "target_position": 0
         },
         {
+          "candidate_alone_relative_rms": {
+            "14": 0.916968043928223,
+            "15": 0.11042317301335369,
+            "16": 0.7924242400547287,
+            "17": 0.816536374579858
+          },
           "case": "pos1",
           "indices": [
             14,
@@ -95,15 +142,24 @@
             0.43344900012016296
           ],
           "margin": 0.010486990213394165,
+          "nearest_alone_index": 15,
+          "nearest_alone_is_target": true,
+          "nearest_alone_relative_rms": 0.11042317301335369,
           "prediction": 2,
           "relative_rms_vs_alone": 0.11042317301335369,
           "runtime": {
-            "elapsed_seconds": 1.592941353097558,
-            "prompt_eval_tokens_per_second": 563.51
+            "elapsed_seconds": 1.5981104809325188,
+            "prompt_eval_tokens_per_second": 531.56
           },
           "target_position": 1
         },
         {
+          "candidate_alone_relative_rms": {
+            "13": 0.9912844897330377,
+            "14": 0.9570402133823024,
+            "15": 0.0,
+            "16": 0.7287077078025893
+          },
           "case": "pos2",
           "indices": [
             13,
@@ -117,15 +173,24 @@
             0.4010027050971985
           ],
           "margin": 0.019177496433258057,
+          "nearest_alone_index": 15,
+          "nearest_alone_is_target": true,
+          "nearest_alone_relative_rms": 0.0,
           "prediction": 1,
           "relative_rms_vs_alone": 0.0,
           "runtime": {
-            "elapsed_seconds": 1.5413163639605045,
-            "prompt_eval_tokens_per_second": 559.14
+            "elapsed_seconds": 1.5340695101767778,
+            "prompt_eval_tokens_per_second": 574.69
           },
           "target_position": 2
         },
         {
+          "candidate_alone_relative_rms": {
+            "12": 0.9046758628679449,
+            "13": 0.9624561830928878,
+            "14": 0.9142342180655985,
+            "15": 0.11432589143680794
+          },
           "case": "pos3",
           "indices": [
             12,
@@ -139,11 +204,14 @@
             0.42447328567504883
           ],
           "margin": 0.0015243887901306152,
+          "nearest_alone_index": 15,
+          "nearest_alone_is_target": true,
+          "nearest_alone_relative_rms": 0.11432589143680794,
           "prediction": 2,
           "relative_rms_vs_alone": 0.11432589143680794,
           "runtime": {
-            "elapsed_seconds": 1.6601161530707031,
-            "prompt_eval_tokens_per_second": 575.34
+            "elapsed_seconds": 1.6611274839378893,
+            "prompt_eval_tokens_per_second": 577.2
           },
           "target_position": 3
         }
@@ -156,6 +224,9 @@
       "alone_prediction": 0,
       "cases": [
         {
+          "candidate_alone_relative_rms": {
+            "35": 0.0
+          },
           "case": "alone",
           "indices": [
             35
@@ -166,15 +237,24 @@
             0.1691482961177826
           ],
           "margin": 0.12439489364624023,
+          "nearest_alone_index": 35,
+          "nearest_alone_is_target": true,
+          "nearest_alone_relative_rms": 0.0,
           "prediction": 0,
           "relative_rms_vs_alone": 0.0,
           "runtime": {
-            "elapsed_seconds": 1.4213570228312165,
-            "prompt_eval_tokens_per_second": 407.25
+            "elapsed_seconds": 1.4185672209132463,
+            "prompt_eval_tokens_per_second": 395.92
           },
           "target_position": 0
         },
         {
+          "candidate_alone_relative_rms": {
+            "35": 0.0,
+            "36": 0.9700363732258932,
+            "37": 0.43292101615804685,
+            "38": 0.8898335437698587
+          },
           "case": "pos0",
           "indices": [
             35,
@@ -188,15 +268,24 @@
             0.1691482961177826
           ],
           "margin": 0.12439489364624023,
+          "nearest_alone_index": 35,
+          "nearest_alone_is_target": true,
+          "nearest_alone_relative_rms": 0.0,
           "prediction": 0,
           "relative_rms_vs_alone": 0.0,
           "runtime": {
-            "elapsed_seconds": 1.6010199079755694,
-            "prompt_eval_tokens_per_second": 600.54
+            "elapsed_seconds": 1.5925938379950821,
+            "prompt_eval_tokens_per_second": 609.03
           },
           "target_position": 0
         },
         {
+          "candidate_alone_relative_rms": {
+            "34": 0.9947682975813684,
+            "35": 0.0,
+            "36": 0.9700363732258932,
+            "37": 0.43292101615804685
+          },
           "case": "pos1",
           "indices": [
             34,
@@ -210,15 +299,24 @@
             0.1691482961177826
           ],
           "margin": 0.12439489364624023,
+          "nearest_alone_index": 35,
+          "nearest_alone_is_target": true,
+          "nearest_alone_relative_rms": 0.0,
           "prediction": 0,
           "relative_rms_vs_alone": 0.0,
           "runtime": {
-            "elapsed_seconds": 1.5892899530008435,
-            "prompt_eval_tokens_per_second": 577.37
+            "elapsed_seconds": 1.609557991847396,
+            "prompt_eval_tokens_per_second": 521.44
           },
           "target_position": 1
         },
         {
+          "candidate_alone_relative_rms": {
+            "33": 0.854956207589293,
+            "34": 0.8996212285399944,
+            "35": 0.30515261718676356,
+            "36": 0.867050452144141
+          },
           "case": "pos2",
           "indices": [
             33,
@@ -232,15 +330,24 @@
             0.21914349496364594
           ],
           "margin": 0.15640458464622498,
+          "nearest_alone_index": 35,
+          "nearest_alone_is_target": true,
+          "nearest_alone_relative_rms": 0.30515261718676356,
           "prediction": 1,
           "relative_rms_vs_alone": 0.30515261718676356,
           "runtime": {
-            "elapsed_seconds": 1.5750963459722698,
-            "prompt_eval_tokens_per_second": 576.7
+            "elapsed_seconds": 1.571928123012185,
+            "prompt_eval_tokens_per_second": 578.11
           },
           "target_position": 2
         },
         {
+          "candidate_alone_relative_rms": {
+            "32": 0.9384863166836053,
+            "33": 0.7842182898714067,
+            "34": 0.942376543866837,
+            "35": 0.22141202841467506
+          },
           "case": "pos3",
           "indices": [
             32,
@@ -254,11 +361,14 @@
             0.16284890472888947
           ],
           "margin": 0.08445632457733154,
+          "nearest_alone_index": 35,
+          "nearest_alone_is_target": true,
+          "nearest_alone_relative_rms": 0.22141202841467506,
           "prediction": 1,
           "relative_rms_vs_alone": 0.22141202841467506,
           "runtime": {
-            "elapsed_seconds": 1.5577872190624475,
-            "prompt_eval_tokens_per_second": 582.16
+            "elapsed_seconds": 1.558448783122003,
+            "prompt_eval_tokens_per_second": 582.69
           },
           "target_position": 3
         }

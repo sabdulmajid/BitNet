@@ -105,8 +105,10 @@ top-level evidence is intentionally short:
   is not lossless at some BPE boundaries.
 - A native batching audit that prevents overclaiming batched seqcls throughput:
   audited low-margin rows change logits and predictions with sequence position
-  inside a multi-prompt embedding batch, so batched numbers are blocked until
-  the runtime contract is fixed.
+  inside a multi-prompt embedding batch. A nearest-single-logit diagnostic shows
+  the drifted rows remain closest to their own single-prompt logits, so this is
+  not a simple output-row swap. Batched numbers are blocked until the runtime
+  contract is fixed.
 - Explicit product gates that prevent fast but unusable artifacts from being
   reported as successful LLMs.
 
@@ -157,8 +159,9 @@ The next work is deliberately narrow:
 4. Close the product gap by upgrading the native sequence-classification token-ID
    sample into a faithful full-validation evaluator. The current 64-example
    sample has high agreement with saved PyTorch predictions but still shows
-   residual packed-runtime drift, and batching parity currently fails, so full
-   product claims remain premature.
+   residual packed-runtime drift. Batching parity currently fails through
+   position-dependent drift rather than row swapping, so batched/full product
+   claims remain premature.
 5. Keep MoE/Kimi as future work until the dense case is solved.
 
 Detailed current status and next steps are in

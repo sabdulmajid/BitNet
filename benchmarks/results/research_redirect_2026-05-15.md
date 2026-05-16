@@ -179,7 +179,10 @@ now carries the classifier head and matches sidecar logits, and a repaired
 64-example direct-token native CPU sample reaches saved-PyTorch agreement
 `0.96875`, accuracy `0.59375`, and RSS `950.64 MiB`. This is useful plumbing,
 but not a deployable classifier: full-split CPU quality/RSS/throughput and
-batching parity have not been proven on one native artifact.
+batching parity have not been proven on one native artifact. The batching
+audit now diagnoses the failure as position-dependent drift rather than a
+simple output-row mapping error: every drifted target row remains closest to
+its own single-prompt logits.
 
 For row-scale causal artifacts, the supported packed runtime remains `I2_SR`.
 TL2 is not a shortcut: the converter recomputes one scalar scale, ggml byte

@@ -1261,6 +1261,21 @@ def audit_seqcls_native_i2sr_cpu_sample(root: Path, checks: list[dict[str, Any]]
         ),
         "batched native seqcls timing should remain blocked until logits are batch-invariant",
     )
+    add_check(
+        checks,
+        "Sequence-classification native batching audit diagnoses non-swap drift",
+        batching.get("status") == "batching_parity_mismatch"
+        and batching_summary.get("mapping_diagnosis") == "position_dependent_drift_not_row_swap"
+        and batching_summary.get("drifted_rows_nearest_self") is True
+        and isinstance(batching_summary.get("drifted_case_count"), int)
+        and batching_summary.get("drifted_case_count") > 0,
+        (
+            f"diagnosis={batching_summary.get('mapping_diagnosis')}, "
+            f"nearest_self={batching_summary.get('drifted_rows_nearest_self')}, "
+            f"drifted={batching_summary.get('drifted_case_count')}"
+        ),
+        "batching audit should show whether the failure is a row swap or true batched-runtime drift",
+    )
 
 
 def audit_qwen3_paper_alignment(root: Path, checks: list[dict[str, Any]]) -> None:

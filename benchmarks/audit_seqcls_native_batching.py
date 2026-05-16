@@ -80,6 +80,9 @@ def render_markdown(result: dict[str, Any]) -> str:
                     case["prediction"],
                     case["margin"],
                     case["relative_rms_vs_alone"],
+                    case["nearest_alone_index"],
+                    case["nearest_alone_relative_rms"],
+                    case["nearest_alone_is_target"],
                     case["indices"],
                 ]
             )
@@ -99,12 +102,25 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["all predictions invariant", result["summary"]["all_predictions_invariant"]],
                     ["max relative RMS vs alone", result["summary"]["max_relative_rms_vs_alone"]],
                     ["changed cases", result["summary"]["changed_case_count"]],
+                    ["drifted rows nearest own single-prompt logits", result["summary"]["drifted_rows_nearest_self"]],
+                    ["mapping diagnosis", result["summary"]["mapping_diagnosis"]],
                     ["ready for batched product benchmark", result["ready_for_batched_product_benchmark"]],
                 ],
             ),
             "## Cases",
             md_table(
-                ["target", "case", "target pos", "pred", "margin", "rel RMS vs alone", "indices"],
+                [
+                    "target",
+                    "case",
+                    "target pos",
+                    "pred",
+                    "margin",
+                    "rel RMS vs alone",
+                    "nearest alone idx",
+                    "nearest alone rel RMS",
+                    "nearest is target",
+                    "indices",
+                ],
                 rows,
             ),
             "## Interpretation",
@@ -149,7 +165,8 @@ def main() -> None:
     tokenizer = AutoTokenizer.from_pretrained(checkpoint_dir, trust_remote_code=True)
     prompts = [render_prompt(tokenizer, "mnli", row, prompt_input="token_ids") for row in rows]
 
-    target_results: list[dict[str, Any]] = []
+    raw_cases_by_target: dict[int, list[tuple[str, list[int]]]] = {}
+    unique_indices: set[int] = set()
     for target in args.targets:
         raw_cases: list[tuple[str, list[int]]] = [("alone", [target])]
         for pos in range(4):
@@ -157,10 +174,30 @@ def main() -> None:
             if start < 0 or start + 4 > len(rows):
                 continue
             raw_cases.append((f"pos{pos}", list(range(start, start + 4))))
+        raw_cases_by_target[target] = raw_cases
+        for _, indices in raw_cases:
+            unique_indices.update(indices)
 
+    alone_logits_by_index: dict[int, np.ndarray] = {}
+    for index in sorted(unique_indices):
+        logits, _ = run_native_classifier(
+            binary=binary,
+            gguf=gguf,
+            prompts=[prompts[index]],
+            separator=args.separator,
+            threads=args.threads,
+            ctx_size=args.ctx_size,
+            batch_size=args.batch_size,
+            ubatch_size=args.ubatch_size,
+            timeout_seconds=args.timeout_seconds,
+        )
+        alone_logits_by_index[index] = logits[0].astype(np.float32)
+
+    target_results: list[dict[str, Any]] = []
+    for target in args.targets:
         case_results: list[dict[str, Any]] = []
-        alone_logits: np.ndarray | None = None
-        for name, indices in raw_cases:
+        alone_logits = alone_logits_by_index[target]
+        for name, indices in raw_cases_by_target[target]:
             logits, meta = run_native_classifier(
                 binary=binary,
                 gguf=gguf,
@@ -174,10 +211,14 @@ def main() -> None:
             )
             target_pos = indices.index(target)
             target_logits = logits[target_pos].astype(np.float32)
-            if name == "alone":
-                alone_logits = target_logits
-            if alone_logits is None:
-                raise RuntimeError("alone case must run first")
+            candidate_distances = {
+                str(index): rel_rms(target_logits, alone_logits_by_index[index])
+                for index in indices
+            }
+            nearest_index, nearest_distance = min(
+                ((int(index), float(distance)) for index, distance in candidate_distances.items()),
+                key=lambda item: item[1],
+            )
             case_results.append(
                 {
                     "case": name,
@@ -187,6 +228,10 @@ def main() -> None:
                     "prediction": int(np.argmax(target_logits)),
                     "margin": margin(target_logits),
                     "relative_rms_vs_alone": rel_rms(target_logits, alone_logits),
+                    "nearest_alone_index": nearest_index,
+                    "nearest_alone_relative_rms": nearest_distance,
+                    "nearest_alone_is_target": nearest_index == target,
+                    "candidate_alone_relative_rms": candidate_distances,
                     "runtime": {
                         "elapsed_seconds": meta.get("elapsed_seconds"),
                         "prompt_eval_tokens_per_second": (meta.get("perf", {}) or {}).get(
@@ -212,9 +257,30 @@ def main() -> None:
         for case in target["cases"]
         if case["prediction"] != target["alone_prediction"]
     ]
+    drifted_cases = [
+        (target["target_index"], case["case"], case["nearest_alone_index"])
+        for target in target_results
+        for case in target["cases"]
+        if float(case["relative_rms_vs_alone"]) > 1e-4
+    ]
     all_predictions_invariant = not changed_cases
     max_rel = max(float(target["max_relative_rms_vs_alone"]) for target in target_results)
+    drifted_rows_nearest_self = bool(drifted_cases) and all(
+        nearest == target for target, _, nearest in drifted_cases
+    )
+    possible_row_mapping_cases = [
+        (target, case, nearest)
+        for target, case, nearest in drifted_cases
+        if nearest != target
+    ]
     status = "pass" if all_predictions_invariant and max_rel < 1e-4 else "batching_parity_mismatch"
+    mapping_diagnosis = (
+        "no_drift"
+        if not drifted_cases
+        else "position_dependent_drift_not_row_swap"
+        if drifted_rows_nearest_self
+        else "possible_row_mapping_or_cross_sequence_leakage"
+    )
     result = {
         "schema": "seqcls_native_batching_audit.v1",
         "date": DATE,
@@ -230,15 +296,29 @@ def main() -> None:
             "changed_cases": changed_cases,
             "changed_case_count": len(changed_cases),
             "max_relative_rms_vs_alone": max_rel,
+            "drifted_case_count": len(drifted_cases),
+            "drifted_cases": drifted_cases,
+            "drifted_rows_nearest_self": drifted_rows_nearest_self,
+            "possible_row_mapping_cases": possible_row_mapping_cases,
+            "mapping_diagnosis": mapping_diagnosis,
         },
         "targets": target_results,
         "ready_for_batched_product_benchmark": status == "pass",
         "interpretation": (
             "Native batched logits are invariant for the audited rows."
             if status == "pass"
-            else "Native batched logits are not invariant for the audited rows. Do not promote batched "
-            "throughput or full-validation numbers until the llama.cpp sequence embedding path has a "
-            "stable batching contract."
+            else (
+                "Native batched logits are not invariant for the audited rows. The nearest-single-logit "
+                "diagnostic compares each drifted target row against the single-prompt logits for the "
+                "examples in that batch. In this audit the drifted target rows remain closest to their "
+                "own single-prompt logits, so the failure is not explained by a simple output-row swap. "
+                "Do not promote batched throughput or full-validation numbers until the llama.cpp "
+                "sequence embedding path has a stable batching contract."
+                if mapping_diagnosis == "position_dependent_drift_not_row_swap"
+                else "Native batched logits are not invariant for the audited rows. Do not promote "
+                "batched throughput or full-validation numbers until the llama.cpp sequence embedding "
+                "path has a stable batching contract."
+            )
         ),
     }
 

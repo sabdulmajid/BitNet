@@ -175,6 +175,9 @@ A faster batch-4 sample reaches `2.639` examples/sec and happens to agree with
 the saved PyTorch predictions on the first 64 examples, but it is not a valid
 product benchmark yet. The batching audit shows that the same low-margin rows
 can change logits and predictions with sequence position inside the batch.
+The nearest-single-logit probe shows every drifted target row remains closest
+to its own single-prompt logits, so the failure is not explained by a simple
+output-row swap.
 
 A credible product needs one artifact that carries both:
 
@@ -253,6 +256,7 @@ prompt eval:        finite single-prompt smoke timing only; not a benchmark
 64-example MNLI:    accuracy 0.59375, saved-prediction agreement 0.96875
 token IDs:          direct-token path required; text round-trip is not lossless
 batching parity:    failed; max relative RMS vs alone 0.305153 on audited rows
+batching diagnosis: position-dependent drift, not simple output-row swap
 ```
 
 Missing before product claims:
