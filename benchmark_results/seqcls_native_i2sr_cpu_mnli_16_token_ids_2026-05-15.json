@@ -1,0 +1,258 @@
+{
+  "artifacts": {
+    "embedding_binary": "build-portable-avx2/bin/llama-embedding",
+    "gguf": "models/seqcls-native-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr_cls.gguf"
+  },
+  "batch_size": 4096,
+  "checkpoint": {
+    "path": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8",
+    "prediction_trace": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/eval_predictions.jsonl",
+    "stored_accuracy": 0.6535914416709119,
+    "stored_eval_examples": 9815.0
+  },
+  "date": "2026-05-15",
+  "expected_examples": 9815,
+  "full_validation_complete": false,
+  "limitations": [
+    "This uses llama-embedding JSON output as the classifier-logit transport.",
+    "The faithful path uses direct token IDs because text decode/re-tokenize is not lossless for all Qwen pair prompts.",
+    "The smoke is product-ready only after full validation and batching parity pass.",
+    "The child RSS value is a process-level peak from resource.getrusage on Linux."
+  ],
+  "max_samples": 16,
+  "prediction_sha256": "2bfa07cb71280a21d9984ab191126ced52cc81557ddc925a3e9ac6f30b83199a",
+  "predictions": [
+    1,
+    2,
+    1,
+    1,
+    2,
+    2,
+    2,
+    1,
+    0,
+    1,
+    0,
+    2,
+    2,
+    0,
+    0,
+    1
+  ],
+  "prompt_batch_size": 1,
+  "prompt_input": "token_ids",
+  "ready_to_productize": false,
+  "runtime": {
+    "child_peak_rss_kib": 973212,
+    "child_peak_rss_mib": 950.40234375,
+    "examples_per_second": 0.7101855634796818,
+    "load_time_ms": 18010.79,
+    "prompt_eval_ms": 2691.65,
+    "prompt_eval_tokens": 739,
+    "prompt_eval_tokens_per_second": 274.5527836085672,
+    "subprocesses": 16,
+    "total_time_ms": 2709.14,
+    "wall_seconds": 22.529323071008548
+  },
+  "sample_predictions": [
+    {
+      "index": 0,
+      "label": 1,
+      "logits": [
+        -0.5463041067123413,
+        1.5163328647613525,
+        0.17090030014514923
+      ],
+      "prediction": 1,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 1,
+      "label": 2,
+      "logits": [
+        -1.4871422052383423,
+        0.9743350744247437,
+        3.046990394592285
+      ],
+      "prediction": 2,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 2,
+      "label": 0,
+      "logits": [
+        0.1926816999912262,
+        1.1598310470581055,
+        -0.10884910076856613
+      ],
+      "prediction": 1,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 3,
+      "label": 2,
+      "logits": [
+        -1.792236328125,
+        2.07373046875,
+        1.190706491470337
+      ],
+      "prediction": 1,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 4,
+      "label": 2,
+      "logits": [
+        -0.2992353141307831,
+        -0.24617239832878113,
+        2.3527259826660156
+      ],
+      "prediction": 2,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 5,
+      "label": 2,
+      "logits": [
+        -0.1052756980061531,
+        0.21817900240421295,
+        0.936591625213623
+      ],
+      "prediction": 2,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 6,
+      "label": 2,
+      "logits": [
+        -0.9621124863624573,
+        0.7577884793281555,
+        2.0486130714416504
+      ],
+      "prediction": 2,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 7,
+      "label": 1,
+      "logits": [
+        0.35508111119270325,
+        1.1758449077606201,
+        -0.8361248970031738
+      ],
+      "prediction": 1,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 8,
+      "label": 2,
+      "logits": [
+        1.038619875907898,
+        0.12424539774656296,
+        -0.07804659754037857
+      ],
+      "prediction": 0,
+      "saved_pytorch_prediction": 0
+    },
+    {
+      "index": 9,
+      "label": 1,
+      "logits": [
+        -0.8998944163322449,
+        1.6248388290405273,
+        0.9376394152641296
+      ],
+      "prediction": 1,
+      "saved_pytorch_prediction": 1
+    },
+    {
+      "index": 10,
+      "label": 2,
+      "logits": [
+        0.7625346779823303,
+        0.0660495012998581,
+        0.24579119682312012
+      ],
+      "prediction": 0,
+      "saved_pytorch_prediction": 0
+    },
+    {
+      "index": 11,
+      "label": 2,
+      "logits": [
+        -0.36629220843315125,
+        0.5964599847793579,
+        1.1661860942840576
+      ],
+      "prediction": 2,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 12,
+      "label": 2,
+      "logits": [
+        -0.4029250144958496,
+        -0.16641849279403687,
+        2.155704975128174
+      ],
+      "prediction": 2,
+      "saved_pytorch_prediction": 2
+    },
+    {
+      "index": 13,
+      "label": 0,
+      "logits": [
+        2.044666290283203,
+        -0.9897887706756592,
+        -0.16443850100040436
+      ],
+      "prediction": 0,
+      "saved_pytorch_prediction": 0
+    },
+    {
+      "index": 14,
+      "label": 1,
+      "logits": [
+        1.2654709815979004,
+        -1.0188071727752686,
+        0.8302673101425171
+      ],
+      "prediction": 0,
+      "saved_pytorch_prediction": 0
+    },
+    {
+      "index": 15,
+      "label": 0,
+      "logits": [
+        0.3744511902332306,
+        0.42018020153045654,
+        0.4010027050971985
+      ],
+      "prediction": 1,
+      "saved_pytorch_prediction": 2
+    }
+  ],
+  "schema": "seqcls_native_i2sr_cpu.v1",
+  "status": "quality_mismatch",
+  "stderr_tail": "      = 0.0e+00\nllm_load_print_meta: f_max_alibi_bias = 0.0e+00\nllm_load_print_meta: f_logit_scale    = 0.0e+00\nllm_load_print_meta: n_ff             = 4864\nllm_load_print_meta: n_expert         = 0\nllm_load_print_meta: n_expert_used    = 0\nllm_load_print_meta: n_cls            = 3\nllm_load_print_meta: causal attn      = 1\nllm_load_print_meta: pooling type     = 3\nllm_load_print_meta: rope type        = 2\nllm_load_print_meta: rope scaling     = linear\nllm_load_print_meta: freq_base_train  = 1000000.0\nllm_load_print_meta: freq_scale_train = 1\nllm_load_print_meta: n_ctx_orig_yarn  = 32768\nllm_load_print_meta: rope_finetuned   = unknown\nllm_load_print_meta: ssm_d_conv       = 0\nllm_load_print_meta: ssm_d_inner      = 0\nllm_load_print_meta: ssm_d_state      = 0\nllm_load_print_meta: ssm_dt_rank      = 0\nllm_load_print_meta: ssm_dt_b_c_rms   = 0\nllm_load_print_meta: model type       = 700M\nllm_load_print_meta: model ftype      = I2_SR - 2 bpw ternary row-scale\nllm_load_print_meta: model params     = 494.17 M\nllm_load_print_meta: model size       = 346.94 MiB (5.89 BPW) \nllm_load_print_meta: general.name     = Bitdistill Longwarmup Row Layer 8\nllm_load_print_meta: BOS token        = 151643 '<|endoftext|>'\nllm_load_print_meta: EOS token        = 151643 '<|endoftext|>'\nllm_load_print_meta: EOT token        = 151645 '<|im_end|>'\nllm_load_print_meta: PAD token        = 151643 '<|endoftext|>'\nllm_load_print_meta: LF token         = 148848 '\u00c4\u012c'\nllm_load_print_meta: FIM PRE token    = 151659 '<|fim_prefix|>'\nllm_load_print_meta: FIM SUF token    = 151661 '<|fim_suffix|>'\nllm_load_print_meta: FIM MID token    = 151660 '<|fim_middle|>'\nllm_load_print_meta: FIM PAD token    = 151662 '<|fim_pad|>'\nllm_load_print_meta: FIM REP token    = 151663 '<|repo_name|>'\nllm_load_print_meta: FIM SEP token    = 151664 '<|file_sep|>'\nllm_load_print_meta: EOG token        = 151643 '<|endoftext|>'\nllm_load_print_meta: EOG token        = 151645 '<|im_end|>'\nllm_load_print_meta: EOG token        = 151662 '<|fim_pad|>'\nllm_load_print_meta: EOG token        = 151663 '<|repo_name|>'\nllm_load_print_meta: EOG token        = 151664 '<|file_sep|>'\nllm_load_print_meta: max token length = 256\nllm_load_tensors: ggml ctx size =    0.14 MiB\nllm_load_tensors:        CPU buffer size =   346.94 MiB\n.................\nllama_new_context_with_model: n_ctx      = 512\nllama_new_context_with_model: n_batch    = 512\nllama_new_context_with_model: n_ubatch   = 512\nllama_new_context_with_model: flash_attn = 0\nllama_new_context_with_model: freq_base  = 1000000.0\nllama_new_context_with_model: freq_scale = 1\nllama_kv_cache_init:        CPU KV buffer size =     6.00 MiB\nllama_new_context_with_model: KV self size  =    6.00 MiB, K (f16):    3.00 MiB, V (f16):    3.00 MiB\nllama_new_context_with_model:        CPU  output buffer size =     0.00 MiB\nllama_new_context_with_model:        CPU compute buffer size =   301.26 MiB\nllama_new_context_with_model: graph nodes  = 944\nllama_new_context_with_model: graph splits = 1\ncommon_init_from_params: warming up the model with an empty run - please wait ... (--no-warmup to disable)\n\nsystem_info: n_threads = 24 (n_threads_batch = 24) / 24 | AVX = 1 | AVX_VNNI = 0 | AVX2 = 1 | AVX512 = 0 | AVX512_VBMI = 0 | AVX512_VNNI = 0 | AVX512_BF16 = 0 | FMA = 1 | NEON = 0 | SVE = 0 | ARM_FMA = 0 | F16C = 1 | FP16_VA = 0 | RISCV_VECT = 0 | WASM_SIMD = 0 | BLAS = 0 | SSE3 = 1 | SSSE3 = 1 | VSX = 0 | MATMUL_INT8 = 0 | LLAMAFILE = 1 | \nmain: last token in the prompt is not SEP\nmain: 'tokenizer.ggml.add_eos_token' should be set to 'true' in the GGUF header\nbatch_decode: n_tokens = 20, n_seq = 1\nllama_perf_context_print:        load time =    1125.40 ms\nllama_perf_context_print: prompt eval time =     166.79 ms /    20 tokens (    8.34 ms per token,   119.91 tokens per second)\nllama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)\nllama_perf_context_print:       total time =     167.79 ms /    21 tokens\n",
+  "summary": {
+    "accuracy": 0.625,
+    "accuracy_ci95_wilson": [
+      0.38641040545502714,
+      0.8151876744113636
+    ],
+    "agreement_with_saved_pytorch_predictions": 0.9375,
+    "correct": 10,
+    "disagreements_with_saved_pytorch_predictions": 1,
+    "examples": 16,
+    "first_saved_prediction_mismatch_indices": [
+      15
+    ],
+    "label_agreement_with_saved_trace": 1.0,
+    "saved_trace_predictions": 16,
+    "saved_trace_scores": 16
+  },
+  "task": "mnli",
+  "ubatch_size": 512,
+  "verdict": "Native same-artifact classifier execution is measurable, but the product gate remains blocked until full validation, batching parity, RSS, and throughput are audited."
+}

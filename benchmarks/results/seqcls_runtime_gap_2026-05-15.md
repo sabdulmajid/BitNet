@@ -4,11 +4,11 @@ This audit separates the best GLUE quality path from the packed CPU runtime path
 
 | field | value |
 | --- | --- |
-| status | native_classifier_sample_quality_mismatch_full_validation_blocked |
+| status | native_classifier_sample_available_full_validation_blocked |
 | same artifact quality+CPU ready | false |
 | sidecar prototype smoke | prototype_smoke_passed |
 | native GGUF classifier smoke | pass |
-| native sampled CPU quality | quality_mismatch |
+| native sampled CPU quality | sample_only |
 | sidecar sampled CPU quality | quality_mismatch |
 | sidecar hidden contract | hidden_contract_mismatch |
 | sidecar architecture contract | bitnet_qwen_contract_available |
@@ -74,13 +74,14 @@ These checkpoints are the strict GLUE reproduction artifacts. They use `Qwen2For
 
 | field | value |
 | --- | --- |
-| status | quality_mismatch |
+| status | sample_only |
 | task | mnli |
-| examples | 16 |
-| accuracy | 0.562500 |
-| agreement with saved PyTorch predictions | 0.875000 |
-| examples/sec | 0.709880 |
-| child peak RSS MiB | 952.378906 |
+| prompt input | token_ids |
+| examples | 64 |
+| accuracy | 0.593750 |
+| agreement with saved PyTorch predictions | 0.968750 |
+| examples/sec | 0.717335 |
+| child peak RSS MiB | 950.640625 |
 | full validation complete | false |
 | ready to productize | false |
 
@@ -98,15 +99,15 @@ These checkpoints are export-compatible with the current GGUF/I2_SR path, but th
 | --- | --- |
 | Backbone GGUF + dense head sidecar smoke | prototype implemented |
 | Sampled sidecar CPU quality agreement | prototype improved; needs full validation |
-| Tokenizer pair formatting parity | passes for audited MNLI sample |
+| Tokenizer pair formatting parity | requires direct token-ID input for Qwen pair prompts |
 | PyTorch pooled hidden state matches llama.cpp embedding | near pass on audited sample, not exact |
 | Packed graph matches Qwen2 SiLU/SwiGLU semantics | implemented via bitnet-qwen |
 | Packed loader supports Qwen2 Q/K/V projection biases | implemented via bitnet-qwen |
 | GGUF writer persists classifier/score head tensors and label metadata | single-prompt smoke implemented |
 | llama.cpp pools and applies the Qwen sequence-classification head | single-prompt smoke implemented |
-| CPU evaluator reports GLUE accuracy from the packed classifier artifact | sample implemented; quality mismatch |
-| Quality, RSS, and throughput measured on the same deployed artifact | blocked |
+| CPU evaluator reports GLUE accuracy from the packed classifier artifact | 64-row token-ID sample implemented |
+| Quality, RSS, and throughput measured on the same deployed artifact | sample only; full validation blocked |
 
 ## Interpretation
 
-The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. It now also has a prototype sequence-classification backbone path through `bitnet-qwen` I2_SR plus an external dense head sidecar, and a native single-artifact GGUF smoke that matches the sidecar logits for one prompt. A small native CPU sample is measurable, but it currently disagrees with saved PyTorch predictions enough to block product claims. Full-split CPU quality, batching parity, RSS, and throughput have not been measured on a faithful native artifact.
+The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. It now also has a prototype sequence-classification backbone path through `bitnet-qwen` I2_SR plus an external dense head sidecar, and a native single-artifact GGUF smoke that matches the sidecar logits for one prompt. A 64-row native CPU sample using direct token IDs is measurable and reaches high agreement with saved PyTorch predictions, but it remains sample-only and still has residual packed-runtime drift. Full-split CPU quality, batching parity, RSS, and throughput have not been measured on a faithful native artifact.

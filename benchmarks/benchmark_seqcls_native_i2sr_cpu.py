@@ -119,13 +119,17 @@ def load_rows(task: str, limit: int) -> list[dict[str, Any]]:
     return [dict(row) for row in dataset]
 
 
-def render_prompt(tokenizer: Any, task: str, row: dict[str, Any]) -> str:
+def render_prompt(tokenizer: Any, task: str, row: dict[str, Any], *, prompt_input: str) -> str:
     spec = TASK_SPECS[task]
     text_a, text_b = spec["text_keys"]
     if text_b is None:
         encoded = tokenizer(row[text_a], truncation=True, max_length=512, add_special_tokens=True)
     else:
         encoded = tokenizer(row[text_a], row[text_b], truncation=True, max_length=512, add_special_tokens=True)
+    if prompt_input == "token_ids":
+        return "token_ids:" + json.dumps([int(item) for item in encoded["input_ids"]], separators=(",", ":"))
+    if prompt_input != "text_roundtrip":
+        raise ValueError(f"unsupported prompt_input={prompt_input!r}")
     return tokenizer.decode(encoded["input_ids"], clean_up_tokenization_spaces=False)
 
 
@@ -315,6 +319,7 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["stored PyTorch accuracy", checkpoint.get("stored_accuracy")],
                     ["agreement with saved PyTorch predictions", summary["agreement_with_saved_pytorch_predictions"]],
                     ["label agreement with saved trace", summary["label_agreement_with_saved_trace"]],
+                    ["prompt input", result["prompt_input"]],
                     ["prompt batch size", result["prompt_batch_size"]],
                     ["llama batch size", result["batch_size"]],
                     ["ubatch size", result["ubatch_size"]],
@@ -355,6 +360,15 @@ def main() -> None:
     parser.add_argument("--timeout-seconds", type=int, default=7200)
     parser.add_argument("--separator", default="<#BITNET_NATIVE_EVAL_SEP#>")
     parser.add_argument(
+        "--prompt-input",
+        choices=["token_ids", "text_roundtrip"],
+        default="token_ids",
+        help=(
+            "Use direct HF token IDs by default. Decoding pair token IDs back to text is not "
+            "lossless for Qwen BPE at some sentence-pair boundaries."
+        ),
+    )
+    parser.add_argument(
         "--output-json",
         type=Path,
         default=Path(f"benchmark_results/seqcls_native_i2sr_cpu_mnli_512_{DATE}.json"),
@@ -381,7 +395,7 @@ def main() -> None:
     prediction_trace = read_prediction_trace(root / prediction_trace_path, args.max_samples)
     tokenizer = AutoTokenizer.from_pretrained(checkpoint_dir, trust_remote_code=True)
     rows = load_rows(args.task, args.max_samples)
-    prompts = [render_prompt(tokenizer, args.task, row) for row in rows]
+    prompts = [render_prompt(tokenizer, args.task, row, prompt_input=args.prompt_input) for row in rows]
     labels = [int(row["label"]) for row in rows]
 
     all_logits: list[np.ndarray] = []
@@ -456,6 +470,7 @@ def main() -> None:
         "expected_examples": expected_examples,
         "full_validation_complete": full_validation_complete,
         "ready_to_productize": ready_to_productize,
+        "prompt_input": args.prompt_input,
         "prompt_batch_size": args.prompt_batch_size,
         "batch_size": args.batch_size,
         "ubatch_size": args.ubatch_size,
@@ -487,6 +502,7 @@ def main() -> None:
         ],
         "limitations": [
             "This uses llama-embedding JSON output as the classifier-logit transport.",
+            "The faithful path uses direct token IDs because text decode/re-tokenize is not lossless for all Qwen pair prompts.",
             "The smoke is product-ready only after full validation and batching parity pass.",
             "The child RSS value is a process-level peak from resource.getrusage on Linux.",
         ],

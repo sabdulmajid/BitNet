@@ -26,10 +26,11 @@ result.
 | Training under ternary constraints helps | Proven partially | Best row-scale QAT improves ten-task mean by `+0.150788` over naive PTQ, but remains `-0.144710` behind FP. |
 | BitNet-SFT baseline can clear the paper anchor | Proven for one local MNLI row | CE-only Qwen2.5-0.5B BitNet-SFT reaches `0.628935` vs paper BitNet-SFT anchor `0.608000`. |
 | BitDistill FP recovery is not reproduced | Proven not yet complete | Controlled BitDistill rows reach `0.616607` and `0.691187`, still far from local FP16-SFT `0.807641`. |
+| Loss-normalized attention KD helps | Proven for one matched diagnostic | Gamma-60 reaches MNLI `0.738462`, improving over the matched paper-gamma row by `+0.047275`, but still remains `-0.069689` behind FP16. |
 | Row-scale runtime contract matters | Proven by output audit | One-scale TL2 relative output RMS error `1.904230`; exact row scales `0.000197`. |
 | TL2 group/tile-scale compromise is enough | Rejected for strict fidelity | Best available fp16 group-scale row is `0.098692` relative output RMS; exact fp16 row scales are `0.000197`. |
 | `I2_SR` can preserve row-scale ternary semantics in packed CPU inference | Proven for compatible causal-LM artifacts | Qwen2.5-1.5B `I2_SR` runs on Xeon Silver 4116 with PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
-| Native packed sequence-classification product is solved | No, native plumbing only | A single-artifact `bitnet-qwen` GGUF carries the classifier head and matches the sidecar smoke logits with relative RMS delta `0.000000103`, but a 16-example native MNLI CPU sample is `quality_mismatch`: accuracy `0.5625`, agreement with saved PyTorch predictions `0.875`. |
+| Native packed sequence-classification product is solved | No, native plumbing only | A single-artifact `bitnet-qwen` GGUF carries the classifier head and matches the sidecar path. Direct token-ID evaluation fixes a Qwen BPE pair-boundary artifact; the repaired 64-example MNLI CPU sample reaches saved-PyTorch agreement `0.96875`, accuracy `0.59375`, and RSS `950.64 MiB`, but remains sample-only. |
 | Kimi/MoE product viability is proven | Not proven | Current MoE work is tiny-fixture plumbing only. |
 
 ## What Changed In The Research Question
@@ -63,10 +64,9 @@ At the last local check:
 
 | Job | Partition / node | Purpose | Status |
 | ---: | --- | --- | --- |
-| `10040` | `dualcard / ece-nebula10` | Qwen3 paper-alignment run | running near `19310/20000` downstream steps |
-| `10077` | `midcard / ece-nebula12` | gamma-60 BitDistill diagnostic | running near `4470/10000` downstream steps |
+| `10043` | `dualcard / ece-nebula10` | Qwen3 paper-alignment run | running at last check |
+| `10079` | `midcard / ece-nebula12` | unweighted LS BitNet-SFT initializer benchmark | running at last check |
 | `10070` | `dualcard` | controlled 327.68M Stage-2 row | pending |
-| `10079` | `midcard` | unweighted LS BitNet-SFT initializer benchmark | pending |
 | `10080` | `midcard` | calibrated diag-LS BitNet-SFT initializer benchmark | pending |
 
 No quality claim should be made from these rows until their postprocess audits
@@ -118,9 +118,11 @@ Completed paper-gamma rows show weighted-attention/CE ratios in the thousands:
 ```
 
 The median equalizing gamma estimated from raw losses is around `58-61`, not
-`100000`, under this implementation. That does not prove the paper coefficient
-is bad. It proves the local reduction/normalization contract is different
-enough that the coefficient cannot be interpreted without telemetry.
+`100000`, under this implementation. The completed gamma-60 diagnostic reaches
+MNLI `0.738462`, a paired `+0.047275` over the matched paper-gamma control.
+That does not prove the paper coefficient is bad. It proves the local
+reduction/normalization contract is different enough that coefficient values
+cannot be transferred without telemetry.
 
 ### 4. Row-scale is a fork contribution, not a BitDistill reproduction
 
@@ -134,9 +136,11 @@ absmean quantization in its baseline equations.
 The strongest quality path is sequence classification. The strongest packed
 runtime path was causal-LM `I2_SR`; the new `bitnet-qwen` native classifier
 smoke proves that a single GGUF can carry the dense classifier head and emit
-matching logits for one prompt. The first native MNLI CPU sample is measurable
-but not faithful enough: 16 examples, accuracy `0.5625`, saved-prediction
-agreement `0.875`.
+matching logits. A direct-token input path was added to `llama-embedding`
+because Qwen sentence-pair token IDs cannot always be decoded to text and
+re-tokenized losslessly. The repaired native MNLI CPU sample is measurable but
+still sample-only: 64 examples, accuracy `0.59375`, saved-prediction agreement
+`0.96875`, child peak RSS `950.64 MiB`.
 
 A credible product needs one artifact that carries both:
 
@@ -168,15 +172,15 @@ Decision:
 
 ### Gate B: Gamma-60 Diagnostic
 
-The gamma-60 run tests whether the empirically equalized attention-KD scale is
+The gamma-60 run tested whether the empirically equalized attention-KD scale is
 healthier than paper-gamma under the local loss normalization.
 
 Decision:
 
-- If gamma-60 improves accuracy or stability, run a small normalized-gamma
-  sweep with fixed Stage-2 checkpoints.
-- If it does not, look beyond scalar gamma toward attention-layer choice,
-  teacher quality, and Stage-2 budget.
+- It did improve accuracy: `0.738462` vs matched paper-gamma `0.691187`.
+- It did not recover FP: paired delta vs FP16 is `-0.069689`.
+- Next step is a small normalized-gamma sweep with fixed Stage-2 checkpoints,
+  not a broad search over unrelated axes.
 
 ### Gate C: Initializer Diagnostics
 
@@ -208,18 +212,19 @@ Current proof:
 single-prompt native GGUF logits match sidecar logits
 relative RMS delta: 0.000000103
 prompt eval:        finite single-prompt smoke timing only; not a benchmark
-16-example MNLI:    accuracy 0.5625, saved-prediction agreement 0.875
+64-example MNLI:    accuracy 0.59375, saved-prediction agreement 0.96875
+token IDs:          direct-token path required; text round-trip is not lossless
 ```
 
 Missing before product claims:
 
 ```text
-root-cause native-vs-PyTorch mismatch
 full MNLI validation
 batched inference parity
 RSS measurement
 throughput distribution
 comparison against FP16 and Q4 task artifacts
+residual packed-runtime drift analysis for the remaining disagreements
 ```
 
 ### Gate E: TL2 Row-Scale Contract

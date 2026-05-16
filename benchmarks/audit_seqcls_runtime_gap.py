@@ -198,6 +198,7 @@ def load_native_cpu_benchmark(path: Path) -> dict[str, Any]:
         "exists": path.exists(),
         "status": data.get("status"),
         "task": data.get("task"),
+        "prompt_input": data.get("prompt_input"),
         "examples": summary.get("examples"),
         "accuracy": summary.get("accuracy"),
         "agreement_with_saved_pytorch_predictions": summary.get("agreement_with_saved_pytorch_predictions"),
@@ -330,6 +331,7 @@ def render_markdown(result: dict[str, Any]) -> str:
                 [
                     ["status", native_cpu["status"]],
                     ["task", native_cpu["task"]],
+                    ["prompt input", native_cpu["prompt_input"]],
                     ["examples", native_cpu["examples"]],
                     ["accuracy", native_cpu["accuracy"]],
                     ["agreement with saved PyTorch predictions", native_cpu["agreement_with_saved_pytorch_predictions"]],
@@ -351,14 +353,14 @@ def render_markdown(result: dict[str, Any]) -> str:
                 [
                     ["Backbone GGUF + dense head sidecar smoke", "prototype implemented"],
                     ["Sampled sidecar CPU quality agreement", "prototype improved; needs full validation"],
-                    ["Tokenizer pair formatting parity", "passes for audited MNLI sample"],
+                    ["Tokenizer pair formatting parity", "requires direct token-ID input for Qwen pair prompts"],
                     ["PyTorch pooled hidden state matches llama.cpp embedding", "near pass on audited sample, not exact"],
                     ["Packed graph matches Qwen2 SiLU/SwiGLU semantics", "implemented via bitnet-qwen"],
                     ["Packed loader supports Qwen2 Q/K/V projection biases", "implemented via bitnet-qwen"],
                     ["GGUF writer persists classifier/score head tensors and label metadata", "single-prompt smoke implemented"],
                     ["llama.cpp pools and applies the Qwen sequence-classification head", "single-prompt smoke implemented"],
-                    ["CPU evaluator reports GLUE accuracy from the packed classifier artifact", "sample implemented; quality mismatch"],
-                    ["Quality, RSS, and throughput measured on the same deployed artifact", "blocked"],
+                    ["CPU evaluator reports GLUE accuracy from the packed classifier artifact", "64-row token-ID sample implemented"],
+                    ["Quality, RSS, and throughput measured on the same deployed artifact", "sample only; full validation blocked"],
                 ],
             ),
             "## Interpretation",
@@ -366,9 +368,10 @@ def render_markdown(result: dict[str, Any]) -> str:
                 "The current repository has a PyTorch quality proof path and a causal GGUF runtime proof path. "
                 "It now also has a prototype sequence-classification backbone path through `bitnet-qwen` I2_SR plus "
                 "an external dense head sidecar, and a native single-artifact GGUF smoke that matches the sidecar "
-                "logits for one prompt. A small native CPU sample is measurable, but it currently disagrees with "
-                "saved PyTorch predictions enough to block product claims. Full-split CPU quality, batching parity, "
-                "RSS, and throughput have not been measured on a faithful native artifact."
+                "logits for one prompt. A 64-row native CPU sample using direct token IDs is measurable and reaches "
+                "high agreement with saved PyTorch predictions, but it remains sample-only and still has residual "
+                "packed-runtime drift. Full-split CPU quality, batching parity, RSS, and throughput have not been "
+                "measured on a faithful native artifact."
             ),
         ]
     )
@@ -418,7 +421,7 @@ def main() -> None:
     parser.add_argument(
         "--seqcls-native-cpu-benchmark",
         type=Path,
-        default=Path(f"benchmark_results/seqcls_native_i2sr_cpu_mnli_16_{DATE}.json"),
+        default=Path(f"benchmark_results/seqcls_native_i2sr_cpu_mnli_64_token_ids_{DATE}.json"),
     )
     parser.add_argument("--llama-cpp", type=Path, default=Path("3rdparty/llama.cpp"))
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/seqcls_runtime_gap_{DATE}.json"))
@@ -449,8 +452,8 @@ def main() -> None:
     )
     if same_artifact_ready:
         status = "ready"
-    elif native_cpu.get("status") == "quality_mismatch":
-        status = "native_classifier_sample_quality_mismatch_full_validation_blocked"
+    elif native_cpu.get("status") in {"sample_only", "quality_mismatch"}:
+        status = "native_classifier_sample_available_full_validation_blocked"
     elif native_smoke["passed"]:
         status = "native_classifier_smoke_available_full_validation_blocked"
     elif (

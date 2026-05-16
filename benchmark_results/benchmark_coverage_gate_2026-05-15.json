@@ -2,7 +2,7 @@
   "schema": "benchmark_coverage_gate.v1",
   "date": "2026-05-15",
   "passed": true,
-  "check_count": 96,
+  "check_count": 97,
   "failed": [],
   "checks": [
     {
@@ -398,7 +398,7 @@
     {
       "name": "Sequence-classification runtime gap is narrowed but not closed",
       "passed": true,
-      "evidence": "status=native_classifier_sample_quality_mismatch_full_validation_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6",
+      "evidence": "status=native_classifier_sample_available_full_validation_blocked, seqcls=15, seqcls_exportable=0, causal_exportable=6, exports=6",
       "blocker": ""
     },
     {
@@ -450,15 +450,21 @@
       "blocker": ""
     },
     {
-      "name": "Sequence-classification native I2_SR CPU sample records mismatch",
+      "name": "Sequence-classification native I2_SR CPU token-ID sample records agreement",
       "passed": true,
-      "evidence": "status=quality_mismatch, examples=16, accuracy=0.5625, agreement=0.875",
+      "evidence": "status=sample_only, prompt_input=token_ids, examples=64, accuracy=0.59375, agreement=0.96875",
       "blocker": ""
     },
     {
       "name": "Sequence-classification native I2_SR CPU sample keeps product blocked",
       "passed": true,
-      "evidence": "full_validation=False, ready=False, examples_per_second=0.7098795621057228, rss_mib=952.37890625",
+      "evidence": "full_validation=False, ready=False, examples_per_second=0.7173345972905404, rss_mib=950.640625",
+      "blocker": ""
+    },
+    {
+      "name": "Sequence-classification native mismatch audit isolates runtime drift",
+      "passed": true,
+      "evidence": "status=runtime_hidden_drift, token_ids=True, text_roundtrip=False, native_sidecar=True",
       "blocker": ""
     },
     {
@@ -572,7 +578,7 @@
     {
       "name": "evidence manifest has no missing artifacts",
       "passed": true,
-      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=270, missing=0, missing_labels=[]",
+      "evidence": "path=benchmarks/results/evidence_manifest_2026-05-15.json, artifacts=278, missing=0, missing_labels=[]",
       "blocker": ""
     },
     {

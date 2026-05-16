@@ -129,6 +129,9 @@ def load_pytorch_model(checkpoint_dir: Path, *, model_dtype: str) -> tuple[Any, 
             exclude_linear_regex=metrics.get("exclude_linear_regex") or "score|classifier",
             quant_eps=1e-5,
             activation_quantization=True,
+            ternary_init_mode="absmean",
+            init_state_dict=None,
+            ternary_init_iterations=0,
         )
         prepare_bitnet_student(model, shim_args)
 

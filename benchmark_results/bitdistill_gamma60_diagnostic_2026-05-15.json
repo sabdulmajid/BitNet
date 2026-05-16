@@ -1,105 +1,101 @@
 {
   "baseline_accuracy": 0.6911869587366276,
   "baseline_comparison": {
-    "both_correct": 0,
-    "both_wrong": 0,
-    "candidate_accuracy": null,
-    "candidate_wins": 0,
-    "delta_vs_reference": null,
-    "errors": [
-      "missing /mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-gamma60-headinit/eval_predictions.jsonl"
+    "both_correct": 6199,
+    "both_wrong": 1982,
+    "candidate_accuracy": 0.7384615384615385,
+    "candidate_wins": 1049,
+    "delta_vs_reference": 0.04727457972491089,
+    "errors": [],
+    "matched": 9815,
+    "mcnemar_exact_p": 9.070700837806306e-31,
+    "missing": [],
+    "paired_ci95": [
+      0.039256485932005106,
+      0.055292673517816596
     ],
-    "matched": 0,
-    "mcnemar_exact_p": null,
-    "missing": [
-      "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-gamma60-headinit/eval_predictions.jsonl"
-    ],
-    "paired_ci95": null,
-    "reference_accuracy": null,
-    "reference_wins": 0,
-    "status": "pending"
+    "reference_accuracy": 0.6911869587366276,
+    "reference_wins": 585,
+    "status": "pass"
   },
   "baseline_dir": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit",
   "baseline_metrics_exists": true,
   "baseline_predictions_exists": true,
-  "candidate_accuracy": null,
+  "candidate_accuracy": 0.7384615384615385,
   "candidate_dir": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-gamma60-headinit",
-  "candidate_metrics_exists": false,
-  "candidate_predictions_exists": false,
+  "candidate_metrics_exists": true,
+  "candidate_predictions_exists": true,
   "date": "2026-05-15",
-  "delta_accuracy_vs_baseline_metric": null,
+  "delta_accuracy_vs_baseline_metric": 0.04727457972491089,
   "expected_eval_examples": 9815,
   "fp_comparison": {
-    "both_correct": 0,
-    "both_wrong": 0,
-    "candidate_accuracy": null,
-    "candidate_wins": 0,
-    "delta_vs_reference": null,
-    "errors": [
-      "missing /mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-gamma60-headinit/eval_predictions.jsonl"
+    "both_correct": 6608,
+    "both_wrong": 1243,
+    "candidate_accuracy": 0.7384615384615385,
+    "candidate_wins": 640,
+    "delta_vs_reference": -0.06968925114620472,
+    "errors": [],
+    "matched": 9815,
+    "mcnemar_exact_p": 1.1019313339450127e-54,
+    "missing": [],
+    "paired_ci95": [
+      -0.0784313427049032,
+      -0.06094715958750638
     ],
-    "matched": 0,
-    "mcnemar_exact_p": null,
-    "missing": [
-      "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-gamma60-headinit/eval_predictions.jsonl"
-    ],
-    "paired_ci95": null,
-    "reference_accuracy": null,
-    "reference_wins": 0,
-    "status": "pending"
+    "reference_accuracy": 0.8081507896077432,
+    "reference_wins": 1324,
+    "status": "pass"
   },
   "fp_predictions": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/checkpoints/bitdistill-glue-seqcls-predtrace/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
-  "improves_over_paper_gamma_baseline": false,
+  "improves_over_paper_gamma_baseline": true,
   "job_id": "10077",
   "live_log": {
     "ce_attention_equalizing_gamma_summary": {
-      "max": 89.68279610764786,
-      "mean": 40.476793847192425,
-      "min": 11.22161595721616,
-      "p50": 36.47535081037056,
-      "p95": 74.77259576037144
+      "max": 137.5759333833868,
+      "mean": 41.51775269222051,
+      "min": 2.2230901945749064,
+      "p50": 37.32796676188003,
+      "p95": 87.90600855149651
     },
     "exists": true,
     "latest": {
-      "attention_kd": 0.024702,
-      "ce": 0.558594,
-      "elapsed": 348.4,
-      "logit_kd": 0.022656,
-      "loss": 2.267294,
-      "lr": 1.995e-05,
-      "step": 430.0,
-      "weighted_attention_kd": 1.48214,
-      "weighted_logit_kd": 0.22656
+      "attention_kd": 0.016701,
+      "ce": 0.431641,
+      "elapsed": 8106.8,
+      "logit_kd": 0.007077,
+      "loss": 1.504445,
+      "lr": 2e-06,
+      "step": 10000.0,
+      "weighted_attention_kd": 1.002033,
+      "weighted_logit_kd": 0.070772
     },
-    "latest_step": 430,
-    "latest_weighted_attention_to_ce": 2.65334035095257,
-    "latest_weighted_logit_to_ce": 0.4055897485472454,
-    "parsed_steps": 44,
+    "latest_step": 10000,
+    "latest_weighted_attention_to_ce": 2.321450001274207,
+    "latest_weighted_logit_to_ce": 0.16396032814306333,
+    "parsed_steps": 1001,
     "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/logs/bitdistill-gamma60-10077.out",
     "weighted_attention_to_ce_summary": {
-      "max": 5.346765545956006,
-      "mean": 1.8185658913592013,
-      "min": 0.669020821192053,
-      "p50": 1.6449744929637133,
-      "p95": 3.5763577505774022
+      "max": 26.988897751525215,
+      "mean": 2.2209297162549997,
+      "min": 0.4361128682170543,
+      "p50": 1.6074059130434784,
+      "p95": 6.106116324151656
     },
     "weighted_logit_to_ce_summary": {
-      "max": 1.5278685673988155,
-      "mean": 0.5659268079553924,
-      "min": 0.1453108428583083,
-      "p50": 0.5188857620253164,
-      "p95": 0.9339834857904992
+      "max": 5.507392984034879,
+      "mean": 0.4853698135953154,
+      "min": 0.02859949283419546,
+      "p50": 0.40930061016949154,
+      "p95": 1.1116982480884505
     }
   },
   "passes_fp_recovery_gate": false,
   "purpose": "Test whether reducing attention-KD gamma from 100000 to 60 improves the matched 20k-warmup tensor-scale MNLI BitDistill row under local loss normalization.",
   "schema": "bitdistill-gamma60-diagnostic-v1",
   "squeue": {
-    "elapsed": "6:45",
     "job_id": "10077",
-    "reason": "ece-nebula12",
-    "state": "RUNNING"
+    "state": "not_in_squeue"
   },
-  "status": "pending",
+  "status": "completed_baseline_improved",
   "success_delta_from_fp": -0.01
 }

@@ -305,16 +305,17 @@
     "token_id_match": true
   },
   "seqcls_native_cpu_benchmark": {
-    "accuracy": 0.5625,
-    "agreement_with_saved_pytorch_predictions": 0.875,
-    "child_peak_rss_mib": 952.37890625,
-    "examples": 16,
-    "examples_per_second": 0.7098795621057228,
+    "accuracy": 0.59375,
+    "agreement_with_saved_pytorch_predictions": 0.96875,
+    "child_peak_rss_mib": 950.640625,
+    "examples": 64,
+    "examples_per_second": 0.7173345972905404,
     "exists": true,
     "full_validation_complete": false,
-    "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/seqcls_native_i2sr_cpu_mnli_16_2026-05-15.json",
+    "path": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/benchmark_results/seqcls_native_i2sr_cpu_mnli_64_token_ids_2026-05-15.json",
+    "prompt_input": "token_ids",
     "ready_to_productize": false,
-    "status": "quality_mismatch",
+    "status": "sample_only",
     "task": "mnli"
   },
   "seqcls_native_smoke": {
@@ -376,5 +377,5 @@
     ],
     "ternary_checkpoints": 12
   },
-  "status": "native_classifier_sample_quality_mismatch_full_validation_blocked"
+  "status": "native_classifier_sample_available_full_validation_blocked"
 }

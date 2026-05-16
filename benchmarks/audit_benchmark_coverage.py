@@ -988,6 +988,7 @@ def audit_seqcls_runtime_gap(root: Path, checks: list[dict[str, Any]]) -> None:
             "sidecar_qwen_contract_available_native_head_blocked",
             "native_classifier_smoke_available_full_validation_blocked",
             "native_classifier_sample_quality_mismatch_full_validation_blocked",
+            "native_classifier_sample_available_full_validation_blocked",
         }
         and data.get("same_artifact_quality_cpu_ready") is False
         and seqcls.get("sequence_classification", 0) > 0
@@ -1167,7 +1168,7 @@ def audit_seqcls_native_i2sr_smoke(root: Path, checks: list[dict[str, Any]]) -> 
 
 
 def audit_seqcls_native_i2sr_cpu_sample(root: Path, checks: list[dict[str, Any]]) -> None:
-    path = root / f"benchmark_results/seqcls_native_i2sr_cpu_mnli_16_{DATE}.json"
+    path = root / f"benchmark_results/seqcls_native_i2sr_cpu_mnli_64_token_ids_{DATE}.json"
     if not path.exists():
         add_check(
             checks,
@@ -1182,17 +1183,18 @@ def audit_seqcls_native_i2sr_cpu_sample(root: Path, checks: list[dict[str, Any]]
     runtime = data.get("runtime", {}) if isinstance(data.get("runtime"), dict) else {}
     add_check(
         checks,
-        "Sequence-classification native I2_SR CPU sample records mismatch",
-        data.get("status") == "quality_mismatch"
-        and summary.get("examples") == 16
+        "Sequence-classification native I2_SR CPU token-ID sample records agreement",
+        data.get("status") in {"sample_only", "quality_mismatch"}
+        and data.get("prompt_input") == "token_ids"
+        and summary.get("examples") == 64
         and isinstance(summary.get("agreement_with_saved_pytorch_predictions"), (int, float))
-        and summary.get("agreement_with_saved_pytorch_predictions") < 0.95
+        and summary.get("agreement_with_saved_pytorch_predictions") >= 0.95
         and isinstance(summary.get("accuracy"), (int, float)),
         (
-            f"status={data.get('status')}, examples={summary.get('examples')}, "
+            f"status={data.get('status')}, prompt_input={data.get('prompt_input')}, examples={summary.get('examples')}, "
             f"accuracy={summary.get('accuracy')}, agreement={summary.get('agreement_with_saved_pytorch_predictions')}"
         ),
-        "native sampled classifier result should record the current quality mismatch, not promote the artifact",
+        "native sampled classifier result should use the repaired token-ID path and report agreement",
     )
     add_check(
         checks,
@@ -1208,6 +1210,23 @@ def audit_seqcls_native_i2sr_cpu_sample(root: Path, checks: list[dict[str, Any]]
             f"examples_per_second={runtime.get('examples_per_second')}, rss_mib={runtime.get('child_peak_rss_mib')}"
         ),
         "native sampled classifier result should include runtime/RSS evidence and remain blocked",
+    )
+    mismatch_path = root / f"benchmark_results/seqcls_native_mismatch_audit_{DATE}.json"
+    mismatch = read_json(mismatch_path)
+    mismatch_summary = mismatch.get("summary", {}) if isinstance(mismatch.get("summary"), dict) else {}
+    add_check(
+        checks,
+        "Sequence-classification native mismatch audit isolates runtime drift",
+        mismatch.get("status") == "runtime_hidden_drift"
+        and mismatch_summary.get("all_token_ids_match") is True
+        and mismatch_summary.get("text_roundtrip_all_token_ids_match") is False
+        and mismatch_summary.get("native_vs_sidecar_logits_match") is True,
+        (
+            f"status={mismatch.get('status')}, token_ids={mismatch_summary.get('all_token_ids_match')}, "
+            f"text_roundtrip={mismatch_summary.get('text_roundtrip_all_token_ids_match')}, "
+            f"native_sidecar={mismatch_summary.get('native_vs_sidecar_logits_match')}"
+        ),
+        "mismatch audit should prove token-ID repair and isolate residual packed-runtime drift",
     )
 
 
