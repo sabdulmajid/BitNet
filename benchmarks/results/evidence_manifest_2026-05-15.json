@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "c2e14cb1cc0c0a13ac3c66e3f5d25cbef506aa10eb7e8af524fa824fded6b1db",
-      "size_bytes": 15324
+      "sha256": "b20b2df293479d025e929460e6be31968079244f2ca9f288760091c8176fba2f",
+      "size_bytes": 15536
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "current_research_plan_report",
       "metrics": {},
       "path": "benchmarks/results/current_research_plan_2026-05-16.md",
-      "sha256": "a7072fa548d00ce92c98455c513b6bc03042807235f651ccbc9b4f4c2ada6c96",
-      "size_bytes": 12742
+      "sha256": "4ccc8fb062ab60e9a80abcc626acb8235ba975b3c974d963dd68f9952e3510c8",
+      "size_bytes": 12808
     },
     {
       "exists": true,
@@ -25,8 +25,8 @@
       "label": "research_redirect_report",
       "metrics": {},
       "path": "benchmarks/results/research_redirect_2026-05-15.md",
-      "sha256": "e123d3219d5f35098727535a664e771e48e82b26b20d7860f004b6c2cb3ad7e1",
-      "size_bytes": 11675
+      "sha256": "d76e7a2a77f69de01e9352c018314fbc13459ab2fdd9584cface6b5cc4308059",
+      "size_bytes": 11672
     },
     {
       "exists": true,
@@ -610,8 +610,8 @@
       "label": "qwen3_paper_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/qwen3_paper_alignment_2026-05-15.md",
-      "sha256": "091689ecd402404892ec2a32588e4cf325a1cd263e1f23c13797b0c4097dc006",
-      "size_bytes": 4545
+      "sha256": "50fe1a4cb85a0b570ac52c0c3edd27f4c9fcfe0a248bb368563ed34ccd30d1d6",
+      "size_bytes": 4592
     },
     {
       "exists": true,
@@ -880,7 +880,7 @@
       "label": "benchmark_coverage_gate_report",
       "metrics": {},
       "path": "benchmarks/results/benchmark_coverage_gate_2026-05-15.md",
-      "sha256": "be9d444ef54affe3cf5b066a9d63c6bf6edeb2af1ff34ea64554f2c7a879ccc6",
+      "sha256": "86606ac36a04c65ccc6045c682afc2cb6506b7d97f6fff0b3e28ba8fff87f53f",
       "size_bytes": 13402
     },
     {
@@ -2636,7 +2636,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "3bccad15b02eafb5e15f6636915bfc8dfaf00acca09be2aa5f3d7783cfb6fd8a",
+      "sha256": "540d8f518d6de5f9023b903d6ff887496b536f2d2020ec3f39ea5dfd43d3cd6d",
       "size_bytes": 20958
     },
     {
@@ -3010,8 +3010,8 @@
       "label": "qwen3_paper_alignment_json",
       "metrics": {},
       "path": "benchmark_results/qwen3_paper_alignment_2026-05-15.json",
-      "sha256": "90c886dd235bc5a3adfc955cf5dd3c612da8a319c2771cf7da45b96b173859db",
-      "size_bytes": 23327
+      "sha256": "65b89004e7fab2ff4350ccbd120285dd062f40d3b984beafd0b38ee505c59113",
+      "size_bytes": 23739
     },
     {
       "exists": true,
