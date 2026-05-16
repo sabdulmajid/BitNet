@@ -31,5 +31,8 @@ python benchmarks/benchmark_seqcls_native_i2sr_cpu.py \
   --batch-size 4096 \
   --ubatch-size 512 \
   --timeout-seconds 7200 \
+  --progress-jsonl "benchmark_results/seqcls_native_i2sr_cpu_mnli_full_token_ids_${DATE}.progress.jsonl" \
+  --resume-progress \
+  --progress-every 64 \
   --output-json "benchmark_results/seqcls_native_i2sr_cpu_mnli_full_token_ids_${DATE}.json" \
   --output-md "benchmarks/results/seqcls_native_i2sr_cpu_mnli_full_token_ids_${DATE}.md"

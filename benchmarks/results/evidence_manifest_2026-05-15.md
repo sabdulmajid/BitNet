@@ -3,7 +3,7 @@ Artifacts: `285`. Missing: `0`.
 | label | kind | exists | size bytes | sha256 prefix | parsed summary |
 | --- | --- | --- | ---: | --- | --- |
 | README | tracked_report | yes | 15031 | 7ecc87a1ca5f |  |
-| current_research_plan_report | tracked_report | yes | 15800 | 1e436cd347a2 |  |
+| current_research_plan_report | tracked_report | yes | 15820 | 54963f978268 |  |
 | research_redirect_report | tracked_report | yes | 14285 | 26f2f5bda19e |  |
 | research_redirect_claims_report | tracked_report | yes | 2392 | 0a0d290f728d |  |
 | side_by_side_report | tracked_report | yes | 17206 | 3e4cc51b063c |  |
@@ -61,7 +61,7 @@ Artifacts: `285`. Missing: `0`.
 | seqcls_native_i2sr_cpu_mnli16_token_ids_report | tracked_report | yes | 1129 | 0a0fc9b97fe4 |  |
 | seqcls_native_i2sr_cpu_mnli64_token_ids_report | tracked_report | yes | 1124 | b690c71635bc |  |
 | seqcls_native_i2sr_cpu_mnli64_token_ids_batch4_report | tracked_report | yes | 1124 | 3044b89bb306 |  |
-| seqcls_native_full_cpu_submission_report | tracked_report | yes | 1312 | d4b3a92d8778 |  |
+| seqcls_native_full_cpu_submission_report | tracked_report | yes | 1612 | 0118a0468e11 |  |
 | seqcls_native_mismatch_audit_report | tracked_report | yes | 1723 | 23061853e2c8 |  |
 | seqcls_native_mismatch_audit_fp32_report | tracked_report | yes | 1723 | bc40829d586a |  |
 | seqcls_native_batching_audit_report | tracked_report | yes | 2183 | 13a609b787f6 |  |

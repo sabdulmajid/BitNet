@@ -101,6 +101,19 @@ def read_prediction_trace(path: Path, limit: int) -> list[dict[str, Any]]:
     return rows
 
 
+def read_progress_trace(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    rows: list[dict[str, Any]] = []
+    with path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if not line:
+                continue
+            rows.append(json.loads(line))
+    return rows
+
+
 def load_batching_audit(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {
@@ -236,6 +249,15 @@ def run_native_classifier(
         "stderr_tail": result.stderr[-4000:],
     }
     return np.asarray(logits, dtype=np.float32), meta
+
+
+def append_progress_rows(path: Path, rows: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
 
 
 def accuracy_ci_wilson(correct: int, total: int, z: float = 1.959963984540054) -> list[float] | None:
@@ -397,6 +419,18 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--progress-jsonl",
+        type=Path,
+        default=None,
+        help="Optional per-example progress trace. Enables partial evidence for long CPU validation runs.",
+    )
+    parser.add_argument(
+        "--resume-progress",
+        action="store_true",
+        help="Resume from a contiguous --progress-jsonl trace instead of starting from example 0.",
+    )
+    parser.add_argument("--progress-every", type=int, default=64)
+    parser.add_argument(
         "--output-json",
         type=Path,
         default=Path(f"benchmark_results/seqcls_native_i2sr_cpu_mnli_512_{DATE}.json"),
@@ -429,10 +463,34 @@ def main() -> None:
     prompts = [render_prompt(tokenizer, args.task, row, prompt_input=args.prompt_input) for row in rows]
     labels = [int(row["label"]) for row in rows]
 
-    all_logits: list[np.ndarray] = []
+    progress_path = None
+    progress_rows: list[dict[str, Any]] = []
+    if args.progress_jsonl is not None:
+        progress_path = args.progress_jsonl if args.progress_jsonl.is_absolute() else root / args.progress_jsonl
+        if args.resume_progress:
+            raw_progress = read_progress_trace(progress_path)
+            for expected_index, row in enumerate(raw_progress):
+                if int(row.get("index", -1)) != expected_index:
+                    break
+                if not isinstance(row.get("logits"), list):
+                    break
+                progress_rows.append(row)
+        else:
+            try:
+                progress_path.unlink()
+            except FileNotFoundError:
+                pass
+
+    logits_rows: list[np.ndarray] = [
+        np.asarray(row["logits"], dtype=np.float32)
+        for row in progress_rows
+    ]
     metas: list[dict[str, Any]] = []
     started = time.perf_counter()
-    for start in range(0, len(prompts), args.prompt_batch_size):
+    start_index = len(logits_rows)
+    if start_index:
+        print(f"resumed native seqcls progress at {start_index}/{len(prompts)} examples", flush=True)
+    for start in range(start_index, len(prompts), args.prompt_batch_size):
         batch_prompts = prompts[start : start + args.prompt_batch_size]
         batch_logits, meta = run_native_classifier(
             binary=embedding_binary,
@@ -445,10 +503,52 @@ def main() -> None:
             ubatch_size=args.ubatch_size,
             timeout_seconds=args.timeout_seconds,
         )
-        all_logits.append(batch_logits)
         metas.append(meta)
+        progress_batch_rows: list[dict[str, Any]] = []
+        for offset, row_logits in enumerate(batch_logits):
+            index = start + offset
+            logits_rows.append(row_logits.astype(np.float32))
+            progress_batch_rows.append(
+                {
+                    "index": index,
+                    "label": labels[index],
+                    "prediction": int(np.argmax(row_logits)),
+                    "saved_pytorch_prediction": prediction_trace[index].get("prediction")
+                    if index < len(prediction_trace)
+                    else None,
+                    "logits": [float(value) for value in row_logits.tolist()],
+                    "elapsed_seconds": time.perf_counter() - started,
+                    "prompt_batch_size": args.prompt_batch_size,
+                    "prompt_input": args.prompt_input,
+                }
+            )
+        if progress_path is not None:
+            append_progress_rows(progress_path, progress_batch_rows)
+        completed = len(logits_rows)
+        if args.progress_every > 0 and (completed == len(prompts) or completed % args.progress_every == 0):
+            partial_predictions = [int(np.argmax(row)) for row in logits_rows]
+            correct = sum(int(pred == label) for pred, label in zip(partial_predictions, labels, strict=False))
+            trace_predictions = [
+                int(row["prediction"])
+                for row in prediction_trace[:completed]
+                if isinstance(row, dict) and isinstance(row.get("prediction"), int)
+            ]
+            agreement = None
+            if len(trace_predictions) == completed:
+                agreement = sum(
+                    int(pred == trace_pred)
+                    for pred, trace_pred in zip(partial_predictions, trace_predictions, strict=True)
+                ) / completed
+            elapsed = time.perf_counter() - started
+            print(
+                "native seqcls progress "
+                f"{completed}/{len(prompts)} acc_so_far={correct / completed:.6f} "
+                f"agreement_so_far={agreement if agreement is not None else 'NA'} "
+                f"elapsed={elapsed:.1f}s",
+                flush=True,
+            )
     wall_seconds = time.perf_counter() - started
-    logits = np.concatenate(all_logits, axis=0) if all_logits else np.zeros((0, 3), dtype=np.float32)
+    logits = np.stack(logits_rows, axis=0) if logits_rows else np.zeros((0, 3), dtype=np.float32)
     predictions = [int(x) for x in np.argmax(logits, axis=-1)]
     summary = summarize_agreement(predictions, labels, prediction_trace)
     expected_examples = int(TASK_SPECS[args.task]["expected_examples"])
@@ -458,9 +558,13 @@ def main() -> None:
     load_time_ms = sum(float(meta["perf"].get("load_time_ms") or 0.0) for meta in metas)
     total_time_ms = sum(float(meta["perf"].get("total_time_ms") or 0.0) for meta in metas)
     child_peak_rss_kib = max((meta.get("child_peak_rss_kib_after") or 0) for meta in metas) if metas else None
+    processed_this_run = len(rows) - start_index
     runtime = {
         "wall_seconds": wall_seconds,
-        "examples_per_second": len(rows) / wall_seconds if wall_seconds > 0 else None,
+        "examples_per_second": processed_this_run / wall_seconds if wall_seconds > 0 else None,
+        "evaluated_examples_this_process": processed_this_run,
+        "resumed_examples": start_index,
+        "total_examples_in_result": len(rows),
         "subprocesses": len(metas),
         "load_time_ms": load_time_ms,
         "prompt_eval_ms": prompt_eval_ms,
@@ -504,6 +608,12 @@ def main() -> None:
         "ready_to_productize": ready_to_productize,
         "batching_parity_ready": batching_parity_ready,
         "batching_audit": batching_audit,
+        "progress": {
+            "path": maybe_relative(progress_path, root) if progress_path is not None else None,
+            "resume_requested": args.resume_progress,
+            "resumed_examples": start_index,
+            "written_examples": len(logits_rows),
+        },
         "prompt_input": args.prompt_input,
         "prompt_batch_size": args.prompt_batch_size,
         "batch_size": args.batch_size,

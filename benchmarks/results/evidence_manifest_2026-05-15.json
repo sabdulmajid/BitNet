@@ -16,8 +16,8 @@
       "label": "current_research_plan_report",
       "metrics": {},
       "path": "benchmarks/results/current_research_plan_2026-05-16.md",
-      "sha256": "1e436cd347a287a21a919e7498bf8550480e54c48e6d668e4f47c88c84d00908",
-      "size_bytes": 15800
+      "sha256": "54963f978268ea0f02b0d6748b0b38be37ceb8841e75b32c3a2922e90478f943",
+      "size_bytes": 15820
     },
     {
       "exists": true,
@@ -538,8 +538,8 @@
       "label": "seqcls_native_full_cpu_submission_report",
       "metrics": {},
       "path": "benchmarks/results/seqcls_native_full_cpu_submission_2026-05-15.md",
-      "sha256": "d4b3a92d8778e4bf89e1ae0a532ab8fc5b534c88fdc56699e432593e4807b85b",
-      "size_bytes": 1312
+      "sha256": "0118a0468e11d9610412ff4b1342beacc28b3f66cde453dd4e8d42f7ba165834",
+      "size_bytes": 1612
     },
     {
       "exists": true,
