@@ -82,7 +82,7 @@ Overall status: **PASS**.
 | Sequence-classification native I2_SR CPU sample keeps product blocked | pass | full_validation=False, ready=False, examples_per_second=0.7173345972905404, rss_mib=950.640625 |  |
 | Sequence-classification native mismatch audit isolates runtime drift | pass | status=runtime_hidden_drift, token_ids=True, text_roundtrip=False, native_sidecar=True |  |
 | Sequence-classification native batching audit blocks batched throughput | pass | status=batching_parity_mismatch, invariant=False, changed=4, ready=False |  |
-| Qwen3 paper-alignment audit tracks required GLUE rows | pass | jobs=16, complete=7, ready=False |  |
+| Qwen3 paper-alignment audit tracks required GLUE rows | pass | jobs=16, complete=8, ready=False |  |
 | FP F16 CPU row is finite | pass | ppl=12.2808, prefill=114.468162, decode=5.555998 |  |
 | FP Q8_0 CPU row is finite | pass | ppl=12.3056, prefill=124.864246, decode=10.131914 |  |
 | FP Q4_K_M CPU row is finite | pass | ppl=12.8112, prefill=92.077037, decode=16.013125 |  |

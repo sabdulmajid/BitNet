@@ -7,8 +7,8 @@
       "label": "README",
       "metrics": {},
       "path": "README.md",
-      "sha256": "b20b2df293479d025e929460e6be31968079244f2ca9f288760091c8176fba2f",
-      "size_bytes": 15536
+      "sha256": "bdf5322b61518d35741704eafe1cc02ea0d2b90716ebbff83b087dd69e119b8f",
+      "size_bytes": 15767
     },
     {
       "exists": true,
@@ -16,8 +16,8 @@
       "label": "current_research_plan_report",
       "metrics": {},
       "path": "benchmarks/results/current_research_plan_2026-05-16.md",
-      "sha256": "4ccc8fb062ab60e9a80abcc626acb8235ba975b3c974d963dd68f9952e3510c8",
-      "size_bytes": 12808
+      "sha256": "831a46e3d288c518a1a5231c7ca9a768e1135a3e23e345567e992d0fecdc9105",
+      "size_bytes": 12907
     },
     {
       "exists": true,
@@ -25,8 +25,8 @@
       "label": "research_redirect_report",
       "metrics": {},
       "path": "benchmarks/results/research_redirect_2026-05-15.md",
-      "sha256": "8f43406797c43b87b83380351a98d0998a17aca3962243c5ffc60bbc149772a7",
-      "size_bytes": 12057
+      "sha256": "9322d8522f20809f7898be94898bc73bcca8cfd1256d4102b878caea7332098a",
+      "size_bytes": 12096
     },
     {
       "exists": true,
@@ -610,8 +610,8 @@
       "label": "qwen3_paper_alignment_report",
       "metrics": {},
       "path": "benchmarks/results/qwen3_paper_alignment_2026-05-15.md",
-      "sha256": "50fe1a4cb85a0b570ac52c0c3edd27f4c9fcfe0a248bb368563ed34ccd30d1d6",
-      "size_bytes": 4592
+      "sha256": "69581b6e6808e1e3d53e4e046768a8763317030da58954ed6f219dbaf83fc9c1",
+      "size_bytes": 4639
     },
     {
       "exists": true,
@@ -2636,7 +2636,7 @@
         "passed": true
       },
       "path": "benchmark_results/benchmark_coverage_gate_2026-05-15.json",
-      "sha256": "540d8f518d6de5f9023b903d6ff887496b536f2d2020ec3f39ea5dfd43d3cd6d",
+      "sha256": "311a196764fc5381efcb52726aca4b16443a31be8450c6b4db53f97bf4eef8b9",
       "size_bytes": 20958
     },
     {
@@ -3010,8 +3010,8 @@
       "label": "qwen3_paper_alignment_json",
       "metrics": {},
       "path": "benchmark_results/qwen3_paper_alignment_2026-05-15.json",
-      "sha256": "65b89004e7fab2ff4350ccbd120285dd062f40d3b984beafd0b38ee505c59113",
-      "size_bytes": 23739
+      "sha256": "5f45b4780144362b8c14f0853cceaa06c2be7d66e9aabc7d3173668a0cbdea6a",
+      "size_bytes": 24157
     },
     {
       "exists": true,

@@ -27,7 +27,7 @@ result.
 | BitNet-SFT baseline can clear the paper anchor | Proven for one Qwen2.5 MNLI tensor-scale schedule/budget row | CE-only Qwen2.5-0.5B BitNet-SFT reaches `0.628935` vs paper BitNet-SFT anchor `0.608000`. This is a baseline sanity check, not BitDistill recovery and not a general Qwen3 result. |
 | BitDistill FP recovery is not reproduced | Proven not yet complete | Controlled BitDistill rows reach `0.616607` and `0.691187`, still far from local FP16-SFT `0.807641`. |
 | Loss-normalized attention KD helps | Proven for one matched diagnostic | Gamma-60 reaches MNLI `0.738462`, improving over the matched paper-gamma row by `+0.047275`, but still remains `-0.069689` behind FP16. |
-| Qwen3 paper-alignment is not reproduced | Proven for completed MNLI/QNLI rows | Qwen3-0.6B-Base MNLI FP16-SFT is `0.829750`; BitNet-SFT is `0.477127`; tensor BitDistill improves to `0.723484` but remains `-0.106266` paired delta behind FP. QNLI FP16-SFT is `0.921106`; BitNet-SFT is `0.587040`; tensor BitDistill improves to `0.861065` but remains `-0.060040` paired delta behind FP. Row MNLI BitDistill is lower than tensor at `0.696179`. |
+| Qwen3 paper-alignment is not reproduced | Proven for completed MNLI/QNLI rows | Qwen3-0.6B-Base MNLI FP16-SFT is `0.829750`; BitNet-SFT is `0.477127`; tensor BitDistill improves to `0.723484` but remains `-0.106266` paired delta behind FP. QNLI FP16-SFT is `0.921106`; BitNet-SFT is `0.587040`; tensor BitDistill improves to `0.861065` but remains `-0.060040` paired delta behind FP. Row BitDistill is lower than tensor on both completed tasks: MNLI `0.696179`, QNLI `0.848435`. |
 | Row-scale runtime contract matters | Proven by output audit | One-scale TL2 relative output RMS error `1.904230`; exact row scales `0.000197`. |
 | TL2 group/tile-scale compromise is enough | Rejected for strict fidelity | Best available fp16 group-scale row is `0.098692` relative output RMS; exact fp16 row scales are `0.000197`. |
 | `I2_SR` can preserve row-scale ternary semantics in packed CPU inference | Proven for compatible causal-LM artifacts | Qwen2.5-1.5B `I2_SR` runs on Xeon Silver 4116 with PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. |
@@ -137,10 +137,11 @@ through `I2_SR`. It should be labeled `retrofit-variant`, not
 `paper-reproduction`, because the BitDistill paper describes per-tensor
 absmean quantization in its baseline equations.
 
-The completed Qwen3 MNLI branch is a useful caution: row-scale is not
+The completed Qwen3 MNLI/QNLI branch is a useful caution: row-scale is not
 monotonically better. On Qwen3-0.6B-Base MNLI, tensor BitDistill is `0.723484`
-while row BitDistill is `0.696179`. Row-scale remains a systems/runtime
-contribution and a retrofit variant, not a general accuracy guarantee.
+while row BitDistill is `0.696179`; on QNLI, tensor is `0.861065` while row is
+`0.848435`. Row-scale remains a systems/runtime contribution and a retrofit
+variant, not a general accuracy guarantee.
 
 ### 5. The product artifact gap has narrowed, but remains
 
