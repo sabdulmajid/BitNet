@@ -1544,6 +1544,25 @@ def load_optional_state_dict(model: nn.Module, args: argparse.Namespace) -> dict
     }
 
 
+def resolve_init_state_manifest(args: argparse.Namespace) -> None:
+    if not args.init_state_manifest:
+        return
+    manifest_path = Path(args.init_state_manifest)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    state_dict_path = manifest.get("state_dict_path")
+    if not isinstance(state_dict_path, str) or not state_dict_path:
+        raise ValueError(f"{manifest_path} does not contain a non-empty state_dict_path")
+    resolved_path = Path(state_dict_path)
+    if not resolved_path.exists():
+        raise FileNotFoundError(f"{manifest_path} state_dict_path does not exist: {resolved_path}")
+    if args.init_state_dict and Path(args.init_state_dict) != resolved_path:
+        raise ValueError(
+            "--init-state-dict disagrees with --init-state-manifest: "
+            f"{args.init_state_dict} != {resolved_path}"
+        )
+    args.init_state_dict = str(resolved_path)
+
+
 def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
     _teacher, student, tokenizer, loader = load_causal_models(args)
     if args.method in {"bitnet_sft", "bitdistill"}:
@@ -1953,6 +1972,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--student-model", default="Qwen/Qwen2.5-0.5B")
     parser.add_argument("--teacher-model", default="")
     parser.add_argument("--init-state-dict", default="")
+    parser.add_argument("--init-state-manifest", default="")
     parser.add_argument("--task-name", choices=sorted(GLUE_SPECS), default="sst2")
     parser.add_argument("--task-format", choices=["causal_lm", "sequence_classification"], default="causal_lm")
     parser.add_argument("--label-scheme", choices=["words", "letters"], default="words")
@@ -2018,6 +2038,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=1234)
     parser.add_argument("--smoke-test", action="store_true")
     args = parser.parse_args()
+    resolve_init_state_manifest(args)
     if args.use_subln is None:
         args.use_subln = args.method == "bitdistill"
     if args.smoke_test:

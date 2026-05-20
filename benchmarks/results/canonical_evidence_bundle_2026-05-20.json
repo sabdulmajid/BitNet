@@ -1,0 +1,128 @@
+{
+  "artifacts": {
+    "controlled_curve": {
+      "path": "benchmarks/results/bitdistill_controlled_curve_2026-05-20.json",
+      "sha256": "a63434b9b1635ea71205952b24ec645ae0774c631f20e2ade13160066fb500bc"
+    },
+    "cpu_frontier": {
+      "path": "benchmark_results/cpu_tradeoff_frontier_2026-05-15.json",
+      "sha256": "792515abce6eff6c0521a6cddfb8243c7778d254fabfbcf793e9a3529f1045f2"
+    },
+    "fp_lm_eval": {
+      "path": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json",
+      "sha256": "e48cdc1bb44f1979512cef71f50b31b370692b11d08a4baa45dc7757ac71d6dd"
+    },
+    "fp_ppl": {
+      "path": "benchmark_results/quality-9735/qwen15b_fp_wikitext.json",
+      "sha256": "acd79bab6f4020657f052232e19474fdd484b87885e09c810cac27c2a2392e58"
+    },
+    "gamma60": {
+      "path": "benchmark_results/bitdistill_gamma60_diagnostic_2026-05-15.json",
+      "sha256": "428f308e82e67593c9b48effb2db6e19893087df4d618d381d4063170efdd7f9"
+    },
+    "native_seqcls": {
+      "path": "benchmark_results/seqcls_native_i2sr_cpu_mnli_full_token_ids_sequence_isolated_2026-05-15.json",
+      "sha256": "1a78dc21dc0ccb0c3be0fca41ccb7c6228ccdd5117c5ef5f2dd82ea97d84d75a"
+    },
+    "ptq_lm_eval": {
+      "path": "benchmark_results/lm-eval-qwen15b-full10/qwen15b_naive_ptq.json",
+      "sha256": "46e7097b707eb8b145579eed40eabd6a3707cd73dd6d92a5d5665788fe197804"
+    },
+    "ptq_ppl": {
+      "path": "benchmark_results/quality-ptq-qwen15b/qwen15b_naive_ptq_wikitext.json",
+      "sha256": "8481ac1399014e94c23860ce8e9dbc2d9c50512634ac15d5f6886625141bab34"
+    },
+    "row_qat_lm_eval": {
+      "path": "benchmark_results/lm-eval-qwen15b-klonly-row-notiehead-full10/qwen15b_qat_ternary.json",
+      "sha256": "50cda719e02af1824b041667ecdde0dbccd999a53d8aaa08cbe88e9af4553a5b"
+    },
+    "stage2_curve": {
+      "path": "benchmark_results/bitdistill_stage2_curve_2026-05-16.json",
+      "sha256": "9973aab406aaa32ae352b7a7da0d5972907f9ca7042f67c8620cb6af468faeb9"
+    },
+    "stage2_manifest": {
+      "path": "benchmarks/results/stage2_manifest_2026-05-20.json",
+      "sha256": "22777a30e5ac6dff707cbb20d06e82d5f20c897fc3fccba62c51fdf744d313fa"
+    },
+    "tl2_contract": {
+      "path": "benchmark_results/tl2_row_scale_runtime_contract_2026-05-15.json",
+      "sha256": "4e631065cf2ef7df7eeca3dbb911516abed7360e678c75fb1a6c6062ed3506f5"
+    }
+  },
+  "claims": {
+    "bitdistill_reproduction": {
+      "caveat": "The 327.68M Stage-2 producer finished, but downstream MNLI must be rerun with the snapshot state_dict_path.",
+      "controlled_163_84m_mnli": 0.6911869587366276,
+      "controlled_327_68m_downstream_status": "rerun_submitted",
+      "controlled_327_68m_stage2_final_ce": 3.7840569019317627,
+      "controlled_327_68m_stage2_tokens": 327680000,
+      "controlled_40_96m_mnli": 0.6166072338257769,
+      "fp16_sft_mnli": 0.8081507896077432,
+      "state_dict_path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-40k/checkpoint-40000/custom_state_dict.pt",
+      "status": "not_reproduced_327m_pending"
+    },
+    "blind_ptq": {
+      "caveat": "Dense Qwen2.5-1.5B tested setup; not a theorem for every architecture.",
+      "fp_ten_task_mean": 0.6441691641219306,
+      "fp_wikitext_ppl": 13.901475466625362,
+      "ptq_ten_task_mean": 0.34867101715441434,
+      "ptq_wikitext_ppl": 3813121.80332679,
+      "status": "strong_negative_tested_setup"
+    },
+    "gamma_normalization": {
+      "caveat": "This is a local normalization diagnostic, not a claim that the paper coefficient is wrong.",
+      "gamma60_delta_vs_fp": -0.06968925114620472,
+      "gamma60_mnli": 0.7384615384615385,
+      "status": "local_loss_normalization_mismatch"
+    },
+    "i2sr_cpu": {
+      "caveat": "I2_SR is a speed-oriented proof of row-scale ternary runtime semantics. It improves decode speed versus FP16 and is faster than Q4_K_M in the audited run, but it is larger than Q4_K_M and has much worse PPL. It should not be claimed as a quality/storage win over mature Q4 quantization.",
+      "fp_f16": {
+        "decode_tok_s": 5.555998,
+        "file_mib": 2950.3500366210938,
+        "ppl": 12.2808,
+        "prompt_tok_s": 114.468162
+      },
+      "q4_k_m": {
+        "decode_tok_s": 16.013125,
+        "file_mib": 940.3661499023438,
+        "ppl": 12.8112,
+        "prompt_tok_s": 92.077037
+      },
+      "row_i2sr": {
+        "decode_tok_s": 19.065496,
+        "file_mib": 1211.3169555664062,
+        "ppl": 38.8477,
+        "prompt_tok_s": 211.668328
+      },
+      "status": "working_not_q4_quality_competitive"
+    },
+    "moe_kimi": {
+      "caveat": "Only tiny Qwen2MoE fixture/plumbing exists; no Kimi quality or routed CPU runtime is proven.",
+      "status": "not_supported"
+    },
+    "native_classifier": {
+      "caveat": "Agreement remains below the 0.99 product gate.",
+      "examples_per_second": 7.456204234199212,
+      "mnli_accuracy": 0.6521650534895568,
+      "pytorch_agreement": 0.9766683647478349,
+      "rss_mib": 960.15234375,
+      "status": "research_demo_not_product_ready"
+    },
+    "qat_distill": {
+      "best_row_scale_qat_ten_task_mean": 0.49945920048238823,
+      "caveat": "Row-scale QAT is a retrofit variant, not standard BitDistill.",
+      "gap_vs_fp": -0.14470996363954236,
+      "recovery_vs_ptq": 0.1507881833279739,
+      "status": "partial_recovery_not_fp"
+    },
+    "row_scale_runtime_contract": {
+      "caveat": "This supports I2_SR/row-scale contracts; TL2 row-scale support is not implemented.",
+      "exact_fp16_row_scale_relative_rms_error": 0.00019744640689756221,
+      "one_scale_tl2_relative_rms_error": 1.9042302114103853,
+      "status": "strong_systems_result"
+    }
+  },
+  "created_utc": "2026-05-20T08:40:24.678926+00:00",
+  "schema": "bitnet-canonical-evidence-bundle-v1"
+}

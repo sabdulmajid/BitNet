@@ -386,16 +386,25 @@ def main() -> int:
         type=Path,
         default=Path(f"benchmark_results/bitdistill_recovery_submission_{DATE}.json"),
     )
+    parser.add_argument("--allow-empty", action="store_true", help="permit an explicitly empty controlled-curve report")
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_controlled_curve_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/bitdistill_controlled_curve_{DATE}.md"))
     args = parser.parse_args()
 
     summary = build_summary(args)
+    if summary["expected"] == 0 and not args.allow_empty:
+        raise SystemExit(
+            "No controlled-curve downstream rows found. "
+            f"submission_json={args.submission_json} recovery_submission_json={args.recovery_submission_json}. "
+            "Pass explicit submission paths or --allow-empty with an empty-report reason."
+        )
+    if summary["expected"] == 0:
+        summary["empty_expected_reason"] = "explicit --allow-empty"
     args.output_json.parent.mkdir(parents=True, exist_ok=True)
     args.output_md.parent.mkdir(parents=True, exist_ok=True)
     args.output_json.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     markdown = render_markdown(summary)
-    args.output_md.write_text(markdown, encoding="utf-8")
+    args.output_md.write_text(markdown.rstrip() + "\n", encoding="utf-8")
     print(markdown)
     return 0
 

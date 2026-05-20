@@ -1,0 +1,43 @@
+# Reporting Rules
+
+This fork should be presented as an evidence-led research artifact.
+
+## Rules
+
+1. Public claims must cite JSON/manifest artifacts or be explicitly marked as
+   interpretation.
+2. Missing metrics or predictions mean `pending` or `incomplete`, not failure
+   or success.
+3. A report with `complete 0/0` is invalid unless it explicitly states why no
+   rows were expected.
+4. Paper-style tensor-scale BitDistill rows and row-scale retrofit variants
+   must be labeled separately.
+5. Runtime speed, file size, RSS, task quality, and LM perplexity are separate
+   gates.
+6. MoE/Kimi claims require trained-model quality and routed runtime evidence.
+
+## Fail-Closed Validator
+
+```bash
+python benchmarks/validate_reports_fail_closed.py <json-or-md-report> [...]
+```
+
+The validator rejects silent empty reports. For example, the stale 2026-05-17
+controlled-curve files are expected to fail because date-based postprocessing
+missed the real 2026-05-15/16 artifacts and produced `0/0` rows.
+
+## Preferred Public Labels
+
+| Label | Meaning |
+| --- | --- |
+| `paper-reproduction` | Same task family, model class, quantization semantics, and recipe target as the paper. |
+| `paper-inspired` | Uses similar ingredients but changes budget, backbone, reduction, scale granularity, or task formulation. |
+| `retrofit-variant` | Fork-specific extensions such as row-scale ternary and `I2_SR`. |
+
+## Do Not Claim
+
+- arbitrary FP16/BF16 to BitNet conversion,
+- paper-level BitDistill reproduction,
+- Q4-quality parity for `I2_SR`,
+- product-ready native classification,
+- Kimi/MoE support.
