@@ -85,6 +85,7 @@ reports by date.
 python -m py_compile train_bitdistill.py benchmarks/*.py
 python benchmarks/validate_stage2_manifest.py benchmarks/results/stage2_manifest_2026-05-20.json
 python benchmarks/validate_reports_fail_closed.py <reports-to-check>
+python benchmarks/validate_public_docs.py
 ```
 
 The report validator must reject silent `0/0` reports unless the report has an

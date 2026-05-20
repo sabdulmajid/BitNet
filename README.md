@@ -10,7 +10,7 @@ The current answer is deliberately narrow:
 > Extreme ternary quantization is not a file-format conversion problem. It is a
 > representation-learning problem plus a runtime-contract problem.
 
-This repository is **not** a universal BitNet converter. The evidence so far
+This repository is not a universal BitNet converter. The evidence so far
 supports a CPU-first evaluation stack: test whether a model-task pair survives
 ternary training/distillation, then verify that the packed runtime preserves the
 same scale semantics the trained checkpoint learned.
@@ -32,7 +32,7 @@ The current canonical evidence bundle is:
 | Row-scale semantics matter at runtime | **Yes: strong systems result** | TL2 one-scale relative output RMS error `1.904230`; exact FP16 row scales reduce it to `0.000197`. | Row scales are part of the learned function. TL2 row-scale support is not implemented. |
 | `I2_SR` packed CPU inference works | **Yes, for compatible causal artifacts** | Xeon Silver 4116: row-scale `I2_SR` file `1211.3 MiB`, PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. | It does **not** beat Q4_K_M on quality or file size. Q4_K_M is `940.4 MiB` with PPL `12.8112`. |
 | Native packed sequence classification is product-ready | **No: research demo only** | Full MNLI native sequence-isolated path: accuracy `0.652165`, PyTorch agreement `0.976668`, `7.456204` examples/s, RSS `960.15 MiB`. | Agreement is below the `0.99` product gate and the model quality is weak. |
-| Kimi/MoE support is proven | **No** | Only tiny Qwen2MoE fixture/plumbing exists. | No trained Kimi quality, MLA/shared-expert mapping, routed expert locality, or CPU product result is proven. |
+| Kimi/MoE support is proven | **No: not supported** | Only tiny Qwen2MoE fixture/plumbing exists. | No trained Kimi quality, MLA/shared-expert mapping, routed expert locality, or CPU product result is proven. |
 
 ## What This Fork Adds
 
@@ -98,6 +98,11 @@ python benchmarks/validate_reports_fail_closed.py \
 
 That command is expected to fail for the stale 2026-05-17 controlled-curve
 files because they summarize `0/0` rows without an explicit empty-report reason.
+Validate the public docs against the canonical JSON bundle:
+
+```bash
+python benchmarks/validate_public_docs.py
+```
 
 ## Correct 327.68M Downstream Rerun
 

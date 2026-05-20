@@ -26,6 +26,16 @@ The validator rejects silent empty reports. For example, the stale 2026-05-17
 controlled-curve files are expected to fail because date-based postprocessing
 missed the real 2026-05-15/16 artifacts and produced `0/0` rows.
 
+## Public Doc Validator
+
+```bash
+python benchmarks/validate_public_docs.py
+```
+
+This validator checks that the headline README, claims page, and runtime
+contract still contain the canonical evidence-bundle numbers and that every
+artifact referenced by the bundle exists.
+
 ## Preferred Public Labels
 
 | Label | Meaning |
