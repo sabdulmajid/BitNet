@@ -2,7 +2,7 @@
   "artifacts": {
     "controlled_curve": {
       "path": "benchmarks/results/bitdistill_controlled_curve_2026-05-20.json",
-      "sha256": "a63434b9b1635ea71205952b24ec645ae0774c631f20e2ade13160066fb500bc"
+      "sha256": "d7417c87913e913a91d80f7d77e9aca6b4abfe4dd479f4cacf9f39698b35b2ee"
     },
     "cpu_frontier": {
       "path": "benchmark_results/cpu_tradeoff_frontier_2026-05-15.json",
@@ -123,6 +123,6 @@
       "status": "strong_systems_result"
     }
   },
-  "created_utc": "2026-05-20T08:40:24.678926+00:00",
+  "created_utc": "2026-05-20T08:41:56.690272+00:00",
   "schema": "bitnet-canonical-evidence-bundle-v1"
 }

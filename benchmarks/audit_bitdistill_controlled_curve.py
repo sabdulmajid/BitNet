@@ -149,6 +149,39 @@ def squeue_state(job_id: str) -> dict[str, str]:
     }
 
 
+def apply_stage2_manifest_rerun(jobs: list[dict[str, Any]], manifest_path: Path) -> list[dict[str, Any]]:
+    if not manifest_path.exists():
+        return jobs
+    manifest = read_json(manifest_path)
+    downstream = manifest.get("downstream", {}) if isinstance(manifest.get("downstream"), dict) else {}
+    rerun_job_id = downstream.get("rerun_job_id")
+    rerun_output_dir = downstream.get("rerun_output_dir")
+    token_presentations = manifest.get("token_presentations")
+    if not rerun_job_id or not rerun_output_dir or not isinstance(token_presentations, int):
+        return jobs
+    replacement = {
+        "job_id": str(rerun_job_id),
+        "label": "40k-warmup downstream control rerun",
+        "dependency": "",
+        "partition": "midcard",
+        "init_state_dict": manifest.get("state_dict_path", ""),
+        "output_dir": rerun_output_dir,
+        "stage2_token_presentations": token_presentations,
+        "supersedes_job_id": downstream.get("failed_job_id", ""),
+    }
+    replaced = False
+    updated: list[dict[str, Any]] = []
+    for job in jobs:
+        if job.get("stage2_token_presentations") == token_presentations:
+            updated.append(replacement)
+            replaced = True
+        else:
+            updated.append(job)
+    if not replaced:
+        updated.append(replacement)
+    return updated
+
+
 def summarize_job(job: dict[str, Any], reference_predictions: Path) -> dict[str, Any]:
     output_dir = Path(str(job.get("output_dir", "")))
     metrics_path = output_dir / "metrics.json"
@@ -229,6 +262,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                 "stage2_token_presentations": 163_840_000,
             },
         )
+    downstream_jobs = apply_stage2_manifest_rerun(downstream_jobs, args.stage2_manifest)
     rows = [summarize_job(job, args.reference_predictions) for job in downstream_jobs]
     complete_rows = [row for row in rows if row["paired"]["status"] == "pass"]
     passed_rows = [row for row in complete_rows if row["passed_fp_recovery_gate"]]
@@ -385,6 +419,12 @@ def main() -> int:
         "--recovery-submission-json",
         type=Path,
         default=Path(f"benchmark_results/bitdistill_recovery_submission_{DATE}.json"),
+    )
+    parser.add_argument(
+        "--stage2-manifest",
+        type=Path,
+        default=Path("benchmarks/results/stage2_manifest_2026-05-20.json"),
+        help="optional manifest used to replace a failed 40k downstream row with a submitted rerun",
     )
     parser.add_argument("--allow-empty", action="store_true", help="permit an explicitly empty controlled-curve report")
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_controlled_curve_{DATE}.json"))
