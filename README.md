@@ -26,8 +26,8 @@ The current canonical evidence bundle is:
 | --- | --- | --- | --- |
 | Blind FP/BF16 to ternary PTQ works as a general retrofit | **No: strong negative result in the tested setup** | Qwen2.5-1.5B FP WikiText PPL `13.901`; naive ternary PTQ PPL `3,813,121.803`. FP ten-task mean `0.644169`; naive PTQ mean `0.348671`. | Dense Qwen2.5-1.5B tested setup; do not generalize as a theorem for every architecture. |
 | QAT/distillation recovers signal | **Partial recovery, not FP quality** | Best row-scale QAT ten-task mean `0.499459`, a `+0.150788` recovery over naive PTQ and still `-0.144710` below FP. | Row-scale QAT is this fork's retrofit variant, not standard BitDistill. |
-| BitDistill paper-level GLUE reproduction is complete | **No** | Qwen2.5-0.5B local FP16-SFT MNLI is about `0.808151`. Controlled MNLI rows: `40.96M` Stage-2 token presentations gives `0.616607`; `163.84M` gives `0.691187`. | The `327.68M` Stage-2 producer finished; corrected downstream rerun job `10169` has been submitted and remains pending quality evidence until metrics and predictions exist. |
-| The `327.68M` Stage-2 checkpoint is usable | **Yes, as a producer checkpoint** | [stage2_manifest_2026-05-20.md](benchmarks/results/stage2_manifest_2026-05-20.md) records job `10070`, `40000` steps, `327,680,000` token presentations, final CE `3.784057`, rerun job `10169`, and the exact state dict path. | Job `10071` failed before quality evaluation because it expected a root `custom_state_dict.pt`; the valid path is under `checkpoint-40000/`. |
+| BitDistill paper-level GLUE reproduction is complete | **No** | Qwen2.5-0.5B local FP16-SFT MNLI is about `0.808151`. Controlled MNLI rows: `40.96M` Stage-2 token presentations gives `0.616607`; `163.84M` gives `0.691187`; `327.68M` gives `0.720020`. | The largest completed row improves over shorter warm-ups but still trails FP by paired delta `-0.088130` with CI `[-0.096749, -0.079511]`. |
+| The `327.68M` Stage-2 checkpoint is usable | **Yes, as a producer checkpoint** | [stage2_manifest_2026-05-20.md](benchmarks/results/stage2_manifest_2026-05-20.md) records job `10070`, `40000` steps, `327,680,000` token presentations, final CE `3.784057`, rerun job `10169`, and the exact state dict path. | Job `10071` failed before quality evaluation because it expected a root `custom_state_dict.pt`; corrected rerun `10169` completed and produced the `0.720020` MNLI row. |
 | Paper gamma can be copied literally into this implementation | **No, not without matching loss normalization** | Local gamma-60 diagnostic MNLI `0.738462`, still `-0.069689` below FP. Telemetry shows paper-gamma attention KD can dominate CE under local reductions. | This is a local normalization mismatch, not evidence that the paper coefficient is wrong. |
 | Row-scale semantics matter at runtime | **Yes: strong systems result** | TL2 one-scale relative output RMS error `1.904230`; exact FP16 row scales reduce it to `0.000197`. | Row scales are part of the learned function. TL2 row-scale support is not implemented. |
 | `I2_SR` packed CPU inference works | **Yes, for compatible causal artifacts** | Xeon Silver 4116: row-scale `I2_SR` file `1211.3 MiB`, PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. | It does **not** beat Q4_K_M on quality or file size. Q4_K_M is `940.4 MiB` with PPL `12.8112`. |
@@ -122,8 +122,7 @@ checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bi
 The previous job `10071` failed before evaluation because it looked for a
 root-level `custom_state_dict.pt` that was never written under the chosen
 snapshot-only save mode. Corrected rerun job `10169` was submitted with
-`INIT_STATE_MANIFEST`; do not claim the `327.68M` MNLI quality row until that
-job writes metrics and prediction traces.
+`INIT_STATE_MANIFEST` and completed with MNLI accuracy `0.720020`.
 
 ## Current Research Direction
 

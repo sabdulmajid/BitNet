@@ -2,7 +2,7 @@
   "artifacts": {
     "controlled_curve": {
       "path": "benchmarks/results/bitdistill_controlled_curve_2026-05-20.json",
-      "sha256": "d7417c87913e913a91d80f7d77e9aca6b4abfe4dd479f4cacf9f39698b35b2ee"
+      "sha256": "5b09d697182c852899781af932c193f525062bc190d888c2b0ff17cb8b7dd3d9"
     },
     "cpu_frontier": {
       "path": "benchmark_results/cpu_tradeoff_frontier_2026-05-15.json",
@@ -42,7 +42,7 @@
     },
     "stage2_manifest": {
       "path": "benchmarks/results/stage2_manifest_2026-05-20.json",
-      "sha256": "22777a30e5ac6dff707cbb20d06e82d5f20c897fc3fccba62c51fdf744d313fa"
+      "sha256": "4de6e5ac19a17bc53cac7eb33024964c069a13a24ba36afaec8632ba14f79bdf"
     },
     "tl2_contract": {
       "path": "benchmark_results/tl2_row_scale_runtime_contract_2026-05-15.json",
@@ -51,15 +51,21 @@
   },
   "claims": {
     "bitdistill_reproduction": {
-      "caveat": "The 327.68M Stage-2 producer finished, but downstream MNLI must be rerun with the snapshot state_dict_path.",
+      "caveat": "The 327.68M row improves over 163.84M but remains below the FP16 recovery gate.",
       "controlled_163_84m_mnli": 0.6911869587366276,
-      "controlled_327_68m_downstream_status": "rerun_submitted",
+      "controlled_327_68m_delta_vs_fp": -0.0881304126337239,
+      "controlled_327_68m_downstream_status": "rerun_complete",
+      "controlled_327_68m_mnli": 0.7200203769740193,
+      "controlled_327_68m_paired_ci95": [
+        -0.0967494587122408,
+        -0.07951136655520699
+      ],
       "controlled_327_68m_stage2_final_ce": 3.7840569019317627,
       "controlled_327_68m_stage2_tokens": 327680000,
       "controlled_40_96m_mnli": 0.6166072338257769,
       "fp16_sft_mnli": 0.8081507896077432,
       "state_dict_path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-40k/checkpoint-40000/custom_state_dict.pt",
-      "status": "not_reproduced_327m_pending"
+      "status": "not_reproduced_327m_complete"
     },
     "blind_ptq": {
       "caveat": "Dense Qwen2.5-1.5B tested setup; not a theorem for every architecture.",
@@ -123,6 +129,6 @@
       "status": "strong_systems_result"
     }
   },
-  "created_utc": "2026-05-20T08:41:56.690272+00:00",
+  "created_utc": "2026-05-20T11:05:32.918139+00:00",
   "schema": "bitnet-canonical-evidence-bundle-v1"
 }

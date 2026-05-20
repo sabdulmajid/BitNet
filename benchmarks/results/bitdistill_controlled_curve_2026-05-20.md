@@ -1,11 +1,11 @@
 # BitDistill Controlled Stage-2 Curve Audit, 2026-05-20
 
-Pending: at least one controlled Stage-2 curve row lacks metrics or prediction traces.
+Controlled Stage-2 curve rows are complete, but at least one row misses the FP16 recovery gate.
 
 | field | value |
 | --- | --- |
 | reference_predictions | checkpoints/bitdistill-glue-seqcls-predtrace/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl |
-| complete | 2/3 |
+| complete | 3/3 |
 | passed FP recovery gate | 0/3 |
 | success delta from FP16 | -0.010000 |
 
@@ -15,7 +15,7 @@ Pending: at least one controlled Stage-2 curve row lacks metrics or prediction t
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 10069 | 5k-warmup downstream control | paper-inspired | not_in_squeue | 40960000 | 0.004096 | true | true | 0.616607 | -0.191544 | [-0.201893, -0.181194] | false |  |
 | 10068 | 20k-warmup downstream control | paper-inspired | not_in_squeue | 163840000 | 0.016384 | true | true | 0.691187 | -0.116964 | [-0.126110, -0.107817] | false |  |
-| 10169 | 40k-warmup downstream control rerun | paper-inspired | RUNNING | 327680000 | 0.032768 | false | false | - | - | - | false | missing checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit-rerun/eval_predictions.jsonl |
+| 10169 | 40k-warmup downstream control rerun | paper-inspired | not_in_squeue | 327680000 | 0.032768 | true | true | 0.720020 | -0.088130 | [-0.096749, -0.079511] | false |  |
 
 ## Loss Components
 
@@ -23,7 +23,7 @@ Pending: at least one controlled Stage-2 curve row lacks metrics or prediction t
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 10069 | 5k-warmup downstream control | 10000 | 4718.947626 | 15427.580675 | 1637.956123 | 3908.755310 | 61.052380 | 120.050236 | 0.279297 | 0.015239 | 0.152390 | 0.013180 | 1317.987915 | 0.279297 | 0.015239 | 0.152390 | 0.013180 | 1317.987915 |
 | 10068 | 20k-warmup downstream control | 10000 | 5945.070866 | 37819.641342 | 1729.105844 | 6080.253825 | 57.831811 | 135.086455 | 0.200195 | 0.007469 | 0.074691 | 0.011902 | 1190.173462 | 0.200195 | 0.007469 | 0.074691 | 0.011902 | 1190.173462 |
-| 10169 | 40k-warmup downstream control rerun | 270 | 2920.854280 | 4728.807627 | 2124.262792 | 4331.094870 | 47.080235 | 114.875443 | - | - | - | - | - | 0.718750 | 0.013851 | 0.138514 | 0.020994 | 2099.364014 |
+| 10169 | 40k-warmup downstream control rerun | 10000 | 3190.995498 | 24038.027696 | 1755.253104 | 7327.265686 | 56.969902 | 137.370117 | 0.339844 | 0.010467 | 0.104675 | 0.010844 | 1084.440674 | 0.339844 | 0.010467 | 0.104675 | 0.010844 | 1084.440674 |
 
 ## Interpretation
 

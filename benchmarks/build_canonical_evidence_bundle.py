@@ -86,6 +86,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
     controlled_by_tokens = {
         int(row["stage2_token_presentations"]): row for row in controlled_rows if row.get("metric_accuracy") is not None
     }
+    controlled_327m = controlled_by_tokens.get(327_680_000, {})
     stage2_manifest = loaded["stage2_manifest"]
     bundle = {
         "schema": "bitnet-canonical-evidence-bundle-v1",
@@ -110,15 +111,22 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
                 "caveat": "Row-scale QAT is a retrofit variant, not standard BitDistill.",
             },
             "bitdistill_reproduction": {
-                "status": "not_reproduced_327m_pending",
+                "status": "not_reproduced_327m_complete",
                 "fp16_sft_mnli": loaded["stage2_curve"]["fp16_accuracy"],
                 "controlled_40_96m_mnli": controlled_by_tokens[40_960_000]["metric_accuracy"],
                 "controlled_163_84m_mnli": controlled_by_tokens[163_840_000]["metric_accuracy"],
+                "controlled_327_68m_mnli": controlled_327m.get("metric_accuracy"),
+                "controlled_327_68m_delta_vs_fp": (controlled_327m.get("paired") or {}).get("delta_vs_reference")
+                if isinstance(controlled_327m.get("paired"), dict)
+                else None,
+                "controlled_327_68m_paired_ci95": (controlled_327m.get("paired") or {}).get("paired_ci95")
+                if isinstance(controlled_327m.get("paired"), dict)
+                else None,
                 "controlled_327_68m_stage2_tokens": stage2_manifest["token_presentations"],
                 "controlled_327_68m_stage2_final_ce": stage2_manifest["final_ce"],
                 "controlled_327_68m_downstream_status": stage2_manifest["downstream"]["status"],
                 "state_dict_path": stage2_manifest["state_dict_path"],
-                "caveat": "The 327.68M Stage-2 producer finished, but downstream MNLI must be rerun with the snapshot state_dict_path.",
+                "caveat": "The 327.68M row improves over 163.84M but remains below the FP16 recovery gate.",
             },
             "gamma_normalization": {
                 "status": "local_loss_normalization_mismatch",
@@ -207,7 +215,7 @@ def render_markdown(bundle: dict[str, Any]) -> str:
         [
             "BitDistill",
             claims["bitdistill_reproduction"]["status"],
-            f"MNLI 40.96M {claims['bitdistill_reproduction']['controlled_40_96m_mnli']:.6f}; 163.84M {claims['bitdistill_reproduction']['controlled_163_84m_mnli']:.6f}; 327.68M downstream {claims['bitdistill_reproduction']['controlled_327_68m_downstream_status']}",
+            f"MNLI 40.96M {claims['bitdistill_reproduction']['controlled_40_96m_mnli']:.6f}; 163.84M {claims['bitdistill_reproduction']['controlled_163_84m_mnli']:.6f}; 327.68M {claims['bitdistill_reproduction']['controlled_327_68m_mnli']:.6f}, delta {claims['bitdistill_reproduction']['controlled_327_68m_delta_vs_fp']:+.6f}",
             claims["bitdistill_reproduction"]["caveat"],
         ],
         [

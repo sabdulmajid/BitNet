@@ -79,6 +79,10 @@ def build_manifest(args: argparse.Namespace) -> dict[str, Any]:
     last = root_metrics.get("last", {}) if isinstance(root_metrics.get("last"), dict) else {}
     repo_root = Path(".").resolve()
     llama_dir = repo_root / "3rdparty/llama.cpp"
+    manifest_bitnet_commit = git_sha(repo_root)
+    manifest_llama_commit = git_sha(llama_dir) if llama_dir.exists() else ""
+    producer_bitnet_commit = args.producer_bitnet_commit or manifest_bitnet_commit
+    producer_llama_commit = args.producer_llama_cpp_commit or manifest_llama_commit
     return {
         "schema": "bitnet-stage2-checkpoint-manifest-v1",
         "created_utc": datetime.now(timezone.utc).isoformat(),
@@ -104,8 +108,12 @@ def build_manifest(args: argparse.Namespace) -> dict[str, Any]:
         if isinstance(snapshot_metrics.get("snapshot"), dict)
         else None,
         "git": {
-            "bitnet_commit": git_sha(repo_root),
-            "llama_cpp_commit": git_sha(llama_dir) if llama_dir.exists() else "",
+            "bitnet_commit": producer_bitnet_commit,
+            "llama_cpp_commit": producer_llama_commit,
+            "producer_bitnet_commit": producer_bitnet_commit,
+            "producer_llama_cpp_commit": producer_llama_commit,
+            "manifest_bitnet_commit": manifest_bitnet_commit,
+            "manifest_llama_cpp_commit": manifest_llama_commit,
         },
         "downstream": {
             "status": args.downstream_status,
@@ -168,6 +176,8 @@ def main() -> int:
     parser.add_argument("--run-id", default="qwen25-05b-bitdistill-tensor-stage2-40k-job10070")
     parser.add_argument("--job-id", default="10070")
     parser.add_argument("--model", default="Qwen/Qwen2.5-0.5B")
+    parser.add_argument("--producer-bitnet-commit", default="")
+    parser.add_argument("--producer-llama-cpp-commit", default="")
     parser.add_argument("--downstream-status", default="pending_rerun")
     parser.add_argument("--downstream-rerun-job-id", default="")
     parser.add_argument("--downstream-output-dir", default="")

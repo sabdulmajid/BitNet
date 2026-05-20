@@ -63,9 +63,9 @@ OUTPUT_DIR=checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bi
 sbatch --partition=midcard slurm_bitdistill_glue.sh
 ```
 
-Corrected rerun job `10169` has been submitted with this manifest. Until that
-job writes metrics and prediction traces, the `327.68M` MNLI quality row remains
-pending; do not infer quality from the completed Stage-2 CE alone.
+Corrected rerun job `10169` completed with full metrics and prediction traces.
+The measured MNLI accuracy is `0.720020`, paired delta `-0.088130` versus the
+local FP16-SFT reference, CI `[-0.096749, -0.079511]`.
 
 ## Canonical Evidence Bundle
 

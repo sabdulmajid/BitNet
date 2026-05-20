@@ -14,7 +14,7 @@ This manifest pins the exact warm-up checkpoint consumed by downstream BitDistil
 | state_dict_path | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-40k/checkpoint-40000/custom_state_dict.pt |
 | bitnet_commit | 6353f7e3e770618f2c03b053b0179bf486ef5fb4 |
 | llama_cpp_commit | dc0bc5ee0423a2202d6284a4fc2d78d1e39905d7 |
-| downstream_status | rerun_submitted |
+| downstream_status | rerun_complete |
 | downstream_rerun_job_id | 10169 |
 | downstream_rerun_output_dir | checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit-rerun |
 

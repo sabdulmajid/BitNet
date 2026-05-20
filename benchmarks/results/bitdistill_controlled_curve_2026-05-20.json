@@ -1,7 +1,7 @@
 {
-  "all_complete": false,
+  "all_complete": true,
   "all_passed_fp_recovery_gate": false,
-  "complete": 2,
+  "complete": 3,
   "date": "2026-05-20",
   "expected": 3,
   "passed_fp_recovery_gate": 0,
@@ -179,85 +179,82 @@
       "job_id": "10169",
       "label": "40k-warmup downstream control rerun",
       "last": {
-        "attention_kd": null,
-        "ce": null,
-        "logit_kd": null,
-        "weighted_attention_kd": null,
-        "weighted_logit_kd": null
+        "attention_kd": 0.010844406671822071,
+        "ce": 0.33984375,
+        "logit_kd": 0.010467484593391418,
+        "weighted_attention_kd": 1084.440673828125,
+        "weighted_logit_kd": 0.10467484593391418
       },
       "live_log": {
         "ce_attention_equalizing_gamma_summary": {
-          "max": 122.79308859941867,
-          "mean": 58.26650987688959,
-          "min": 21.14692638502403,
-          "p05": 23.21294289473522,
-          "p50": 47.08023502848545,
-          "p95": 114.87544336176492
+          "max": 267.7274927395934,
+          "mean": 64.55181707954617,
+          "min": 4.160250750485608,
+          "p05": 13.648189645005308,
+          "p50": 56.96990246168137,
+          "p95": 137.37011693373756
         },
         "exists": true,
         "latest": {
-          "attention_kd": 0.020994,
-          "ce": 0.71875,
-          "elapsed": 220.3,
-          "logit_kd": 0.013851,
-          "loss": 2100.221191,
-          "lr": 1.999e-05,
-          "step": 270.0,
-          "weighted_attention_kd": 2099.364014,
-          "weighted_logit_kd": 0.138514
+          "attention_kd": 0.010844,
+          "ce": 0.339844,
+          "elapsed": 8178.5,
+          "logit_kd": 0.010467,
+          "loss": 1084.885132,
+          "lr": 2e-06,
+          "step": 10000.0,
+          "weighted_attention_kd": 1084.440674,
+          "weighted_logit_kd": 0.104675
         },
-        "latest_step": 270,
-        "latest_weighted_attention_to_ce": 2920.8542803478263,
-        "max_weighted_attention_to_ce": 4728.807626881419,
-        "min_weighted_attention_to_ce": 814.378264109589,
-        "parsed_steps": 28,
+        "latest_step": 10000,
+        "latest_weighted_attention_to_ce": 3190.9954979343465,
+        "max_weighted_attention_to_ce": 24038.027695833953,
+        "min_weighted_attention_to_ce": 373.49898485875707,
+        "parsed_steps": 1001,
         "path": "logs/bitdistill-glue-10169.out",
         "weighted_attention_to_ce_summary": {
-          "max": 4728.807626881419,
-          "mean": 2178.429554294682,
-          "min": 814.378264109589,
-          "p05": 870.5954357505377,
-          "p50": 2124.2627922032116,
-          "p95": 4331.094870022092
+          "max": 24038.027695833953,
+          "mean": 2546.414743264708,
+          "min": 373.49898485875707,
+          "p05": 727.9685977635947,
+          "p50": 1755.2531042050873,
+          "p95": 7327.265686164375
         }
       },
-      "metric_accuracy": null,
-      "metric_eval_examples": null,
-      "metrics_exists": false,
+      "metric_accuracy": 0.7200203769740193,
+      "metric_eval_examples": 9815.0,
+      "metrics_exists": true,
       "metrics_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit-rerun/metrics.json",
       "output_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit-rerun",
       "paired": {
-        "both_correct": 0,
-        "both_wrong": 0,
-        "candidate_accuracy": null,
-        "candidate_wins": 0,
-        "delta_vs_reference": null,
-        "errors": [
-          "missing checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit-rerun/eval_predictions.jsonl"
+        "both_correct": 6530,
+        "both_wrong": 1346,
+        "candidate_accuracy": 0.7200203769740193,
+        "candidate_wins": 537,
+        "delta_vs_reference": -0.0881304126337239,
+        "errors": [],
+        "matched": 9815,
+        "mcnemar_exact_p": 9.901701252165422e-89,
+        "missing": [],
+        "paired_ci95": [
+          -0.0967494587122408,
+          -0.07951136655520699
         ],
-        "matched": 0,
-        "mcnemar_exact_p": null,
-        "missing": [
-          "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit-rerun/eval_predictions.jsonl"
-        ],
-        "paired_ci95": null,
-        "reference_accuracy": null,
-        "reference_wins": 0,
-        "status": "pending"
+        "reference_accuracy": 0.8081507896077432,
+        "reference_wins": 1402,
+        "status": "pass"
       },
       "paper_stage2_fraction": 0.032768,
       "partition": "midcard",
       "passed_fp_recovery_gate": false,
-      "predictions_exists": false,
+      "predictions_exists": true,
       "predictions_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit-rerun/eval_predictions.jsonl",
       "squeue": {
-        "elapsed": "5:03",
         "job_id": "10169",
-        "reason": "ece-nebula12",
-        "state": "RUNNING"
+        "state": "not_in_squeue"
       },
       "stage2_token_presentations": 327680000,
-      "steps": null
+      "steps": 10000
     }
   ],
   "schema": "bitdistill-controlled-curve-audit-v1",
