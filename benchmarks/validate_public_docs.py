@@ -550,6 +550,37 @@ def validate_publication_product_plan(report: dict[str, Any], readme: str, error
     )
 
 
+def validate_active_gate_watchdog(report: dict[str, Any], readme: str, errors: list[str]) -> None:
+    if report.get("schema") != "bitdistill-active-gate-watchdog-v1":
+        errors.append(f"active gate watchdog: unexpected schema {report.get('schema')}")
+    if report.get("quality_claim") != "none":
+        errors.append(f"active gate watchdog: unexpected quality_claim {report.get('quality_claim')}")
+    if report.get("status") != "passed":
+        errors.append(f"active gate watchdog: unexpected status {report.get('status')}")
+    commands = report.get("commands")
+    if not isinstance(commands, list) or len(commands) < 6:
+        errors.append("active gate watchdog: missing command rows")
+    else:
+        failed = [row.get("label") for row in commands if isinstance(row, dict) and row.get("passed") is not True]
+        if failed:
+            errors.append(f"active gate watchdog: failed commands {failed}")
+    summary = report.get("summary")
+    if not isinstance(summary, dict) or summary.get("ingestion_status") is None:
+        errors.append("active gate watchdog: missing status summary")
+    require_contains(
+        "README active gate watchdog report",
+        "active_gate_watchdog_2026-05-23.md",
+        readme,
+        errors,
+    )
+    require_contains(
+        "README active gate watchdog json",
+        "active_gate_watchdog_2026-05-23.json",
+        readme,
+        errors,
+    )
+
+
 def validate_readme(bundle: dict[str, Any], readme: str, errors: list[str]) -> None:
     claims = bundle["claims"]
     blind = claims["blind_ptq"]
@@ -768,6 +799,11 @@ def main() -> int:
         default=Path("benchmarks/results/bitdistill_publication_product_plan_2026-05-23.json"),
     )
     parser.add_argument(
+        "--active-gate-watchdog",
+        type=Path,
+        default=Path("benchmarks/results/active_gate_watchdog_2026-05-23.json"),
+    )
+    parser.add_argument(
         "--active-slurm-batch-scripts",
         type=Path,
         default=Path("benchmarks/results/active_slurm_batch_scripts_2026-05-23.json"),
@@ -786,6 +822,7 @@ def main() -> int:
     benchmark_scoreboard = load_json(args.benchmark_scoreboard)
     goal_traceability = load_json(args.goal_traceability)
     publication_product_plan = load_json(args.publication_product_plan)
+    active_gate_watchdog = load_json(args.active_gate_watchdog)
     active_slurm_batch_scripts = load_json(args.active_slurm_batch_scripts)
     readme = read_text(args.readme)
     claims_doc = read_text(args.claims)
@@ -802,6 +839,7 @@ def main() -> int:
     validate_benchmark_scoreboard(benchmark_scoreboard, readme, errors)
     validate_goal_traceability(goal_traceability, readme, errors)
     validate_publication_product_plan(publication_product_plan, readme, errors)
+    validate_active_gate_watchdog(active_gate_watchdog, readme, errors)
     validate_active_slurm_batch_scripts(active_slurm_batch_scripts, errors)
     validate_readme(bundle, readme, errors)
     validate_reproduction_gap_docs(reproduction_gap, readme, claims_doc, errors)

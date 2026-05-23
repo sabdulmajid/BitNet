@@ -16,7 +16,7 @@
     ],
     "safe_headline": "Blind ternary PTQ fails for tested dense Qwen; row-scale ternary students require matching CPU runtime semantics; BitDistill-style recovery is still under gate."
   },
-  "created_utc": "2026-05-23T17:23:05.264315+00:00",
+  "created_utc": "2026-05-23T17:33:31.932727+00:00",
   "decision_gates": [
     {
       "decision_rule": "Wait for the active 655.36M Stage-2 producer, downstream MNLI, and postprocess reports.",

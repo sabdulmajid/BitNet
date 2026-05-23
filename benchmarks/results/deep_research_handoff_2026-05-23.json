@@ -2,12 +2,12 @@
   "active_gate": {
     "downstream_complete": false,
     "downstream_status": "waiting_for_handoff",
-    "eta_hours": 18.720250000000004,
-    "latest_ce": 3.689435,
+    "eta_hours": 18.277295321637425,
+    "latest_ce": 3.8836,
     "latest_complete_snapshot_step": null,
-    "latest_step": 2920,
+    "latest_step": 3800,
     "max_steps": 40000,
-    "progress": 0.073,
+    "progress": 0.095,
     "stage2_job_id": "10250",
     "stage2_slurm_state": "RUNNING",
     "stage2_status": "running",
@@ -46,7 +46,7 @@
       "interpretation": "The systems path is real, but quality/storage tradeoffs remain unfavorable versus mature Q4."
     }
   ],
-  "created_utc": "2026-05-23T17:06:55.397698+00:00",
+  "created_utc": "2026-05-23T17:33:31.762987+00:00",
   "nonclaims": [
     "universal BitNet converter",
     "paper-level BitDistill reproduction",
@@ -77,7 +77,7 @@
   ],
   "open_questions": [
     {
-      "current_state": "running; step 2920/40000; downstream waiting_for_handoff.",
+      "current_state": "running; step 3800/40000; downstream waiting_for_handoff.",
       "evidence_needed": "Completed 655M Stage-2 manifest plus downstream MNLI metrics.json and eval_predictions.jsonl.",
       "question": "Does the Stage-2 token-budget curve keep improving at 655.36M tokens?"
     },
@@ -117,7 +117,7 @@
     },
     "current_status": {
       "path": "benchmarks/results/current_goal_status_2026-05-23.json",
-      "sha256": "8999cd4a62ffe2a2ae0db8a61704cf3fe48625e19cabe6028ff648010470a967"
+      "sha256": "dac145e709001da3bad819255122c32fc6ca28476fe1edb4332de799e6548210"
     },
     "reproduction_gap": {
       "path": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json",

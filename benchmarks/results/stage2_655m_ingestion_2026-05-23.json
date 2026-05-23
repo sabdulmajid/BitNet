@@ -7,7 +7,7 @@
     "target_row": {},
     "target_row_exists": false
   },
-  "created_utc": "2026-05-23T17:29:23.799838+00:00",
+  "created_utc": "2026-05-23T17:33:31.475951+00:00",
   "downstream": {
     "metric_accuracy": null,
     "metric_eval_examples": null,
@@ -97,7 +97,7 @@
       "name": "bd-s2-655m",
       "reason": "ece-nebula12",
       "state": "RUNNING",
-      "time": "1:51:58"
+      "time": "1:56:06"
     }
   },
   "status": "pending_handoff",

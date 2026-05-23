@@ -70,6 +70,8 @@ Active next gate:
 - [gamma60_telemetry_submission_2026-05-23.md](benchmarks/results/gamma60_telemetry_submission_2026-05-23.md)
 - [stage2_655m_ingestion_2026-05-23.md](benchmarks/results/stage2_655m_ingestion_2026-05-23.md)
 - [stage2_655m_ingestion_2026-05-23.json](benchmarks/results/stage2_655m_ingestion_2026-05-23.json)
+- [active_gate_watchdog_2026-05-23.md](benchmarks/results/active_gate_watchdog_2026-05-23.md)
+- [active_gate_watchdog_2026-05-23.json](benchmarks/results/active_gate_watchdog_2026-05-23.json)
 - [gamma60_gradient_balance_2026-05-23.md](benchmarks/results/gamma60_gradient_balance_2026-05-23.md)
 - [bitdistill_next_decision_2026-05-23.md](benchmarks/results/bitdistill_next_decision_2026-05-23.md)
 - [bitdistill_decision_scenarios_2026-05-23.md](benchmarks/results/bitdistill_decision_scenarios_2026-05-23.md)
