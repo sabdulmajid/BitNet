@@ -62,6 +62,7 @@ Active next gate:
 
 - [stage2_655m_submission_2026-05-23.md](benchmarks/results/stage2_655m_submission_2026-05-23.md)
 - [gamma60_telemetry_submission_2026-05-23.md](benchmarks/results/gamma60_telemetry_submission_2026-05-23.md)
+- [gamma60_gradient_balance_2026-05-23.md](benchmarks/results/gamma60_gradient_balance_2026-05-23.md)
 
 Job `10250` is a cumulative continuation from the verified `327.68M` checkpoint
 to `655.36M` token presentations. It is explicitly labeled as a continuation
@@ -72,7 +73,9 @@ finishes successfully. It also queues a postprocess job after downstream MNLI
 terminates so the controlled curve and reproduction-gap reports can be rebuilt
 from the actual metrics and prediction trace.
 
-Job `10254` is a dependent gamma-60 component-gradient diagnostic; it is not a quality benchmark.
+Job `10256` is a dependent gamma-60 component-gradient diagnostic; it is not a quality benchmark.
+It replaces pending job `10254` so the stored Slurm script also generates the
+post-run gamma-balance report.
 Its role is to compare a lower attention-KD coefficient against the existing
 paper-gamma telemetry, where attention KD dominates CE under this
 implementation's current loss reductions.

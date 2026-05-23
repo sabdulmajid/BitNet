@@ -18,6 +18,10 @@ mkdir -p logs benchmarks/results
 DATE="${BITNET_REPORT_DATE:-2026-05-23}"
 STATUS_JSON="${STATUS_JSON:-benchmarks/results/gamma60_telemetry_status_${DATE}.json}"
 STATUS_MD="${STATUS_MD:-benchmarks/results/gamma60_telemetry_status_${DATE}.md}"
+DYNAMICS_JSON="${DYNAMICS_JSON:-benchmarks/results/bitdistill_training_dynamics_${DATE}.json}"
+DYNAMICS_MD="${DYNAMICS_MD:-benchmarks/results/bitdistill_training_dynamics_${DATE}.md}"
+BALANCE_JSON="${BALANCE_JSON:-benchmarks/results/gamma60_gradient_balance_${DATE}.json}"
+BALANCE_MD="${BALANCE_MD:-benchmarks/results/gamma60_gradient_balance_${DATE}.md}"
 OUTPUT_DIR="${OUTPUT_DIR:-checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200}"
 
 write_status_report() {
@@ -98,5 +102,18 @@ export OUTPUT_DIR
 
 write_status_report running 0
 bash slurm_bitdistill_glue.sh
-trap - ERR
 write_status_report complete 0
+python benchmarks/audit_bitdistill_training_dynamics.py \
+  --output-json "$DYNAMICS_JSON" \
+  --output-md "$DYNAMICS_MD"
+python benchmarks/audit_bitdistill_gamma_balance.py \
+  --job-id "${SLURM_JOB_ID:-local}" \
+  --gamma-status "$STATUS_JSON" \
+  --gamma-telemetry "$OUTPUT_DIR/telemetry.jsonl" \
+  --output-json "$BALANCE_JSON" \
+  --output-md "$BALANCE_MD"
+python benchmarks/validate_reports_fail_closed.py \
+  "$STATUS_JSON" "$STATUS_MD" \
+  "$DYNAMICS_JSON" "$DYNAMICS_MD" \
+  "$BALANCE_JSON" "$BALANCE_MD"
+trap - ERR

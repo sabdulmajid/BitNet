@@ -1,0 +1,76 @@
+{
+  "balanced_max_grad_attention_to_ce": 10.0,
+  "caveat": "This audit compares gradient/loss balance only. It is not a task-quality benchmark and does not update BitDistill reproduction status.",
+  "created_utc": "2026-05-23T16:53:51.895992+00:00",
+  "gamma60_trace": {
+    "exists": false,
+    "has_activation": false,
+    "has_component_grad_norms": false,
+    "has_dynamics": false,
+    "path": "checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/telemetry.jsonl",
+    "rows": 0
+  },
+  "gamma_status": "benchmarks/results/gamma60_telemetry_status_2026-05-23.json",
+  "gamma_status_report_exists": false,
+  "gamma_status_report_status": null,
+  "gamma_telemetry": "checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/telemetry.jsonl",
+  "interpretation": "Gamma-60 telemetry is pending; no loss-normalization conclusion is available yet.",
+  "job_id": "10256",
+  "metrics": {
+    "gamma60_attention_grad_reduction_factor": null,
+    "gamma60_attention_loss_reduction_factor": null,
+    "gamma60_final_grad_attention_to_ce": null,
+    "gamma60_final_loss_attention_to_ce": null,
+    "gamma60_max_activation_clipped_fraction": null,
+    "gamma60_max_activation_edge_fraction": null,
+    "gamma60_max_grad_attention_to_ce": null,
+    "gamma60_mean_flip_fraction": null,
+    "paper_final_grad_attention_to_ce": 221.3849856028098,
+    "paper_final_loss_attention_to_ce": 2549.206537356322,
+    "paper_max_grad_attention_to_ce": 234.8386596342272
+  },
+  "paper_dynamics": "benchmarks/results/bitdistill_training_dynamics_2026-05-23.json",
+  "paper_trace": {
+    "final_grad_attention_to_ce": 221.3849856028098,
+    "final_grad_logit_to_ce": 0.7738586165758821,
+    "final_loss_attention_to_ce": 2549.206537356322,
+    "final_loss_logit_to_ce": 0.674511701211162,
+    "final_qkv_grad_norms": {
+      "weighted_attention_k_kd": 3052.1011005159394,
+      "weighted_attention_q_kd": 923.4188650009037,
+      "weighted_attention_v_kd": 11872.908320875804
+    },
+    "final_qkv_weighted_losses": {
+      "weighted_attention_k_kd": 184.92176818847656,
+      "weighted_attention_q_kd": 47.08085632324219,
+      "weighted_attention_v_kd": 1500.6612548828125
+    },
+    "first_step": 1,
+    "has_activation": true,
+    "has_component_grad_norms": true,
+    "has_dynamics": true,
+    "inferred_attention_kd_weight": 100000.00046784793,
+    "kind": "controlled",
+    "label": "bitdistill-tensor-20kwarmup-papergamma-headinit-telemetry-steps200",
+    "last_step": 200,
+    "max_activation_clipped_fraction": 0.0,
+    "max_activation_edge_fraction": 0.00036234174455915177,
+    "max_flip_fraction": 0.0037808665613407034,
+    "max_grad_attention_to_ce": 234.8386596342272,
+    "max_loss_attention_to_ce": 2898.926047120419,
+    "max_scale_abs_delta_max": 8.8447704911232e-06,
+    "mean_flip_fraction": 0.0025930774437592907,
+    "mean_scale_abs_delta_mean": 2.0783946162001008e-07,
+    "path": "checkpoints/bitdistill-glue-seqcls-telemetry/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-papergamma-headinit-telemetry-steps200/telemetry.jsonl",
+    "rows": 9
+  },
+  "quality_claim": "none",
+  "schema": "bitdistill-gamma-balance-audit-v1",
+  "squeue": {
+    "elapsed": "0:00",
+    "job_id": "10256",
+    "reason": "(Dependency)",
+    "state": "PENDING"
+  },
+  "status": "pending_gamma60_telemetry"
+}

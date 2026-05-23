@@ -2,9 +2,13 @@
   "schema": "bitdistill-gradient-telemetry-submission-v1",
   "created_utc": "2026-05-23T16:12:00+00:00",
   "status": "dependency_pending",
-  "job_id": "10254",
-  "cancelled_job_id": "10252",
-  "cancelled_job_reason": "Job 10252 was cancelled while dependency-pending because its stored batch script did not embed the diagnostic constants. Job 10254 was resubmitted with slurm_gamma60_telemetry.sh, which hardcodes ATTENTION_KD_WEIGHT=60 and telemetry settings in the Slurm batch script.",
+  "job_id": "10256",
+  "cancelled_job_id": "10254",
+  "cancelled_job_ids": [
+    "10252",
+    "10254"
+  ],
+  "cancelled_job_reason": "Job 10252 was cancelled while dependency-pending because its stored batch script did not embed the diagnostic constants. Job 10254 was cancelled while dependency-pending because its stored batch script did not include post-run gamma-balance report generation. Job 10256 was resubmitted with slurm_gamma60_telemetry.sh, which hardcodes ATTENTION_KD_WEIGHT=60, telemetry settings, and post-run balance reporting in the Slurm batch script.",
   "dependency": "afterok:10250",
   "partition": "midcard",
   "script": "slurm_gamma60_telemetry.sh",
@@ -43,6 +47,14 @@
   "expected_artifacts": [
     "checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/telemetry.jsonl",
     "checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/metrics.json"
+  ],
+  "expected_reports": [
+    "benchmarks/results/gamma60_telemetry_status_2026-05-23.json",
+    "benchmarks/results/gamma60_telemetry_status_2026-05-23.md",
+    "benchmarks/results/bitdistill_training_dynamics_2026-05-23.json",
+    "benchmarks/results/bitdistill_training_dynamics_2026-05-23.md",
+    "benchmarks/results/gamma60_gradient_balance_2026-05-23.json",
+    "benchmarks/results/gamma60_gradient_balance_2026-05-23.md"
   ],
   "caveat": "This is a short gradient-balance diagnostic, not a quality benchmark. Do not compare its task accuracy to full downstream runs."
 }

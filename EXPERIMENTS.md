@@ -163,9 +163,10 @@ The loss-normalization gate now has a queued equalized-gamma telemetry job:
 - `benchmarks/results/gamma60_telemetry_submission_2026-05-23.json`
 - `benchmarks/results/gamma60_telemetry_submission_2026-05-23.md`
 
-Job `10254` is dependency-blocked on `afterok:10250`. It is a short 200-step
+Job `10256` is dependency-blocked on `afterok:10250`. It is a short 200-step
 component-gradient telemetry diagnostic with `ATTENTION_KD_WEIGHT=60`; it is
-not a task-quality benchmark.
+not a task-quality benchmark. It replaces pending job `10254` so the stored
+Slurm script also writes the post-run gamma-balance audit.
 
 After it materializes, rebuild the training-dynamics audit:
 
@@ -175,13 +176,20 @@ python benchmarks/audit_bitdistill_training_dynamics.py \
   --output-md benchmarks/results/bitdistill_training_dynamics_2026-05-23.md
 ```
 
+The Slurm script now performs this rebuild automatically and also writes:
+
+```bash
+benchmarks/results/gamma60_gradient_balance_2026-05-23.md
+benchmarks/results/gamma60_gradient_balance_2026-05-23.json
+```
+
 The audit includes both paper-gamma telemetry directories and the queued
 `bitdistill-glue-seqcls-telemetry-gamma60` directory. Compare component-gradient
 ratios, not task accuracy, for this diagnostic.
 
 ## Active Gate Monitor
 
-Use this while `10250`, `10255`, and `10254` are still live:
+Use this while `10250`, `10255`, and `10256` are still live:
 
 ```bash
 python benchmarks/monitor_active_stage2_extension.py

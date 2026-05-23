@@ -32,7 +32,7 @@
       "job_id": "10255",
       "passed": true,
       "purpose": "655M Stage-2 handoff",
-      "scontrol_message": "batch script for job 10255 written to /tmp/bitnet-slurm-script-tf3hsfwv/10255.sh",
+      "scontrol_message": "batch script for job 10255 written to /tmp/bitnet-slurm-script-cffpjiqm/10255.sh",
       "script_available": true,
       "slurm": {
         "job_id": "10255",
@@ -64,15 +64,23 @@
         {
           "present": true,
           "snippet": "export TELEMETRY_COMPONENT_GRAD_NORMS=1"
+        },
+        {
+          "present": true,
+          "snippet": "audit_bitdistill_gamma_balance.py"
+        },
+        {
+          "present": true,
+          "snippet": "validate_reports_fail_closed.py"
         }
       ],
-      "job_id": "10254",
+      "job_id": "10256",
       "passed": true,
       "purpose": "gamma-60 gradient telemetry",
-      "scontrol_message": "batch script for job 10254 written to /tmp/bitnet-slurm-script-ddiwjvil/10254.sh",
+      "scontrol_message": "batch script for job 10256 written to /tmp/bitnet-slurm-script-1fbgulv1/10256.sh",
       "script_available": true,
       "slurm": {
-        "job_id": "10254",
+        "job_id": "10256",
         "name": "bd-g60-telemetry",
         "reason": "(Dependency)",
         "state": "PENDING",
@@ -80,7 +88,7 @@
       }
     }
   ],
-  "created_utc": "2026-05-23T16:45:25.810568+00:00",
+  "created_utc": "2026-05-23T16:53:51.891732+00:00",
   "quality_claim": "none",
   "schema": "bitnet-active-slurm-batch-script-audit-v1",
   "status": "passed"

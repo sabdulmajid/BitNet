@@ -97,6 +97,8 @@ def audit_gamma(submission: dict[str, Any]) -> dict[str, Any]:
         "export MAX_STEPS=200",
         "export TELEMETRY_EVERY_STEPS=25",
         "export TELEMETRY_COMPONENT_GRAD_NORMS=1",
+        "audit_bitdistill_gamma_balance.py",
+        "validate_reports_fail_closed.py",
     ]
     checks = check_snippets(script, required)
     passed = bool(script) and all(check["present"] for check in checks)
