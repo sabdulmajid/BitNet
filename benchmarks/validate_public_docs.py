@@ -319,6 +319,63 @@ def validate_active_stage2_monitor(report: dict[str, Any], errors: list[str]) ->
         caveat = log_freshness.get("caveat")
         if not isinstance(caveat, str) or "Fresh logs are required" not in caveat:
             errors.append("stage2 monitor: log_freshness caveat must explain freshness requirement")
+    producer_config = stage2.get("producer_config")
+    if not isinstance(producer_config, dict):
+        errors.append("stage2 monitor: missing producer_config object")
+    else:
+        producer_status = producer_config.get("status")
+        allowed_producer_statuses = {"missing_log", "missing_header", "mismatched", "matched"}
+        if producer_status not in allowed_producer_statuses:
+            errors.append(f"stage2 monitor: unexpected producer_config status {producer_status}")
+        if report.get("status") == "running" and producer_status != "matched":
+            errors.append(f"stage2 monitor: running producer config is not matched: {producer_status}")
+        mismatches = producer_config.get("mismatches")
+        if not isinstance(mismatches, list):
+            errors.append("stage2 monitor: producer_config mismatches must be a list")
+        elif mismatches:
+            errors.append(f"stage2 monitor: producer_config mismatches present: {mismatches}")
+        checks = producer_config.get("checks")
+        if producer_status == "matched":
+            if not isinstance(checks, list) or not checks:
+                errors.append("stage2 monitor: matched producer_config must include checks")
+            else:
+                by_key = {
+                    str(check.get("key")): check
+                    for check in checks
+                    if isinstance(check, dict) and check.get("key") is not None
+                }
+                for key in (
+                    "SLURM_JOB_ID",
+                    "MODEL",
+                    "STAGE",
+                    "METHOD",
+                    "INIT_STATE_MANIFEST",
+                    "INIT_STATE_DICT",
+                    "SCALE_MODE",
+                    "ACTIVATION_QUANTIZATION",
+                    "USE_SUBLN",
+                    "MAX_SEQ_LEN",
+                    "MAX_STEPS",
+                    "LR",
+                    "LR_SCHEDULER",
+                    "SAVE_MODEL_ARTIFACTS",
+                    "OUTPUT_DIR",
+                ):
+                    check = by_key.get(key)
+                    if not isinstance(check, dict):
+                        errors.append(f"stage2 monitor: producer_config missing check {key}")
+                    elif check.get("matched") is not True:
+                        errors.append(f"stage2 monitor: producer_config check did not match {key}")
+        log_header = producer_config.get("log_header")
+        if not isinstance(log_header, dict):
+            errors.append("stage2 monitor: producer_config missing log_header")
+        else:
+            values = log_header.get("values")
+            if producer_status == "matched" and not isinstance(values, dict):
+                errors.append("stage2 monitor: matched producer_config missing header values")
+        caveat = producer_config.get("caveat")
+        if not isinstance(caveat, str) or "producer log header" not in caveat:
+            errors.append("stage2 monitor: producer_config caveat must explain producer log-header scope")
     time_limit_gate = stage2.get("time_limit_gate")
     if not isinstance(time_limit_gate, dict):
         errors.append("stage2 monitor: missing time_limit_gate object")

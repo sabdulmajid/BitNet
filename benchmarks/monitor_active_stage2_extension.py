@@ -15,6 +15,7 @@ from typing import Any
 STEP_RE = re.compile(
     r"step=(?P<step>\d+)\s+ce=(?P<ce>[0-9.eE+-]+)\s+lr=(?P<lr>[0-9.eE+-]+)\s+elapsed=(?P<elapsed>[0-9.eE+-]+)s"
 )
+HEADER_KV_RE = re.compile(r"(?P<key>[A-Z0-9_]+)=(?P<value>\S+)")
 RUNNING_LOG_STALE_SECONDS = 15 * 60
 TIME_LIMIT_TIGHT_MARGIN_SECONDS = 30 * 60
 
@@ -121,6 +122,104 @@ def parse_latest_step(log_path: Path) -> dict[str, Any]:
             }
         )
     return latest
+
+
+def parse_log_header(log_path: Path) -> dict[str, Any]:
+    if not log_path.exists():
+        return {"exists": False, "path": str(log_path), "values": {}, "line_count": 0}
+    values: dict[str, str] = {}
+    line_count = 0
+    for line in log_path.read_text(encoding="utf-8", errors="replace").splitlines():
+        if STEP_RE.search(line):
+            break
+        line_count += 1
+        for match in HEADER_KV_RE.finditer(line):
+            values[match.group("key")] = match.group("value")
+    return {
+        "exists": True,
+        "path": str(log_path),
+        "values": values,
+        "line_count": line_count,
+    }
+
+
+def config_match(key: str, expected: Any, actual: str | None, mode: str = "string") -> dict[str, Any]:
+    if actual is None:
+        matched = False
+    elif mode == "float":
+        try:
+            matched = abs(float(actual) - float(expected)) <= max(abs(float(expected)) * 1e-9, 1e-12)
+        except ValueError:
+            matched = False
+    else:
+        matched = str(actual) == str(expected)
+    return {
+        "key": key,
+        "expected": expected,
+        "actual": actual,
+        "mode": mode,
+        "matched": matched,
+    }
+
+
+def producer_config_gate(
+    *,
+    log_path: Path,
+    stage2_submission: dict[str, Any],
+    stage2_job_id: str,
+) -> dict[str, Any]:
+    header = parse_log_header(log_path)
+    values = header.get("values", {})
+    if not header["exists"]:
+        status = "missing_log"
+        checks: list[dict[str, Any]] = []
+    elif not values:
+        status = "missing_header"
+        checks = []
+    else:
+        run_config = stage2_submission["run_config"]
+        parent = stage2_submission["parent_manifest"]
+        checks = [
+            config_match("SLURM_JOB_ID", stage2_job_id, values.get("SLURM_JOB_ID")),
+            config_match("MODEL", stage2_submission["model"], values.get("MODEL")),
+            config_match("STAGE", run_config["stage"], values.get("STAGE")),
+            config_match("METHOD", run_config["method"], values.get("METHOD")),
+            config_match("INIT_STATE_MANIFEST", parent["path"], values.get("INIT_STATE_MANIFEST")),
+            config_match("INIT_STATE_DICT", parent["state_dict_path"], values.get("INIT_STATE_DICT")),
+            config_match("SCALE_MODE", run_config["scale_mode"], values.get("SCALE_MODE")),
+            config_match(
+                "ACTIVATION_QUANTIZATION",
+                "1" if run_config["activation_quantization"] else "0",
+                values.get("ACTIVATION_QUANTIZATION"),
+            ),
+            config_match("USE_SUBLN", "1" if run_config["use_subln"] else "0", values.get("USE_SUBLN")),
+            config_match("MAX_SEQ_LEN", run_config["max_seq_len"], values.get("MAX_SEQ_LEN")),
+            config_match("MAX_STEPS", run_config["max_steps"], values.get("MAX_STEPS")),
+            config_match(
+                "PER_DEVICE_BATCH_SIZE",
+                run_config["per_device_batch_size"],
+                values.get("PER_DEVICE_BATCH_SIZE"),
+            ),
+            config_match("GRAD_ACCUM_STEPS", run_config["grad_accum_steps"], values.get("GRAD_ACCUM_STEPS")),
+            config_match("LR", run_config["learning_rate"], values.get("LR"), mode="float"),
+            config_match("LR_SCHEDULER", run_config["lr_scheduler"], values.get("LR_SCHEDULER")),
+            config_match("SAVE_EVERY_STEPS", run_config["save_every_steps"], values.get("SAVE_EVERY_STEPS")),
+            config_match(
+                "SAVE_MODEL_ARTIFACTS",
+                "1" if run_config["save_model_artifacts"] else "0",
+                values.get("SAVE_MODEL_ARTIFACTS"),
+            ),
+            config_match("OUTPUT_DIR", run_config["output_dir"], values.get("OUTPUT_DIR")),
+        ]
+        status = "matched" if all(check["matched"] for check in checks) else "mismatched"
+    mismatches = [check for check in checks if not check["matched"]]
+    return {
+        "status": status,
+        "log_header": header,
+        "checks": checks,
+        "mismatches": mismatches,
+        "caveat": "This validates the producer log header against the submitted Stage-2 configuration.",
+    }
 
 
 def log_freshness(log_path: Path, squeue_row: dict[str, str] | None) -> dict[str, Any]:
@@ -429,6 +528,11 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
         )
     )
     latest_step = parse_latest_step(args.stage2_log)
+    producer_config_status = producer_config_gate(
+        log_path=args.stage2_log,
+        stage2_submission=stage2_submission,
+        stage2_job_id=stage2_job_id,
+    )
     max_steps = int(stage2_config["max_steps"])
     save_every_steps = int(stage2_config.get("save_every_steps") or 0)
     step = latest_step.get("step")
@@ -467,6 +571,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
             "progress_estimate": progress_estimate,
             "time_limit_gate": time_limit_gate(stage2_slurm_row, progress_estimate),
             "log_freshness": log_freshness(args.stage2_log, rows.get(stage2_job_id)),
+            "producer_config": producer_config_status,
             "snapshot_status": snapshot_status,
             "expected_snapshots": snapshots,
             "latest_complete_snapshot_step": complete_snapshots[-1]["step"] if complete_snapshots else None,
@@ -559,6 +664,7 @@ def render_markdown(report: dict[str, Any]) -> str:
     estimate = stage2["progress_estimate"]
     time_gate = stage2["time_limit_gate"]
     freshness = stage2["log_freshness"]
+    producer_config = stage2["producer_config"]
     snapshot_status = stage2["snapshot_status"]
     artifact_rows = [
         ["stage2 root metrics", stage2["root_metrics"]["exists"], stage2["root_metrics"]["path"]],
@@ -645,6 +751,7 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["latest_ce", latest.get("ce", "")],
                     ["latest_lr", latest.get("lr", "")],
                     ["log_freshness_status", freshness["status"]],
+                    ["producer_config_status", producer_config["status"]],
                     ["log_age_seconds", freshness["age_seconds"]],
                     ["time_limit_status", time_gate["status"]],
                     ["time_limit_margin_seconds", time_gate["margin_seconds"]],
@@ -693,6 +800,31 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["stale_after_seconds", freshness["stale_after_seconds"]],
                     ["slurm_state", freshness["slurm_state"]],
                     ["caveat", freshness["caveat"]],
+                ],
+            ),
+            "## Producer Config Gate",
+            md_table(
+                ["field", "value"],
+                [
+                    ["status", producer_config["status"]],
+                    ["log_path", producer_config["log_header"]["path"]],
+                    ["header_exists", producer_config["log_header"]["exists"]],
+                    ["header_line_count", producer_config["log_header"]["line_count"]],
+                    ["mismatch_count", len(producer_config["mismatches"])],
+                    ["caveat", producer_config["caveat"]],
+                ],
+            ),
+            md_table(
+                ["key", "expected", "actual", "mode", "matched"],
+                [
+                    [
+                        check["key"],
+                        check["expected"],
+                        check["actual"],
+                        check["mode"],
+                        check["matched"],
+                    ]
+                    for check in producer_config["checks"]
                 ],
             ),
             "## Snapshot Gate",

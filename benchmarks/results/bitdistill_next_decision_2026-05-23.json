@@ -1,11 +1,11 @@
 {
   "active_monitor": {
     "downstream_status": "waiting_for_handoff",
-    "latest_step": 4870,
+    "latest_step": 5170,
     "stage2_job_id": "10250",
     "status": "running"
   },
-  "created_utc": "2026-05-23T18:06:07.583466+00:00",
+  "created_utc": "2026-05-23T18:15:10.097106+00:00",
   "evidence_gaps": [
     "latest controlled row is 327,680,000 tokens, below 655.36M"
   ],

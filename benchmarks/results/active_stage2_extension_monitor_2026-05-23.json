@@ -1,5 +1,5 @@
 {
-  "created_utc": "2026-05-23T18:06:07.303452+00:00",
+  "created_utc": "2026-05-23T18:15:09.805241+00:00",
   "downstream": {
     "caveat": "This section tracks downstream artifact existence only; it does not compute or claim MNLI accuracy.",
     "complete": false,
@@ -140,26 +140,26 @@
     "job_id": "10250",
     "latest_complete_snapshot_step": null,
     "latest_step": {
-      "ce": 4.12825,
-      "elapsed_seconds": 8852.5,
+      "ce": 3.9318,
+      "elapsed_seconds": 9398.4,
       "first_elapsed_seconds": 2.0,
       "first_step": 1,
       "log_exists": true,
       "lr": 2e-06,
-      "parsed_log_rows": 488,
+      "parsed_log_rows": 518,
       "path": "logs/bd-s2-655m-10250.out",
-      "recent_ce_max": 4.12825,
-      "recent_ce_mean": 3.78807135,
-      "recent_ce_min": 3.339326,
+      "recent_ce_max": 4.076796,
+      "recent_ce_mean": 3.61352525,
+      "recent_ce_min": 3.209952,
       "recent_window_rows": 20,
-      "step": 4870
+      "step": 5170
     },
     "log_freshness": {
-      "age_seconds": 11.778615,
+      "age_seconds": 11.557275,
       "caveat": "Fresh logs are required while the Stage-2 producer is running.",
-      "checked_utc": "2026-05-23T18:06:07.303516+00:00",
+      "checked_utc": "2026-05-23T18:15:09.805303+00:00",
       "exists": true,
-      "mtime_utc": "2026-05-23T18:05:55.524901+00:00",
+      "mtime_utc": "2026-05-23T18:14:58.248028+00:00",
       "path": "logs/bd-s2-655m-10250.out",
       "slurm_state": "RUNNING",
       "stale_after_seconds": 900,
@@ -167,15 +167,194 @@
     },
     "max_steps": 40000,
     "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
-    "progress": 0.12175,
+    "producer_config": {
+      "caveat": "This validates the producer log header against the submitted Stage-2 configuration.",
+      "checks": [
+        {
+          "actual": "10250",
+          "expected": "10250",
+          "key": "SLURM_JOB_ID",
+          "matched": true,
+          "mode": "string"
+        },
+        {
+          "actual": "Qwen/Qwen2.5-0.5B",
+          "expected": "Qwen/Qwen2.5-0.5B",
+          "key": "MODEL",
+          "matched": true,
+          "mode": "string"
+        },
+        {
+          "actual": "continued_pretrain",
+          "expected": "continued_pretrain",
+          "key": "STAGE",
+          "matched": true,
+          "mode": "string"
+        },
+        {
+          "actual": "bitdistill",
+          "expected": "bitdistill",
+          "key": "METHOD",
+          "matched": true,
+          "mode": "string"
+        },
+        {
+          "actual": "benchmarks/results/stage2_manifest_2026-05-20.json",
+          "expected": "benchmarks/results/stage2_manifest_2026-05-20.json",
+          "key": "INIT_STATE_MANIFEST",
+          "matched": true,
+          "mode": "string"
+        },
+        {
+          "actual": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-40k/checkpoint-40000/custom_state_dict.pt",
+          "expected": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-40k/checkpoint-40000/custom_state_dict.pt",
+          "key": "INIT_STATE_DICT",
+          "matched": true,
+          "mode": "string"
+        },
+        {
+          "actual": "tensor",
+          "expected": "tensor",
+          "key": "SCALE_MODE",
+          "matched": true,
+          "mode": "string"
+        },
+        {
+          "actual": "1",
+          "expected": "1",
+          "key": "ACTIVATION_QUANTIZATION",
+          "matched": true,
+          "mode": "string"
+        },
+        {
+          "actual": "1",
+          "expected": "1",
+          "key": "USE_SUBLN",
+          "matched": true,
+          "mode": "string"
+        },
+        {
+          "actual": "512",
+          "expected": 512,
+          "key": "MAX_SEQ_LEN",
+          "matched": true,
+          "mode": "string"
+        },
+        {
+          "actual": "40000",
+          "expected": 40000,
+          "key": "MAX_STEPS",
+          "matched": true,
+          "mode": "string"
+        },
+        {
+          "actual": "4",
+          "expected": 4,
+          "key": "PER_DEVICE_BATCH_SIZE",
+          "matched": true,
+          "mode": "string"
+        },
+        {
+          "actual": "4",
+          "expected": 4,
+          "key": "GRAD_ACCUM_STEPS",
+          "matched": true,
+          "mode": "string"
+        },
+        {
+          "actual": "2e-6",
+          "expected": 2e-06,
+          "key": "LR",
+          "matched": true,
+          "mode": "float"
+        },
+        {
+          "actual": "constant",
+          "expected": "constant",
+          "key": "LR_SCHEDULER",
+          "matched": true,
+          "mode": "string"
+        },
+        {
+          "actual": "10000",
+          "expected": 10000,
+          "key": "SAVE_EVERY_STEPS",
+          "matched": true,
+          "mode": "string"
+        },
+        {
+          "actual": "0",
+          "expected": "0",
+          "key": "SAVE_MODEL_ARTIFACTS",
+          "matched": true,
+          "mode": "string"
+        },
+        {
+          "actual": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
+          "expected": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
+          "key": "OUTPUT_DIR",
+          "matched": true,
+          "mode": "string"
+        }
+      ],
+      "log_header": {
+        "exists": true,
+        "line_count": 18,
+        "path": "logs/bd-s2-655m-10250.out",
+        "values": {
+          "ACTIVATION_QUANTIZATION": "1",
+          "ATTENTION_KD_WEIGHT": "100.0",
+          "ATTENTION_SPLIT_HEADS": "8",
+          "ATTENTION_TEMPERATURE": "1.0",
+          "CANDIDATE_SCORE": "sum",
+          "DISTILL_LAYER": "-1",
+          "EXCLUDE_LINEAR_REGEX": "score|classifier",
+          "GRAD_ACCUM_STEPS": "4",
+          "INIT_OUTPUT_HEAD_FROM_TEACHER": "0",
+          "INIT_STATE_DICT": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-40k/checkpoint-40000/custom_state_dict.pt",
+          "INIT_STATE_MANIFEST": "benchmarks/results/stage2_manifest_2026-05-20.json",
+          "LABEL_SCHEME": "words",
+          "LOGIT_KD_TEMPERATURE_SCALE": "none",
+          "LOGIT_KD_WEIGHT": "10.0",
+          "LOGIT_TEMPERATURE": "5.0",
+          "LR": "2e-6",
+          "LR_SCHEDULER": "constant",
+          "MAX_SEQ_LEN": "512",
+          "MAX_STEPS": "40000",
+          "METHOD": "bitdistill",
+          "MODEL": "Qwen/Qwen2.5-0.5B",
+          "MODEL_SLUG": "Qwen-Qwen2.5-0.5B",
+          "OUTPUT_DIR": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
+          "PER_DEVICE_BATCH_SIZE": "4",
+          "SAVE_EVERY_STEPS": "10000",
+          "SAVE_MODEL_ARTIFACTS": "0",
+          "SCALE_MODE": "tensor",
+          "SLURM_JOB_ID": "10250",
+          "STAGE": "continued_pretrain",
+          "TASK_FORMAT": "sequence_classification",
+          "TASK_NAME": "mnli",
+          "TEACHER_MODEL": "none",
+          "TELEMETRY_COMPONENT_GRAD_NORMS": "0",
+          "TELEMETRY_EVERY_STEPS": "0",
+          "TELEMETRY_MAX_ELEMENTS_PER_LAYER": "65536",
+          "TERNARY_INIT_CALIBRATION_BATCHES": "8",
+          "TERNARY_INIT_ITERATIONS": "8",
+          "TERNARY_INIT_MODE": "absmean",
+          "USE_SUBLN": "1"
+        }
+      },
+      "mismatches": [],
+      "status": "matched"
+    },
+    "progress": 0.12925,
     "progress_estimate": {
-      "estimated_completion_utc": "2026-05-24T11:50:25.275258+00:00",
-      "estimated_total_seconds": 72710.47227926078,
-      "eta_hours": 17.738325633127996,
-      "eta_seconds": 63857.97227926078,
-      "seconds_per_step": 1.8177618069815196,
-      "segment_token_presentations_per_second": 4506.641061846936,
-      "steps_per_hour": 1980.4574978819542
+      "estimated_completion_utc": "2026-05-24T11:50:26.298382+00:00",
+      "estimated_total_seconds": 72714.89361702128,
+      "eta_hours": 17.58791489361702,
+      "eta_seconds": 63316.493617021275,
+      "seconds_per_step": 1.817872340425532,
+      "segment_token_presentations_per_second": 4506.367041198501,
+      "steps_per_hour": 1980.3370786516855
     },
     "root_metrics": {
       "exists": false,
@@ -188,7 +367,7 @@
       "name": "bd-s2-655m",
       "reason": "ece-nebula12",
       "state": "RUNNING",
-      "time": "2:28:42",
+      "time": "2:37:44",
       "time_limit": "1-00:00:00"
     },
     "snapshot_status": {
@@ -204,11 +383,11 @@
     },
     "time_limit_gate": {
       "caveat": "Compares current ETA with Slurm time remaining; it is a runtime-risk signal, not quality evidence.",
-      "elapsed": "2:28:42",
-      "elapsed_seconds": 8922,
-      "eta_seconds": 63857.97227926078,
-      "margin_seconds": 13620.027720739221,
-      "remaining_seconds": 77478,
+      "elapsed": "2:37:44",
+      "elapsed_seconds": 9464,
+      "eta_seconds": 63316.493617021275,
+      "margin_seconds": 13619.506382978725,
+      "remaining_seconds": 76936,
       "slurm_state": "RUNNING",
       "status": "within_time_limit",
       "tight_margin_threshold_seconds": 1800,

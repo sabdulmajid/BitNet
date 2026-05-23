@@ -6,7 +6,7 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | job | id | slurm state | time | reason |
 | --- | --- | --- | --- | --- |
-| stage2 | 10250 | RUNNING | 2:28:42 | ece-nebula12 |
+| stage2 | 10250 | RUNNING | 2:37:44 | ece-nebula12 |
 | handoff | 10255 | PENDING | 0:00 | (Dependency) |
 | gamma60 telemetry | 10257 | PENDING | 0:00 | (Dependency) |
 | downstream MNLI | - | not_submitted |  |  |
@@ -14,7 +14,7 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | stage2 field | value |
 | --- | --- |
-| latest_step | 4870 |
+| latest_step | 5170 |
 | max_steps | 40000 |
 | save_every_steps | 10000 |
 | snapshot_status | pre_first_snapshot |
@@ -22,24 +22,25 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | missing_output_dir_is_expected | True |
 | first_snapshot_step | 10000 |
 | next_snapshot_step | 10000 |
-| progress | 0.121750 |
-| latest_ce | 4.128250 |
+| progress | 0.129250 |
+| latest_ce | 3.931800 |
 | latest_lr | 0.000002 |
 | log_freshness_status | fresh_running_log |
-| log_age_seconds | 11.778615 |
+| producer_config_status | matched |
+| log_age_seconds | 11.557275 |
 | time_limit_status | within_time_limit |
-| time_limit_margin_seconds | 13620.027721 |
-| log_elapsed_seconds | 8852.500000 |
-| parsed_log_rows | 488 |
+| time_limit_margin_seconds | 13619.506383 |
+| log_elapsed_seconds | 9398.400000 |
+| parsed_log_rows | 518 |
 | recent_window_rows | 20 |
-| recent_ce_mean | 3.788071 |
-| recent_ce_min | 3.339326 |
-| recent_ce_max | 4.128250 |
-| seconds_per_step | 1.817762 |
-| steps_per_hour | 1980.457498 |
-| eta_hours | 17.738326 |
-| estimated_completion_utc | 2026-05-24T11:50:25.275258+00:00 |
-| segment_token_presentations_per_second | 4506.641062 |
+| recent_ce_mean | 3.613525 |
+| recent_ce_min | 3.209952 |
+| recent_ce_max | 4.076796 |
+| seconds_per_step | 1.817872 |
+| steps_per_hour | 1980.337079 |
+| eta_hours | 17.587915 |
+| estimated_completion_utc | 2026-05-24T11:50:26.298382+00:00 |
+| segment_token_presentations_per_second | 4506.367041 |
 | latest_complete_snapshot_step | - |
 | cumulative_token_presentations | 655360000 |
 
@@ -49,13 +50,13 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | --- | --- |
 | status | within_time_limit |
 | slurm_state | RUNNING |
-| elapsed | 2:28:42 |
+| elapsed | 2:37:44 |
 | time_limit | 1-00:00:00 |
-| elapsed_seconds | 8922 |
+| elapsed_seconds | 9464 |
 | time_limit_seconds | 86400 |
-| eta_seconds | 63857.972279 |
-| remaining_seconds | 77478 |
-| margin_seconds | 13620.027721 |
+| eta_seconds | 63316.493617 |
+| remaining_seconds | 76936 |
+| margin_seconds | 13619.506383 |
 | tight_margin_threshold_seconds | 1800 |
 | caveat | Compares current ETA with Slurm time remaining; it is a runtime-risk signal, not quality evidence. |
 
@@ -66,12 +67,44 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | status | fresh_running_log |
 | path | logs/bd-s2-655m-10250.out |
 | exists | True |
-| checked_utc | 2026-05-23T18:06:07.303516+00:00 |
-| mtime_utc | 2026-05-23T18:05:55.524901+00:00 |
-| age_seconds | 11.778615 |
+| checked_utc | 2026-05-23T18:15:09.805303+00:00 |
+| mtime_utc | 2026-05-23T18:14:58.248028+00:00 |
+| age_seconds | 11.557275 |
 | stale_after_seconds | 900 |
 | slurm_state | RUNNING |
 | caveat | Fresh logs are required while the Stage-2 producer is running. |
+
+## Producer Config Gate
+
+| field | value |
+| --- | --- |
+| status | matched |
+| log_path | logs/bd-s2-655m-10250.out |
+| header_exists | True |
+| header_line_count | 18 |
+| mismatch_count | 0 |
+| caveat | This validates the producer log header against the submitted Stage-2 configuration. |
+
+| key | expected | actual | mode | matched |
+| --- | --- | --- | --- | --- |
+| SLURM_JOB_ID | 10250 | 10250 | string | True |
+| MODEL | Qwen/Qwen2.5-0.5B | Qwen/Qwen2.5-0.5B | string | True |
+| STAGE | continued_pretrain | continued_pretrain | string | True |
+| METHOD | bitdistill | bitdistill | string | True |
+| INIT_STATE_MANIFEST | benchmarks/results/stage2_manifest_2026-05-20.json | benchmarks/results/stage2_manifest_2026-05-20.json | string | True |
+| INIT_STATE_DICT | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-40k/checkpoint-40000/custom_state_dict.pt | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-40k/checkpoint-40000/custom_state_dict.pt | string | True |
+| SCALE_MODE | tensor | tensor | string | True |
+| ACTIVATION_QUANTIZATION | 1 | 1 | string | True |
+| USE_SUBLN | 1 | 1 | string | True |
+| MAX_SEQ_LEN | 512 | 512 | string | True |
+| MAX_STEPS | 40000 | 40000 | string | True |
+| PER_DEVICE_BATCH_SIZE | 4 | 4 | string | True |
+| GRAD_ACCUM_STEPS | 4 | 4 | string | True |
+| LR | 0.000002 | 2e-6 | float | True |
+| LR_SCHEDULER | constant | constant | string | True |
+| SAVE_EVERY_STEPS | 10000 | 10000 | string | True |
+| SAVE_MODEL_ARTIFACTS | 0 | 0 | string | True |
+| OUTPUT_DIR | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m | string | True |
 
 ## Snapshot Gate
 

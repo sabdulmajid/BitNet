@@ -1,6 +1,6 @@
 # Active BitDistill Gate Watchdog
 
-Generated: `2026-05-23T18:06:08.193703+00:00`
+Generated: `2026-05-23T18:15:10.711019+00:00`
 
 Status: **passed**.
 
@@ -20,9 +20,9 @@ This watchdog refreshes status and validates artifacts; it does not create bench
 | next_blueprint_status | pending_655m_downstream |
 | next_blueprint_action | wait_and_watch_655m_gate |
 | stage2_job_id | 10250 |
-| stage2_latest_step | 4870 |
-| stage2_latest_ce | 4.128250 |
-| stage2_progress | 0.121750 |
+| stage2_latest_step | 5170 |
+| stage2_latest_ce | 3.931800 |
+| stage2_progress | 0.129250 |
 | stage2_log_freshness | fresh_running_log |
 | stage2_time_limit_status | within_time_limit |
 | stage2_time_limit_margin_seconds | 1.362e+04 |
@@ -33,19 +33,19 @@ This watchdog refreshes status and validates artifacts; it does not create bench
 
 | label | passed | returncode | elapsed seconds |
 | --- | --- | --- | --- |
-| monitor active Stage-2 extension | true | 0 | 0.094204 |
-| audit 655M ingestion | true | 0 | 0.096470 |
-| audit active Slurm batch scripts | true | 0 | 0.111468 |
-| build next decision | true | 0 | 0.069257 |
-| build next experiment blueprint | true | 0 | 0.066468 |
-| build current goal status | true | 0 | 0.085353 |
-| build deep research handoff | true | 0 | 0.073634 |
-| build goal traceability | true | 0 | 0.093302 |
-| build paper alignment audit | true | 0 | 0.067162 |
-| build publication/product plan | true | 0 | 0.067484 |
-| validate fail-closed reports | true | 0 | 0.068383 |
-| compile Python sources | true | 0 | 0.075298 |
-| check Slurm shell syntax | true | 0 | 0.003429 |
+| monitor active Stage-2 extension | true | 0 | 0.102537 |
+| audit 655M ingestion | true | 0 | 0.105577 |
+| audit active Slurm batch scripts | true | 0 | 0.111840 |
+| build next decision | true | 0 | 0.070994 |
+| build next experiment blueprint | true | 0 | 0.069505 |
+| build current goal status | true | 0 | 0.082929 |
+| build deep research handoff | true | 0 | 0.072798 |
+| build goal traceability | true | 0 | 0.095328 |
+| build paper alignment audit | true | 0 | 0.068605 |
+| build publication/product plan | true | 0 | 0.067142 |
+| validate fail-closed reports | true | 0 | 0.071894 |
+| compile Python sources | true | 0 | 0.071644 |
+| check Slurm shell syntax | true | 0 | 0.004630 |
 
 ## Failures
 
