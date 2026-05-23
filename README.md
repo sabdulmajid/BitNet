@@ -54,6 +54,8 @@ For external technical review or a deep-research agent, use:
 - [deep_research_handoff_2026-05-23.json](benchmarks/results/deep_research_handoff_2026-05-23.json)
 - [bitdistill_goal_traceability_2026-05-23.md](benchmarks/results/bitdistill_goal_traceability_2026-05-23.md)
 - [bitdistill_goal_traceability_2026-05-23.json](benchmarks/results/bitdistill_goal_traceability_2026-05-23.json)
+- [bitdistill_paper_alignment_2026-05-23.md](benchmarks/results/bitdistill_paper_alignment_2026-05-23.md)
+- [bitdistill_paper_alignment_2026-05-23.json](benchmarks/results/bitdistill_paper_alignment_2026-05-23.json)
 - [bitdistill_publication_product_plan_2026-05-23.md](benchmarks/results/bitdistill_publication_product_plan_2026-05-23.md)
 - [bitdistill_publication_product_plan_2026-05-23.json](benchmarks/results/bitdistill_publication_product_plan_2026-05-23.json)
 

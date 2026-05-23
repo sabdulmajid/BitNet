@@ -1,0 +1,158 @@
+{
+  "alignment_counts": {
+    "active_tensor_matches_paper_equation": 1,
+    "aligned": 1,
+    "implemented": 2,
+    "matched": 1,
+    "matched_for_active_downstream": 1,
+    "matched_in_active_gate": 1,
+    "matched_strategy": 1,
+    "mismatch": 2,
+    "mismatch_or_unproven": 1,
+    "mnli_present": 1,
+    "normalization_not_proven_equivalent": 1,
+    "not_met": 1,
+    "paper_ablation_backbone_not_primary_backbone": 1,
+    "partial": 1,
+    "under_budget_active_extension_running": 1
+  },
+  "created_utc": "2026-05-23T17:37:47.867981+00:00",
+  "highest_risks": [
+    "Stage-2 token budget is far below 10B and the 655M gate is still running.",
+    "Stage-2 corpus differs from the paper's FALCON corpus unless explicitly overridden.",
+    "Attention-KD coefficient equivalence is not proven because loss reductions may differ.",
+    "Batch size/hardware differ materially from paper conditions.",
+    "QNLI/SST2/CNNDM are not yet paper-level reproduction rows."
+  ],
+  "quality_claim": "paper_alignment_not_new_benchmark",
+  "rows": [
+    {
+      "axis": "Goal",
+      "local_state": "The repo is now framed as task-specific ternary distillation plus runtime-contract testing.",
+      "paper_recipe": "Task-specific finetuning of FP LLMs into 1.58-bit BitNet models.",
+      "risk": "Do not revert to a universal arbitrary converter claim.",
+      "status": "aligned"
+    },
+    {
+      "axis": "Backbone",
+      "local_state": "Primary controlled reproduction is Qwen/Qwen2.5-0.5B; dense Qwen2.5-1.5B used for PTQ/runtime boundary study.",
+      "paper_recipe": "Qwen3 0.6B/1.7B/4B primary; Qwen2.5-0.5B and Gemma ablations.",
+      "risk": "Good for Qwen2.5 ablation alignment, not exact Qwen3 main-table reproduction.",
+      "status": "paper_ablation_backbone_not_primary_backbone"
+    },
+    {
+      "axis": "Tasks",
+      "local_state": "Current controlled BitDistill gate is MNLI first; QNLI/SST2 are intentionally gated; CNNDM not run.",
+      "paper_recipe": "MNLI, QNLI, SST2, and CNNDM.",
+      "risk": "Do not claim full GLUE/CNNDM reproduction.",
+      "status": "partial"
+    },
+    {
+      "axis": "Baselines",
+      "local_state": "MNLI FP16-SFT 0.808151; BitNet-SFT best 0.628935; BitDistill latest 0.720020.",
+      "paper_recipe": "FP16-SFT, BitNet-SFT, and BitDistill.",
+      "risk": "BitDistill is still below FP; QNLI/SST2 baselines should wait for MNLI recovery gate.",
+      "status": "mnli_present"
+    },
+    {
+      "axis": "Stage-1 SubLN",
+      "local_state": "Source check passed: True; active Stage-2 USE_SUBLN=True.",
+      "paper_recipe": "Insert SubLN before attention output projection and FFN down projection.",
+      "risk": "Source presence does not itself prove paper-level optimization behavior.",
+      "status": "implemented"
+    },
+    {
+      "axis": "Ternary weight quantization",
+      "local_state": "Active controlled Stage-2 scale_mode=tensor; row-scale work is separately labeled retrofit variant.",
+      "paper_recipe": "Per-tensor absmean W1.58 in the paper equation.",
+      "risk": "Row-scale I2_SR results must not be labeled as standard BitDistill.",
+      "status": "active_tensor_matches_paper_equation"
+    },
+    {
+      "axis": "Activation quantization",
+      "local_state": "Active Stage-2 activation_quantization=True.",
+      "paper_recipe": "8-bit activation quantization.",
+      "risk": "Kernel/runtime parity still needs same-artifact proof for product claims.",
+      "status": "matched_in_active_gate"
+    },
+    {
+      "axis": "Stage-2 corpus",
+      "local_state": "Local Slurm defaults use HuggingFaceFW/fineweb-edu sample-10BT unless overridden.",
+      "paper_recipe": "10B tokens sampled from FALCON corpus.",
+      "risk": "Corpus mismatch is a plausible reproduction gap and must be named.",
+      "status": "mismatch"
+    },
+    {
+      "axis": "Stage-2 token budget",
+      "local_state": "Completed controlled row 327,680,000 tokens (3.2768% of paper); active gate targets 655,360,000 tokens (6.5536% of paper).",
+      "paper_recipe": "10B continued-pretraining tokens.",
+      "risk": "Current non-reproduction cannot disprove paper-scale BitDistill.",
+      "status": "under_budget_active_extension_running"
+    },
+    {
+      "axis": "Stage-3 loss terms",
+      "local_state": "Source check passed: True.",
+      "paper_recipe": "CE + logits KL + attention-relation KD over Q/K/V.",
+      "risk": "Loss terms exist, but normalization and gradient balance remain suspect.",
+      "status": "implemented"
+    },
+    {
+      "axis": "Logits distillation temperature",
+      "local_state": "Active handoff downstream recipe sets LOGIT_TEMPERATURE=5.0.",
+      "paper_recipe": "Temperature 5.0.",
+      "risk": "Only applies after handoff/downstream job runs.",
+      "status": "matched_for_active_downstream"
+    },
+    {
+      "axis": "Attention-relation coefficient",
+      "local_state": "Paper-gamma local telemetry showed attention/CE imbalance; gamma status is pending_gamma60_telemetry.",
+      "paper_recipe": "Classification uses large attention-KD coefficient; exact meaning depends on reductions.",
+      "risk": "Copying gamma numerically is not enough unless reductions match.",
+      "status": "normalization_not_proven_equivalent"
+    },
+    {
+      "axis": "Attention layer selection",
+      "local_state": "Active downstream handoff uses DISTILL_LAYER=-1.",
+      "paper_recipe": "Distill a single selected layer, often later layers.",
+      "risk": "Layer choice still requires sweep/replication evidence.",
+      "status": "matched_strategy"
+    },
+    {
+      "axis": "Sequence length",
+      "local_state": "Active Stage-2/downstream configuration uses max_seq_len=512.",
+      "paper_recipe": "Max sequence length 512 for GLUE setup.",
+      "risk": "Padding/tokenization details still need exact paper parity if claiming reproduction.",
+      "status": "matched"
+    },
+    {
+      "axis": "Batch size",
+      "local_state": "Active Stage-2 effective local batch is 16 (4 per device x grad_accum 4).",
+      "paper_recipe": "Batch size 32.",
+      "risk": "Optimizer dynamics may differ from paper setup.",
+      "status": "mismatch_or_unproven"
+    },
+    {
+      "axis": "Hardware",
+      "local_state": "Local active gate is single midcard GPU; CPU runtime measured on Xeon Silver 4116.",
+      "paper_recipe": "8x AMD MI300X servers for paper experiments.",
+      "risk": "Throughput and feasible token budget are not paper-comparable.",
+      "status": "mismatch"
+    },
+    {
+      "axis": "Success criterion",
+      "local_state": "Latest completed MNLI delta vs FP16 is -0.088130; configured recovery gate is -0.010000.",
+      "paper_recipe": "BitDistill comparable to FP16-SFT on downstream tasks.",
+      "risk": "No public claim of paper-level reproduction.",
+      "status": "not_met"
+    }
+  ],
+  "schema": "bitdistill-paper-alignment-audit-v1",
+  "source_paths": {
+    "next_decision": "benchmarks/results/bitdistill_next_decision_2026-05-23.json",
+    "reproduction_gap": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json",
+    "stage2_submission": "benchmarks/results/stage2_655m_submission_2026-05-23.json",
+    "traceability": "benchmarks/results/bitdistill_goal_traceability_2026-05-23.json"
+  },
+  "status": "not_exact_reproduction",
+  "verdict": "The local work is a paper-inspired Qwen2.5 MNLI reproduction-gap study with several implemented BitDistill components. It is not an exact paper reproduction."
+}

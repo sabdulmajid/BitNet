@@ -550,6 +550,38 @@ def validate_publication_product_plan(report: dict[str, Any], readme: str, error
     )
 
 
+def validate_paper_alignment(report: dict[str, Any], readme: str, errors: list[str]) -> None:
+    if report.get("schema") != "bitdistill-paper-alignment-audit-v1":
+        errors.append(f"paper alignment: unexpected schema {report.get('schema')}")
+    if report.get("quality_claim") != "paper_alignment_not_new_benchmark":
+        errors.append(f"paper alignment: unexpected quality_claim {report.get('quality_claim')}")
+    if report.get("status") != "not_exact_reproduction":
+        errors.append(f"paper alignment: unexpected status {report.get('status')}")
+    rows = report.get("rows")
+    if not isinstance(rows, list) or len(rows) < 12:
+        errors.append("paper alignment: missing alignment rows")
+    else:
+        axes = {str(row.get("axis")) for row in rows if isinstance(row, dict)}
+        for axis in ("Stage-2 token budget", "Stage-2 corpus", "Attention-relation coefficient", "Success criterion"):
+            if axis not in axes:
+                errors.append(f"paper alignment: missing axis {axis}")
+    risks = report.get("highest_risks")
+    if not isinstance(risks, list) or len(risks) < 4:
+        errors.append("paper alignment: missing highest-risk mismatch list")
+    require_contains(
+        "README paper alignment report",
+        "bitdistill_paper_alignment_2026-05-23.md",
+        readme,
+        errors,
+    )
+    require_contains(
+        "README paper alignment json",
+        "bitdistill_paper_alignment_2026-05-23.json",
+        readme,
+        errors,
+    )
+
+
 def validate_active_gate_watchdog(report: dict[str, Any], readme: str, errors: list[str]) -> None:
     if report.get("schema") != "bitdistill-active-gate-watchdog-v1":
         errors.append(f"active gate watchdog: unexpected schema {report.get('schema')}")
@@ -799,6 +831,11 @@ def main() -> int:
         default=Path("benchmarks/results/bitdistill_publication_product_plan_2026-05-23.json"),
     )
     parser.add_argument(
+        "--paper-alignment",
+        type=Path,
+        default=Path("benchmarks/results/bitdistill_paper_alignment_2026-05-23.json"),
+    )
+    parser.add_argument(
         "--active-gate-watchdog",
         type=Path,
         default=Path("benchmarks/results/active_gate_watchdog_2026-05-23.json"),
@@ -822,6 +859,7 @@ def main() -> int:
     benchmark_scoreboard = load_json(args.benchmark_scoreboard)
     goal_traceability = load_json(args.goal_traceability)
     publication_product_plan = load_json(args.publication_product_plan)
+    paper_alignment = load_json(args.paper_alignment)
     active_gate_watchdog = load_json(args.active_gate_watchdog)
     active_slurm_batch_scripts = load_json(args.active_slurm_batch_scripts)
     readme = read_text(args.readme)
@@ -838,6 +876,7 @@ def main() -> int:
     validate_deep_research_handoff(deep_research_handoff, errors)
     validate_benchmark_scoreboard(benchmark_scoreboard, readme, errors)
     validate_goal_traceability(goal_traceability, readme, errors)
+    validate_paper_alignment(paper_alignment, readme, errors)
     validate_publication_product_plan(publication_product_plan, readme, errors)
     validate_active_gate_watchdog(active_gate_watchdog, readme, errors)
     validate_active_slurm_batch_scripts(active_slurm_batch_scripts, errors)

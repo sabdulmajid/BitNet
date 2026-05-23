@@ -1,5 +1,5 @@
 {
-  "created_utc": "2026-05-23T17:33:31.395735+00:00",
+  "created_utc": "2026-05-23T17:37:47.328704+00:00",
   "downstream": {
     "caveat": "This section tracks downstream artifact existence only; it does not compute or claim MNLI accuracy.",
     "complete": false,
@@ -139,31 +139,31 @@
     "job_id": "10250",
     "latest_complete_snapshot_step": null,
     "latest_step": {
-      "ce": 3.8836,
-      "elapsed_seconds": 6907.0,
+      "ce": 3.758549,
+      "elapsed_seconds": 7161.6,
       "first_elapsed_seconds": 2.0,
       "first_step": 1,
       "log_exists": true,
       "lr": 2e-06,
-      "parsed_log_rows": 381,
+      "parsed_log_rows": 395,
       "path": "logs/bd-s2-655m-10250.out",
       "recent_ce_max": 4.074328,
-      "recent_ce_mean": 3.7817207500000003,
-      "recent_ce_min": 3.247459,
+      "recent_ce_mean": 3.74035985,
+      "recent_ce_min": 3.366408,
       "recent_window_rows": 20,
-      "step": 3800
+      "step": 3940
     },
     "max_steps": 40000,
     "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
-    "progress": 0.095,
+    "progress": 0.0985,
     "progress_estimate": {
-      "estimated_completion_utc": "2026-05-24T11:50:09.658456+00:00",
-      "estimated_total_seconds": 72705.26315789473,
-      "eta_hours": 18.277295321637425,
-      "eta_seconds": 65798.26315789473,
-      "seconds_per_step": 1.8176315789473685,
-      "segment_token_presentations_per_second": 4506.963949616332,
-      "steps_per_hour": 1980.5993919212392
+      "estimated_completion_utc": "2026-05-24T11:50:12.327235+00:00",
+      "estimated_total_seconds": 72706.59898477158,
+      "eta_hours": 18.20694416243655,
+      "eta_seconds": 65544.99898477158,
+      "seconds_per_step": 1.8176649746192894,
+      "segment_token_presentations_per_second": 4506.881143878462,
+      "steps_per_hour": 1980.563002680965
     },
     "root_metrics": {
       "exists": false,
@@ -176,7 +176,7 @@
       "name": "bd-s2-655m",
       "reason": "ece-nebula12",
       "state": "RUNNING",
-      "time": "1:56:06"
+      "time": "2:00:22"
     }
   },
   "status": "running",
