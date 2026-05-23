@@ -26,6 +26,47 @@ DOWNSTREAM_OUTPUT_DIR="${DOWNSTREAM_OUTPUT_DIR:-checkpoints/bitdistill-glue-seqc
 HANDOFF_JSON="${HANDOFF_JSON:-benchmarks/results/stage2_655m_handoff_${DATE}.json}"
 HANDOFF_MD="${HANDOFF_MD:-benchmarks/results/stage2_655m_handoff_${DATE}.md}"
 
+write_failure_report() {
+  local exit_code="$1"
+  local line_no="$2"
+  python - <<PY
+import json
+from pathlib import Path
+
+data = {
+    "schema": "bitnet-stage2-extension-handoff-v1",
+    "status": "failed",
+    "stage2_job_id": "$STAGE2_JOB_ID",
+    "handoff_job_id": "${SLURM_JOB_ID:-local}",
+    "exit_code": int("$exit_code"),
+    "line": "$line_no",
+    "manifest_json": "$MANIFEST_JSON",
+    "manifest_md": "$MANIFEST_MD",
+    "stage2_output_dir": "$STAGE2_OUTPUT_DIR",
+    "downstream_output_dir": "$DOWNSTREAM_OUTPUT_DIR",
+    "caveat": "The handoff did not submit or validate downstream quality evidence.",
+}
+Path("$HANDOFF_JSON").write_text(json.dumps(data, indent=2, sort_keys=True) + "\\n", encoding="utf-8")
+Path("$HANDOFF_MD").write_text(
+    "\\n\\n".join([
+        "# Stage-2 655.36M Handoff",
+        "Status: **failed**.",
+        "| field | value |\\n| --- | --- |\\n"
+        f"| stage2_job_id | `{data['stage2_job_id']}` |\\n"
+        f"| handoff_job_id | `{data['handoff_job_id']}` |\\n"
+        f"| exit_code | `{data['exit_code']}` |\\n"
+        f"| line | `{data['line']}` |\\n"
+        f"| manifest_json | `{data['manifest_json']}` |\\n"
+        f"| downstream_output_dir | `{data['downstream_output_dir']}` |",
+        "No quality claim should be updated from this failed handoff."
+    ]) + "\\n",
+    encoding="utf-8",
+)
+PY
+}
+
+trap 'status=$?; trap - ERR; write_failure_report "$status" "${BASH_LINENO[0]:-unknown}"; exit "$status"' ERR
+
 echo "SLURM_JOB_ID=${SLURM_JOB_ID:-local}"
 echo "STAGE2_JOB_ID=$STAGE2_JOB_ID"
 echo "PARENT_MANIFEST=$PARENT_MANIFEST"
@@ -126,4 +167,5 @@ Path("$HANDOFF_MD").write_text(
 )
 PY
 
+trap - ERR
 echo "DOWNSTREAM_JOB_ID=$DOWNSTREAM_JOB_ID"
