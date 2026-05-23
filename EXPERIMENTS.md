@@ -121,7 +121,9 @@ python benchmarks/build_stage2_manifest.py \
   --parent-manifest benchmarks/results/stage2_manifest_2026-05-20.json \
   --run-id qwen25-05b-bitdistill-tensor-stage2-655m-from327m-job10250 \
   --job-id 10250 \
-  --downstream-status pending_rerun \
+  --downstream-status pending_submission \
+  --downstream-failed-job-id "" \
+  --downstream-failure-mode "" \
   --output-json benchmarks/results/stage2_manifest_655m_2026-05-23.json \
   --output-md benchmarks/results/stage2_manifest_655m_2026-05-23.md
 ```
@@ -135,7 +137,7 @@ Job `10253` has dependency `afterok:10250`. If `10250` succeeds, it will build
 and validate the `655.36M` manifest and submit the matched downstream MNLI
 BitDistill job.
 
-After the downstream job submitted by `10251` produces both `metrics.json` and
+After the downstream job submitted by `10253` produces both `metrics.json` and
 `eval_predictions.jsonl`, rebuild the controlled curve with the same fixed
 recipe:
 
