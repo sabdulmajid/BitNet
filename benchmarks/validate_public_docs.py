@@ -274,7 +274,7 @@ def validate_reproduction_gap_docs(
     )
     require_contains("README stage2 extension job", "10250", readme, errors)
     require_contains("README stage2 extension tokens", "655.36M", readme, errors)
-    require_contains("README stage2 handoff job", "10251", readme, errors)
+    require_contains("README stage2 handoff job", "10253", readme, errors)
     require_contains("README stage2 handoff dependency", "afterok:10250", readme, errors)
     require_contains(
         "README gamma telemetry report",

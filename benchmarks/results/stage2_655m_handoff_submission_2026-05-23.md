@@ -5,12 +5,17 @@ Status: **dependency pending**.
 | field | value |
 | --- | --- |
 | stage2_job_id | `10250` |
-| handoff_job_id | `10251` |
+| handoff_job_id | `10253` |
+| cancelled_handoff_job_id | `10251` |
 | dependency | `afterok:10250` |
 | partition | `midcard` |
 | script | `slurm_stage2_655m_handoff.sh` |
 | expected_manifest_json | `benchmarks/results/stage2_manifest_655m_2026-05-23.json` |
 | expected_downstream_output_dir | `checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit` |
+
+Job `10251` was cancelled while dependency-pending because Slurm had
+snapshotted the pre-hardening handoff script. Job `10253` was resubmitted with
+the current fail-closed script.
 
 The handoff job will only run if Stage-2 job `10250` exits successfully. It is
 responsible for building and validating the `655.36M` Stage-2 manifest, then

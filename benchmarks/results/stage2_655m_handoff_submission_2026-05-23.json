@@ -1,9 +1,11 @@
 {
   "schema": "bitnet-stage2-extension-handoff-submission-v1",
-  "created_utc": "2026-05-23T15:42:00+00:00",
+  "created_utc": "2026-05-23T16:05:00+00:00",
   "status": "dependency_pending",
   "stage2_job_id": "10250",
-  "handoff_job_id": "10251",
+  "handoff_job_id": "10253",
+  "cancelled_handoff_job_id": "10251",
+  "cancelled_handoff_reason": "Job 10251 was cancelled while dependency-pending because Slurm had snapshotted the pre-hardening handoff script. Job 10253 was resubmitted with the current fail-closed script.",
   "dependency": "afterok:10250",
   "partition": "midcard",
   "script": "slurm_stage2_655m_handoff.sh",

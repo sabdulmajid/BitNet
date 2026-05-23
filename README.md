@@ -56,7 +56,7 @@ Active next gate:
 Job `10250` is a cumulative continuation from the verified `327.68M` checkpoint
 to `655.36M` token presentations. It is explicitly labeled as a continuation
 with a fresh optimizer/scheduler segment, not an uninterrupted 80k-step run.
-A dependent handoff job, `10251`, is queued with `afterok:10250` to build the
+A dependent handoff job, `10253`, is queued with `afterok:10250` to build the
 655M manifest and submit the matched downstream MNLI evaluation if Stage-2
 finishes successfully.
 
