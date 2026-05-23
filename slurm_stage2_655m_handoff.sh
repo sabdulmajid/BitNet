@@ -27,6 +27,10 @@ HANDOFF_JSON="${HANDOFF_JSON:-benchmarks/results/stage2_655m_handoff_${DATE}.jso
 HANDOFF_MD="${HANDOFF_MD:-benchmarks/results/stage2_655m_handoff_${DATE}.md}"
 POSTPROCESS_JSON="${POSTPROCESS_JSON:-benchmarks/results/stage2_655m_postprocess_${DATE}.json}"
 POSTPROCESS_MD="${POSTPROCESS_MD:-benchmarks/results/stage2_655m_postprocess_${DATE}.md}"
+PRODUCER_BITNET_COMMIT="${PRODUCER_BITNET_COMMIT:-10341701e5104c66d18fc9779ab9799bf2190c9a}"
+PRODUCER_LLAMA_CPP_COMMIT="${PRODUCER_LLAMA_CPP_COMMIT:-dc0bc5ee0423a2202d6284a4fc2d78d1e39905d7}"
+PRODUCER_BITNET_COMMIT_NOTE="${PRODUCER_BITNET_COMMIT_NOTE:-inferred from the commit that captured the LR_SCHEDULER wrapper patch used by Stage-2 job 10250; the job log confirms LR_SCHEDULER=constant}"
+PRODUCER_LLAMA_CPP_COMMIT_NOTE="${PRODUCER_LLAMA_CPP_COMMIT_NOTE:-recorded in the Stage-2 submission report for job 10250}"
 
 write_failure_report() {
   local exit_code="$1"
@@ -48,6 +52,8 @@ data = {
     "downstream_output_dir": "$DOWNSTREAM_OUTPUT_DIR",
     "postprocess_json": "$POSTPROCESS_JSON",
     "postprocess_md": "$POSTPROCESS_MD",
+    "producer_bitnet_commit": "$PRODUCER_BITNET_COMMIT",
+    "producer_llama_cpp_commit": "$PRODUCER_LLAMA_CPP_COMMIT",
     "caveat": "The handoff did not submit or validate downstream quality evidence.",
 }
 Path("$HANDOFF_JSON").write_text(json.dumps(data, indent=2, sort_keys=True) + "\\n", encoding="utf-8")
@@ -78,10 +84,16 @@ echo "PARENT_MANIFEST=$PARENT_MANIFEST"
 echo "STAGE2_OUTPUT_DIR=$STAGE2_OUTPUT_DIR"
 echo "MANIFEST_JSON=$MANIFEST_JSON"
 echo "DOWNSTREAM_OUTPUT_DIR=$DOWNSTREAM_OUTPUT_DIR"
+echo "PRODUCER_BITNET_COMMIT=$PRODUCER_BITNET_COMMIT"
+echo "PRODUCER_LLAMA_CPP_COMMIT=$PRODUCER_LLAMA_CPP_COMMIT"
 
 python benchmarks/build_stage2_manifest.py \
   --output-dir "$STAGE2_OUTPUT_DIR" \
   --parent-manifest "$PARENT_MANIFEST" \
+  --producer-bitnet-commit "$PRODUCER_BITNET_COMMIT" \
+  --producer-llama-cpp-commit "$PRODUCER_LLAMA_CPP_COMMIT" \
+  --producer-bitnet-commit-note "$PRODUCER_BITNET_COMMIT_NOTE" \
+  --producer-llama-cpp-commit-note "$PRODUCER_LLAMA_CPP_COMMIT_NOTE" \
   --run-id "$RUN_ID" \
   --job-id "$STAGE2_JOB_ID" \
   --downstream-status pending_submission \
@@ -138,6 +150,10 @@ POSTPROCESS_JOB_ID="$(
 python benchmarks/build_stage2_manifest.py \
   --output-dir "$STAGE2_OUTPUT_DIR" \
   --parent-manifest "$PARENT_MANIFEST" \
+  --producer-bitnet-commit "$PRODUCER_BITNET_COMMIT" \
+  --producer-llama-cpp-commit "$PRODUCER_LLAMA_CPP_COMMIT" \
+  --producer-bitnet-commit-note "$PRODUCER_BITNET_COMMIT_NOTE" \
+  --producer-llama-cpp-commit-note "$PRODUCER_LLAMA_CPP_COMMIT_NOTE" \
   --run-id "$RUN_ID" \
   --job-id "$STAGE2_JOB_ID" \
   --downstream-status submitted_downstream \
@@ -166,6 +182,8 @@ data = {
     "downstream_output_dir": "$DOWNSTREAM_OUTPUT_DIR",
     "postprocess_json": "$POSTPROCESS_JSON",
     "postprocess_md": "$POSTPROCESS_MD",
+    "producer_bitnet_commit": "$PRODUCER_BITNET_COMMIT",
+    "producer_llama_cpp_commit": "$PRODUCER_LLAMA_CPP_COMMIT",
     "next_after_downstream": [
         "Wait for the postprocess job to rebuild the controlled curve and reproduction-gap reports.",
         "Update canonical/public claims only after downstream metrics.json and eval_predictions.jsonl exist."

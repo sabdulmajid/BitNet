@@ -1,8 +1,12 @@
 {
-  "cancelled_handoff_job_id": "10253",
-  "cancelled_handoff_reason": "Job 10253 was cancelled while dependency-pending because Slurm had snapshotted the pre-postprocess handoff script. Job 10255 was resubmitted with the current handoff script that queues the downstream postprocess job.",
+  "cancelled_handoff_job_id": "10255",
+  "cancelled_handoff_job_ids": [
+    "10253",
+    "10255"
+  ],
+  "cancelled_handoff_reason": "Job 10253 was cancelled while dependency-pending because Slurm had snapshotted the pre-postprocess handoff script. Job 10255 was cancelled while dependency-pending because it lacked explicit producer commit metadata in the manifest handoff path. Job 10259 was resubmitted with the provenance-pinned handoff script.",
   "caveat": "The handoff job has not run yet. It will only build the 655M manifest, submit the matched downstream MNLI job, and queue the downstream postprocess job if Stage-2 job 10250 exits successfully.",
-  "created_utc": "2026-05-23T16:44:45+00:00",
+  "created_utc": "2026-05-23T19:07:20+00:00",
   "dependency": "afterok:10250",
   "expected_downstream_output_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit",
   "expected_handoff_json": "benchmarks/results/stage2_655m_handoff_2026-05-23.json",
@@ -13,9 +17,13 @@
   "expected_postprocess_md": "benchmarks/results/stage2_655m_postprocess_2026-05-23.md",
   "expected_next_decision_json": "benchmarks/results/bitdistill_next_decision_2026-05-23.json",
   "expected_next_decision_md": "benchmarks/results/bitdistill_next_decision_2026-05-23.md",
-  "handoff_job_id": "10255",
+  "handoff_job_id": "10259",
   "partition": "midcard",
   "postprocess_script": "slurm_stage2_655m_postprocess.sh",
+  "producer_bitnet_commit": "10341701e5104c66d18fc9779ab9799bf2190c9a",
+  "producer_bitnet_commit_note": "Inferred from the commit that captured the LR_SCHEDULER wrapper patch used by Stage-2 job 10250; the job log confirms LR_SCHEDULER=constant.",
+  "producer_llama_cpp_commit": "dc0bc5ee0423a2202d6284a4fc2d78d1e39905d7",
+  "producer_llama_cpp_commit_note": "Recorded in the Stage-2 submission report for job 10250.",
   "schema": "bitnet-stage2-extension-handoff-submission-v1",
   "script": "slurm_stage2_655m_handoff.sh",
   "slurm_state_at_submission": {

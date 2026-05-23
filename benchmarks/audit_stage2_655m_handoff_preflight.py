@@ -141,6 +141,10 @@ def manifest_command(
     parent_manifest: Path,
     run_id: str,
     job_id: str,
+    producer_bitnet_commit: str,
+    producer_llama_cpp_commit: str,
+    producer_bitnet_commit_note: str,
+    producer_llama_cpp_commit_note: str,
     output_json: Path,
     output_md: Path,
 ) -> list[str]:
@@ -151,6 +155,14 @@ def manifest_command(
         str(output_dir),
         "--parent-manifest",
         str(parent_manifest),
+        "--producer-bitnet-commit",
+        producer_bitnet_commit,
+        "--producer-llama-cpp-commit",
+        producer_llama_cpp_commit,
+        "--producer-bitnet-commit-note",
+        producer_bitnet_commit_note,
+        "--producer-llama-cpp-commit-note",
+        producer_llama_cpp_commit_note,
         "--run-id",
         run_id,
         "--job-id",
@@ -246,6 +258,10 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     parent_manifest = Path(stage2_submission["parent_manifest"]["path"])
     manifest_json = Path(handoff_submission["expected_manifest_json"])
     manifest_md = Path(handoff_submission["expected_manifest_md"])
+    producer_bitnet_commit = str(handoff_submission.get("producer_bitnet_commit", ""))
+    producer_llama_cpp_commit = str(handoff_submission.get("producer_llama_cpp_commit", ""))
+    producer_bitnet_commit_note = str(handoff_submission.get("producer_bitnet_commit_note", ""))
+    producer_llama_cpp_commit_note = str(handoff_submission.get("producer_llama_cpp_commit_note", ""))
     run_id = f"qwen25-05b-bitdistill-tensor-stage2-655m-from327m-job{job_id}"
     final_snapshot = output_dir / f"checkpoint-{max_steps}"
     final_state = file_info(final_snapshot / "custom_state_dict.pt")
@@ -265,6 +281,22 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         check_file("postprocess script exists", Path(handoff_submission["postprocess_script"])),
         check_command("handoff script syntax", ["bash", "-n", handoff_submission["script"]]),
         check_command("postprocess script syntax", ["bash", "-n", handoff_submission["postprocess_script"]]),
+        {
+            "label": "handoff submission pins producer BitNet commit",
+            "kind": "metadata",
+            "path": str(args.handoff_submission),
+            "required_now": True,
+            "passed": bool(producer_bitnet_commit),
+            "exists": True,
+        },
+        {
+            "label": "handoff submission pins producer llama.cpp commit",
+            "kind": "metadata",
+            "path": str(args.handoff_submission),
+            "required_now": True,
+            "passed": bool(producer_llama_cpp_commit),
+            "exists": True,
+        },
         check_file("downstream training script exists", Path("slurm_bitdistill_glue.sh")),
         check_file(
             "FP16 teacher directory exists",
@@ -296,6 +328,10 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         parent_manifest=parent_manifest,
         run_id=run_id,
         job_id=job_id,
+        producer_bitnet_commit=producer_bitnet_commit,
+        producer_llama_cpp_commit=producer_llama_cpp_commit,
+        producer_bitnet_commit_note=producer_bitnet_commit_note,
+        producer_llama_cpp_commit_note=producer_llama_cpp_commit_note,
         output_json=manifest_json,
         output_md=manifest_md,
     )
@@ -308,6 +344,10 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                 parent_manifest=parent_manifest,
                 run_id=run_id,
                 job_id=job_id,
+                producer_bitnet_commit=producer_bitnet_commit,
+                producer_llama_cpp_commit=producer_llama_cpp_commit,
+                producer_bitnet_commit_note=producer_bitnet_commit_note,
+                producer_llama_cpp_commit_note=producer_llama_cpp_commit_note,
                 output_json=dry_json,
                 output_md=dry_md,
             )

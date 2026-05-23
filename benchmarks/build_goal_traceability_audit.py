@@ -393,6 +393,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     seqcls_gap = read_json(args.seqcls_gap)
     moe_support = read_json(args.moe_support)
     next_decision = read_json(args.next_decision)
+    handoff_submission = read_json(args.handoff_submission)
+    handoff_job_id = str(handoff_submission.get("handoff_job_id") or args.handoff_job_id)
     require_schema(args.canonical_bundle, bundle, "bitnet-canonical-evidence-bundle-v1")
     require_schema(args.scoreboard, scoreboard, "bitdistill-benchmark-scoreboard-v1")
     require_schema(args.reproduction_gap, reproduction_gap, "bitnet-reproduction-gap-report-v1")
@@ -402,7 +404,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     require_schema(args.moe_support, moe_support, "bitnet-moe-support-audit-v1")
     require_schema(args.next_decision, next_decision, "bitdistill-next-decision-v1")
 
-    live_jobs = squeue_rows([args.stage2_job_id, args.handoff_job_id, args.telemetry_job_id])
+    live_jobs = squeue_rows([args.stage2_job_id, handoff_job_id, args.telemetry_job_id])
     latest_step = parse_latest_step(args.stage2_log)
     estimate = estimate_stage2(latest_step, args.stage2_max_steps)
     live = {
@@ -432,6 +434,12 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         live=live,
         checks=checks,
     )
+    for row in requirements:
+        if row.get("requirement") == "Stage-2 continued pretraining":
+            row["next_action"] = (
+                f"Wait for job {args.stage2_job_id}, handoff {handoff_job_id}, "
+                "and postprocess before changing experiment axes."
+            )
     status_counts: dict[str, int] = {}
     for row in requirements:
         status_counts[str(row["status"])] = status_counts.get(str(row["status"]), 0) + 1
@@ -448,6 +456,11 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             "until the 655M downstream gate and gamma-balance telemetry land."
         ),
         "live_state": live,
+        "active_job_ids": {
+            "stage2": args.stage2_job_id,
+            "handoff": handoff_job_id,
+            "telemetry": args.telemetry_job_id,
+        },
         "status_counts": status_counts,
         "requirements": requirements,
         "source_checks": checks,
@@ -475,14 +488,20 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             "seqcls_gap": str(args.seqcls_gap),
             "moe_support": str(args.moe_support),
             "next_decision": str(args.next_decision),
+            "handoff_submission": str(args.handoff_submission),
         },
     }
 
 
 def render_markdown(report: dict[str, Any]) -> str:
     live = report["live_state"]
+    active_job_ids = report.get("active_job_ids", {})
     live_rows = []
-    for job_id in ("10250", "10255", "10257"):
+    for job_id in (
+        active_job_ids.get("stage2", "10250"),
+        active_job_ids.get("handoff", "10255"),
+        active_job_ids.get("telemetry", "10257"),
+    ):
         job = live["jobs"].get(job_id, {"job_id": job_id, "state": "not_in_squeue"})
         live_rows.append([job_id, job.get("name", ""), job.get("state"), job.get("time", ""), job.get("reason", "")])
     stage2 = live["stage2"]
@@ -553,6 +572,7 @@ def main() -> int:
     parser.add_argument("--seqcls-gap", type=Path, default=Path("benchmark_results/seqcls_runtime_gap_2026-05-15.json"))
     parser.add_argument("--moe-support", type=Path, default=Path("benchmark_results/moe_support_audit_2026-05-15.json"))
     parser.add_argument("--next-decision", type=Path, default=Path("benchmarks/results/bitdistill_next_decision_2026-05-23.json"))
+    parser.add_argument("--handoff-submission", type=Path, default=Path("benchmarks/results/stage2_655m_handoff_submission_2026-05-23.json"))
     parser.add_argument("--stage2-log", type=Path, default=Path("logs/bd-s2-655m-10250.out"))
     parser.add_argument("--stage2-job-id", default="10250")
     parser.add_argument("--handoff-job-id", default="10255")

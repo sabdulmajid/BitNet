@@ -1,8 +1,8 @@
 {
   "checks": [
     {
-      "cancelled_handoff_job_id": "10253",
-      "cancelled_handoff_reason": "Job 10253 was cancelled while dependency-pending because Slurm had snapshotted the pre-postprocess handoff script. Job 10255 was resubmitted with the current handoff script that queues the downstream postprocess job.",
+      "cancelled_handoff_job_id": "10255",
+      "cancelled_handoff_reason": "Job 10253 was cancelled while dependency-pending because Slurm had snapshotted the pre-postprocess handoff script. Job 10255 was cancelled while dependency-pending because it lacked explicit producer commit metadata in the manifest handoff path. Job 10259 was resubmitted with the provenance-pinned handoff script.",
       "checks": [
         {
           "present": true,
@@ -19,6 +19,30 @@
         {
           "present": true,
           "snippet": "--downstream-failure-mode \"\""
+        },
+        {
+          "present": true,
+          "snippet": "PRODUCER_BITNET_COMMIT="
+        },
+        {
+          "present": true,
+          "snippet": "PRODUCER_LLAMA_CPP_COMMIT="
+        },
+        {
+          "present": true,
+          "snippet": "--producer-bitnet-commit \"$PRODUCER_BITNET_COMMIT\""
+        },
+        {
+          "present": true,
+          "snippet": "--producer-llama-cpp-commit \"$PRODUCER_LLAMA_CPP_COMMIT\""
+        },
+        {
+          "present": true,
+          "snippet": "--producer-bitnet-commit-note \"$PRODUCER_BITNET_COMMIT_NOTE\""
+        },
+        {
+          "present": true,
+          "snippet": "--producer-llama-cpp-commit-note \"$PRODUCER_LLAMA_CPP_COMMIT_NOTE\""
         },
         {
           "present": true,
@@ -117,13 +141,13 @@
           "snippet": "sbatch --parsable --partition=midcard --job-name=bd-mnli-655m slurm_bitdistill_glue.sh"
         }
       ],
-      "job_id": "10255",
+      "job_id": "10259",
       "passed": true,
       "purpose": "655M Stage-2 handoff",
-      "scontrol_message": "batch script for job 10255 written to /tmp/bitnet-slurm-script-fbsw3lfd/10255.sh",
+      "scontrol_message": "batch script for job 10259 written to /tmp/bitnet-slurm-script-mu82tghr/10259.sh",
       "script_available": true,
       "slurm": {
-        "job_id": "10255",
+        "job_id": "10259",
         "name": "bd-655m-handoff",
         "reason": "(Dependency)",
         "state": "PENDING",
@@ -205,7 +229,7 @@
       "job_id": "10257",
       "passed": true,
       "purpose": "gamma-60 gradient telemetry",
-      "scontrol_message": "batch script for job 10257 written to /tmp/bitnet-slurm-script-1glgnhey/10257.sh",
+      "scontrol_message": "batch script for job 10257 written to /tmp/bitnet-slurm-script-6yqsbgcw/10257.sh",
       "script_available": true,
       "slurm": {
         "job_id": "10257",
@@ -250,7 +274,7 @@
       "job_id": "10258",
       "passed": true,
       "purpose": "655M Stage-2 afterany audit",
-      "scontrol_message": "batch script for job 10258 written to /tmp/bitnet-slurm-script-gkb3v75f/10258.sh",
+      "scontrol_message": "batch script for job 10258 written to /tmp/bitnet-slurm-script-2xglt5zq/10258.sh",
       "script_available": true,
       "slurm": {
         "job_id": "10258",
@@ -261,7 +285,7 @@
       }
     }
   ],
-  "created_utc": "2026-05-23T18:57:53.194555+00:00",
+  "created_utc": "2026-05-23T19:08:51.581500+00:00",
   "dependency_checks": [
     {
       "actual_command": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/slurm_stage2_655m_handoff.sh",
@@ -270,14 +294,14 @@
       "dependency_matches": true,
       "expected_command_suffix": "slurm_stage2_655m_handoff.sh",
       "expected_dependency": "afterok:10250",
-      "job_id": "10255",
+      "job_id": "10259",
       "job_state": "PENDING",
       "normalized_dependency": "afterok:10250",
       "passed": true,
       "purpose": "655M Stage-2 handoff dependency",
       "scontrol_available": true,
       "slurm": {
-        "job_id": "10255",
+        "job_id": "10259",
         "name": "bd-655m-handoff",
         "reason": "(Dependency)",
         "state": "PENDING",

@@ -133,12 +133,12 @@ A dependent handoff has also been queued:
 - `benchmarks/results/stage2_655m_handoff_submission_2026-05-23.json`
 - `benchmarks/results/stage2_655m_handoff_submission_2026-05-23.md`
 
-Job `10255` has dependency `afterok:10250`. If `10250` succeeds, it will build
+Job `10259` has dependency `afterok:10250`. If `10250` succeeds, it will build
 and validate the `655.36M` manifest, submit the matched downstream MNLI
 BitDistill job, and queue `slurm_stage2_655m_postprocess.sh` after the
 downstream job terminates.
 
-After the downstream job submitted by `10255` produces both `metrics.json` and
+After the downstream job submitted by `10259` produces both `metrics.json` and
 `eval_predictions.jsonl`, the queued postprocess job should rebuild the
 controlled curve with the same fixed recipe. The manual command is:
 
@@ -213,7 +213,7 @@ ratios, not task accuracy, for this diagnostic.
 
 ## Active Gate Monitor
 
-Use the watchdog while `10250`, `10255`, and `10257` are still live:
+Use the watchdog while `10250`, `10259`, and `10257` are still live:
 
 ```bash
 python benchmarks/run_active_gate_watchdog.py

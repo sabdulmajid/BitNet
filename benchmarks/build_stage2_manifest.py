@@ -133,6 +133,8 @@ def build_manifest(args: argparse.Namespace) -> dict[str, Any]:
             "llama_cpp_commit": producer_llama_commit,
             "producer_bitnet_commit": producer_bitnet_commit,
             "producer_llama_cpp_commit": producer_llama_commit,
+            "producer_bitnet_commit_note": args.producer_bitnet_commit_note,
+            "producer_llama_cpp_commit_note": args.producer_llama_cpp_commit_note,
             "manifest_bitnet_commit": manifest_bitnet_commit,
             "manifest_llama_cpp_commit": manifest_llama_commit,
         },
@@ -191,6 +193,8 @@ def render_markdown(manifest: dict[str, Any]) -> str:
                     ["parent_manifest_path", manifest.get("parent_manifest_path", "")],
                     ["bitnet_commit", manifest["git"]["bitnet_commit"]],
                     ["llama_cpp_commit", manifest["git"]["llama_cpp_commit"]],
+                    ["producer_bitnet_commit_note", manifest["git"].get("producer_bitnet_commit_note", "")],
+                    ["producer_llama_cpp_commit_note", manifest["git"].get("producer_llama_cpp_commit_note", "")],
                     ["downstream_status", manifest["downstream"]["status"]],
                     ["downstream_rerun_job_id", manifest["downstream"].get("rerun_job_id", "")],
                     ["downstream_rerun_output_dir", manifest["downstream"].get("rerun_output_dir", "")],
@@ -212,6 +216,8 @@ def main() -> int:
     parser.add_argument("--model", default="Qwen/Qwen2.5-0.5B")
     parser.add_argument("--producer-bitnet-commit", default="")
     parser.add_argument("--producer-llama-cpp-commit", default="")
+    parser.add_argument("--producer-bitnet-commit-note", default="")
+    parser.add_argument("--producer-llama-cpp-commit-note", default="")
     parser.add_argument("--parent-manifest", type=Path)
     parser.add_argument("--cumulative-token-presentations", type=int, default=0)
     parser.add_argument(

@@ -7,7 +7,7 @@
     "target_row": {},
     "target_row_exists": false
   },
-  "created_utc": "2026-05-23T18:57:45.115461+00:00",
+  "created_utc": "2026-05-23T19:08:43.511666+00:00",
   "downstream": {
     "metric_accuracy": null,
     "metric_eval_examples": null,
@@ -37,14 +37,14 @@
   },
   "handoff": {
     "downstream_job_id": "",
-    "job_id": "10255",
+    "job_id": "10259",
     "report": {
       "exists": false,
       "path": "benchmarks/results/stage2_655m_handoff_2026-05-23.json",
       "size_bytes": null
     },
     "slurm": {
-      "job_id": "10255",
+      "job_id": "10259",
       "name": "bd-655m-handoff",
       "reason": "(Dependency)",
       "state": "PENDING",
@@ -97,7 +97,7 @@
       "name": "bd-s2-655m",
       "reason": "ece-nebula12",
       "state": "RUNNING",
-      "time": "3:20:20"
+      "time": "3:31:18"
     }
   },
   "status": "pending_handoff",

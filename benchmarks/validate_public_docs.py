@@ -156,6 +156,10 @@ def validate_stage2_handoff_submission(report: dict[str, Any], errors: list[str]
     postprocess_script = report.get("postprocess_script")
     if postprocess_script is not None and not Path(str(postprocess_script)).exists():
         errors.append(f"stage2 handoff: postprocess script does not exist: {postprocess_script}")
+    if not report.get("producer_bitnet_commit"):
+        errors.append("stage2 handoff: missing producer_bitnet_commit")
+    if not report.get("producer_llama_cpp_commit"):
+        errors.append("stage2 handoff: missing producer_llama_cpp_commit")
 
 
 def validate_stage2_afterany_submission(report: dict[str, Any], readme: str, errors: list[str]) -> None:
@@ -1141,6 +1145,7 @@ def validate_readme(bundle: dict[str, Any], readme: str, errors: list[str]) -> N
 
 def validate_reproduction_gap_docs(
     report: dict[str, Any],
+    stage2_handoff: dict[str, Any],
     readme: str,
     claims_doc: str,
     errors: list[str],
@@ -1166,8 +1171,19 @@ def validate_reproduction_gap_docs(
     )
     require_contains("README stage2 extension job", "10250", readme, errors)
     require_contains("README stage2 extension tokens", "655.36M", readme, errors)
-    require_contains("README stage2 handoff job", "10255", readme, errors)
+    require_contains(
+        "README stage2 handoff job",
+        str(stage2_handoff.get("handoff_job_id", "")),
+        readme,
+        errors,
+    )
     require_contains("README stage2 handoff dependency", "afterok:10250", readme, errors)
+    require_contains(
+        "README stage2 handoff producer commit",
+        str(stage2_handoff.get("producer_bitnet_commit", "")),
+        readme,
+        errors,
+    )
     require_contains(
         "README gamma telemetry report",
         "gamma60_telemetry_submission_2026-05-23.md",
@@ -1417,7 +1433,7 @@ def main() -> int:
     validate_next_experiment_blueprint(next_experiment_blueprint, readme, errors)
     validate_active_slurm_batch_scripts(active_slurm_batch_scripts, errors)
     validate_readme(bundle, readme, errors)
-    validate_reproduction_gap_docs(reproduction_gap, readme, claims_doc, errors)
+    validate_reproduction_gap_docs(reproduction_gap, stage2_handoff, readme, claims_doc, errors)
     validate_claims_doc(bundle, claims_doc, errors)
     validate_experiments_doc(experiments_doc, readme, errors)
     validate_runtime_doc(bundle, read_text(args.runtime_contract), errors)

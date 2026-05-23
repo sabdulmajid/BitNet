@@ -1,6 +1,6 @@
 # Stage-2 655M Handoff Preflight
 
-Generated: `2026-05-23T18:57:53.005813+00:00`
+Generated: `2026-05-23T19:08:51.388051+00:00`
 
 Status: **pending_stage2_completion**.
 
@@ -14,11 +14,11 @@ This validates the queued handoff path only. It does not run downstream evaluati
 | --- | --- |
 | stage2_job_id | 10250 |
 | slurm_state | RUNNING |
-| slurm_time | 3:20:20 |
-| latest_step | 6580 |
+| slurm_time | 3:31:18 |
+| latest_step | 6940 |
 | snapshot_status | pre_first_snapshot |
 | next_snapshot_step | 10000 |
-| steps_to_next_snapshot | 3420 |
+| steps_to_next_snapshot | 3060 |
 | output_dir | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m |
 | final_snapshot | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000 |
 
@@ -34,6 +34,8 @@ This validates the queued handoff path only. It does not run downstream evaluati
 | postprocess script exists | file_exists | slurm_stage2_655m_postprocess.sh | true | true | - |
 | handoff script syntax | command | bash -n slurm_stage2_655m_handoff.sh | true | - | 0 |
 | postprocess script syntax | command | bash -n slurm_stage2_655m_postprocess.sh | true | - | 0 |
+| handoff submission pins producer BitNet commit | metadata | benchmarks/results/stage2_655m_handoff_submission_2026-05-23.json | true | true | - |
+| handoff submission pins producer llama.cpp commit | metadata | benchmarks/results/stage2_655m_handoff_submission_2026-05-23.json | true | true | - |
 | downstream training script exists | file_exists | slurm_bitdistill_glue.sh | true | true | - |
 | FP16 teacher directory exists | file_exists | checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1 | true | true | - |
 | training save contract matches handoff assumptions | source_contract | train_bitdistill.py | true | true | - |
@@ -60,7 +62,7 @@ The running 655M producer was submitted before any code change here. For this ac
 
 ## Manifest Command
 
-`python benchmarks/build_stage2_manifest.py --output-dir checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m --parent-manifest benchmarks/results/stage2_manifest_2026-05-20.json --run-id qwen25-05b-bitdistill-tensor-stage2-655m-from327m-job10250 --job-id 10250 --downstream-status pending_submission --downstream-failed-job-id  --downstream-failure-mode  --output-json benchmarks/results/stage2_manifest_655m_2026-05-23.json --output-md benchmarks/results/stage2_manifest_655m_2026-05-23.md`
+`python benchmarks/build_stage2_manifest.py --output-dir checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m --parent-manifest benchmarks/results/stage2_manifest_2026-05-20.json --producer-bitnet-commit 10341701e5104c66d18fc9779ab9799bf2190c9a --producer-llama-cpp-commit dc0bc5ee0423a2202d6284a4fc2d78d1e39905d7 --producer-bitnet-commit-note Inferred from the commit that captured the LR_SCHEDULER wrapper patch used by Stage-2 job 10250; the job log confirms LR_SCHEDULER=constant. --producer-llama-cpp-commit-note Recorded in the Stage-2 submission report for job 10250. --run-id qwen25-05b-bitdistill-tensor-stage2-655m-from327m-job10250 --job-id 10250 --downstream-status pending_submission --downstream-failed-job-id  --downstream-failure-mode  --output-json benchmarks/results/stage2_manifest_655m_2026-05-23.json --output-md benchmarks/results/stage2_manifest_655m_2026-05-23.md`
 
 ## Dry Run
 

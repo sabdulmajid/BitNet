@@ -90,13 +90,17 @@ Active next gate:
 Job `10250` is a cumulative continuation from the verified `327.68M` checkpoint
 to `655.36M` token presentations. It is explicitly labeled as a continuation
 with a fresh optimizer/scheduler segment, not an uninterrupted 80k-step run.
-A dependent handoff job, `10255`, is queued with `afterok:10250` to build the
+A dependent handoff job, `10259`, is queued with `afterok:10250` to build the
 655M manifest and submit the matched downstream MNLI evaluation if Stage-2
 finishes successfully. It also queues a postprocess job after downstream MNLI
 terminates so the controlled curve and reproduction-gap reports can be rebuilt
 from the actual metrics and prediction trace. The postprocess also rebuilds the
 next-decision report so the repository records whether to extend Stage-2,
 switch to loss-normalization debugging, or replicate a successful recovery row.
+The handoff manifest pins the producer BitNet commit
+`10341701e5104c66d18fc9779ab9799bf2190c9a` and llama.cpp commit
+`dc0bc5ee0423a2202d6284a4fc2d78d1e39905d7` rather than using the later report
+generation commit.
 The decision-scenario matrix documents these thresholds before the 655M result
 arrives; it is policy documentation, not benchmark evidence.
 The next-experiment blueprint maps each decision status to a bounded command
