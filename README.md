@@ -52,6 +52,8 @@ For external technical review or a deep-research agent, use:
 
 - [deep_research_handoff_2026-05-23.md](benchmarks/results/deep_research_handoff_2026-05-23.md)
 - [deep_research_handoff_2026-05-23.json](benchmarks/results/deep_research_handoff_2026-05-23.json)
+- [bitdistill_goal_traceability_2026-05-23.md](benchmarks/results/bitdistill_goal_traceability_2026-05-23.md)
+- [bitdistill_goal_traceability_2026-05-23.json](benchmarks/results/bitdistill_goal_traceability_2026-05-23.json)
 
 The short default BitNet-SFT row was undertrained: the default row is
 `0.487621`, while the best 10k-step BitNet-SFT budget row reaches `0.628935`,

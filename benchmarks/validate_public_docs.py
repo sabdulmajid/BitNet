@@ -423,6 +423,50 @@ def validate_benchmark_scoreboard(report: dict[str, Any], readme: str, errors: l
     )
 
 
+def validate_goal_traceability(report: dict[str, Any], readme: str, errors: list[str]) -> None:
+    if report.get("schema") != "bitdistill-goal-traceability-audit-v1":
+        errors.append(f"goal traceability: unexpected schema {report.get('schema')}")
+    if report.get("quality_claim") != "traceability_from_existing_artifacts_not_new_benchmark":
+        errors.append(f"goal traceability: unexpected quality_claim {report.get('quality_claim')}")
+    if report.get("objective_achieved") is not False:
+        errors.append("goal traceability: objective_achieved must be false")
+    if report.get("completion_status") != "in_progress":
+        errors.append(f"goal traceability: unexpected completion_status {report.get('completion_status')}")
+    requirements = report.get("requirements")
+    if not isinstance(requirements, list) or len(requirements) < 10:
+        errors.append("goal traceability: missing requirement rows")
+    else:
+        names = {str(row.get("requirement")) for row in requirements if isinstance(row, dict)}
+        for name in (
+            "Post-training ternary math audit",
+            "Stage-2 continued pretraining",
+            "Stage-3 downstream CE + logits KL + attention-relation KD",
+            "MoE/Kimi feasibility",
+            "Publishable framing",
+        ):
+            if name not in names:
+                errors.append(f"goal traceability: missing requirement {name}")
+    source_checks = report.get("source_checks")
+    if not isinstance(source_checks, list) or not source_checks:
+        errors.append("goal traceability: missing source checks")
+    else:
+        failed = [row.get("label") for row in source_checks if isinstance(row, dict) and row.get("passed") is not True]
+        if failed:
+            errors.append(f"goal traceability: failed source checks {failed}")
+    require_contains(
+        "README goal traceability report",
+        "bitdistill_goal_traceability_2026-05-23.md",
+        readme,
+        errors,
+    )
+    require_contains(
+        "README goal traceability json",
+        "bitdistill_goal_traceability_2026-05-23.json",
+        readme,
+        errors,
+    )
+
+
 def validate_readme(bundle: dict[str, Any], readme: str, errors: list[str]) -> None:
     claims = bundle["claims"]
     blind = claims["blind_ptq"]
@@ -626,6 +670,11 @@ def main() -> int:
         default=Path("benchmarks/results/bitdistill_benchmark_scoreboard_2026-05-23.json"),
     )
     parser.add_argument(
+        "--goal-traceability",
+        type=Path,
+        default=Path("benchmarks/results/bitdistill_goal_traceability_2026-05-23.json"),
+    )
+    parser.add_argument(
         "--active-slurm-batch-scripts",
         type=Path,
         default=Path("benchmarks/results/active_slurm_batch_scripts_2026-05-23.json"),
@@ -641,6 +690,7 @@ def main() -> int:
     current_goal_status = load_json(args.current_goal_status)
     deep_research_handoff = load_json(args.deep_research_handoff)
     benchmark_scoreboard = load_json(args.benchmark_scoreboard)
+    goal_traceability = load_json(args.goal_traceability)
     active_slurm_batch_scripts = load_json(args.active_slurm_batch_scripts)
     readme = read_text(args.readme)
     claims_doc = read_text(args.claims)
@@ -654,6 +704,7 @@ def main() -> int:
     validate_current_goal_status(current_goal_status, errors)
     validate_deep_research_handoff(deep_research_handoff, errors)
     validate_benchmark_scoreboard(benchmark_scoreboard, readme, errors)
+    validate_goal_traceability(goal_traceability, readme, errors)
     validate_active_slurm_batch_scripts(active_slurm_batch_scripts, errors)
     validate_readme(bundle, readme, errors)
     validate_reproduction_gap_docs(reproduction_gap, readme, claims_doc, errors)

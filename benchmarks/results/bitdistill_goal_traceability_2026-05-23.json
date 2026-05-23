@@ -1,0 +1,228 @@
+{
+  "completion_status": "in_progress",
+  "created_utc": "2026-05-23T17:19:52.379333+00:00",
+  "live_state": {
+    "jobs": {
+      "10250": {
+        "job_id": "10250",
+        "name": "bd-s2-655m",
+        "nodes": "1",
+        "reason": "ece-nebula12",
+        "state": "RUNNING",
+        "time": "1:42:27"
+      },
+      "10255": {
+        "job_id": "10255",
+        "name": "bd-655m-handoff",
+        "nodes": "1",
+        "reason": "(Dependency)",
+        "state": "PENDING",
+        "time": "0:00"
+      },
+      "10257": {
+        "job_id": "10257",
+        "name": "bd-g60-telemetry",
+        "nodes": "1",
+        "reason": "(Dependency)",
+        "state": "PENDING",
+        "time": "0:00"
+      }
+    },
+    "stage2": {
+      "eta_hours": 18.50429933665008,
+      "job_id": "10250",
+      "latest_ce": 3.941726,
+      "latest_lr": 2e-06,
+      "latest_step": 3350,
+      "log_path": "logs/bd-s2-655m-10250.out",
+      "max_steps": 40000,
+      "progress": 0.08375,
+      "recent_ce_mean": 3.8111371
+    }
+  },
+  "objective_achieved": false,
+  "quality_claim": "traceability_from_existing_artifacts_not_new_benchmark",
+  "requirements": [
+    {
+      "evidence": "FP PPL 13.901475; PTQ PPL 3813121.803327; FP ten-task mean 0.644169; PTQ mean 0.348671; math test present True",
+      "next_action": "Keep this as the headline negative result; do not market universal conversion.",
+      "proof_strength": "strong empirical plus analytic probe",
+      "remaining_gap": "The claim is scoped to tested dense Qwen checkpoints, not every possible architecture.",
+      "requested_scope": "Determine whether naive FP/BF16 to ternary conversion is lossless or destructive.",
+      "requirement": "Post-training ternary math audit",
+      "status": "proven_negative_for_tested_dense_qwen"
+    },
+    {
+      "evidence": "SubLN source check True; BitNet-SFT best budget row 0.628935; default row 0.487621",
+      "next_action": "Use 655M and gamma telemetry to decide whether to continue budget scaling or audit recipe alignment.",
+      "proof_strength": "source evidence plus training artifacts",
+      "remaining_gap": "Implementation exists, but paper-level BitDistill recovery is not proven.",
+      "requested_scope": "Add SubLN and BitDistill-style model surgery for Qwen-family models.",
+      "requirement": "BitLinear/SubLN implementation",
+      "status": "implemented_alignment_still_under_quality_audit"
+    },
+    {
+      "evidence": "completed latest tokens 327,680,000; latest MNLI 0.720020; live job RUNNING; live step 3350; ETA hours 18.50",
+      "next_action": "Wait for job 10250, handoff 10255, and postprocess before changing experiment axes.",
+      "proof_strength": "completed 327.68M row plus live 655.36M job",
+      "remaining_gap": "655.36M downstream MNLI and paired prediction trace are pending.",
+      "requested_scope": "Run controlled continued-pretraining budgets before downstream distillation.",
+      "requirement": "Stage-2 continued pretraining",
+      "status": "active_extension_running"
+    },
+    {
+      "evidence": "loss source check True; FP16-SFT MNLI 0.808151; 327.68M BitDistill MNLI 0.720020; delta -0.088130",
+      "next_action": "Do not expand to claims; use the next decision gate after 655M/gamma evidence.",
+      "proof_strength": "source evidence plus MNLI curve",
+      "remaining_gap": "Not within the 0.5-1.0 point FP recovery target.",
+      "requested_scope": "Implement and evaluate downstream BitDistill training.",
+      "requirement": "Stage-3 downstream CE + logits KL + attention-relation KD",
+      "status": "implemented_but_not_reproduced"
+    },
+    {
+      "evidence": "FP16-SFT MNLI 0.808151; BitNet-SFT best MNLI 0.628935; BitDistill latest MNLI 0.720020; scoreboard status mixed_supported_and_blocked",
+      "next_action": "Gate QNLI/SST2 on the MNLI recovery decision to avoid wasting compute.",
+      "proof_strength": "MNLI controlled rows and earlier GLUE audits",
+      "remaining_gap": "QNLI/SST2 should be run only after a credible MNLI recovery row or recipe fix.",
+      "requested_scope": "Compare FP16-SFT, BitNet-SFT, and BitDistill on GLUE tasks.",
+      "requirement": "MNLI/QNLI/SST2 paper-style baseline reproduction",
+      "status": "partial_mnli_focused_not_complete"
+    },
+    {
+      "evidence": "row-scale QAT mean 0.499459; recovery vs PTQ +0.150788; row-scale RMS 0.000197; one-scale RMS 1.904230",
+      "next_action": "Keep row-scale results labeled as retrofit-variant systems work.",
+      "proof_strength": "paired quality evidence plus runtime contract",
+      "remaining_gap": "Row scale is not standard BitDistill and does not close FP gap yet.",
+      "requested_scope": "Compare tensor-scale BitDistill with row-scale retrofit variants.",
+      "requirement": "Row-scale novelty vs paper-style tensor scale",
+      "status": "supported_as_retrofit_variant"
+    },
+    {
+      "evidence": "I2_SR file 1211.3 MiB; PPL 38.8477; prompt 211.67; decode 19.07; Q4 PPL 12.8112",
+      "next_action": "Decide whether product target is packed classifier or causal prompt scorer.",
+      "proof_strength": "CPU benchmark artifact",
+      "remaining_gap": "Same-artifact task quality plus product-ready packed runtime remains unsolved.",
+      "requested_scope": "Export row-scale checkpoints and measure speed, memory, RSS, and quality.",
+      "requirement": "I2_SR export and CPU benchmarking on Xeon",
+      "status": "working_not_q4_quality_competitive"
+    },
+    {
+      "evidence": "quality benchmarks 12; lm-eval tasks 10; coverage checks 108; failed checks 0",
+      "next_action": "Append 655M downstream evidence after postprocess, do not preclaim it.",
+      "proof_strength": "coverage gate",
+      "remaining_gap": "These benchmarks do not include the active 655M BitDistill row.",
+      "requested_scope": "Provide enough benchmark evidence to prove or disprove the hypothesis.",
+      "requirement": "At least ten benchmark comparisons",
+      "status": "complete_for_existing_qwen15b_boundary_study"
+    },
+    {
+      "evidence": "local Kimi artifacts 0; MoE product gates passed 6/9",
+      "next_action": "Keep MoE/Kimi in future work until dense path is resolved.",
+      "proof_strength": "negative scope audit",
+      "remaining_gap": "No real Kimi mapping, trained MoE quality, routed expert-locality benchmark, or product CPU runtime.",
+      "requested_scope": "Assess expert routing and Kimi/MoE viability.",
+      "requirement": "MoE/Kimi feasibility",
+      "status": "not_supported_beyond_tiny_plumbing"
+    },
+    {
+      "evidence": "MNLI 0.652165; agreement 0.976668; sequence-isolated 7.456204 ex/s; token-id runner 2.724140 ex/s",
+      "next_action": "Choose product surface after MNLI recovery result: classifier runtime or causal prompt-scoring evaluator.",
+      "proof_strength": "native classifier audit",
+      "remaining_gap": "Agreement below 0.99 product gate and quality weak.",
+      "requested_scope": "Create a useful deployable CPU artifact for task quality.",
+      "requirement": "Product-ready packed sequence classification",
+      "status": "research_demo_not_product_ready"
+    },
+    {
+      "evidence": "product scope research_mvp_only; supported claims 5; unsupported claims 4; scoreboard publishable True",
+      "next_action": "Frame as negative PTQ result plus row-scale runtime contract; keep stronger claims gated.",
+      "proof_strength": "claim ledger plus scoreboard",
+      "remaining_gap": "Paper-level BitDistill reproduction and product artifact remain incomplete.",
+      "requested_scope": "Determine whether the work is publishable and under what claim boundaries.",
+      "requirement": "Publishable framing",
+      "status": "publishable_as_boundary_study_not_converter"
+    }
+  ],
+  "research_agent_summary": {
+    "next_decision_rule": "Wait for the active 655.36M Stage-2 producer, downstream MNLI, and postprocess reports.",
+    "publishability": {
+      "framing": "Publishable as an independent negative/positive boundary study and systems-contract prototype, not as a universal BitNet converter and not yet as a paper-level BitDistill reproduction.",
+      "main_blocker": "The same artifact still does not jointly satisfy paper-level task quality, general-LM quality, mature Q4-level storage/quality tradeoffs, and product-ready packed runtime.",
+      "publishable": true,
+      "strongest_contribution": "Blind PTQ failure plus row-scale runtime-contract evidence showing that trained ternary scale semantics must be preserved in CPU formats such as I2_SR."
+    },
+    "what_is_being_tested_now": [
+      "Whether 655.36M cumulative Stage-2 token presentations continue the MNLI recovery curve.",
+      "Whether gamma-60 component-gradient telemetry fixes the local attention-KD imbalance."
+    ],
+    "what_is_solved": [
+      "Blind ternary PTQ is rejected for tested dense Qwen.",
+      "BitDistill-style components and telemetry exist in source.",
+      "Row-scale runtime semantics are proven material for current row-scale checkpoints.",
+      "I2_SR packed CPU runtime works for compatible dense causal artifacts.",
+      "MoE/Kimi is correctly scoped as not supported beyond tiny fixtures."
+    ]
+  },
+  "schema": "bitdistill-goal-traceability-audit-v1",
+  "source_checks": [
+    {
+      "exists": true,
+      "label": "SubLN wrapper implemented",
+      "missing_patterns": [],
+      "passed": true,
+      "path": "train_bitdistill.py"
+    },
+    {
+      "exists": true,
+      "label": "Stage-3 loss combines CE, logits KD, and attention KD",
+      "missing_patterns": [],
+      "passed": true,
+      "path": "train_bitdistill.py"
+    },
+    {
+      "exists": true,
+      "label": "component-gradient telemetry exists",
+      "missing_patterns": [],
+      "passed": true,
+      "path": "train_bitdistill.py"
+    },
+    {
+      "exists": true,
+      "label": "math viability test exists",
+      "missing_patterns": [],
+      "passed": true,
+      "path": "experiments/math_viability_test.py"
+    },
+    {
+      "exists": true,
+      "label": "row-scale scoreboard exists",
+      "missing_patterns": [],
+      "passed": true,
+      "path": "benchmarks/results/bitdistill_benchmark_scoreboard_2026-05-23.json"
+    }
+  ],
+  "source_paths": {
+    "canonical_bundle": "benchmarks/results/canonical_evidence_bundle_2026-05-20.json",
+    "controlled_curve": "benchmarks/results/bitdistill_controlled_curve_2026-05-20.json",
+    "moe_support": "benchmark_results/moe_support_audit_2026-05-15.json",
+    "next_decision": "benchmarks/results/bitdistill_next_decision_2026-05-23.json",
+    "product_scope": "benchmark_results/product_scope_gate_2026-05-15.json",
+    "reproduction_gap": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json",
+    "scoreboard": "benchmarks/results/bitdistill_benchmark_scoreboard_2026-05-23.json",
+    "seqcls_gap": "benchmark_results/seqcls_runtime_gap_2026-05-15.json"
+  },
+  "status_counts": {
+    "active_extension_running": 1,
+    "complete_for_existing_qwen15b_boundary_study": 1,
+    "implemented_alignment_still_under_quality_audit": 1,
+    "implemented_but_not_reproduced": 1,
+    "not_supported_beyond_tiny_plumbing": 1,
+    "partial_mnli_focused_not_complete": 1,
+    "proven_negative_for_tested_dense_qwen": 1,
+    "publishable_as_boundary_study_not_converter": 1,
+    "research_demo_not_product_ready": 1,
+    "supported_as_retrofit_variant": 1,
+    "working_not_q4_quality_competitive": 1
+  },
+  "verdict": "The original universal retrofit thesis is disproven for the tested dense-Qwen setup. The active goal is now a bounded BitDistill/row-scale runtime study, and it is not complete until the 655M downstream gate and gamma-balance telemetry land."
+}
