@@ -137,11 +137,22 @@ def validate_consistency(report: dict[str, Any]) -> list[str]:
 
     metrics_exists = downstream["metrics"]["exists"]
     predictions_exists = downstream["predictions"]["exists"]
+    handoff_status = report["handoff"].get("status")
+    downstream_job_id = str(report["handoff"].get("downstream_job_id") or "")
     if metrics_exists != predictions_exists:
         errors.append("downstream metrics/predictions existence mismatch")
+    if (metrics_exists or predictions_exists) and handoff_status != "submitted_downstream":
+        errors.append(
+            "downstream artifacts exist before the 655M handoff submitted downstream; "
+            f"handoff status is {handoff_status}"
+        )
+    if (metrics_exists or predictions_exists) and not downstream_job_id:
+        errors.append("downstream artifacts exist but handoff report has no downstream_job_id")
     if metrics_exists:
         if downstream["metric_eval_examples"] != EXPECTED_MNLI:
             errors.append(f"downstream eval_examples {downstream['metric_eval_examples']} != {EXPECTED_MNLI}")
+        if downstream["prediction_rows"] != EXPECTED_MNLI:
+            errors.append(f"downstream prediction_rows {downstream['prediction_rows']} != {EXPECTED_MNLI}")
         if downstream["paired"].get("status") != "pass":
             errors.append(f"downstream paired status is {downstream['paired'].get('status')}")
         if downstream["prediction_error_count"]:
