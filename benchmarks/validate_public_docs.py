@@ -465,6 +465,12 @@ def validate_reproduction_gap_docs(
         errors,
     )
     require_contains(
+        "README decision scenarios report",
+        "bitdistill_decision_scenarios_2026-05-23.md",
+        readme,
+        errors,
+    )
+    require_contains(
         "README current goal status report",
         "current_goal_status_2026-05-23.md",
         readme,

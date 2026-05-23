@@ -1,11 +1,11 @@
 {
   "active_monitor": {
     "downstream_status": "waiting_for_handoff",
-    "latest_step": 2750,
+    "latest_step": 2920,
     "stage2_job_id": "10250",
     "status": "running"
   },
-  "created_utc": "2026-05-23T17:01:43.262706+00:00",
+  "created_utc": "2026-05-23T17:06:55.262643+00:00",
   "evidence_gaps": [
     "latest controlled row is 327,680,000 tokens, below 655.36M"
   ],
@@ -42,6 +42,7 @@
   "status": "pending_655m_downstream",
   "thresholds": {
     "balanced_max_grad_attention_to_ce": 10.0,
+    "decision_eps": 1e-12,
     "meaningful_stage2_gain": 0.015,
     "saturation_stage2_gain": 0.005,
     "success_delta_from_fp": -0.01,

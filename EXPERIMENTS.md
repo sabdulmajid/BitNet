@@ -161,11 +161,15 @@ The downstream postprocess also writes:
 ```bash
 benchmarks/results/bitdistill_next_decision_2026-05-23.md
 benchmarks/results/bitdistill_next_decision_2026-05-23.json
+benchmarks/results/bitdistill_decision_scenarios_2026-05-23.md
+benchmarks/results/bitdistill_decision_scenarios_2026-05-23.json
 ```
 
 That report is decision support, not a new benchmark. It remains pending until
 the `655.36M` downstream row exists, then records whether the next step should
 be a larger Stage-2 point, a loss-normalization ablation, or a replication run.
+The scenario matrix applies the same thresholds to representative hypothetical
+655M outcomes so the decision policy can be reviewed before the result arrives.
 
 ## Gamma-Balanced Telemetry
 

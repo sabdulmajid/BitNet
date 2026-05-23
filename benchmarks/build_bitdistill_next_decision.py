@@ -21,6 +21,7 @@ SUCCESS_DELTA_FROM_FP = -0.01
 MEANINGFUL_STAGE2_GAIN = 0.015
 SATURATION_STAGE2_GAIN = 0.005
 BALANCED_MAX_GRAD_ATTENTION_TO_CE = 10.0
+DECISION_EPS = 1e-12
 
 
 def read_json(path: Path, required: bool = True) -> dict[str, Any]:
@@ -36,6 +37,14 @@ def read_json(path: Path, required: bool = True) -> dict[str, Any]:
 
 def finite(value: Any) -> bool:
     return isinstance(value, (int, float)) and math.isfinite(float(value))
+
+
+def at_least(value: float, threshold: float) -> bool:
+    return value >= threshold - DECISION_EPS
+
+
+def at_most(value: float, threshold: float) -> bool:
+    return value <= threshold + DECISION_EPS
 
 
 def fmt(value: Any) -> str:
@@ -117,7 +126,7 @@ def classify_decision(
             evidence_gaps,
         )
 
-    if finite(latest_delta_vs_fp) and float(latest_delta_vs_fp) >= SUCCESS_DELTA_FROM_FP:
+    if finite(latest_delta_vs_fp) and at_least(float(latest_delta_vs_fp), SUCCESS_DELTA_FROM_FP):
         return (
             "replicate_recovery_gate",
             "Do not broaden yet; replicate the recovered row and then run QNLI/SST2 with the same recipe.",
@@ -135,11 +144,11 @@ def classify_decision(
     gamma_grad_ratio = gamma_metrics.get("gamma60_final_grad_attention_to_ce")
     gamma_rebalanced = (
         gamma_status == "gamma60_rebalanced_attention_updates"
-        or (finite(gamma_grad_ratio) and float(gamma_grad_ratio) <= BALANCED_MAX_GRAD_ATTENTION_TO_CE)
+        or (finite(gamma_grad_ratio) and at_most(float(gamma_grad_ratio), BALANCED_MAX_GRAD_ATTENTION_TO_CE))
     )
     gamma_pending = gamma_status in {"pending_gamma60_telemetry", "missing_gamma_balance"} or not gamma
 
-    if finite(previous_gain) and float(previous_gain) >= MEANINGFUL_STAGE2_GAIN:
+    if finite(previous_gain) and at_least(float(previous_gain), MEANINGFUL_STAGE2_GAIN):
         return (
             "extend_stage2_curve",
             (
@@ -171,7 +180,7 @@ def classify_decision(
             evidence_gaps,
         )
 
-    if finite(previous_gain) and float(previous_gain) <= SATURATION_STAGE2_GAIN:
+    if finite(previous_gain) and at_most(float(previous_gain), SATURATION_STAGE2_GAIN):
         return (
             "pause_broad_stage2_audit_recipe",
             (
@@ -226,6 +235,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             "meaningful_stage2_gain": MEANINGFUL_STAGE2_GAIN,
             "saturation_stage2_gain": SATURATION_STAGE2_GAIN,
             "balanced_max_grad_attention_to_ce": BALANCED_MAX_GRAD_ATTENTION_TO_CE,
+            "decision_eps": DECISION_EPS,
         },
         "latest_controlled_row": {
             "stage2_token_presentations": latest.get("stage2_token_presentations") if latest else None,
@@ -306,6 +316,7 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["meaningful Stage-2 gain", thresholds["meaningful_stage2_gain"]],
                     ["saturation Stage-2 gain", thresholds["saturation_stage2_gain"]],
                     ["balanced max grad attention/CE", thresholds["balanced_max_grad_attention_to_ce"]],
+                    ["decision epsilon", thresholds["decision_eps"]],
                 ],
             ),
             "## Evidence Gaps",

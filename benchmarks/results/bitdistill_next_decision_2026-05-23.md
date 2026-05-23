@@ -1,6 +1,6 @@
 # BitDistill Next Decision
 
-Generated: `2026-05-23T17:01:43.262706+00:00`
+Generated: `2026-05-23T17:06:55.262643+00:00`
 
 Status: **pending_655m_downstream**.
 
@@ -36,6 +36,7 @@ Wait for the active 655.36M Stage-2 producer, downstream MNLI, and postprocess r
 | meaningful Stage-2 gain | 0.015000 |
 | saturation Stage-2 gain | 0.005000 |
 | balanced max grad attention/CE | 10.000000 |
+| decision epsilon | 1.000e-12 |
 
 ## Evidence Gaps
 

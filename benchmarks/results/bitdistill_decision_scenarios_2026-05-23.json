@@ -1,0 +1,91 @@
+{
+  "caveat": "This report simulates decision outcomes using existing thresholds. It does not add benchmark evidence or predict the 655M result.",
+  "created_utc": "2026-05-23T17:06:55.191170+00:00",
+  "current_completed_accuracy": 0.7200203769740193,
+  "fp16_sft_mnli": 0.8081507896077432,
+  "quality_claim": "decision_policy_not_benchmark",
+  "scenarios": [
+    {
+      "accuracy": 0.7200203769740193,
+      "decision_status": "hold_for_gamma_balance",
+      "delta_vs_327m": 0.0,
+      "delta_vs_fp16": -0.0881304126337239,
+      "evidence_gaps": [
+        "gamma-60 balance diagnostic is still pending"
+      ],
+      "gamma": "pending",
+      "label": "flat 655M",
+      "recommendation": "The 655M quality row does not provide enough evidence by itself; wait for gamma-balance telemetry before launching another expensive broad run.",
+      "why": "No downstream improvement and gamma telemetry still absent."
+    },
+    {
+      "accuracy": 0.7250203769740193,
+      "decision_status": "run_gamma_balanced_downstream",
+      "delta_vs_327m": 0.0050000000000000044,
+      "delta_vs_fp16": -0.0831304126337239,
+      "evidence_gaps": [],
+      "gamma": "rebalanced",
+      "label": "saturated 655M, gamma rebalanced",
+      "recommendation": "The Stage-2 marginal gain is weak and gamma-60 rebalances updates. Run a matched 10k-step downstream MNLI row with the balanced coefficient before spending more Stage-2 tokens.",
+      "why": "Stage-2 gain is weak but gamma-60 fixes update balance."
+    },
+    {
+      "accuracy": 0.7250203769740193,
+      "decision_status": "pause_broad_stage2_audit_recipe",
+      "delta_vs_327m": 0.0050000000000000044,
+      "delta_vs_fp16": -0.0831304126337239,
+      "evidence_gaps": [],
+      "gamma": "still_dominated",
+      "label": "saturated 655M, gamma still dominated",
+      "recommendation": "The Stage-2 curve appears to saturate and gamma telemetry did not resolve the update imbalance. Stop broad budget scaling and audit recipe alignment.",
+      "why": "Stage-2 gain is weak and gamma-60 does not fix update balance."
+    },
+    {
+      "accuracy": 0.7300203769740193,
+      "decision_status": "ambiguous_recovery_continue_with_controls",
+      "delta_vs_327m": 0.010000000000000009,
+      "delta_vs_fp16": -0.07813041263372389,
+      "evidence_gaps": [],
+      "gamma": "still_dominated",
+      "label": "ambiguous mid gain",
+      "recommendation": "Evidence is mixed. Run one narrow ablation at a time: either the next Stage-2 point or one gamma-balanced downstream row, but do not expand axes.",
+      "why": "Improvement exists but is below the meaningful-gain threshold."
+    },
+    {
+      "accuracy": 0.7350203769740193,
+      "decision_status": "extend_stage2_curve",
+      "delta_vs_327m": 0.015000000000000013,
+      "delta_vs_fp16": -0.07313041263372388,
+      "evidence_gaps": [],
+      "gamma": "pending",
+      "label": "meaningful gain",
+      "recommendation": "Stage-2 still has meaningful marginal gain. Queue the next controlled point before changing the recipe, while keeping gamma telemetry as a diagnostic.",
+      "why": "Stage-2 gain remains large enough to justify another controlled point."
+    },
+    {
+      "accuracy": 0.7981507896077432,
+      "decision_status": "replicate_recovery_gate",
+      "delta_vs_327m": 0.07813041263372389,
+      "delta_vs_fp16": -0.010000000000000009,
+      "evidence_gaps": [],
+      "gamma": "pending",
+      "label": "FP recovery gate",
+      "recommendation": "Do not broaden yet; replicate the recovered row and then run QNLI/SST2 with the same recipe.",
+      "why": "The row reaches the configured within-1pt FP16 recovery gate."
+    }
+  ],
+  "schema": "bitdistill-decision-scenarios-v1",
+  "source_paths": {
+    "controlled_curve": "benchmarks/results/bitdistill_controlled_curve_2026-05-20.json",
+    "reproduction_gap": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json"
+  },
+  "thresholds": {
+    "balanced_max_grad_attention_to_ce": 10.0,
+    "decision_eps": 1e-12,
+    "meaningful_stage2_gain": 0.015,
+    "saturation_stage2_gain": 0.005,
+    "success_accuracy": 0.7981507896077432,
+    "success_delta_from_fp": -0.01,
+    "target_stage2_tokens": 655360000
+  }
+}
