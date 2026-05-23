@@ -9,6 +9,7 @@ bundle and that every artifact referenced by the bundle exists.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -27,6 +28,14 @@ def load_json(path: Path) -> dict[str, Any]:
     if not isinstance(data, dict):
         raise ValueError(f"{path} is not a JSON object")
     return data
+
+
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def fmt(value: float, digits: int = 6) -> str:
@@ -59,6 +68,12 @@ def validate_artifacts(bundle: dict[str, Any], errors: list[str]) -> None:
             continue
         if not Path(path).exists():
             errors.append(f"artifact {label}: path does not exist: {path}")
+            continue
+        expected_sha = artifact.get("sha256")
+        if isinstance(expected_sha, str) and expected_sha:
+            actual_sha = sha256(Path(path))
+            if actual_sha != expected_sha:
+                errors.append(f"artifact {label}: sha256 mismatch: {actual_sha} != {expected_sha}")
 
 
 def validate_reproduction_gap(report: dict[str, Any], errors: list[str]) -> None:
@@ -80,6 +95,14 @@ def validate_reproduction_gap(report: dict[str, Any], errors: list[str]) -> None
             continue
         if not Path(path).exists():
             errors.append(f"reproduction gap artifact {label}: path does not exist: {path}")
+            continue
+        expected_sha = artifact.get("sha256")
+        if isinstance(expected_sha, str) and expected_sha:
+            actual_sha = sha256(Path(path))
+            if actual_sha != expected_sha:
+                errors.append(
+                    f"reproduction gap artifact {label}: sha256 mismatch: {actual_sha} != {expected_sha}"
+                )
 
 
 def validate_stage2_extension_submission(report: dict[str, Any], errors: list[str]) -> None:
