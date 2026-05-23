@@ -65,6 +65,21 @@ def validate_inputs(status: dict[str, Any], canonical: dict[str, Any], gap: dict
         raise RuntimeError("\n".join(errors))
 
 
+def validate_decision_inputs(next_decision: dict[str, Any], blueprint: dict[str, Any]) -> None:
+    errors: list[str] = []
+    if next_decision.get("schema") != "bitdistill-next-decision-v1":
+        errors.append(f"unexpected next-decision schema {next_decision.get('schema')}")
+    if blueprint.get("schema") != "bitdistill-next-experiment-blueprint-v1":
+        errors.append(f"unexpected blueprint schema {blueprint.get('schema')}")
+    if next_decision.get("status") != blueprint.get("status"):
+        errors.append(
+            "next-decision and blueprint status mismatch: "
+            f"{next_decision.get('status')} != {blueprint.get('status')}"
+        )
+    if errors:
+        raise RuntimeError("\n".join(errors))
+
+
 def artifact(path: Path) -> dict[str, str]:
     return {"path": str(path), "sha256": sha256(path)}
 
@@ -73,7 +88,10 @@ def build_handoff(args: argparse.Namespace) -> dict[str, Any]:
     status = read_json(args.current_status)
     canonical = read_json(args.canonical_bundle)
     gap = read_json(args.reproduction_gap)
+    next_decision = read_json(args.next_decision)
+    blueprint = read_json(args.next_experiment_blueprint)
     validate_inputs(status, canonical, gap)
+    validate_decision_inputs(next_decision, blueprint)
 
     claims = canonical["claims"]
     blind = claims["blind_ptq"]
@@ -183,6 +201,16 @@ def build_handoff(args: argparse.Namespace) -> dict[str, Any]:
     ]
 
     active_gate = status["active_gate"]
+    current_action = blueprint.get("current_action", {}) if isinstance(blueprint.get("current_action"), dict) else {}
+    next_action = {
+        "decision_status": next_decision.get("status"),
+        "recommendation": next_decision.get("recommendation"),
+        "blueprint_action": current_action.get("action"),
+        "runnable_now": current_action.get("runnable_now"),
+        "claim_boundary": current_action.get("claim_boundary"),
+        "required_evidence": current_action.get("evidence_required", []),
+        "commands": current_action.get("commands", []),
+    }
     open_questions = [
         {
             "question": "Does the Stage-2 token-budget curve keep improving at 655.36M tokens?",
@@ -222,6 +250,7 @@ def build_handoff(args: argparse.Namespace) -> dict[str, Any]:
         "completed_findings": completed_findings,
         "novelty": novelty,
         "active_gate": active_gate,
+        "next_action": next_action,
         "open_questions": open_questions,
         "nonclaims": status["publishable_scope"]["not_publishable_as"],
         "publishable_angles": status["publishable_scope"]["potentially_publishable_as"],
@@ -229,6 +258,8 @@ def build_handoff(args: argparse.Namespace) -> dict[str, Any]:
             "current_status": artifact(args.current_status),
             "canonical_bundle": artifact(args.canonical_bundle),
             "reproduction_gap": artifact(args.reproduction_gap),
+            "next_decision": artifact(args.next_decision),
+            "next_experiment_blueprint": artifact(args.next_experiment_blueprint),
         },
     }
 
@@ -261,6 +292,19 @@ def render_markdown(report: dict[str, Any]) -> str:
             ),
             "## Active 655M Gate",
             md_table(["field", "value"], [[key, value] for key, value in report["active_gate"].items()]),
+            "## Next Action Policy",
+            md_table(
+                ["field", "value"],
+                [
+                    ["decision_status", report["next_action"]["decision_status"]],
+                    ["recommendation", report["next_action"]["recommendation"]],
+                    ["blueprint_action", report["next_action"]["blueprint_action"]],
+                    ["runnable_now", report["next_action"]["runnable_now"]],
+                    ["claim_boundary", report["next_action"]["claim_boundary"]],
+                    ["required_evidence", ", ".join(report["next_action"]["required_evidence"])],
+                    ["commands", " ; ".join(report["next_action"]["commands"])],
+                ],
+            ),
             "## Open Research Questions",
             md_table(
                 ["question", "evidence needed", "current state"],
@@ -296,6 +340,16 @@ def main() -> int:
         "--reproduction-gap",
         type=Path,
         default=Path("benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json"),
+    )
+    parser.add_argument(
+        "--next-decision",
+        type=Path,
+        default=Path("benchmarks/results/bitdistill_next_decision_2026-05-23.json"),
+    )
+    parser.add_argument(
+        "--next-experiment-blueprint",
+        type=Path,
+        default=Path("benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.json"),
     )
     parser.add_argument(
         "--output-json",
