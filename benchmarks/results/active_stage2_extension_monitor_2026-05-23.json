@@ -1,5 +1,5 @@
 {
-  "created_utc": "2026-05-23T16:53:51.847458+00:00",
+  "created_utc": "2026-05-23T17:01:43.219654+00:00",
   "downstream": {
     "caveat": "This section tracks downstream artifact existence only; it does not compute or claim MNLI accuracy.",
     "complete": false,
@@ -45,6 +45,10 @@
     "expected_json_exists": false,
     "expected_md": "benchmarks/results/stage2_655m_postprocess_2026-05-23.md",
     "expected_md_exists": false,
+    "expected_next_decision_json": "benchmarks/results/bitdistill_next_decision_2026-05-23.json",
+    "expected_next_decision_json_exists": true,
+    "expected_next_decision_md": "benchmarks/results/bitdistill_next_decision_2026-05-23.md",
+    "expected_next_decision_md_exists": true,
     "job_id": "",
     "slurm": {
       "job_id": "",
@@ -135,31 +139,31 @@
     "job_id": "10250",
     "latest_complete_snapshot_step": null,
     "latest_step": {
-      "ce": 3.937422,
-      "elapsed_seconds": 4524.8,
+      "ce": 4.063435,
+      "elapsed_seconds": 4997.9,
       "first_elapsed_seconds": 2.0,
       "first_step": 1,
       "log_exists": true,
       "lr": 2e-06,
-      "parsed_log_rows": 250,
+      "parsed_log_rows": 276,
       "path": "logs/bd-s2-655m-10250.out",
-      "recent_ce_max": 4.37203,
-      "recent_ce_mean": 3.93566995,
-      "recent_ce_min": 3.437619,
+      "recent_ce_max": 4.197744,
+      "recent_ce_mean": 3.7403668000000003,
+      "recent_ce_min": 3.254467,
       "recent_window_rows": 20,
-      "step": 2490
+      "step": 2750
     },
     "max_steps": 40000,
     "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
-    "progress": 0.06225,
+    "progress": 0.06875,
     "progress_estimate": {
-      "estimated_completion_utc": "2026-05-24T11:49:54.597216+00:00",
-      "estimated_total_seconds": 72687.55020080322,
-      "eta_hours": 18.934097278000895,
-      "eta_seconds": 68162.75020080322,
-      "seconds_per_step": 1.8171887550200805,
-      "segment_token_presentations_per_second": 4508.062234794907,
-      "steps_per_hour": 1981.082036775106
+      "estimated_completion_utc": "2026-05-24T11:50:02.046480+00:00",
+      "estimated_total_seconds": 72696.72727272726,
+      "eta_hours": 18.8052297979798,
+      "eta_seconds": 67698.82727272727,
+      "seconds_per_step": 1.8174181818181816,
+      "segment_token_presentations_per_second": 4507.4931471217915,
+      "steps_per_hour": 1980.831949418756
     },
     "root_metrics": {
       "exists": false,
@@ -172,7 +176,7 @@
       "name": "bd-s2-655m",
       "reason": "ece-nebula12",
       "state": "RUNNING",
-      "time": "1:16:26"
+      "time": "1:24:18"
     }
   },
   "status": "running",
@@ -191,9 +195,9 @@
         "size_bytes": null
       }
     ],
-    "job_id": "10256",
+    "job_id": "10257",
     "slurm": {
-      "job_id": "10256",
+      "job_id": "10257",
       "name": "bd-g60-telemetry",
       "reason": "(Dependency)",
       "state": "PENDING",

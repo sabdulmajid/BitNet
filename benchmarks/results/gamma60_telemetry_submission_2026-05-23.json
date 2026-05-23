@@ -2,13 +2,14 @@
   "schema": "bitdistill-gradient-telemetry-submission-v1",
   "created_utc": "2026-05-23T16:12:00+00:00",
   "status": "dependency_pending",
-  "job_id": "10256",
-  "cancelled_job_id": "10254",
+  "job_id": "10257",
+  "cancelled_job_id": "10256",
   "cancelled_job_ids": [
     "10252",
-    "10254"
+    "10254",
+    "10256"
   ],
-  "cancelled_job_reason": "Job 10252 was cancelled while dependency-pending because its stored batch script did not embed the diagnostic constants. Job 10254 was cancelled while dependency-pending because its stored batch script did not include post-run gamma-balance report generation. Job 10256 was resubmitted with slurm_gamma60_telemetry.sh, which hardcodes ATTENTION_KD_WEIGHT=60, telemetry settings, and post-run balance reporting in the Slurm batch script.",
+  "cancelled_job_reason": "Job 10252 was cancelled while dependency-pending because its stored batch script did not embed the diagnostic constants. Job 10254 was cancelled while dependency-pending because its stored batch script did not include post-run gamma-balance report generation. Job 10256 was cancelled while dependency-pending because its stored batch script did not include the next-decision report rebuild. Job 10257 was resubmitted with slurm_gamma60_telemetry.sh, which hardcodes ATTENTION_KD_WEIGHT=60, telemetry settings, post-run balance reporting, and next-decision report generation in the Slurm batch script.",
   "dependency": "afterok:10250",
   "partition": "midcard",
   "script": "slurm_gamma60_telemetry.sh",

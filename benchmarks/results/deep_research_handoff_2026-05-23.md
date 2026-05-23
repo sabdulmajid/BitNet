@@ -1,6 +1,6 @@
 # Deep Research Handoff
 
-Generated: `2026-05-23T16:53:59.087608+00:00`
+Generated: `2026-05-23T17:01:50.689010+00:00`
 
 Status: **handoff_not_completion**.
 
@@ -38,23 +38,23 @@ Status: **handoff_not_completion**.
 | --- | --- |
 | downstream_complete | False |
 | downstream_status | waiting_for_handoff |
-| eta_hours | 18.934097 |
-| latest_ce | 3.937422 |
+| eta_hours | 18.805230 |
+| latest_ce | 4.063435 |
 | latest_complete_snapshot_step | - |
-| latest_step | 2490 |
+| latest_step | 2750 |
 | max_steps | 40000 |
-| progress | 0.062250 |
+| progress | 0.068750 |
 | stage2_job_id | 10250 |
 | stage2_slurm_state | RUNNING |
 | stage2_status | running |
-| telemetry_job_id | 10256 |
+| telemetry_job_id | 10257 |
 | telemetry_slurm_state | PENDING |
 
 ## Open Research Questions
 
 | question | evidence needed | current state |
 | --- | --- | --- |
-| Does the Stage-2 token-budget curve keep improving at 655.36M tokens? | Completed 655M Stage-2 manifest plus downstream MNLI metrics.json and eval_predictions.jsonl. | running; step 2490/40000; downstream waiting_for_handoff. |
+| Does the Stage-2 token-budget curve keep improving at 655.36M tokens? | Completed 655M Stage-2 manifest plus downstream MNLI metrics.json and eval_predictions.jsonl. | running; step 2750/40000; downstream waiting_for_handoff. |
 | Is the remaining BitDistill gap mostly compute budget or loss-normalization mismatch? | 655M/longer budget curve and gamma-balanced component-gradient telemetry. | paper-gamma grad attention/CE 221.384986; gamma-60 telemetry queued. |
 | Can the same artifact provide both quality and CPU runtime evidence? | Packed classifier or causal prompt-scoring artifact with task quality, RSS, file size, and throughput. | native classifier MNLI 0.652165, agreement 0.976668; not product-ready. |
 | Do row-scale variants help generally or only in specific retrofit regimes? | Controlled tensor/row/group-scale comparisons across tasks/backbones with paired confidence intervals. | Row-scale runtime contract is strong; row-scale accuracy is not a universal guarantee. |
@@ -79,6 +79,6 @@ Status: **handoff_not_completion**.
 
 | artifact | path | sha256 |
 | --- | --- | --- |
-| current_status | benchmarks/results/current_goal_status_2026-05-23.json | a5eb9cd332a8efec37e3017f6c29d58530ddeb91b5524a107cc034fa3dce88fc |
+| current_status | benchmarks/results/current_goal_status_2026-05-23.json | 67b96eb4205d1656d984d536940aecd29e621b3606805c22c8930f3b4880d36d |
 | canonical_bundle | benchmarks/results/canonical_evidence_bundle_2026-05-20.json | af9ec2e35931986c7caf63c178b7c482c3e93406f8d880774bbf8d114f27824c |
 | reproduction_gap | benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json | b5a37266b33dc7318b55a23569673467d11fa7aa67ba6725baaa374210a42820 |

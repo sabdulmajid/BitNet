@@ -25,6 +25,8 @@ GAP_JSON="${GAP_JSON:-benchmarks/results/bitdistill_reproduction_gap_${DATE}.jso
 GAP_MD="${GAP_MD:-benchmarks/results/bitdistill_reproduction_gap_${DATE}.md}"
 POSTPROCESS_JSON="${POSTPROCESS_JSON:-benchmarks/results/stage2_655m_postprocess_${DATE}.json}"
 POSTPROCESS_MD="${POSTPROCESS_MD:-benchmarks/results/stage2_655m_postprocess_${DATE}.md}"
+DECISION_JSON="${DECISION_JSON:-benchmarks/results/bitdistill_next_decision_${DATE}.json}"
+DECISION_MD="${DECISION_MD:-benchmarks/results/bitdistill_next_decision_${DATE}.md}"
 
 write_postprocess_report() {
   local status="$1"
@@ -47,6 +49,8 @@ data = {
     "controlled_curve_md": "$CONTROLLED_MD",
     "reproduction_gap_json": "$GAP_JSON",
     "reproduction_gap_md": "$GAP_MD",
+    "next_decision_json": "$DECISION_JSON",
+    "next_decision_md": "$DECISION_MD",
     "caveat": "$caveat",
 }
 Path("$POSTPROCESS_JSON").write_text(json.dumps(data, indent=2, sort_keys=True) + "\\n", encoding="utf-8")
@@ -60,7 +64,8 @@ Path("$POSTPROCESS_MD").write_text(
         f"| metrics_exists | `{data['metrics_exists']}` |\\n"
         f"| predictions_exists | `{data['predictions_exists']}` |\\n"
         f"| controlled_curve_json | `{data['controlled_curve_json']}` |\\n"
-        f"| reproduction_gap_json | `{data['reproduction_gap_json']}` |",
+        f"| reproduction_gap_json | `{data['reproduction_gap_json']}` |\\n"
+        f"| next_decision_json | `{data['next_decision_json']}` |",
         data["caveat"],
     ]) + "\\n",
     encoding="utf-8",
@@ -76,6 +81,9 @@ if [[ ! -s "$METRICS_JSON" || ! -s "$PREDICTIONS_JSONL" ]]; then
   python benchmarks/monitor_active_stage2_extension.py
   python benchmarks/build_current_goal_status.py
   python benchmarks/build_deep_research_handoff.py
+  python benchmarks/build_bitdistill_next_decision.py \
+    --output-json "$DECISION_JSON" \
+    --output-md "$DECISION_MD"
   write_postprocess_report \
     "downstream_incomplete" \
     "Downstream metrics or prediction traces are missing. No quality reports were rebuilt."
@@ -94,12 +102,19 @@ python benchmarks/build_reproduction_gap_report.py \
 python benchmarks/monitor_active_stage2_extension.py
 python benchmarks/build_current_goal_status.py
 python benchmarks/build_deep_research_handoff.py
+python benchmarks/build_bitdistill_next_decision.py \
+  --reproduction-gap "$GAP_JSON" \
+  --controlled-curve "$CONTROLLED_JSON" \
+  --output-json "$DECISION_JSON" \
+  --output-md "$DECISION_MD"
 
 python benchmarks/validate_reports_fail_closed.py \
   "$CONTROLLED_JSON" \
   "$CONTROLLED_MD" \
   "$GAP_JSON" \
   "$GAP_MD" \
+  "$DECISION_JSON" \
+  "$DECISION_MD" \
   benchmarks/results/current_goal_status_2026-05-23.json \
   benchmarks/results/current_goal_status_2026-05-23.md \
   benchmarks/results/deep_research_handoff_2026-05-23.json \

@@ -1,0 +1,50 @@
+{
+  "active_monitor": {
+    "downstream_status": "waiting_for_handoff",
+    "latest_step": 2750,
+    "stage2_job_id": "10250",
+    "status": "running"
+  },
+  "created_utc": "2026-05-23T17:01:43.262706+00:00",
+  "evidence_gaps": [
+    "latest controlled row is 327,680,000 tokens, below 655.36M"
+  ],
+  "gamma_balance": {
+    "gamma60_attention_grad_reduction_factor": null,
+    "gamma60_final_grad_attention_to_ce": null,
+    "paper_final_grad_attention_to_ce": 221.3849856028098,
+    "status": "pending_gamma60_telemetry"
+  },
+  "latest_controlled_row": {
+    "accuracy": 0.7200203769740193,
+    "delta_vs_fp16": -0.0881304126337239,
+    "paired_ci95": [
+      -0.0967494587122408,
+      -0.07951136655520699
+    ],
+    "passes_fp_recovery_gate": false,
+    "stage2_token_presentations": 327680000
+  },
+  "marginal_stage2_gain": 0.028833418237391717,
+  "previous_controlled_row": {
+    "accuracy": 0.6911869587366276,
+    "stage2_token_presentations": 163840000
+  },
+  "quality_claim": "decision_support_not_new_benchmark",
+  "recommendation": "Wait for the active 655.36M Stage-2 producer, downstream MNLI, and postprocess reports.",
+  "schema": "bitdistill-next-decision-v1",
+  "source_paths": {
+    "active_monitor": "benchmarks/results/active_stage2_extension_monitor_2026-05-23.json",
+    "controlled_curve": "benchmarks/results/bitdistill_controlled_curve_2026-05-20.json",
+    "gamma_balance": "benchmarks/results/gamma60_gradient_balance_2026-05-23.json",
+    "reproduction_gap": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json"
+  },
+  "status": "pending_655m_downstream",
+  "thresholds": {
+    "balanced_max_grad_attention_to_ce": 10.0,
+    "meaningful_stage2_gain": 0.015,
+    "saturation_stage2_gain": 0.005,
+    "success_delta_from_fp": -0.01,
+    "target_stage2_tokens": 655360000
+  }
+}

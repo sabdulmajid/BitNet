@@ -4,8 +4,8 @@ Status: **dependency pending**.
 
 | field | value |
 | --- | --- |
-| job_id | `10256` |
-| cancelled_job_id | `10254` |
+| job_id | `10257` |
+| cancelled_job_id | `10256` |
 | dependency | `afterok:10250` |
 | partition | `midcard` |
 | script | `slurm_gamma60_telemetry.sh` |
@@ -20,10 +20,12 @@ Status: **dependency pending**.
 Job `10252` was cancelled while dependency-pending because its stored batch
 script did not embed the diagnostic constants. Job `10254` was cancelled while
 dependency-pending because its stored batch script did not include post-run
-gamma-balance report generation. Job `10256` was resubmitted with
+gamma-balance report generation. Job `10256` was cancelled while
+dependency-pending because its stored batch script did not include the
+next-decision report rebuild. Job `10257` was resubmitted with
 `slurm_gamma60_telemetry.sh`, which hardcodes `ATTENTION_KD_WEIGHT=60`, the
-telemetry settings, and the post-run balance reporting in the Slurm batch
-script.
+telemetry settings, the post-run balance reporting, and next-decision report
+generation in the Slurm batch script.
 
 This is a short gradient-balance diagnostic, not a quality benchmark. Its role
 is to compare equalized-gamma component-gradient telemetry against the existing

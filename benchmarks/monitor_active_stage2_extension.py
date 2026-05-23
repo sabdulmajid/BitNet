@@ -244,6 +244,24 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
             handoff_submission.get("expected_postprocess_md", ""),
         )
     )
+    next_decision_json_text = str(
+        (handoff_report or {}).get(
+            "next_decision_json",
+            handoff_submission.get(
+                "expected_next_decision_json",
+                "benchmarks/results/bitdistill_next_decision_2026-05-23.json",
+            ),
+        )
+    )
+    next_decision_md_text = str(
+        (handoff_report or {}).get(
+            "next_decision_md",
+            handoff_submission.get(
+                "expected_next_decision_md",
+                "benchmarks/results/bitdistill_next_decision_2026-05-23.md",
+            ),
+        )
+    )
     latest_step = parse_latest_step(args.stage2_log)
     max_steps = int(stage2_config["max_steps"])
     save_every_steps = int(stage2_config.get("save_every_steps") or 0)
@@ -320,6 +338,10 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
             "expected_json_exists": Path(postprocess_json_text).exists() if postprocess_json_text else False,
             "expected_md": postprocess_md_text,
             "expected_md_exists": Path(postprocess_md_text).exists() if postprocess_md_text else False,
+            "expected_next_decision_json": next_decision_json_text,
+            "expected_next_decision_json_exists": Path(next_decision_json_text).exists() if next_decision_json_text else False,
+            "expected_next_decision_md": next_decision_md_text,
+            "expected_next_decision_md_exists": Path(next_decision_md_text).exists() if next_decision_md_text else False,
             "caveat": "This section tracks report-regeneration job state only; it is not quality evidence.",
         },
         "telemetry": {
@@ -367,6 +389,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         ["downstream metrics", downstream["metrics"]["exists"], downstream["metrics"]["path"]],
         ["downstream predictions", downstream["predictions"]["exists"], downstream["predictions"]["path"]],
         ["postprocess report", postprocess["expected_json_exists"], postprocess["expected_json"]],
+        ["next decision report", postprocess["expected_next_decision_json_exists"], postprocess["expected_next_decision_json"]],
     ]
     artifact_rows.extend(
         [f"telemetry artifact {idx}", artifact["exists"], artifact["path"]]
@@ -477,6 +500,10 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["expected_json_exists", postprocess["expected_json_exists"]],
                     ["expected_md", postprocess["expected_md"]],
                     ["expected_md_exists", postprocess["expected_md_exists"]],
+                    ["expected_next_decision_json", postprocess["expected_next_decision_json"]],
+                    ["expected_next_decision_json_exists", postprocess["expected_next_decision_json_exists"]],
+                    ["expected_next_decision_md", postprocess["expected_next_decision_md"]],
+                    ["expected_next_decision_md_exists", postprocess["expected_next_decision_md_exists"]],
                     ["caveat", postprocess["caveat"]],
                 ],
             ),

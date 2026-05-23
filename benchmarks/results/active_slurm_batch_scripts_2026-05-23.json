@@ -32,7 +32,7 @@
       "job_id": "10255",
       "passed": true,
       "purpose": "655M Stage-2 handoff",
-      "scontrol_message": "batch script for job 10255 written to /tmp/bitnet-slurm-script-cffpjiqm/10255.sh",
+      "scontrol_message": "batch script for job 10255 written to /tmp/bitnet-slurm-script-rr_jjosf/10255.sh",
       "script_available": true,
       "slurm": {
         "job_id": "10255",
@@ -40,6 +40,34 @@
         "reason": "(Dependency)",
         "state": "PENDING",
         "time": "0:00"
+      }
+    },
+    {
+      "checks": [
+        {
+          "present": true,
+          "snippet": "build_bitdistill_next_decision.py"
+        },
+        {
+          "present": true,
+          "snippet": "DECISION_JSON"
+        },
+        {
+          "present": true,
+          "snippet": "DECISION_MD"
+        },
+        {
+          "present": true,
+          "snippet": "validate_reports_fail_closed.py"
+        }
+      ],
+      "job_id": "local",
+      "passed": true,
+      "purpose": "655M Stage-2 postprocess script",
+      "scontrol_message": "slurm_stage2_655m_postprocess.sh",
+      "script_available": true,
+      "slurm": {
+        "state": "local_file"
       }
     },
     {
@@ -71,16 +99,20 @@
         },
         {
           "present": true,
+          "snippet": "build_bitdistill_next_decision.py"
+        },
+        {
+          "present": true,
           "snippet": "validate_reports_fail_closed.py"
         }
       ],
-      "job_id": "10256",
+      "job_id": "10257",
       "passed": true,
       "purpose": "gamma-60 gradient telemetry",
-      "scontrol_message": "batch script for job 10256 written to /tmp/bitnet-slurm-script-1fbgulv1/10256.sh",
+      "scontrol_message": "batch script for job 10257 written to /tmp/bitnet-slurm-script-_gj8gd_1/10257.sh",
       "script_available": true,
       "slurm": {
-        "job_id": "10256",
+        "job_id": "10257",
         "name": "bd-g60-telemetry",
         "reason": "(Dependency)",
         "state": "PENDING",
@@ -88,7 +120,7 @@
       }
     }
   ],
-  "created_utc": "2026-05-23T16:53:51.891732+00:00",
+  "created_utc": "2026-05-23T17:01:43.255905+00:00",
   "quality_claim": "none",
   "schema": "bitnet-active-slurm-batch-script-audit-v1",
   "status": "passed"

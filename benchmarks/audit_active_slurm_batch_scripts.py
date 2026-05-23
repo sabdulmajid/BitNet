@@ -88,6 +88,27 @@ def audit_handoff(submission: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def audit_postprocess_script(path: Path = Path("slurm_stage2_655m_postprocess.sh")) -> dict[str, Any]:
+    script = path.read_text(encoding="utf-8", errors="replace") if path.exists() else ""
+    required = [
+        "build_bitdistill_next_decision.py",
+        "DECISION_JSON",
+        "DECISION_MD",
+        "validate_reports_fail_closed.py",
+    ]
+    checks = check_snippets(script, required)
+    passed = bool(script) and all(check["present"] for check in checks)
+    return {
+        "job_id": "local",
+        "purpose": "655M Stage-2 postprocess script",
+        "slurm": {"state": "local_file"},
+        "script_available": bool(script),
+        "scontrol_message": str(path),
+        "checks": checks,
+        "passed": passed,
+    }
+
+
 def audit_gamma(submission: dict[str, Any]) -> dict[str, Any]:
     job_id = str(submission.get("job_id", ""))
     script, message = slurm_batch_script(job_id)
@@ -98,6 +119,7 @@ def audit_gamma(submission: dict[str, Any]) -> dict[str, Any]:
         "export TELEMETRY_EVERY_STEPS=25",
         "export TELEMETRY_COMPONENT_GRAD_NORMS=1",
         "audit_bitdistill_gamma_balance.py",
+        "build_bitdistill_next_decision.py",
         "validate_reports_fail_closed.py",
     ]
     checks = check_snippets(script, required)
@@ -116,8 +138,9 @@ def audit_gamma(submission: dict[str, Any]) -> dict[str, Any]:
 
 def build(args: argparse.Namespace) -> dict[str, Any]:
     handoff = audit_handoff(read_json(args.handoff_submission))
+    postprocess = audit_postprocess_script()
     gamma = audit_gamma(read_json(args.gamma_submission))
-    checks = [handoff, gamma]
+    checks = [handoff, postprocess, gamma]
     return {
         "schema": "bitnet-active-slurm-batch-script-audit-v1",
         "created_utc": datetime.now(timezone.utc).isoformat(),

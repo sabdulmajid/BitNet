@@ -156,6 +156,17 @@ The audit auto-loads the verified `327.68M` manifest and the expected
 `655.36M` manifest path. If the 655M downstream result is still pending, the row
 must remain pending and public quality claims must not change.
 
+The downstream postprocess also writes:
+
+```bash
+benchmarks/results/bitdistill_next_decision_2026-05-23.md
+benchmarks/results/bitdistill_next_decision_2026-05-23.json
+```
+
+That report is decision support, not a new benchmark. It remains pending until
+the `655.36M` downstream row exists, then records whether the next step should
+be a larger Stage-2 point, a loss-normalization ablation, or a replication run.
+
 ## Gamma-Balanced Telemetry
 
 The loss-normalization gate now has a queued equalized-gamma telemetry job:
@@ -163,10 +174,11 @@ The loss-normalization gate now has a queued equalized-gamma telemetry job:
 - `benchmarks/results/gamma60_telemetry_submission_2026-05-23.json`
 - `benchmarks/results/gamma60_telemetry_submission_2026-05-23.md`
 
-Job `10256` is dependency-blocked on `afterok:10250`. It is a short 200-step
+Job `10257` is dependency-blocked on `afterok:10250`. It is a short 200-step
 component-gradient telemetry diagnostic with `ATTENTION_KD_WEIGHT=60`; it is
-not a task-quality benchmark. It replaces pending job `10254` so the stored
-Slurm script also writes the post-run gamma-balance audit.
+not a task-quality benchmark. It replaces pending job `10256` so the stored
+Slurm script also writes the post-run gamma-balance audit and refreshes the
+next-decision report.
 
 After it materializes, rebuild the training-dynamics audit:
 
@@ -181,6 +193,8 @@ The Slurm script now performs this rebuild automatically and also writes:
 ```bash
 benchmarks/results/gamma60_gradient_balance_2026-05-23.md
 benchmarks/results/gamma60_gradient_balance_2026-05-23.json
+benchmarks/results/bitdistill_next_decision_2026-05-23.md
+benchmarks/results/bitdistill_next_decision_2026-05-23.json
 ```
 
 The audit includes both paper-gamma telemetry directories and the queued
@@ -189,7 +203,7 @@ ratios, not task accuracy, for this diagnostic.
 
 ## Active Gate Monitor
 
-Use this while `10250`, `10255`, and `10256` are still live:
+Use this while `10250`, `10255`, and `10257` are still live:
 
 ```bash
 python benchmarks/monitor_active_stage2_extension.py

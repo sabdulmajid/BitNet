@@ -14,6 +14,7 @@ Status: **dependency pending**.
 | expected_manifest_json | `benchmarks/results/stage2_manifest_655m_2026-05-23.json` |
 | expected_downstream_output_dir | `checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit` |
 | expected_postprocess_json | `benchmarks/results/stage2_655m_postprocess_2026-05-23.json` |
+| expected_next_decision_json | `benchmarks/results/bitdistill_next_decision_2026-05-23.json` |
 
 Job `10253` was cancelled while dependency-pending because Slurm had
 snapshotted the pre-postprocess handoff script. Job `10255` was resubmitted with

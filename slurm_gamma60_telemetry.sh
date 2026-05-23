@@ -22,6 +22,8 @@ DYNAMICS_JSON="${DYNAMICS_JSON:-benchmarks/results/bitdistill_training_dynamics_
 DYNAMICS_MD="${DYNAMICS_MD:-benchmarks/results/bitdistill_training_dynamics_${DATE}.md}"
 BALANCE_JSON="${BALANCE_JSON:-benchmarks/results/gamma60_gradient_balance_${DATE}.json}"
 BALANCE_MD="${BALANCE_MD:-benchmarks/results/gamma60_gradient_balance_${DATE}.md}"
+DECISION_JSON="${DECISION_JSON:-benchmarks/results/bitdistill_next_decision_${DATE}.json}"
+DECISION_MD="${DECISION_MD:-benchmarks/results/bitdistill_next_decision_${DATE}.md}"
 OUTPUT_DIR="${OUTPUT_DIR:-checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200}"
 
 write_status_report() {
@@ -112,8 +114,13 @@ python benchmarks/audit_bitdistill_gamma_balance.py \
   --gamma-telemetry "$OUTPUT_DIR/telemetry.jsonl" \
   --output-json "$BALANCE_JSON" \
   --output-md "$BALANCE_MD"
+python benchmarks/build_bitdistill_next_decision.py \
+  --gamma-balance "$BALANCE_JSON" \
+  --output-json "$DECISION_JSON" \
+  --output-md "$DECISION_MD"
 python benchmarks/validate_reports_fail_closed.py \
   "$STATUS_JSON" "$STATUS_MD" \
   "$DYNAMICS_JSON" "$DYNAMICS_MD" \
-  "$BALANCE_JSON" "$BALANCE_MD"
+  "$BALANCE_JSON" "$BALANCE_MD" \
+  "$DECISION_JSON" "$DECISION_MD"
 trap - ERR

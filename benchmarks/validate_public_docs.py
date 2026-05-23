@@ -456,8 +456,14 @@ def validate_reproduction_gap_docs(
         readme,
         errors,
     )
-    require_contains("README gamma telemetry job", "10254", readme, errors)
+    require_contains("README gamma telemetry job", "10257", readme, errors)
     require_contains("README gamma telemetry caveat", "not a quality benchmark", readme, errors)
+    require_contains(
+        "README next decision report",
+        "bitdistill_next_decision_2026-05-23.md",
+        readme,
+        errors,
+    )
     require_contains(
         "README current goal status report",
         "current_goal_status_2026-05-23.md",
