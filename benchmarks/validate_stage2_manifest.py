@@ -58,6 +58,31 @@ def main() -> int:
             continue
         if not Path(value).exists():
             errors.append(f"{key} does not exist: {value}")
+    parent_manifest_path = manifest.get("parent_manifest_path")
+    if parent_manifest_path:
+        if not isinstance(parent_manifest_path, str):
+            errors.append(f"parent_manifest_path is not a string: {parent_manifest_path!r}")
+        elif not Path(parent_manifest_path).exists():
+            errors.append(f"parent_manifest_path does not exist: {parent_manifest_path}")
+    parent_state_dict_path = manifest.get("parent_state_dict_path")
+    if parent_state_dict_path:
+        if not isinstance(parent_state_dict_path, str):
+            errors.append(f"parent_state_dict_path is not a string: {parent_state_dict_path!r}")
+        elif not Path(parent_state_dict_path).exists():
+            errors.append(f"parent_state_dict_path does not exist: {parent_state_dict_path}")
+    segment_tokens = manifest.get("segment_token_presentations")
+    parent_tokens = manifest.get("parent_token_presentations")
+    total_tokens = manifest.get("token_presentations")
+    if segment_tokens is not None or parent_tokens is not None:
+        if not isinstance(segment_tokens, int):
+            errors.append(f"segment_token_presentations is not an int: {segment_tokens!r}")
+        if not isinstance(parent_tokens, int):
+            errors.append(f"parent_token_presentations is not an int: {parent_tokens!r}")
+        if isinstance(segment_tokens, int) and isinstance(parent_tokens, int) and total_tokens != segment_tokens + parent_tokens:
+            errors.append(
+                "token_presentations does not equal parent + segment: "
+                f"{total_tokens!r} != {parent_tokens!r} + {segment_tokens!r}"
+            )
     git = manifest.get("git")
     if not isinstance(git, dict) or not git.get("bitnet_commit"):
         errors.append("git.bitnet_commit missing")

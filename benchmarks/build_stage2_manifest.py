@@ -77,6 +77,16 @@ def build_manifest(args: argparse.Namespace) -> dict[str, Any]:
     root_metrics = read_json(root_metrics_path)
     snapshot_metrics = read_json(snapshot_metrics_path)
     last = root_metrics.get("last", {}) if isinstance(root_metrics.get("last"), dict) else {}
+    segment_token_presentations = root_metrics.get("effective_train_token_presentations")
+    parent_manifest = read_json(args.parent_manifest) if args.parent_manifest else {}
+    parent_token_presentations = parent_manifest.get("token_presentations", 0) if parent_manifest else 0
+    if parent_manifest and not isinstance(parent_token_presentations, int):
+        raise TypeError(f"{args.parent_manifest} token_presentations is not an int: {parent_token_presentations!r}")
+    if not isinstance(segment_token_presentations, int):
+        raise TypeError(f"{root_metrics_path} effective_train_token_presentations is not an int: {segment_token_presentations!r}")
+    cumulative_token_presentations = args.cumulative_token_presentations or (
+        int(parent_token_presentations) + segment_token_presentations
+    )
     repo_root = Path(".").resolve()
     llama_dir = repo_root / "3rdparty/llama.cpp"
     manifest_bitnet_commit = git_sha(repo_root)
@@ -93,7 +103,9 @@ def build_manifest(args: argparse.Namespace) -> dict[str, Any]:
         "method": root_metrics.get("method"),
         "scale_mode": root_metrics.get("scale_mode"),
         "steps": root_metrics.get("steps"),
-        "token_presentations": root_metrics.get("effective_train_token_presentations"),
+        "segment_token_presentations": segment_token_presentations,
+        "parent_token_presentations": parent_token_presentations,
+        "token_presentations": cumulative_token_presentations,
         "final_ce": last.get("ce"),
         "final_loss": last.get("loss"),
         "final_lr": last.get("lr"),
@@ -104,6 +116,8 @@ def build_manifest(args: argparse.Namespace) -> dict[str, Any]:
         "snapshot_metrics_path": str(snapshot_metrics_path),
         "state_dict_path": str(state_dict_path),
         "state_dict_sha256": file_sha256(state_dict_path),
+        "parent_manifest_path": str(args.parent_manifest) if args.parent_manifest else "",
+        "parent_state_dict_path": parent_manifest.get("state_dict_path", "") if parent_manifest else "",
         "snapshot_complete": bool(snapshot_metrics.get("snapshot", {}).get("complete"))
         if isinstance(snapshot_metrics.get("snapshot"), dict)
         else None,
@@ -150,8 +164,11 @@ def render_markdown(manifest: dict[str, Any]) -> str:
                     ["scale_mode", manifest["scale_mode"]],
                     ["steps", manifest["steps"]],
                     ["token_presentations", manifest["token_presentations"]],
+                    ["segment_token_presentations", manifest.get("segment_token_presentations", "")],
+                    ["parent_token_presentations", manifest.get("parent_token_presentations", "")],
                     ["final_ce", manifest["final_ce"]],
                     ["state_dict_path", manifest["state_dict_path"]],
+                    ["parent_manifest_path", manifest.get("parent_manifest_path", "")],
                     ["bitnet_commit", manifest["git"]["bitnet_commit"]],
                     ["llama_cpp_commit", manifest["git"]["llama_cpp_commit"]],
                     ["downstream_status", manifest["downstream"]["status"]],
@@ -178,6 +195,8 @@ def main() -> int:
     parser.add_argument("--model", default="Qwen/Qwen2.5-0.5B")
     parser.add_argument("--producer-bitnet-commit", default="")
     parser.add_argument("--producer-llama-cpp-commit", default="")
+    parser.add_argument("--parent-manifest", type=Path)
+    parser.add_argument("--cumulative-token-presentations", type=int, default=0)
     parser.add_argument("--downstream-status", default="pending_rerun")
     parser.add_argument("--downstream-rerun-job-id", default="")
     parser.add_argument("--downstream-output-dir", default="")

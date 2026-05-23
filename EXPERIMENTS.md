@@ -100,6 +100,32 @@ Current result: the best 10k-step BitNet-SFT budget row reaches MNLI
 `0.628935`, clearing the paper BitNet-SFT anchor by `+0.020935`, but the
 completed `327.68M` BitDistill row is still `-0.088130` below local FP16-SFT.
 
+## 655.36M Stage-2 Continuation
+
+The next Stage-2 point has been submitted as a cumulative continuation from the
+verified `327.68M` checkpoint:
+
+- `benchmarks/results/stage2_655m_submission_2026-05-23.json`
+- `benchmarks/results/stage2_655m_submission_2026-05-23.md`
+
+Job `10250` extends the 327.68M checkpoint by another 327.68M token
+presentations, for a cumulative `655,360,000` token presentations. This is a
+continuation with a fresh optimizer/scheduler segment, not an uninterrupted
+80k-step Stage-2 run.
+
+After completion, build the manifest with:
+
+```bash
+python benchmarks/build_stage2_manifest.py \
+  --output-dir checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m \
+  --parent-manifest benchmarks/results/stage2_manifest_2026-05-20.json \
+  --run-id qwen25-05b-bitdistill-tensor-stage2-655m-from327m-job10250 \
+  --job-id 10250 \
+  --downstream-status pending_rerun \
+  --output-json benchmarks/results/stage2_manifest_655m_2026-05-23.json \
+  --output-md benchmarks/results/stage2_manifest_655m_2026-05-23.md
+```
+
 ## Validation
 
 ```bash

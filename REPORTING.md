@@ -52,6 +52,13 @@ The current report is:
 benchmarks/results/bitdistill_reproduction_gap_2026-05-23.md
 ```
 
+Stage-2 jobs that extend an existing checkpoint must record both segment and
+cumulative token presentations. The current pending extension is:
+
+```text
+benchmarks/results/stage2_655m_submission_2026-05-23.md
+```
+
 ## Preferred Public Labels
 
 | Label | Meaning |

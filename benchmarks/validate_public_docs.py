@@ -82,6 +82,42 @@ def validate_reproduction_gap(report: dict[str, Any], errors: list[str]) -> None
             errors.append(f"reproduction gap artifact {label}: path does not exist: {path}")
 
 
+def validate_stage2_extension_submission(report: dict[str, Any], errors: list[str]) -> None:
+    if report.get("schema") != "bitnet-stage2-extension-submission-v1":
+        errors.append(f"stage2 extension: unexpected schema {report.get('schema')}")
+    if report.get("status") not in {"pending", "running", "complete", "failed", "cancelled"}:
+        errors.append(f"stage2 extension: unexpected status {report.get('status')}")
+    parent = report.get("parent_manifest", {})
+    if not isinstance(parent, dict):
+        errors.append("stage2 extension: missing parent_manifest object")
+        return
+    parent_path = parent.get("path")
+    if not isinstance(parent_path, str) or not parent_path:
+        errors.append("stage2 extension: missing parent manifest path")
+    elif not Path(parent_path).exists():
+        errors.append(f"stage2 extension: parent manifest does not exist: {parent_path}")
+    state_dict = parent.get("state_dict_path")
+    if not isinstance(state_dict, str) or not state_dict:
+        errors.append("stage2 extension: missing parent state_dict_path")
+    elif not Path(state_dict).exists():
+        errors.append(f"stage2 extension: parent state_dict_path does not exist: {state_dict}")
+    config = report.get("run_config", {})
+    if not isinstance(config, dict):
+        errors.append("stage2 extension: missing run_config object")
+        return
+    segment = config.get("segment_token_presentations")
+    cumulative = config.get("cumulative_token_presentations")
+    parent_tokens = parent.get("token_presentations")
+    if isinstance(segment, int) and isinstance(cumulative, int) and isinstance(parent_tokens, int):
+        if cumulative != parent_tokens + segment:
+            errors.append(
+                "stage2 extension: cumulative tokens do not equal parent + segment: "
+                f"{cumulative} != {parent_tokens} + {segment}"
+            )
+    else:
+        errors.append("stage2 extension: token presentation fields must be integers")
+
+
 def validate_readme(bundle: dict[str, Any], readme: str, errors: list[str]) -> None:
     claims = bundle["claims"]
     blind = claims["blind_ptq"]
@@ -143,6 +179,14 @@ def validate_reproduction_gap_docs(
     for label, needle in required.items():
         require_contains(f"README reproduction gap {label}", needle, readme, errors)
         require_contains(f"CLAIMS reproduction gap {label}", needle, claims_doc, errors)
+    require_contains(
+        "README stage2 extension report",
+        "stage2_655m_submission_2026-05-23.md",
+        readme,
+        errors,
+    )
+    require_contains("README stage2 extension job", "10250", readme, errors)
+    require_contains("README stage2 extension tokens", "655.36M", readme, errors)
 
 
 def validate_claims_doc(bundle: dict[str, Any], claims_doc: str, errors: list[str]) -> None:
@@ -195,15 +239,22 @@ def main() -> int:
         type=Path,
         default=Path("benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json"),
     )
+    parser.add_argument(
+        "--stage2-extension",
+        type=Path,
+        default=Path("benchmarks/results/stage2_655m_submission_2026-05-23.json"),
+    )
     args = parser.parse_args()
 
     bundle = load_json(args.bundle)
     reproduction_gap = load_json(args.reproduction_gap)
+    stage2_extension = load_json(args.stage2_extension)
     readme = read_text(args.readme)
     claims_doc = read_text(args.claims)
     errors: list[str] = []
     validate_artifacts(bundle, errors)
     validate_reproduction_gap(reproduction_gap, errors)
+    validate_stage2_extension_submission(stage2_extension, errors)
     validate_readme(bundle, readme, errors)
     validate_reproduction_gap_docs(reproduction_gap, readme, claims_doc, errors)
     validate_claims_doc(bundle, claims_doc, errors)

@@ -48,6 +48,14 @@ That does **not** reproduce BitDistill. The completed `327.68M` Stage-2
 BitDistill row reaches `0.720020`, which is still `-0.088130` below the local
 FP16-SFT MNLI reference.
 
+Active next gate:
+
+- [stage2_655m_submission_2026-05-23.md](benchmarks/results/stage2_655m_submission_2026-05-23.md)
+
+Job `10250` is a cumulative continuation from the verified `327.68M` checkpoint
+to `655.36M` token presentations. It is explicitly labeled as a continuation
+with a fresh optimizer/scheduler segment, not an uninterrupted 80k-step run.
+
 ## What This Fork Adds
 
 - Mathematical and empirical audits showing why blind ternary PTQ collapses on

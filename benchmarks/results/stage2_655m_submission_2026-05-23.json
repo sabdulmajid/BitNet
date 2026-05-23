@@ -1,0 +1,50 @@
+{
+  "schema": "bitnet-stage2-extension-submission-v1",
+  "created_utc": "2026-05-23T15:39:00+00:00",
+  "status": "running",
+  "model": "Qwen/Qwen2.5-0.5B",
+  "purpose": "Next controlled Stage-2 token-budget point for BitDistill MNLI recovery curve.",
+  "submitted_job_id": "10250",
+  "cancelled_job_id": "10249",
+  "cancelled_job_reason": "Submitted before slurm_bitdistill_glue.sh passed LR_SCHEDULER through to train_bitdistill.py; cancelled after 13 seconds and resubmitted with log-confirmed LR_SCHEDULER=constant.",
+  "partition": "midcard",
+  "node_at_submission": "ece-nebula12",
+  "parent_manifest": {
+    "path": "benchmarks/results/stage2_manifest_2026-05-20.json",
+    "sha256": "4de6e5ac19a17bc53cac7eb33024964c069a13a24ba36afaec8632ba14f79bdf",
+    "token_presentations": 327680000,
+    "final_ce": 3.7840569019317627,
+    "state_dict_path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-40k/checkpoint-40000/custom_state_dict.pt"
+  },
+  "run_config": {
+    "stage": "continued_pretrain",
+    "method": "bitdistill",
+    "scale_mode": "tensor",
+    "activation_quantization": true,
+    "use_subln": true,
+    "max_seq_len": 512,
+    "max_steps": 40000,
+    "per_device_batch_size": 4,
+    "grad_accum_steps": 4,
+    "segment_token_presentations": 327680000,
+    "cumulative_token_presentations": 655360000,
+    "paper_stage2_fraction": 0.065536,
+    "learning_rate": 0.000002,
+    "lr_scheduler": "constant",
+    "warmup_steps": 0,
+    "save_every_steps": 10000,
+    "save_model_artifacts": false,
+    "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m"
+  },
+  "caveat": "This is a cumulative continuation from the verified 327.68M checkpoint with a fresh optimizer/scheduler segment. It is not an uninterrupted 80k-step Stage-2 run.",
+  "git": {
+    "submission_head_before_wrapper_commit": "0f797102639a9de5e07d16e29393ce98f0f3d258",
+    "llama_cpp_commit": "dc0bc5ee0423a2202d6284a4fc2d78d1e39905d7"
+  },
+  "expected_completion_artifact": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/custom_state_dict.pt",
+  "next_after_completion": [
+    "Build a Stage-2 manifest with --parent-manifest benchmarks/results/stage2_manifest_2026-05-20.json.",
+    "Run matched MNLI downstream BitDistill with INIT_STATE_MANIFEST pointing at the new 655.36M manifest.",
+    "Update the controlled Stage-2 curve only after metrics.json and eval_predictions.jsonl exist."
+  ]
+}
