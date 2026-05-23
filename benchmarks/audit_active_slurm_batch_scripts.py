@@ -160,11 +160,42 @@ def audit_gamma(submission: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def audit_afterany(submission: dict[str, Any]) -> dict[str, Any]:
+    job_id = str(submission.get("job_id", ""))
+    script, message = slurm_batch_script(job_id)
+    local_script_path = Path(str(submission.get("script") or "slurm_stage2_655m_afterany_audit.sh"))
+    if not script and local_script_path.exists():
+        script = local_script_path.read_text(encoding="utf-8", errors="replace")
+        message = (message + "; " if message else "") + f"validated local script fallback {local_script_path}"
+    required = [
+        "audit_stage2_snapshot_salvage.py",
+        "audit_stage2_655m_ingestion.py",
+        "run_active_gate_watchdog.py",
+        "bitnet-stage2-afterany-audit-v1",
+        "quality_claim",
+        "This afterany audit refreshes postmortem/salvage status only",
+        "exit \"$EXIT_CODE\"",
+    ]
+    checks = check_snippets(script, required)
+    passed = bool(script) and all(check["present"] for check in checks)
+    return {
+        "job_id": job_id,
+        "purpose": "655M Stage-2 afterany audit",
+        "slurm": squeue_state(job_id),
+        "script_available": bool(script),
+        "scontrol_message": message,
+        "checks": checks,
+        "passed": passed,
+        "caveat": submission.get("caveat", ""),
+    }
+
+
 def build(args: argparse.Namespace) -> dict[str, Any]:
     handoff = audit_handoff(read_json(args.handoff_submission))
     postprocess = audit_postprocess_script()
     gamma = audit_gamma(read_json(args.gamma_submission))
-    checks = [handoff, postprocess, gamma]
+    afterany = audit_afterany(read_json(args.afterany_submission))
+    checks = [handoff, postprocess, gamma, afterany]
     return {
         "schema": "bitnet-active-slurm-batch-script-audit-v1",
         "created_utc": datetime.now(timezone.utc).isoformat(),
@@ -229,6 +260,11 @@ def main() -> int:
         "--gamma-submission",
         type=Path,
         default=Path("benchmarks/results/gamma60_telemetry_submission_2026-05-23.json"),
+    )
+    parser.add_argument(
+        "--afterany-submission",
+        type=Path,
+        default=Path("benchmarks/results/stage2_655m_afterany_submission_2026-05-23.json"),
     )
     parser.add_argument(
         "--output-json",

@@ -120,7 +120,7 @@
       "job_id": "10255",
       "passed": true,
       "purpose": "655M Stage-2 handoff",
-      "scontrol_message": "batch script for job 10255 written to /tmp/bitnet-slurm-script-nbkcdud7/10255.sh",
+      "scontrol_message": "batch script for job 10255 written to /tmp/bitnet-slurm-script-9epmcv4t/10255.sh",
       "script_available": true,
       "slurm": {
         "job_id": "10255",
@@ -205,7 +205,7 @@
       "job_id": "10257",
       "passed": true,
       "purpose": "gamma-60 gradient telemetry",
-      "scontrol_message": "batch script for job 10257 written to /tmp/bitnet-slurm-script-fp9_sito/10257.sh",
+      "scontrol_message": "batch script for job 10257 written to /tmp/bitnet-slurm-script-6wvgku3v/10257.sh",
       "script_available": true,
       "slurm": {
         "job_id": "10257",
@@ -214,9 +214,54 @@
         "state": "PENDING",
         "time": "0:00"
       }
+    },
+    {
+      "caveat": "This afterany job refreshes postmortem/salvage status only. It does not create downstream quality evidence.",
+      "checks": [
+        {
+          "present": true,
+          "snippet": "audit_stage2_snapshot_salvage.py"
+        },
+        {
+          "present": true,
+          "snippet": "audit_stage2_655m_ingestion.py"
+        },
+        {
+          "present": true,
+          "snippet": "run_active_gate_watchdog.py"
+        },
+        {
+          "present": true,
+          "snippet": "bitnet-stage2-afterany-audit-v1"
+        },
+        {
+          "present": true,
+          "snippet": "quality_claim"
+        },
+        {
+          "present": true,
+          "snippet": "This afterany audit refreshes postmortem/salvage status only"
+        },
+        {
+          "present": true,
+          "snippet": "exit \"$EXIT_CODE\""
+        }
+      ],
+      "job_id": "10258",
+      "passed": true,
+      "purpose": "655M Stage-2 afterany audit",
+      "scontrol_message": "batch script for job 10258 written to /tmp/bitnet-slurm-script-gyzahp9y/10258.sh",
+      "script_available": true,
+      "slurm": {
+        "job_id": "10258",
+        "name": "bd-655m-afterany",
+        "reason": "(Dependency)",
+        "state": "PENDING",
+        "time": "0:00"
+      }
     }
   ],
-  "created_utc": "2026-05-23T18:28:04.392322+00:00",
+  "created_utc": "2026-05-23T18:33:30.393270+00:00",
   "quality_claim": "none",
   "schema": "bitnet-active-slurm-batch-script-audit-v1",
   "status": "passed"

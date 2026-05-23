@@ -16,7 +16,7 @@
     "partial": 1,
     "under_budget_active_extension_running": 1
   },
-  "created_utc": "2026-05-23T18:28:04.858504+00:00",
+  "created_utc": "2026-05-23T18:33:30.862695+00:00",
   "highest_risks": [
     "Stage-2 token budget is far below 10B and the 655M gate is still running.",
     "Stage-2 corpus differs from the paper's FALCON corpus unless explicitly overridden.",

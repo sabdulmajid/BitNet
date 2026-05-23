@@ -60,6 +60,7 @@ def build_summary() -> dict[str, Any]:
     monitor = read_json(Path(f"benchmarks/results/active_stage2_extension_monitor_{DATE}.json"))
     ingestion = read_json(Path(f"benchmarks/results/stage2_655m_ingestion_{DATE}.json"))
     salvage = read_json(Path(f"benchmarks/results/stage2_snapshot_salvage_{DATE}.json"))
+    afterany = read_json(Path(f"benchmarks/results/stage2_655m_afterany_submission_{DATE}.json"))
     slurm_scripts = read_json(Path(f"benchmarks/results/active_slurm_batch_scripts_{DATE}.json"))
     traceability = read_json(Path(f"benchmarks/results/bitdistill_goal_traceability_{DATE}.json"))
     next_decision = read_json(Path(f"benchmarks/results/bitdistill_next_decision_{DATE}.json"))
@@ -75,6 +76,8 @@ def build_summary() -> dict[str, Any]:
         "ingestion_status": ingestion.get("status"),
         "snapshot_salvage_status": salvage.get("status"),
         "snapshot_salvage_complete_count": salvage.get("complete_snapshot_count"),
+        "afterany_job_id": afterany.get("job_id"),
+        "afterany_status": afterany.get("status"),
         "slurm_script_status": slurm_scripts.get("status"),
         "traceability_status": traceability.get("completion_status"),
         "next_decision_status": next_decision.get("status"),
@@ -230,6 +233,7 @@ def main() -> int:
                 "bash",
                 "-n",
                 "slurm_gamma60_telemetry.sh",
+                "slurm_stage2_655m_afterany_audit.sh",
                 "slurm_stage2_655m_handoff.sh",
                 "slurm_stage2_655m_postprocess.sh",
             ],
@@ -249,6 +253,7 @@ def main() -> int:
             "active_monitor": f"benchmarks/results/active_stage2_extension_monitor_{args.date}.json",
             "ingestion": f"benchmarks/results/stage2_655m_ingestion_{args.date}.json",
             "snapshot_salvage": f"benchmarks/results/stage2_snapshot_salvage_{args.date}.json",
+            "afterany_submission": f"benchmarks/results/stage2_655m_afterany_submission_{args.date}.json",
             "slurm_script_audit": f"benchmarks/results/active_slurm_batch_scripts_{args.date}.json",
             "traceability": f"benchmarks/results/bitdistill_goal_traceability_{args.date}.json",
             "paper_alignment": f"benchmarks/results/bitdistill_paper_alignment_{args.date}.json",

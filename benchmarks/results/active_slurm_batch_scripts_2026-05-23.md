@@ -9,6 +9,7 @@ Quality claim: **none**. This validates queued script contents only.
 | 655M Stage-2 handoff | 10255 | PENDING | true | true |
 | 655M Stage-2 postprocess script | local | local_file | true | true |
 | gamma-60 gradient telemetry | 10257 | PENDING | true | true |
+| 655M Stage-2 afterany audit | 10258 | PENDING | true | true |
 
 ## Required Snippets
 
@@ -56,3 +57,10 @@ Quality claim: **none**. This validates queued script contents only.
 | 10257 | audit_bitdistill_gamma_balance.py | true |
 | 10257 | build_bitdistill_next_decision.py | true |
 | 10257 | validate_reports_fail_closed.py | true |
+| 10258 | audit_stage2_snapshot_salvage.py | true |
+| 10258 | audit_stage2_655m_ingestion.py | true |
+| 10258 | run_active_gate_watchdog.py | true |
+| 10258 | bitnet-stage2-afterany-audit-v1 | true |
+| 10258 | quality_claim | true |
+| 10258 | This afterany audit refreshes postmortem/salvage status only | true |
+| 10258 | exit "$EXIT_CODE" | true |

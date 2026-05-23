@@ -158,6 +158,43 @@ def validate_stage2_handoff_submission(report: dict[str, Any], errors: list[str]
         errors.append(f"stage2 handoff: postprocess script does not exist: {postprocess_script}")
 
 
+def validate_stage2_afterany_submission(report: dict[str, Any], readme: str, errors: list[str]) -> None:
+    if report.get("schema") != "bitnet-stage2-afterany-submission-v1":
+        errors.append(f"stage2 afterany: unexpected schema {report.get('schema')}")
+    if report.get("quality_claim") != "none":
+        errors.append(f"stage2 afterany: unexpected quality_claim {report.get('quality_claim')}")
+    if report.get("status") not in {"dependency_pending", "running", "completed", "failed"}:
+        errors.append(f"stage2 afterany: unexpected status {report.get('status')}")
+    if report.get("dependency") != "afterany:10250":
+        errors.append(f"stage2 afterany: unexpected dependency {report.get('dependency')}")
+    if report.get("stage2_job_id") != "10250":
+        errors.append(f"stage2 afterany: unexpected stage2 job {report.get('stage2_job_id')}")
+    script = report.get("script")
+    if script != "slurm_stage2_655m_afterany_audit.sh":
+        errors.append(f"stage2 afterany: unexpected script {script}")
+    elif not Path(script).exists():
+        errors.append(f"stage2 afterany: script does not exist: {script}")
+    for key in ("expected_report_json", "expected_salvage_json", "expected_ingestion_json", "expected_watchdog_json"):
+        value = report.get(key)
+        if not isinstance(value, str) or not value:
+            errors.append(f"stage2 afterany: missing {key}")
+    caveat = report.get("caveat")
+    if not isinstance(caveat, str) or "does not create downstream quality evidence" not in caveat:
+        errors.append("stage2 afterany: caveat must prohibit quality claims")
+    require_contains(
+        "README stage2 afterany report",
+        "stage2_655m_afterany_submission_2026-05-23.md",
+        readme,
+        errors,
+    )
+    require_contains(
+        "README stage2 afterany json",
+        "stage2_655m_afterany_submission_2026-05-23.json",
+        readme,
+        errors,
+    )
+
+
 def validate_stage2_ingestion(report: dict[str, Any], readme: str, errors: list[str]) -> None:
     if report.get("schema") != "bitdistill-655m-ingestion-audit-v1":
         errors.append(f"stage2 ingestion: unexpected schema {report.get('schema')}")
@@ -331,7 +368,7 @@ def validate_active_slurm_batch_scripts(report: dict[str, Any], errors: list[str
         for check in checks
         if isinstance(check, dict) and check.get("purpose") is not None
     }
-    for purpose in ("655M Stage-2 handoff", "gamma-60 gradient telemetry"):
+    for purpose in ("655M Stage-2 handoff", "gamma-60 gradient telemetry", "655M Stage-2 afterany audit"):
         check = by_purpose.get(purpose)
         if not isinstance(check, dict):
             errors.append(f"slurm batch audit: missing purpose {purpose}")
@@ -1135,6 +1172,11 @@ def main() -> int:
         default=Path("benchmarks/results/stage2_655m_handoff_submission_2026-05-23.json"),
     )
     parser.add_argument(
+        "--stage2-afterany",
+        type=Path,
+        default=Path("benchmarks/results/stage2_655m_afterany_submission_2026-05-23.json"),
+    )
+    parser.add_argument(
         "--stage2-ingestion",
         type=Path,
         default=Path("benchmarks/results/stage2_655m_ingestion_2026-05-23.json"),
@@ -1205,6 +1247,7 @@ def main() -> int:
     reproduction_gap = load_json(args.reproduction_gap)
     stage2_extension = load_json(args.stage2_extension)
     stage2_handoff = load_json(args.stage2_handoff)
+    stage2_afterany = load_json(args.stage2_afterany)
     stage2_ingestion = load_json(args.stage2_ingestion)
     stage2_snapshot_salvage = load_json(args.stage2_snapshot_salvage)
     gamma_telemetry = load_json(args.gamma_telemetry_submission)
@@ -1226,6 +1269,7 @@ def main() -> int:
     validate_reproduction_gap(reproduction_gap, errors)
     validate_stage2_extension_submission(stage2_extension, errors)
     validate_stage2_handoff_submission(stage2_handoff, errors)
+    validate_stage2_afterany_submission(stage2_afterany, readme, errors)
     validate_stage2_ingestion(stage2_ingestion, readme, errors)
     validate_stage2_snapshot_salvage(stage2_snapshot_salvage, readme, errors)
     validate_gradient_telemetry_submission(gamma_telemetry, errors)

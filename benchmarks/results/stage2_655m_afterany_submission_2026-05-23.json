@@ -1,0 +1,16 @@
+{
+  "caveat": "This afterany job refreshes postmortem/salvage status only. It does not create downstream quality evidence.",
+  "created_utc": "2026-05-23T18:33:14.324701+00:00",
+  "dependency": "afterany:10250",
+  "expected_ingestion_json": "benchmarks/results/stage2_655m_ingestion_2026-05-23.json",
+  "expected_report_json": "benchmarks/results/stage2_655m_afterany_audit_2026-05-23.json",
+  "expected_report_md": "benchmarks/results/stage2_655m_afterany_audit_2026-05-23.md",
+  "expected_salvage_json": "benchmarks/results/stage2_snapshot_salvage_2026-05-23.json",
+  "expected_watchdog_json": "benchmarks/results/active_gate_watchdog_2026-05-23.json",
+  "job_id": "10258",
+  "quality_claim": "none",
+  "schema": "bitnet-stage2-afterany-submission-v1",
+  "script": "slurm_stage2_655m_afterany_audit.sh",
+  "stage2_job_id": "10250",
+  "status": "dependency_pending"
+}
