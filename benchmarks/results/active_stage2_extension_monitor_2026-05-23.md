@@ -6,7 +6,7 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | job | id | slurm state | time | reason |
 | --- | --- | --- | --- | --- |
-| stage2 | 10250 | RUNNING | 3:11:19 | ece-nebula12 |
+| stage2 | 10250 | RUNNING | 3:12:50 | ece-nebula12 |
 | handoff | 10255 | PENDING | 0:00 | (Dependency) |
 | gamma60 telemetry | 10257 | PENDING | 0:00 | (Dependency) |
 | downstream MNLI | - | not_submitted |  |  |
@@ -14,7 +14,7 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | stage2 field | value |
 | --- | --- |
-| latest_step | 6280 |
+| latest_step | 6330 |
 | max_steps | 40000 |
 | save_every_steps | 10000 |
 | snapshot_status | pre_first_snapshot |
@@ -22,28 +22,28 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | missing_output_dir_is_expected | True |
 | first_snapshot_step | 10000 |
 | next_snapshot_step | 10000 |
-| steps_to_next_snapshot | 3720 |
-| next_snapshot_eta_hours | 1.878478 |
-| progress | 0.157000 |
-| latest_ce | 3.764886 |
+| steps_to_next_snapshot | 3670 |
+| next_snapshot_eta_hours | 1.853215 |
+| progress | 0.158250 |
+| latest_ce | 3.851597 |
 | latest_lr | 0.000002 |
 | log_freshness_status | fresh_running_log |
 | log_health_status | healthy |
 | producer_config_status | matched |
-| log_age_seconds | 9.289536 |
+| log_age_seconds | 7.613088 |
 | time_limit_status | within_time_limit |
-| time_limit_margin_seconds | 13622.013376 |
-| log_elapsed_seconds | 11416.300000 |
-| parsed_log_rows | 629 |
+| time_limit_margin_seconds | 13622.408057 |
+| log_elapsed_seconds | 11507.100000 |
+| parsed_log_rows | 634 |
 | recent_window_rows | 20 |
-| recent_ce_mean | 3.778450 |
+| recent_ce_mean | 3.743432 |
 | recent_ce_min | 3.392081 |
 | recent_ce_max | 4.279006 |
-| seconds_per_step | 1.817882 |
-| steps_per_hour | 1980.326375 |
-| eta_hours | 17.027496 |
-| estimated_completion_utc | 2026-05-24T11:50:23.800603+00:00 |
-| segment_token_presentations_per_second | 4506.342685 |
+| seconds_per_step | 1.817867 |
+| steps_per_hour | 1980.342571 |
+| eta_hours | 17.002109 |
+| estimated_completion_utc | 2026-05-24T11:50:22.889347+00:00 |
+| segment_token_presentations_per_second | 4506.379540 |
 | latest_complete_snapshot_step | - |
 | cumulative_token_presentations | 655360000 |
 
@@ -53,13 +53,13 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | --- | --- |
 | status | within_time_limit |
 | slurm_state | RUNNING |
-| elapsed | 3:11:19 |
+| elapsed | 3:12:50 |
 | time_limit | 1-00:00:00 |
-| elapsed_seconds | 11479 |
+| elapsed_seconds | 11570 |
 | time_limit_seconds | 86400 |
-| eta_seconds | 61298.986624 |
-| remaining_seconds | 74921 |
-| margin_seconds | 13622.013376 |
+| eta_seconds | 61207.591943 |
+| remaining_seconds | 74830 |
+| margin_seconds | 13622.408057 |
 | tight_margin_threshold_seconds | 1800 |
 | caveat | Compares current ETA with Slurm time remaining; it is a runtime-risk signal, not quality evidence. |
 
@@ -70,9 +70,9 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | status | fresh_running_log |
 | path | logs/bd-s2-655m-10250.out |
 | exists | True |
-| checked_utc | 2026-05-23T18:48:44.814568+00:00 |
-| mtime_utc | 2026-05-23T18:48:35.525032+00:00 |
-| age_seconds | 9.289536 |
+| checked_utc | 2026-05-23T18:50:15.297975+00:00 |
+| mtime_utc | 2026-05-23T18:50:07.684887+00:00 |
+| age_seconds | 7.613088 |
 | stale_after_seconds | 900 |
 | slurm_state | RUNNING |
 | caveat | Fresh logs are required while the Stage-2 producer is running. |
@@ -83,14 +83,14 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | --- | --- |
 | status | healthy |
 | path | logs/bd-s2-655m-10250.out |
-| parsed_step_rows | 629 |
+| parsed_step_rows | 634 |
 | first_step | 1 |
-| latest_step | 6280 |
-| latest_ce | 3.764886 |
+| latest_step | 6330 |
+| latest_ce | 3.851597 |
 | latest_lr | 0.000002 |
-| latest_elapsed_seconds | 11416.300000 |
+| latest_elapsed_seconds | 11507.100000 |
 | recent_window_rows | 20 |
-| recent_ce_mean | 3.778450 |
+| recent_ce_mean | 3.743432 |
 | recent_ce_min | 3.392081 |
 | recent_ce_max | 4.279006 |
 | issue_count | 0 |
@@ -147,9 +147,9 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | output_dir_exists | False |
 | first_snapshot_step | 10000 |
 | next_snapshot_step | 10000 |
-| steps_to_next_snapshot | 3720 |
-| next_snapshot_eta_hours | 1.878478 |
-| estimated_next_snapshot_utc | 2026-05-23T20:41:27.336145+00:00 |
+| steps_to_next_snapshot | 3670 |
+| next_snapshot_eta_hours | 1.853215 |
+| estimated_next_snapshot_utc | 2026-05-23T20:41:26.870884+00:00 |
 | latest_complete_snapshot_step | - |
 | missing_output_dir_is_expected | True |
 | caveat | A missing output directory is expected before the first snapshot when save_every_steps has not been reached. |

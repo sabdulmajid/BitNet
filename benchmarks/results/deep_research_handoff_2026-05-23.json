@@ -5,25 +5,25 @@
     "afterany_status": "dependency_pending",
     "downstream_complete": false,
     "downstream_status": "waiting_for_handoff",
-    "eta_hours": 17.027496284501062,
-    "latest_ce": 3.764886,
+    "eta_hours": 17.002108873091103,
+    "latest_ce": 3.851597,
     "latest_complete_snapshot_step": null,
-    "latest_step": 6280,
+    "latest_step": 6330,
     "log_health_status": "healthy",
     "max_steps": 40000,
-    "next_snapshot_eta_hours": 1.878478237791932,
+    "next_snapshot_eta_hours": 1.8532147182727752,
     "next_snapshot_step": 10000,
     "producer_config_status": "matched",
-    "progress": 0.157,
+    "progress": 0.15825,
     "snapshot_salvage_complete_count": 0,
     "snapshot_salvage_status": "no_snapshot_expected_yet",
     "stage2_job_id": "10250",
     "stage2_slurm_state": "RUNNING",
     "stage2_status": "running",
-    "steps_to_next_snapshot": 3720,
+    "steps_to_next_snapshot": 3670,
     "telemetry_job_id": "10257",
     "telemetry_slurm_state": "PENDING",
-    "time_limit_margin_seconds": 13622.013375796181,
+    "time_limit_margin_seconds": 13622.408056872031,
     "time_limit_status": "within_time_limit"
   },
   "completed_findings": [
@@ -58,7 +58,7 @@
       "interpretation": "The systems path is real, but quality/storage tradeoffs remain unfavorable versus mature Q4."
     }
   ],
-  "created_utc": "2026-05-23T18:48:45.504866+00:00",
+  "created_utc": "2026-05-23T18:50:15.969308+00:00",
   "next_action": {
     "blueprint_action": "wait_and_watch_655m_gate",
     "claim_boundary": "status only; quality_claim remains none until ingestion is ingested_reports_rebuilt",
@@ -106,7 +106,7 @@
   ],
   "open_questions": [
     {
-      "current_state": "running; step 6280/40000; downstream waiting_for_handoff.",
+      "current_state": "running; step 6330/40000; downstream waiting_for_handoff.",
       "evidence_needed": "Completed 655M Stage-2 manifest plus downstream MNLI metrics.json and eval_predictions.jsonl.",
       "question": "Does the Stage-2 token-budget curve keep improving at 655.36M tokens?"
     },
@@ -146,15 +146,15 @@
     },
     "current_status": {
       "path": "benchmarks/results/current_goal_status_2026-05-23.json",
-      "sha256": "622e0d1f16562f8dfa8c320f22b04dd8a4cc7528bc071df71931e0a7416da3db"
+      "sha256": "0e7c59a1ce68c02a27ecdd2361a38b0b7544419178fcf30e60030310aa99699f"
     },
     "next_decision": {
       "path": "benchmarks/results/bitdistill_next_decision_2026-05-23.json",
-      "sha256": "e0afa5c2644c715e02cc69dd918a8ea1bc0214b8dbffb618d2bfa6c7df4dd63a"
+      "sha256": "73181199cf3df06ff50b595b180bdc68f499d8f530c8b1a799767ce234029379"
     },
     "next_experiment_blueprint": {
       "path": "benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.json",
-      "sha256": "88e57b1b910543cd1e84beb321dcc618404c64418e3235d53a53b095066df166"
+      "sha256": "e111cc3dede2a83f9bfe06eb6c608cce455ca2cea68462805cafd8500e5a037a"
     },
     "reproduction_gap": {
       "path": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json",

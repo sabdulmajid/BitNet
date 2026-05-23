@@ -2,10 +2,10 @@
   "best_salvage_snapshot": null,
   "caveat": "This inventories Stage-2 checkpoints for failover only. It does not run downstream evaluation or create quality evidence.",
   "complete_snapshot_count": 0,
-  "created_utc": "2026-05-23T18:48:45.011146+00:00",
-  "latest_logged_step": 6280,
+  "created_utc": "2026-05-23T18:50:15.486794+00:00",
+  "latest_logged_step": 6330,
   "max_steps": 40000,
-  "next_snapshot_eta_hours": 1.878478237791932,
+  "next_snapshot_eta_hours": 1.8532147182727752,
   "next_snapshot_step": 10000,
   "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
   "parent_manifest": {
@@ -25,7 +25,7 @@
     "name": "bd-s2-655m",
     "reason": "ece-nebula12",
     "state": "RUNNING",
-    "time": "3:11:20",
+    "time": "3:12:50",
     "time_limit": "1-00:00:00"
   },
   "snapshots": [
@@ -176,6 +176,6 @@
   },
   "stage2_job_id": "10250",
   "status": "no_snapshot_expected_yet",
-  "steps_to_next_snapshot": 3720,
+  "steps_to_next_snapshot": 3670,
   "target_cumulative_token_presentations": 655360000
 }
