@@ -120,7 +120,7 @@
       "why": "Only run this if the 655M curve saturates and gamma60 telemetry shows attention-KD updates are rebalanced."
     }
   },
-  "created_utc": "2026-05-23T18:04:18.373552+00:00",
+  "created_utc": "2026-05-23T18:06:07.649886+00:00",
   "current_action": {
     "action": "wait_and_watch_655m_gate",
     "claim_boundary": "status only; quality_claim remains none until ingestion is ingested_reports_rebuilt",
