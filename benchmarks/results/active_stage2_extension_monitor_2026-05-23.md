@@ -6,18 +6,23 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | job | id | slurm state | time | reason |
 | --- | --- | --- | --- | --- |
-| stage2 | 10250 | RUNNING | 21:14 | ece-nebula12 |
+| stage2 | 10250 | RUNNING | 26:23 | ece-nebula12 |
 | handoff | 10251 | PENDING | 0:00 | (Dependency) |
 | gamma60 telemetry | 10252 | PENDING | 0:00 | (Dependency) |
 
 | stage2 field | value |
 | --- | --- |
-| latest_step | 670 |
+| latest_step | 840 |
 | max_steps | 40000 |
-| progress | 0.016750 |
-| latest_ce | 3.822555 |
+| progress | 0.021000 |
+| latest_ce | 3.630813 |
 | latest_lr | 0.000002 |
-| log_elapsed_seconds | 1216.000000 |
+| log_elapsed_seconds | 1525.000000 |
+| seconds_per_step | 1.815476 |
+| steps_per_hour | 1982.950820 |
+| eta_hours | 19.748347 |
+| estimated_completion_utc | 2026-05-24T11:48:42.165671+00:00 |
+| segment_token_presentations_per_second | 4512.314754 |
 | cumulative_token_presentations | 655360000 |
 
 ## Artifacts

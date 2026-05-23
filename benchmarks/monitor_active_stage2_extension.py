@@ -72,6 +72,42 @@ def file_info(path: Path) -> dict[str, Any]:
     return {"path": str(path), "exists": path.exists(), "size_bytes": path.stat().st_size if path.exists() else None}
 
 
+def estimate_progress(latest_step: dict[str, Any], max_steps: int, segment_tokens: int | None) -> dict[str, Any]:
+    step = latest_step.get("step")
+    elapsed = latest_step.get("elapsed_seconds")
+    if not isinstance(step, int) or step <= 0 or not isinstance(elapsed, (int, float)) or elapsed <= 0:
+        return {
+            "seconds_per_step": None,
+            "steps_per_hour": None,
+            "eta_seconds": None,
+            "eta_hours": None,
+            "estimated_total_seconds": None,
+            "estimated_completion_utc": None,
+            "segment_token_presentations_per_second": None,
+        }
+    seconds_per_step = float(elapsed) / float(step)
+    remaining_steps = max(max_steps - step, 0)
+    eta_seconds = remaining_steps * seconds_per_step
+    estimated_total_seconds = max_steps * seconds_per_step
+    token_rate = (
+        float(segment_tokens) / estimated_total_seconds
+        if isinstance(segment_tokens, int) and segment_tokens > 0 and estimated_total_seconds > 0
+        else None
+    )
+    return {
+        "seconds_per_step": seconds_per_step,
+        "steps_per_hour": 3600.0 / seconds_per_step,
+        "eta_seconds": eta_seconds,
+        "eta_hours": eta_seconds / 3600.0,
+        "estimated_total_seconds": estimated_total_seconds,
+        "estimated_completion_utc": datetime.fromtimestamp(
+            datetime.now(timezone.utc).timestamp() + eta_seconds,
+            tz=timezone.utc,
+        ).isoformat(),
+        "segment_token_presentations_per_second": token_rate,
+    }
+
+
 def classify_stage2_status(
     *,
     squeue_row: dict[str, str] | None,
@@ -108,6 +144,11 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
     latest_step = parse_latest_step(args.stage2_log)
     max_steps = int(stage2_config["max_steps"])
     step = latest_step.get("step")
+    progress_estimate = estimate_progress(
+        latest_step,
+        max_steps,
+        stage2_config.get("segment_token_presentations"),
+    )
 
     return {
         "schema": "bitnet-active-stage2-extension-monitor-v1",
@@ -124,6 +165,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
             "latest_step": latest_step,
             "max_steps": max_steps,
             "progress": (float(step) / float(max_steps)) if isinstance(step, int) and max_steps else None,
+            "progress_estimate": progress_estimate,
             "root_metrics": file_info(root_metrics),
             "final_state": file_info(final_state),
             "final_snapshot_metrics": file_info(final_snapshot_metrics),
@@ -171,6 +213,7 @@ def render_markdown(report: dict[str, Any]) -> str:
     handoff = report["handoff"]
     telemetry = report["telemetry"]
     latest = stage2["latest_step"]
+    estimate = stage2["progress_estimate"]
     artifact_rows = [
         ["stage2 root metrics", stage2["root_metrics"]["exists"], stage2["root_metrics"]["path"]],
         ["stage2 final state", stage2["final_state"]["exists"], stage2["final_state"]["path"]],
@@ -222,6 +265,11 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["latest_ce", latest.get("ce", "")],
                     ["latest_lr", latest.get("lr", "")],
                     ["log_elapsed_seconds", latest.get("elapsed_seconds", "")],
+                    ["seconds_per_step", estimate.get("seconds_per_step")],
+                    ["steps_per_hour", estimate.get("steps_per_hour")],
+                    ["eta_hours", estimate.get("eta_hours")],
+                    ["estimated_completion_utc", estimate.get("estimated_completion_utc")],
+                    ["segment_token_presentations_per_second", estimate.get("segment_token_presentations_per_second")],
                     ["cumulative_token_presentations", stage2["cumulative_token_presentations"]],
                 ],
             ),
