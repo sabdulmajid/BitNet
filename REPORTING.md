@@ -72,6 +72,15 @@ quality benchmarks. The current equalized-gamma submission is:
 benchmarks/results/gamma60_telemetry_submission_2026-05-23.md
 ```
 
+Active long-running gates can be monitored without changing quality claims:
+
+```bash
+python benchmarks/monitor_active_stage2_extension.py
+```
+
+The generated report must keep `quality_claim` set to `none` until downstream
+metrics and prediction traces exist.
+
 ## Preferred Public Labels
 
 | Label | Meaning |

@@ -146,6 +146,16 @@ Job `10252` is dependency-blocked on `afterok:10250`. It is a short 200-step
 component-gradient telemetry diagnostic with `ATTENTION_KD_WEIGHT=60`; it is
 not a task-quality benchmark.
 
+## Active Gate Monitor
+
+Use this while `10250`, `10251`, and `10252` are still live:
+
+```bash
+python benchmarks/monitor_active_stage2_extension.py
+```
+
+The monitor report is status-only and must not be used as quality evidence.
+
 ## Validation
 
 ```bash

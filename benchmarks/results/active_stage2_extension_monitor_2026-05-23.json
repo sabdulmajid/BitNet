@@ -1,0 +1,83 @@
+{
+  "created_utc": "2026-05-23T15:48:16.521441+00:00",
+  "handoff": {
+    "dependency": "afterok:10250",
+    "expected_handoff_exists": false,
+    "expected_handoff_json": "benchmarks/results/stage2_655m_handoff_2026-05-23.json",
+    "expected_manifest_exists": false,
+    "expected_manifest_json": "benchmarks/results/stage2_manifest_655m_2026-05-23.json",
+    "job_id": "10251",
+    "slurm": {
+      "job_id": "10251",
+      "name": "bd-655m-handoff",
+      "reason": "(Dependency)",
+      "state": "PENDING",
+      "time": "0:00"
+    }
+  },
+  "quality_claim": "none",
+  "schema": "bitnet-active-stage2-extension-monitor-v1",
+  "stage2": {
+    "caveat": "This is a cumulative continuation from the verified 327.68M checkpoint with a fresh optimizer/scheduler segment. It is not an uninterrupted 80k-step Stage-2 run.",
+    "cumulative_token_presentations": 655360000,
+    "final_snapshot_metrics": {
+      "exists": false,
+      "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/metrics.json",
+      "size_bytes": null
+    },
+    "final_state": {
+      "exists": false,
+      "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/custom_state_dict.pt",
+      "size_bytes": null
+    },
+    "job_id": "10250",
+    "latest_step": {
+      "ce": 4.152133,
+      "elapsed_seconds": 579.7,
+      "log_exists": true,
+      "lr": 2e-06,
+      "path": "logs/bd-s2-655m-10250.out",
+      "step": 320
+    },
+    "max_steps": 40000,
+    "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
+    "progress": 0.008,
+    "root_metrics": {
+      "exists": false,
+      "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/metrics.json",
+      "size_bytes": null
+    },
+    "slurm": {
+      "job_id": "10250",
+      "name": "bd-s2-655m",
+      "reason": "ece-nebula12",
+      "state": "RUNNING",
+      "time": "10:51"
+    }
+  },
+  "status": "running",
+  "telemetry": {
+    "caveat": "This is a short gradient-balance diagnostic, not a quality benchmark. Do not compare its task accuracy to full downstream runs.",
+    "dependency": "afterok:10250",
+    "expected_artifacts": [
+      {
+        "exists": false,
+        "path": "checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/telemetry.jsonl",
+        "size_bytes": null
+      },
+      {
+        "exists": false,
+        "path": "checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/metrics.json",
+        "size_bytes": null
+      }
+    ],
+    "job_id": "10252",
+    "slurm": {
+      "job_id": "10252",
+      "name": "bd-g60-telemetry",
+      "reason": "(Dependency)",
+      "state": "PENDING",
+      "time": "0:00"
+    }
+  }
+}

@@ -1,0 +1,277 @@
+#!/usr/bin/env python3
+"""Monitor active Stage-2 extension jobs without making quality claims."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+
+STEP_RE = re.compile(
+    r"step=(?P<step>\d+)\s+ce=(?P<ce>[0-9.eE+-]+)\s+lr=(?P<lr>[0-9.eE+-]+)\s+elapsed=(?P<elapsed>[0-9.eE+-]+)s"
+)
+
+
+def read_json(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        raise FileNotFoundError(path)
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError(f"{path} is not a JSON object")
+    return data
+
+
+def squeue_rows(job_ids: list[str]) -> dict[str, dict[str, str]]:
+    if not job_ids:
+        return {}
+    command = ["squeue", "-h", "-j", ",".join(job_ids), "-o", "%i\t%T\t%M\t%R\t%j"]
+    result = subprocess.run(command, check=False, capture_output=True, text=True)
+    rows: dict[str, dict[str, str]] = {}
+    if result.returncode != 0:
+        return rows
+    for line in result.stdout.splitlines():
+        parts = line.split("\t", 4)
+        if len(parts) != 5:
+            continue
+        job_id, state, time_used, reason, name = parts
+        rows[job_id] = {
+            "job_id": job_id,
+            "state": state,
+            "time": time_used,
+            "reason": reason,
+            "name": name,
+        }
+    return rows
+
+
+def parse_latest_step(log_path: Path) -> dict[str, Any]:
+    if not log_path.exists():
+        return {"log_exists": False}
+    latest: dict[str, Any] = {"log_exists": True, "path": str(log_path)}
+    for line in log_path.read_text(encoding="utf-8", errors="replace").splitlines():
+        match = STEP_RE.search(line)
+        if not match:
+            continue
+        latest = {
+            "log_exists": True,
+            "path": str(log_path),
+            "step": int(match.group("step")),
+            "ce": float(match.group("ce")),
+            "lr": float(match.group("lr")),
+            "elapsed_seconds": float(match.group("elapsed")),
+        }
+    return latest
+
+
+def file_info(path: Path) -> dict[str, Any]:
+    return {"path": str(path), "exists": path.exists(), "size_bytes": path.stat().st_size if path.exists() else None}
+
+
+def classify_stage2_status(
+    *,
+    squeue_row: dict[str, str] | None,
+    root_metrics: Path,
+    final_state: Path,
+) -> str:
+    if root_metrics.exists() and final_state.exists():
+        return "complete_artifacts_present"
+    if squeue_row:
+        state = squeue_row.get("state", "").lower()
+        if state == "running":
+            return "running"
+        if state == "pending":
+            return "pending"
+        return f"slurm_{state}"
+    return "not_in_squeue_incomplete"
+
+
+def build(args: argparse.Namespace) -> dict[str, Any]:
+    stage2_submission = read_json(args.stage2_submission)
+    handoff_submission = read_json(args.handoff_submission)
+    telemetry_submission = read_json(args.telemetry_submission)
+    stage2_job_id = str(stage2_submission["submitted_job_id"])
+    handoff_job_id = str(handoff_submission["handoff_job_id"])
+    telemetry_job_id = str(telemetry_submission["job_id"])
+    rows = squeue_rows([stage2_job_id, handoff_job_id, telemetry_job_id])
+
+    stage2_config = stage2_submission["run_config"]
+    stage2_output = Path(stage2_config["output_dir"])
+    final_snapshot = stage2_output / f"checkpoint-{stage2_config['max_steps']}"
+    root_metrics = stage2_output / "metrics.json"
+    final_state = final_snapshot / "custom_state_dict.pt"
+    final_snapshot_metrics = final_snapshot / "metrics.json"
+    latest_step = parse_latest_step(args.stage2_log)
+    max_steps = int(stage2_config["max_steps"])
+    step = latest_step.get("step")
+
+    return {
+        "schema": "bitnet-active-stage2-extension-monitor-v1",
+        "created_utc": datetime.now(timezone.utc).isoformat(),
+        "status": classify_stage2_status(
+            squeue_row=rows.get(stage2_job_id),
+            root_metrics=root_metrics,
+            final_state=final_state,
+        ),
+        "quality_claim": "none",
+        "stage2": {
+            "job_id": stage2_job_id,
+            "slurm": rows.get(stage2_job_id, {"job_id": stage2_job_id, "state": "not_in_squeue"}),
+            "latest_step": latest_step,
+            "max_steps": max_steps,
+            "progress": (float(step) / float(max_steps)) if isinstance(step, int) and max_steps else None,
+            "root_metrics": file_info(root_metrics),
+            "final_state": file_info(final_state),
+            "final_snapshot_metrics": file_info(final_snapshot_metrics),
+            "output_dir": str(stage2_output),
+            "cumulative_token_presentations": stage2_config["cumulative_token_presentations"],
+            "caveat": stage2_submission["caveat"],
+        },
+        "handoff": {
+            "job_id": handoff_job_id,
+            "slurm": rows.get(handoff_job_id, {"job_id": handoff_job_id, "state": "not_in_squeue"}),
+            "dependency": handoff_submission["dependency"],
+            "expected_manifest_json": handoff_submission["expected_manifest_json"],
+            "expected_manifest_exists": Path(handoff_submission["expected_manifest_json"]).exists(),
+            "expected_handoff_json": handoff_submission["expected_handoff_json"],
+            "expected_handoff_exists": Path(handoff_submission["expected_handoff_json"]).exists(),
+        },
+        "telemetry": {
+            "job_id": telemetry_job_id,
+            "slurm": rows.get(telemetry_job_id, {"job_id": telemetry_job_id, "state": "not_in_squeue"}),
+            "dependency": telemetry_submission["dependency"],
+            "expected_artifacts": [file_info(Path(path)) for path in telemetry_submission["expected_artifacts"]],
+            "caveat": telemetry_submission["caveat"],
+        },
+    }
+
+
+def fmt(value: Any) -> str:
+    if isinstance(value, float):
+        return f"{value:.6f}"
+    return str(value)
+
+
+def md_table(headers: list[str], rows: list[list[Any]]) -> str:
+    lines = [
+        "| " + " | ".join(headers) + " |",
+        "| " + " | ".join(["---"] * len(headers)) + " |",
+    ]
+    for row in rows:
+        lines.append("| " + " | ".join(fmt(value).replace("|", "\\|") for value in row) + " |")
+    return "\n".join(lines)
+
+
+def render_markdown(report: dict[str, Any]) -> str:
+    stage2 = report["stage2"]
+    handoff = report["handoff"]
+    telemetry = report["telemetry"]
+    latest = stage2["latest_step"]
+    artifact_rows = [
+        ["stage2 root metrics", stage2["root_metrics"]["exists"], stage2["root_metrics"]["path"]],
+        ["stage2 final state", stage2["final_state"]["exists"], stage2["final_state"]["path"]],
+        ["stage2 final snapshot metrics", stage2["final_snapshot_metrics"]["exists"], stage2["final_snapshot_metrics"]["path"]],
+        ["handoff manifest", handoff["expected_manifest_exists"], handoff["expected_manifest_json"]],
+        ["handoff report", handoff["expected_handoff_exists"], handoff["expected_handoff_json"]],
+    ]
+    artifact_rows.extend(
+        [f"telemetry artifact {idx}", artifact["exists"], artifact["path"]]
+        for idx, artifact in enumerate(telemetry["expected_artifacts"], start=1)
+    )
+    return "\n\n".join(
+        [
+            "# Active Stage-2 Extension Monitor",
+            f"Status: **{report['status']}**.",
+            "Quality claim: **none**. This report monitors job/artifact state only.",
+            md_table(
+                ["job", "id", "slurm state", "time", "reason"],
+                [
+                    [
+                        "stage2",
+                        stage2["job_id"],
+                        stage2["slurm"].get("state"),
+                        stage2["slurm"].get("time", ""),
+                        stage2["slurm"].get("reason", ""),
+                    ],
+                    [
+                        "handoff",
+                        handoff["job_id"],
+                        handoff["slurm"].get("state"),
+                        handoff["slurm"].get("time", ""),
+                        handoff["slurm"].get("reason", ""),
+                    ],
+                    [
+                        "gamma60 telemetry",
+                        telemetry["job_id"],
+                        telemetry["slurm"].get("state"),
+                        telemetry["slurm"].get("time", ""),
+                        telemetry["slurm"].get("reason", ""),
+                    ],
+                ],
+            ),
+            md_table(
+                ["stage2 field", "value"],
+                [
+                    ["latest_step", latest.get("step", "")],
+                    ["max_steps", stage2["max_steps"]],
+                    ["progress", stage2["progress"]],
+                    ["latest_ce", latest.get("ce", "")],
+                    ["latest_lr", latest.get("lr", "")],
+                    ["log_elapsed_seconds", latest.get("elapsed_seconds", "")],
+                    ["cumulative_token_presentations", stage2["cumulative_token_presentations"]],
+                ],
+            ),
+            "## Artifacts",
+            md_table(["artifact", "exists", "path"], artifact_rows),
+            "## Caveat",
+            stage2["caveat"],
+            "",
+        ]
+    )
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--stage2-submission",
+        type=Path,
+        default=Path("benchmarks/results/stage2_655m_submission_2026-05-23.json"),
+    )
+    parser.add_argument(
+        "--handoff-submission",
+        type=Path,
+        default=Path("benchmarks/results/stage2_655m_handoff_submission_2026-05-23.json"),
+    )
+    parser.add_argument(
+        "--telemetry-submission",
+        type=Path,
+        default=Path("benchmarks/results/gamma60_telemetry_submission_2026-05-23.json"),
+    )
+    parser.add_argument("--stage2-log", type=Path, default=Path("logs/bd-s2-655m-10250.out"))
+    parser.add_argument(
+        "--output-json",
+        type=Path,
+        default=Path("benchmarks/results/active_stage2_extension_monitor_2026-05-23.json"),
+    )
+    parser.add_argument(
+        "--output-md",
+        type=Path,
+        default=Path("benchmarks/results/active_stage2_extension_monitor_2026-05-23.md"),
+    )
+    args = parser.parse_args()
+
+    report = build(args)
+    args.output_json.parent.mkdir(parents=True, exist_ok=True)
+    args.output_md.parent.mkdir(parents=True, exist_ok=True)
+    args.output_json.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    args.output_md.write_text(render_markdown(report).rstrip() + "\n", encoding="utf-8")
+    print(json.dumps(report, indent=2, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

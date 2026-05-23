@@ -132,6 +132,24 @@ def validate_stage2_handoff_submission(report: dict[str, Any], errors: list[str]
         errors.append(f"stage2 handoff: script does not exist: {script}")
 
 
+def validate_active_stage2_monitor(report: dict[str, Any], errors: list[str]) -> None:
+    if report.get("schema") != "bitnet-active-stage2-extension-monitor-v1":
+        errors.append(f"stage2 monitor: unexpected schema {report.get('schema')}")
+    if report.get("quality_claim") != "none":
+        errors.append(f"stage2 monitor: quality_claim must be none, got {report.get('quality_claim')}")
+    stage2 = report.get("stage2", {})
+    if not isinstance(stage2, dict):
+        errors.append("stage2 monitor: missing stage2 object")
+        return
+    if stage2.get("job_id") != "10250":
+        errors.append(f"stage2 monitor: unexpected stage2 job {stage2.get('job_id')}")
+    if stage2.get("cumulative_token_presentations") != 655360000:
+        errors.append(
+            "stage2 monitor: unexpected cumulative tokens "
+            f"{stage2.get('cumulative_token_presentations')}"
+        )
+
+
 def validate_readme(bundle: dict[str, Any], readme: str, errors: list[str]) -> None:
     claims = bundle["claims"]
     blind = claims["blind_ptq"]
@@ -265,12 +283,18 @@ def main() -> int:
         type=Path,
         default=Path("benchmarks/results/stage2_655m_handoff_submission_2026-05-23.json"),
     )
+    parser.add_argument(
+        "--stage2-monitor",
+        type=Path,
+        default=Path("benchmarks/results/active_stage2_extension_monitor_2026-05-23.json"),
+    )
     args = parser.parse_args()
 
     bundle = load_json(args.bundle)
     reproduction_gap = load_json(args.reproduction_gap)
     stage2_extension = load_json(args.stage2_extension)
     stage2_handoff = load_json(args.stage2_handoff)
+    stage2_monitor = load_json(args.stage2_monitor)
     readme = read_text(args.readme)
     claims_doc = read_text(args.claims)
     errors: list[str] = []
@@ -278,6 +302,7 @@ def main() -> int:
     validate_reproduction_gap(reproduction_gap, errors)
     validate_stage2_extension_submission(stage2_extension, errors)
     validate_stage2_handoff_submission(stage2_handoff, errors)
+    validate_active_stage2_monitor(stage2_monitor, errors)
     validate_readme(bundle, readme, errors)
     validate_reproduction_gap_docs(reproduction_gap, readme, claims_doc, errors)
     validate_claims_doc(bundle, claims_doc, errors)
