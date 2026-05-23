@@ -1,18 +1,27 @@
 {
   "active_gate": {
+    "afterany_dependency": "afterany:10250",
+    "afterany_job_id": "10258",
+    "afterany_status": "dependency_pending",
     "downstream_complete": false,
     "downstream_status": "waiting_for_handoff",
-    "eta_hours": 17.279718569780854,
-    "latest_ce": 3.394341,
+    "eta_hours": 17.22423089983022,
+    "latest_ce": 3.240129,
     "latest_complete_snapshot_step": null,
-    "latest_step": 5780,
+    "latest_step": 5890,
+    "log_health_status": "healthy",
     "max_steps": 40000,
-    "progress": 0.1445,
+    "producer_config_status": "matched",
+    "progress": 0.14725,
+    "snapshot_salvage_complete_count": 0,
+    "snapshot_salvage_status": "no_snapshot_expected_yet",
     "stage2_job_id": "10250",
     "stage2_slurm_state": "RUNNING",
     "stage2_status": "running",
     "telemetry_job_id": "10257",
-    "telemetry_slurm_state": "PENDING"
+    "telemetry_slurm_state": "PENDING",
+    "time_limit_margin_seconds": 13624.768760611201,
+    "time_limit_status": "within_time_limit"
   },
   "completed_findings": [
     {
@@ -46,7 +55,7 @@
       "interpretation": "The systems path is real, but quality/storage tradeoffs remain unfavorable versus mature Q4."
     }
   ],
-  "created_utc": "2026-05-23T18:33:30.696732+00:00",
+  "created_utc": "2026-05-23T18:36:53.865728+00:00",
   "next_action": {
     "blueprint_action": "wait_and_watch_655m_gate",
     "claim_boundary": "status only; quality_claim remains none until ingestion is ingested_reports_rebuilt",
@@ -94,7 +103,7 @@
   ],
   "open_questions": [
     {
-      "current_state": "running; step 5780/40000; downstream waiting_for_handoff.",
+      "current_state": "running; step 5890/40000; downstream waiting_for_handoff.",
       "evidence_needed": "Completed 655M Stage-2 manifest plus downstream MNLI metrics.json and eval_predictions.jsonl.",
       "question": "Does the Stage-2 token-budget curve keep improving at 655.36M tokens?"
     },
@@ -134,15 +143,15 @@
     },
     "current_status": {
       "path": "benchmarks/results/current_goal_status_2026-05-23.json",
-      "sha256": "6dd9314f74112ae1ab584321dbb4f69c69818e6e4699b94a86d024f06a475fb7"
+      "sha256": "109ef7bf02a8affcd295582bd41e0cd7f781f7198690f0ff866ea53f0853f306"
     },
     "next_decision": {
       "path": "benchmarks/results/bitdistill_next_decision_2026-05-23.json",
-      "sha256": "34d4ceed2107b9df0fce4b919233ccf504e094253728454271d9cfd089e65ad4"
+      "sha256": "b415f542b4d0f147835d7d82fbdfee9fc3e5351ee50e066e5cf07c2553491950"
     },
     "next_experiment_blueprint": {
       "path": "benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.json",
-      "sha256": "0c0eeb79ffb87014676d2cbb1cb38d1e5104909a7539c5b0d2051f8a8389bf22"
+      "sha256": "a6c4f974fdb64141bf65f12277caea0a2b88550e60a7f4d794bcbf669b8a1070"
     },
     "reproduction_gap": {
       "path": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json",

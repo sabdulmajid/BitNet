@@ -87,7 +87,13 @@ def build_status(args: argparse.Namespace) -> dict[str, Any]:
     canonical = read_json(args.canonical_bundle)
     gap = read_json(args.reproduction_gap)
     monitor = read_json(args.active_monitor)
+    snapshot_salvage = read_json(args.snapshot_salvage)
+    afterany_submission = read_json(args.afterany_submission)
     validate_inputs(canonical, gap, monitor)
+    if snapshot_salvage.get("schema") != "bitdistill-stage2-snapshot-salvage-v1":
+        raise RuntimeError(f"unexpected snapshot-salvage schema: {snapshot_salvage.get('schema')}")
+    if afterany_submission.get("schema") != "bitnet-stage2-afterany-submission-v1":
+        raise RuntimeError(f"unexpected afterany-submission schema: {afterany_submission.get('schema')}")
 
     claims = canonical["claims"]
     blind = claims["blind_ptq"]
@@ -106,6 +112,9 @@ def build_status(args: argparse.Namespace) -> dict[str, Any]:
     stage2 = monitor["stage2"]
     downstream = monitor["downstream"]
     telemetry = monitor["telemetry"]
+    log_health = stage2.get("log_health", {}) if isinstance(stage2.get("log_health"), dict) else {}
+    producer_config = stage2.get("producer_config", {}) if isinstance(stage2.get("producer_config"), dict) else {}
+    time_limit_gate = stage2.get("time_limit_gate", {}) if isinstance(stage2.get("time_limit_gate"), dict) else {}
 
     requirements = [
         {
@@ -172,6 +181,16 @@ def build_status(args: argparse.Namespace) -> dict[str, Any]:
             "evidence": moe["caveat"],
             "remaining_gap": "Needs real routed model mapping, quality, and CPU runtime evidence.",
         },
+        {
+            "requirement": "Active 655M evidence-chain guardrails",
+            "status": "watching_no_quality_claim",
+            "evidence": (
+                f"producer_config {producer_config.get('status')}; log_health {log_health.get('status')}; "
+                f"snapshot_salvage {snapshot_salvage.get('status')}; afterany job "
+                f"{afterany_submission.get('job_id')} {afterany_submission.get('status')}"
+            ),
+            "remaining_gap": "These are integrity controls only; MNLI quality still requires downstream metrics and paired predictions.",
+        },
     ]
 
     active_gate = {
@@ -183,6 +202,15 @@ def build_status(args: argparse.Namespace) -> dict[str, Any]:
         "progress": stage2["progress"],
         "latest_ce": stage2["latest_step"].get("ce"),
         "eta_hours": stage2["progress_estimate"].get("eta_hours"),
+        "time_limit_status": time_limit_gate.get("status"),
+        "time_limit_margin_seconds": time_limit_gate.get("margin_seconds"),
+        "producer_config_status": producer_config.get("status"),
+        "log_health_status": log_health.get("status"),
+        "snapshot_salvage_status": snapshot_salvage.get("status"),
+        "snapshot_salvage_complete_count": snapshot_salvage.get("complete_snapshot_count"),
+        "afterany_job_id": afterany_submission.get("job_id"),
+        "afterany_status": afterany_submission.get("status"),
+        "afterany_dependency": afterany_submission.get("dependency"),
         "latest_complete_snapshot_step": stage2["latest_complete_snapshot_step"],
         "downstream_status": downstream["status"],
         "downstream_complete": downstream["complete"],
@@ -222,6 +250,8 @@ def build_status(args: argparse.Namespace) -> dict[str, Any]:
             "canonical_bundle": artifact(args.canonical_bundle),
             "reproduction_gap": artifact(args.reproduction_gap),
             "active_monitor": artifact(args.active_monitor),
+            "snapshot_salvage": artifact(args.snapshot_salvage),
+            "afterany_submission": artifact(args.afterany_submission),
         },
         "headline_metrics": {
             "blind_ptq_fp_ppl": blind["fp_wikitext_ppl"],
@@ -309,6 +339,16 @@ def main() -> int:
         "--active-monitor",
         type=Path,
         default=Path("benchmarks/results/active_stage2_extension_monitor_2026-05-23.json"),
+    )
+    parser.add_argument(
+        "--snapshot-salvage",
+        type=Path,
+        default=Path("benchmarks/results/stage2_snapshot_salvage_2026-05-23.json"),
+    )
+    parser.add_argument(
+        "--afterany-submission",
+        type=Path,
+        default=Path("benchmarks/results/stage2_655m_afterany_submission_2026-05-23.json"),
     )
     parser.add_argument(
         "--output-json",

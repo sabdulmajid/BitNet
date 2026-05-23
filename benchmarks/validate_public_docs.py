@@ -679,9 +679,39 @@ def validate_current_goal_status(report: dict[str, Any], errors: list[str]) -> N
                 errors.append(f"current goal status artifact {label}: sha256 mismatch: {actual_sha} != {expected_sha}")
     if report.get("headline_metrics", {}).get("bitdistill_655_36m_status") is None:
         errors.append("current goal status: missing 655.36M status headline")
+    active_gate = report.get("active_gate")
+    if not isinstance(active_gate, dict):
+        errors.append("current goal status: missing active_gate object")
+    else:
+        required_active_fields = {
+            "producer_config_status",
+            "log_health_status",
+            "snapshot_salvage_status",
+            "snapshot_salvage_complete_count",
+            "afterany_job_id",
+            "afterany_status",
+            "afterany_dependency",
+            "time_limit_status",
+        }
+        missing_active = sorted(required_active_fields.difference(active_gate))
+        if missing_active:
+            errors.append(f"current goal status: missing active gate fields {missing_active}")
+        if active_gate.get("producer_config_status") not in {"matched", "missing_log", "missing_header", "mismatched", None}:
+            errors.append(
+                "current goal status: unexpected producer_config_status "
+                f"{active_gate.get('producer_config_status')}"
+            )
+        if active_gate.get("log_health_status") not in {"healthy", "missing_log", "no_steps", "unhealthy", None}:
+            errors.append(f"current goal status: unexpected log_health_status {active_gate.get('log_health_status')}")
+        if active_gate.get("afterany_dependency") not in {"afterany:10250", None}:
+            errors.append(f"current goal status: unexpected afterany dependency {active_gate.get('afterany_dependency')}")
     requirements = report.get("requirements")
     if not isinstance(requirements, list) or len(requirements) < 5:
         errors.append("current goal status: missing requirement audit rows")
+    else:
+        names = {str(row.get("requirement")) for row in requirements if isinstance(row, dict)}
+        if "Active 655M evidence-chain guardrails" not in names:
+            errors.append("current goal status: missing active evidence-chain guardrail requirement")
 
 
 def validate_deep_research_handoff(report: dict[str, Any], errors: list[str]) -> None:

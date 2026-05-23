@@ -1,8 +1,8 @@
 # Current Goal Status
 
-Generated: `2026-05-23T18:33:30.615719+00:00`
+Generated: `2026-05-23T18:36:53.781840+00:00`
 
-Git HEAD: `5d1687224867f42ce017d948bd8f5dcd8b27b9ee`
+Git HEAD: `47406d73d86294e77649930e6eb263417cdbe619`
 
 Objective achieved: **False**.
 
@@ -40,6 +40,7 @@ Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style 
 | Packed CPU I2_SR path | working_not_q4_quality_competitive | I2_SR file 1211.3 MiB; PPL 38.8477; prompt 211.67 tok/s; decode 19.07 tok/s | Not quality/storage competitive with Q4_K_M. |
 | Native packed classifier product | research_demo_not_product_ready | MNLI accuracy 0.652165; PyTorch agreement 0.976668; RSS 960.15 MiB | Agreement and task quality remain below product gates. |
 | MoE/Kimi support | not_supported | Only tiny Qwen2MoE fixture/plumbing exists; no Kimi quality or routed CPU runtime is proven. | Needs real routed model mapping, quality, and CPU runtime evidence. |
+| Active 655M evidence-chain guardrails | watching_no_quality_claim | producer_config matched; log_health healthy; snapshot_salvage no_snapshot_expected_yet; afterany job 10258 dependency_pending | These are integrity controls only; MNLI quality still requires downstream metrics and paired predictions. |
 
 ## Active 655M Gate
 
@@ -48,11 +49,20 @@ Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style 
 | stage2_job_id | 10250 |
 | stage2_status | running |
 | stage2_slurm_state | RUNNING |
-| latest_step | 5780 |
+| latest_step | 5890 |
 | max_steps | 40000 |
-| progress | 0.144500 |
-| latest_ce | 3.394341 |
-| eta_hours | 17.279719 |
+| progress | 0.147250 |
+| latest_ce | 3.240129 |
+| eta_hours | 17.224231 |
+| time_limit_status | within_time_limit |
+| time_limit_margin_seconds | 13624.768761 |
+| producer_config_status | matched |
+| log_health_status | healthy |
+| snapshot_salvage_status | no_snapshot_expected_yet |
+| snapshot_salvage_complete_count | 0 |
+| afterany_job_id | 10258 |
+| afterany_status | dependency_pending |
+| afterany_dependency | afterany:10250 |
 | latest_complete_snapshot_step | - |
 | downstream_status | waiting_for_handoff |
 | downstream_complete | False |
@@ -89,4 +99,6 @@ Potentially publishable as:
 | --- | --- | --- |
 | canonical_bundle | benchmarks/results/canonical_evidence_bundle_2026-05-20.json | af9ec2e35931986c7caf63c178b7c482c3e93406f8d880774bbf8d114f27824c |
 | reproduction_gap | benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json | b5a37266b33dc7318b55a23569673467d11fa7aa67ba6725baaa374210a42820 |
-| active_monitor | benchmarks/results/active_stage2_extension_monitor_2026-05-23.json | 380fa7de13d532ec60fac681e843a600903902604f93f3dd2e6b89486b064a5b |
+| active_monitor | benchmarks/results/active_stage2_extension_monitor_2026-05-23.json | 6fe9af765bc9829bbdc4535ad8b4c841be6b6c629421ffc78990baf200ed54bb |
+| snapshot_salvage | benchmarks/results/stage2_snapshot_salvage_2026-05-23.json | f7a71b81ffcef942ae08336c67313027b5f3e490d037ea0cfbe189be4e5a739b |
+| afterany_submission | benchmarks/results/stage2_655m_afterany_submission_2026-05-23.json | 807495d10307b7d9a8bb5e69196a3b0cc7c12e69a415cce65a868df43156cd77 |

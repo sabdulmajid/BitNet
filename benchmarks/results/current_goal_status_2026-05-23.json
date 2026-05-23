@@ -1,23 +1,36 @@
 {
   "active_gate": {
+    "afterany_dependency": "afterany:10250",
+    "afterany_job_id": "10258",
+    "afterany_status": "dependency_pending",
     "downstream_complete": false,
     "downstream_status": "waiting_for_handoff",
-    "eta_hours": 17.279718569780854,
-    "latest_ce": 3.394341,
+    "eta_hours": 17.22423089983022,
+    "latest_ce": 3.240129,
     "latest_complete_snapshot_step": null,
-    "latest_step": 5780,
+    "latest_step": 5890,
+    "log_health_status": "healthy",
     "max_steps": 40000,
-    "progress": 0.1445,
+    "producer_config_status": "matched",
+    "progress": 0.14725,
+    "snapshot_salvage_complete_count": 0,
+    "snapshot_salvage_status": "no_snapshot_expected_yet",
     "stage2_job_id": "10250",
     "stage2_slurm_state": "RUNNING",
     "stage2_status": "running",
     "telemetry_job_id": "10257",
-    "telemetry_slurm_state": "PENDING"
+    "telemetry_slurm_state": "PENDING",
+    "time_limit_margin_seconds": 13624.768760611201,
+    "time_limit_status": "within_time_limit"
   },
   "artifacts": {
     "active_monitor": {
       "path": "benchmarks/results/active_stage2_extension_monitor_2026-05-23.json",
-      "sha256": "380fa7de13d532ec60fac681e843a600903902604f93f3dd2e6b89486b064a5b"
+      "sha256": "6fe9af765bc9829bbdc4535ad8b4c841be6b6c629421ffc78990baf200ed54bb"
+    },
+    "afterany_submission": {
+      "path": "benchmarks/results/stage2_655m_afterany_submission_2026-05-23.json",
+      "sha256": "807495d10307b7d9a8bb5e69196a3b0cc7c12e69a415cce65a868df43156cd77"
     },
     "canonical_bundle": {
       "path": "benchmarks/results/canonical_evidence_bundle_2026-05-20.json",
@@ -26,12 +39,16 @@
     "reproduction_gap": {
       "path": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json",
       "sha256": "b5a37266b33dc7318b55a23569673467d11fa7aa67ba6725baaa374210a42820"
+    },
+    "snapshot_salvage": {
+      "path": "benchmarks/results/stage2_snapshot_salvage_2026-05-23.json",
+      "sha256": "f7a71b81ffcef942ae08336c67313027b5f3e490d037ea0cfbe189be4e5a739b"
     }
   },
   "completion_status": "in_progress",
-  "created_utc": "2026-05-23T18:33:30.615719+00:00",
+  "created_utc": "2026-05-23T18:36:53.781840+00:00",
   "current_verdict": "Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style recovery status is not_reproduced; the active 655.36M Stage-2 gate is testing whether recovery continues with more tokens.",
-  "git_head": "5d1687224867f42ce017d948bd8f5dcd8b27b9ee",
+  "git_head": "47406d73d86294e77649930e6eb263417cdbe619",
   "headline_metrics": {
     "bitdistill_327_68m_delta_vs_fp": -0.0881304126337239,
     "bitdistill_327_68m_mnli": 0.7200203769740193,
@@ -127,6 +144,12 @@
       "remaining_gap": "Needs real routed model mapping, quality, and CPU runtime evidence.",
       "requirement": "MoE/Kimi support",
       "status": "not_supported"
+    },
+    {
+      "evidence": "producer_config matched; log_health healthy; snapshot_salvage no_snapshot_expected_yet; afterany job 10258 dependency_pending",
+      "remaining_gap": "These are integrity controls only; MNLI quality still requires downstream metrics and paired predictions.",
+      "requirement": "Active 655M evidence-chain guardrails",
+      "status": "watching_no_quality_claim"
     }
   ],
   "schema": "bitnet-current-goal-status-v1"
