@@ -6,29 +6,30 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | job | id | slurm state | time | reason |
 | --- | --- | --- | --- | --- |
-| stage2 | 10250 | RUNNING | 40:45 | ece-nebula12 |
+| stage2 | 10250 | RUNNING | 48:33 | ece-nebula12 |
 | handoff | 10253 | PENDING | 0:00 | (Dependency) |
 | gamma60 telemetry | 10254 | PENDING | 0:00 | (Dependency) |
+| downstream MNLI | - | not_submitted |  |  |
 
 | stage2 field | value |
 | --- | --- |
-| latest_step | 1310 |
+| latest_step | 1570 |
 | max_steps | 40000 |
 | save_every_steps | 10000 |
-| progress | 0.032750 |
-| latest_ce | 3.859161 |
+| progress | 0.039250 |
+| latest_ce | 3.716177 |
 | latest_lr | 0.000002 |
-| log_elapsed_seconds | 2379.400000 |
-| parsed_log_rows | 132 |
+| log_elapsed_seconds | 2852.100000 |
+| parsed_log_rows | 158 |
 | recent_window_rows | 20 |
-| recent_ce_mean | 3.828109 |
-| recent_ce_min | 3.461743 |
-| recent_ce_max | 4.152130 |
-| seconds_per_step | 1.816336 |
-| steps_per_hour | 1982.012272 |
-| eta_hours | 19.520565 |
-| estimated_completion_utc | 2026-05-24T11:49:24.950392+00:00 |
-| segment_token_presentations_per_second | 4510.179037 |
+| recent_ce_mean | 3.789933 |
+| recent_ce_min | 3.120689 |
+| recent_ce_max | 4.441776 |
+| seconds_per_step | 1.816624 |
+| steps_per_hour | 1981.697696 |
+| eta_hours | 19.392463 |
+| estimated_completion_utc | 2026-05-24T11:49:31.607515+00:00 |
+| segment_token_presentations_per_second | 4509.463203 |
 | latest_complete_snapshot_step | - |
 | cumulative_token_presentations | 655360000 |
 
@@ -50,8 +51,21 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | stage2 final snapshot metrics | False | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/metrics.json |
 | handoff manifest | False | benchmarks/results/stage2_manifest_655m_2026-05-23.json |
 | handoff report | False | benchmarks/results/stage2_655m_handoff_2026-05-23.json |
+| downstream metrics | False | checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json |
+| downstream predictions | False | checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl |
 | telemetry artifact 1 | False | checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/telemetry.jsonl |
 | telemetry artifact 2 | False | checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/metrics.json |
+
+## Downstream
+
+| field | value |
+| --- | --- |
+| status | waiting_for_handoff |
+| handoff_report_exists | False |
+| handoff_report_status | - |
+| output_dir | checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit |
+| complete | False |
+| caveat | This section tracks downstream artifact existence only; it does not compute or claim MNLI accuracy. |
 
 ## Caveat
 

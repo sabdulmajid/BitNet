@@ -26,6 +26,12 @@ def read_json(path: Path) -> dict[str, Any]:
     return data
 
 
+def read_optional_json(path: Path) -> dict[str, Any] | None:
+    if not path.exists():
+        return None
+    return read_json(path)
+
+
 def squeue_rows(job_ids: list[str]) -> dict[str, dict[str, str]]:
     if not job_ids:
         return {}
@@ -164,6 +170,32 @@ def classify_stage2_status(
     return "not_in_squeue_incomplete"
 
 
+def classify_downstream_status(
+    *,
+    handoff_report: dict[str, Any] | None,
+    metrics: Path,
+    predictions: Path,
+    slurm_row: dict[str, str] | None,
+) -> str:
+    if metrics.exists() and predictions.exists():
+        return "complete_artifacts_present"
+    if handoff_report is None:
+        return "waiting_for_handoff"
+    handoff_status = str(handoff_report.get("status", ""))
+    if handoff_status == "failed":
+        return "handoff_failed"
+    if slurm_row:
+        state = slurm_row.get("state", "").lower()
+        if state == "running":
+            return "running"
+        if state == "pending":
+            return "pending"
+        return f"slurm_{state}"
+    if handoff_status == "submitted_downstream":
+        return "submitted_downstream_not_in_squeue_incomplete"
+    return "not_submitted_incomplete"
+
+
 def build(args: argparse.Namespace) -> dict[str, Any]:
     stage2_submission = read_json(args.stage2_submission)
     handoff_submission = read_json(args.handoff_submission)
@@ -171,7 +203,15 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
     stage2_job_id = str(stage2_submission["submitted_job_id"])
     handoff_job_id = str(handoff_submission["handoff_job_id"])
     telemetry_job_id = str(telemetry_submission["job_id"])
-    rows = squeue_rows([stage2_job_id, handoff_job_id, telemetry_job_id])
+    handoff_report_path = Path(handoff_submission["expected_handoff_json"])
+    handoff_report = read_optional_json(handoff_report_path)
+    downstream_job_id = ""
+    if isinstance(handoff_report, dict):
+        downstream_job_id = str(handoff_report.get("downstream_job_id") or "")
+    job_ids = [stage2_job_id, handoff_job_id, telemetry_job_id]
+    if downstream_job_id:
+        job_ids.append(downstream_job_id)
+    rows = squeue_rows(job_ids)
 
     stage2_config = stage2_submission["run_config"]
     stage2_output = Path(stage2_config["output_dir"])
@@ -179,6 +219,15 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
     root_metrics = stage2_output / "metrics.json"
     final_state = final_snapshot / "custom_state_dict.pt"
     final_snapshot_metrics = final_snapshot / "metrics.json"
+    downstream_output_text = str(
+        (handoff_report or {}).get(
+            "downstream_output_dir",
+            handoff_submission.get("expected_downstream_output_dir", ""),
+        )
+    )
+    downstream_output = Path(downstream_output_text) if downstream_output_text else None
+    downstream_metrics = downstream_output / "metrics.json" if downstream_output is not None else Path("")
+    downstream_predictions = downstream_output / "eval_predictions.jsonl" if downstream_output is not None else Path("")
     latest_step = parse_latest_step(args.stage2_log)
     max_steps = int(stage2_config["max_steps"])
     save_every_steps = int(stage2_config.get("save_every_steps") or 0)
@@ -224,7 +273,27 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
             "expected_manifest_json": handoff_submission["expected_manifest_json"],
             "expected_manifest_exists": Path(handoff_submission["expected_manifest_json"]).exists(),
             "expected_handoff_json": handoff_submission["expected_handoff_json"],
-            "expected_handoff_exists": Path(handoff_submission["expected_handoff_json"]).exists(),
+            "expected_handoff_exists": handoff_report_path.exists(),
+            "handoff_report_status": handoff_report.get("status") if isinstance(handoff_report, dict) else None,
+        },
+        "downstream": {
+            "job_id": downstream_job_id,
+            "slurm": rows.get(downstream_job_id, {"job_id": downstream_job_id, "state": "not_submitted"})
+            if downstream_job_id
+            else {"job_id": "", "state": "not_submitted"},
+            "status": classify_downstream_status(
+                handoff_report=handoff_report,
+                metrics=downstream_metrics,
+                predictions=downstream_predictions,
+                slurm_row=rows.get(downstream_job_id) if downstream_job_id else None,
+            ),
+            "handoff_report_exists": handoff_report_path.exists(),
+            "handoff_report_status": handoff_report.get("status") if isinstance(handoff_report, dict) else None,
+            "output_dir": downstream_output_text,
+            "metrics": file_info(downstream_metrics) if downstream_output is not None else {"path": "", "exists": False, "size_bytes": None},
+            "predictions": file_info(downstream_predictions) if downstream_output is not None else {"path": "", "exists": False, "size_bytes": None},
+            "complete": downstream_metrics.exists() and downstream_predictions.exists() if downstream_output is not None else False,
+            "caveat": "This section tracks downstream artifact existence only; it does not compute or claim MNLI accuracy.",
         },
         "telemetry": {
             "job_id": telemetry_job_id,
@@ -257,6 +326,7 @@ def md_table(headers: list[str], rows: list[list[Any]]) -> str:
 def render_markdown(report: dict[str, Any]) -> str:
     stage2 = report["stage2"]
     handoff = report["handoff"]
+    downstream = report["downstream"]
     telemetry = report["telemetry"]
     latest = stage2["latest_step"]
     estimate = stage2["progress_estimate"]
@@ -266,6 +336,8 @@ def render_markdown(report: dict[str, Any]) -> str:
         ["stage2 final snapshot metrics", stage2["final_snapshot_metrics"]["exists"], stage2["final_snapshot_metrics"]["path"]],
         ["handoff manifest", handoff["expected_manifest_exists"], handoff["expected_manifest_json"]],
         ["handoff report", handoff["expected_handoff_exists"], handoff["expected_handoff_json"]],
+        ["downstream metrics", downstream["metrics"]["exists"], downstream["metrics"]["path"]],
+        ["downstream predictions", downstream["predictions"]["exists"], downstream["predictions"]["path"]],
     ]
     artifact_rows.extend(
         [f"telemetry artifact {idx}", artifact["exists"], artifact["path"]]
@@ -310,6 +382,13 @@ def render_markdown(report: dict[str, Any]) -> str:
                         telemetry["slurm"].get("time", ""),
                         telemetry["slurm"].get("reason", ""),
                     ],
+                    [
+                        "downstream MNLI",
+                        downstream["job_id"] or "-",
+                        downstream["slurm"].get("state"),
+                        downstream["slurm"].get("time", ""),
+                        downstream["slurm"].get("reason", ""),
+                    ],
                 ],
             ),
             md_table(
@@ -340,6 +419,18 @@ def render_markdown(report: dict[str, Any]) -> str:
             md_table(["step", "dir exists", "state", "metrics", "complete"], snapshot_rows),
             "## Artifacts",
             md_table(["artifact", "exists", "path"], artifact_rows),
+            "## Downstream",
+            md_table(
+                ["field", "value"],
+                [
+                    ["status", downstream["status"]],
+                    ["handoff_report_exists", downstream["handoff_report_exists"]],
+                    ["handoff_report_status", downstream["handoff_report_status"]],
+                    ["output_dir", downstream["output_dir"]],
+                    ["complete", downstream["complete"]],
+                    ["caveat", downstream["caveat"]],
+                ],
+            ),
             "## Caveat",
             stage2["caveat"],
             "",
