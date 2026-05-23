@@ -1,8 +1,8 @@
 # Current Goal Status
 
-Generated: `2026-05-23T18:40:11.721532+00:00`
+Generated: `2026-05-23T18:44:53.894616+00:00`
 
-Git HEAD: `5210279f2052fa330a5c0d7f844c71487a70a36a`
+Git HEAD: `98bcefca9547c70cc1225ba2414d87439867e046`
 
 Objective achieved: **False**.
 
@@ -49,13 +49,13 @@ Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style 
 | stage2_job_id | 10250 |
 | stage2_status | running |
 | stage2_slurm_state | RUNNING |
-| latest_step | 6000 |
+| latest_step | 6150 |
 | max_steps | 40000 |
-| progress | 0.150000 |
-| latest_ce | 3.505086 |
-| eta_hours | 17.168583 |
+| progress | 0.153750 |
+| latest_ce | 3.449912 |
+| eta_hours | 17.093027 |
 | time_limit_status | within_time_limit |
-| time_limit_margin_seconds | 13627.100000 |
+| time_limit_margin_seconds | 13617.103252 |
 | producer_config_status | matched |
 | log_health_status | healthy |
 | snapshot_salvage_status | no_snapshot_expected_yet |
@@ -99,6 +99,6 @@ Potentially publishable as:
 | --- | --- | --- |
 | canonical_bundle | benchmarks/results/canonical_evidence_bundle_2026-05-20.json | af9ec2e35931986c7caf63c178b7c482c3e93406f8d880774bbf8d114f27824c |
 | reproduction_gap | benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json | b5a37266b33dc7318b55a23569673467d11fa7aa67ba6725baaa374210a42820 |
-| active_monitor | benchmarks/results/active_stage2_extension_monitor_2026-05-23.json | a98c4f533ee0ce840c2781406eb75dff92df1037d1bb415b5ff75a56fa6ed5ca |
-| snapshot_salvage | benchmarks/results/stage2_snapshot_salvage_2026-05-23.json | d3373bdcbd91c9395f7c0884168cdad48a6445697009bac89017e7bd6790af3c |
+| active_monitor | benchmarks/results/active_stage2_extension_monitor_2026-05-23.json | e2532bd3eb9812213399e72b20256e56d7c10261e86a80ccda7cd944db47a784 |
+| snapshot_salvage | benchmarks/results/stage2_snapshot_salvage_2026-05-23.json | d933beb59989a291f4ebdd1700337dfd5cbd706a6587d67682e742520d239b13 |
 | afterany_submission | benchmarks/results/stage2_655m_afterany_submission_2026-05-23.json | 807495d10307b7d9a8bb5e69196a3b0cc7c12e69a415cce65a868df43156cd77 |
