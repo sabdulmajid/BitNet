@@ -291,6 +291,44 @@ def validate_active_stage2_monitor(report: dict[str, Any], errors: list[str]) ->
             "stage2 monitor: unexpected cumulative tokens "
             f"{stage2.get('cumulative_token_presentations')}"
         )
+    latest_step_obj = stage2.get("latest_step")
+    latest_step = latest_step_obj.get("step") if isinstance(latest_step_obj, dict) else None
+    save_every_steps = stage2.get("save_every_steps")
+    snapshot_status = stage2.get("snapshot_status")
+    if not isinstance(snapshot_status, dict):
+        errors.append("stage2 monitor: missing snapshot_status object")
+    else:
+        allowed_snapshot_statuses = {
+            "log_not_parsed",
+            "snapshots_disabled",
+            "pre_first_snapshot",
+            "snapshots_present",
+            "snapshot_due_missing",
+            "unknown",
+        }
+        status = snapshot_status.get("status")
+        if status not in allowed_snapshot_statuses:
+            errors.append(f"stage2 monitor: unexpected snapshot status {status}")
+        if status == "snapshot_due_missing":
+            errors.append("stage2 monitor: snapshot is due but missing")
+        if snapshot_status.get("save_every_steps") != save_every_steps:
+            errors.append(
+                "stage2 monitor: snapshot_status save_every_steps mismatch "
+                f"{snapshot_status.get('save_every_steps')} != {save_every_steps}"
+            )
+        if isinstance(latest_step, int) and isinstance(save_every_steps, int) and save_every_steps > 0:
+            if latest_step < save_every_steps and status != "pre_first_snapshot":
+                errors.append(
+                    "stage2 monitor: latest step is before first snapshot but status is "
+                    f"{status}"
+                )
+            if latest_step >= save_every_steps and status == "pre_first_snapshot":
+                errors.append("stage2 monitor: pre_first_snapshot status after first snapshot step")
+        if not isinstance(snapshot_status.get("missing_output_dir_is_expected"), bool):
+            errors.append("stage2 monitor: snapshot_status missing_output_dir_is_expected must be boolean")
+        caveat = snapshot_status.get("caveat")
+        if not isinstance(caveat, str) or "missing output directory is expected before the first snapshot" not in caveat:
+            errors.append("stage2 monitor: snapshot_status caveat must explain pre-first-snapshot behavior")
     downstream = report.get("downstream")
     if not isinstance(downstream, dict):
         errors.append("stage2 monitor: missing downstream object")
@@ -397,6 +435,16 @@ def validate_deep_research_handoff(report: dict[str, Any], errors: list[str]) ->
     open_questions = report.get("open_questions")
     if not isinstance(open_questions, list) or len(open_questions) < 4:
         errors.append("deep research handoff: missing open questions")
+    next_action = report.get("next_action")
+    if not isinstance(next_action, dict):
+        errors.append("deep research handoff: missing next_action")
+    else:
+        if next_action.get("decision_status") != "pending_655m_downstream":
+            errors.append(f"deep research handoff: unexpected next-action status {next_action.get('decision_status')}")
+        if next_action.get("blueprint_action") != "wait_and_watch_655m_gate":
+            errors.append(f"deep research handoff: unexpected blueprint action {next_action.get('blueprint_action')}")
+        if "quality_claim remains none" not in str(next_action.get("claim_boundary", "")):
+            errors.append("deep research handoff: next-action boundary must keep quality claims closed")
     nonclaims = report.get("nonclaims")
     if not isinstance(nonclaims, list) or "universal BitNet converter" not in nonclaims:
         errors.append("deep research handoff: missing universal-converter nonclaim")

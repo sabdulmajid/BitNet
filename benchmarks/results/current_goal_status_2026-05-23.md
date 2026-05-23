@@ -1,8 +1,8 @@
 # Current Goal Status
 
-Generated: `2026-05-23T17:52:38.169865+00:00`
+Generated: `2026-05-23T17:54:09.514298+00:00`
 
-Git HEAD: `25bfced22aee2aedceb3cc2847d37da699c8f1ba`
+Git HEAD: `967840e12831f687022d6175c18ce881a646e5f7`
 
 Objective achieved: **False**.
 
@@ -48,11 +48,11 @@ Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style 
 | stage2_job_id | 10250 |
 | stage2_status | running |
 | stage2_slurm_state | RUNNING |
-| latest_step | 4430 |
+| latest_step | 4480 |
 | max_steps | 40000 |
-| progress | 0.110750 |
-| latest_ce | 3.651451 |
-| eta_hours | 17.959638 |
+| progress | 0.112000 |
+| latest_ce | 3.587912 |
+| eta_hours | 17.934869 |
 | latest_complete_snapshot_step | - |
 | downstream_status | waiting_for_handoff |
 | downstream_complete | False |
@@ -89,4 +89,4 @@ Potentially publishable as:
 | --- | --- | --- |
 | canonical_bundle | benchmarks/results/canonical_evidence_bundle_2026-05-20.json | af9ec2e35931986c7caf63c178b7c482c3e93406f8d880774bbf8d114f27824c |
 | reproduction_gap | benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json | b5a37266b33dc7318b55a23569673467d11fa7aa67ba6725baaa374210a42820 |
-| active_monitor | benchmarks/results/active_stage2_extension_monitor_2026-05-23.json | c209271847722941761159194f61f7592fdd0dd82f2daceef7cada750d3deb89 |
+| active_monitor | benchmarks/results/active_stage2_extension_monitor_2026-05-23.json | 1a7718fdd2368d826441ebc190cb103655a64f32aec4634595c60c270b49b857 |
