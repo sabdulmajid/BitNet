@@ -1,5 +1,5 @@
 {
-  "created_utc": "2026-05-23T17:54:09.072663+00:00",
+  "created_utc": "2026-05-23T17:57:35.077070+00:00",
   "downstream": {
     "caveat": "This section tracks downstream artifact existence only; it does not compute or claim MNLI accuracy.",
     "complete": false,
@@ -139,31 +139,42 @@
     "job_id": "10250",
     "latest_complete_snapshot_step": null,
     "latest_step": {
-      "ce": 3.587912,
-      "elapsed_seconds": 8143.4,
+      "ce": 4.162914,
+      "elapsed_seconds": 8343.2,
       "first_elapsed_seconds": 2.0,
       "first_step": 1,
       "log_exists": true,
       "lr": 2e-06,
-      "parsed_log_rows": 449,
+      "parsed_log_rows": 460,
       "path": "logs/bd-s2-655m-10250.out",
-      "recent_ce_max": 4.204939,
-      "recent_ce_mean": 3.7624939,
+      "recent_ce_max": 4.302428,
+      "recent_ce_mean": 3.82192455,
       "recent_ce_min": 3.312929,
       "recent_window_rows": 20,
-      "step": 4480
+      "step": 4590
+    },
+    "log_freshness": {
+      "age_seconds": 11.551408,
+      "caveat": "Fresh logs are required while the Stage-2 producer is running.",
+      "checked_utc": "2026-05-23T17:57:35.077107+00:00",
+      "exists": true,
+      "mtime_utc": "2026-05-23T17:57:23.525699+00:00",
+      "path": "logs/bd-s2-655m-10250.out",
+      "slurm_state": "RUNNING",
+      "stale_after_seconds": 900,
+      "status": "fresh_running_log"
     },
     "max_steps": 40000,
     "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
-    "progress": 0.112,
+    "progress": 0.11475,
     "progress_estimate": {
-      "estimated_completion_utc": "2026-05-24T11:50:14.600622+00:00",
-      "estimated_total_seconds": 72708.92857142857,
-      "eta_hours": 17.93486904761905,
-      "eta_seconds": 64565.52857142857,
-      "seconds_per_step": 1.8177232142857143,
-      "segment_token_presentations_per_second": 4506.736743866199,
-      "steps_per_hour": 1980.4995456443255
+      "estimated_completion_utc": "2026-05-24T11:50:19.501859+00:00",
+      "estimated_total_seconds": 72707.62527233116,
+      "eta_hours": 17.87900702009199,
+      "eta_seconds": 64364.42527233116,
+      "seconds_per_step": 1.817690631808279,
+      "segment_token_presentations_per_second": 4506.817528046792,
+      "steps_per_hour": 1980.535046504938
     },
     "root_metrics": {
       "exists": false,
@@ -176,7 +187,7 @@
       "name": "bd-s2-655m",
       "reason": "ece-nebula12",
       "state": "RUNNING",
-      "time": "2:16:44"
+      "time": "2:20:10"
     },
     "snapshot_status": {
       "caveat": "A missing output directory is expected before the first snapshot when save_every_steps has not been reached.",

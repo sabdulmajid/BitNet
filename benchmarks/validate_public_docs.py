@@ -291,6 +291,34 @@ def validate_active_stage2_monitor(report: dict[str, Any], errors: list[str]) ->
             "stage2 monitor: unexpected cumulative tokens "
             f"{stage2.get('cumulative_token_presentations')}"
         )
+    log_freshness = stage2.get("log_freshness")
+    if not isinstance(log_freshness, dict):
+        errors.append("stage2 monitor: missing log_freshness object")
+    else:
+        allowed_log_statuses = {
+            "missing_log_running",
+            "missing_log_not_running",
+            "not_running",
+            "stale_running_log",
+            "fresh_running_log",
+        }
+        log_status = log_freshness.get("status")
+        if log_status not in allowed_log_statuses:
+            errors.append(f"stage2 monitor: unexpected log freshness status {log_status}")
+        if log_status in {"missing_log_running", "stale_running_log"}:
+            errors.append(f"stage2 monitor: unhealthy running log status {log_status}")
+        if log_freshness.get("exists") is not True and log_status == "fresh_running_log":
+            errors.append("stage2 monitor: fresh_running_log without existing log")
+        if not isinstance(log_freshness.get("stale_after_seconds"), int):
+            errors.append("stage2 monitor: log_freshness stale_after_seconds must be an integer")
+        age_seconds = log_freshness.get("age_seconds")
+        stale_after = log_freshness.get("stale_after_seconds")
+        if log_status == "fresh_running_log" and isinstance(age_seconds, (int, float)) and isinstance(stale_after, int):
+            if float(age_seconds) > float(stale_after):
+                errors.append("stage2 monitor: fresh_running_log has age beyond stale threshold")
+        caveat = log_freshness.get("caveat")
+        if not isinstance(caveat, str) or "Fresh logs are required" not in caveat:
+            errors.append("stage2 monitor: log_freshness caveat must explain freshness requirement")
     latest_step_obj = stage2.get("latest_step")
     latest_step = latest_step_obj.get("step") if isinstance(latest_step_obj, dict) else None
     save_every_steps = stage2.get("save_every_steps")

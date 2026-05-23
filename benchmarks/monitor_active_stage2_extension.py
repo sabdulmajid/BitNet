@@ -15,6 +15,7 @@ from typing import Any
 STEP_RE = re.compile(
     r"step=(?P<step>\d+)\s+ce=(?P<ce>[0-9.eE+-]+)\s+lr=(?P<lr>[0-9.eE+-]+)\s+elapsed=(?P<elapsed>[0-9.eE+-]+)s"
 )
+RUNNING_LOG_STALE_SECONDS = 15 * 60
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -89,6 +90,44 @@ def parse_latest_step(log_path: Path) -> dict[str, Any]:
             }
         )
     return latest
+
+
+def log_freshness(log_path: Path, squeue_row: dict[str, str] | None) -> dict[str, Any]:
+    state = (squeue_row or {}).get("state", "")
+    is_running = state.lower() == "running"
+    now = datetime.now(timezone.utc)
+    if not log_path.exists():
+        status = "missing_log_running" if is_running else "missing_log_not_running"
+        return {
+            "status": status,
+            "path": str(log_path),
+            "exists": False,
+            "checked_utc": now.isoformat(),
+            "mtime_utc": None,
+            "age_seconds": None,
+            "stale_after_seconds": RUNNING_LOG_STALE_SECONDS,
+            "slurm_state": state,
+            "caveat": "Fresh logs are required while the Stage-2 producer is running.",
+        }
+    mtime = datetime.fromtimestamp(log_path.stat().st_mtime, tz=timezone.utc)
+    age_seconds = (now - mtime).total_seconds()
+    if not is_running:
+        status = "not_running"
+    elif age_seconds > RUNNING_LOG_STALE_SECONDS:
+        status = "stale_running_log"
+    else:
+        status = "fresh_running_log"
+    return {
+        "status": status,
+        "path": str(log_path),
+        "exists": True,
+        "checked_utc": now.isoformat(),
+        "mtime_utc": mtime.isoformat(),
+        "age_seconds": age_seconds,
+        "stale_after_seconds": RUNNING_LOG_STALE_SECONDS,
+        "slurm_state": state,
+        "caveat": "Fresh logs are required while the Stage-2 producer is running.",
+    }
 
 
 def file_info(path: Path) -> dict[str, Any]:
@@ -349,6 +388,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
             "save_every_steps": save_every_steps,
             "progress": (float(step) / float(max_steps)) if isinstance(step, int) and max_steps else None,
             "progress_estimate": progress_estimate,
+            "log_freshness": log_freshness(args.stage2_log, rows.get(stage2_job_id)),
             "snapshot_status": snapshot_status,
             "expected_snapshots": snapshots,
             "latest_complete_snapshot_step": complete_snapshots[-1]["step"] if complete_snapshots else None,
@@ -439,6 +479,7 @@ def render_markdown(report: dict[str, Any]) -> str:
     telemetry = report["telemetry"]
     latest = stage2["latest_step"]
     estimate = stage2["progress_estimate"]
+    freshness = stage2["log_freshness"]
     snapshot_status = stage2["snapshot_status"]
     artifact_rows = [
         ["stage2 root metrics", stage2["root_metrics"]["exists"], stage2["root_metrics"]["path"]],
@@ -524,6 +565,8 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["progress", stage2["progress"]],
                     ["latest_ce", latest.get("ce", "")],
                     ["latest_lr", latest.get("lr", "")],
+                    ["log_freshness_status", freshness["status"]],
+                    ["log_age_seconds", freshness["age_seconds"]],
                     ["log_elapsed_seconds", latest.get("elapsed_seconds", "")],
                     ["parsed_log_rows", latest.get("parsed_log_rows", "")],
                     ["recent_window_rows", latest.get("recent_window_rows", "")],
@@ -537,6 +580,21 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["segment_token_presentations_per_second", estimate.get("segment_token_presentations_per_second")],
                     ["latest_complete_snapshot_step", stage2["latest_complete_snapshot_step"]],
                     ["cumulative_token_presentations", stage2["cumulative_token_presentations"]],
+                ],
+            ),
+            "## Log Freshness",
+            md_table(
+                ["field", "value"],
+                [
+                    ["status", freshness["status"]],
+                    ["path", freshness["path"]],
+                    ["exists", freshness["exists"]],
+                    ["checked_utc", freshness["checked_utc"]],
+                    ["mtime_utc", freshness["mtime_utc"]],
+                    ["age_seconds", freshness["age_seconds"]],
+                    ["stale_after_seconds", freshness["stale_after_seconds"]],
+                    ["slurm_state", freshness["slurm_state"]],
+                    ["caveat", freshness["caveat"]],
                 ],
             ),
             "## Snapshot Gate",

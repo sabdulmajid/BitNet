@@ -6,7 +6,7 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | job | id | slurm state | time | reason |
 | --- | --- | --- | --- | --- |
-| stage2 | 10250 | RUNNING | 2:16:44 | ece-nebula12 |
+| stage2 | 10250 | RUNNING | 2:20:10 | ece-nebula12 |
 | handoff | 10255 | PENDING | 0:00 | (Dependency) |
 | gamma60 telemetry | 10257 | PENDING | 0:00 | (Dependency) |
 | downstream MNLI | - | not_submitted |  |  |
@@ -14,7 +14,7 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | stage2 field | value |
 | --- | --- |
-| latest_step | 4480 |
+| latest_step | 4590 |
 | max_steps | 40000 |
 | save_every_steps | 10000 |
 | snapshot_status | pre_first_snapshot |
@@ -22,22 +22,38 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | missing_output_dir_is_expected | True |
 | first_snapshot_step | 10000 |
 | next_snapshot_step | 10000 |
-| progress | 0.112000 |
-| latest_ce | 3.587912 |
+| progress | 0.114750 |
+| latest_ce | 4.162914 |
 | latest_lr | 0.000002 |
-| log_elapsed_seconds | 8143.400000 |
-| parsed_log_rows | 449 |
+| log_freshness_status | fresh_running_log |
+| log_age_seconds | 11.551408 |
+| log_elapsed_seconds | 8343.200000 |
+| parsed_log_rows | 460 |
 | recent_window_rows | 20 |
-| recent_ce_mean | 3.762494 |
+| recent_ce_mean | 3.821925 |
 | recent_ce_min | 3.312929 |
-| recent_ce_max | 4.204939 |
-| seconds_per_step | 1.817723 |
-| steps_per_hour | 1980.499546 |
-| eta_hours | 17.934869 |
-| estimated_completion_utc | 2026-05-24T11:50:14.600622+00:00 |
-| segment_token_presentations_per_second | 4506.736744 |
+| recent_ce_max | 4.302428 |
+| seconds_per_step | 1.817691 |
+| steps_per_hour | 1980.535047 |
+| eta_hours | 17.879007 |
+| estimated_completion_utc | 2026-05-24T11:50:19.501859+00:00 |
+| segment_token_presentations_per_second | 4506.817528 |
 | latest_complete_snapshot_step | - |
 | cumulative_token_presentations | 655360000 |
+
+## Log Freshness
+
+| field | value |
+| --- | --- |
+| status | fresh_running_log |
+| path | logs/bd-s2-655m-10250.out |
+| exists | True |
+| checked_utc | 2026-05-23T17:57:35.077107+00:00 |
+| mtime_utc | 2026-05-23T17:57:23.525699+00:00 |
+| age_seconds | 11.551408 |
+| stale_after_seconds | 900 |
+| slurm_state | RUNNING |
+| caveat | Fresh logs are required while the Stage-2 producer is running. |
 
 ## Snapshot Gate
 
