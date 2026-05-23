@@ -1,6 +1,6 @@
 # Stage-2 655.36M Ingestion Audit
 
-Generated: `2026-05-23T17:57:35.158250+00:00`
+Generated: `2026-05-23T18:00:08.431736+00:00`
 
 Status: **pending_handoff**.
 
@@ -12,7 +12,7 @@ This report is an ingestion receipt. It does not create a quality claim; it veri
 
 | job | id | state | time | reason |
 | --- | --- | --- | --- | --- |
-| stage2 | 10250 | RUNNING | 2:20:10 | ece-nebula12 |
+| stage2 | 10250 | RUNNING | 2:22:43 | ece-nebula12 |
 | handoff | 10255 | PENDING | 0:00 | (Dependency) |
 
 ## Downstream Artifacts

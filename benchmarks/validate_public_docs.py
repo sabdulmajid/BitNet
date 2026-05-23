@@ -319,6 +319,31 @@ def validate_active_stage2_monitor(report: dict[str, Any], errors: list[str]) ->
         caveat = log_freshness.get("caveat")
         if not isinstance(caveat, str) or "Fresh logs are required" not in caveat:
             errors.append("stage2 monitor: log_freshness caveat must explain freshness requirement")
+    time_limit_gate = stage2.get("time_limit_gate")
+    if not isinstance(time_limit_gate, dict):
+        errors.append("stage2 monitor: missing time_limit_gate object")
+    else:
+        allowed_time_statuses = {
+            "not_running",
+            "unknown",
+            "likely_walltime_failure",
+            "tight_walltime_margin",
+            "within_time_limit",
+        }
+        time_status = time_limit_gate.get("status")
+        if time_status not in allowed_time_statuses:
+            errors.append(f"stage2 monitor: unexpected time-limit status {time_status}")
+        if time_status == "likely_walltime_failure":
+            errors.append("stage2 monitor: estimated completion exceeds Slurm time remaining")
+        for field in ("elapsed_seconds", "time_limit_seconds", "eta_seconds", "remaining_seconds", "margin_seconds"):
+            value = time_limit_gate.get(field)
+            if time_status == "within_time_limit" and not isinstance(value, (int, float)):
+                errors.append(f"stage2 monitor: time_limit_gate {field} must be numeric")
+        if time_status == "within_time_limit" and float(time_limit_gate.get("margin_seconds", -1)) <= 0:
+            errors.append("stage2 monitor: within_time_limit has non-positive margin")
+        caveat = time_limit_gate.get("caveat")
+        if not isinstance(caveat, str) or "runtime-risk signal" not in caveat:
+            errors.append("stage2 monitor: time_limit_gate caveat must explain runtime-risk scope")
     latest_step_obj = stage2.get("latest_step")
     latest_step = latest_step_obj.get("step") if isinstance(latest_step_obj, dict) else None
     save_every_steps = stage2.get("save_every_steps")

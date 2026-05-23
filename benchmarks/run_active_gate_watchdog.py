@@ -65,6 +65,8 @@ def build_summary() -> dict[str, Any]:
     next_blueprint = read_json(Path(f"benchmarks/results/bitdistill_next_experiment_blueprint_{DATE}.json"))
     stage2 = monitor.get("stage2", {}) if isinstance(monitor.get("stage2"), dict) else {}
     latest_step = stage2.get("latest_step", {}) if isinstance(stage2.get("latest_step"), dict) else {}
+    time_limit_gate = stage2.get("time_limit_gate", {}) if isinstance(stage2.get("time_limit_gate"), dict) else {}
+    log_freshness = stage2.get("log_freshness", {}) if isinstance(stage2.get("log_freshness"), dict) else {}
     return {
         "monitor_status": monitor.get("status"),
         "ingestion_status": ingestion.get("status"),
@@ -79,6 +81,9 @@ def build_summary() -> dict[str, Any]:
         "stage2_latest_step": latest_step.get("step"),
         "stage2_latest_ce": latest_step.get("ce"),
         "stage2_progress": stage2.get("progress"),
+        "stage2_log_freshness": log_freshness.get("status"),
+        "stage2_time_limit_status": time_limit_gate.get("status"),
+        "stage2_time_limit_margin_seconds": time_limit_gate.get("margin_seconds"),
         "downstream_status": (monitor.get("downstream") or {}).get("status")
         if isinstance(monitor.get("downstream"), dict)
         else None,

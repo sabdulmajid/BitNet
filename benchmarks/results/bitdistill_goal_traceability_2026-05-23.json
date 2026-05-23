@@ -1,6 +1,6 @@
 {
   "completion_status": "in_progress",
-  "created_utc": "2026-05-23T17:57:35.686545+00:00",
+  "created_utc": "2026-05-23T18:00:08.965643+00:00",
   "live_state": {
     "jobs": {
       "10250": {
@@ -9,7 +9,7 @@
         "nodes": "1",
         "reason": "ece-nebula12",
         "state": "RUNNING",
-        "time": "2:20:10"
+        "time": "2:22:43"
       },
       "10255": {
         "job_id": "10255",
@@ -29,15 +29,15 @@
       }
     },
     "stage2": {
-      "eta_hours": 17.87900702009199,
+      "eta_hours": 17.834000474833807,
       "job_id": "10250",
-      "latest_ce": 4.162914,
+      "latest_ce": 3.724242,
       "latest_lr": 2e-06,
-      "latest_step": 4590,
+      "latest_step": 4680,
       "log_path": "logs/bd-s2-655m-10250.out",
       "max_steps": 40000,
-      "progress": 0.11475,
-      "recent_ce_mean": 3.82192455
+      "progress": 0.117,
+      "recent_ce_mean": 3.7986744000000003
     }
   },
   "objective_achieved": false,
@@ -62,7 +62,7 @@
       "status": "implemented_alignment_still_under_quality_audit"
     },
     {
-      "evidence": "completed latest tokens 327,680,000; latest MNLI 0.720020; live job RUNNING; live step 4590; ETA hours 17.88",
+      "evidence": "completed latest tokens 327,680,000; latest MNLI 0.720020; live job RUNNING; live step 4680; ETA hours 17.83",
       "next_action": "Wait for job 10250, handoff 10255, and postprocess before changing experiment axes.",
       "proof_strength": "completed 327.68M row plus live 655.36M job",
       "remaining_gap": "655.36M downstream MNLI and paired prediction trace are pending.",

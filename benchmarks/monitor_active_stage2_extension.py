@@ -16,6 +16,7 @@ STEP_RE = re.compile(
     r"step=(?P<step>\d+)\s+ce=(?P<ce>[0-9.eE+-]+)\s+lr=(?P<lr>[0-9.eE+-]+)\s+elapsed=(?P<elapsed>[0-9.eE+-]+)s"
 )
 RUNNING_LOG_STALE_SECONDS = 15 * 60
+TIME_LIMIT_TIGHT_MARGIN_SECONDS = 30 * 60
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -36,24 +37,54 @@ def read_optional_json(path: Path) -> dict[str, Any] | None:
 def squeue_rows(job_ids: list[str]) -> dict[str, dict[str, str]]:
     if not job_ids:
         return {}
-    command = ["squeue", "-h", "-j", ",".join(job_ids), "-o", "%i\t%T\t%M\t%R\t%j"]
+    command = ["squeue", "-h", "-j", ",".join(job_ids), "-o", "%i\t%T\t%M\t%l\t%R\t%j"]
     result = subprocess.run(command, check=False, capture_output=True, text=True)
     rows: dict[str, dict[str, str]] = {}
     if result.returncode != 0:
         return rows
     for line in result.stdout.splitlines():
-        parts = line.split("\t", 4)
-        if len(parts) != 5:
+        parts = line.split("\t", 5)
+        if len(parts) != 6:
             continue
-        job_id, state, time_used, reason, name = parts
+        job_id, state, time_used, time_limit, reason, name = parts
         rows[job_id] = {
             "job_id": job_id,
             "state": state,
             "time": time_used,
+            "time_limit": time_limit,
             "reason": reason,
             "name": name,
         }
     return rows
+
+
+def parse_slurm_duration(value: str | None) -> int | None:
+    if not value:
+        return None
+    text = value.strip()
+    if text in {"UNLIMITED", "NOT_SET", "N/A", "INVALID"}:
+        return None
+    days = 0
+    if "-" in text:
+        day_text, text = text.split("-", 1)
+        if not day_text.isdigit():
+            return None
+        days = int(day_text)
+    parts = text.split(":")
+    if not all(part.isdigit() for part in parts):
+        return None
+    if len(parts) == 3:
+        hours, minutes, seconds = (int(part) for part in parts)
+    elif len(parts) == 2:
+        hours = 0
+        minutes, seconds = (int(part) for part in parts)
+    elif len(parts) == 1:
+        hours = 0
+        minutes = 0
+        seconds = int(parts[0])
+    else:
+        return None
+    return days * 86400 + hours * 3600 + minutes * 60 + seconds
 
 
 def parse_latest_step(log_path: Path) -> dict[str, Any]:
@@ -242,6 +273,51 @@ def estimate_progress(latest_step: dict[str, Any], max_steps: int, segment_token
     }
 
 
+def time_limit_gate(squeue_row: dict[str, str] | None, estimate: dict[str, Any]) -> dict[str, Any]:
+    state = (squeue_row or {}).get("state", "")
+    elapsed_text = (squeue_row or {}).get("time")
+    limit_text = (squeue_row or {}).get("time_limit")
+    elapsed_seconds = parse_slurm_duration(elapsed_text)
+    limit_seconds = parse_slurm_duration(limit_text)
+    eta_seconds = estimate.get("eta_seconds")
+    if state.lower() != "running":
+        status = "not_running"
+    elif elapsed_seconds is None or limit_seconds is None or not isinstance(eta_seconds, (int, float)):
+        status = "unknown"
+    else:
+        remaining_seconds = limit_seconds - elapsed_seconds
+        margin_seconds = remaining_seconds - float(eta_seconds)
+        if margin_seconds < 0:
+            status = "likely_walltime_failure"
+        elif margin_seconds < TIME_LIMIT_TIGHT_MARGIN_SECONDS:
+            status = "tight_walltime_margin"
+        else:
+            status = "within_time_limit"
+    remaining_seconds = (
+        limit_seconds - elapsed_seconds
+        if isinstance(elapsed_seconds, int) and isinstance(limit_seconds, int)
+        else None
+    )
+    margin_seconds = (
+        remaining_seconds - float(eta_seconds)
+        if isinstance(remaining_seconds, int) and isinstance(eta_seconds, (int, float))
+        else None
+    )
+    return {
+        "status": status,
+        "slurm_state": state,
+        "elapsed": elapsed_text,
+        "time_limit": limit_text,
+        "elapsed_seconds": elapsed_seconds,
+        "time_limit_seconds": limit_seconds,
+        "eta_seconds": eta_seconds,
+        "remaining_seconds": remaining_seconds,
+        "margin_seconds": margin_seconds,
+        "tight_margin_threshold_seconds": TIME_LIMIT_TIGHT_MARGIN_SECONDS,
+        "caveat": "Compares current ETA with Slurm time remaining; it is a runtime-risk signal, not quality evidence.",
+    }
+
+
 def classify_stage2_status(
     *,
     squeue_row: dict[str, str] | None,
@@ -361,6 +437,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
         max_steps,
         stage2_config.get("segment_token_presentations"),
     )
+    stage2_slurm_row = rows.get(stage2_job_id)
     snapshots = expected_snapshots(stage2_output, max_steps, save_every_steps)
     complete_snapshots = [snapshot for snapshot in snapshots if snapshot["complete"]]
     snapshot_status = snapshot_gate(
@@ -388,6 +465,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
             "save_every_steps": save_every_steps,
             "progress": (float(step) / float(max_steps)) if isinstance(step, int) and max_steps else None,
             "progress_estimate": progress_estimate,
+            "time_limit_gate": time_limit_gate(stage2_slurm_row, progress_estimate),
             "log_freshness": log_freshness(args.stage2_log, rows.get(stage2_job_id)),
             "snapshot_status": snapshot_status,
             "expected_snapshots": snapshots,
@@ -479,6 +557,7 @@ def render_markdown(report: dict[str, Any]) -> str:
     telemetry = report["telemetry"]
     latest = stage2["latest_step"]
     estimate = stage2["progress_estimate"]
+    time_gate = stage2["time_limit_gate"]
     freshness = stage2["log_freshness"]
     snapshot_status = stage2["snapshot_status"]
     artifact_rows = [
@@ -567,6 +646,8 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["latest_lr", latest.get("lr", "")],
                     ["log_freshness_status", freshness["status"]],
                     ["log_age_seconds", freshness["age_seconds"]],
+                    ["time_limit_status", time_gate["status"]],
+                    ["time_limit_margin_seconds", time_gate["margin_seconds"]],
                     ["log_elapsed_seconds", latest.get("elapsed_seconds", "")],
                     ["parsed_log_rows", latest.get("parsed_log_rows", "")],
                     ["recent_window_rows", latest.get("recent_window_rows", "")],
@@ -580,6 +661,23 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["segment_token_presentations_per_second", estimate.get("segment_token_presentations_per_second")],
                     ["latest_complete_snapshot_step", stage2["latest_complete_snapshot_step"]],
                     ["cumulative_token_presentations", stage2["cumulative_token_presentations"]],
+                ],
+            ),
+            "## Time Limit Gate",
+            md_table(
+                ["field", "value"],
+                [
+                    ["status", time_gate["status"]],
+                    ["slurm_state", time_gate["slurm_state"]],
+                    ["elapsed", time_gate["elapsed"]],
+                    ["time_limit", time_gate["time_limit"]],
+                    ["elapsed_seconds", time_gate["elapsed_seconds"]],
+                    ["time_limit_seconds", time_gate["time_limit_seconds"]],
+                    ["eta_seconds", time_gate["eta_seconds"]],
+                    ["remaining_seconds", time_gate["remaining_seconds"]],
+                    ["margin_seconds", time_gate["margin_seconds"]],
+                    ["tight_margin_threshold_seconds", time_gate["tight_margin_threshold_seconds"]],
+                    ["caveat", time_gate["caveat"]],
                 ],
             ),
             "## Log Freshness",

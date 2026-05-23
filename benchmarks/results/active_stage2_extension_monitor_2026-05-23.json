@@ -1,5 +1,5 @@
 {
-  "created_utc": "2026-05-23T17:57:35.077070+00:00",
+  "created_utc": "2026-05-23T18:00:08.345953+00:00",
   "downstream": {
     "caveat": "This section tracks downstream artifact existence only; it does not compute or claim MNLI accuracy.",
     "complete": false,
@@ -36,7 +36,8 @@
       "name": "bd-655m-handoff",
       "reason": "(Dependency)",
       "state": "PENDING",
-      "time": "0:00"
+      "time": "0:00",
+      "time_limit": "20:00"
     }
   },
   "postprocess": {
@@ -139,26 +140,26 @@
     "job_id": "10250",
     "latest_complete_snapshot_step": null,
     "latest_step": {
-      "ce": 4.162914,
-      "elapsed_seconds": 8343.2,
+      "ce": 3.724242,
+      "elapsed_seconds": 8507.0,
       "first_elapsed_seconds": 2.0,
       "first_step": 1,
       "log_exists": true,
       "lr": 2e-06,
-      "parsed_log_rows": 460,
+      "parsed_log_rows": 469,
       "path": "logs/bd-s2-655m-10250.out",
       "recent_ce_max": 4.302428,
-      "recent_ce_mean": 3.82192455,
-      "recent_ce_min": 3.312929,
+      "recent_ce_mean": 3.7986744000000003,
+      "recent_ce_min": 3.345604,
       "recent_window_rows": 20,
-      "step": 4590
+      "step": 4680
     },
     "log_freshness": {
-      "age_seconds": 11.551408,
+      "age_seconds": 0.980599,
       "caveat": "Fresh logs are required while the Stage-2 producer is running.",
-      "checked_utc": "2026-05-23T17:57:35.077107+00:00",
+      "checked_utc": "2026-05-23T18:00:08.346047+00:00",
       "exists": true,
-      "mtime_utc": "2026-05-23T17:57:23.525699+00:00",
+      "mtime_utc": "2026-05-23T18:00:07.365448+00:00",
       "path": "logs/bd-s2-655m-10250.out",
       "slurm_state": "RUNNING",
       "stale_after_seconds": 900,
@@ -166,15 +167,15 @@
     },
     "max_steps": 40000,
     "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
-    "progress": 0.11475,
+    "progress": 0.117,
     "progress_estimate": {
-      "estimated_completion_utc": "2026-05-24T11:50:19.501859+00:00",
-      "estimated_total_seconds": 72707.62527233116,
-      "eta_hours": 17.87900702009199,
-      "eta_seconds": 64364.42527233116,
-      "seconds_per_step": 1.817690631808279,
-      "segment_token_presentations_per_second": 4506.817528046792,
-      "steps_per_hour": 1980.535046504938
+      "estimated_completion_utc": "2026-05-24T11:50:10.747024+00:00",
+      "estimated_total_seconds": 72709.4017094017,
+      "eta_hours": 17.834000474833807,
+      "eta_seconds": 64202.40170940171,
+      "seconds_per_step": 1.8177350427350427,
+      "segment_token_presentations_per_second": 4506.707417420947,
+      "steps_per_hour": 1980.486658046315
     },
     "root_metrics": {
       "exists": false,
@@ -187,7 +188,8 @@
       "name": "bd-s2-655m",
       "reason": "ece-nebula12",
       "state": "RUNNING",
-      "time": "2:20:10"
+      "time": "2:22:43",
+      "time_limit": "1-00:00:00"
     },
     "snapshot_status": {
       "caveat": "A missing output directory is expected before the first snapshot when save_every_steps has not been reached.",
@@ -199,6 +201,19 @@
       "output_dir_exists": false,
       "save_every_steps": 10000,
       "status": "pre_first_snapshot"
+    },
+    "time_limit_gate": {
+      "caveat": "Compares current ETA with Slurm time remaining; it is a runtime-risk signal, not quality evidence.",
+      "elapsed": "2:22:43",
+      "elapsed_seconds": 8563,
+      "eta_seconds": 64202.40170940171,
+      "margin_seconds": 13634.59829059829,
+      "remaining_seconds": 77837,
+      "slurm_state": "RUNNING",
+      "status": "within_time_limit",
+      "tight_margin_threshold_seconds": 1800,
+      "time_limit": "1-00:00:00",
+      "time_limit_seconds": 86400
     }
   },
   "status": "running",
@@ -223,7 +238,8 @@
       "name": "bd-g60-telemetry",
       "reason": "(Dependency)",
       "state": "PENDING",
-      "time": "0:00"
+      "time": "0:00",
+      "time_limit": "1-00:00:00"
     }
   }
 }
