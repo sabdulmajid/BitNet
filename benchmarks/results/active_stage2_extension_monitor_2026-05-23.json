@@ -1,5 +1,5 @@
 {
-  "created_utc": "2026-05-23T16:33:21.294218+00:00",
+  "created_utc": "2026-05-23T16:37:20.355399+00:00",
   "downstream": {
     "caveat": "This section tracks downstream artifact existence only; it does not compute or claim MNLI accuracy.",
     "complete": false,
@@ -123,31 +123,31 @@
     "job_id": "10250",
     "latest_complete_snapshot_step": null,
     "latest_step": {
-      "ce": 3.886587,
-      "elapsed_seconds": 3288.6,
+      "ce": 3.505811,
+      "elapsed_seconds": 3524.9,
       "first_elapsed_seconds": 2.0,
       "first_step": 1,
       "log_exists": true,
       "lr": 2e-06,
-      "parsed_log_rows": 182,
+      "parsed_log_rows": 195,
       "path": "logs/bd-s2-655m-10250.out",
-      "recent_ce_max": 4.402316,
-      "recent_ce_mean": 3.8275841,
-      "recent_ce_min": 3.426823,
+      "recent_ce_max": 4.278359,
+      "recent_ce_mean": 3.89734245,
+      "recent_ce_min": 3.441311,
       "recent_window_rows": 20,
-      "step": 1810
+      "step": 1940
     },
     "max_steps": 40000,
     "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
-    "progress": 0.04525,
+    "progress": 0.0485,
     "progress_estimate": {
-      "estimated_completion_utc": "2026-05-24T11:49:48.936868+00:00",
-      "estimated_total_seconds": 72676.24309392265,
-      "eta_hours": 19.274345303867403,
-      "eta_seconds": 69387.64309392266,
-      "seconds_per_step": 1.8169060773480663,
-      "segment_token_presentations_per_second": 4508.763607614183,
-      "steps_per_hour": 1981.3902572523261
+      "estimated_completion_utc": "2026-05-24T11:49:53.805476+00:00",
+      "estimated_total_seconds": 72678.35051546391,
+      "eta_hours": 19.209291809851088,
+      "eta_seconds": 69153.45051546392,
+      "seconds_per_step": 1.816958762886598,
+      "segment_token_presentations_per_second": 4508.6328690175615,
+      "steps_per_hour": 1981.3328037674828
     },
     "root_metrics": {
       "exists": false,
@@ -160,7 +160,7 @@
       "name": "bd-s2-655m",
       "reason": "ece-nebula12",
       "state": "RUNNING",
-      "time": "55:56"
+      "time": "59:55"
     }
   },
   "status": "running",

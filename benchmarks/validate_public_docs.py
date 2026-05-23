@@ -327,6 +327,48 @@ def validate_current_goal_status(report: dict[str, Any], errors: list[str]) -> N
         errors.append("current goal status: missing requirement audit rows")
 
 
+def validate_deep_research_handoff(report: dict[str, Any], errors: list[str]) -> None:
+    if report.get("schema") != "bitnet-deep-research-handoff-v1":
+        errors.append(f"deep research handoff: unexpected schema {report.get('schema')}")
+    if report.get("status") != "handoff_not_completion":
+        errors.append(f"deep research handoff: unexpected status {report.get('status')}")
+    thesis = report.get("thesis")
+    if not isinstance(thesis, dict):
+        errors.append("deep research handoff: missing thesis object")
+    elif "No for the tested dense-Qwen setup" not in str(thesis.get("current_answer", "")):
+        errors.append("deep research handoff: thesis does not preserve the negative PTQ answer")
+    findings = report.get("completed_findings")
+    if not isinstance(findings, list) or len(findings) < 5:
+        errors.append("deep research handoff: missing completed findings")
+    open_questions = report.get("open_questions")
+    if not isinstance(open_questions, list) or len(open_questions) < 4:
+        errors.append("deep research handoff: missing open questions")
+    nonclaims = report.get("nonclaims")
+    if not isinstance(nonclaims, list) or "universal BitNet converter" not in nonclaims:
+        errors.append("deep research handoff: missing universal-converter nonclaim")
+    artifacts = report.get("source_artifacts")
+    if not isinstance(artifacts, dict):
+        errors.append("deep research handoff: missing source artifacts")
+        return
+    for label in ("current_status", "canonical_bundle", "reproduction_gap"):
+        artifact = artifacts.get(label)
+        if not isinstance(artifact, dict):
+            errors.append(f"deep research handoff: missing artifact {label}")
+            continue
+        path = artifact.get("path")
+        if not isinstance(path, str) or not path:
+            errors.append(f"deep research handoff artifact {label}: missing path")
+            continue
+        if not Path(path).exists():
+            errors.append(f"deep research handoff artifact {label}: path does not exist: {path}")
+            continue
+        expected_sha = artifact.get("sha256")
+        if isinstance(expected_sha, str) and expected_sha:
+            actual_sha = sha256(Path(path))
+            if actual_sha != expected_sha:
+                errors.append(f"deep research handoff artifact {label}: sha256 mismatch: {actual_sha} != {expected_sha}")
+
+
 def validate_readme(bundle: dict[str, Any], readme: str, errors: list[str]) -> None:
     claims = bundle["claims"]
     blind = claims["blind_ptq"]
@@ -418,6 +460,18 @@ def validate_reproduction_gap_docs(
         readme,
         errors,
     )
+    require_contains(
+        "README deep research handoff report",
+        "deep_research_handoff_2026-05-23.md",
+        readme,
+        errors,
+    )
+    require_contains(
+        "README deep research handoff json",
+        "deep_research_handoff_2026-05-23.json",
+        readme,
+        errors,
+    )
 
 
 def validate_claims_doc(bundle: dict[str, Any], claims_doc: str, errors: list[str]) -> None:
@@ -496,6 +550,11 @@ def main() -> int:
         default=Path("benchmarks/results/current_goal_status_2026-05-23.json"),
     )
     parser.add_argument(
+        "--deep-research-handoff",
+        type=Path,
+        default=Path("benchmarks/results/deep_research_handoff_2026-05-23.json"),
+    )
+    parser.add_argument(
         "--active-slurm-batch-scripts",
         type=Path,
         default=Path("benchmarks/results/active_slurm_batch_scripts_2026-05-23.json"),
@@ -509,6 +568,7 @@ def main() -> int:
     gamma_telemetry = load_json(args.gamma_telemetry_submission)
     stage2_monitor = load_json(args.stage2_monitor)
     current_goal_status = load_json(args.current_goal_status)
+    deep_research_handoff = load_json(args.deep_research_handoff)
     active_slurm_batch_scripts = load_json(args.active_slurm_batch_scripts)
     readme = read_text(args.readme)
     claims_doc = read_text(args.claims)
@@ -520,6 +580,7 @@ def main() -> int:
     validate_gradient_telemetry_submission(gamma_telemetry, errors)
     validate_active_stage2_monitor(stage2_monitor, errors)
     validate_current_goal_status(current_goal_status, errors)
+    validate_deep_research_handoff(deep_research_handoff, errors)
     validate_active_slurm_batch_scripts(active_slurm_batch_scripts, errors)
     validate_readme(bundle, readme, errors)
     validate_reproduction_gap_docs(reproduction_gap, readme, claims_doc, errors)

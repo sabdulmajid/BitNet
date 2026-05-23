@@ -2,12 +2,12 @@
   "active_gate": {
     "downstream_complete": false,
     "downstream_status": "waiting_for_handoff",
-    "eta_hours": 19.274345303867403,
-    "latest_ce": 3.886587,
+    "eta_hours": 19.209291809851088,
+    "latest_ce": 3.505811,
     "latest_complete_snapshot_step": null,
-    "latest_step": 1810,
+    "latest_step": 1940,
     "max_steps": 40000,
-    "progress": 0.04525,
+    "progress": 0.0485,
     "stage2_job_id": "10250",
     "stage2_slurm_state": "RUNNING",
     "stage2_status": "running",
@@ -17,7 +17,7 @@
   "artifacts": {
     "active_monitor": {
       "path": "benchmarks/results/active_stage2_extension_monitor_2026-05-23.json",
-      "sha256": "8d53a92096384ba59189df0d34f9d954e1a7fbe28ac41219287f3fa7e8821064"
+      "sha256": "f6bf82ef0e0f9f70a2295165fd092b10ee61028d0555ae2dd8f65cea8e4403d1"
     },
     "canonical_bundle": {
       "path": "benchmarks/results/canonical_evidence_bundle_2026-05-20.json",
@@ -29,9 +29,9 @@
     }
   },
   "completion_status": "in_progress",
-  "created_utc": "2026-05-23T16:33:21.375953+00:00",
+  "created_utc": "2026-05-23T16:37:20.438736+00:00",
   "current_verdict": "Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style recovery remains unreproduced; the active 655.36M Stage-2 gate is testing whether recovery continues with more tokens.",
-  "git_head": "7168c8d6dca04b6df9e2be29980ea5c923dce086",
+  "git_head": "1ebbbb26333d5c1f0dd689e35f92f5b2cb57e85c",
   "headline_metrics": {
     "bitdistill_327_68m_delta_vs_fp": -0.0881304126337239,
     "bitdistill_327_68m_mnli": 0.7200203769740193,

@@ -192,9 +192,10 @@ To generate a reviewer-facing snapshot of the current objective state:
 
 ```bash
 python benchmarks/build_current_goal_status.py
+python benchmarks/build_deep_research_handoff.py
 ```
 
-This report is a status ledger, not a completion declaration. It reads the
+These reports are status ledgers, not completion declarations. They read the
 canonical evidence bundle, reproduction-gap report, and active 655M monitor.
 
 After changing or resubmitting queued Slurm scripts, verify the stored batch
