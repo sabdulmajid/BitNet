@@ -61,6 +61,27 @@ def validate_artifacts(bundle: dict[str, Any], errors: list[str]) -> None:
             errors.append(f"artifact {label}: path does not exist: {path}")
 
 
+def validate_reproduction_gap(report: dict[str, Any], errors: list[str]) -> None:
+    if report.get("schema") != "bitnet-reproduction-gap-report-v1":
+        errors.append(f"reproduction gap: unexpected schema {report.get('schema')}")
+    if report.get("status") != "not_reproduced":
+        errors.append(f"reproduction gap: unexpected status {report.get('status')}")
+    artifacts = report.get("artifacts")
+    if not isinstance(artifacts, dict):
+        errors.append("reproduction gap: missing artifacts object")
+        return
+    for label, artifact in artifacts.items():
+        if not isinstance(artifact, dict):
+            errors.append(f"reproduction gap artifact {label}: not an object")
+            continue
+        path = artifact.get("path")
+        if not isinstance(path, str) or not path:
+            errors.append(f"reproduction gap artifact {label}: missing path")
+            continue
+        if not Path(path).exists():
+            errors.append(f"reproduction gap artifact {label}: path does not exist: {path}")
+
+
 def validate_readme(bundle: dict[str, Any], readme: str, errors: list[str]) -> None:
     claims = bundle["claims"]
     blind = claims["blind_ptq"]
@@ -101,6 +122,27 @@ def validate_readme(bundle: dict[str, Any], readme: str, errors: list[str]) -> N
     }
     for label, needle in required.items():
         require_contains(f"README {label}", needle, readme, errors)
+
+
+def validate_reproduction_gap_docs(
+    report: dict[str, Any],
+    readme: str,
+    claims_doc: str,
+    errors: list[str],
+) -> None:
+    metrics = report["metrics"]
+    required = {
+        "gap_report_md": "bitdistill_reproduction_gap_2026-05-23.md",
+        "gap_report_json": "bitdistill_reproduction_gap_2026-05-23.json",
+        "bitnet_default": fmt(float(metrics["bitnet_sft_default_mnli"])),
+        "bitnet_best": fmt(float(metrics["bitnet_sft_best_mnli"])),
+        "bitnet_vs_paper": f"{float(metrics['bitnet_sft_best_delta_vs_paper_anchor']):+.6f}",
+        "bitdistill_327": fmt(float(metrics["bitdistill_327_68m_mnli"])),
+        "bitdistill_vs_fp": f"{float(metrics['bitdistill_327_68m_delta_vs_fp16']):+.6f}",
+    }
+    for label, needle in required.items():
+        require_contains(f"README reproduction gap {label}", needle, readme, errors)
+        require_contains(f"CLAIMS reproduction gap {label}", needle, claims_doc, errors)
 
 
 def validate_claims_doc(bundle: dict[str, Any], claims_doc: str, errors: list[str]) -> None:
@@ -148,13 +190,23 @@ def main() -> int:
     parser.add_argument("--readme", type=Path, default=Path("README.md"))
     parser.add_argument("--claims", type=Path, default=Path("CLAIMS.md"))
     parser.add_argument("--runtime-contract", type=Path, default=Path("RUNTIME_CONTRACT.md"))
+    parser.add_argument(
+        "--reproduction-gap",
+        type=Path,
+        default=Path("benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json"),
+    )
     args = parser.parse_args()
 
     bundle = load_json(args.bundle)
+    reproduction_gap = load_json(args.reproduction_gap)
+    readme = read_text(args.readme)
+    claims_doc = read_text(args.claims)
     errors: list[str] = []
     validate_artifacts(bundle, errors)
-    validate_readme(bundle, read_text(args.readme), errors)
-    validate_claims_doc(bundle, read_text(args.claims), errors)
+    validate_reproduction_gap(reproduction_gap, errors)
+    validate_readme(bundle, readme, errors)
+    validate_reproduction_gap_docs(reproduction_gap, readme, claims_doc, errors)
+    validate_claims_doc(bundle, claims_doc, errors)
     validate_runtime_doc(bundle, read_text(args.runtime_contract), errors)
 
     if errors:

@@ -34,6 +34,20 @@ The current canonical evidence bundle is:
 | Native packed sequence classification is product-ready | **No: research demo only** | Full MNLI native sequence-isolated path: accuracy `0.652165`, PyTorch agreement `0.976668`, `7.456204` examples/s, RSS `960.15 MiB`. | Agreement is below the `0.99` product gate and the model quality is weak. |
 | Kimi/MoE support is proven | **No: not supported** | Only tiny Qwen2MoE fixture/plumbing exists. | No trained Kimi quality, MLA/shared-expert mapping, routed expert locality, or CPU product result is proven. |
 
+## Current Reproduction Gap
+
+The latest focused gap report is:
+
+- [bitdistill_reproduction_gap_2026-05-23.md](benchmarks/results/bitdistill_reproduction_gap_2026-05-23.md)
+- [bitdistill_reproduction_gap_2026-05-23.json](benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json)
+
+The short default BitNet-SFT row was undertrained: the default row is
+`0.487621`, while the best 10k-step BitNet-SFT budget row reaches `0.628935`,
+which is `+0.020935` above the paper's Qwen2.5-0.5B MNLI BitNet-SFT anchor.
+That does **not** reproduce BitDistill. The completed `327.68M` Stage-2
+BitDistill row reaches `0.720020`, which is still `-0.088130` below the local
+FP16-SFT MNLI reference.
+
 ## What This Fork Adds
 
 - Mathematical and empirical audits showing why blind ternary PTQ collapses on
@@ -86,6 +100,8 @@ python benchmarks/build_canonical_evidence_bundle.py \
   --stage2-manifest benchmarks/results/stage2_manifest_2026-05-20.json \
   --output-json benchmarks/results/canonical_evidence_bundle_2026-05-20.json \
   --output-md benchmarks/results/canonical_evidence_bundle_2026-05-20.md
+
+python benchmarks/build_reproduction_gap_report.py
 ```
 
 Fail-closed report validation example:

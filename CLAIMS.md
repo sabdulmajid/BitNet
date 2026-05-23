@@ -20,6 +20,20 @@ representation-learning problem plus a runtime-contract problem.
 | Native classifier runtime is product-ready | Not yet | Full MNLI native path runs, but accuracy `0.652165` and PyTorch agreement `0.976668` are below product gates. |
 | Kimi/MoE support is proven | Not supported | Tiny Qwen2MoE fixtures only. |
 
+## Reproduction Gap Update
+
+The current gap report is:
+
+- `benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json`
+- `benchmarks/results/bitdistill_reproduction_gap_2026-05-23.md`
+
+The earlier short BitNet-SFT default was undertrained: it measured `0.487621`.
+A 10k-step BitNet-SFT budget row reaches MNLI `0.628935`, which is `+0.020935`
+above the paper BitNet-SFT anchor for Qwen2.5-0.5B MNLI. The remaining failure
+is therefore not only the BitNet-SFT baseline: the completed `327.68M` Stage-2
+BitDistill row reaches `0.720020`, still `-0.088130` below the local FP16-SFT
+reference.
+
 ## Language To Avoid
 
 - Do not say "universal BitNet converter."

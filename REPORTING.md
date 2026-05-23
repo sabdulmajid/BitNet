@@ -36,6 +36,22 @@ This validator checks that the headline README, claims page, and runtime
 contract still contain the canonical evidence-bundle numbers and that every
 artifact referenced by the bundle exists.
 
+## Reproduction Gap Reports
+
+Gap reports should distinguish:
+
+- the short/default BitNet-SFT baseline,
+- the best tuned BitNet-SFT budget row,
+- controlled BitDistill Stage-2 rows,
+- FP16 recovery gap,
+- loss/gradient-balance telemetry.
+
+The current report is:
+
+```text
+benchmarks/results/bitdistill_reproduction_gap_2026-05-23.md
+```
+
 ## Preferred Public Labels
 
 | Label | Meaning |

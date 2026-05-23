@@ -79,6 +79,27 @@ python benchmarks/build_canonical_evidence_bundle.py \
 The bundle fails if a required artifact is missing. It does not discover
 reports by date.
 
+## Reproduction Gap Report
+
+The reproduction-gap report is manifest/artifact based and intentionally
+separates the BitNet-SFT baseline from the remaining BitDistill recovery gap.
+
+```bash
+python benchmarks/audit_bitnet_sft_budget_sweep.py \
+  --output-json benchmarks/results/bitnet_sft_budget_sweep_2026-05-23.json \
+  --output-md benchmarks/results/bitnet_sft_budget_sweep_2026-05-23.md
+
+python benchmarks/audit_bitdistill_training_dynamics.py \
+  --output-json benchmarks/results/bitdistill_training_dynamics_2026-05-23.json \
+  --output-md benchmarks/results/bitdistill_training_dynamics_2026-05-23.md
+
+python benchmarks/build_reproduction_gap_report.py
+```
+
+Current result: the best 10k-step BitNet-SFT budget row reaches MNLI
+`0.628935`, clearing the paper BitNet-SFT anchor by `+0.020935`, but the
+completed `327.68M` BitDistill row is still `-0.088130` below local FP16-SFT.
+
 ## Validation
 
 ```bash

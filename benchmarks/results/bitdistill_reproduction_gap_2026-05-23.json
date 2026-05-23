@@ -1,0 +1,89 @@
+{
+  "artifacts": {
+    "bitnet_sft_budget": {
+      "path": "benchmarks/results/bitnet_sft_budget_sweep_2026-05-23.json",
+      "sha256": "b9bec4ae74fbadf2e82488f7be53fbb2fb31ddeb375a61d42070bc93248191f6"
+    },
+    "canonical_bundle": {
+      "path": "benchmarks/results/canonical_evidence_bundle_2026-05-20.json",
+      "sha256": "767ca0548cb2143d3a44fcca5facabe521621b7344dd7db62d05074fbce30070"
+    },
+    "controlled_curve": {
+      "path": "benchmarks/results/bitdistill_controlled_curve_2026-05-20.json",
+      "sha256": "5b09d697182c852899781af932c193f525062bc190d888c2b0ff17cb8b7dd3d9"
+    },
+    "training_dynamics": {
+      "path": "benchmarks/results/bitdistill_training_dynamics_2026-05-23.json",
+      "sha256": "270ae7aa2e73a78ab112ee4e9017fab1dfa9c632920b00f089ff8d63769006f2"
+    }
+  },
+  "conclusions": [
+    {
+      "evidence": "default 0.487621; best budget row 0.628935; gain +0.141314",
+      "finding": "The short BitNet-SFT default was undertrained."
+    },
+    {
+      "evidence": "best BitNet-SFT 0.628935; paper BitNet-SFT anchor 0.608000; delta +0.020935",
+      "finding": "The local BitNet-SFT anchor is no longer the primary blocker."
+    },
+    {
+      "evidence": "327.68M BitDistill MNLI 0.720020; FP16 0.808151; delta -0.088130",
+      "finding": "BitDistill is still not reproduced."
+    },
+    {
+      "evidence": "40.96M 0.616607; 163.84M 0.691187; 327.68M 0.720020; paper fraction 3.2768%",
+      "finding": "Stage-2 budget helps, but current budget is still small relative to the paper."
+    },
+    {
+      "evidence": "final grad attention/CE 221.384986; final loss attention/CE 2549.206537",
+      "finding": "Local paper-gamma training dynamics are still suspect."
+    }
+  ],
+  "created_utc": "2026-05-23T15:33:41.547741+00:00",
+  "metrics": {
+    "bitdistill_163_84m_mnli": 0.6911869587366276,
+    "bitdistill_327_68m_ci95": [
+      -0.0967494587122408,
+      -0.07951136655520699
+    ],
+    "bitdistill_327_68m_delta_vs_bitnet_best": 0.09108507386653075,
+    "bitdistill_327_68m_delta_vs_fp16": -0.0881304126337239,
+    "bitdistill_327_68m_mnli": 0.7200203769740193,
+    "bitdistill_40_96m_mnli": 0.6166072338257769,
+    "bitnet_sft_best_delta_vs_default": 0.1413143148242486,
+    "bitnet_sft_best_delta_vs_fp16": -0.17921548650025465,
+    "bitnet_sft_best_delta_vs_paper_anchor": 0.02093530310748859,
+    "bitnet_sft_best_mnli": 0.6289353031074886,
+    "bitnet_sft_default_mnli": 0.48762098828323996,
+    "controlled_trace_count": 2,
+    "final_grad_attention_to_ce": 221.3849856028098,
+    "final_loss_attention_to_ce": 2549.206537356322,
+    "fp16_sft_mnli": 0.8081507896077432,
+    "materialized_controlled_trace_count": 2,
+    "stage2_327_68m_fraction_of_paper": 0.032768
+  },
+  "next_gates": [
+    {
+      "gate": "Stage-2 token-budget curve",
+      "minimum_next_point": "640M token presentations with the same downstream recipe",
+      "why": "Determine whether MNLI continues improving toward FP or saturates far below it."
+    },
+    {
+      "gate": "Loss-normalization/gradient-balance sweep",
+      "minimum_next_point": "component-gradient telemetry for gamma near equalized and paper values",
+      "why": "Paper gamma is only comparable if CE, logits KD, and attention KD reductions match."
+    },
+    {
+      "gate": "Same-artifact runtime quality",
+      "minimum_next_point": "packed classifier head or primary causal prompt-scoring evaluation",
+      "why": "The strongest PyTorch classifier result and strongest packed causal runtime are still separate artifacts."
+    },
+    {
+      "gate": "Backbone alignment",
+      "minimum_next_point": "one Qwen3-0.6B or exact Qwen2.5-0.5B MNLI run with matched logging",
+      "why": "Paper-scale claims need exact/closest public Qwen3/Qwen2.5 recipe alignment."
+    }
+  ],
+  "schema": "bitnet-reproduction-gap-report-v1",
+  "status": "not_reproduced"
+}

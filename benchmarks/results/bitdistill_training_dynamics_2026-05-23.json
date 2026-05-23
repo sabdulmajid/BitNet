@@ -1,0 +1,77 @@
+{
+  "controlled_trace_count": 2,
+  "date": "2026-05-23",
+  "materialized_controlled_count": 2,
+  "non_smoke_trace_count": 2,
+  "schema": "bitdistill-training-dynamics-audit-v1",
+  "smoke_materialized_count": 0,
+  "status": "controlled_materialized",
+  "trace_count": 2,
+  "traces": [
+    {
+      "final_grad_attention_to_ce": 221.3849856028098,
+      "final_grad_logit_to_ce": 0.7738586165758821,
+      "final_loss_attention_to_ce": 2549.206537356322,
+      "final_loss_logit_to_ce": 0.674511701211162,
+      "final_qkv_grad_norms": {
+        "weighted_attention_k_kd": 3052.1011005159394,
+        "weighted_attention_q_kd": 923.4188650009037,
+        "weighted_attention_v_kd": 11872.908320875804
+      },
+      "final_qkv_weighted_losses": {
+        "weighted_attention_k_kd": 184.92176818847656,
+        "weighted_attention_q_kd": 47.08085632324219,
+        "weighted_attention_v_kd": 1500.6612548828125
+      },
+      "first_step": 1,
+      "has_activation": true,
+      "has_component_grad_norms": true,
+      "has_dynamics": true,
+      "kind": "controlled",
+      "last_step": 200,
+      "max_activation_clipped_fraction": 0.0,
+      "max_activation_edge_fraction": 0.00036234174455915177,
+      "max_flip_fraction": 0.0037808665613407034,
+      "max_grad_attention_to_ce": 234.8386596342272,
+      "max_loss_attention_to_ce": 2898.926047120419,
+      "max_scale_abs_delta_max": 8.8447704911232e-06,
+      "mean_flip_fraction": 0.0025930774437592907,
+      "mean_scale_abs_delta_mean": 2.0783946162001008e-07,
+      "path": "checkpoints/bitdistill-glue-seqcls-telemetry/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-papergamma-headinit-telemetry-steps200/telemetry.jsonl",
+      "rows": 9
+    },
+    {
+      "final_grad_attention_to_ce": 221.3849856028098,
+      "final_grad_logit_to_ce": 0.7738586165758821,
+      "final_loss_attention_to_ce": 2549.206537356322,
+      "final_loss_logit_to_ce": 0.674511701211162,
+      "final_qkv_grad_norms": {
+        "weighted_attention_k_kd": 3052.1011005159394,
+        "weighted_attention_q_kd": 923.4188650009037,
+        "weighted_attention_v_kd": 11872.908320875804
+      },
+      "final_qkv_weighted_losses": {
+        "weighted_attention_k_kd": 184.92176818847656,
+        "weighted_attention_q_kd": 47.08085632324219,
+        "weighted_attention_v_kd": 1500.6612548828125
+      },
+      "first_step": 1,
+      "has_activation": true,
+      "has_component_grad_norms": true,
+      "has_dynamics": true,
+      "kind": "controlled",
+      "last_step": 200,
+      "max_activation_clipped_fraction": 0.0,
+      "max_activation_edge_fraction": 0.00036234174455915177,
+      "max_flip_fraction": 0.0037808665613407034,
+      "max_grad_attention_to_ce": 234.8386596342272,
+      "max_loss_attention_to_ce": 2898.926047120419,
+      "max_scale_abs_delta_max": 8.8447704911232e-06,
+      "mean_flip_fraction": 0.0025930774437592907,
+      "mean_scale_abs_delta_mean": 2.0783946162001008e-07,
+      "path": "checkpoints/bitdistill-glue-seqcls-telemetry-fast/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-papergamma-headinit-after10069-steps200/telemetry.jsonl",
+      "rows": 9
+    }
+  ],
+  "verdict": "Controlled training-dynamics telemetry is materialized."
+}
