@@ -162,6 +162,11 @@ def validate_gradient_telemetry_submission(report: dict[str, Any], errors: list[
         errors.append(f"gamma telemetry: unexpected status {report.get('status')}")
     if report.get("dependency") != "afterok:10250":
         errors.append(f"gamma telemetry: unexpected dependency {report.get('dependency')}")
+    script = report.get("script")
+    if script != "slurm_gamma60_telemetry.sh":
+        errors.append(f"gamma telemetry: unexpected script {script}")
+    elif not Path(script).exists():
+        errors.append(f"gamma telemetry: script does not exist: {script}")
     config = report.get("run_config", {})
     if not isinstance(config, dict):
         errors.append("gamma telemetry: missing run_config object")
@@ -185,6 +190,42 @@ def validate_gradient_telemetry_submission(report: dict[str, Any], errors: list[
     caveat = report.get("caveat")
     if not isinstance(caveat, str) or "not a quality benchmark" not in caveat:
         errors.append("gamma telemetry: missing non-quality-benchmark caveat")
+
+
+def validate_active_slurm_batch_scripts(report: dict[str, Any], errors: list[str]) -> None:
+    if report.get("schema") != "bitnet-active-slurm-batch-script-audit-v1":
+        errors.append(f"slurm batch audit: unexpected schema {report.get('schema')}")
+    if report.get("quality_claim") != "none":
+        errors.append(f"slurm batch audit: quality_claim must be none, got {report.get('quality_claim')}")
+    if report.get("status") != "passed":
+        errors.append(f"slurm batch audit: unexpected status {report.get('status')}")
+    checks = report.get("checks")
+    if not isinstance(checks, list) or not checks:
+        errors.append("slurm batch audit: missing checks")
+        return
+    by_job = {
+        str(check.get("job_id")): check
+        for check in checks
+        if isinstance(check, dict) and check.get("job_id") is not None
+    }
+    for job_id in ("10253", "10254"):
+        check = by_job.get(job_id)
+        if not isinstance(check, dict):
+            errors.append(f"slurm batch audit: missing job {job_id}")
+            continue
+        if check.get("passed") is not True:
+            errors.append(f"slurm batch audit: job {job_id} did not pass")
+        snippets = check.get("checks")
+        if not isinstance(snippets, list) or not snippets:
+            errors.append(f"slurm batch audit: job {job_id} missing snippet checks")
+            continue
+        missing = [
+            snippet.get("snippet")
+            for snippet in snippets
+            if isinstance(snippet, dict) and snippet.get("present") is not True
+        ]
+        if missing:
+            errors.append(f"slurm batch audit: job {job_id} missing snippets: {missing}")
 
 
 def validate_active_stage2_monitor(report: dict[str, Any], errors: list[str]) -> None:
@@ -356,6 +397,11 @@ def main() -> int:
         type=Path,
         default=Path("benchmarks/results/active_stage2_extension_monitor_2026-05-23.json"),
     )
+    parser.add_argument(
+        "--active-slurm-batch-scripts",
+        type=Path,
+        default=Path("benchmarks/results/active_slurm_batch_scripts_2026-05-23.json"),
+    )
     args = parser.parse_args()
 
     bundle = load_json(args.bundle)
@@ -364,6 +410,7 @@ def main() -> int:
     stage2_handoff = load_json(args.stage2_handoff)
     gamma_telemetry = load_json(args.gamma_telemetry_submission)
     stage2_monitor = load_json(args.stage2_monitor)
+    active_slurm_batch_scripts = load_json(args.active_slurm_batch_scripts)
     readme = read_text(args.readme)
     claims_doc = read_text(args.claims)
     errors: list[str] = []
@@ -373,6 +420,7 @@ def main() -> int:
     validate_stage2_handoff_submission(stage2_handoff, errors)
     validate_gradient_telemetry_submission(gamma_telemetry, errors)
     validate_active_stage2_monitor(stage2_monitor, errors)
+    validate_active_slurm_batch_scripts(active_slurm_batch_scripts, errors)
     validate_readme(bundle, readme, errors)
     validate_reproduction_gap_docs(reproduction_gap, readme, claims_doc, errors)
     validate_claims_doc(bundle, claims_doc, errors)
