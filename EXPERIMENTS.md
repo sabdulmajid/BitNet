@@ -178,13 +178,20 @@ ratios, not task accuracy, for this diagnostic.
 
 ## Active Gate Monitor
 
-Use this while `10250`, `10251`, and `10252` are still live:
+Use this while `10250`, `10252`, and `10253` are still live:
 
 ```bash
 python benchmarks/monitor_active_stage2_extension.py
 ```
 
 The monitor report is status-only and must not be used as quality evidence.
+
+After changing or resubmitting queued Slurm scripts, verify the stored batch
+script contents:
+
+```bash
+python benchmarks/audit_active_slurm_batch_scripts.py
+```
 
 ## Validation
 

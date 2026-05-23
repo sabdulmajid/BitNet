@@ -85,6 +85,16 @@ python benchmarks/monitor_active_stage2_extension.py
 The generated report must keep `quality_claim` set to `none` until downstream
 metrics and prediction traces exist.
 
+Queued Slurm batch scripts should also be audited after resubmission or script
+hardening:
+
+```bash
+python benchmarks/audit_active_slurm_batch_scripts.py
+```
+
+This verifies the stored Slurm script contents for the active handoff and
+telemetry jobs. It is job-plumbing evidence only, not quality evidence.
+
 ## Preferred Public Labels
 
 | Label | Meaning |

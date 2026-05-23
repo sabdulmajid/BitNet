@@ -1,0 +1,71 @@
+{
+  "checks": [
+    {
+      "cancelled_handoff_job_id": "10251",
+      "cancelled_handoff_reason": "Job 10251 was cancelled while dependency-pending because Slurm had snapshotted the pre-hardening handoff script. Job 10253 was resubmitted with the current fail-closed script.",
+      "checks": [
+        {
+          "present": true,
+          "snippet": "write_failure_report()"
+        },
+        {
+          "present": true,
+          "snippet": "trap 'status=$?; trap - ERR; write_failure_report"
+        },
+        {
+          "present": true,
+          "snippet": "--downstream-failed-job-id \"\""
+        },
+        {
+          "present": true,
+          "snippet": "--downstream-failure-mode \"\""
+        }
+      ],
+      "job_id": "10253",
+      "passed": true,
+      "purpose": "655M Stage-2 handoff",
+      "scontrol_message": "batch script for job 10253 written to /tmp/bitnet-slurm-script-ane02kyl/10253.sh",
+      "script_available": true,
+      "slurm": {
+        "job_id": "10253",
+        "name": "bd-655m-handoff",
+        "reason": "(Dependency)",
+        "state": "PENDING",
+        "time": "0:00"
+      }
+    },
+    {
+      "caveat": "This is a short gradient-balance diagnostic, not a quality benchmark. Do not compare its task accuracy to full downstream runs.",
+      "checks": [
+        {
+          "present": true,
+          "snippet": "--telemetry-every-steps"
+        },
+        {
+          "present": true,
+          "snippet": "--telemetry-component-grad-norms"
+        },
+        {
+          "present": true,
+          "snippet": "--attention-kd-weight \"$ATTENTION_KD_WEIGHT\""
+        }
+      ],
+      "job_id": "10252",
+      "passed": true,
+      "purpose": "gamma-60 gradient telemetry",
+      "scontrol_message": "batch script for job 10252 written to /tmp/bitnet-slurm-script-ob8qgi1n/10252.sh",
+      "script_available": true,
+      "slurm": {
+        "job_id": "10252",
+        "name": "bd-g60-telemetry",
+        "reason": "(Dependency)",
+        "state": "PENDING",
+        "time": "0:00"
+      }
+    }
+  ],
+  "created_utc": "2026-05-23T16:09:00.785317+00:00",
+  "quality_claim": "none",
+  "schema": "bitnet-active-slurm-batch-script-audit-v1",
+  "status": "passed"
+}
