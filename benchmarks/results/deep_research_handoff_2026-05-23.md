@@ -1,6 +1,6 @@
 # Deep Research Handoff
 
-Generated: `2026-05-23T18:50:15.969308+00:00`
+Generated: `2026-05-23T18:55:10.481238+00:00`
 
 Status: **handoff_not_completion**.
 
@@ -41,25 +41,25 @@ Status: **handoff_not_completion**.
 | afterany_status | dependency_pending |
 | downstream_complete | False |
 | downstream_status | waiting_for_handoff |
-| eta_hours | 17.002109 |
-| latest_ce | 3.851597 |
+| eta_hours | 16.921374 |
+| latest_ce | 3.607363 |
 | latest_complete_snapshot_step | - |
-| latest_step | 6330 |
+| latest_step | 6490 |
 | log_health_status | healthy |
 | max_steps | 40000 |
-| next_snapshot_eta_hours | 1.853215 |
+| next_snapshot_eta_hours | 1.772427 |
 | next_snapshot_step | 10000 |
 | producer_config_status | matched |
-| progress | 0.158250 |
+| progress | 0.162250 |
 | snapshot_salvage_complete_count | 0 |
 | snapshot_salvage_status | no_snapshot_expected_yet |
 | stage2_job_id | 10250 |
 | stage2_slurm_state | RUNNING |
 | stage2_status | running |
-| steps_to_next_snapshot | 3670 |
+| steps_to_next_snapshot | 3510 |
 | telemetry_job_id | 10257 |
 | telemetry_slurm_state | PENDING |
-| time_limit_margin_seconds | 13622.408057 |
+| time_limit_margin_seconds | 13627.053929 |
 | time_limit_status | within_time_limit |
 
 ## Next Action Policy
@@ -78,7 +78,7 @@ Status: **handoff_not_completion**.
 
 | question | evidence needed | current state |
 | --- | --- | --- |
-| Does the Stage-2 token-budget curve keep improving at 655.36M tokens? | Completed 655M Stage-2 manifest plus downstream MNLI metrics.json and eval_predictions.jsonl. | running; step 6330/40000; downstream waiting_for_handoff. |
+| Does the Stage-2 token-budget curve keep improving at 655.36M tokens? | Completed 655M Stage-2 manifest plus downstream MNLI metrics.json and eval_predictions.jsonl. | running; step 6490/40000; downstream waiting_for_handoff. |
 | Is the remaining BitDistill gap mostly compute budget or loss-normalization mismatch? | 655M/longer budget curve and gamma-balanced component-gradient telemetry. | paper-gamma grad attention/CE 221.384986; gamma-60 telemetry queued. |
 | Can the same artifact provide both quality and CPU runtime evidence? | Packed classifier or causal prompt-scoring artifact with task quality, RSS, file size, and throughput. | native classifier MNLI 0.652165, agreement 0.976668; not product-ready. |
 | Do row-scale variants help generally or only in specific retrofit regimes? | Controlled tensor/row/group-scale comparisons across tasks/backbones with paired confidence intervals. | Row-scale runtime contract is strong; row-scale accuracy is not a universal guarantee. |
@@ -103,8 +103,8 @@ Status: **handoff_not_completion**.
 
 | artifact | path | sha256 |
 | --- | --- | --- |
-| current_status | benchmarks/results/current_goal_status_2026-05-23.json | 0e7c59a1ce68c02a27ecdd2361a38b0b7544419178fcf30e60030310aa99699f |
+| current_status | benchmarks/results/current_goal_status_2026-05-23.json | 1a36f93c9ab0b23d9eb0df56b59ab2a38810314a1ba59dc220ea213c01abfeca |
 | canonical_bundle | benchmarks/results/canonical_evidence_bundle_2026-05-20.json | af9ec2e35931986c7caf63c178b7c482c3e93406f8d880774bbf8d114f27824c |
 | reproduction_gap | benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json | b5a37266b33dc7318b55a23569673467d11fa7aa67ba6725baaa374210a42820 |
-| next_decision | benchmarks/results/bitdistill_next_decision_2026-05-23.json | 73181199cf3df06ff50b595b180bdc68f499d8f530c8b1a799767ce234029379 |
-| next_experiment_blueprint | benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.json | e111cc3dede2a83f9bfe06eb6c608cce455ca2cea68462805cafd8500e5a037a |
+| next_decision | benchmarks/results/bitdistill_next_decision_2026-05-23.json | cd119854e89f3b9e5ae0ba39577118dfd84579201c6a4971d986e70d1185e0b5 |
+| next_experiment_blueprint | benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.json | 87e267a3e2b48a1a57022b17e55af93e078f219502e64745d68b9a5749301871 |

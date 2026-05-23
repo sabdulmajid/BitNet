@@ -1,8 +1,8 @@
 # Current Goal Status
 
-Generated: `2026-05-23T18:50:15.891470+00:00`
+Generated: `2026-05-23T18:55:10.399617+00:00`
 
-Git HEAD: `eab3851cefd5ec027782f463454dfae28eec2322`
+Git HEAD: `32ba008bd5ee3a5e723b53541712f96fbc0160fd`
 
 Objective achieved: **False**.
 
@@ -49,20 +49,20 @@ Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style 
 | stage2_job_id | 10250 |
 | stage2_status | running |
 | stage2_slurm_state | RUNNING |
-| latest_step | 6330 |
+| latest_step | 6490 |
 | max_steps | 40000 |
-| progress | 0.158250 |
-| latest_ce | 3.851597 |
-| eta_hours | 17.002109 |
+| progress | 0.162250 |
+| latest_ce | 3.607363 |
+| eta_hours | 16.921374 |
 | time_limit_status | within_time_limit |
-| time_limit_margin_seconds | 13622.408057 |
+| time_limit_margin_seconds | 13627.053929 |
 | producer_config_status | matched |
 | log_health_status | healthy |
 | snapshot_salvage_status | no_snapshot_expected_yet |
 | snapshot_salvage_complete_count | 0 |
 | next_snapshot_step | 10000 |
-| steps_to_next_snapshot | 3670 |
-| next_snapshot_eta_hours | 1.853215 |
+| steps_to_next_snapshot | 3510 |
+| next_snapshot_eta_hours | 1.772427 |
 | afterany_job_id | 10258 |
 | afterany_status | dependency_pending |
 | afterany_dependency | afterany:10250 |
@@ -102,6 +102,6 @@ Potentially publishable as:
 | --- | --- | --- |
 | canonical_bundle | benchmarks/results/canonical_evidence_bundle_2026-05-20.json | af9ec2e35931986c7caf63c178b7c482c3e93406f8d880774bbf8d114f27824c |
 | reproduction_gap | benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json | b5a37266b33dc7318b55a23569673467d11fa7aa67ba6725baaa374210a42820 |
-| active_monitor | benchmarks/results/active_stage2_extension_monitor_2026-05-23.json | b64703145dc64e9782ac7b008b00f6f0726f6d320fed5c18c0ba3bb850a2e32b |
-| snapshot_salvage | benchmarks/results/stage2_snapshot_salvage_2026-05-23.json | 0094465be9d178fcaedd5c8e76ffdc8bf1bcfe5e715e5191a57bf849fd070835 |
+| active_monitor | benchmarks/results/active_stage2_extension_monitor_2026-05-23.json | 9338dc078be5c42d197bde661b8d9fbedfcdd441dd5f595d5eae080d4b587d72 |
+| snapshot_salvage | benchmarks/results/stage2_snapshot_salvage_2026-05-23.json | f54f60d654e75445bc3e5ae543aed3a749f85db03f9023bcd27ab95dc72225e8 |
 | afterany_submission | benchmarks/results/stage2_655m_afterany_submission_2026-05-23.json | 807495d10307b7d9a8bb5e69196a3b0cc7c12e69a415cce65a868df43156cd77 |

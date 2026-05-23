@@ -315,6 +315,61 @@ def validate_stage2_snapshot_salvage(report: dict[str, Any], readme: str, errors
     )
 
 
+def validate_stage2_handoff_preflight(report: dict[str, Any], readme: str, errors: list[str]) -> None:
+    if report.get("schema") != "bitdistill-655m-handoff-preflight-v1":
+        errors.append(f"stage2 handoff preflight: unexpected schema {report.get('schema')}")
+    if report.get("quality_claim") != "none":
+        errors.append(f"stage2 handoff preflight: unexpected quality_claim {report.get('quality_claim')}")
+    allowed_statuses = {
+        "pending_stage2_completion",
+        "final_artifacts_ready_pending_dry_run",
+        "ready_for_handoff",
+        "failed_preflight",
+        "failed_manifest_dry_run",
+        "failed_missing_final_snapshot",
+    }
+    status = report.get("status")
+    if status not in allowed_statuses:
+        errors.append(f"stage2 handoff preflight: unexpected status {status}")
+    if status and str(status).startswith("failed"):
+        errors.append(f"stage2 handoff preflight: failed status {status}")
+    if report.get("stage2_job_id") != "10250":
+        errors.append(f"stage2 handoff preflight: unexpected job id {report.get('stage2_job_id')}")
+    checks = report.get("preflight_checks")
+    if not isinstance(checks, list) or not checks:
+        errors.append("stage2 handoff preflight: missing preflight checks")
+    else:
+        for check in checks:
+            if not isinstance(check, dict):
+                errors.append("stage2 handoff preflight: malformed check row")
+                continue
+            if check.get("required_now") is True and check.get("passed") is not True:
+                errors.append(f"stage2 handoff preflight: required check failed: {check.get('label')}")
+    final_checks = report.get("final_artifact_checks")
+    if not isinstance(final_checks, list) or len(final_checks) < 3:
+        errors.append("stage2 handoff preflight: expected final artifact checks")
+    command = report.get("expected_manifest_command")
+    if not isinstance(command, list) or "benchmarks/build_stage2_manifest.py" not in command:
+        errors.append("stage2 handoff preflight: missing build_stage2_manifest command")
+    if "benchmarks/results/stage2_manifest_655m_2026-05-23.json" not in command:
+        errors.append("stage2 handoff preflight: command does not target 655M manifest")
+    caveat = report.get("caveat")
+    if not isinstance(caveat, str) or "does not run downstream evaluation" not in caveat:
+        errors.append("stage2 handoff preflight: caveat must prohibit quality claims")
+    require_contains(
+        "README stage2 handoff preflight report",
+        "stage2_655m_handoff_preflight_2026-05-23.md",
+        readme,
+        errors,
+    )
+    require_contains(
+        "README stage2 handoff preflight json",
+        "stage2_655m_handoff_preflight_2026-05-23.json",
+        readme,
+        errors,
+    )
+
+
 def validate_gradient_telemetry_submission(report: dict[str, Any], errors: list[str]) -> None:
     if report.get("schema") != "bitdistill-gradient-telemetry-submission-v1":
         errors.append(f"gamma telemetry: unexpected schema {report.get('schema')}")
@@ -1253,6 +1308,11 @@ def main() -> int:
         default=Path("benchmarks/results/stage2_snapshot_salvage_2026-05-23.json"),
     )
     parser.add_argument(
+        "--stage2-handoff-preflight",
+        type=Path,
+        default=Path("benchmarks/results/stage2_655m_handoff_preflight_2026-05-23.json"),
+    )
+    parser.add_argument(
         "--gamma-telemetry-submission",
         type=Path,
         default=Path("benchmarks/results/gamma60_telemetry_submission_2026-05-23.json"),
@@ -1316,6 +1376,7 @@ def main() -> int:
     stage2_afterany = load_json(args.stage2_afterany)
     stage2_ingestion = load_json(args.stage2_ingestion)
     stage2_snapshot_salvage = load_json(args.stage2_snapshot_salvage)
+    stage2_handoff_preflight = load_json(args.stage2_handoff_preflight)
     gamma_telemetry = load_json(args.gamma_telemetry_submission)
     stage2_monitor = load_json(args.stage2_monitor)
     current_goal_status = load_json(args.current_goal_status)
@@ -1338,6 +1399,7 @@ def main() -> int:
     validate_stage2_afterany_submission(stage2_afterany, readme, errors)
     validate_stage2_ingestion(stage2_ingestion, readme, errors)
     validate_stage2_snapshot_salvage(stage2_snapshot_salvage, readme, errors)
+    validate_stage2_handoff_preflight(stage2_handoff_preflight, readme, errors)
     validate_gradient_telemetry_submission(gamma_telemetry, errors)
     validate_active_stage2_monitor(stage2_monitor, errors)
     validate_current_goal_status(current_goal_status, errors)

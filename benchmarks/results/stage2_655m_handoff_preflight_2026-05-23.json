@@ -1,0 +1,200 @@
+{
+  "caveat": "This validates the queued handoff path only. It does not run downstream evaluation or update quality claims.",
+  "created_utc": "2026-05-23T18:55:09.991225+00:00",
+  "dry_run": null,
+  "dry_run_manifest_command": [],
+  "expected_manifest_command": [
+    "python",
+    "benchmarks/build_stage2_manifest.py",
+    "--output-dir",
+    "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
+    "--parent-manifest",
+    "benchmarks/results/stage2_manifest_2026-05-20.json",
+    "--run-id",
+    "qwen25-05b-bitdistill-tensor-stage2-655m-from327m-job10250",
+    "--job-id",
+    "10250",
+    "--downstream-status",
+    "pending_submission",
+    "--downstream-failed-job-id",
+    "",
+    "--downstream-failure-mode",
+    "",
+    "--output-json",
+    "benchmarks/results/stage2_manifest_655m_2026-05-23.json",
+    "--output-md",
+    "benchmarks/results/stage2_manifest_655m_2026-05-23.md"
+  ],
+  "expected_manifest_json": "benchmarks/results/stage2_manifest_655m_2026-05-23.json",
+  "expected_manifest_md": "benchmarks/results/stage2_manifest_655m_2026-05-23.md",
+  "final_artifact_checks": [
+    {
+      "exists": false,
+      "label": "final state dict",
+      "passed": true,
+      "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/custom_state_dict.pt",
+      "required_now": false,
+      "size_bytes": null
+    },
+    {
+      "exists": false,
+      "label": "final snapshot metrics",
+      "passed": true,
+      "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/metrics.json",
+      "required_now": false,
+      "size_bytes": null
+    },
+    {
+      "exists": false,
+      "label": "root metrics",
+      "passed": true,
+      "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/metrics.json",
+      "required_now": false,
+      "size_bytes": null
+    }
+  ],
+  "final_snapshot": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000",
+  "latest_step": 6490,
+  "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
+  "preflight_checks": [
+    {
+      "exists": true,
+      "kind": "file_exists",
+      "label": "parent manifest exists",
+      "passed": true,
+      "path": "benchmarks/results/stage2_manifest_2026-05-20.json",
+      "required_now": true
+    },
+    {
+      "kind": "command",
+      "label": "parent manifest validates",
+      "passed": true,
+      "required_now": true,
+      "result": {
+        "command": [
+          "python",
+          "benchmarks/validate_stage2_manifest.py",
+          "benchmarks/results/stage2_manifest_2026-05-20.json"
+        ],
+        "passed": true,
+        "returncode": 0,
+        "stderr": "",
+        "stdout": "validated benchmarks/results/stage2_manifest_2026-05-20.json\n"
+      }
+    },
+    {
+      "exists": true,
+      "kind": "file_exists",
+      "label": "build_stage2_manifest.py exists",
+      "passed": true,
+      "path": "benchmarks/build_stage2_manifest.py",
+      "required_now": true
+    },
+    {
+      "exists": true,
+      "kind": "file_exists",
+      "label": "validate_stage2_manifest.py exists",
+      "passed": true,
+      "path": "benchmarks/validate_stage2_manifest.py",
+      "required_now": true
+    },
+    {
+      "exists": true,
+      "kind": "file_exists",
+      "label": "handoff script exists",
+      "passed": true,
+      "path": "slurm_stage2_655m_handoff.sh",
+      "required_now": true
+    },
+    {
+      "exists": true,
+      "kind": "file_exists",
+      "label": "postprocess script exists",
+      "passed": true,
+      "path": "slurm_stage2_655m_postprocess.sh",
+      "required_now": true
+    },
+    {
+      "kind": "command",
+      "label": "handoff script syntax",
+      "passed": true,
+      "required_now": true,
+      "result": {
+        "command": [
+          "bash",
+          "-n",
+          "slurm_stage2_655m_handoff.sh"
+        ],
+        "passed": true,
+        "returncode": 0,
+        "stderr": "",
+        "stdout": ""
+      }
+    },
+    {
+      "kind": "command",
+      "label": "postprocess script syntax",
+      "passed": true,
+      "required_now": true,
+      "result": {
+        "command": [
+          "bash",
+          "-n",
+          "slurm_stage2_655m_postprocess.sh"
+        ],
+        "passed": true,
+        "returncode": 0,
+        "stderr": "",
+        "stdout": ""
+      }
+    },
+    {
+      "exists": true,
+      "kind": "file_exists",
+      "label": "downstream training script exists",
+      "passed": true,
+      "path": "slurm_bitdistill_glue.sh",
+      "required_now": true
+    },
+    {
+      "exists": true,
+      "kind": "file_exists",
+      "label": "FP16 teacher directory exists",
+      "passed": true,
+      "path": "checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1",
+      "required_now": true
+    }
+  ],
+  "quality_claim": "none",
+  "schema": "bitdistill-655m-handoff-preflight-v1",
+  "slurm": {
+    "job_id": "10250",
+    "name": "bd-s2-655m",
+    "reason": "ece-nebula12",
+    "state": "RUNNING",
+    "time": "3:17:37",
+    "time_limit": "1-00:00:00"
+  },
+  "snapshot_status": {
+    "caveat": "A missing output directory is expected before the first snapshot when save_every_steps has not been reached.",
+    "estimated_next_snapshot_utc": "2026-05-23T20:41:22.715349+00:00",
+    "first_snapshot_step": 10000,
+    "latest_complete_snapshot_step": null,
+    "missing_output_dir_is_expected": true,
+    "next_snapshot_eta_hours": 1.772426810477658,
+    "next_snapshot_eta_seconds": 6380.736517719569,
+    "next_snapshot_step": 10000,
+    "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
+    "output_dir_exists": false,
+    "save_every_steps": 10000,
+    "status": "pre_first_snapshot",
+    "steps_to_next_snapshot": 3510
+  },
+  "source_paths": {
+    "active_monitor": "benchmarks/results/active_stage2_extension_monitor_2026-05-23.json",
+    "handoff_submission": "benchmarks/results/stage2_655m_handoff_submission_2026-05-23.json",
+    "stage2_submission": "benchmarks/results/stage2_655m_submission_2026-05-23.json"
+  },
+  "stage2_job_id": "10250",
+  "status": "pending_stage2_completion"
+}

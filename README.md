@@ -73,6 +73,8 @@ Active next gate:
 - [gamma60_telemetry_submission_2026-05-23.md](benchmarks/results/gamma60_telemetry_submission_2026-05-23.md)
 - [stage2_655m_afterany_submission_2026-05-23.md](benchmarks/results/stage2_655m_afterany_submission_2026-05-23.md)
 - [stage2_655m_afterany_submission_2026-05-23.json](benchmarks/results/stage2_655m_afterany_submission_2026-05-23.json)
+- [stage2_655m_handoff_preflight_2026-05-23.md](benchmarks/results/stage2_655m_handoff_preflight_2026-05-23.md)
+- [stage2_655m_handoff_preflight_2026-05-23.json](benchmarks/results/stage2_655m_handoff_preflight_2026-05-23.json)
 - [stage2_655m_ingestion_2026-05-23.md](benchmarks/results/stage2_655m_ingestion_2026-05-23.md)
 - [stage2_655m_ingestion_2026-05-23.json](benchmarks/results/stage2_655m_ingestion_2026-05-23.json)
 - [stage2_snapshot_salvage_2026-05-23.md](benchmarks/results/stage2_snapshot_salvage_2026-05-23.md)
