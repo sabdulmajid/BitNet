@@ -162,7 +162,7 @@ The loss-normalization gate now has a queued equalized-gamma telemetry job:
 - `benchmarks/results/gamma60_telemetry_submission_2026-05-23.json`
 - `benchmarks/results/gamma60_telemetry_submission_2026-05-23.md`
 
-Job `10252` is dependency-blocked on `afterok:10250`. It is a short 200-step
+Job `10254` is dependency-blocked on `afterok:10250`. It is a short 200-step
 component-gradient telemetry diagnostic with `ATTENTION_KD_WEIGHT=60`; it is
 not a task-quality benchmark.
 
@@ -180,7 +180,7 @@ ratios, not task accuracy, for this diagnostic.
 
 ## Active Gate Monitor
 
-Use this while `10250`, `10252`, and `10253` are still live:
+Use this while `10250`, `10253`, and `10254` are still live:
 
 ```bash
 python benchmarks/monitor_active_stage2_extension.py

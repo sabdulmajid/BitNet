@@ -1,11 +1,13 @@
 {
   "schema": "bitdistill-gradient-telemetry-submission-v1",
-  "created_utc": "2026-05-23T15:45:05+00:00",
+  "created_utc": "2026-05-23T16:12:00+00:00",
   "status": "dependency_pending",
-  "job_id": "10252",
+  "job_id": "10254",
+  "cancelled_job_id": "10252",
+  "cancelled_job_reason": "Job 10252 was cancelled while dependency-pending because its stored batch script did not embed the diagnostic constants. Job 10254 was resubmitted with slurm_gamma60_telemetry.sh, which hardcodes ATTENTION_KD_WEIGHT=60 and telemetry settings in the Slurm batch script.",
   "dependency": "afterok:10250",
   "partition": "midcard",
-  "script": "slurm_bitdistill_glue.sh",
+  "script": "slurm_gamma60_telemetry.sh",
   "purpose": "Materialize component-gradient telemetry for an equalized-gamma diagnostic to compare against existing paper-gamma telemetry.",
   "model": "Qwen/Qwen2.5-0.5B",
   "run_config": {

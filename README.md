@@ -60,7 +60,7 @@ A dependent handoff job, `10253`, is queued with `afterok:10250` to build the
 655M manifest and submit the matched downstream MNLI evaluation if Stage-2
 finishes successfully.
 
-Job `10252` is a dependent gamma-60 component-gradient diagnostic; it is not a quality benchmark.
+Job `10254` is a dependent gamma-60 component-gradient diagnostic; it is not a quality benchmark.
 Its role is to compare a lower attention-KD coefficient against the existing
 paper-gamma telemetry, where attention KD dominates CE under this
 implementation's current loss reductions.

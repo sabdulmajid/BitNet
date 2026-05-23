@@ -90,9 +90,11 @@ def audit_gamma(submission: dict[str, Any]) -> dict[str, Any]:
     job_id = str(submission.get("job_id", ""))
     script, message = slurm_batch_script(job_id)
     required = [
-        "--telemetry-every-steps",
-        "--telemetry-component-grad-norms",
-        "--attention-kd-weight \"$ATTENTION_KD_WEIGHT\"",
+        "write_status_report()",
+        "export ATTENTION_KD_WEIGHT=60",
+        "export MAX_STEPS=200",
+        "export TELEMETRY_EVERY_STEPS=25",
+        "export TELEMETRY_COMPONENT_GRAD_NORMS=1",
     ]
     checks = check_snippets(script, required)
     passed = bool(script) and all(check["present"] for check in checks)

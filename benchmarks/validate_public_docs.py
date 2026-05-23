@@ -282,7 +282,7 @@ def validate_reproduction_gap_docs(
         readme,
         errors,
     )
-    require_contains("README gamma telemetry job", "10252", readme, errors)
+    require_contains("README gamma telemetry job", "10254", readme, errors)
     require_contains("README gamma telemetry caveat", "not a quality benchmark", readme, errors)
 
 

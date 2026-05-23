@@ -7,7 +7,7 @@ Quality claim: **none**. This validates queued script contents only.
 | purpose | job | state | script available | passed |
 | --- | --- | --- | --- | --- |
 | 655M Stage-2 handoff | 10253 | PENDING | true | true |
-| gamma-60 gradient telemetry | 10252 | PENDING | true | true |
+| gamma-60 gradient telemetry | 10254 | PENDING | true | true |
 
 ## Required Snippets
 
@@ -17,6 +17,8 @@ Quality claim: **none**. This validates queued script contents only.
 | 10253 | trap 'status=$?; trap - ERR; write_failure_report | true |
 | 10253 | --downstream-failed-job-id "" | true |
 | 10253 | --downstream-failure-mode "" | true |
-| 10252 | --telemetry-every-steps | true |
-| 10252 | --telemetry-component-grad-norms | true |
-| 10252 | --attention-kd-weight "$ATTENTION_KD_WEIGHT" | true |
+| 10254 | write_status_report() | true |
+| 10254 | export ATTENTION_KD_WEIGHT=60 | true |
+| 10254 | export MAX_STEPS=200 | true |
+| 10254 | export TELEMETRY_EVERY_STEPS=25 | true |
+| 10254 | export TELEMETRY_COMPONENT_GRAD_NORMS=1 | true |

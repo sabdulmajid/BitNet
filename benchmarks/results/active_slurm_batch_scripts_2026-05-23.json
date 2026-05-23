@@ -24,7 +24,7 @@
       "job_id": "10253",
       "passed": true,
       "purpose": "655M Stage-2 handoff",
-      "scontrol_message": "batch script for job 10253 written to /tmp/bitnet-slurm-script-ane02kyl/10253.sh",
+      "scontrol_message": "batch script for job 10253 written to /tmp/bitnet-slurm-script-yjn8sszr/10253.sh",
       "script_available": true,
       "slurm": {
         "job_id": "10253",
@@ -39,24 +39,32 @@
       "checks": [
         {
           "present": true,
-          "snippet": "--telemetry-every-steps"
+          "snippet": "write_status_report()"
         },
         {
           "present": true,
-          "snippet": "--telemetry-component-grad-norms"
+          "snippet": "export ATTENTION_KD_WEIGHT=60"
         },
         {
           "present": true,
-          "snippet": "--attention-kd-weight \"$ATTENTION_KD_WEIGHT\""
+          "snippet": "export MAX_STEPS=200"
+        },
+        {
+          "present": true,
+          "snippet": "export TELEMETRY_EVERY_STEPS=25"
+        },
+        {
+          "present": true,
+          "snippet": "export TELEMETRY_COMPONENT_GRAD_NORMS=1"
         }
       ],
-      "job_id": "10252",
+      "job_id": "10254",
       "passed": true,
       "purpose": "gamma-60 gradient telemetry",
-      "scontrol_message": "batch script for job 10252 written to /tmp/bitnet-slurm-script-ob8qgi1n/10252.sh",
+      "scontrol_message": "batch script for job 10254 written to /tmp/bitnet-slurm-script-wvyhcmsg/10254.sh",
       "script_available": true,
       "slurm": {
-        "job_id": "10252",
+        "job_id": "10254",
         "name": "bd-g60-telemetry",
         "reason": "(Dependency)",
         "state": "PENDING",
@@ -64,7 +72,7 @@
       }
     }
   ],
-  "created_utc": "2026-05-23T16:09:00.785317+00:00",
+  "created_utc": "2026-05-23T16:15:12.451629+00:00",
   "quality_claim": "none",
   "schema": "bitnet-active-slurm-batch-script-audit-v1",
   "status": "passed"
