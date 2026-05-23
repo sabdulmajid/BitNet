@@ -255,6 +255,12 @@ def validate_stage2_snapshot_salvage(report: dict[str, Any], readme: str, errors
     best = report.get("best_salvage_snapshot")
     if complete_count and not isinstance(best, dict):
         errors.append("stage2 snapshot salvage: complete snapshots exist but best_salvage_snapshot is missing")
+    salvage_command = report.get("salvage_manifest_command")
+    if complete_count:
+        if not isinstance(salvage_command, list) or "--allow-snapshot-metrics-root" not in salvage_command:
+            errors.append("stage2 snapshot salvage: complete snapshot lacks snapshot-metrics manifest command")
+    elif salvage_command not in ([], None):
+        errors.append("stage2 snapshot salvage: command present before any complete snapshot exists")
     caveat = report.get("caveat")
     if not isinstance(caveat, str) or "does not run downstream evaluation" not in caveat:
         errors.append("stage2 snapshot salvage: caveat must prohibit quality claims")

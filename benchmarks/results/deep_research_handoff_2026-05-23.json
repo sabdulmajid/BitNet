@@ -2,12 +2,12 @@
   "active_gate": {
     "downstream_complete": false,
     "downstream_status": "waiting_for_handoff",
-    "eta_hours": 17.441153642653642,
-    "latest_ce": 4.132606,
+    "eta_hours": 17.370805555555556,
+    "latest_ce": 3.854629,
     "latest_complete_snapshot_step": null,
-    "latest_step": 5460,
+    "latest_step": 5600,
     "max_steps": 40000,
-    "progress": 0.1365,
+    "progress": 0.14,
     "stage2_job_id": "10250",
     "stage2_slurm_state": "RUNNING",
     "stage2_status": "running",
@@ -46,7 +46,7 @@
       "interpretation": "The systems path is real, but quality/storage tradeoffs remain unfavorable versus mature Q4."
     }
   ],
-  "created_utc": "2026-05-23T18:23:47.215472+00:00",
+  "created_utc": "2026-05-23T18:28:04.693000+00:00",
   "next_action": {
     "blueprint_action": "wait_and_watch_655m_gate",
     "claim_boundary": "status only; quality_claim remains none until ingestion is ingested_reports_rebuilt",
@@ -94,7 +94,7 @@
   ],
   "open_questions": [
     {
-      "current_state": "running; step 5460/40000; downstream waiting_for_handoff.",
+      "current_state": "running; step 5600/40000; downstream waiting_for_handoff.",
       "evidence_needed": "Completed 655M Stage-2 manifest plus downstream MNLI metrics.json and eval_predictions.jsonl.",
       "question": "Does the Stage-2 token-budget curve keep improving at 655.36M tokens?"
     },
@@ -134,15 +134,15 @@
     },
     "current_status": {
       "path": "benchmarks/results/current_goal_status_2026-05-23.json",
-      "sha256": "ac08f4010f2fe4dbd30af59502fbfad4d2fc644ebfd63a594135275678e8e1c2"
+      "sha256": "121eeebf50954237ea2ca69cf6d9634550440c51107a18fe9ab3f1d3f518ca8d"
     },
     "next_decision": {
       "path": "benchmarks/results/bitdistill_next_decision_2026-05-23.json",
-      "sha256": "b3bd9ee98bdb23370ccafef4e3d837ef4f7b6c5098ab2f9dcccabbedbbad90fb"
+      "sha256": "ef11e3bc9d7a1fb7a894e4b4e466cb09f2b0b03cf846895974bb8377d45ea028"
     },
     "next_experiment_blueprint": {
       "path": "benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.json",
-      "sha256": "114de3db8ba82da19c3f7a2935ab6b80b3357e7cf6c1d99ba7b69f62f9d26e62"
+      "sha256": "27ba7cb37a330e3dc1fa99f96a9277607892e336566b2c5700aa377dae817365"
     },
     "reproduction_gap": {
       "path": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json",

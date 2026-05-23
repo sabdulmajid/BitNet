@@ -1,6 +1,6 @@
 # Active BitDistill Gate Watchdog
 
-Generated: `2026-05-23T18:23:47.611758+00:00`
+Generated: `2026-05-23T18:28:05.083498+00:00`
 
 Status: **passed**.
 
@@ -22,9 +22,9 @@ This watchdog refreshes status and validates artifacts; it does not create bench
 | next_blueprint_status | pending_655m_downstream |
 | next_blueprint_action | wait_and_watch_655m_gate |
 | stage2_job_id | 10250 |
-| stage2_latest_step | 5460 |
-| stage2_latest_ce | 4.132606 |
-| stage2_progress | 0.136500 |
+| stage2_latest_step | 5600 |
+| stage2_latest_ce | 3.854629 |
+| stage2_progress | 0.140000 |
 | stage2_log_freshness | fresh_running_log |
 | stage2_log_health | healthy |
 | stage2_producer_config | matched |
@@ -37,20 +37,20 @@ This watchdog refreshes status and validates artifacts; it does not create bench
 
 | label | passed | returncode | elapsed seconds |
 | --- | --- | --- | --- |
-| monitor active Stage-2 extension | true | 0 | 0.124239 |
-| audit 655M ingestion | true | 0 | 0.096950 |
-| audit Stage-2 snapshot salvage | true | 0 | 0.089120 |
-| audit active Slurm batch scripts | true | 0 | 0.113446 |
-| build next decision | true | 0 | 0.068526 |
-| build next experiment blueprint | true | 0 | 0.069057 |
-| build current goal status | true | 0 | 0.083037 |
-| build deep research handoff | true | 0 | 0.075023 |
-| build goal traceability | true | 0 | 0.094713 |
-| build paper alignment audit | true | 0 | 0.069414 |
-| build publication/product plan | true | 0 | 0.069782 |
-| validate fail-closed reports | true | 0 | 0.069552 |
-| compile Python sources | true | 0 | 0.078621 |
-| check Slurm shell syntax | true | 0 | 0.003588 |
+| monitor active Stage-2 extension | true | 0 | 0.133307 |
+| audit 655M ingestion | true | 0 | 0.102520 |
+| audit Stage-2 snapshot salvage | true | 0 | 0.087575 |
+| audit active Slurm batch scripts | true | 0 | 0.111687 |
+| build next decision | true | 0 | 0.070717 |
+| build next experiment blueprint | true | 0 | 0.066210 |
+| build current goal status | true | 0 | 0.088665 |
+| build deep research handoff | true | 0 | 0.073103 |
+| build goal traceability | true | 0 | 0.095471 |
+| build paper alignment audit | true | 0 | 0.068951 |
+| build publication/product plan | true | 0 | 0.066847 |
+| validate fail-closed reports | true | 0 | 0.068865 |
+| compile Python sources | true | 0 | 0.075556 |
+| check Slurm shell syntax | true | 0 | 0.004278 |
 
 ## Failures
 

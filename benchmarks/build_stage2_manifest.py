@@ -63,9 +63,6 @@ def discover_latest_snapshot(output_dir: Path) -> Path:
 
 def build_manifest(args: argparse.Namespace) -> dict[str, Any]:
     output_dir = args.output_dir
-    root_metrics_path = output_dir / "metrics.json"
-    if not root_metrics_path.exists():
-        raise FileNotFoundError(root_metrics_path)
     snapshot_dir = args.snapshot_dir or discover_latest_snapshot(output_dir)
     state_dict_path = snapshot_dir / "custom_state_dict.pt"
     snapshot_metrics_path = snapshot_dir / "metrics.json"
@@ -74,8 +71,17 @@ def build_manifest(args: argparse.Namespace) -> dict[str, Any]:
     if not snapshot_metrics_path.exists():
         raise FileNotFoundError(snapshot_metrics_path)
 
-    root_metrics = read_json(root_metrics_path)
     snapshot_metrics = read_json(snapshot_metrics_path)
+    root_metrics_path = output_dir / "metrics.json"
+    if root_metrics_path.exists():
+        root_metrics = read_json(root_metrics_path)
+        root_metrics_source = "root_metrics"
+    elif args.allow_snapshot_metrics_root:
+        root_metrics = snapshot_metrics
+        root_metrics_path = snapshot_metrics_path
+        root_metrics_source = "snapshot_metrics_fallback"
+    else:
+        raise FileNotFoundError(root_metrics_path)
     last = root_metrics.get("last", {}) if isinstance(root_metrics.get("last"), dict) else {}
     segment_token_presentations = root_metrics.get("effective_train_token_presentations")
     parent_manifest = read_json(args.parent_manifest) if args.parent_manifest else {}
@@ -112,6 +118,7 @@ def build_manifest(args: argparse.Namespace) -> dict[str, Any]:
         "final_grad_norm": last.get("grad_norm"),
         "output_dir": str(output_dir),
         "root_metrics_path": str(root_metrics_path),
+        "root_metrics_source": root_metrics_source,
         "snapshot_dir": str(snapshot_dir),
         "snapshot_metrics_path": str(snapshot_metrics_path),
         "state_dict_path": str(state_dict_path),
@@ -180,6 +187,7 @@ def render_markdown(manifest: dict[str, Any]) -> str:
                     ["parent_token_presentations", manifest.get("parent_token_presentations", "")],
                     ["final_ce", manifest["final_ce"]],
                     ["state_dict_path", manifest["state_dict_path"]],
+                    ["root_metrics_source", manifest.get("root_metrics_source", "")],
                     ["parent_manifest_path", manifest.get("parent_manifest_path", "")],
                     ["bitnet_commit", manifest["git"]["bitnet_commit"]],
                     ["llama_cpp_commit", manifest["git"]["llama_cpp_commit"]],
@@ -206,6 +214,15 @@ def main() -> int:
     parser.add_argument("--producer-llama-cpp-commit", default="")
     parser.add_argument("--parent-manifest", type=Path)
     parser.add_argument("--cumulative-token-presentations", type=int, default=0)
+    parser.add_argument(
+        "--allow-snapshot-metrics-root",
+        action="store_true",
+        help=(
+            "Use the selected snapshot metrics as the manifest root metrics if the run "
+            "did not write output_dir/metrics.json. Intended for explicitly labeled "
+            "salvage manifests only."
+        ),
+    )
     parser.add_argument("--downstream-status", default="pending_rerun")
     parser.add_argument("--downstream-failed-job-id", default="10071")
     parser.add_argument(

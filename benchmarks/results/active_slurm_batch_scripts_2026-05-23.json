@@ -120,7 +120,7 @@
       "job_id": "10255",
       "passed": true,
       "purpose": "655M Stage-2 handoff",
-      "scontrol_message": "batch script for job 10255 written to /tmp/bitnet-slurm-script-nvpu_eb0/10255.sh",
+      "scontrol_message": "batch script for job 10255 written to /tmp/bitnet-slurm-script-nbkcdud7/10255.sh",
       "script_available": true,
       "slurm": {
         "job_id": "10255",
@@ -205,7 +205,7 @@
       "job_id": "10257",
       "passed": true,
       "purpose": "gamma-60 gradient telemetry",
-      "scontrol_message": "batch script for job 10257 written to /tmp/bitnet-slurm-script-ttj3hny3/10257.sh",
+      "scontrol_message": "batch script for job 10257 written to /tmp/bitnet-slurm-script-fp9_sito/10257.sh",
       "script_available": true,
       "slurm": {
         "job_id": "10257",
@@ -216,7 +216,7 @@
       }
     }
   ],
-  "created_utc": "2026-05-23T18:23:46.916199+00:00",
+  "created_utc": "2026-05-23T18:28:04.392322+00:00",
   "quality_claim": "none",
   "schema": "bitnet-active-slurm-batch-script-audit-v1",
   "status": "passed"

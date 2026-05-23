@@ -202,6 +202,50 @@ def recommendation(status: str, slurm_state: str) -> str:
     return "Keep watching for the first complete snapshot."
 
 
+def build_salvage_manifest_command(
+    *,
+    snapshot: dict[str, Any] | None,
+    output_dir: str,
+    parent_manifest: dict[str, Any],
+    stage2_job_id: str,
+    model: str,
+    date: str,
+) -> list[str]:
+    if not snapshot:
+        return []
+    step = snapshot["step"]
+    cumulative_tokens = snapshot.get("cumulative_token_presentations")
+    return [
+        "python",
+        "benchmarks/build_stage2_manifest.py",
+        "--output-dir",
+        output_dir,
+        "--snapshot-dir",
+        snapshot["snapshot_dir"],
+        "--allow-snapshot-metrics-root",
+        "--parent-manifest",
+        str(parent_manifest["path"]),
+        "--cumulative-token-presentations",
+        str(cumulative_tokens),
+        "--run-id",
+        f"qwen25-05b-bitdistill-tensor-stage2-655m-salvage-step{step}-job{stage2_job_id}",
+        "--job-id",
+        stage2_job_id,
+        "--model",
+        model,
+        "--downstream-status",
+        "salvage_pending_downstream",
+        "--downstream-failed-job-id",
+        "",
+        "--downstream-failure-mode",
+        "salvage manifest from intermediate Stage-2 snapshot",
+        "--output-json",
+        f"benchmarks/results/stage2_manifest_655m_salvage_step{step}_{date}.json",
+        "--output-md",
+        f"benchmarks/results/stage2_manifest_655m_salvage_step{step}_{date}.md",
+    ]
+
+
 def build_report(args: argparse.Namespace) -> dict[str, Any]:
     submission = read_json(args.stage2_submission)
     monitor = read_json(args.active_monitor, required=False)
@@ -237,6 +281,16 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         final_step=max_steps,
         slurm_state=slurm.get("state", ""),
     )
+    salvage_manifest_command = build_salvage_manifest_command(
+        snapshot=best,
+        output_dir=str(output_dir),
+        parent_manifest={
+            "path": str(args.parent_manifest or submission["parent_manifest"]["path"]),
+        },
+        stage2_job_id=job_id,
+        model=str(submission["model"]),
+        date=args.date,
+    )
     return {
         "schema": "bitdistill-stage2-snapshot-salvage-v1",
         "created_utc": datetime.now(timezone.utc).isoformat(),
@@ -255,6 +309,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "best_salvage_snapshot": best,
         "snapshots": snapshots,
         "recommendation": recommendation(status, slurm.get("state", "")),
+        "salvage_manifest_command": salvage_manifest_command,
         "source_paths": {
             "stage2_submission": str(args.stage2_submission),
             "active_monitor": str(args.active_monitor),
@@ -315,6 +370,10 @@ def render_markdown(report: dict[str, Any]) -> str:
                 ["step", "status", "state", "metrics", "cumulative tokens", "last_ce", "validation errors"],
                 snapshot_rows,
             ),
+            "## Salvage Manifest Command",
+            "`" + " ".join(report["salvage_manifest_command"]) + "`"
+            if report["salvage_manifest_command"]
+            else "No complete intermediate snapshot is available yet.",
             "## Source Artifacts",
             md_table(["artifact", "path"], [[key, value] for key, value in report["source_paths"].items()]),
         ]
@@ -333,6 +392,12 @@ def main() -> int:
         type=Path,
         default=Path("benchmarks/results/active_stage2_extension_monitor_2026-05-23.json"),
     )
+    parser.add_argument(
+        "--parent-manifest",
+        type=Path,
+        default=Path("benchmarks/results/stage2_manifest_2026-05-20.json"),
+    )
+    parser.add_argument("--date", default="2026-05-23")
     parser.add_argument(
         "--output-json",
         type=Path,

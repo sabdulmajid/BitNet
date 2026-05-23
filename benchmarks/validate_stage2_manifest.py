@@ -65,6 +65,19 @@ def main() -> int:
         errors.append(f"stage is not continued_pretrain: {manifest.get('stage')}")
     if manifest.get("method") != "bitdistill":
         errors.append(f"method is not bitdistill: {manifest.get('method')}")
+    root_metrics_source = manifest.get("root_metrics_source", "root_metrics")
+    if root_metrics_source not in {"root_metrics", "snapshot_metrics_fallback"}:
+        errors.append(f"unexpected root_metrics_source: {root_metrics_source!r}")
+    if root_metrics_source == "snapshot_metrics_fallback":
+        if manifest.get("root_metrics_path") != manifest.get("snapshot_metrics_path"):
+            errors.append(
+                "snapshot_metrics_fallback requires root_metrics_path to equal snapshot_metrics_path: "
+                f"{manifest.get('root_metrics_path')!r} != {manifest.get('snapshot_metrics_path')!r}"
+            )
+        run_id = str(manifest.get("run_id", ""))
+        downstream = manifest.get("downstream", {}) if isinstance(manifest.get("downstream"), dict) else {}
+        if "salvage" not in run_id and "fallback" not in str(downstream.get("status", "")):
+            errors.append("snapshot_metrics_fallback manifests must be explicitly labeled salvage or fallback")
     for key in ["steps", "token_presentations", "final_ce"]:
         if not finite_number(manifest.get(key)):
             errors.append(f"{key} is not finite: {manifest.get(key)!r}")
