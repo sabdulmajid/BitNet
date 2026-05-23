@@ -6,30 +6,31 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | job | id | slurm state | time | reason |
 | --- | --- | --- | --- | --- |
-| stage2 | 10250 | RUNNING | 59:55 | ece-nebula12 |
-| handoff | 10253 | PENDING | 0:00 | (Dependency) |
+| stage2 | 10250 | RUNNING | 1:08:00 | ece-nebula12 |
+| handoff | 10255 | PENDING | 0:00 | (Dependency) |
 | gamma60 telemetry | 10254 | PENDING | 0:00 | (Dependency) |
 | downstream MNLI | - | not_submitted |  |  |
+| postprocess | - | not_submitted |  |  |
 
 | stage2 field | value |
 | --- | --- |
-| latest_step | 1940 |
+| latest_step | 2210 |
 | max_steps | 40000 |
 | save_every_steps | 10000 |
-| progress | 0.048500 |
-| latest_ce | 3.505811 |
+| progress | 0.055250 |
+| latest_ce | 4.366409 |
 | latest_lr | 0.000002 |
-| log_elapsed_seconds | 3524.900000 |
-| parsed_log_rows | 195 |
+| log_elapsed_seconds | 4015.900000 |
+| parsed_log_rows | 222 |
 | recent_window_rows | 20 |
-| recent_ce_mean | 3.897342 |
-| recent_ce_min | 3.441311 |
-| recent_ce_max | 4.278359 |
-| seconds_per_step | 1.816959 |
-| steps_per_hour | 1981.332804 |
-| eta_hours | 19.209292 |
-| estimated_completion_utc | 2026-05-24T11:49:53.805476+00:00 |
-| segment_token_presentations_per_second | 4508.632869 |
+| recent_ce_mean | 3.738855 |
+| recent_ce_min | 2.864071 |
+| recent_ce_max | 4.366409 |
+| seconds_per_step | 1.817149 |
+| steps_per_hour | 1981.125028 |
+| eta_hours | 19.075020 |
+| estimated_completion_utc | 2026-05-24T11:49:55.767375+00:00 |
+| segment_token_presentations_per_second | 4508.160064 |
 | latest_complete_snapshot_step | - |
 | cumulative_token_presentations | 655360000 |
 
@@ -53,6 +54,7 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | handoff report | False | benchmarks/results/stage2_655m_handoff_2026-05-23.json |
 | downstream metrics | False | checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json |
 | downstream predictions | False | checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl |
+| postprocess report | False | benchmarks/results/stage2_655m_postprocess_2026-05-23.json |
 | telemetry artifact 1 | False | checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/telemetry.jsonl |
 | telemetry artifact 2 | False | checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/metrics.json |
 
@@ -66,6 +68,18 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | output_dir | checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit |
 | complete | False |
 | caveat | This section tracks downstream artifact existence only; it does not compute or claim MNLI accuracy. |
+
+## Postprocess
+
+| field | value |
+| --- | --- |
+| job_id |  |
+| slurm_state | not_submitted |
+| expected_json | benchmarks/results/stage2_655m_postprocess_2026-05-23.json |
+| expected_json_exists | False |
+| expected_md | benchmarks/results/stage2_655m_postprocess_2026-05-23.md |
+| expected_md_exists | False |
+| caveat | This section tracks report-regeneration job state only; it is not quality evidence. |
 
 ## Caveat
 

@@ -12,6 +12,7 @@ from typing import Any
 
 
 PAPER_STAGE2_TOKENS = 10_000_000_000
+SUCCESS_DELTA_FROM_FP = -0.01
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -119,12 +120,17 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     row_40m = controlled_by_tokens[40_960_000]
     row_163m = controlled_by_tokens[163_840_000]
     row_327m = controlled_by_tokens[327_680_000]
+    latest_tokens = max(controlled_by_tokens)
+    latest_row = controlled_by_tokens[latest_tokens]
 
     fp16 = float(bitdistill["fp16_sft_mnli"])
     bitnet_best = float(best_bitnet["accuracy"])
     bitnet_default = float(bitnet_budget["default_baseline_accuracy"])
     paper_bitnet = float(bitnet_budget["paper_anchor"])
     bitdistill_327 = float(row_327m["metric_accuracy"])
+    bitdistill_latest = float(latest_row["metric_accuracy"])
+    latest_delta_vs_fp = bitdistill_latest - fp16
+    status = "reproduced" if latest_delta_vs_fp >= SUCCESS_DELTA_FROM_FP else "not_reproduced"
     dynamics_traces = dynamics.get("traces", [])
     controlled_traces = [
         trace for trace in dynamics_traces if isinstance(trace, dict) and trace.get("kind") == "controlled"
@@ -151,10 +157,11 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             ),
         },
         {
-            "finding": "BitDistill is still not reproduced.",
+            "finding": "BitDistill recovery is evaluated against the latest completed Stage-2 row.",
             "evidence": (
-                f"327.68M BitDistill MNLI {bitdistill_327:.6f}; FP16 {fp16:.6f}; "
-                f"delta {bitdistill_327 - fp16:+.6f}"
+                f"{latest_tokens / 1_000_000:.2f}M BitDistill MNLI {bitdistill_latest:.6f}; "
+                f"FP16 {fp16:.6f}; delta {latest_delta_vs_fp:+.6f}; "
+                f"gate {SUCCESS_DELTA_FROM_FP:+.6f}"
             ),
         },
         {
@@ -163,7 +170,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                 f"40.96M {float(row_40m['metric_accuracy']):.6f}; "
                 f"163.84M {float(row_163m['metric_accuracy']):.6f}; "
                 f"327.68M {bitdistill_327:.6f}; "
-                f"paper fraction {pct(327_680_000 / PAPER_STAGE2_TOKENS)}"
+                f"latest {latest_tokens / 1_000_000:.2f}M {bitdistill_latest:.6f}; "
+                f"latest paper fraction {pct(latest_tokens / PAPER_STAGE2_TOKENS)}"
             ),
         },
         {
@@ -207,7 +215,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     return {
         "schema": "bitnet-reproduction-gap-report-v1",
         "created_utc": datetime.now(timezone.utc).isoformat(),
-        "status": "not_reproduced",
+        "status": status,
         "artifacts": {
             label: {"path": str(path), "sha256": sha256(path)} for label, path in artifacts.items()
         },
@@ -225,6 +233,13 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             "bitdistill_327_68m_delta_vs_fp16": bitdistill_327 - fp16,
             "bitdistill_327_68m_ci95": row_327m["paired"]["paired_ci95"],
             "stage2_327_68m_fraction_of_paper": 327_680_000 / PAPER_STAGE2_TOKENS,
+            "bitdistill_latest_stage2_tokens": latest_tokens,
+            "bitdistill_latest_mnli": bitdistill_latest,
+            "bitdistill_latest_delta_vs_bitnet_best": bitdistill_latest - bitnet_best,
+            "bitdistill_latest_delta_vs_fp16": latest_delta_vs_fp,
+            "bitdistill_latest_ci95": latest_row["paired"]["paired_ci95"],
+            "bitdistill_latest_fraction_of_paper": latest_tokens / PAPER_STAGE2_TOKENS,
+            "success_delta_from_fp16": SUCCESS_DELTA_FROM_FP,
             "final_grad_attention_to_ce": strongest_trace.get("final_grad_attention_to_ce"),
             "final_loss_attention_to_ce": strongest_trace.get("final_loss_attention_to_ce"),
             "controlled_trace_count": dynamics.get("controlled_trace_count"),
@@ -247,7 +262,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         [
             "# BitDistill Reproduction Gap Report",
             (
-                "Status: **not reproduced**. This report separates the now-improved "
+                f"Status: **{report['status']}**. This report separates the now-improved "
                 "BitNet-SFT baseline from the remaining BitDistill/FP recovery gap."
             ),
             md_table(
@@ -266,6 +281,13 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["BitDistill 327.68M vs FP16", metrics["bitdistill_327_68m_delta_vs_fp16"]],
                     ["BitDistill 327.68M CI95", metrics["bitdistill_327_68m_ci95"]],
                     ["327.68M as paper Stage-2 fraction", pct(metrics["stage2_327_68m_fraction_of_paper"])],
+                    ["BitDistill latest Stage-2 tokens", metrics["bitdistill_latest_stage2_tokens"]],
+                    ["BitDistill latest MNLI", metrics["bitdistill_latest_mnli"]],
+                    ["BitDistill latest vs BitNet-SFT best", metrics["bitdistill_latest_delta_vs_bitnet_best"]],
+                    ["BitDistill latest vs FP16", metrics["bitdistill_latest_delta_vs_fp16"]],
+                    ["BitDistill latest CI95", metrics["bitdistill_latest_ci95"]],
+                    ["latest as paper Stage-2 fraction", pct(metrics["bitdistill_latest_fraction_of_paper"])],
+                    ["success delta from FP16", metrics["success_delta_from_fp16"]],
                     ["final grad attention/CE", metrics["final_grad_attention_to_ce"]],
                     ["final loss attention/CE", metrics["final_loss_attention_to_ce"]],
                     ["controlled telemetry traces", metrics["materialized_controlled_trace_count"]],

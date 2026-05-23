@@ -1,8 +1,8 @@
 # Current Goal Status
 
-Generated: `2026-05-23T16:37:20.438736+00:00`
+Generated: `2026-05-23T16:45:25.890744+00:00`
 
-Git HEAD: `1ebbbb26333d5c1f0dd689e35f92f5b2cb57e85c`
+Git HEAD: `1e66c199dc7676d0f018c9ed0f4b5b57535d88f1`
 
 Objective achieved: **False**.
 
@@ -10,7 +10,7 @@ Completion status: **in_progress**.
 
 ## Verdict
 
-Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style recovery remains unreproduced; the active 655.36M Stage-2 gate is testing whether recovery continues with more tokens.
+Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style recovery status is not_reproduced; the active 655.36M Stage-2 gate is testing whether recovery continues with more tokens.
 
 ## Headline Metrics
 
@@ -24,6 +24,9 @@ Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style 
 | fp16_sft_mnli | 0.808151 |
 | bitdistill_327_68m_mnli | 0.720020 |
 | bitdistill_327_68m_delta_vs_fp | -0.088130 |
+| bitdistill_latest_stage2_tokens | 327680000 |
+| bitdistill_latest_mnli | 0.720020 |
+| bitdistill_latest_delta_vs_fp | -0.088130 |
 | bitdistill_655_36m_status | waiting_for_handoff |
 
 ## Requirement Audit
@@ -31,7 +34,7 @@ Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style 
 | requirement | status | evidence | remaining gap |
 | --- | --- | --- | --- |
 | Arbitrary FP/BF16 to ternary retrofit | rejected_for_tested_dense_qwen_setup | FP WikiText PPL 13.901; naive PTQ PPL 3813121.803; FP ten-task mean 0.644169; PTQ mean 0.348671 | Do not market as a universal converter. |
-| BitDistill paper-level MNLI recovery | not_reproduced | FP16-SFT 0.808151; 327.68M BitDistill 0.720020; delta -0.088130 | 655.36M downstream MNLI is pending behind the active Stage-2 producer. |
+| BitDistill paper-level MNLI recovery | not_reproduced | FP16-SFT 0.808151; latest 327.68M BitDistill 0.720020; delta -0.088130 | 655.36M downstream MNLI is pending behind the active Stage-2 producer. |
 | BitNet-SFT baseline sanity | locally_sanity_checked | default 0.487621; best budget row 0.628935; delta vs paper anchor +0.020935 | This does not reproduce BitDistill recovery. |
 | Row-scale runtime contract | supported | one-scale TL2 RMS error 1.904230; exact row-scale RMS error 0.000197 | TL2 row-scale kernels are not implemented; I2_SR is the supported row-scale path. |
 | Packed CPU I2_SR path | working_not_q4_quality_competitive | I2_SR file 1211.3 MiB; PPL 38.8477; prompt 211.67 tok/s; decode 19.07 tok/s | Not quality/storage competitive with Q4_K_M. |
@@ -45,11 +48,11 @@ Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style 
 | stage2_job_id | 10250 |
 | stage2_status | running |
 | stage2_slurm_state | RUNNING |
-| latest_step | 1940 |
+| latest_step | 2210 |
 | max_steps | 40000 |
-| progress | 0.048500 |
-| latest_ce | 3.505811 |
-| eta_hours | 19.209292 |
+| progress | 0.055250 |
+| latest_ce | 4.366409 |
+| eta_hours | 19.075020 |
 | latest_complete_snapshot_step | - |
 | downstream_status | waiting_for_handoff |
 | downstream_complete | False |
@@ -86,4 +89,4 @@ Potentially publishable as:
 | --- | --- | --- |
 | canonical_bundle | benchmarks/results/canonical_evidence_bundle_2026-05-20.json | af9ec2e35931986c7caf63c178b7c482c3e93406f8d880774bbf8d114f27824c |
 | reproduction_gap | benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json | b5a37266b33dc7318b55a23569673467d11fa7aa67ba6725baaa374210a42820 |
-| active_monitor | benchmarks/results/active_stage2_extension_monitor_2026-05-23.json | f6bf82ef0e0f9f70a2295165fd092b10ee61028d0555ae2dd8f65cea8e4403d1 |
+| active_monitor | benchmarks/results/active_stage2_extension_monitor_2026-05-23.json | 9e60c67c0c4de2a28d2009f7c143a0b415e7407f7f17cf367d9b3efdb934447f |

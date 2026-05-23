@@ -70,6 +70,8 @@ def audit_handoff(submission: dict[str, Any]) -> dict[str, Any]:
         "trap 'status=$?; trap - ERR; write_failure_report",
         "--downstream-failed-job-id \"\"",
         "--downstream-failure-mode \"\"",
+        "slurm_stage2_655m_postprocess.sh",
+        "POSTPROCESS_JOB_ID",
     ]
     checks = check_snippets(script, required)
     passed = bool(script) and all(check["present"] for check in checks)

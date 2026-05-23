@@ -98,6 +98,11 @@ def build_status(args: argparse.Namespace) -> dict[str, Any]:
     native = claims["native_classifier"]
     moe = claims["moe_kimi"]
     gap_metrics = gap["metrics"]
+    latest_tokens = int(gap_metrics.get("bitdistill_latest_stage2_tokens") or 327_680_000)
+    latest_mnli = float(gap_metrics.get("bitdistill_latest_mnli", gap_metrics["bitdistill_327_68m_mnli"]))
+    latest_delta_vs_fp = float(
+        gap_metrics.get("bitdistill_latest_delta_vs_fp16", gap_metrics["bitdistill_327_68m_delta_vs_fp16"])
+    )
     stage2 = monitor["stage2"]
     downstream = monitor["downstream"]
     telemetry = monitor["telemetry"]
@@ -115,11 +120,11 @@ def build_status(args: argparse.Namespace) -> dict[str, Any]:
         },
         {
             "requirement": "BitDistill paper-level MNLI recovery",
-            "status": "not_reproduced",
+            "status": str(gap.get("status", "not_reproduced")),
             "evidence": (
                 f"FP16-SFT {gap_metrics['fp16_sft_mnli']:.6f}; "
-                f"327.68M BitDistill {gap_metrics['bitdistill_327_68m_mnli']:.6f}; "
-                f"delta {gap_metrics['bitdistill_327_68m_delta_vs_fp16']:+.6f}"
+                f"latest {latest_tokens / 1_000_000:.2f}M BitDistill {latest_mnli:.6f}; "
+                f"delta {latest_delta_vs_fp:+.6f}"
             ),
             "remaining_gap": "655.36M downstream MNLI is pending behind the active Stage-2 producer.",
         },
@@ -210,7 +215,7 @@ def build_status(args: argparse.Namespace) -> dict[str, Any]:
         "quality_claim": "mixed_completed_evidence_plus_active_pending_gate",
         "current_verdict": (
             "Blind ternary PTQ is rejected for the tested dense-Qwen setup. "
-            "BitDistill-style recovery remains unreproduced; the active 655.36M "
+            f"BitDistill-style recovery status is {gap.get('status')}; the active 655.36M "
             "Stage-2 gate is testing whether recovery continues with more tokens."
         ),
         "artifacts": {
@@ -227,6 +232,9 @@ def build_status(args: argparse.Namespace) -> dict[str, Any]:
             "fp16_sft_mnli": bitdistill["fp16_sft_mnli"],
             "bitdistill_327_68m_mnli": bitdistill["controlled_327_68m_mnli"],
             "bitdistill_327_68m_delta_vs_fp": bitdistill["controlled_327_68m_delta_vs_fp"],
+            "bitdistill_latest_stage2_tokens": latest_tokens,
+            "bitdistill_latest_mnli": latest_mnli,
+            "bitdistill_latest_delta_vs_fp": latest_delta_vs_fp,
             "bitdistill_655_36m_status": downstream["status"],
         },
         "requirements": requirements,

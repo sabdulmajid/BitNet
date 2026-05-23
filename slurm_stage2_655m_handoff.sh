@@ -25,6 +25,8 @@ RUN_ID="${RUN_ID:-qwen25-05b-bitdistill-tensor-stage2-655m-from327m-job10250}"
 DOWNSTREAM_OUTPUT_DIR="${DOWNSTREAM_OUTPUT_DIR:-checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit}"
 HANDOFF_JSON="${HANDOFF_JSON:-benchmarks/results/stage2_655m_handoff_${DATE}.json}"
 HANDOFF_MD="${HANDOFF_MD:-benchmarks/results/stage2_655m_handoff_${DATE}.md}"
+POSTPROCESS_JSON="${POSTPROCESS_JSON:-benchmarks/results/stage2_655m_postprocess_${DATE}.json}"
+POSTPROCESS_MD="${POSTPROCESS_MD:-benchmarks/results/stage2_655m_postprocess_${DATE}.md}"
 
 write_failure_report() {
   local exit_code="$1"
@@ -44,6 +46,8 @@ data = {
     "manifest_md": "$MANIFEST_MD",
     "stage2_output_dir": "$STAGE2_OUTPUT_DIR",
     "downstream_output_dir": "$DOWNSTREAM_OUTPUT_DIR",
+    "postprocess_json": "$POSTPROCESS_JSON",
+    "postprocess_md": "$POSTPROCESS_MD",
     "caveat": "The handoff did not submit or validate downstream quality evidence.",
 }
 Path("$HANDOFF_JSON").write_text(json.dumps(data, indent=2, sort_keys=True) + "\\n", encoding="utf-8")
@@ -57,7 +61,8 @@ Path("$HANDOFF_MD").write_text(
         f"| exit_code | `{data['exit_code']}` |\\n"
         f"| line | `{data['line']}` |\\n"
         f"| manifest_json | `{data['manifest_json']}` |\\n"
-        f"| downstream_output_dir | `{data['downstream_output_dir']}` |",
+        f"| downstream_output_dir | `{data['downstream_output_dir']}` |\\n"
+        f"| postprocess_json | `{data['postprocess_json']}` |",
         "No quality claim should be updated from this failed handoff."
     ]) + "\\n",
     encoding="utf-8",
@@ -121,6 +126,15 @@ DOWNSTREAM_JOB_ID="$(
   sbatch --parsable --partition=midcard --job-name=bd-mnli-655m slurm_bitdistill_glue.sh
 )"
 
+POSTPROCESS_JOB_ID="$(
+  DOWNSTREAM_JOB_ID="$DOWNSTREAM_JOB_ID" \
+  DOWNSTREAM_OUTPUT_DIR="$DOWNSTREAM_OUTPUT_DIR" \
+  POSTPROCESS_JSON="$POSTPROCESS_JSON" \
+  POSTPROCESS_MD="$POSTPROCESS_MD" \
+  sbatch --parsable --partition=midcard --dependency=afterany:"$DOWNSTREAM_JOB_ID" \
+    --job-name=bd-655m-post slurm_stage2_655m_postprocess.sh
+)"
+
 python benchmarks/build_stage2_manifest.py \
   --output-dir "$STAGE2_OUTPUT_DIR" \
   --parent-manifest "$PARENT_MANIFEST" \
@@ -146,12 +160,15 @@ data = {
     "stage2_job_id": "$STAGE2_JOB_ID",
     "handoff_job_id": "${SLURM_JOB_ID:-local}",
     "downstream_job_id": "$DOWNSTREAM_JOB_ID",
+    "postprocess_job_id": "$POSTPROCESS_JOB_ID",
     "manifest_json": "$MANIFEST_JSON",
     "manifest_md": "$MANIFEST_MD",
     "downstream_output_dir": "$DOWNSTREAM_OUTPUT_DIR",
+    "postprocess_json": "$POSTPROCESS_JSON",
+    "postprocess_md": "$POSTPROCESS_MD",
     "next_after_downstream": [
-        "Run benchmarks/audit_bitdistill_controlled_curve.py with the 655M manifest included.",
-        "Update canonical reports only after downstream metrics.json and eval_predictions.jsonl exist."
+        "Wait for the postprocess job to rebuild the controlled curve and reproduction-gap reports.",
+        "Update canonical/public claims only after downstream metrics.json and eval_predictions.jsonl exist."
     ],
 }
 Path("$HANDOFF_JSON").write_text(json.dumps(data, indent=2, sort_keys=True) + "\\n", encoding="utf-8")
@@ -163,8 +180,10 @@ Path("$HANDOFF_MD").write_text(
         f"| stage2_job_id | `{data['stage2_job_id']}` |\\n"
         f"| handoff_job_id | `{data['handoff_job_id']}` |\\n"
         f"| downstream_job_id | `{data['downstream_job_id']}` |\\n"
+        f"| postprocess_job_id | `{data['postprocess_job_id']}` |\\n"
         f"| manifest_json | `{data['manifest_json']}` |\\n"
-        f"| downstream_output_dir | `{data['downstream_output_dir']}` |",
+        f"| downstream_output_dir | `{data['downstream_output_dir']}` |\\n"
+        f"| postprocess_json | `{data['postprocess_json']}` |",
         "Do not update quality claims until the downstream directory has both `metrics.json` and `eval_predictions.jsonl`."
     ]) + "\\n",
     encoding="utf-8",
@@ -173,3 +192,4 @@ PY
 
 trap - ERR
 echo "DOWNSTREAM_JOB_ID=$DOWNSTREAM_JOB_ID"
+echo "POSTPROCESS_JOB_ID=$POSTPROCESS_JOB_ID"

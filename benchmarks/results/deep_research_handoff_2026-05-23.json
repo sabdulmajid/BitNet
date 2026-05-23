@@ -2,12 +2,12 @@
   "active_gate": {
     "downstream_complete": false,
     "downstream_status": "waiting_for_handoff",
-    "eta_hours": 19.209291809851088,
-    "latest_ce": 3.505811,
+    "eta_hours": 19.075020236299647,
+    "latest_ce": 4.366409,
     "latest_complete_snapshot_step": null,
-    "latest_step": 1940,
+    "latest_step": 2210,
     "max_steps": 40000,
-    "progress": 0.0485,
+    "progress": 0.05525,
     "stage2_job_id": "10250",
     "stage2_slurm_state": "RUNNING",
     "stage2_status": "running",
@@ -26,8 +26,8 @@
       "interpretation": "Training can move some function into the ternary family, but current runs do not close the gap."
     },
     {
-      "evidence": "FP16-SFT MNLI 0.808151; 327.68M BitDistill 0.720020; delta -0.088130.",
-      "finding": "BitDistill paper-level recovery is not reproduced locally.",
+      "evidence": "FP16-SFT MNLI 0.808151; latest 327.68M BitDistill 0.720020; delta -0.088130; status not_reproduced.",
+      "finding": "BitDistill paper-level recovery remains governed by the latest completed Stage-2 row.",
       "interpretation": "The local implementation remains below the paper recovery gate; more Stage-2 budget is being tested."
     },
     {
@@ -46,7 +46,7 @@
       "interpretation": "The systems path is real, but quality/storage tradeoffs remain unfavorable versus mature Q4."
     }
   ],
-  "created_utc": "2026-05-23T16:37:20.514923+00:00",
+  "created_utc": "2026-05-23T16:45:25.966814+00:00",
   "nonclaims": [
     "universal BitNet converter",
     "paper-level BitDistill reproduction",
@@ -77,7 +77,7 @@
   ],
   "open_questions": [
     {
-      "current_state": "running; step 1940/40000; downstream waiting_for_handoff.",
+      "current_state": "running; step 2210/40000; downstream waiting_for_handoff.",
       "evidence_needed": "Completed 655M Stage-2 manifest plus downstream MNLI metrics.json and eval_predictions.jsonl.",
       "question": "Does the Stage-2 token-budget curve keep improving at 655.36M tokens?"
     },
@@ -117,7 +117,7 @@
     },
     "current_status": {
       "path": "benchmarks/results/current_goal_status_2026-05-23.json",
-      "sha256": "fe53431ad6600c4a218ec046d0b51334434870fce977b304f373f9ac6823b687"
+      "sha256": "62074972028efd32fc5254c1ee16d9165a1d5b5f99ce8c777855237c2744afb5"
     },
     "reproduction_gap": {
       "path": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json",

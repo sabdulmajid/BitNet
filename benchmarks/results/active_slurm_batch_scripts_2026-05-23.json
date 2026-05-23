@@ -1,8 +1,8 @@
 {
   "checks": [
     {
-      "cancelled_handoff_job_id": "10251",
-      "cancelled_handoff_reason": "Job 10251 was cancelled while dependency-pending because Slurm had snapshotted the pre-hardening handoff script. Job 10253 was resubmitted with the current fail-closed script.",
+      "cancelled_handoff_job_id": "10253",
+      "cancelled_handoff_reason": "Job 10253 was cancelled while dependency-pending because Slurm had snapshotted the pre-postprocess handoff script. Job 10255 was resubmitted with the current handoff script that queues the downstream postprocess job.",
       "checks": [
         {
           "present": true,
@@ -19,15 +19,23 @@
         {
           "present": true,
           "snippet": "--downstream-failure-mode \"\""
+        },
+        {
+          "present": true,
+          "snippet": "slurm_stage2_655m_postprocess.sh"
+        },
+        {
+          "present": true,
+          "snippet": "POSTPROCESS_JOB_ID"
         }
       ],
-      "job_id": "10253",
+      "job_id": "10255",
       "passed": true,
       "purpose": "655M Stage-2 handoff",
-      "scontrol_message": "batch script for job 10253 written to /tmp/bitnet-slurm-script-yjn8sszr/10253.sh",
+      "scontrol_message": "batch script for job 10255 written to /tmp/bitnet-slurm-script-tf3hsfwv/10255.sh",
       "script_available": true,
       "slurm": {
-        "job_id": "10253",
+        "job_id": "10255",
         "name": "bd-655m-handoff",
         "reason": "(Dependency)",
         "state": "PENDING",
@@ -61,7 +69,7 @@
       "job_id": "10254",
       "passed": true,
       "purpose": "gamma-60 gradient telemetry",
-      "scontrol_message": "batch script for job 10254 written to /tmp/bitnet-slurm-script-wvyhcmsg/10254.sh",
+      "scontrol_message": "batch script for job 10254 written to /tmp/bitnet-slurm-script-ddiwjvil/10254.sh",
       "script_available": true,
       "slurm": {
         "job_id": "10254",
@@ -72,7 +80,7 @@
       }
     }
   ],
-  "created_utc": "2026-05-23T16:15:12.451629+00:00",
+  "created_utc": "2026-05-23T16:45:25.810568+00:00",
   "quality_claim": "none",
   "schema": "bitnet-active-slurm-batch-script-audit-v1",
   "status": "passed"

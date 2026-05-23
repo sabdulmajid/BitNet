@@ -6,17 +6,19 @@ Quality claim: **none**. This validates queued script contents only.
 
 | purpose | job | state | script available | passed |
 | --- | --- | --- | --- | --- |
-| 655M Stage-2 handoff | 10253 | PENDING | true | true |
+| 655M Stage-2 handoff | 10255 | PENDING | true | true |
 | gamma-60 gradient telemetry | 10254 | PENDING | true | true |
 
 ## Required Snippets
 
 | job | snippet | present |
 | --- | --- | --- |
-| 10253 | write_failure_report() | true |
-| 10253 | trap 'status=$?; trap - ERR; write_failure_report | true |
-| 10253 | --downstream-failed-job-id "" | true |
-| 10253 | --downstream-failure-mode "" | true |
+| 10255 | write_failure_report() | true |
+| 10255 | trap 'status=$?; trap - ERR; write_failure_report | true |
+| 10255 | --downstream-failed-job-id "" | true |
+| 10255 | --downstream-failure-mode "" | true |
+| 10255 | slurm_stage2_655m_postprocess.sh | true |
+| 10255 | POSTPROCESS_JOB_ID | true |
 | 10254 | write_status_report() | true |
 | 10254 | export ATTENTION_KD_WEIGHT=60 | true |
 | 10254 | export MAX_STEPS=200 | true |

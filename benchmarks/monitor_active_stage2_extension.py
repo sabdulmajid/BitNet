@@ -206,11 +206,15 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
     handoff_report_path = Path(handoff_submission["expected_handoff_json"])
     handoff_report = read_optional_json(handoff_report_path)
     downstream_job_id = ""
+    postprocess_job_id = ""
     if isinstance(handoff_report, dict):
         downstream_job_id = str(handoff_report.get("downstream_job_id") or "")
+        postprocess_job_id = str(handoff_report.get("postprocess_job_id") or "")
     job_ids = [stage2_job_id, handoff_job_id, telemetry_job_id]
     if downstream_job_id:
         job_ids.append(downstream_job_id)
+    if postprocess_job_id:
+        job_ids.append(postprocess_job_id)
     rows = squeue_rows(job_ids)
 
     stage2_config = stage2_submission["run_config"]
@@ -228,6 +232,18 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
     downstream_output = Path(downstream_output_text) if downstream_output_text else None
     downstream_metrics = downstream_output / "metrics.json" if downstream_output is not None else Path("")
     downstream_predictions = downstream_output / "eval_predictions.jsonl" if downstream_output is not None else Path("")
+    postprocess_json_text = str(
+        (handoff_report or {}).get(
+            "postprocess_json",
+            handoff_submission.get("expected_postprocess_json", ""),
+        )
+    )
+    postprocess_md_text = str(
+        (handoff_report or {}).get(
+            "postprocess_md",
+            handoff_submission.get("expected_postprocess_md", ""),
+        )
+    )
     latest_step = parse_latest_step(args.stage2_log)
     max_steps = int(stage2_config["max_steps"])
     save_every_steps = int(stage2_config.get("save_every_steps") or 0)
@@ -295,6 +311,17 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
             "complete": downstream_metrics.exists() and downstream_predictions.exists() if downstream_output is not None else False,
             "caveat": "This section tracks downstream artifact existence only; it does not compute or claim MNLI accuracy.",
         },
+        "postprocess": {
+            "job_id": postprocess_job_id,
+            "slurm": rows.get(postprocess_job_id, {"job_id": postprocess_job_id, "state": "not_submitted"})
+            if postprocess_job_id
+            else {"job_id": "", "state": "not_submitted"},
+            "expected_json": postprocess_json_text,
+            "expected_json_exists": Path(postprocess_json_text).exists() if postprocess_json_text else False,
+            "expected_md": postprocess_md_text,
+            "expected_md_exists": Path(postprocess_md_text).exists() if postprocess_md_text else False,
+            "caveat": "This section tracks report-regeneration job state only; it is not quality evidence.",
+        },
         "telemetry": {
             "job_id": telemetry_job_id,
             "slurm": rows.get(telemetry_job_id, {"job_id": telemetry_job_id, "state": "not_in_squeue"}),
@@ -327,6 +354,7 @@ def render_markdown(report: dict[str, Any]) -> str:
     stage2 = report["stage2"]
     handoff = report["handoff"]
     downstream = report["downstream"]
+    postprocess = report["postprocess"]
     telemetry = report["telemetry"]
     latest = stage2["latest_step"]
     estimate = stage2["progress_estimate"]
@@ -338,6 +366,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         ["handoff report", handoff["expected_handoff_exists"], handoff["expected_handoff_json"]],
         ["downstream metrics", downstream["metrics"]["exists"], downstream["metrics"]["path"]],
         ["downstream predictions", downstream["predictions"]["exists"], downstream["predictions"]["path"]],
+        ["postprocess report", postprocess["expected_json_exists"], postprocess["expected_json"]],
     ]
     artifact_rows.extend(
         [f"telemetry artifact {idx}", artifact["exists"], artifact["path"]]
@@ -389,6 +418,13 @@ def render_markdown(report: dict[str, Any]) -> str:
                         downstream["slurm"].get("time", ""),
                         downstream["slurm"].get("reason", ""),
                     ],
+                    [
+                        "postprocess",
+                        postprocess["job_id"] or "-",
+                        postprocess["slurm"].get("state"),
+                        postprocess["slurm"].get("time", ""),
+                        postprocess["slurm"].get("reason", ""),
+                    ],
                 ],
             ),
             md_table(
@@ -429,6 +465,19 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["output_dir", downstream["output_dir"]],
                     ["complete", downstream["complete"]],
                     ["caveat", downstream["caveat"]],
+                ],
+            ),
+            "## Postprocess",
+            md_table(
+                ["field", "value"],
+                [
+                    ["job_id", postprocess["job_id"]],
+                    ["slurm_state", postprocess["slurm"].get("state")],
+                    ["expected_json", postprocess["expected_json"]],
+                    ["expected_json_exists", postprocess["expected_json_exists"]],
+                    ["expected_md", postprocess["expected_md"]],
+                    ["expected_md_exists", postprocess["expected_md_exists"]],
+                    ["caveat", postprocess["caveat"]],
                 ],
             ),
             "## Caveat",

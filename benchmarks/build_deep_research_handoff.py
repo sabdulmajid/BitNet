@@ -83,6 +83,11 @@ def build_handoff(args: argparse.Namespace) -> dict[str, Any]:
     i2sr = claims["i2sr_cpu"]
     native = claims["native_classifier"]
     gap_metrics = gap["metrics"]
+    latest_tokens = int(gap_metrics.get("bitdistill_latest_stage2_tokens") or 327_680_000)
+    latest_mnli = float(gap_metrics.get("bitdistill_latest_mnli", bitdistill["controlled_327_68m_mnli"]))
+    latest_delta_vs_fp = float(
+        gap_metrics.get("bitdistill_latest_delta_vs_fp16", bitdistill["controlled_327_68m_delta_vs_fp"])
+    )
 
     thesis = {
         "original_question": "Can arbitrary pretrained FP16/BF16 models be post-hoc converted to BitNet-style W1.58A8 CPU inference?",
@@ -117,11 +122,11 @@ def build_handoff(args: argparse.Namespace) -> dict[str, Any]:
             "interpretation": "Training can move some function into the ternary family, but current runs do not close the gap.",
         },
         {
-            "finding": "BitDistill paper-level recovery is not reproduced locally.",
+            "finding": "BitDistill paper-level recovery remains governed by the latest completed Stage-2 row.",
             "evidence": (
                 f"FP16-SFT MNLI {bitdistill['fp16_sft_mnli']:.6f}; "
-                f"327.68M BitDistill {bitdistill['controlled_327_68m_mnli']:.6f}; "
-                f"delta {bitdistill['controlled_327_68m_delta_vs_fp']:+.6f}."
+                f"latest {latest_tokens / 1_000_000:.2f}M BitDistill {latest_mnli:.6f}; "
+                f"delta {latest_delta_vs_fp:+.6f}; status {gap.get('status')}."
             ),
             "interpretation": "The local implementation remains below the paper recovery gate; more Stage-2 budget is being tested.",
         },

@@ -153,6 +153,9 @@ def validate_stage2_handoff_submission(report: dict[str, Any], errors: list[str]
         errors.append("stage2 handoff: missing script")
     elif not Path(script).exists():
         errors.append(f"stage2 handoff: script does not exist: {script}")
+    postprocess_script = report.get("postprocess_script")
+    if postprocess_script is not None and not Path(str(postprocess_script)).exists():
+        errors.append(f"stage2 handoff: postprocess script does not exist: {postprocess_script}")
 
 
 def validate_gradient_telemetry_submission(report: dict[str, Any], errors: list[str]) -> None:
@@ -203,21 +206,21 @@ def validate_active_slurm_batch_scripts(report: dict[str, Any], errors: list[str
     if not isinstance(checks, list) or not checks:
         errors.append("slurm batch audit: missing checks")
         return
-    by_job = {
-        str(check.get("job_id")): check
+    by_purpose = {
+        str(check.get("purpose")): check
         for check in checks
-        if isinstance(check, dict) and check.get("job_id") is not None
+        if isinstance(check, dict) and check.get("purpose") is not None
     }
-    for job_id in ("10253", "10254"):
-        check = by_job.get(job_id)
+    for purpose in ("655M Stage-2 handoff", "gamma-60 gradient telemetry"):
+        check = by_purpose.get(purpose)
         if not isinstance(check, dict):
-            errors.append(f"slurm batch audit: missing job {job_id}")
+            errors.append(f"slurm batch audit: missing purpose {purpose}")
             continue
         if check.get("passed") is not True:
-            errors.append(f"slurm batch audit: job {job_id} did not pass")
+            errors.append(f"slurm batch audit: {purpose} did not pass")
         snippets = check.get("checks")
         if not isinstance(snippets, list) or not snippets:
-            errors.append(f"slurm batch audit: job {job_id} missing snippet checks")
+            errors.append(f"slurm batch audit: {purpose} missing snippet checks")
             continue
         missing = [
             snippet.get("snippet")
@@ -225,7 +228,7 @@ def validate_active_slurm_batch_scripts(report: dict[str, Any], errors: list[str
             if isinstance(snippet, dict) and snippet.get("present") is not True
         ]
         if missing:
-            errors.append(f"slurm batch audit: job {job_id} missing snippets: {missing}")
+            errors.append(f"slurm batch audit: {purpose} missing snippets: {missing}")
 
 
 def validate_active_stage2_monitor(report: dict[str, Any], errors: list[str]) -> None:
@@ -290,6 +293,13 @@ def validate_active_stage2_monitor(report: dict[str, Any], errors: list[str]) ->
     present_forbidden = sorted(forbidden_quality_keys.intersection(downstream.keys()))
     if present_forbidden:
         errors.append(f"stage2 monitor: downstream contains quality-like keys {present_forbidden}")
+    postprocess = report.get("postprocess")
+    if not isinstance(postprocess, dict):
+        errors.append("stage2 monitor: missing postprocess object")
+    else:
+        caveat = postprocess.get("caveat")
+        if not isinstance(caveat, str) or "not quality evidence" not in caveat:
+            errors.append("stage2 monitor: postprocess caveat must prohibit quality claims")
 
 
 def validate_current_goal_status(report: dict[str, Any], errors: list[str]) -> None:
@@ -438,7 +448,7 @@ def validate_reproduction_gap_docs(
     )
     require_contains("README stage2 extension job", "10250", readme, errors)
     require_contains("README stage2 extension tokens", "655.36M", readme, errors)
-    require_contains("README stage2 handoff job", "10253", readme, errors)
+    require_contains("README stage2 handoff job", "10255", readme, errors)
     require_contains("README stage2 handoff dependency", "afterok:10250", readme, errors)
     require_contains(
         "README gamma telemetry report",
