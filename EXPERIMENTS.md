@@ -188,6 +188,15 @@ python benchmarks/monitor_active_stage2_extension.py
 
 The monitor report is status-only and must not be used as quality evidence.
 
+To generate a reviewer-facing snapshot of the current objective state:
+
+```bash
+python benchmarks/build_current_goal_status.py
+```
+
+This report is a status ledger, not a completion declaration. It reads the
+canonical evidence bundle, reproduction-gap report, and active 655M monitor.
+
 After changing or resubmitting queued Slurm scripts, verify the stored batch
 script contents:
 

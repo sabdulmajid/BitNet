@@ -292,6 +292,41 @@ def validate_active_stage2_monitor(report: dict[str, Any], errors: list[str]) ->
         errors.append(f"stage2 monitor: downstream contains quality-like keys {present_forbidden}")
 
 
+def validate_current_goal_status(report: dict[str, Any], errors: list[str]) -> None:
+    if report.get("schema") != "bitnet-current-goal-status-v1":
+        errors.append(f"current goal status: unexpected schema {report.get('schema')}")
+    if report.get("objective_achieved") is not False:
+        errors.append("current goal status: objective_achieved must remain false")
+    if report.get("completion_status") != "in_progress":
+        errors.append(f"current goal status: unexpected completion_status {report.get('completion_status')}")
+    artifacts = report.get("artifacts")
+    if not isinstance(artifacts, dict):
+        errors.append("current goal status: missing artifacts object")
+        return
+    for label in ("canonical_bundle", "reproduction_gap", "active_monitor"):
+        artifact = artifacts.get(label)
+        if not isinstance(artifact, dict):
+            errors.append(f"current goal status: missing artifact {label}")
+            continue
+        path = artifact.get("path")
+        if not isinstance(path, str) or not path:
+            errors.append(f"current goal status artifact {label}: missing path")
+            continue
+        if not Path(path).exists():
+            errors.append(f"current goal status artifact {label}: path does not exist: {path}")
+            continue
+        expected_sha = artifact.get("sha256")
+        if isinstance(expected_sha, str) and expected_sha:
+            actual_sha = sha256(Path(path))
+            if actual_sha != expected_sha:
+                errors.append(f"current goal status artifact {label}: sha256 mismatch: {actual_sha} != {expected_sha}")
+    if report.get("headline_metrics", {}).get("bitdistill_655_36m_status") is None:
+        errors.append("current goal status: missing 655.36M status headline")
+    requirements = report.get("requirements")
+    if not isinstance(requirements, list) or len(requirements) < 5:
+        errors.append("current goal status: missing requirement audit rows")
+
+
 def validate_readme(bundle: dict[str, Any], readme: str, errors: list[str]) -> None:
     claims = bundle["claims"]
     blind = claims["blind_ptq"]
@@ -371,6 +406,18 @@ def validate_reproduction_gap_docs(
     )
     require_contains("README gamma telemetry job", "10254", readme, errors)
     require_contains("README gamma telemetry caveat", "not a quality benchmark", readme, errors)
+    require_contains(
+        "README current goal status report",
+        "current_goal_status_2026-05-23.md",
+        readme,
+        errors,
+    )
+    require_contains(
+        "README current goal status json",
+        "current_goal_status_2026-05-23.json",
+        readme,
+        errors,
+    )
 
 
 def validate_claims_doc(bundle: dict[str, Any], claims_doc: str, errors: list[str]) -> None:
@@ -444,6 +491,11 @@ def main() -> int:
         default=Path("benchmarks/results/active_stage2_extension_monitor_2026-05-23.json"),
     )
     parser.add_argument(
+        "--current-goal-status",
+        type=Path,
+        default=Path("benchmarks/results/current_goal_status_2026-05-23.json"),
+    )
+    parser.add_argument(
         "--active-slurm-batch-scripts",
         type=Path,
         default=Path("benchmarks/results/active_slurm_batch_scripts_2026-05-23.json"),
@@ -456,6 +508,7 @@ def main() -> int:
     stage2_handoff = load_json(args.stage2_handoff)
     gamma_telemetry = load_json(args.gamma_telemetry_submission)
     stage2_monitor = load_json(args.stage2_monitor)
+    current_goal_status = load_json(args.current_goal_status)
     active_slurm_batch_scripts = load_json(args.active_slurm_batch_scripts)
     readme = read_text(args.readme)
     claims_doc = read_text(args.claims)
@@ -466,6 +519,7 @@ def main() -> int:
     validate_stage2_handoff_submission(stage2_handoff, errors)
     validate_gradient_telemetry_submission(gamma_telemetry, errors)
     validate_active_stage2_monitor(stage2_monitor, errors)
+    validate_current_goal_status(current_goal_status, errors)
     validate_active_slurm_batch_scripts(active_slurm_batch_scripts, errors)
     validate_readme(bundle, readme, errors)
     validate_reproduction_gap_docs(reproduction_gap, readme, claims_doc, errors)

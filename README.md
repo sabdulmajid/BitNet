@@ -41,6 +41,11 @@ The latest focused gap report is:
 - [bitdistill_reproduction_gap_2026-05-23.md](benchmarks/results/bitdistill_reproduction_gap_2026-05-23.md)
 - [bitdistill_reproduction_gap_2026-05-23.json](benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json)
 
+The current objective snapshot is:
+
+- [current_goal_status_2026-05-23.md](benchmarks/results/current_goal_status_2026-05-23.md)
+- [current_goal_status_2026-05-23.json](benchmarks/results/current_goal_status_2026-05-23.json)
+
 The short default BitNet-SFT row was undertrained: the default row is
 `0.487621`, while the best 10k-step BitNet-SFT budget row reaches `0.628935`,
 which is `+0.020935` above the paper's Qwen2.5-0.5B MNLI BitNet-SFT anchor.

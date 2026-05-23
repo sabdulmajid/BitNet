@@ -1,0 +1,130 @@
+{
+  "active_gate": {
+    "downstream_complete": false,
+    "downstream_status": "waiting_for_handoff",
+    "eta_hours": 19.274345303867403,
+    "latest_ce": 3.886587,
+    "latest_complete_snapshot_step": null,
+    "latest_step": 1810,
+    "max_steps": 40000,
+    "progress": 0.04525,
+    "stage2_job_id": "10250",
+    "stage2_slurm_state": "RUNNING",
+    "stage2_status": "running",
+    "telemetry_job_id": "10254",
+    "telemetry_slurm_state": "PENDING"
+  },
+  "artifacts": {
+    "active_monitor": {
+      "path": "benchmarks/results/active_stage2_extension_monitor_2026-05-23.json",
+      "sha256": "8d53a92096384ba59189df0d34f9d954e1a7fbe28ac41219287f3fa7e8821064"
+    },
+    "canonical_bundle": {
+      "path": "benchmarks/results/canonical_evidence_bundle_2026-05-20.json",
+      "sha256": "af9ec2e35931986c7caf63c178b7c482c3e93406f8d880774bbf8d114f27824c"
+    },
+    "reproduction_gap": {
+      "path": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json",
+      "sha256": "b5a37266b33dc7318b55a23569673467d11fa7aa67ba6725baaa374210a42820"
+    }
+  },
+  "completion_status": "in_progress",
+  "created_utc": "2026-05-23T16:33:21.375953+00:00",
+  "current_verdict": "Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style recovery remains unreproduced; the active 655.36M Stage-2 gate is testing whether recovery continues with more tokens.",
+  "git_head": "7168c8d6dca04b6df9e2be29980ea5c923dce086",
+  "headline_metrics": {
+    "bitdistill_327_68m_delta_vs_fp": -0.0881304126337239,
+    "bitdistill_327_68m_mnli": 0.7200203769740193,
+    "bitdistill_655_36m_status": "waiting_for_handoff",
+    "blind_ptq_fp_ppl": 13.901475466625362,
+    "blind_ptq_naive_ppl": 3813121.80332679,
+    "fp16_sft_mnli": 0.8081507896077432,
+    "qat_gap_vs_fp": -0.14470996363954236,
+    "qat_recovery_vs_ptq": 0.1507881833279739,
+    "qat_row_scale_ten_task_mean": 0.49945920048238823
+  },
+  "next_gates": [
+    {
+      "gate": "Stage-2 token-budget curve",
+      "minimum_next_point": "655.36M cumulative token presentations with the same downstream recipe",
+      "why": "Determine whether MNLI continues improving toward FP or saturates far below it."
+    },
+    {
+      "gate": "Loss-normalization/gradient-balance sweep",
+      "minimum_next_point": "component-gradient telemetry for gamma near equalized and paper values",
+      "why": "Paper gamma is only comparable if CE, logits KD, and attention KD reductions match."
+    },
+    {
+      "gate": "Same-artifact runtime quality",
+      "minimum_next_point": "packed classifier head or primary causal prompt-scoring evaluation",
+      "why": "The strongest PyTorch classifier result and strongest packed causal runtime are still separate artifacts."
+    },
+    {
+      "gate": "Backbone alignment",
+      "minimum_next_point": "one Qwen3-0.6B or exact Qwen2.5-0.5B MNLI run with matched logging",
+      "why": "Paper-scale claims need exact/closest public Qwen3/Qwen2.5 recipe alignment."
+    }
+  ],
+  "objective_achieved": false,
+  "publishable_scope": {
+    "not_publishable_as": [
+      "universal BitNet converter",
+      "paper-level BitDistill reproduction",
+      "Q4-quality I2_SR replacement",
+      "Kimi/MoE runtime support"
+    ],
+    "potentially_publishable_as": [
+      "negative blind-ternary-PTQ result for tested dense Qwen models",
+      "independent BitDistill reproduction-gap study",
+      "row-scale ternary runtime-contract evidence",
+      "I2_SR packed CPU row-scale extension for compatible causal artifacts",
+      "boundary study separating task quality, LM perplexity, RSS, file size, and throughput"
+    ]
+  },
+  "quality_claim": "mixed_completed_evidence_plus_active_pending_gate",
+  "requirements": [
+    {
+      "evidence": "FP WikiText PPL 13.901; naive PTQ PPL 3813121.803; FP ten-task mean 0.644169; PTQ mean 0.348671",
+      "remaining_gap": "Do not market as a universal converter.",
+      "requirement": "Arbitrary FP/BF16 to ternary retrofit",
+      "status": "rejected_for_tested_dense_qwen_setup"
+    },
+    {
+      "evidence": "FP16-SFT 0.808151; 327.68M BitDistill 0.720020; delta -0.088130",
+      "remaining_gap": "655.36M downstream MNLI is pending behind the active Stage-2 producer.",
+      "requirement": "BitDistill paper-level MNLI recovery",
+      "status": "not_reproduced"
+    },
+    {
+      "evidence": "default 0.487621; best budget row 0.628935; delta vs paper anchor +0.020935",
+      "remaining_gap": "This does not reproduce BitDistill recovery.",
+      "requirement": "BitNet-SFT baseline sanity",
+      "status": "locally_sanity_checked"
+    },
+    {
+      "evidence": "one-scale TL2 RMS error 1.904230; exact row-scale RMS error 0.000197",
+      "remaining_gap": "TL2 row-scale kernels are not implemented; I2_SR is the supported row-scale path.",
+      "requirement": "Row-scale runtime contract",
+      "status": "supported"
+    },
+    {
+      "evidence": "I2_SR file 1211.3 MiB; PPL 38.8477; prompt 211.67 tok/s; decode 19.07 tok/s",
+      "remaining_gap": "Not quality/storage competitive with Q4_K_M.",
+      "requirement": "Packed CPU I2_SR path",
+      "status": "working_not_q4_quality_competitive"
+    },
+    {
+      "evidence": "MNLI accuracy 0.652165; PyTorch agreement 0.976668; RSS 960.15 MiB",
+      "remaining_gap": "Agreement and task quality remain below product gates.",
+      "requirement": "Native packed classifier product",
+      "status": "research_demo_not_product_ready"
+    },
+    {
+      "evidence": "Only tiny Qwen2MoE fixture/plumbing exists; no Kimi quality or routed CPU runtime is proven.",
+      "remaining_gap": "Needs real routed model mapping, quality, and CPU runtime evidence.",
+      "requirement": "MoE/Kimi support",
+      "status": "not_supported"
+    }
+  ],
+  "schema": "bitnet-current-goal-status-v1"
+}
