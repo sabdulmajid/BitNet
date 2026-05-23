@@ -94,6 +94,8 @@ def audit_postprocess_script(path: Path = Path("slurm_stage2_655m_postprocess.sh
         "build_bitdistill_next_decision.py",
         "DECISION_JSON",
         "DECISION_MD",
+        "INGESTION_JSON",
+        "audit_stage2_655m_ingestion.py",
         "validate_reports_fail_closed.py",
     ]
     checks = check_snippets(script, required)

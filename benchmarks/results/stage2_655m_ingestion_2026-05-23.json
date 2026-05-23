@@ -1,0 +1,106 @@
+{
+  "complete": false,
+  "consistency_errors": [],
+  "controlled_curve": {
+    "exists": false,
+    "path": "benchmarks/results/bitdistill_controlled_curve_2026-05-23.json",
+    "target_row": {},
+    "target_row_exists": false
+  },
+  "created_utc": "2026-05-23T17:29:23.799838+00:00",
+  "downstream": {
+    "metric_accuracy": null,
+    "metric_eval_examples": null,
+    "metrics": {
+      "exists": false,
+      "path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json",
+      "size_bytes": null
+    },
+    "paired": {
+      "errors": [],
+      "matched": 0,
+      "missing": [
+        "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl"
+      ],
+      "status": "pending"
+    },
+    "prediction_error_count": 1,
+    "prediction_errors": [
+      "missing checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl"
+    ],
+    "prediction_rows": 0,
+    "predictions": {
+      "exists": false,
+      "path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
+      "size_bytes": null
+    }
+  },
+  "handoff": {
+    "downstream_job_id": "",
+    "job_id": "10255",
+    "report": {
+      "exists": false,
+      "path": "benchmarks/results/stage2_655m_handoff_2026-05-23.json",
+      "size_bytes": null
+    },
+    "slurm": {
+      "job_id": "10255",
+      "name": "bd-655m-handoff",
+      "reason": "(Dependency)",
+      "state": "PENDING",
+      "time": "0:00"
+    },
+    "status": "dependency_pending",
+    "submission": "benchmarks/results/stage2_655m_handoff_submission_2026-05-23.json"
+  },
+  "next_decision": {
+    "exists": true,
+    "path": "benchmarks/results/bitdistill_next_decision_2026-05-23.json",
+    "recommendation": "Wait for the active 655.36M Stage-2 producer, downstream MNLI, and postprocess reports.",
+    "status": "pending_655m_downstream"
+  },
+  "postprocess": {
+    "downstream_job_id": "",
+    "job_id": "",
+    "report": {
+      "exists": false,
+      "path": "benchmarks/results/stage2_655m_postprocess_2026-05-23.json",
+      "size_bytes": null
+    },
+    "status": null
+  },
+  "quality_claim": "none_until_complete_downstream_trace",
+  "reproduction_gap": {
+    "exists": true,
+    "latest_delta_vs_fp16": null,
+    "latest_mnli": null,
+    "latest_stage2_tokens": null,
+    "path": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json",
+    "status": "not_reproduced"
+  },
+  "schema": "bitdistill-655m-ingestion-audit-v1",
+  "source_paths": {
+    "controlled_curve": "benchmarks/results/bitdistill_controlled_curve_2026-05-23.json",
+    "handoff_report": "benchmarks/results/stage2_655m_handoff_2026-05-23.json",
+    "handoff_submission": "benchmarks/results/stage2_655m_handoff_submission_2026-05-23.json",
+    "next_decision": "benchmarks/results/bitdistill_next_decision_2026-05-23.json",
+    "postprocess_report": "benchmarks/results/stage2_655m_postprocess_2026-05-23.json",
+    "reference_predictions": "checkpoints/bitdistill-glue-seqcls-predtrace/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+    "reproduction_gap": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json",
+    "stage2_submission": "benchmarks/results/stage2_655m_submission_2026-05-23.json"
+  },
+  "stage2": {
+    "expected_completion_artifact": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/custom_state_dict.pt",
+    "job_id": "10250",
+    "slurm": {
+      "job_id": "10250",
+      "name": "bd-s2-655m",
+      "reason": "ece-nebula12",
+      "state": "RUNNING",
+      "time": "1:51:58"
+    }
+  },
+  "status": "pending_handoff",
+  "success_delta_from_fp": -0.01,
+  "target_stage2_tokens": 655360000
+}

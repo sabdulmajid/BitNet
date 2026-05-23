@@ -23,6 +23,8 @@ Quality claim: **none**. This validates queued script contents only.
 | local | build_bitdistill_next_decision.py | true |
 | local | DECISION_JSON | true |
 | local | DECISION_MD | true |
+| local | INGESTION_JSON | true |
+| local | audit_stage2_655m_ingestion.py | true |
 | local | validate_reports_fail_closed.py | true |
 | 10257 | write_status_report() | true |
 | 10257 | export ATTENTION_KD_WEIGHT=60 | true |

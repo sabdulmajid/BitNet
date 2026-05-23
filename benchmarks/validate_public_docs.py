@@ -158,6 +158,50 @@ def validate_stage2_handoff_submission(report: dict[str, Any], errors: list[str]
         errors.append(f"stage2 handoff: postprocess script does not exist: {postprocess_script}")
 
 
+def validate_stage2_ingestion(report: dict[str, Any], readme: str, errors: list[str]) -> None:
+    if report.get("schema") != "bitdistill-655m-ingestion-audit-v1":
+        errors.append(f"stage2 ingestion: unexpected schema {report.get('schema')}")
+    if report.get("quality_claim") != "none_until_complete_downstream_trace":
+        errors.append(f"stage2 ingestion: unexpected quality_claim {report.get('quality_claim')}")
+    allowed = {
+        "pending_handoff",
+        "handoff_failed",
+        "downstream_pending_or_running",
+        "downstream_incomplete",
+        "downstream_complete_pending_report_ingestion",
+        "ingested_reports_rebuilt",
+    }
+    status = report.get("status")
+    if status not in allowed:
+        errors.append(f"stage2 ingestion: unexpected status {status}")
+    if report.get("target_stage2_tokens") != 655360000:
+        errors.append(f"stage2 ingestion: unexpected target tokens {report.get('target_stage2_tokens')}")
+    if report.get("consistency_errors") not in ([], None):
+        errors.append(f"stage2 ingestion: consistency errors present: {report.get('consistency_errors')}")
+    downstream = report.get("downstream")
+    if not isinstance(downstream, dict):
+        errors.append("stage2 ingestion: missing downstream object")
+    else:
+        metrics = downstream.get("metrics")
+        predictions = downstream.get("predictions")
+        if not isinstance(metrics, dict) or not isinstance(metrics.get("exists"), bool):
+            errors.append("stage2 ingestion: malformed metrics file info")
+        if not isinstance(predictions, dict) or not isinstance(predictions.get("exists"), bool):
+            errors.append("stage2 ingestion: malformed predictions file info")
+    require_contains(
+        "README stage2 ingestion report",
+        "stage2_655m_ingestion_2026-05-23.md",
+        readme,
+        errors,
+    )
+    require_contains(
+        "README stage2 ingestion json",
+        "stage2_655m_ingestion_2026-05-23.json",
+        readme,
+        errors,
+    )
+
+
 def validate_gradient_telemetry_submission(report: dict[str, Any], errors: list[str]) -> None:
     if report.get("schema") != "bitdistill-gradient-telemetry-submission-v1":
         errors.append(f"gamma telemetry: unexpected schema {report.get('schema')}")
@@ -684,6 +728,11 @@ def main() -> int:
         default=Path("benchmarks/results/stage2_655m_handoff_submission_2026-05-23.json"),
     )
     parser.add_argument(
+        "--stage2-ingestion",
+        type=Path,
+        default=Path("benchmarks/results/stage2_655m_ingestion_2026-05-23.json"),
+    )
+    parser.add_argument(
         "--gamma-telemetry-submission",
         type=Path,
         default=Path("benchmarks/results/gamma60_telemetry_submission_2026-05-23.json"),
@@ -729,6 +778,7 @@ def main() -> int:
     reproduction_gap = load_json(args.reproduction_gap)
     stage2_extension = load_json(args.stage2_extension)
     stage2_handoff = load_json(args.stage2_handoff)
+    stage2_ingestion = load_json(args.stage2_ingestion)
     gamma_telemetry = load_json(args.gamma_telemetry_submission)
     stage2_monitor = load_json(args.stage2_monitor)
     current_goal_status = load_json(args.current_goal_status)
@@ -744,6 +794,7 @@ def main() -> int:
     validate_reproduction_gap(reproduction_gap, errors)
     validate_stage2_extension_submission(stage2_extension, errors)
     validate_stage2_handoff_submission(stage2_handoff, errors)
+    validate_stage2_ingestion(stage2_ingestion, readme, errors)
     validate_gradient_telemetry_submission(gamma_telemetry, errors)
     validate_active_stage2_monitor(stage2_monitor, errors)
     validate_current_goal_status(current_goal_status, errors)

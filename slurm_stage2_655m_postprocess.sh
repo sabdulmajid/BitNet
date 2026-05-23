@@ -25,6 +25,8 @@ GAP_JSON="${GAP_JSON:-benchmarks/results/bitdistill_reproduction_gap_${DATE}.jso
 GAP_MD="${GAP_MD:-benchmarks/results/bitdistill_reproduction_gap_${DATE}.md}"
 POSTPROCESS_JSON="${POSTPROCESS_JSON:-benchmarks/results/stage2_655m_postprocess_${DATE}.json}"
 POSTPROCESS_MD="${POSTPROCESS_MD:-benchmarks/results/stage2_655m_postprocess_${DATE}.md}"
+INGESTION_JSON="${INGESTION_JSON:-benchmarks/results/stage2_655m_ingestion_${DATE}.json}"
+INGESTION_MD="${INGESTION_MD:-benchmarks/results/stage2_655m_ingestion_${DATE}.md}"
 DECISION_JSON="${DECISION_JSON:-benchmarks/results/bitdistill_next_decision_${DATE}.json}"
 DECISION_MD="${DECISION_MD:-benchmarks/results/bitdistill_next_decision_${DATE}.md}"
 
@@ -87,6 +89,24 @@ if [[ ! -s "$METRICS_JSON" || ! -s "$PREDICTIONS_JSONL" ]]; then
   write_postprocess_report \
     "downstream_incomplete" \
     "Downstream metrics or prediction traces are missing. No quality reports were rebuilt."
+  python benchmarks/audit_stage2_655m_ingestion.py \
+    --postprocess-report "$POSTPROCESS_JSON" \
+    --controlled-curve "$CONTROLLED_JSON" \
+    --reproduction-gap "$GAP_JSON" \
+    --next-decision "$DECISION_JSON" \
+    --output-json "$INGESTION_JSON" \
+    --output-md "$INGESTION_MD"
+  python benchmarks/validate_reports_fail_closed.py \
+    "$POSTPROCESS_JSON" \
+    "$POSTPROCESS_MD" \
+    "$DECISION_JSON" \
+    "$DECISION_MD" \
+    "$INGESTION_JSON" \
+    "$INGESTION_MD" \
+    benchmarks/results/current_goal_status_2026-05-23.json \
+    benchmarks/results/current_goal_status_2026-05-23.md \
+    benchmarks/results/deep_research_handoff_2026-05-23.json \
+    benchmarks/results/deep_research_handoff_2026-05-23.md
   exit 0
 fi
 
@@ -108,6 +128,18 @@ python benchmarks/build_bitdistill_next_decision.py \
   --output-json "$DECISION_JSON" \
   --output-md "$DECISION_MD"
 
+write_postprocess_report \
+  "reports_rebuilt" \
+  "The controlled curve and reproduction-gap reports were rebuilt from completed downstream metrics and prediction traces."
+
+python benchmarks/audit_stage2_655m_ingestion.py \
+  --postprocess-report "$POSTPROCESS_JSON" \
+  --controlled-curve "$CONTROLLED_JSON" \
+  --reproduction-gap "$GAP_JSON" \
+  --next-decision "$DECISION_JSON" \
+  --output-json "$INGESTION_JSON" \
+  --output-md "$INGESTION_MD"
+
 python benchmarks/validate_reports_fail_closed.py \
   "$CONTROLLED_JSON" \
   "$CONTROLLED_MD" \
@@ -115,11 +147,9 @@ python benchmarks/validate_reports_fail_closed.py \
   "$GAP_MD" \
   "$DECISION_JSON" \
   "$DECISION_MD" \
+  "$INGESTION_JSON" \
+  "$INGESTION_MD" \
   benchmarks/results/current_goal_status_2026-05-23.json \
   benchmarks/results/current_goal_status_2026-05-23.md \
   benchmarks/results/deep_research_handoff_2026-05-23.json \
   benchmarks/results/deep_research_handoff_2026-05-23.md
-
-write_postprocess_report \
-  "reports_rebuilt" \
-  "The controlled curve and reproduction-gap reports were rebuilt from completed downstream metrics and prediction traces."
