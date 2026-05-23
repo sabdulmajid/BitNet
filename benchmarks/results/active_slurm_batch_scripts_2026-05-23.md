@@ -64,3 +64,11 @@ Quality claim: **none**. This validates queued script contents only.
 | 10258 | quality_claim | true |
 | 10258 | This afterany audit refreshes postmortem/salvage status only | true |
 | 10258 | exit "$EXIT_CODE" | true |
+
+## Dependency Graph
+
+| purpose | job | state | expected dependency | actual dependency | dependency matched | expected command | command matched | passed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 655M Stage-2 handoff dependency | 10255 | PENDING | afterok:10250 | afterok:10250 | true | slurm_stage2_655m_handoff.sh | true | true |
+| gamma-60 telemetry dependency | 10257 | PENDING | afterok:10250 | afterok:10250 | true | slurm_gamma60_telemetry.sh | true | true |
+| 655M Stage-2 afterany dependency | 10258 | PENDING | afterany:10250 | afterany:10250 | true | slurm_stage2_655m_afterany_audit.sh | true | true |

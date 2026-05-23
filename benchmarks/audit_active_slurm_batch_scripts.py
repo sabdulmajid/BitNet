@@ -58,6 +58,69 @@ def slurm_batch_script(job_id: str) -> tuple[str, str]:
         return script_path.read_text(encoding="utf-8", errors="replace"), stderr or stdout
 
 
+def scontrol_job_fields(job_id: str) -> dict[str, str]:
+    result = subprocess.run(
+        ["scontrol", "show", "job", "-o", job_id],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0 or not result.stdout.strip():
+        return {}
+    fields: dict[str, str] = {}
+    for token in result.stdout.strip().split():
+        if "=" not in token:
+            continue
+        key, value = token.split("=", 1)
+        fields[key] = value
+    return fields
+
+
+def normalize_dependency(value: str) -> str:
+    return value.split("(", 1)[0]
+
+
+def audit_dependency(
+    *,
+    purpose: str,
+    job_id: str,
+    expected_dependency: str,
+    expected_command_suffix: str,
+) -> dict[str, Any]:
+    slurm = squeue_state(job_id)
+    fields = scontrol_job_fields(job_id)
+    actual_dependency = fields.get("Dependency", "")
+    normalized_dependency = normalize_dependency(actual_dependency)
+    actual_command = fields.get("Command", "")
+    state = fields.get("JobState", slurm.get("state", ""))
+    scontrol_available = bool(fields)
+    # Completed jobs may age out of scontrol; while pending/running, the dependency must be visible.
+    must_match = slurm.get("state") in {"PENDING", "RUNNING"} or state in {"PENDING", "RUNNING"}
+    dependency_matches = normalized_dependency == expected_dependency
+    command_matches = actual_command.endswith(expected_command_suffix)
+    passed = (
+        dependency_matches
+        and command_matches
+        if scontrol_available
+        else not must_match
+    )
+    return {
+        "purpose": purpose,
+        "job_id": job_id,
+        "slurm": slurm,
+        "scontrol_available": scontrol_available,
+        "job_state": state,
+        "expected_dependency": expected_dependency,
+        "actual_dependency": actual_dependency,
+        "normalized_dependency": normalized_dependency,
+        "dependency_matches": dependency_matches,
+        "expected_command_suffix": expected_command_suffix,
+        "actual_command": actual_command,
+        "command_matches": command_matches,
+        "passed": passed,
+    }
+
+
 def check_snippets(script: str, required: list[str]) -> list[dict[str, Any]]:
     return [{"snippet": snippet, "present": snippet in script} for snippet in required]
 
@@ -191,17 +254,43 @@ def audit_afterany(submission: dict[str, Any]) -> dict[str, Any]:
 
 
 def build(args: argparse.Namespace) -> dict[str, Any]:
-    handoff = audit_handoff(read_json(args.handoff_submission))
+    handoff_submission = read_json(args.handoff_submission)
+    gamma_submission = read_json(args.gamma_submission)
+    afterany_submission = read_json(args.afterany_submission)
+    handoff = audit_handoff(handoff_submission)
     postprocess = audit_postprocess_script()
-    gamma = audit_gamma(read_json(args.gamma_submission))
-    afterany = audit_afterany(read_json(args.afterany_submission))
+    gamma = audit_gamma(gamma_submission)
+    afterany = audit_afterany(afterany_submission)
     checks = [handoff, postprocess, gamma, afterany]
+    dependency_checks = [
+        audit_dependency(
+            purpose="655M Stage-2 handoff dependency",
+            job_id=str(handoff_submission.get("handoff_job_id", "")),
+            expected_dependency=str(handoff_submission.get("dependency", "afterok:10250")),
+            expected_command_suffix="slurm_stage2_655m_handoff.sh",
+        ),
+        audit_dependency(
+            purpose="gamma-60 telemetry dependency",
+            job_id=str(gamma_submission.get("job_id", "")),
+            expected_dependency=str(gamma_submission.get("dependency", "afterok:10250")),
+            expected_command_suffix="slurm_gamma60_telemetry.sh",
+        ),
+        audit_dependency(
+            purpose="655M Stage-2 afterany dependency",
+            job_id=str(afterany_submission.get("job_id", "")),
+            expected_dependency=str(afterany_submission.get("dependency", "afterany:10250")),
+            expected_command_suffix="slurm_stage2_655m_afterany_audit.sh",
+        ),
+    ]
     return {
         "schema": "bitnet-active-slurm-batch-script-audit-v1",
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "quality_claim": "none",
-        "status": "passed" if all(check["passed"] for check in checks) else "failed",
+        "status": "passed"
+        if all(check["passed"] for check in checks) and all(check["passed"] for check in dependency_checks)
+        else "failed",
         "checks": checks,
+        "dependency_checks": dependency_checks,
     }
 
 
@@ -224,6 +313,7 @@ def md_table(headers: list[str], rows: list[list[Any]]) -> str:
 def render_markdown(report: dict[str, Any]) -> str:
     rows = []
     snippet_rows = []
+    dependency_rows = []
     for check in report["checks"]:
         rows.append(
             [
@@ -236,6 +326,20 @@ def render_markdown(report: dict[str, Any]) -> str:
         )
         for snippet in check["checks"]:
             snippet_rows.append([check["job_id"], snippet["snippet"], snippet["present"]])
+    for check in report["dependency_checks"]:
+        dependency_rows.append(
+            [
+                check["purpose"],
+                check["job_id"],
+                check["job_state"],
+                check["expected_dependency"],
+                check["normalized_dependency"],
+                check["dependency_matches"],
+                check["expected_command_suffix"],
+                check["command_matches"],
+                check["passed"],
+            ]
+        )
     return "\n\n".join(
         [
             "# Active Slurm Batch Script Audit",
@@ -244,6 +348,21 @@ def render_markdown(report: dict[str, Any]) -> str:
             md_table(["purpose", "job", "state", "script available", "passed"], rows),
             "## Required Snippets",
             md_table(["job", "snippet", "present"], snippet_rows),
+            "## Dependency Graph",
+            md_table(
+                [
+                    "purpose",
+                    "job",
+                    "state",
+                    "expected dependency",
+                    "actual dependency",
+                    "dependency matched",
+                    "expected command",
+                    "command matched",
+                    "passed",
+                ],
+                dependency_rows,
+            ),
             "",
         ]
     )

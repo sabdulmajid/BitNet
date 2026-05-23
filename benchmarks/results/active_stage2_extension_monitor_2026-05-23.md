@@ -6,7 +6,7 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | job | id | slurm state | time | reason |
 | --- | --- | --- | --- | --- |
-| stage2 | 10250 | RUNNING | 2:59:28 | ece-nebula12 |
+| stage2 | 10250 | RUNNING | 3:02:46 | ece-nebula12 |
 | handoff | 10255 | PENDING | 0:00 | (Dependency) |
 | gamma60 telemetry | 10257 | PENDING | 0:00 | (Dependency) |
 | downstream MNLI | - | not_submitted |  |  |
@@ -14,7 +14,7 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | stage2 field | value |
 | --- | --- |
-| latest_step | 5890 |
+| latest_step | 6000 |
 | max_steps | 40000 |
 | save_every_steps | 10000 |
 | snapshot_status | pre_first_snapshot |
@@ -22,26 +22,26 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | missing_output_dir_is_expected | True |
 | first_snapshot_step | 10000 |
 | next_snapshot_step | 10000 |
-| progress | 0.147250 |
-| latest_ce | 3.240129 |
+| progress | 0.150000 |
+| latest_ce | 3.505086 |
 | latest_lr | 0.000002 |
 | log_freshness_status | fresh_running_log |
 | log_health_status | healthy |
 | producer_config_status | matched |
-| log_age_seconds | 4.250098 |
+| log_age_seconds | 2.481001 |
 | time_limit_status | within_time_limit |
-| time_limit_margin_seconds | 13624.768761 |
-| log_elapsed_seconds | 10707.200000 |
-| parsed_log_rows | 590 |
+| time_limit_margin_seconds | 13627.100000 |
+| log_elapsed_seconds | 10907.100000 |
+| parsed_log_rows | 601 |
 | recent_window_rows | 20 |
-| recent_ce_mean | 3.759052 |
+| recent_ce_mean | 3.690000 |
 | recent_ce_min | 3.240129 |
-| recent_ce_max | 4.225643 |
-| seconds_per_step | 1.817861 |
-| steps_per_hour | 1980.349671 |
-| eta_hours | 17.224231 |
-| estimated_completion_utc | 2026-05-24T11:50:20.446896+00:00 |
-| segment_token_presentations_per_second | 4506.395696 |
+| recent_ce_max | 4.146634 |
+| seconds_per_step | 1.817850 |
+| steps_per_hour | 1980.361416 |
+| eta_hours | 17.168583 |
+| estimated_completion_utc | 2026-05-24T11:50:18.026287+00:00 |
+| segment_token_presentations_per_second | 4506.422422 |
 | latest_complete_snapshot_step | - |
 | cumulative_token_presentations | 655360000 |
 
@@ -51,13 +51,13 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | --- | --- |
 | status | within_time_limit |
 | slurm_state | RUNNING |
-| elapsed | 2:59:28 |
+| elapsed | 3:02:46 |
 | time_limit | 1-00:00:00 |
-| elapsed_seconds | 10768 |
+| elapsed_seconds | 10966 |
 | time_limit_seconds | 86400 |
-| eta_seconds | 62007.231239 |
-| remaining_seconds | 75632 |
-| margin_seconds | 13624.768761 |
+| eta_seconds | 61806.900000 |
+| remaining_seconds | 75434 |
+| margin_seconds | 13627.100000 |
 | tight_margin_threshold_seconds | 1800 |
 | caveat | Compares current ETA with Slurm time remaining; it is a runtime-risk signal, not quality evidence. |
 
@@ -68,9 +68,9 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | status | fresh_running_log |
 | path | logs/bd-s2-655m-10250.out |
 | exists | True |
-| checked_utc | 2026-05-23T18:36:53.216230+00:00 |
-| mtime_utc | 2026-05-23T18:36:48.966132+00:00 |
-| age_seconds | 4.250098 |
+| checked_utc | 2026-05-23T18:40:11.126825+00:00 |
+| mtime_utc | 2026-05-23T18:40:08.645824+00:00 |
+| age_seconds | 2.481001 |
 | stale_after_seconds | 900 |
 | slurm_state | RUNNING |
 | caveat | Fresh logs are required while the Stage-2 producer is running. |
@@ -81,16 +81,16 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | --- | --- |
 | status | healthy |
 | path | logs/bd-s2-655m-10250.out |
-| parsed_step_rows | 590 |
+| parsed_step_rows | 601 |
 | first_step | 1 |
-| latest_step | 5890 |
-| latest_ce | 3.240129 |
+| latest_step | 6000 |
+| latest_ce | 3.505086 |
 | latest_lr | 0.000002 |
-| latest_elapsed_seconds | 10707.200000 |
+| latest_elapsed_seconds | 10907.100000 |
 | recent_window_rows | 20 |
-| recent_ce_mean | 3.759052 |
+| recent_ce_mean | 3.690000 |
 | recent_ce_min | 3.240129 |
-| recent_ce_max | 4.225643 |
+| recent_ce_max | 4.146634 |
 | issue_count | 0 |
 | fatal_match_count | 0 |
 | caveat | This checks producer log structure and fatal patterns; it is not quality evidence. |

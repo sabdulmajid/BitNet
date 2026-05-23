@@ -5,14 +5,14 @@
     "afterany_status": "dependency_pending",
     "downstream_complete": false,
     "downstream_status": "waiting_for_handoff",
-    "eta_hours": 17.22423089983022,
-    "latest_ce": 3.240129,
+    "eta_hours": 17.168583333333334,
+    "latest_ce": 3.505086,
     "latest_complete_snapshot_step": null,
-    "latest_step": 5890,
+    "latest_step": 6000,
     "log_health_status": "healthy",
     "max_steps": 40000,
     "producer_config_status": "matched",
-    "progress": 0.14725,
+    "progress": 0.15,
     "snapshot_salvage_complete_count": 0,
     "snapshot_salvage_status": "no_snapshot_expected_yet",
     "stage2_job_id": "10250",
@@ -20,7 +20,7 @@
     "stage2_status": "running",
     "telemetry_job_id": "10257",
     "telemetry_slurm_state": "PENDING",
-    "time_limit_margin_seconds": 13624.768760611201,
+    "time_limit_margin_seconds": 13627.099999999999,
     "time_limit_status": "within_time_limit"
   },
   "completed_findings": [
@@ -55,7 +55,7 @@
       "interpretation": "The systems path is real, but quality/storage tradeoffs remain unfavorable versus mature Q4."
     }
   ],
-  "created_utc": "2026-05-23T18:36:53.865728+00:00",
+  "created_utc": "2026-05-23T18:40:11.801700+00:00",
   "next_action": {
     "blueprint_action": "wait_and_watch_655m_gate",
     "claim_boundary": "status only; quality_claim remains none until ingestion is ingested_reports_rebuilt",
@@ -103,7 +103,7 @@
   ],
   "open_questions": [
     {
-      "current_state": "running; step 5890/40000; downstream waiting_for_handoff.",
+      "current_state": "running; step 6000/40000; downstream waiting_for_handoff.",
       "evidence_needed": "Completed 655M Stage-2 manifest plus downstream MNLI metrics.json and eval_predictions.jsonl.",
       "question": "Does the Stage-2 token-budget curve keep improving at 655.36M tokens?"
     },
@@ -143,15 +143,15 @@
     },
     "current_status": {
       "path": "benchmarks/results/current_goal_status_2026-05-23.json",
-      "sha256": "109ef7bf02a8affcd295582bd41e0cd7f781f7198690f0ff866ea53f0853f306"
+      "sha256": "a1789c98a832f3dae3e6b8c26a8dec7232715f2f02f5e80c0dea378d791415cc"
     },
     "next_decision": {
       "path": "benchmarks/results/bitdistill_next_decision_2026-05-23.json",
-      "sha256": "b415f542b4d0f147835d7d82fbdfee9fc3e5351ee50e066e5cf07c2553491950"
+      "sha256": "4907933a122d1385a297a2f69aac31535c69dee18bb5066fa9503aa1562166f6"
     },
     "next_experiment_blueprint": {
       "path": "benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.json",
-      "sha256": "a6c4f974fdb64141bf65f12277caea0a2b88550e60a7f4d794bcbf669b8a1070"
+      "sha256": "c0e4d1906d8d4a870d2ef339024f6d9764aa38e73eb558216cabf2e08aa3e5b7"
     },
     "reproduction_gap": {
       "path": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json",

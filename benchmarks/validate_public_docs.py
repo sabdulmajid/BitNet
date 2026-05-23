@@ -386,6 +386,42 @@ def validate_active_slurm_batch_scripts(report: dict[str, Any], errors: list[str
         ]
         if missing:
             errors.append(f"slurm batch audit: {purpose} missing snippets: {missing}")
+    dependency_checks = report.get("dependency_checks")
+    if not isinstance(dependency_checks, list) or not dependency_checks:
+        errors.append("slurm batch audit: missing dependency checks")
+    else:
+        by_dependency_purpose = {
+            str(check.get("purpose")): check
+            for check in dependency_checks
+            if isinstance(check, dict) and check.get("purpose") is not None
+        }
+        expected = {
+            "655M Stage-2 handoff dependency": ("afterok:10250", "slurm_stage2_655m_handoff.sh"),
+            "gamma-60 telemetry dependency": ("afterok:10250", "slurm_gamma60_telemetry.sh"),
+            "655M Stage-2 afterany dependency": ("afterany:10250", "slurm_stage2_655m_afterany_audit.sh"),
+        }
+        for purpose, (dependency, command_suffix) in expected.items():
+            check = by_dependency_purpose.get(purpose)
+            if not isinstance(check, dict):
+                errors.append(f"slurm batch audit: missing dependency purpose {purpose}")
+                continue
+            if check.get("passed") is not True:
+                errors.append(f"slurm batch audit: dependency check failed for {purpose}")
+            if check.get("expected_dependency") != dependency:
+                errors.append(
+                    f"slurm batch audit: {purpose} expected dependency {check.get('expected_dependency')} != {dependency}"
+                )
+            if check.get("normalized_dependency") != dependency:
+                errors.append(
+                    f"slurm batch audit: {purpose} actual dependency {check.get('normalized_dependency')} != {dependency}"
+                )
+            if check.get("expected_command_suffix") != command_suffix:
+                errors.append(
+                    f"slurm batch audit: {purpose} expected command suffix "
+                    f"{check.get('expected_command_suffix')} != {command_suffix}"
+                )
+            if check.get("command_matches") is not True:
+                errors.append(f"slurm batch audit: {purpose} command suffix did not match")
 
 
 def validate_active_stage2_monitor(report: dict[str, Any], errors: list[str]) -> None:

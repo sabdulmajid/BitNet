@@ -5,14 +5,14 @@
     "afterany_status": "dependency_pending",
     "downstream_complete": false,
     "downstream_status": "waiting_for_handoff",
-    "eta_hours": 17.22423089983022,
-    "latest_ce": 3.240129,
+    "eta_hours": 17.168583333333334,
+    "latest_ce": 3.505086,
     "latest_complete_snapshot_step": null,
-    "latest_step": 5890,
+    "latest_step": 6000,
     "log_health_status": "healthy",
     "max_steps": 40000,
     "producer_config_status": "matched",
-    "progress": 0.14725,
+    "progress": 0.15,
     "snapshot_salvage_complete_count": 0,
     "snapshot_salvage_status": "no_snapshot_expected_yet",
     "stage2_job_id": "10250",
@@ -20,13 +20,13 @@
     "stage2_status": "running",
     "telemetry_job_id": "10257",
     "telemetry_slurm_state": "PENDING",
-    "time_limit_margin_seconds": 13624.768760611201,
+    "time_limit_margin_seconds": 13627.099999999999,
     "time_limit_status": "within_time_limit"
   },
   "artifacts": {
     "active_monitor": {
       "path": "benchmarks/results/active_stage2_extension_monitor_2026-05-23.json",
-      "sha256": "6fe9af765bc9829bbdc4535ad8b4c841be6b6c629421ffc78990baf200ed54bb"
+      "sha256": "a98c4f533ee0ce840c2781406eb75dff92df1037d1bb415b5ff75a56fa6ed5ca"
     },
     "afterany_submission": {
       "path": "benchmarks/results/stage2_655m_afterany_submission_2026-05-23.json",
@@ -42,13 +42,13 @@
     },
     "snapshot_salvage": {
       "path": "benchmarks/results/stage2_snapshot_salvage_2026-05-23.json",
-      "sha256": "f7a71b81ffcef942ae08336c67313027b5f3e490d037ea0cfbe189be4e5a739b"
+      "sha256": "d3373bdcbd91c9395f7c0884168cdad48a6445697009bac89017e7bd6790af3c"
     }
   },
   "completion_status": "in_progress",
-  "created_utc": "2026-05-23T18:36:53.781840+00:00",
+  "created_utc": "2026-05-23T18:40:11.721532+00:00",
   "current_verdict": "Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style recovery status is not_reproduced; the active 655.36M Stage-2 gate is testing whether recovery continues with more tokens.",
-  "git_head": "47406d73d86294e77649930e6eb263417cdbe619",
+  "git_head": "5210279f2052fa330a5c0d7f844c71487a70a36a",
   "headline_metrics": {
     "bitdistill_327_68m_delta_vs_fp": -0.0881304126337239,
     "bitdistill_327_68m_mnli": 0.7200203769740193,
