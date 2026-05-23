@@ -202,6 +202,76 @@ def validate_stage2_ingestion(report: dict[str, Any], readme: str, errors: list[
     )
 
 
+def validate_stage2_snapshot_salvage(report: dict[str, Any], readme: str, errors: list[str]) -> None:
+    if report.get("schema") != "bitdistill-stage2-snapshot-salvage-v1":
+        errors.append(f"stage2 snapshot salvage: unexpected schema {report.get('schema')}")
+    if report.get("quality_claim") != "none":
+        errors.append(f"stage2 snapshot salvage: unexpected quality_claim {report.get('quality_claim')}")
+    allowed_statuses = {
+        "no_snapshot_expected_yet",
+        "waiting_for_snapshot",
+        "salvage_available",
+        "final_snapshot_available",
+        "failed_no_salvage_snapshot",
+        "invalid_snapshot_metadata",
+    }
+    status = report.get("status")
+    if status not in allowed_statuses:
+        errors.append(f"stage2 snapshot salvage: unexpected status {status}")
+    if status == "invalid_snapshot_metadata":
+        errors.append("stage2 snapshot salvage: invalid snapshot metadata present")
+    if report.get("stage2_job_id") != "10250":
+        errors.append(f"stage2 snapshot salvage: unexpected job id {report.get('stage2_job_id')}")
+    if report.get("target_cumulative_token_presentations") != 655360000:
+        errors.append(
+            "stage2 snapshot salvage: unexpected target cumulative tokens "
+            f"{report.get('target_cumulative_token_presentations')}"
+        )
+    snapshots = report.get("snapshots")
+    if not isinstance(snapshots, list) or len(snapshots) != 4:
+        errors.append("stage2 snapshot salvage: expected four 10k-step snapshot rows")
+    else:
+        for snapshot in snapshots:
+            if not isinstance(snapshot, dict):
+                errors.append("stage2 snapshot salvage: snapshot row is not an object")
+                continue
+            if snapshot.get("validation_errors") not in ([], None):
+                errors.append(
+                    "stage2 snapshot salvage: snapshot validation errors present: "
+                    f"{snapshot.get('validation_errors')}"
+                )
+            state = snapshot.get("state")
+            metrics = snapshot.get("metrics_file")
+            if not isinstance(state, dict) or not isinstance(metrics, dict):
+                errors.append("stage2 snapshot salvage: malformed snapshot file info")
+    if status == "no_snapshot_expected_yet":
+        latest_step = report.get("latest_logged_step")
+        save_every_steps = report.get("save_every_steps")
+        if isinstance(latest_step, int) and isinstance(save_every_steps, int) and latest_step >= save_every_steps:
+            errors.append("stage2 snapshot salvage: no_snapshot_expected_yet after save interval")
+    complete_count = report.get("complete_snapshot_count")
+    if not isinstance(complete_count, int):
+        errors.append("stage2 snapshot salvage: complete_snapshot_count must be an integer")
+    best = report.get("best_salvage_snapshot")
+    if complete_count and not isinstance(best, dict):
+        errors.append("stage2 snapshot salvage: complete snapshots exist but best_salvage_snapshot is missing")
+    caveat = report.get("caveat")
+    if not isinstance(caveat, str) or "does not run downstream evaluation" not in caveat:
+        errors.append("stage2 snapshot salvage: caveat must prohibit quality claims")
+    require_contains(
+        "README stage2 snapshot salvage report",
+        "stage2_snapshot_salvage_2026-05-23.md",
+        readme,
+        errors,
+    )
+    require_contains(
+        "README stage2 snapshot salvage json",
+        "stage2_snapshot_salvage_2026-05-23.json",
+        readme,
+        errors,
+    )
+
+
 def validate_gradient_telemetry_submission(report: dict[str, Any], errors: list[str]) -> None:
     if report.get("schema") != "bitdistill-gradient-telemetry-submission-v1":
         errors.append(f"gamma telemetry: unexpected schema {report.get('schema')}")
@@ -1064,6 +1134,11 @@ def main() -> int:
         default=Path("benchmarks/results/stage2_655m_ingestion_2026-05-23.json"),
     )
     parser.add_argument(
+        "--stage2-snapshot-salvage",
+        type=Path,
+        default=Path("benchmarks/results/stage2_snapshot_salvage_2026-05-23.json"),
+    )
+    parser.add_argument(
         "--gamma-telemetry-submission",
         type=Path,
         default=Path("benchmarks/results/gamma60_telemetry_submission_2026-05-23.json"),
@@ -1125,6 +1200,7 @@ def main() -> int:
     stage2_extension = load_json(args.stage2_extension)
     stage2_handoff = load_json(args.stage2_handoff)
     stage2_ingestion = load_json(args.stage2_ingestion)
+    stage2_snapshot_salvage = load_json(args.stage2_snapshot_salvage)
     gamma_telemetry = load_json(args.gamma_telemetry_submission)
     stage2_monitor = load_json(args.stage2_monitor)
     current_goal_status = load_json(args.current_goal_status)
@@ -1145,6 +1221,7 @@ def main() -> int:
     validate_stage2_extension_submission(stage2_extension, errors)
     validate_stage2_handoff_submission(stage2_handoff, errors)
     validate_stage2_ingestion(stage2_ingestion, readme, errors)
+    validate_stage2_snapshot_salvage(stage2_snapshot_salvage, readme, errors)
     validate_gradient_telemetry_submission(gamma_telemetry, errors)
     validate_active_stage2_monitor(stage2_monitor, errors)
     validate_current_goal_status(current_goal_status, errors)

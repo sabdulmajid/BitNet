@@ -59,6 +59,7 @@ def report_status(path: Path) -> Any:
 def build_summary() -> dict[str, Any]:
     monitor = read_json(Path(f"benchmarks/results/active_stage2_extension_monitor_{DATE}.json"))
     ingestion = read_json(Path(f"benchmarks/results/stage2_655m_ingestion_{DATE}.json"))
+    salvage = read_json(Path(f"benchmarks/results/stage2_snapshot_salvage_{DATE}.json"))
     slurm_scripts = read_json(Path(f"benchmarks/results/active_slurm_batch_scripts_{DATE}.json"))
     traceability = read_json(Path(f"benchmarks/results/bitdistill_goal_traceability_{DATE}.json"))
     next_decision = read_json(Path(f"benchmarks/results/bitdistill_next_decision_{DATE}.json"))
@@ -72,6 +73,8 @@ def build_summary() -> dict[str, Any]:
     return {
         "monitor_status": monitor.get("status"),
         "ingestion_status": ingestion.get("status"),
+        "snapshot_salvage_status": salvage.get("status"),
+        "snapshot_salvage_complete_count": salvage.get("complete_snapshot_count"),
         "slurm_script_status": slurm_scripts.get("status"),
         "traceability_status": traceability.get("completion_status"),
         "next_decision_status": next_decision.get("status"),
@@ -188,6 +191,8 @@ def main() -> int:
         f"benchmarks/results/active_stage2_extension_monitor_{args.date}.md",
         f"benchmarks/results/stage2_655m_ingestion_{args.date}.json",
         f"benchmarks/results/stage2_655m_ingestion_{args.date}.md",
+        f"benchmarks/results/stage2_snapshot_salvage_{args.date}.json",
+        f"benchmarks/results/stage2_snapshot_salvage_{args.date}.md",
         f"benchmarks/results/active_slurm_batch_scripts_{args.date}.json",
         f"benchmarks/results/active_slurm_batch_scripts_{args.date}.md",
         f"benchmarks/results/current_goal_status_{args.date}.json",
@@ -208,6 +213,7 @@ def main() -> int:
     commands = [
         ["monitor active Stage-2 extension", [python, "benchmarks/monitor_active_stage2_extension.py"]],
         ["audit 655M ingestion", [python, "benchmarks/audit_stage2_655m_ingestion.py"]],
+        ["audit Stage-2 snapshot salvage", [python, "benchmarks/audit_stage2_snapshot_salvage.py"]],
         ["audit active Slurm batch scripts", [python, "benchmarks/audit_active_slurm_batch_scripts.py"]],
         ["build next decision", [python, "benchmarks/build_bitdistill_next_decision.py"]],
         ["build next experiment blueprint", [python, "benchmarks/build_bitdistill_next_experiment_blueprint.py"]],
@@ -242,6 +248,7 @@ def main() -> int:
         "source_paths": {
             "active_monitor": f"benchmarks/results/active_stage2_extension_monitor_{args.date}.json",
             "ingestion": f"benchmarks/results/stage2_655m_ingestion_{args.date}.json",
+            "snapshot_salvage": f"benchmarks/results/stage2_snapshot_salvage_{args.date}.json",
             "slurm_script_audit": f"benchmarks/results/active_slurm_batch_scripts_{args.date}.json",
             "traceability": f"benchmarks/results/bitdistill_goal_traceability_{args.date}.json",
             "paper_alignment": f"benchmarks/results/bitdistill_paper_alignment_{args.date}.json",
