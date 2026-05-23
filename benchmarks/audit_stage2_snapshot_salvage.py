@@ -258,6 +258,9 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     stage2 = monitor.get("stage2", {}) if isinstance(monitor.get("stage2"), dict) else {}
     latest = stage2.get("latest_step", {}) if isinstance(stage2.get("latest_step"), dict) else {}
     latest_step = latest.get("step") if isinstance(latest.get("step"), int) else None
+    monitor_snapshot_status = (
+        stage2.get("snapshot_status", {}) if isinstance(stage2.get("snapshot_status"), dict) else {}
+    )
     job_id = str(submission.get("submitted_job_id") or "")
     slurm = squeue_state(job_id)
     snapshots = [
@@ -303,6 +306,9 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "latest_logged_step": latest_step,
         "max_steps": max_steps,
         "save_every_steps": save_every_steps,
+        "next_snapshot_step": monitor_snapshot_status.get("next_snapshot_step"),
+        "steps_to_next_snapshot": monitor_snapshot_status.get("steps_to_next_snapshot"),
+        "next_snapshot_eta_hours": monitor_snapshot_status.get("next_snapshot_eta_hours"),
         "parent_manifest": parent,
         "target_cumulative_token_presentations": config["cumulative_token_presentations"],
         "complete_snapshot_count": len(complete),
@@ -348,6 +354,9 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["latest_logged_step", report["latest_logged_step"]],
                     ["max_steps", report["max_steps"]],
                     ["save_every_steps", report["save_every_steps"]],
+                    ["next_snapshot_step", report["next_snapshot_step"]],
+                    ["steps_to_next_snapshot", report["steps_to_next_snapshot"]],
+                    ["next_snapshot_eta_hours", report["next_snapshot_eta_hours"]],
                     ["complete_snapshot_count", report["complete_snapshot_count"]],
                     ["target_cumulative_token_presentations", report["target_cumulative_token_presentations"]],
                     ["recommendation", report["recommendation"]],

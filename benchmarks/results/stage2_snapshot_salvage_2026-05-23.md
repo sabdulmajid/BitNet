@@ -1,6 +1,6 @@
 # Stage-2 Snapshot Salvage Audit
 
-Generated: `2026-05-23T18:44:53.493776+00:00`
+Generated: `2026-05-23T18:48:45.011146+00:00`
 
 Status: **no_snapshot_expected_yet**.
 
@@ -14,10 +14,13 @@ This inventories Stage-2 checkpoints for failover only. It does not run downstre
 | --- | --- |
 | stage2_job_id | 10250 |
 | slurm_state | RUNNING |
-| slurm_time | 3:07:28 |
-| latest_logged_step | 6150 |
+| slurm_time | 3:11:20 |
+| latest_logged_step | 6280 |
 | max_steps | 40000 |
 | save_every_steps | 10000 |
+| next_snapshot_step | 10000 |
+| steps_to_next_snapshot | 3720 |
+| next_snapshot_eta_hours | 1.878478 |
 | complete_snapshot_count | 0 |
 | target_cumulative_token_presentations | 655360000 |
 | recommendation | Keep watching; no checkpoint is expected before the first save interval. |

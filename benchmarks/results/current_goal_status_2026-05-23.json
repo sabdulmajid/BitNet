@@ -5,28 +5,31 @@
     "afterany_status": "dependency_pending",
     "downstream_complete": false,
     "downstream_status": "waiting_for_handoff",
-    "eta_hours": 17.09302687443541,
-    "latest_ce": 3.449912,
+    "eta_hours": 17.027496284501062,
+    "latest_ce": 3.764886,
     "latest_complete_snapshot_step": null,
-    "latest_step": 6150,
+    "latest_step": 6280,
     "log_health_status": "healthy",
     "max_steps": 40000,
+    "next_snapshot_eta_hours": 1.878478237791932,
+    "next_snapshot_step": 10000,
     "producer_config_status": "matched",
-    "progress": 0.15375,
+    "progress": 0.157,
     "snapshot_salvage_complete_count": 0,
     "snapshot_salvage_status": "no_snapshot_expected_yet",
     "stage2_job_id": "10250",
     "stage2_slurm_state": "RUNNING",
     "stage2_status": "running",
+    "steps_to_next_snapshot": 3720,
     "telemetry_job_id": "10257",
     "telemetry_slurm_state": "PENDING",
-    "time_limit_margin_seconds": 13617.103252032524,
+    "time_limit_margin_seconds": 13622.013375796181,
     "time_limit_status": "within_time_limit"
   },
   "artifacts": {
     "active_monitor": {
       "path": "benchmarks/results/active_stage2_extension_monitor_2026-05-23.json",
-      "sha256": "e2532bd3eb9812213399e72b20256e56d7c10261e86a80ccda7cd944db47a784"
+      "sha256": "c919a39a40b9817bff57864189ce54abe9368d533c2d3eedfc3c5854339fb883"
     },
     "afterany_submission": {
       "path": "benchmarks/results/stage2_655m_afterany_submission_2026-05-23.json",
@@ -42,13 +45,13 @@
     },
     "snapshot_salvage": {
       "path": "benchmarks/results/stage2_snapshot_salvage_2026-05-23.json",
-      "sha256": "d933beb59989a291f4ebdd1700337dfd5cbd706a6587d67682e742520d239b13"
+      "sha256": "f381d190d3dd5c8dbf471c5cea23f5ce988e238ed44b49fcd144b7bf1805bab2"
     }
   },
   "completion_status": "in_progress",
-  "created_utc": "2026-05-23T18:44:53.894616+00:00",
+  "created_utc": "2026-05-23T18:48:45.423678+00:00",
   "current_verdict": "Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style recovery status is not_reproduced; the active 655.36M Stage-2 gate is testing whether recovery continues with more tokens.",
-  "git_head": "98bcefca9547c70cc1225ba2414d87439867e046",
+  "git_head": "1a54f398ba018822c84f18e0f5208f96ca80c20b",
   "headline_metrics": {
     "bitdistill_327_68m_delta_vs_fp": -0.0881304126337239,
     "bitdistill_327_68m_mnli": 0.7200203769740193,

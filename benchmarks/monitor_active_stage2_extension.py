@@ -467,10 +467,12 @@ def snapshot_gate(
     first_snapshot_step = save_every_steps if save_every_steps > 0 else None
     complete_steps = [snapshot["step"] for snapshot in snapshots if snapshot["complete"]]
     next_snapshot_step = None
+    steps_to_next_snapshot = None
     if isinstance(step, int) and save_every_steps > 0:
         for snapshot_step in range(save_every_steps, max_steps + 1, save_every_steps):
             if snapshot_step > step:
                 next_snapshot_step = snapshot_step
+                steps_to_next_snapshot = snapshot_step - step
                 break
     if not isinstance(step, int):
         status = "log_not_parsed"
@@ -497,6 +499,7 @@ def snapshot_gate(
         "save_every_steps": save_every_steps,
         "first_snapshot_step": first_snapshot_step,
         "next_snapshot_step": next_snapshot_step,
+        "steps_to_next_snapshot": steps_to_next_snapshot,
         "latest_complete_snapshot_step": complete_steps[-1] if complete_steps else None,
         "missing_output_dir_is_expected": missing_output_dir_is_expected,
         "caveat": (
@@ -722,6 +725,20 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
         save_every_steps=save_every_steps,
         snapshots=snapshots,
     )
+    next_snapshot_steps = snapshot_status.get("steps_to_next_snapshot")
+    seconds_per_step = progress_estimate.get("seconds_per_step")
+    if isinstance(next_snapshot_steps, int) and isinstance(seconds_per_step, (int, float)):
+        next_snapshot_eta_seconds = float(next_snapshot_steps) * float(seconds_per_step)
+        snapshot_status["next_snapshot_eta_seconds"] = next_snapshot_eta_seconds
+        snapshot_status["next_snapshot_eta_hours"] = next_snapshot_eta_seconds / 3600.0
+        snapshot_status["estimated_next_snapshot_utc"] = datetime.fromtimestamp(
+            datetime.now(timezone.utc).timestamp() + next_snapshot_eta_seconds,
+            tz=timezone.utc,
+        ).isoformat()
+    else:
+        snapshot_status["next_snapshot_eta_seconds"] = None
+        snapshot_status["next_snapshot_eta_hours"] = None
+        snapshot_status["estimated_next_snapshot_utc"] = None
 
     return {
         "schema": "bitnet-active-stage2-extension-monitor-v1",
@@ -920,6 +937,8 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["missing_output_dir_is_expected", snapshot_status["missing_output_dir_is_expected"]],
                     ["first_snapshot_step", snapshot_status["first_snapshot_step"]],
                     ["next_snapshot_step", snapshot_status["next_snapshot_step"]],
+                    ["steps_to_next_snapshot", snapshot_status["steps_to_next_snapshot"]],
+                    ["next_snapshot_eta_hours", snapshot_status["next_snapshot_eta_hours"]],
                     ["progress", stage2["progress"]],
                     ["latest_ce", latest.get("ce", "")],
                     ["latest_lr", latest.get("lr", "")],
@@ -1035,6 +1054,9 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["output_dir_exists", snapshot_status["output_dir_exists"]],
                     ["first_snapshot_step", snapshot_status["first_snapshot_step"]],
                     ["next_snapshot_step", snapshot_status["next_snapshot_step"]],
+                    ["steps_to_next_snapshot", snapshot_status["steps_to_next_snapshot"]],
+                    ["next_snapshot_eta_hours", snapshot_status["next_snapshot_eta_hours"]],
+                    ["estimated_next_snapshot_utc", snapshot_status["estimated_next_snapshot_utc"]],
                     ["latest_complete_snapshot_step", snapshot_status["latest_complete_snapshot_step"]],
                     ["missing_output_dir_is_expected", snapshot_status["missing_output_dir_is_expected"]],
                     ["caveat", snapshot_status["caveat"]],

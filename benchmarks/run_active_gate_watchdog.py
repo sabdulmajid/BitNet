@@ -71,11 +71,15 @@ def build_summary() -> dict[str, Any]:
     log_freshness = stage2.get("log_freshness", {}) if isinstance(stage2.get("log_freshness"), dict) else {}
     log_health = stage2.get("log_health", {}) if isinstance(stage2.get("log_health"), dict) else {}
     producer_config = stage2.get("producer_config", {}) if isinstance(stage2.get("producer_config"), dict) else {}
+    snapshot_status = stage2.get("snapshot_status", {}) if isinstance(stage2.get("snapshot_status"), dict) else {}
     return {
         "monitor_status": monitor.get("status"),
         "ingestion_status": ingestion.get("status"),
         "snapshot_salvage_status": salvage.get("status"),
         "snapshot_salvage_complete_count": salvage.get("complete_snapshot_count"),
+        "next_snapshot_step": snapshot_status.get("next_snapshot_step"),
+        "steps_to_next_snapshot": snapshot_status.get("steps_to_next_snapshot"),
+        "next_snapshot_eta_hours": snapshot_status.get("next_snapshot_eta_hours"),
         "afterany_job_id": afterany.get("job_id"),
         "afterany_status": afterany.get("status"),
         "slurm_script_status": slurm_scripts.get("status"),
