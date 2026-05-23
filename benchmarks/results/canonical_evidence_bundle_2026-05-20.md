@@ -16,7 +16,7 @@ This bundle is manifest/artifact based. Missing artifacts are fatal while buildi
 
 | label | path | sha256 |
 | --- | --- | --- |
-| controlled_curve | benchmarks/results/bitdistill_controlled_curve_2026-05-20.json | 5b09d697182c852899781af932c193f525062bc190d888c2b0ff17cb8b7dd3d9 |
+| controlled_curve | benchmarks/results/bitdistill_controlled_curve_2026-05-20.json | d892817f387ff52f1105439e6b7a7c2417d7c0124b0d0dbf56adb3f7585f6356 |
 | cpu_frontier | benchmark_results/cpu_tradeoff_frontier_2026-05-15.json | 792515abce6eff6c0521a6cddfb8243c7778d254fabfbcf793e9a3529f1045f2 |
 | fp_lm_eval | benchmark_results/lm-eval-qwen15b-full10/qwen15b_fp.json | e48cdc1bb44f1979512cef71f50b31b370692b11d08a4baa45dc7757ac71d6dd |
 | fp_ppl | benchmark_results/quality-9735/qwen15b_fp_wikitext.json | acd79bab6f4020657f052232e19474fdd484b87885e09c810cac27c2a2392e58 |

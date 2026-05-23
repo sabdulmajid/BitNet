@@ -6,11 +6,11 @@
     },
     "canonical_bundle": {
       "path": "benchmarks/results/canonical_evidence_bundle_2026-05-20.json",
-      "sha256": "767ca0548cb2143d3a44fcca5facabe521621b7344dd7db62d05074fbce30070"
+      "sha256": "af9ec2e35931986c7caf63c178b7c482c3e93406f8d880774bbf8d114f27824c"
     },
     "controlled_curve": {
       "path": "benchmarks/results/bitdistill_controlled_curve_2026-05-20.json",
-      "sha256": "5b09d697182c852899781af932c193f525062bc190d888c2b0ff17cb8b7dd3d9"
+      "sha256": "d892817f387ff52f1105439e6b7a7c2417d7c0124b0d0dbf56adb3f7585f6356"
     },
     "training_dynamics": {
       "path": "benchmarks/results/bitdistill_training_dynamics_2026-05-23.json",
@@ -39,7 +39,7 @@
       "finding": "Local paper-gamma training dynamics are still suspect."
     }
   ],
-  "created_utc": "2026-05-23T15:54:35.767260+00:00",
+  "created_utc": "2026-05-23T16:01:39.199650+00:00",
   "metrics": {
     "bitdistill_163_84m_mnli": 0.6911869587366276,
     "bitdistill_327_68m_ci95": [
@@ -65,7 +65,7 @@
   "next_gates": [
     {
       "gate": "Stage-2 token-budget curve",
-      "minimum_next_point": "640M token presentations with the same downstream recipe",
+      "minimum_next_point": "655.36M cumulative token presentations with the same downstream recipe",
       "why": "Determine whether MNLI continues improving toward FP or saturates far below it."
     },
     {

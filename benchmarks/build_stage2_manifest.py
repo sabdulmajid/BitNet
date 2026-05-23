@@ -131,10 +131,10 @@ def build_manifest(args: argparse.Namespace) -> dict[str, Any]:
         },
         "downstream": {
             "status": args.downstream_status,
-            "failed_job_id": "10071",
+            "failed_job_id": args.downstream_failed_job_id,
             "rerun_job_id": args.downstream_rerun_job_id,
             "rerun_output_dir": args.downstream_output_dir,
-            "failure_mode": "downstream expected root custom_state_dict.pt, but this Stage-2 run saved snapshot state dicts",
+            "failure_mode": args.downstream_failure_mode,
             "recommended_init_state_dict": str(state_dict_path),
         },
     }
@@ -151,6 +151,18 @@ def md_table(headers: list[str], rows: list[list[Any]]) -> str:
 
 
 def render_markdown(manifest: dict[str, Any]) -> str:
+    downstream = manifest.get("downstream", {}) if isinstance(manifest.get("downstream"), dict) else {}
+    failure_mode = downstream.get("failure_mode")
+    if failure_mode:
+        downstream_note = (
+            f"Downstream failure mode recorded for job {downstream.get('failed_job_id', '')}: "
+            f"{failure_mode}. The valid state dict is the snapshot path recorded above."
+        )
+    else:
+        downstream_note = (
+            "No downstream failure mode is recorded for this manifest. Downstream quality "
+            "claims still require materialized metrics and prediction traces."
+        )
     return "\n\n".join(
         [
             f"# Stage-2 Checkpoint Manifest: {manifest['run_id']}",
@@ -177,10 +189,7 @@ def render_markdown(manifest: dict[str, Any]) -> str:
                 ],
             ),
             "## Downstream Note",
-            (
-                "Job 10071 failed before training/evaluation because it looked for a root-level "
-                "`custom_state_dict.pt`. The valid state dict is the snapshot path recorded above."
-            ),
+            downstream_note,
             "",
         ]
     )
@@ -198,6 +207,11 @@ def main() -> int:
     parser.add_argument("--parent-manifest", type=Path)
     parser.add_argument("--cumulative-token-presentations", type=int, default=0)
     parser.add_argument("--downstream-status", default="pending_rerun")
+    parser.add_argument("--downstream-failed-job-id", default="10071")
+    parser.add_argument(
+        "--downstream-failure-mode",
+        default="downstream expected root custom_state_dict.pt, but this Stage-2 run saved snapshot state dicts",
+    )
     parser.add_argument("--downstream-rerun-job-id", default="")
     parser.add_argument("--downstream-output-dir", default="")
     parser.add_argument("--output-json", type=Path, default=Path("benchmarks/results/stage2_manifest_2026-05-20.json"))

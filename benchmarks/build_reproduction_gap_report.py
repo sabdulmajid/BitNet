@@ -179,7 +179,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         {
             "gate": "Stage-2 token-budget curve",
             "why": "Determine whether MNLI continues improving toward FP or saturates far below it.",
-            "minimum_next_point": "640M token presentations with the same downstream recipe",
+            "minimum_next_point": "655.36M cumulative token presentations with the same downstream recipe",
         },
         {
             "gate": "Loss-normalization/gradient-balance sweep",

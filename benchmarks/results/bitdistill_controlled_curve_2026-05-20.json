@@ -177,7 +177,7 @@
       "claim_label": "paper-inspired",
       "dependency": "",
       "job_id": "10169",
-      "label": "40k-warmup downstream control rerun",
+      "label": "40k-warmup downstream control",
       "last": {
         "attention_kd": 0.010844406671822071,
         "ce": 0.33984375,

@@ -149,6 +149,20 @@ def squeue_state(job_id: str) -> dict[str, str]:
     }
 
 
+def warmup_label(token_presentations: int) -> str:
+    steps = token_presentations / 8192
+    if steps >= 1000 and abs(steps / 1000 - round(steps / 1000)) < 1e-9:
+        return f"{int(round(steps / 1000))}k-warmup downstream control"
+    return f"{token_presentations:,}-token Stage-2 downstream control"
+
+
+def apply_stage2_manifest_reruns(jobs: list[dict[str, Any]], manifest_paths: list[Path]) -> list[dict[str, Any]]:
+    updated = list(jobs)
+    for manifest_path in manifest_paths:
+        updated = apply_stage2_manifest_rerun(updated, manifest_path)
+    return updated
+
+
 def apply_stage2_manifest_rerun(jobs: list[dict[str, Any]], manifest_path: Path) -> list[dict[str, Any]]:
     if not manifest_path.exists():
         return jobs
@@ -161,13 +175,14 @@ def apply_stage2_manifest_rerun(jobs: list[dict[str, Any]], manifest_path: Path)
         return jobs
     replacement = {
         "job_id": str(rerun_job_id),
-        "label": "40k-warmup downstream control rerun",
+        "label": warmup_label(token_presentations),
         "dependency": "",
         "partition": "midcard",
         "init_state_dict": manifest.get("state_dict_path", ""),
         "output_dir": rerun_output_dir,
         "stage2_token_presentations": token_presentations,
         "supersedes_job_id": downstream.get("failed_job_id", ""),
+        "manifest_path": str(manifest_path),
     }
     replaced = False
     updated: list[dict[str, Any]] = []
@@ -262,7 +277,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                 "stage2_token_presentations": 163_840_000,
             },
         )
-    downstream_jobs = apply_stage2_manifest_rerun(downstream_jobs, args.stage2_manifest)
+    downstream_jobs = apply_stage2_manifest_reruns(downstream_jobs, args.stage2_manifest)
     rows = [summarize_job(job, args.reference_predictions) for job in downstream_jobs]
     complete_rows = [row for row in rows if row["paired"]["status"] == "pass"]
     passed_rows = [row for row in complete_rows if row["passed_fp_recovery_gate"]]
@@ -408,7 +423,7 @@ def main() -> int:
     parser.add_argument(
         "--submission-json",
         type=Path,
-        default=Path(f"benchmark_results/bitdistill_stage2_curve_submission_{DATE}.json"),
+        default=Path("benchmark_results/bitdistill_stage2_curve_submission_2026-05-15.json"),
     )
     parser.add_argument(
         "--reference-predictions",
@@ -418,13 +433,17 @@ def main() -> int:
     parser.add_argument(
         "--recovery-submission-json",
         type=Path,
-        default=Path(f"benchmark_results/bitdistill_recovery_submission_{DATE}.json"),
+        default=Path("benchmark_results/bitdistill_recovery_submission_2026-05-15.json"),
     )
     parser.add_argument(
         "--stage2-manifest",
         type=Path,
-        default=Path("benchmarks/results/stage2_manifest_2026-05-20.json"),
-        help="optional manifest used to replace a failed 40k downstream row with a submitted rerun",
+        action="append",
+        default=[
+            Path("benchmarks/results/stage2_manifest_2026-05-20.json"),
+            Path("benchmarks/results/stage2_manifest_655m_2026-05-23.json"),
+        ],
+        help="optional manifest used to add or replace downstream rows; may be passed multiple times",
     )
     parser.add_argument("--allow-empty", action="store_true", help="permit an explicitly empty controlled-curve report")
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_controlled_curve_{DATE}.json"))

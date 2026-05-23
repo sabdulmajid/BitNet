@@ -35,7 +35,7 @@ Status: **not reproduced**. This report separates the now-improved BitNet-SFT ba
 
 | gate | why | minimum next point |
 | --- | --- | --- |
-| Stage-2 token-budget curve | Determine whether MNLI continues improving toward FP or saturates far below it. | 640M token presentations with the same downstream recipe |
+| Stage-2 token-budget curve | Determine whether MNLI continues improving toward FP or saturates far below it. | 655.36M cumulative token presentations with the same downstream recipe |
 | Loss-normalization/gradient-balance sweep | Paper gamma is only comparable if CE, logits KD, and attention KD reductions match. | component-gradient telemetry for gamma near equalized and paper values |
 | Same-artifact runtime quality | The strongest PyTorch classifier result and strongest packed causal runtime are still separate artifacts. | packed classifier head or primary causal prompt-scoring evaluation |
 | Backbone alignment | Paper-scale claims need exact/closest public Qwen3/Qwen2.5 recipe alignment. | one Qwen3-0.6B or exact Qwen2.5-0.5B MNLI run with matched logging |
@@ -45,6 +45,6 @@ Status: **not reproduced**. This report separates the now-improved BitNet-SFT ba
 | label | path | sha256 |
 | --- | --- | --- |
 | bitnet_sft_budget | benchmarks/results/bitnet_sft_budget_sweep_2026-05-23.json | b9bec4ae74fbadf2e82488f7be53fbb2fb31ddeb375a61d42070bc93248191f6 |
-| canonical_bundle | benchmarks/results/canonical_evidence_bundle_2026-05-20.json | 767ca0548cb2143d3a44fcca5facabe521621b7344dd7db62d05074fbce30070 |
-| controlled_curve | benchmarks/results/bitdistill_controlled_curve_2026-05-20.json | 5b09d697182c852899781af932c193f525062bc190d888c2b0ff17cb8b7dd3d9 |
+| canonical_bundle | benchmarks/results/canonical_evidence_bundle_2026-05-20.json | af9ec2e35931986c7caf63c178b7c482c3e93406f8d880774bbf8d114f27824c |
+| controlled_curve | benchmarks/results/bitdistill_controlled_curve_2026-05-20.json | d892817f387ff52f1105439e6b7a7c2417d7c0124b0d0dbf56adb3f7585f6356 |
 | training_dynamics | benchmarks/results/bitdistill_training_dynamics_2026-05-23.json | 8861b2102e7b06f5967ae9497303bc66febab6d6a18ee21f553d8b0d5a57ca39 |

@@ -135,6 +135,24 @@ Job `10251` has dependency `afterok:10250`. If `10250` succeeds, it will build
 and validate the `655.36M` manifest and submit the matched downstream MNLI
 BitDistill job.
 
+After the downstream job submitted by `10251` produces both `metrics.json` and
+`eval_predictions.jsonl`, rebuild the controlled curve with the same fixed
+recipe:
+
+```bash
+BITNET_REPORT_DATE=2026-05-20 python benchmarks/audit_bitdistill_controlled_curve.py \
+  --submission-json benchmark_results/bitdistill_stage2_curve_submission_2026-05-15.json \
+  --recovery-submission-json benchmark_results/bitdistill_recovery_submission_2026-05-15.json \
+  --output-json benchmarks/results/bitdistill_controlled_curve_2026-05-20.json \
+  --output-md benchmarks/results/bitdistill_controlled_curve_2026-05-20.md
+
+python benchmarks/build_reproduction_gap_report.py
+```
+
+The audit auto-loads the verified `327.68M` manifest and the expected
+`655.36M` manifest path. If the 655M downstream result is still pending, the row
+must remain pending and public quality claims must not change.
+
 ## Gamma-Balanced Telemetry
 
 The loss-normalization gate now has a queued equalized-gamma telemetry job:

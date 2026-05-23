@@ -80,6 +80,8 @@ python benchmarks/build_stage2_manifest.py \
   --run-id "$RUN_ID" \
   --job-id "$STAGE2_JOB_ID" \
   --downstream-status pending_submission \
+  --downstream-failed-job-id "" \
+  --downstream-failure-mode "" \
   --output-json "$MANIFEST_JSON" \
   --output-md "$MANIFEST_MD"
 
@@ -125,6 +127,8 @@ python benchmarks/build_stage2_manifest.py \
   --run-id "$RUN_ID" \
   --job-id "$STAGE2_JOB_ID" \
   --downstream-status submitted_downstream \
+  --downstream-failed-job-id "" \
+  --downstream-failure-mode "" \
   --downstream-rerun-job-id "$DOWNSTREAM_JOB_ID" \
   --downstream-output-dir "$DOWNSTREAM_OUTPUT_DIR" \
   --output-json "$MANIFEST_JSON" \

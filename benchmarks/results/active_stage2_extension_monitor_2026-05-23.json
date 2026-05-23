@@ -1,5 +1,5 @@
 {
-  "created_utc": "2026-05-23T15:56:23.460277+00:00",
+  "created_utc": "2026-05-23T15:58:39.815948+00:00",
   "handoff": {
     "dependency": "afterok:10250",
     "expected_handoff_exists": false,
@@ -32,16 +32,16 @@
     },
     "job_id": "10250",
     "latest_step": {
-      "ce": 3.925359,
-      "elapsed_seconds": 1070.4,
+      "ce": 3.822555,
+      "elapsed_seconds": 1216.0,
       "log_exists": true,
       "lr": 2e-06,
       "path": "logs/bd-s2-655m-10250.out",
-      "step": 590
+      "step": 670
     },
     "max_steps": 40000,
     "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
-    "progress": 0.01475,
+    "progress": 0.01675,
     "root_metrics": {
       "exists": false,
       "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/metrics.json",
@@ -52,7 +52,7 @@
       "name": "bd-s2-655m",
       "reason": "ece-nebula12",
       "state": "RUNNING",
-      "time": "18:58"
+      "time": "21:14"
     }
   },
   "status": "running",
