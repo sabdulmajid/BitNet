@@ -62,6 +62,7 @@ def build_summary() -> dict[str, Any]:
     slurm_scripts = read_json(Path(f"benchmarks/results/active_slurm_batch_scripts_{DATE}.json"))
     traceability = read_json(Path(f"benchmarks/results/bitdistill_goal_traceability_{DATE}.json"))
     next_decision = read_json(Path(f"benchmarks/results/bitdistill_next_decision_{DATE}.json"))
+    next_blueprint = read_json(Path(f"benchmarks/results/bitdistill_next_experiment_blueprint_{DATE}.json"))
     stage2 = monitor.get("stage2", {}) if isinstance(monitor.get("stage2"), dict) else {}
     latest_step = stage2.get("latest_step", {}) if isinstance(stage2.get("latest_step"), dict) else {}
     return {
@@ -70,6 +71,10 @@ def build_summary() -> dict[str, Any]:
         "slurm_script_status": slurm_scripts.get("status"),
         "traceability_status": traceability.get("completion_status"),
         "next_decision_status": next_decision.get("status"),
+        "next_blueprint_status": next_blueprint.get("status"),
+        "next_blueprint_action": (next_blueprint.get("current_action") or {}).get("action")
+        if isinstance(next_blueprint.get("current_action"), dict)
+        else None,
         "stage2_job_id": stage2.get("job_id"),
         "stage2_latest_step": latest_step.get("step"),
         "stage2_latest_ce": latest_step.get("ce"),
@@ -188,11 +193,15 @@ def main() -> int:
         f"benchmarks/results/bitdistill_publication_product_plan_{args.date}.md",
         f"benchmarks/results/bitdistill_next_decision_{args.date}.json",
         f"benchmarks/results/bitdistill_next_decision_{args.date}.md",
+        f"benchmarks/results/bitdistill_next_experiment_blueprint_{args.date}.json",
+        f"benchmarks/results/bitdistill_next_experiment_blueprint_{args.date}.md",
     ]
     commands = [
         ["monitor active Stage-2 extension", [python, "benchmarks/monitor_active_stage2_extension.py"]],
         ["audit 655M ingestion", [python, "benchmarks/audit_stage2_655m_ingestion.py"]],
         ["audit active Slurm batch scripts", [python, "benchmarks/audit_active_slurm_batch_scripts.py"]],
+        ["build next decision", [python, "benchmarks/build_bitdistill_next_decision.py"]],
+        ["build next experiment blueprint", [python, "benchmarks/build_bitdistill_next_experiment_blueprint.py"]],
         ["build current goal status", [python, "benchmarks/build_current_goal_status.py"]],
         ["build deep research handoff", [python, "benchmarks/build_deep_research_handoff.py"]],
         ["build goal traceability", [python, "benchmarks/build_goal_traceability_audit.py"]],
@@ -229,6 +238,7 @@ def main() -> int:
             "paper_alignment": f"benchmarks/results/bitdistill_paper_alignment_{args.date}.json",
             "publication_product_plan": f"benchmarks/results/bitdistill_publication_product_plan_{args.date}.json",
             "next_decision": f"benchmarks/results/bitdistill_next_decision_{args.date}.json",
+            "next_experiment_blueprint": f"benchmarks/results/bitdistill_next_experiment_blueprint_{args.date}.json",
         },
     }
     args.output_json.parent.mkdir(parents=True, exist_ok=True)

@@ -78,6 +78,8 @@ Active next gate:
 - [gamma60_gradient_balance_2026-05-23.md](benchmarks/results/gamma60_gradient_balance_2026-05-23.md)
 - [bitdistill_next_decision_2026-05-23.md](benchmarks/results/bitdistill_next_decision_2026-05-23.md)
 - [bitdistill_decision_scenarios_2026-05-23.md](benchmarks/results/bitdistill_decision_scenarios_2026-05-23.md)
+- [bitdistill_next_experiment_blueprint_2026-05-23.md](benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.md)
+- [bitdistill_next_experiment_blueprint_2026-05-23.json](benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.json)
 
 Job `10250` is a cumulative continuation from the verified `327.68M` checkpoint
 to `655.36M` token presentations. It is explicitly labeled as a continuation
@@ -91,6 +93,9 @@ next-decision report so the repository records whether to extend Stage-2,
 switch to loss-normalization debugging, or replicate a successful recovery row.
 The decision-scenario matrix documents these thresholds before the 655M result
 arrives; it is policy documentation, not benchmark evidence.
+The next-experiment blueprint maps each decision status to a bounded command
+template and claim boundary; in the current pending state it only permits
+watchdog and ingestion checks, not new quality runs.
 
 Job `10257` is a dependent gamma-60 component-gradient diagnostic; it is not a quality benchmark.
 It replaces pending job `10256` so the stored Slurm script also generates the

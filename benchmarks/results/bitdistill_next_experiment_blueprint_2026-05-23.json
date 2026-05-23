@@ -1,0 +1,154 @@
+{
+  "action_catalog": {
+    "ambiguous_recovery_continue_with_controls": {
+      "action": "choose_one_narrow_ablation",
+      "claim_boundary": "one-axis ablation only",
+      "commands": [
+        "python benchmarks/build_bitdistill_next_decision.py",
+        "# Choose exactly one: next Stage-2 point OR matched gamma60 downstream, not both."
+      ],
+      "evidence_required": [
+        "single selected ablation objective",
+        "pre-registered output directory",
+        "postprocess report that rebuilds the decision artifact"
+      ],
+      "runnable_now": false,
+      "why": "Evidence is mixed; a broad sweep would be hard to interpret."
+    },
+    "extend_stage2_curve": {
+      "action": "prepare_next_controlled_stage2_point",
+      "claim_boundary": "budget-curve extension only; keep recipe fixed and do not add new task axes",
+      "commands": [
+        "python benchmarks/build_bitdistill_next_decision.py",
+        "# Create a new Stage-2 submission report before sbatch; do not launch from an undocumented one-off command."
+      ],
+      "evidence_required": [
+        "655M marginal gain >= configured meaningful-gain threshold",
+        "compute budget and target token count selected explicitly",
+        "new submission report created before launch"
+      ],
+      "runnable_now": false,
+      "why": "If 655M still has meaningful marginal gain, the next experiment is another controlled Stage-2 point with the same downstream recipe."
+    },
+    "hold_for_gamma_balance": {
+      "action": "wait_for_gamma60_telemetry",
+      "claim_boundary": "diagnostic only; gamma60 telemetry is not a quality benchmark",
+      "commands": [
+        "python benchmarks/run_active_gate_watchdog.py",
+        "python benchmarks/audit_bitdistill_gamma_balance.py"
+      ],
+      "evidence_required": [
+        "gamma60 telemetry status report",
+        "gamma60_gradient_balance report",
+        "rebuilt next-decision report"
+      ],
+      "runnable_now": true,
+      "why": "The quality row alone is insufficient; component-gradient telemetry is needed before choosing more Stage-2 tokens or a rebalance run."
+    },
+    "pause_broad_stage2_audit_recipe": {
+      "action": "stop_broad_scaling_and_audit_recipe",
+      "claim_boundary": "root-cause audit only; do not submit larger Stage-2 runs before resolving recipe mismatch",
+      "commands": [
+        "python benchmarks/build_bitdistill_paper_alignment_audit.py",
+        "python benchmarks/audit_bitdistill_loss_contract.py",
+        "python benchmarks/audit_bitdistill_training_dynamics.py"
+      ],
+      "evidence_required": [
+        "655M marginal gain <= saturation threshold",
+        "gamma60 does not rebalance updates"
+      ],
+      "runnable_now": true,
+      "why": "Saturation plus unresolved update imbalance means more broad compute is not justified."
+    },
+    "pending_655m_downstream": {
+      "action": "wait_and_watch_655m_gate",
+      "claim_boundary": "status only; quality_claim remains none until ingestion is ingested_reports_rebuilt",
+      "commands": [
+        "python benchmarks/run_active_gate_watchdog.py",
+        "python benchmarks/audit_stage2_655m_ingestion.py"
+      ],
+      "evidence_required": [
+        "655M Stage-2 manifest",
+        "655M downstream metrics.json",
+        "655M downstream eval_predictions.jsonl",
+        "rebuilt controlled curve and next-decision report"
+      ],
+      "runnable_now": true,
+      "why": "The active 655.36M producer/downstream chain is already queued; launching another broad run would confound the token-budget curve."
+    },
+    "pending_no_controlled_rows": {
+      "action": "materialize_controlled_row",
+      "claim_boundary": "status repair only; no quality claim",
+      "commands": [
+        "python benchmarks/build_reproduction_gap_report.py",
+        "python benchmarks/run_active_gate_watchdog.py"
+      ],
+      "evidence_required": [
+        "controlled-curve JSON with at least one completed row",
+        "paired FP16 prediction trace"
+      ],
+      "runnable_now": false,
+      "why": "A controlled downstream row is missing, so no broader run is justified."
+    },
+    "replicate_recovery_gate": {
+      "action": "replicate_passing_mnli_then_expand_glue",
+      "claim_boundary": "reproducibility gate; QNLI/SST2 remain gated behind replicated MNLI",
+      "commands": [
+        "MODEL=Qwen/Qwen2.5-0.5B \\\n        STAGE=task_sft \\\n        METHOD=bitdistill \\\n        TASK_NAME=mnli \\\n        TASK_FORMAT=sequence_classification \\\n        LABEL_SCHEME=letters \\\n        CANDIDATE_SCORE=mean \\\n        TEACHER_MODEL=checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1 \\\n        INIT_STATE_MANIFEST=benchmarks/results/stage2_manifest_655m_2026-05-23.json \\\n        SCALE_MODE=tensor \\\n        EXCLUDE_LINEAR_REGEX='score|classifier' \\\n        DISTILL_LAYER=-1 \\\n        ATTENTION_SPLIT_HEADS=8 \\\n        ACTIVATION_QUANTIZATION=1 \\\n        USE_SUBLN=1 \\\n        LOGIT_KD_WEIGHT=10 \\\n        ATTENTION_KD_WEIGHT=100000 \\\n        LOGIT_TEMPERATURE=5.0 \\\n        LOGIT_KD_TEMPERATURE_SCALE=none \\\n        ATTENTION_TEMPERATURE=1.0 \\\n        INIT_OUTPUT_HEAD_FROM_TEACHER=1 \\\n        MAX_SEQ_LEN=512 \\\n        MAX_STEPS=10000 \\\n        PER_DEVICE_BATCH_SIZE=4 \\\n        GRAD_ACCUM_STEPS=4 \\\n        LR=2e-5 \\\n        LR_SCHEDULER=cosine \\\n        SAVE_EVERY_STEPS=0 \\\n        SAVE_MODEL_ARTIFACTS=0 \\\n        OUTPUT_DIR=checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit-replicate1 \\\n        sbatch --partition=midcard --job-name=bd-mnli-655m-rep1 slurm_bitdistill_glue.sh",
+        "# Only after the replicated MNLI row passes the within-1pt FP gate:\n        # 1. Replace TASK_NAME=mnli with TASK_NAME=qnli and the matching QNLI FP16 teacher path.\n        # 2. Repeat with TASK_NAME=sst2 and the matching SST2 FP16 teacher path.\n        # 3. Keep INIT_STATE_MANIFEST, scale_mode, SubLN, distillation layer, batch, LR,\n        #    and loss coefficients identical to the passing MNLI recipe."
+      ],
+      "evidence_required": [
+        "next-decision status replicate_recovery_gate",
+        "655M row reaches the configured FP recovery gate",
+        "replicate prediction trace and paired CI"
+      ],
+      "runnable_now": false,
+      "why": "A within-1pt MNLI row is not enough; it must replicate before QNLI/SST2 are credible."
+    },
+    "run_gamma_balanced_downstream": {
+      "action": "run_matched_gamma60_mnli_downstream",
+      "claim_boundary": "single MNLI ablation; do not broaden to QNLI/SST2 until paired MNLI result is ingested",
+      "commands": [
+        "MODEL=Qwen/Qwen2.5-0.5B \\\n        STAGE=task_sft \\\n        METHOD=bitdistill \\\n        TASK_NAME=mnli \\\n        TASK_FORMAT=sequence_classification \\\n        LABEL_SCHEME=letters \\\n        CANDIDATE_SCORE=mean \\\n        TEACHER_MODEL=checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1 \\\n        INIT_STATE_MANIFEST=benchmarks/results/stage2_manifest_655m_2026-05-23.json \\\n        SCALE_MODE=tensor \\\n        EXCLUDE_LINEAR_REGEX='score|classifier' \\\n        DISTILL_LAYER=-1 \\\n        ATTENTION_SPLIT_HEADS=8 \\\n        ACTIVATION_QUANTIZATION=1 \\\n        USE_SUBLN=1 \\\n        LOGIT_KD_WEIGHT=10 \\\n        ATTENTION_KD_WEIGHT=60 \\\n        LOGIT_TEMPERATURE=5.0 \\\n        LOGIT_KD_TEMPERATURE_SCALE=none \\\n        ATTENTION_TEMPERATURE=1.0 \\\n        INIT_OUTPUT_HEAD_FROM_TEACHER=1 \\\n        MAX_SEQ_LEN=512 \\\n        MAX_STEPS=10000 \\\n        PER_DEVICE_BATCH_SIZE=4 \\\n        GRAD_ACCUM_STEPS=4 \\\n        LR=2e-5 \\\n        LR_SCHEDULER=cosine \\\n        SAVE_EVERY_STEPS=0 \\\n        SAVE_MODEL_ARTIFACTS=0 \\\n        OUTPUT_DIR=checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-gamma60-headinit \\\n        sbatch --partition=midcard --job-name=bd-mnli-655m-g60 slurm_bitdistill_glue.sh"
+      ],
+      "evidence_required": [
+        "next-decision status run_gamma_balanced_downstream",
+        "stage2_manifest_655m_2026-05-23.json exists and validates",
+        "gamma60_gradient_balance status indicates rebalanced updates"
+      ],
+      "runnable_now": false,
+      "why": "Only run this if the 655M curve saturates and gamma60 telemetry shows attention-KD updates are rebalanced."
+    }
+  },
+  "created_utc": "2026-05-23T17:47:45.636925+00:00",
+  "current_action": {
+    "action": "wait_and_watch_655m_gate",
+    "claim_boundary": "status only; quality_claim remains none until ingestion is ingested_reports_rebuilt",
+    "commands": [
+      "python benchmarks/run_active_gate_watchdog.py",
+      "python benchmarks/audit_stage2_655m_ingestion.py"
+    ],
+    "evidence_required": [
+      "655M Stage-2 manifest",
+      "655M downstream metrics.json",
+      "655M downstream eval_predictions.jsonl",
+      "rebuilt controlled curve and next-decision report"
+    ],
+    "runnable_now": true,
+    "why": "The active 655.36M producer/downstream chain is already queued; launching another broad run would confound the token-budget curve."
+  },
+  "nonclaims": [
+    "This report does not add benchmark evidence.",
+    "A runnable command is not permission to update quality claims.",
+    "Broad sweeps remain disallowed until the 655M gate is ingested."
+  ],
+  "quality_claim": "experiment_blueprint_not_benchmark",
+  "recommendation": "Wait for the active 655.36M Stage-2 producer, downstream MNLI, and postprocess reports.",
+  "schema": "bitdistill-next-experiment-blueprint-v1",
+  "source_paths": {
+    "gamma_balance": "benchmarks/results/gamma60_gradient_balance_2026-05-23.json",
+    "next_decision": "benchmarks/results/bitdistill_next_decision_2026-05-23.json",
+    "stage2_ingestion": "benchmarks/results/stage2_655m_ingestion_2026-05-23.json"
+  },
+  "status": "pending_655m_downstream"
+}

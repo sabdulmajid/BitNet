@@ -163,6 +163,8 @@ benchmarks/results/bitdistill_next_decision_2026-05-23.md
 benchmarks/results/bitdistill_next_decision_2026-05-23.json
 benchmarks/results/bitdistill_decision_scenarios_2026-05-23.md
 benchmarks/results/bitdistill_decision_scenarios_2026-05-23.json
+benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.md
+benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.json
 ```
 
 That report is decision support, not a new benchmark. It remains pending until
@@ -170,6 +172,10 @@ the `655.36M` downstream row exists, then records whether the next step should
 be a larger Stage-2 point, a loss-normalization ablation, or a replication run.
 The scenario matrix applies the same thresholds to representative hypothetical
 655M outcomes so the decision policy can be reviewed before the result arrives.
+The next-experiment blueprint consumes the decision report and records the
+allowed command template plus claim boundary for each possible decision state.
+While the status is `pending_655m_downstream`, it only allows status refresh and
+ingestion audit commands.
 
 ## Gamma-Balanced Telemetry
 
@@ -224,6 +230,7 @@ The watchdog refreshes and validates these status artifacts in one pass:
 - `benchmarks/results/bitdistill_paper_alignment_2026-05-23.{json,md}`
 - `benchmarks/results/bitdistill_publication_product_plan_2026-05-23.{json,md}`
 - `benchmarks/results/bitdistill_next_decision_2026-05-23.{json,md}`
+- `benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.{json,md}`
 
 The watchdog's own report is:
 
@@ -289,7 +296,8 @@ python benchmarks/validate_reports_fail_closed.py \
   benchmarks/results/bitdistill_goal_traceability_2026-05-23.json \
   benchmarks/results/bitdistill_paper_alignment_2026-05-23.json \
   benchmarks/results/stage2_655m_ingestion_2026-05-23.json \
-  benchmarks/results/bitdistill_next_decision_2026-05-23.json
+  benchmarks/results/bitdistill_next_decision_2026-05-23.json \
+  benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.json
 python -m py_compile train_bitdistill.py train_distill.py benchmarks/*.py
 bash -n slurm_gamma60_telemetry.sh \
   slurm_stage2_655m_handoff.sh \
@@ -307,6 +315,8 @@ Interpretation rules for the current state:
   hardware, effective batch size, and unfinished QNLI/SST2/CNNDM coverage.
 - `bitdistill_next_decision.status == pending_655m_downstream` must remain
   until the 655M downstream prediction trace exists.
+- `bitdistill_next_experiment_blueprint.status == pending_655m_downstream`
+  means the only runnable action is watchdog/ingestion status refresh.
 - Do not update public quality claims until the ingestion audit is
   `ingested_reports_rebuilt`.
 

@@ -6,7 +6,7 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | job | id | slurm state | time | reason |
 | --- | --- | --- | --- | --- |
-| stage2 | 10250 | RUNNING | 2:02:45 | ece-nebula12 |
+| stage2 | 10250 | RUNNING | 2:10:20 | ece-nebula12 |
 | handoff | 10255 | PENDING | 0:00 | (Dependency) |
 | gamma60 telemetry | 10257 | PENDING | 0:00 | (Dependency) |
 | downstream MNLI | - | not_submitted |  |  |
@@ -14,23 +14,23 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | stage2 field | value |
 | --- | --- |
-| latest_step | 4020 |
+| latest_step | 4270 |
 | max_steps | 40000 |
 | save_every_steps | 10000 |
-| progress | 0.100500 |
-| latest_ce | 3.987523 |
+| progress | 0.106750 |
+| latest_ce | 4.114625 |
 | latest_lr | 0.000002 |
-| log_elapsed_seconds | 7307.100000 |
-| parsed_log_rows | 403 |
+| log_elapsed_seconds | 7761.600000 |
+| parsed_log_rows | 428 |
 | recent_window_rows | 20 |
-| recent_ce_mean | 3.777594 |
-| recent_ce_min | 3.366408 |
-| recent_ce_max | 4.162960 |
-| seconds_per_step | 1.817687 |
-| steps_per_hour | 1980.539475 |
-| eta_hours | 18.166767 |
-| estimated_completion_utc | 2026-05-24T11:50:10.635856+00:00 |
-| segment_token_presentations_per_second | 4506.827606 |
+| recent_ce_mean | 3.755745 |
+| recent_ce_min | 3.401356 |
+| recent_ce_max | 4.206848 |
+| seconds_per_step | 1.817705 |
+| steps_per_hour | 1980.519481 |
+| eta_hours | 18.040721 |
+| estimated_completion_utc | 2026-05-24T11:50:11.876786+00:00 |
+| segment_token_presentations_per_second | 4506.782107 |
 | latest_complete_snapshot_step | - |
 | cumulative_token_presentations | 655360000 |
 

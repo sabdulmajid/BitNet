@@ -613,6 +613,51 @@ def validate_active_gate_watchdog(report: dict[str, Any], readme: str, errors: l
     )
 
 
+def validate_next_experiment_blueprint(report: dict[str, Any], readme: str, errors: list[str]) -> None:
+    if report.get("schema") != "bitdistill-next-experiment-blueprint-v1":
+        errors.append(f"next experiment blueprint: unexpected schema {report.get('schema')}")
+    if report.get("quality_claim") != "experiment_blueprint_not_benchmark":
+        errors.append(f"next experiment blueprint: unexpected quality_claim {report.get('quality_claim')}")
+    if report.get("status") != "pending_655m_downstream":
+        errors.append(f"next experiment blueprint: unexpected status {report.get('status')}")
+    current = report.get("current_action")
+    if not isinstance(current, dict):
+        errors.append("next experiment blueprint: missing current_action")
+    else:
+        if current.get("action") != "wait_and_watch_655m_gate":
+            errors.append(f"next experiment blueprint: unexpected current action {current.get('action')}")
+        commands = current.get("commands")
+        if not isinstance(commands, list) or "python benchmarks/run_active_gate_watchdog.py" not in commands:
+            errors.append("next experiment blueprint: missing watchdog command")
+        if "quality_claim remains none" not in str(current.get("claim_boundary", "")):
+            errors.append("next experiment blueprint: current action must keep quality claims closed")
+    catalog = report.get("action_catalog")
+    if not isinstance(catalog, dict):
+        errors.append("next experiment blueprint: missing action_catalog")
+    else:
+        for status in (
+            "pending_655m_downstream",
+            "run_gamma_balanced_downstream",
+            "extend_stage2_curve",
+            "replicate_recovery_gate",
+            "pause_broad_stage2_audit_recipe",
+        ):
+            if status not in catalog:
+                errors.append(f"next experiment blueprint: missing catalog status {status}")
+    require_contains(
+        "README next experiment blueprint report",
+        "bitdistill_next_experiment_blueprint_2026-05-23.md",
+        readme,
+        errors,
+    )
+    require_contains(
+        "README next experiment blueprint json",
+        "bitdistill_next_experiment_blueprint_2026-05-23.json",
+        readme,
+        errors,
+    )
+
+
 def validate_readme(bundle: dict[str, Any], readme: str, errors: list[str]) -> None:
     claims = bundle["claims"]
     blind = claims["blind_ptq"]
@@ -705,6 +750,12 @@ def validate_reproduction_gap_docs(
         errors,
     )
     require_contains(
+        "README next experiment blueprint report",
+        "bitdistill_next_experiment_blueprint_2026-05-23.md",
+        readme,
+        errors,
+    )
+    require_contains(
         "README current goal status report",
         "current_goal_status_2026-05-23.md",
         readme,
@@ -773,6 +824,7 @@ def validate_experiments_doc(experiments_doc: str, readme: str, errors: list[str
         "watchdog_report": "active_gate_watchdog_2026-05-23.md",
         "ingestion_status": "stage2_655m_ingestion.status == pending_handoff",
         "paper_alignment_status": "bitdistill_paper_alignment.status == not_exact_reproduction",
+        "next_blueprint_status": "bitdistill_next_experiment_blueprint.status == pending_655m_downstream",
         "no_claim_until_ingested": "ingested_reports_rebuilt",
     }
     for label, needle in required.items():
@@ -861,6 +913,11 @@ def main() -> int:
         type=Path,
         default=Path("benchmarks/results/active_slurm_batch_scripts_2026-05-23.json"),
     )
+    parser.add_argument(
+        "--next-experiment-blueprint",
+        type=Path,
+        default=Path("benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.json"),
+    )
     args = parser.parse_args()
 
     bundle = load_json(args.bundle)
@@ -878,6 +935,7 @@ def main() -> int:
     paper_alignment = load_json(args.paper_alignment)
     active_gate_watchdog = load_json(args.active_gate_watchdog)
     active_slurm_batch_scripts = load_json(args.active_slurm_batch_scripts)
+    next_experiment_blueprint = load_json(args.next_experiment_blueprint)
     readme = read_text(args.readme)
     claims_doc = read_text(args.claims)
     experiments_doc = read_text(args.experiments)
@@ -896,6 +954,7 @@ def main() -> int:
     validate_paper_alignment(paper_alignment, readme, errors)
     validate_publication_product_plan(publication_product_plan, readme, errors)
     validate_active_gate_watchdog(active_gate_watchdog, readme, errors)
+    validate_next_experiment_blueprint(next_experiment_blueprint, readme, errors)
     validate_active_slurm_batch_scripts(active_slurm_batch_scripts, errors)
     validate_readme(bundle, readme, errors)
     validate_reproduction_gap_docs(reproduction_gap, readme, claims_doc, errors)
