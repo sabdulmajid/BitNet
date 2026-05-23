@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import subprocess
 from datetime import datetime, timezone
@@ -16,8 +17,18 @@ STEP_RE = re.compile(
     r"step=(?P<step>\d+)\s+ce=(?P<ce>[0-9.eE+-]+)\s+lr=(?P<lr>[0-9.eE+-]+)\s+elapsed=(?P<elapsed>[0-9.eE+-]+)s"
 )
 HEADER_KV_RE = re.compile(r"(?P<key>[A-Z0-9_]+)=(?P<value>\S+)")
+FATAL_LOG_PATTERNS = [
+    ("traceback", re.compile(r"Traceback", re.IGNORECASE)),
+    ("runtime_error", re.compile(r"RuntimeError", re.IGNORECASE)),
+    ("cuda_oom", re.compile(r"CUDA out of memory|OutOfMemoryError", re.IGNORECASE)),
+    ("exception", re.compile(r"\bException:", re.IGNORECASE)),
+    ("nan_token", re.compile(r"\bnan\b", re.IGNORECASE)),
+    ("inf_token", re.compile(r"\binf(?:inity|inite)?\b", re.IGNORECASE)),
+    ("overflow", re.compile(r"\boverflow\b", re.IGNORECASE)),
+]
 RUNNING_LOG_STALE_SECONDS = 15 * 60
 TIME_LIMIT_TIGHT_MARGIN_SECONDS = 30 * 60
+MAX_LOG_HEALTH_EXAMPLES = 20
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -88,24 +99,33 @@ def parse_slurm_duration(value: str | None) -> int | None:
     return days * 86400 + hours * 3600 + minutes * 60 + seconds
 
 
-def parse_latest_step(log_path: Path) -> dict[str, Any]:
+def parse_step_rows(log_path: Path) -> list[dict[str, Any]]:
     if not log_path.exists():
-        return {"log_exists": False}
-    latest: dict[str, Any] = {"log_exists": True, "path": str(log_path)}
+        return []
     rows: list[dict[str, Any]] = []
-    for line in log_path.read_text(encoding="utf-8", errors="replace").splitlines():
+    for line_no, line in enumerate(log_path.read_text(encoding="utf-8", errors="replace").splitlines(), start=1):
         match = STEP_RE.search(line)
         if not match:
             continue
         row = {
             "log_exists": True,
             "path": str(log_path),
+            "line_no": line_no,
             "step": int(match.group("step")),
             "ce": float(match.group("ce")),
             "lr": float(match.group("lr")),
             "elapsed_seconds": float(match.group("elapsed")),
         }
         rows.append(row)
+    return rows
+
+
+def parse_latest_step(log_path: Path) -> dict[str, Any]:
+    if not log_path.exists():
+        return {"log_exists": False}
+    latest: dict[str, Any] = {"log_exists": True, "path": str(log_path)}
+    rows = parse_step_rows(log_path)
+    for row in rows:
         latest = row
     if rows:
         recent = rows[-20:]
@@ -122,6 +142,156 @@ def parse_latest_step(log_path: Path) -> dict[str, Any]:
             }
         )
     return latest
+
+
+def producer_log_health(log_path: Path, stage2_config: dict[str, Any]) -> dict[str, Any]:
+    if not log_path.exists():
+        return {
+            "status": "missing_log",
+            "path": str(log_path),
+            "parsed_step_rows": 0,
+            "issues": [],
+            "fatal_matches": [],
+            "checks": {},
+            "caveat": "This checks producer log structure and fatal patterns; it is not quality evidence.",
+        }
+    text = log_path.read_text(encoding="utf-8", errors="replace")
+    rows = parse_step_rows(log_path)
+    fatal_matches: list[dict[str, Any]] = []
+    for line_no, line in enumerate(text.splitlines(), start=1):
+        for label, pattern in FATAL_LOG_PATTERNS:
+            if pattern.search(line):
+                fatal_matches.append(
+                    {
+                        "line_no": line_no,
+                        "pattern": label,
+                        "line": line[:300],
+                    }
+                )
+                break
+        if len(fatal_matches) >= MAX_LOG_HEALTH_EXAMPLES:
+            break
+
+    issues: list[dict[str, Any]] = []
+    if not rows:
+        return {
+            "status": "no_steps",
+            "path": str(log_path),
+            "parsed_step_rows": 0,
+            "issues": [{"type": "no_step_rows"}],
+            "fatal_matches": fatal_matches,
+            "checks": {
+                "has_step_rows": False,
+                "steps_monotonic": None,
+                "elapsed_monotonic": None,
+                "finite_numeric_values": None,
+                "constant_lr_matches_expected": None,
+                "latest_step_within_max_steps": None,
+            },
+            "caveat": "This checks producer log structure and fatal patterns; it is not quality evidence.",
+        }
+
+    steps_monotonic = True
+    elapsed_monotonic = True
+    finite_numeric_values = True
+    constant_lr_matches_expected = True
+    max_steps = int(stage2_config["max_steps"])
+    expected_lr = float(stage2_config["learning_rate"])
+    lr_scheduler = str(stage2_config.get("lr_scheduler") or "")
+
+    previous_step: int | None = None
+    previous_elapsed: float | None = None
+    for row in rows:
+        step = int(row["step"])
+        elapsed = float(row["elapsed_seconds"])
+        ce = float(row["ce"])
+        lr = float(row["lr"])
+        if previous_step is not None and step <= previous_step:
+            steps_monotonic = False
+            issues.append(
+                {
+                    "type": "non_monotonic_step",
+                    "line_no": row["line_no"],
+                    "previous": previous_step,
+                    "current": step,
+                }
+            )
+            break
+        if previous_elapsed is not None and elapsed < previous_elapsed:
+            elapsed_monotonic = False
+            issues.append(
+                {
+                    "type": "non_monotonic_elapsed",
+                    "line_no": row["line_no"],
+                    "previous": previous_elapsed,
+                    "current": elapsed,
+                }
+            )
+            break
+        if not (math.isfinite(ce) and math.isfinite(lr) and math.isfinite(elapsed)):
+            finite_numeric_values = False
+            issues.append(
+                {
+                    "type": "non_finite_numeric",
+                    "line_no": row["line_no"],
+                    "step": step,
+                    "ce": ce,
+                    "lr": lr,
+                    "elapsed_seconds": elapsed,
+                }
+            )
+            break
+        if lr_scheduler == "constant" and abs(lr - expected_lr) > max(abs(expected_lr) * 1e-6, 1e-12):
+            constant_lr_matches_expected = False
+            issues.append(
+                {
+                    "type": "lr_mismatch",
+                    "line_no": row["line_no"],
+                    "step": step,
+                    "expected_lr": expected_lr,
+                    "actual_lr": lr,
+                }
+            )
+            break
+        previous_step = step
+        previous_elapsed = elapsed
+
+    latest = rows[-1]
+    latest_step_within_max_steps = int(latest["step"]) <= max_steps
+    if not latest_step_within_max_steps:
+        issues.append(
+            {
+                "type": "latest_step_exceeds_max_steps",
+                "latest_step": latest["step"],
+                "max_steps": max_steps,
+            }
+        )
+    status = "healthy" if not issues and not fatal_matches else "unhealthy"
+    return {
+        "status": status,
+        "path": str(log_path),
+        "parsed_step_rows": len(rows),
+        "first_step": rows[0]["step"],
+        "latest_step": latest["step"],
+        "latest_ce": latest["ce"],
+        "latest_lr": latest["lr"],
+        "latest_elapsed_seconds": latest["elapsed_seconds"],
+        "recent_window_rows": min(len(rows), 20),
+        "recent_ce_min": min(float(row["ce"]) for row in rows[-20:]),
+        "recent_ce_max": max(float(row["ce"]) for row in rows[-20:]),
+        "recent_ce_mean": sum(float(row["ce"]) for row in rows[-20:]) / min(len(rows), 20),
+        "issues": issues[:MAX_LOG_HEALTH_EXAMPLES],
+        "fatal_matches": fatal_matches,
+        "checks": {
+            "has_step_rows": True,
+            "steps_monotonic": steps_monotonic,
+            "elapsed_monotonic": elapsed_monotonic,
+            "finite_numeric_values": finite_numeric_values,
+            "constant_lr_matches_expected": constant_lr_matches_expected if lr_scheduler == "constant" else None,
+            "latest_step_within_max_steps": latest_step_within_max_steps,
+        },
+        "caveat": "This checks producer log structure and fatal patterns; it is not quality evidence.",
+    }
 
 
 def parse_log_header(log_path: Path) -> dict[str, Any]:
@@ -528,6 +698,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
         )
     )
     latest_step = parse_latest_step(args.stage2_log)
+    log_health = producer_log_health(args.stage2_log, stage2_config)
     producer_config_status = producer_config_gate(
         log_path=args.stage2_log,
         stage2_submission=stage2_submission,
@@ -571,6 +742,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
             "progress_estimate": progress_estimate,
             "time_limit_gate": time_limit_gate(stage2_slurm_row, progress_estimate),
             "log_freshness": log_freshness(args.stage2_log, rows.get(stage2_job_id)),
+            "log_health": log_health,
             "producer_config": producer_config_status,
             "snapshot_status": snapshot_status,
             "expected_snapshots": snapshots,
@@ -664,6 +836,7 @@ def render_markdown(report: dict[str, Any]) -> str:
     estimate = stage2["progress_estimate"]
     time_gate = stage2["time_limit_gate"]
     freshness = stage2["log_freshness"]
+    log_health = stage2["log_health"]
     producer_config = stage2["producer_config"]
     snapshot_status = stage2["snapshot_status"]
     artifact_rows = [
@@ -751,6 +924,7 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["latest_ce", latest.get("ce", "")],
                     ["latest_lr", latest.get("lr", "")],
                     ["log_freshness_status", freshness["status"]],
+                    ["log_health_status", log_health["status"]],
                     ["producer_config_status", producer_config["status"]],
                     ["log_age_seconds", freshness["age_seconds"]],
                     ["time_limit_status", time_gate["status"]],
@@ -801,6 +975,31 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["slurm_state", freshness["slurm_state"]],
                     ["caveat", freshness["caveat"]],
                 ],
+            ),
+            "## Producer Log Health",
+            md_table(
+                ["field", "value"],
+                [
+                    ["status", log_health["status"]],
+                    ["path", log_health["path"]],
+                    ["parsed_step_rows", log_health["parsed_step_rows"]],
+                    ["first_step", log_health.get("first_step")],
+                    ["latest_step", log_health.get("latest_step")],
+                    ["latest_ce", log_health.get("latest_ce")],
+                    ["latest_lr", log_health.get("latest_lr")],
+                    ["latest_elapsed_seconds", log_health.get("latest_elapsed_seconds")],
+                    ["recent_window_rows", log_health.get("recent_window_rows")],
+                    ["recent_ce_mean", log_health.get("recent_ce_mean")],
+                    ["recent_ce_min", log_health.get("recent_ce_min")],
+                    ["recent_ce_max", log_health.get("recent_ce_max")],
+                    ["issue_count", len(log_health["issues"])],
+                    ["fatal_match_count", len(log_health["fatal_matches"])],
+                    ["caveat", log_health["caveat"]],
+                ],
+            ),
+            md_table(
+                ["check", "value"],
+                [[key, value] for key, value in log_health["checks"].items()],
             ),
             "## Producer Config Gate",
             md_table(

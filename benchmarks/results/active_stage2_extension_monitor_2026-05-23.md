@@ -6,7 +6,7 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | job | id | slurm state | time | reason |
 | --- | --- | --- | --- | --- |
-| stage2 | 10250 | RUNNING | 2:37:44 | ece-nebula12 |
+| stage2 | 10250 | RUNNING | 2:41:28 | ece-nebula12 |
 | handoff | 10255 | PENDING | 0:00 | (Dependency) |
 | gamma60 telemetry | 10257 | PENDING | 0:00 | (Dependency) |
 | downstream MNLI | - | not_submitted |  |  |
@@ -14,7 +14,7 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | stage2 field | value |
 | --- | --- |
-| latest_step | 5170 |
+| latest_step | 5290 |
 | max_steps | 40000 |
 | save_every_steps | 10000 |
 | snapshot_status | pre_first_snapshot |
@@ -22,25 +22,26 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | missing_output_dir_is_expected | True |
 | first_snapshot_step | 10000 |
 | next_snapshot_step | 10000 |
-| progress | 0.129250 |
-| latest_ce | 3.931800 |
+| progress | 0.132250 |
+| latest_ce | 3.651335 |
 | latest_lr | 0.000002 |
 | log_freshness_status | fresh_running_log |
+| log_health_status | healthy |
 | producer_config_status | matched |
-| log_age_seconds | 11.557275 |
+| log_age_seconds | 14.805962 |
 | time_limit_status | within_time_limit |
-| time_limit_margin_seconds | 13619.506383 |
-| log_elapsed_seconds | 9398.400000 |
-| parsed_log_rows | 518 |
+| time_limit_margin_seconds | 13614.600378 |
+| log_elapsed_seconds | 9616.400000 |
+| parsed_log_rows | 530 |
 | recent_window_rows | 20 |
-| recent_ce_mean | 3.613525 |
+| recent_ce_mean | 3.694968 |
 | recent_ce_min | 3.209952 |
-| recent_ce_max | 4.076796 |
-| seconds_per_step | 1.817872 |
-| steps_per_hour | 1980.337079 |
-| eta_hours | 17.587915 |
-| estimated_completion_utc | 2026-05-24T11:50:26.298382+00:00 |
-| segment_token_presentations_per_second | 4506.367041 |
+| recent_ce_max | 4.074725 |
+| seconds_per_step | 1.817845 |
+| steps_per_hour | 1980.366873 |
+| eta_hours | 17.527055 |
+| estimated_completion_utc | 2026-05-24T11:50:30.612722+00:00 |
+| segment_token_presentations_per_second | 4506.434840 |
 | latest_complete_snapshot_step | - |
 | cumulative_token_presentations | 655360000 |
 
@@ -50,13 +51,13 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | --- | --- |
 | status | within_time_limit |
 | slurm_state | RUNNING |
-| elapsed | 2:37:44 |
+| elapsed | 2:41:28 |
 | time_limit | 1-00:00:00 |
-| elapsed_seconds | 9464 |
+| elapsed_seconds | 9688 |
 | time_limit_seconds | 86400 |
-| eta_seconds | 63316.493617 |
-| remaining_seconds | 76936 |
-| margin_seconds | 13619.506383 |
+| eta_seconds | 63097.399622 |
+| remaining_seconds | 76712 |
+| margin_seconds | 13614.600378 |
 | tight_margin_threshold_seconds | 1800 |
 | caveat | Compares current ETA with Slurm time remaining; it is a runtime-risk signal, not quality evidence. |
 
@@ -67,12 +68,41 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | status | fresh_running_log |
 | path | logs/bd-s2-655m-10250.out |
 | exists | True |
-| checked_utc | 2026-05-23T18:15:09.805303+00:00 |
-| mtime_utc | 2026-05-23T18:14:58.248028+00:00 |
-| age_seconds | 11.557275 |
+| checked_utc | 2026-05-23T18:18:53.213639+00:00 |
+| mtime_utc | 2026-05-23T18:18:38.407677+00:00 |
+| age_seconds | 14.805962 |
 | stale_after_seconds | 900 |
 | slurm_state | RUNNING |
 | caveat | Fresh logs are required while the Stage-2 producer is running. |
+
+## Producer Log Health
+
+| field | value |
+| --- | --- |
+| status | healthy |
+| path | logs/bd-s2-655m-10250.out |
+| parsed_step_rows | 530 |
+| first_step | 1 |
+| latest_step | 5290 |
+| latest_ce | 3.651335 |
+| latest_lr | 0.000002 |
+| latest_elapsed_seconds | 9616.400000 |
+| recent_window_rows | 20 |
+| recent_ce_mean | 3.694968 |
+| recent_ce_min | 3.209952 |
+| recent_ce_max | 4.074725 |
+| issue_count | 0 |
+| fatal_match_count | 0 |
+| caveat | This checks producer log structure and fatal patterns; it is not quality evidence. |
+
+| check | value |
+| --- | --- |
+| has_step_rows | True |
+| steps_monotonic | True |
+| elapsed_monotonic | True |
+| finite_numeric_values | True |
+| constant_lr_matches_expected | True |
+| latest_step_within_max_steps | True |
 
 ## Producer Config Gate
 

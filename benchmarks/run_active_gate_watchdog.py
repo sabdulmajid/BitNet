@@ -67,6 +67,8 @@ def build_summary() -> dict[str, Any]:
     latest_step = stage2.get("latest_step", {}) if isinstance(stage2.get("latest_step"), dict) else {}
     time_limit_gate = stage2.get("time_limit_gate", {}) if isinstance(stage2.get("time_limit_gate"), dict) else {}
     log_freshness = stage2.get("log_freshness", {}) if isinstance(stage2.get("log_freshness"), dict) else {}
+    log_health = stage2.get("log_health", {}) if isinstance(stage2.get("log_health"), dict) else {}
+    producer_config = stage2.get("producer_config", {}) if isinstance(stage2.get("producer_config"), dict) else {}
     return {
         "monitor_status": monitor.get("status"),
         "ingestion_status": ingestion.get("status"),
@@ -82,6 +84,8 @@ def build_summary() -> dict[str, Any]:
         "stage2_latest_ce": latest_step.get("ce"),
         "stage2_progress": stage2.get("progress"),
         "stage2_log_freshness": log_freshness.get("status"),
+        "stage2_log_health": log_health.get("status"),
+        "stage2_producer_config": producer_config.get("status"),
         "stage2_time_limit_status": time_limit_gate.get("status"),
         "stage2_time_limit_margin_seconds": time_limit_gate.get("margin_seconds"),
         "downstream_status": (monitor.get("downstream") or {}).get("status")

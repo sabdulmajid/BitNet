@@ -1,5 +1,5 @@
 {
-  "created_utc": "2026-05-23T18:15:09.805241+00:00",
+  "created_utc": "2026-05-23T18:18:53.213577+00:00",
   "downstream": {
     "caveat": "This section tracks downstream artifact existence only; it does not compute or claim MNLI accuracy.",
     "complete": false,
@@ -140,30 +140,56 @@
     "job_id": "10250",
     "latest_complete_snapshot_step": null,
     "latest_step": {
-      "ce": 3.9318,
-      "elapsed_seconds": 9398.4,
+      "ce": 3.651335,
+      "elapsed_seconds": 9616.4,
       "first_elapsed_seconds": 2.0,
       "first_step": 1,
+      "line_no": 548,
       "log_exists": true,
       "lr": 2e-06,
-      "parsed_log_rows": 518,
+      "parsed_log_rows": 530,
       "path": "logs/bd-s2-655m-10250.out",
-      "recent_ce_max": 4.076796,
-      "recent_ce_mean": 3.61352525,
+      "recent_ce_max": 4.074725,
+      "recent_ce_mean": 3.69496765,
       "recent_ce_min": 3.209952,
       "recent_window_rows": 20,
-      "step": 5170
+      "step": 5290
     },
     "log_freshness": {
-      "age_seconds": 11.557275,
+      "age_seconds": 14.805962,
       "caveat": "Fresh logs are required while the Stage-2 producer is running.",
-      "checked_utc": "2026-05-23T18:15:09.805303+00:00",
+      "checked_utc": "2026-05-23T18:18:53.213639+00:00",
       "exists": true,
-      "mtime_utc": "2026-05-23T18:14:58.248028+00:00",
+      "mtime_utc": "2026-05-23T18:18:38.407677+00:00",
       "path": "logs/bd-s2-655m-10250.out",
       "slurm_state": "RUNNING",
       "stale_after_seconds": 900,
       "status": "fresh_running_log"
+    },
+    "log_health": {
+      "caveat": "This checks producer log structure and fatal patterns; it is not quality evidence.",
+      "checks": {
+        "constant_lr_matches_expected": true,
+        "elapsed_monotonic": true,
+        "finite_numeric_values": true,
+        "has_step_rows": true,
+        "latest_step_within_max_steps": true,
+        "steps_monotonic": true
+      },
+      "fatal_matches": [],
+      "first_step": 1,
+      "issues": [],
+      "latest_ce": 3.651335,
+      "latest_elapsed_seconds": 9616.4,
+      "latest_lr": 2e-06,
+      "latest_step": 5290,
+      "parsed_step_rows": 530,
+      "path": "logs/bd-s2-655m-10250.out",
+      "recent_ce_max": 4.074725,
+      "recent_ce_mean": 3.69496765,
+      "recent_ce_min": 3.209952,
+      "recent_window_rows": 20,
+      "status": "healthy"
     },
     "max_steps": 40000,
     "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
@@ -346,15 +372,15 @@
       "mismatches": [],
       "status": "matched"
     },
-    "progress": 0.12925,
+    "progress": 0.13225,
     "progress_estimate": {
-      "estimated_completion_utc": "2026-05-24T11:50:26.298382+00:00",
-      "estimated_total_seconds": 72714.89361702128,
-      "eta_hours": 17.58791489361702,
-      "eta_seconds": 63316.493617021275,
-      "seconds_per_step": 1.817872340425532,
-      "segment_token_presentations_per_second": 4506.367041198501,
-      "steps_per_hour": 1980.3370786516855
+      "estimated_completion_utc": "2026-05-24T11:50:30.612722+00:00",
+      "estimated_total_seconds": 72713.79962192816,
+      "eta_hours": 17.527055450535602,
+      "eta_seconds": 63097.39962192817,
+      "seconds_per_step": 1.8178449905482041,
+      "segment_token_presentations_per_second": 4506.434840480845,
+      "steps_per_hour": 1980.366873258184
     },
     "root_metrics": {
       "exists": false,
@@ -367,7 +393,7 @@
       "name": "bd-s2-655m",
       "reason": "ece-nebula12",
       "state": "RUNNING",
-      "time": "2:37:44",
+      "time": "2:41:28",
       "time_limit": "1-00:00:00"
     },
     "snapshot_status": {
@@ -383,11 +409,11 @@
     },
     "time_limit_gate": {
       "caveat": "Compares current ETA with Slurm time remaining; it is a runtime-risk signal, not quality evidence.",
-      "elapsed": "2:37:44",
-      "elapsed_seconds": 9464,
-      "eta_seconds": 63316.493617021275,
-      "margin_seconds": 13619.506382978725,
-      "remaining_seconds": 76936,
+      "elapsed": "2:41:28",
+      "elapsed_seconds": 9688,
+      "eta_seconds": 63097.39962192817,
+      "margin_seconds": 13614.600378071831,
+      "remaining_seconds": 76712,
       "slurm_state": "RUNNING",
       "status": "within_time_limit",
       "tight_margin_threshold_seconds": 1800,

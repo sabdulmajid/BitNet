@@ -319,6 +319,48 @@ def validate_active_stage2_monitor(report: dict[str, Any], errors: list[str]) ->
         caveat = log_freshness.get("caveat")
         if not isinstance(caveat, str) or "Fresh logs are required" not in caveat:
             errors.append("stage2 monitor: log_freshness caveat must explain freshness requirement")
+    log_health = stage2.get("log_health")
+    if not isinstance(log_health, dict):
+        errors.append("stage2 monitor: missing log_health object")
+    else:
+        log_health_status = log_health.get("status")
+        allowed_log_health_statuses = {"missing_log", "no_steps", "healthy", "unhealthy"}
+        if log_health_status not in allowed_log_health_statuses:
+            errors.append(f"stage2 monitor: unexpected log_health status {log_health_status}")
+        if report.get("status") == "running" and log_health_status != "healthy":
+            errors.append(f"stage2 monitor: running producer log health is not healthy: {log_health_status}")
+        if not isinstance(log_health.get("parsed_step_rows"), int):
+            errors.append("stage2 monitor: log_health parsed_step_rows must be an integer")
+        issues = log_health.get("issues")
+        if not isinstance(issues, list):
+            errors.append("stage2 monitor: log_health issues must be a list")
+        elif issues:
+            errors.append(f"stage2 monitor: log_health issues present: {issues}")
+        fatal_matches = log_health.get("fatal_matches")
+        if not isinstance(fatal_matches, list):
+            errors.append("stage2 monitor: log_health fatal_matches must be a list")
+        elif fatal_matches:
+            errors.append(f"stage2 monitor: log_health fatal matches present: {fatal_matches}")
+        checks = log_health.get("checks")
+        if log_health_status == "healthy":
+            if not isinstance(checks, dict):
+                errors.append("stage2 monitor: healthy log_health must include checks")
+            else:
+                for key in (
+                    "has_step_rows",
+                    "steps_monotonic",
+                    "elapsed_monotonic",
+                    "finite_numeric_values",
+                    "latest_step_within_max_steps",
+                ):
+                    if checks.get(key) is not True:
+                        errors.append(f"stage2 monitor: log_health check failed {key}")
+                constant_lr = checks.get("constant_lr_matches_expected")
+                if constant_lr not in (True, None):
+                    errors.append("stage2 monitor: log_health constant LR check failed")
+        caveat = log_health.get("caveat")
+        if not isinstance(caveat, str) or "not quality evidence" not in caveat:
+            errors.append("stage2 monitor: log_health caveat must prohibit quality claims")
     producer_config = stage2.get("producer_config")
     if not isinstance(producer_config, dict):
         errors.append("stage2 monitor: missing producer_config object")

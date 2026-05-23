@@ -1,6 +1,6 @@
 # Active BitDistill Gate Watchdog
 
-Generated: `2026-05-23T18:15:10.711019+00:00`
+Generated: `2026-05-23T18:18:54.114236+00:00`
 
 Status: **passed**.
 
@@ -20,12 +20,14 @@ This watchdog refreshes status and validates artifacts; it does not create bench
 | next_blueprint_status | pending_655m_downstream |
 | next_blueprint_action | wait_and_watch_655m_gate |
 | stage2_job_id | 10250 |
-| stage2_latest_step | 5170 |
-| stage2_latest_ce | 3.931800 |
-| stage2_progress | 0.129250 |
+| stage2_latest_step | 5290 |
+| stage2_latest_ce | 3.651335 |
+| stage2_progress | 0.132250 |
 | stage2_log_freshness | fresh_running_log |
+| stage2_log_health | healthy |
+| stage2_producer_config | matched |
 | stage2_time_limit_status | within_time_limit |
-| stage2_time_limit_margin_seconds | 1.362e+04 |
+| stage2_time_limit_margin_seconds | 1.361e+04 |
 | downstream_status | waiting_for_handoff |
 | telemetry_state | PENDING |
 
@@ -33,19 +35,19 @@ This watchdog refreshes status and validates artifacts; it does not create bench
 
 | label | passed | returncode | elapsed seconds |
 | --- | --- | --- | --- |
-| monitor active Stage-2 extension | true | 0 | 0.102537 |
-| audit 655M ingestion | true | 0 | 0.105577 |
-| audit active Slurm batch scripts | true | 0 | 0.111840 |
-| build next decision | true | 0 | 0.070994 |
-| build next experiment blueprint | true | 0 | 0.069505 |
-| build current goal status | true | 0 | 0.082929 |
-| build deep research handoff | true | 0 | 0.072798 |
-| build goal traceability | true | 0 | 0.095328 |
-| build paper alignment audit | true | 0 | 0.068605 |
-| build publication/product plan | true | 0 | 0.067142 |
-| validate fail-closed reports | true | 0 | 0.071894 |
-| compile Python sources | true | 0 | 0.071644 |
-| check Slurm shell syntax | true | 0 | 0.004630 |
+| monitor active Stage-2 extension | true | 0 | 0.126913 |
+| audit 655M ingestion | true | 0 | 0.100152 |
+| audit active Slurm batch scripts | true | 0 | 0.110910 |
+| build next decision | true | 0 | 0.070482 |
+| build next experiment blueprint | true | 0 | 0.067812 |
+| build current goal status | true | 0 | 0.081773 |
+| build deep research handoff | true | 0 | 0.072558 |
+| build goal traceability | true | 0 | 0.095227 |
+| build paper alignment audit | true | 0 | 0.068341 |
+| build publication/product plan | true | 0 | 0.066970 |
+| validate fail-closed reports | true | 0 | 0.072388 |
+| compile Python sources | true | 0 | 0.072225 |
+| check Slurm shell syntax | true | 0 | 0.006407 |
 
 ## Failures
 
