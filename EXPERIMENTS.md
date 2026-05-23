@@ -146,6 +146,18 @@ Job `10252` is dependency-blocked on `afterok:10250`. It is a short 200-step
 component-gradient telemetry diagnostic with `ATTENTION_KD_WEIGHT=60`; it is
 not a task-quality benchmark.
 
+After it materializes, rebuild the training-dynamics audit:
+
+```bash
+python benchmarks/audit_bitdistill_training_dynamics.py \
+  --output-json benchmarks/results/bitdistill_training_dynamics_2026-05-23.json \
+  --output-md benchmarks/results/bitdistill_training_dynamics_2026-05-23.md
+```
+
+The audit includes both paper-gamma telemetry directories and the queued
+`bitdistill-glue-seqcls-telemetry-gamma60` directory. Compare component-gradient
+ratios, not task accuracy, for this diagnostic.
+
 ## Active Gate Monitor
 
 Use this while `10250`, `10251`, and `10252` are still live:

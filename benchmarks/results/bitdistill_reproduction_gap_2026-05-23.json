@@ -14,7 +14,7 @@
     },
     "training_dynamics": {
       "path": "benchmarks/results/bitdistill_training_dynamics_2026-05-23.json",
-      "sha256": "270ae7aa2e73a78ab112ee4e9017fab1dfa9c632920b00f089ff8d63769006f2"
+      "sha256": "8861b2102e7b06f5967ae9497303bc66febab6d6a18ee21f553d8b0d5a57ca39"
     }
   },
   "conclusions": [
@@ -39,7 +39,7 @@
       "finding": "Local paper-gamma training dynamics are still suspect."
     }
   ],
-  "created_utc": "2026-05-23T15:33:41.547741+00:00",
+  "created_utc": "2026-05-23T15:54:35.767260+00:00",
   "metrics": {
     "bitdistill_163_84m_mnli": 0.6911869587366276,
     "bitdistill_327_68m_ci95": [

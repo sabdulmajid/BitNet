@@ -132,6 +132,38 @@ def validate_stage2_handoff_submission(report: dict[str, Any], errors: list[str]
         errors.append(f"stage2 handoff: script does not exist: {script}")
 
 
+def validate_gradient_telemetry_submission(report: dict[str, Any], errors: list[str]) -> None:
+    if report.get("schema") != "bitdistill-gradient-telemetry-submission-v1":
+        errors.append(f"gamma telemetry: unexpected schema {report.get('schema')}")
+    if report.get("status") not in {"dependency_pending", "running", "complete", "failed"}:
+        errors.append(f"gamma telemetry: unexpected status {report.get('status')}")
+    if report.get("dependency") != "afterok:10250":
+        errors.append(f"gamma telemetry: unexpected dependency {report.get('dependency')}")
+    config = report.get("run_config", {})
+    if not isinstance(config, dict):
+        errors.append("gamma telemetry: missing run_config object")
+        return
+    if config.get("attention_kd_weight") != 60:
+        errors.append(f"gamma telemetry: expected attention_kd_weight 60, got {config.get('attention_kd_weight')}")
+    if config.get("max_steps") != 200:
+        errors.append(f"gamma telemetry: expected max_steps 200, got {config.get('max_steps')}")
+    if config.get("telemetry_component_grad_norms") is not True:
+        errors.append("gamma telemetry: component gradient telemetry is not enabled")
+    output_dir = config.get("output_dir")
+    if not isinstance(output_dir, str) or "telemetry-gamma60" not in output_dir:
+        errors.append(f"gamma telemetry: unexpected output_dir {output_dir}")
+    target = report.get("comparison_target", {})
+    if not isinstance(target, dict):
+        errors.append("gamma telemetry: missing comparison_target object")
+    else:
+        existing_report = target.get("existing_report")
+        if not isinstance(existing_report, str) or not Path(existing_report).exists():
+            errors.append(f"gamma telemetry: comparison report does not exist: {existing_report}")
+    caveat = report.get("caveat")
+    if not isinstance(caveat, str) or "not a quality benchmark" not in caveat:
+        errors.append("gamma telemetry: missing non-quality-benchmark caveat")
+
+
 def validate_active_stage2_monitor(report: dict[str, Any], errors: list[str]) -> None:
     if report.get("schema") != "bitnet-active-stage2-extension-monitor-v1":
         errors.append(f"stage2 monitor: unexpected schema {report.get('schema')}")
@@ -221,6 +253,14 @@ def validate_reproduction_gap_docs(
     require_contains("README stage2 extension tokens", "655.36M", readme, errors)
     require_contains("README stage2 handoff job", "10251", readme, errors)
     require_contains("README stage2 handoff dependency", "afterok:10250", readme, errors)
+    require_contains(
+        "README gamma telemetry report",
+        "gamma60_telemetry_submission_2026-05-23.md",
+        readme,
+        errors,
+    )
+    require_contains("README gamma telemetry job", "10252", readme, errors)
+    require_contains("README gamma telemetry caveat", "not a quality benchmark", readme, errors)
 
 
 def validate_claims_doc(bundle: dict[str, Any], claims_doc: str, errors: list[str]) -> None:
@@ -284,6 +324,11 @@ def main() -> int:
         default=Path("benchmarks/results/stage2_655m_handoff_submission_2026-05-23.json"),
     )
     parser.add_argument(
+        "--gamma-telemetry-submission",
+        type=Path,
+        default=Path("benchmarks/results/gamma60_telemetry_submission_2026-05-23.json"),
+    )
+    parser.add_argument(
         "--stage2-monitor",
         type=Path,
         default=Path("benchmarks/results/active_stage2_extension_monitor_2026-05-23.json"),
@@ -294,6 +339,7 @@ def main() -> int:
     reproduction_gap = load_json(args.reproduction_gap)
     stage2_extension = load_json(args.stage2_extension)
     stage2_handoff = load_json(args.stage2_handoff)
+    gamma_telemetry = load_json(args.gamma_telemetry_submission)
     stage2_monitor = load_json(args.stage2_monitor)
     readme = read_text(args.readme)
     claims_doc = read_text(args.claims)
@@ -302,6 +348,7 @@ def main() -> int:
     validate_reproduction_gap(reproduction_gap, errors)
     validate_stage2_extension_submission(stage2_extension, errors)
     validate_stage2_handoff_submission(stage2_handoff, errors)
+    validate_gradient_telemetry_submission(gamma_telemetry, errors)
     validate_active_stage2_monitor(stage2_monitor, errors)
     validate_readme(bundle, readme, errors)
     validate_reproduction_gap_docs(reproduction_gap, readme, claims_doc, errors)

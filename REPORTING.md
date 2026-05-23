@@ -72,6 +72,10 @@ quality benchmarks. The current equalized-gamma submission is:
 benchmarks/results/gamma60_telemetry_submission_2026-05-23.md
 ```
 
+`validate_public_docs.py` validates this submission as a diagnostic handoff:
+dependency, coefficient, telemetry settings, comparison report, and caveat must
+all be present before the public docs pass.
+
 Active long-running gates can be monitored without changing quality claims:
 
 ```bash

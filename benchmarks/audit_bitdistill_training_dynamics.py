@@ -86,6 +86,21 @@ def classify_path(path: Path) -> str:
     return "other"
 
 
+def trace_label(path: Path) -> str:
+    parent = path.parent.name
+    if parent:
+        return parent
+    return path.name
+
+
+def infer_attention_kd_weight(loss: dict[str, Any]) -> float | None:
+    raw = loss.get("attention_kd")
+    weighted = loss.get("weighted_attention_kd")
+    if finite(raw) and finite(weighted) and abs(float(raw)) > 0.0:
+        return float(weighted) / float(raw)
+    return None
+
+
 def summarize_trace(path: Path) -> dict[str, Any]:
     rows = read_jsonl(path)
     kind = classify_path(path)
@@ -155,13 +170,16 @@ def summarize_trace(path: Path) -> dict[str, Any]:
         for key in ("weighted_attention_q_kd", "weighted_attention_k_kd", "weighted_attention_v_kd")
         if finite(final_loss.get(key))
     }
+    inferred_attention_kd_weight = infer_attention_kd_weight(final_loss)
 
     return {
         "path": str(path),
+        "label": trace_label(path),
         "kind": kind,
         "rows": len(rows),
         "first_step": min(steps) if steps else None,
         "last_step": max(steps) if steps else None,
+        "inferred_attention_kd_weight": inferred_attention_kd_weight,
         "has_component_grad_norms": bool(grad_rows),
         "has_activation": bool(activation_rows),
         "has_dynamics": bool(dynamics_compared),
@@ -262,11 +280,12 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
 def render_markdown(summary: dict[str, Any]) -> str:
     rows = [
         [
-            Path(trace["path"]).name,
+            trace.get("label") or Path(trace["path"]).name,
             trace["kind"],
             trace["rows"],
             trace["first_step"],
             trace["last_step"],
+            trace["inferred_attention_kd_weight"],
             trace["has_component_grad_norms"],
             trace["has_activation"],
             trace["has_dynamics"],
@@ -292,6 +311,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 "rows",
                 "first",
                 "last",
+                "attn KD weight",
                 "grad",
                 "A8",
                 "dyn",
@@ -318,6 +338,7 @@ def main() -> None:
             f"benchmark_results/bitdistill-smoke-contract-{DATE}/task_sft_row/telemetry.jsonl",
             "checkpoints/bitdistill-glue-seqcls-telemetry/**/telemetry.jsonl",
             "checkpoints/bitdistill-glue-seqcls-telemetry-fast/**/telemetry.jsonl",
+            "checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/**/telemetry.jsonl",
         ],
     )
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_training_dynamics_{DATE}.json"))

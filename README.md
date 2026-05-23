@@ -51,6 +51,7 @@ FP16-SFT MNLI reference.
 Active next gate:
 
 - [stage2_655m_submission_2026-05-23.md](benchmarks/results/stage2_655m_submission_2026-05-23.md)
+- [gamma60_telemetry_submission_2026-05-23.md](benchmarks/results/gamma60_telemetry_submission_2026-05-23.md)
 
 Job `10250` is a cumulative continuation from the verified `327.68M` checkpoint
 to `655.36M` token presentations. It is explicitly labeled as a continuation
@@ -58,6 +59,11 @@ with a fresh optimizer/scheduler segment, not an uninterrupted 80k-step run.
 A dependent handoff job, `10251`, is queued with `afterok:10250` to build the
 655M manifest and submit the matched downstream MNLI evaluation if Stage-2
 finishes successfully.
+
+Job `10252` is a dependent gamma-60 component-gradient diagnostic; it is not a quality benchmark.
+Its role is to compare a lower attention-KD coefficient against the existing
+paper-gamma telemetry, where attention KD dominates CE under this
+implementation's current loss reductions.
 
 ## What This Fork Adds
 

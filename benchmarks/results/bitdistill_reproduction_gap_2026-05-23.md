@@ -47,4 +47,4 @@ Status: **not reproduced**. This report separates the now-improved BitNet-SFT ba
 | bitnet_sft_budget | benchmarks/results/bitnet_sft_budget_sweep_2026-05-23.json | b9bec4ae74fbadf2e82488f7be53fbb2fb31ddeb375a61d42070bc93248191f6 |
 | canonical_bundle | benchmarks/results/canonical_evidence_bundle_2026-05-20.json | 767ca0548cb2143d3a44fcca5facabe521621b7344dd7db62d05074fbce30070 |
 | controlled_curve | benchmarks/results/bitdistill_controlled_curve_2026-05-20.json | 5b09d697182c852899781af932c193f525062bc190d888c2b0ff17cb8b7dd3d9 |
-| training_dynamics | benchmarks/results/bitdistill_training_dynamics_2026-05-23.json | 270ae7aa2e73a78ab112ee4e9017fab1dfa9c632920b00f089ff8d63769006f2 |
+| training_dynamics | benchmarks/results/bitdistill_training_dynamics_2026-05-23.json | 8861b2102e7b06f5967ae9497303bc66febab6d6a18ee21f553d8b0d5a57ca39 |
