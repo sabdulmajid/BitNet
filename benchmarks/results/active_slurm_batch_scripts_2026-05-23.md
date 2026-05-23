@@ -20,6 +20,28 @@ Quality claim: **none**. This validates queued script contents only.
 | 10255 | --downstream-failure-mode "" | true |
 | 10255 | slurm_stage2_655m_postprocess.sh | true |
 | 10255 | POSTPROCESS_JOB_ID | true |
+| 10255 | INIT_STATE_MANIFEST="$MANIFEST_JSON" | true |
+| 10255 | SCALE_MODE=tensor | true |
+| 10255 | TASK_NAME=mnli | true |
+| 10255 | TASK_FORMAT=sequence_classification | true |
+| 10255 | LABEL_SCHEME=letters | true |
+| 10255 | CANDIDATE_SCORE=mean | true |
+| 10255 | TEACHER_MODEL=checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1 | true |
+| 10255 | ATTENTION_KD_WEIGHT=100000 | true |
+| 10255 | LOGIT_KD_WEIGHT=10 | true |
+| 10255 | LOGIT_TEMPERATURE=5.0 | true |
+| 10255 | LOGIT_KD_TEMPERATURE_SCALE=none | true |
+| 10255 | ATTENTION_TEMPERATURE=1.0 | true |
+| 10255 | INIT_OUTPUT_HEAD_FROM_TEACHER=1 | true |
+| 10255 | MAX_SEQ_LEN=512 | true |
+| 10255 | MAX_STEPS=10000 | true |
+| 10255 | PER_DEVICE_BATCH_SIZE=4 | true |
+| 10255 | GRAD_ACCUM_STEPS=4 | true |
+| 10255 | LR=2e-5 | true |
+| 10255 | LR_SCHEDULER=cosine | true |
+| 10255 | SAVE_MODEL_ARTIFACTS=0 | true |
+| 10255 | OUTPUT_DIR="$DOWNSTREAM_OUTPUT_DIR" | true |
+| 10255 | sbatch --parsable --partition=midcard --job-name=bd-mnli-655m slurm_bitdistill_glue.sh | true |
 | local | build_bitdistill_next_decision.py | true |
 | local | DECISION_JSON | true |
 | local | DECISION_MD | true |

@@ -1,6 +1,6 @@
 # BitDistill Goal Traceability Audit
 
-Generated: `2026-05-23T18:00:08.965643+00:00`
+Generated: `2026-05-23T18:02:12.677561+00:00`
 
 Quality claim: **traceability_from_existing_artifacts_not_new_benchmark**.
 
@@ -14,18 +14,18 @@ The original universal retrofit thesis is disproven for the tested dense-Qwen se
 
 | job id | name | state | time | reason |
 | --- | --- | --- | --- | --- |
-| 10250 | bd-s2-655m | RUNNING | 2:22:43 | ece-nebula12 |
+| 10250 | bd-s2-655m | RUNNING | 2:24:47 | ece-nebula12 |
 | 10255 | bd-655m-handoff | PENDING | 0:00 | (Dependency) |
 | 10257 | bd-g60-telemetry | PENDING | 0:00 | (Dependency) |
 
 | stage2 field | value |
 | --- | --- |
-| latest_step | 4680 |
+| latest_step | 4740 |
 | max_steps | 40000 |
-| progress | 0.117000 |
-| latest_ce | 3.724242 |
-| recent_ce_mean | 3.798674 |
-| eta_hours | 17.834000 |
+| progress | 0.118500 |
+| latest_ce | 3.878415 |
+| recent_ce_mean | 3.757647 |
+| eta_hours | 17.803572 |
 | log_path | logs/bd-s2-655m-10250.out |
 
 ## Requirement Traceability
@@ -34,7 +34,7 @@ The original universal retrofit thesis is disproven for the tested dense-Qwen se
 | --- | --- | --- | --- | --- | --- |
 | Post-training ternary math audit | proven_negative_for_tested_dense_qwen | strong empirical plus analytic probe | FP PPL 13.901475; PTQ PPL 3813121.803327; FP ten-task mean 0.644169; PTQ mean 0.348671; math test present True | The claim is scoped to tested dense Qwen checkpoints, not every possible architecture. | Keep this as the headline negative result; do not market universal conversion. |
 | BitLinear/SubLN implementation | implemented_alignment_still_under_quality_audit | source evidence plus training artifacts | SubLN source check True; BitNet-SFT best budget row 0.628935; default row 0.487621 | Implementation exists, but paper-level BitDistill recovery is not proven. | Use 655M and gamma telemetry to decide whether to continue budget scaling or audit recipe alignment. |
-| Stage-2 continued pretraining | active_extension_running | completed 327.68M row plus live 655.36M job | completed latest tokens 327,680,000; latest MNLI 0.720020; live job RUNNING; live step 4680; ETA hours 17.83 | 655.36M downstream MNLI and paired prediction trace are pending. | Wait for job 10250, handoff 10255, and postprocess before changing experiment axes. |
+| Stage-2 continued pretraining | active_extension_running | completed 327.68M row plus live 655.36M job | completed latest tokens 327,680,000; latest MNLI 0.720020; live job RUNNING; live step 4740; ETA hours 17.80 | 655.36M downstream MNLI and paired prediction trace are pending. | Wait for job 10250, handoff 10255, and postprocess before changing experiment axes. |
 | Stage-3 downstream CE + logits KL + attention-relation KD | implemented_but_not_reproduced | source evidence plus MNLI curve | loss source check True; FP16-SFT MNLI 0.808151; 327.68M BitDistill MNLI 0.720020; delta -0.088130 | Not within the 0.5-1.0 point FP recovery target. | Do not expand to claims; use the next decision gate after 655M/gamma evidence. |
 | MNLI/QNLI/SST2 paper-style baseline reproduction | partial_mnli_focused_not_complete | MNLI controlled rows and earlier GLUE audits | FP16-SFT MNLI 0.808151; BitNet-SFT best MNLI 0.628935; BitDistill latest MNLI 0.720020; scoreboard status mixed_supported_and_blocked | QNLI/SST2 should be run only after a credible MNLI recovery row or recipe fix. | Gate QNLI/SST2 on the MNLI recovery decision to avoid wasting compute. |
 | Row-scale novelty vs paper-style tensor scale | supported_as_retrofit_variant | paired quality evidence plus runtime contract | row-scale QAT mean 0.499459; recovery vs PTQ +0.150788; row-scale RMS 0.000197; one-scale RMS 1.904230 | Row scale is not standard BitDistill and does not close FP gap yet. | Keep row-scale results labeled as retrofit-variant systems work. |

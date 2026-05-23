@@ -27,12 +27,100 @@
         {
           "present": true,
           "snippet": "POSTPROCESS_JOB_ID"
+        },
+        {
+          "present": true,
+          "snippet": "INIT_STATE_MANIFEST=\"$MANIFEST_JSON\""
+        },
+        {
+          "present": true,
+          "snippet": "SCALE_MODE=tensor"
+        },
+        {
+          "present": true,
+          "snippet": "TASK_NAME=mnli"
+        },
+        {
+          "present": true,
+          "snippet": "TASK_FORMAT=sequence_classification"
+        },
+        {
+          "present": true,
+          "snippet": "LABEL_SCHEME=letters"
+        },
+        {
+          "present": true,
+          "snippet": "CANDIDATE_SCORE=mean"
+        },
+        {
+          "present": true,
+          "snippet": "TEACHER_MODEL=checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1"
+        },
+        {
+          "present": true,
+          "snippet": "ATTENTION_KD_WEIGHT=100000"
+        },
+        {
+          "present": true,
+          "snippet": "LOGIT_KD_WEIGHT=10"
+        },
+        {
+          "present": true,
+          "snippet": "LOGIT_TEMPERATURE=5.0"
+        },
+        {
+          "present": true,
+          "snippet": "LOGIT_KD_TEMPERATURE_SCALE=none"
+        },
+        {
+          "present": true,
+          "snippet": "ATTENTION_TEMPERATURE=1.0"
+        },
+        {
+          "present": true,
+          "snippet": "INIT_OUTPUT_HEAD_FROM_TEACHER=1"
+        },
+        {
+          "present": true,
+          "snippet": "MAX_SEQ_LEN=512"
+        },
+        {
+          "present": true,
+          "snippet": "MAX_STEPS=10000"
+        },
+        {
+          "present": true,
+          "snippet": "PER_DEVICE_BATCH_SIZE=4"
+        },
+        {
+          "present": true,
+          "snippet": "GRAD_ACCUM_STEPS=4"
+        },
+        {
+          "present": true,
+          "snippet": "LR=2e-5"
+        },
+        {
+          "present": true,
+          "snippet": "LR_SCHEDULER=cosine"
+        },
+        {
+          "present": true,
+          "snippet": "SAVE_MODEL_ARTIFACTS=0"
+        },
+        {
+          "present": true,
+          "snippet": "OUTPUT_DIR=\"$DOWNSTREAM_OUTPUT_DIR\""
+        },
+        {
+          "present": true,
+          "snippet": "sbatch --parsable --partition=midcard --job-name=bd-mnli-655m slurm_bitdistill_glue.sh"
         }
       ],
       "job_id": "10255",
       "passed": true,
       "purpose": "655M Stage-2 handoff",
-      "scontrol_message": "batch script for job 10255 written to /tmp/bitnet-slurm-script-2n7gpdm1/10255.sh",
+      "scontrol_message": "batch script for job 10255 written to /tmp/bitnet-slurm-script-0ki8e3kc/10255.sh",
       "script_available": true,
       "slurm": {
         "job_id": "10255",
@@ -117,7 +205,7 @@
       "job_id": "10257",
       "passed": true,
       "purpose": "gamma-60 gradient telemetry",
-      "scontrol_message": "batch script for job 10257 written to /tmp/bitnet-slurm-script-1i80_h61/10257.sh",
+      "scontrol_message": "batch script for job 10257 written to /tmp/bitnet-slurm-script-meovwwmo/10257.sh",
       "script_available": true,
       "slurm": {
         "job_id": "10257",
@@ -128,7 +216,7 @@
       }
     }
   ],
-  "created_utc": "2026-05-23T18:00:08.569160+00:00",
+  "created_utc": "2026-05-23T18:02:12.281271+00:00",
   "quality_claim": "none",
   "schema": "bitnet-active-slurm-batch-script-audit-v1",
   "status": "passed"
