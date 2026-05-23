@@ -118,6 +118,20 @@ def validate_stage2_extension_submission(report: dict[str, Any], errors: list[st
         errors.append("stage2 extension: token presentation fields must be integers")
 
 
+def validate_stage2_handoff_submission(report: dict[str, Any], errors: list[str]) -> None:
+    if report.get("schema") != "bitnet-stage2-extension-handoff-submission-v1":
+        errors.append(f"stage2 handoff: unexpected schema {report.get('schema')}")
+    if report.get("status") not in {"dependency_pending", "running", "submitted_downstream", "failed"}:
+        errors.append(f"stage2 handoff: unexpected status {report.get('status')}")
+    if report.get("dependency") != "afterok:10250":
+        errors.append(f"stage2 handoff: unexpected dependency {report.get('dependency')}")
+    script = report.get("script")
+    if not isinstance(script, str) or not script:
+        errors.append("stage2 handoff: missing script")
+    elif not Path(script).exists():
+        errors.append(f"stage2 handoff: script does not exist: {script}")
+
+
 def validate_readme(bundle: dict[str, Any], readme: str, errors: list[str]) -> None:
     claims = bundle["claims"]
     blind = claims["blind_ptq"]
@@ -187,6 +201,8 @@ def validate_reproduction_gap_docs(
     )
     require_contains("README stage2 extension job", "10250", readme, errors)
     require_contains("README stage2 extension tokens", "655.36M", readme, errors)
+    require_contains("README stage2 handoff job", "10251", readme, errors)
+    require_contains("README stage2 handoff dependency", "afterok:10250", readme, errors)
 
 
 def validate_claims_doc(bundle: dict[str, Any], claims_doc: str, errors: list[str]) -> None:
@@ -244,17 +260,24 @@ def main() -> int:
         type=Path,
         default=Path("benchmarks/results/stage2_655m_submission_2026-05-23.json"),
     )
+    parser.add_argument(
+        "--stage2-handoff",
+        type=Path,
+        default=Path("benchmarks/results/stage2_655m_handoff_submission_2026-05-23.json"),
+    )
     args = parser.parse_args()
 
     bundle = load_json(args.bundle)
     reproduction_gap = load_json(args.reproduction_gap)
     stage2_extension = load_json(args.stage2_extension)
+    stage2_handoff = load_json(args.stage2_handoff)
     readme = read_text(args.readme)
     claims_doc = read_text(args.claims)
     errors: list[str] = []
     validate_artifacts(bundle, errors)
     validate_reproduction_gap(reproduction_gap, errors)
     validate_stage2_extension_submission(stage2_extension, errors)
+    validate_stage2_handoff_submission(stage2_handoff, errors)
     validate_readme(bundle, readme, errors)
     validate_reproduction_gap_docs(reproduction_gap, readme, claims_doc, errors)
     validate_claims_doc(bundle, claims_doc, errors)

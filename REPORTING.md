@@ -59,6 +59,12 @@ cumulative token presentations. The current pending extension is:
 benchmarks/results/stage2_655m_submission_2026-05-23.md
 ```
 
+The dependent handoff submission is:
+
+```text
+benchmarks/results/stage2_655m_handoff_submission_2026-05-23.md
+```
+
 ## Preferred Public Labels
 
 | Label | Meaning |

@@ -1,0 +1,22 @@
+{
+  "schema": "bitnet-stage2-extension-handoff-submission-v1",
+  "created_utc": "2026-05-23T15:42:00+00:00",
+  "status": "dependency_pending",
+  "stage2_job_id": "10250",
+  "handoff_job_id": "10251",
+  "dependency": "afterok:10250",
+  "partition": "midcard",
+  "script": "slurm_stage2_655m_handoff.sh",
+  "work_dir": "/mnt/slurm_nfs/a6abdulm/projects/BitNet",
+  "expected_manifest_json": "benchmarks/results/stage2_manifest_655m_2026-05-23.json",
+  "expected_manifest_md": "benchmarks/results/stage2_manifest_655m_2026-05-23.md",
+  "expected_downstream_output_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit",
+  "expected_handoff_json": "benchmarks/results/stage2_655m_handoff_2026-05-23.json",
+  "expected_handoff_md": "benchmarks/results/stage2_655m_handoff_2026-05-23.md",
+  "slurm_state_at_submission": {
+    "job_state": "PENDING",
+    "reason": "Dependency",
+    "dependency_text": "afterok:10250(unfulfilled)"
+  },
+  "caveat": "The handoff job has not run yet. It will only build the 655M manifest and submit the matched downstream MNLI job if Stage-2 job 10250 exits successfully."
+}

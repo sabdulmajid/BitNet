@@ -126,6 +126,15 @@ python benchmarks/build_stage2_manifest.py \
   --output-md benchmarks/results/stage2_manifest_655m_2026-05-23.md
 ```
 
+A dependent handoff has also been queued:
+
+- `benchmarks/results/stage2_655m_handoff_submission_2026-05-23.json`
+- `benchmarks/results/stage2_655m_handoff_submission_2026-05-23.md`
+
+Job `10251` has dependency `afterok:10250`. If `10250` succeeds, it will build
+and validate the `655.36M` manifest and submit the matched downstream MNLI
+BitDistill job.
+
 ## Validation
 
 ```bash
