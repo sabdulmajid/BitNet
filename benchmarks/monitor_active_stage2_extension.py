@@ -53,11 +53,12 @@ def parse_latest_step(log_path: Path) -> dict[str, Any]:
     if not log_path.exists():
         return {"log_exists": False}
     latest: dict[str, Any] = {"log_exists": True, "path": str(log_path)}
+    rows: list[dict[str, Any]] = []
     for line in log_path.read_text(encoding="utf-8", errors="replace").splitlines():
         match = STEP_RE.search(line)
         if not match:
             continue
-        latest = {
+        row = {
             "log_exists": True,
             "path": str(log_path),
             "step": int(match.group("step")),
@@ -65,6 +66,22 @@ def parse_latest_step(log_path: Path) -> dict[str, Any]:
             "lr": float(match.group("lr")),
             "elapsed_seconds": float(match.group("elapsed")),
         }
+        rows.append(row)
+        latest = row
+    if rows:
+        recent = rows[-20:]
+        recent_ce = [float(row["ce"]) for row in recent]
+        latest.update(
+            {
+                "parsed_log_rows": len(rows),
+                "first_step": rows[0]["step"],
+                "first_elapsed_seconds": rows[0]["elapsed_seconds"],
+                "recent_window_rows": len(recent),
+                "recent_ce_mean": sum(recent_ce) / len(recent_ce),
+                "recent_ce_min": min(recent_ce),
+                "recent_ce_max": max(recent_ce),
+            }
+        )
     return latest
 
 
@@ -305,6 +322,11 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["latest_ce", latest.get("ce", "")],
                     ["latest_lr", latest.get("lr", "")],
                     ["log_elapsed_seconds", latest.get("elapsed_seconds", "")],
+                    ["parsed_log_rows", latest.get("parsed_log_rows", "")],
+                    ["recent_window_rows", latest.get("recent_window_rows", "")],
+                    ["recent_ce_mean", latest.get("recent_ce_mean", "")],
+                    ["recent_ce_min", latest.get("recent_ce_min", "")],
+                    ["recent_ce_max", latest.get("recent_ce_max", "")],
                     ["seconds_per_step", estimate.get("seconds_per_step")],
                     ["steps_per_hour", estimate.get("steps_per_hour")],
                     ["eta_hours", estimate.get("eta_hours")],
