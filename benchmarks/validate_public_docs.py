@@ -467,6 +467,45 @@ def validate_goal_traceability(report: dict[str, Any], readme: str, errors: list
     )
 
 
+def validate_publication_product_plan(report: dict[str, Any], readme: str, errors: list[str]) -> None:
+    if report.get("schema") != "bitdistill-publication-product-plan-v1":
+        errors.append(f"publication/product plan: unexpected schema {report.get('schema')}")
+    if report.get("quality_claim") != "planning_from_existing_artifacts_not_new_benchmark":
+        errors.append(f"publication/product plan: unexpected quality_claim {report.get('quality_claim')}")
+    if report.get("status") != "research_mvp_with_pending_quality_gate":
+        errors.append(f"publication/product plan: unexpected status {report.get('status')}")
+    product = report.get("product_mvp")
+    if not isinstance(product, dict) or product.get("name") != "CPU-first ternary retrofit evaluator":
+        errors.append("publication/product plan: missing product MVP framing")
+    units = report.get("publishable_units")
+    if not isinstance(units, list) or len(units) < 5:
+        errors.append("publication/product plan: missing publishable units")
+    else:
+        names = {str(row.get("unit")) for row in units if isinstance(row, dict)}
+        for name in ("Negative PTQ result", "Row-scale runtime contract", "BitDistill reproduction gap", "MoE/Kimi"):
+            if name not in names:
+                errors.append(f"publication/product plan: missing unit {name}")
+    rules = report.get("claim_rules")
+    if not isinstance(rules, dict):
+        errors.append("publication/product plan: missing claim rules")
+    else:
+        avoid = rules.get("avoid")
+        if not isinstance(avoid, list) or "universal converter" not in avoid:
+            errors.append("publication/product plan: missing universal-converter avoid rule")
+    require_contains(
+        "README publication/product plan report",
+        "bitdistill_publication_product_plan_2026-05-23.md",
+        readme,
+        errors,
+    )
+    require_contains(
+        "README publication/product plan json",
+        "bitdistill_publication_product_plan_2026-05-23.json",
+        readme,
+        errors,
+    )
+
+
 def validate_readme(bundle: dict[str, Any], readme: str, errors: list[str]) -> None:
     claims = bundle["claims"]
     blind = claims["blind_ptq"]
@@ -675,6 +714,11 @@ def main() -> int:
         default=Path("benchmarks/results/bitdistill_goal_traceability_2026-05-23.json"),
     )
     parser.add_argument(
+        "--publication-product-plan",
+        type=Path,
+        default=Path("benchmarks/results/bitdistill_publication_product_plan_2026-05-23.json"),
+    )
+    parser.add_argument(
         "--active-slurm-batch-scripts",
         type=Path,
         default=Path("benchmarks/results/active_slurm_batch_scripts_2026-05-23.json"),
@@ -691,6 +735,7 @@ def main() -> int:
     deep_research_handoff = load_json(args.deep_research_handoff)
     benchmark_scoreboard = load_json(args.benchmark_scoreboard)
     goal_traceability = load_json(args.goal_traceability)
+    publication_product_plan = load_json(args.publication_product_plan)
     active_slurm_batch_scripts = load_json(args.active_slurm_batch_scripts)
     readme = read_text(args.readme)
     claims_doc = read_text(args.claims)
@@ -705,6 +750,7 @@ def main() -> int:
     validate_deep_research_handoff(deep_research_handoff, errors)
     validate_benchmark_scoreboard(benchmark_scoreboard, readme, errors)
     validate_goal_traceability(goal_traceability, readme, errors)
+    validate_publication_product_plan(publication_product_plan, readme, errors)
     validate_active_slurm_batch_scripts(active_slurm_batch_scripts, errors)
     validate_readme(bundle, readme, errors)
     validate_reproduction_gap_docs(reproduction_gap, readme, claims_doc, errors)
