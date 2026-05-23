@@ -1,6 +1,6 @@
 {
   "caveat": "This validates the queued handoff path only. It does not run downstream evaluation or update quality claims.",
-  "created_utc": "2026-05-23T18:55:09.991225+00:00",
+  "created_utc": "2026-05-23T18:57:53.005813+00:00",
   "dry_run": null,
   "dry_run_manifest_command": [],
   "expected_manifest_command": [
@@ -54,7 +54,7 @@
     }
   ],
   "final_snapshot": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000",
-  "latest_step": 6490,
+  "latest_step": 6580,
   "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
   "preflight_checks": [
     {
@@ -163,6 +163,14 @@
       "passed": true,
       "path": "checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1",
       "required_now": true
+    },
+    {
+      "exists": true,
+      "kind": "source_contract",
+      "label": "training save contract matches handoff assumptions",
+      "passed": true,
+      "path": "train_bitdistill.py",
+      "required_now": true
     }
   ],
   "quality_claim": "none",
@@ -172,23 +180,23 @@
     "name": "bd-s2-655m",
     "reason": "ece-nebula12",
     "state": "RUNNING",
-    "time": "3:17:37",
+    "time": "3:20:20",
     "time_limit": "1-00:00:00"
   },
   "snapshot_status": {
     "caveat": "A missing output directory is expected before the first snapshot when save_every_steps has not been reached.",
-    "estimated_next_snapshot_utc": "2026-05-23T20:41:22.715349+00:00",
+    "estimated_next_snapshot_utc": "2026-05-23T20:41:22.154225+00:00",
     "first_snapshot_step": 10000,
     "latest_complete_snapshot_step": null,
     "missing_output_dir_is_expected": true,
-    "next_snapshot_eta_hours": 1.772426810477658,
-    "next_snapshot_eta_seconds": 6380.736517719569,
+    "next_snapshot_eta_hours": 1.7269787234042553,
+    "next_snapshot_eta_seconds": 6217.123404255319,
     "next_snapshot_step": 10000,
     "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
     "output_dir_exists": false,
     "save_every_steps": 10000,
     "status": "pre_first_snapshot",
-    "steps_to_next_snapshot": 3510
+    "steps_to_next_snapshot": 3420
   },
   "source_paths": {
     "active_monitor": "benchmarks/results/active_stage2_extension_monitor_2026-05-23.json",
@@ -196,5 +204,37 @@
     "stage2_submission": "benchmarks/results/stage2_655m_submission_2026-05-23.json"
   },
   "stage2_job_id": "10250",
-  "status": "pending_stage2_completion"
+  "status": "pending_stage2_completion",
+  "training_save_contract": {
+    "caveat": "The running 655M producer was submitted before any code change here. For this active run, snapshot usability is audited from actual state/metrics files, not from the legacy snapshot.complete flag.",
+    "checks": [
+      {
+        "label": "root metrics are written regardless of save_model_artifacts",
+        "passed": true,
+        "pattern": "(output_dir / \"metrics.json\").write_text"
+      },
+      {
+        "label": "root state dict is gated by save_model_artifacts",
+        "passed": true,
+        "pattern": "if args.save_model_artifacts:"
+      },
+      {
+        "label": "snapshots write custom_state_dict.pt",
+        "passed": true,
+        "pattern": "snapshot_dir / \"custom_state_dict.pt\""
+      },
+      {
+        "label": "snapshots write metrics.json",
+        "passed": true,
+        "pattern": "snapshot_dir / \"metrics.json\""
+      },
+      {
+        "label": "active producer snapshot.complete flag is legacy false",
+        "passed": true,
+        "pattern": "\"snapshot\"] = {\"step\": step, \"complete\": False}"
+      }
+    ],
+    "passed": true,
+    "source_path": "train_bitdistill.py"
+  }
 }

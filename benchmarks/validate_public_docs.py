@@ -348,6 +348,11 @@ def validate_stage2_handoff_preflight(report: dict[str, Any], readme: str, error
     final_checks = report.get("final_artifact_checks")
     if not isinstance(final_checks, list) or len(final_checks) < 3:
         errors.append("stage2 handoff preflight: expected final artifact checks")
+    save_contract = report.get("training_save_contract")
+    if not isinstance(save_contract, dict):
+        errors.append("stage2 handoff preflight: missing training save contract")
+    elif save_contract.get("passed") is not True:
+        errors.append("stage2 handoff preflight: training save contract failed")
     command = report.get("expected_manifest_command")
     if not isinstance(command, list) or "benchmarks/build_stage2_manifest.py" not in command:
         errors.append("stage2 handoff preflight: missing build_stage2_manifest command")

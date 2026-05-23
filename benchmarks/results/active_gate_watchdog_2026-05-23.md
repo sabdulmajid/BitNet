@@ -1,6 +1,6 @@
 # Active BitDistill Gate Watchdog
 
-Generated: `2026-05-23T18:55:10.880796+00:00`
+Generated: `2026-05-23T18:57:53.889122+00:00`
 
 Status: **passed**.
 
@@ -18,8 +18,8 @@ This watchdog refreshes status and validates artifacts; it does not create bench
 | snapshot_salvage_complete_count | 0 |
 | handoff_preflight_status | pending_stage2_completion |
 | next_snapshot_step | 10000 |
-| steps_to_next_snapshot | 3510 |
-| next_snapshot_eta_hours | 1.772427 |
+| steps_to_next_snapshot | 3420 |
+| next_snapshot_eta_hours | 1.726979 |
 | afterany_job_id | 10258 |
 | afterany_status | dependency_pending |
 | slurm_script_status | passed |
@@ -28,9 +28,9 @@ This watchdog refreshes status and validates artifacts; it does not create bench
 | next_blueprint_status | pending_655m_downstream |
 | next_blueprint_action | wait_and_watch_655m_gate |
 | stage2_job_id | 10250 |
-| stage2_latest_step | 6490 |
-| stage2_latest_ce | 3.607363 |
-| stage2_progress | 0.162250 |
+| stage2_latest_step | 6580 |
+| stage2_latest_ce | 3.750599 |
+| stage2_progress | 0.164500 |
 | stage2_log_freshness | fresh_running_log |
 | stage2_log_health | healthy |
 | stage2_producer_config | matched |
@@ -43,21 +43,21 @@ This watchdog refreshes status and validates artifacts; it does not create bench
 
 | label | passed | returncode | elapsed seconds |
 | --- | --- | --- | --- |
-| monitor active Stage-2 extension | true | 0 | 0.124494 |
-| audit 655M ingestion | true | 0 | 0.096005 |
-| audit Stage-2 snapshot salvage | true | 0 | 0.088243 |
-| audit 655M handoff preflight | true | 0 | 7.826964 |
-| audit active Slurm batch scripts | true | 0 | 0.186543 |
-| build next decision | true | 0 | 0.070368 |
-| build next experiment blueprint | true | 0 | 0.066049 |
-| build current goal status | true | 0 | 0.088410 |
-| build deep research handoff | true | 0 | 0.076562 |
-| build goal traceability | true | 0 | 0.098029 |
-| build paper alignment audit | true | 0 | 0.067373 |
-| build publication/product plan | true | 0 | 0.070638 |
-| validate fail-closed reports | true | 0 | 0.072967 |
-| compile Python sources | true | 0 | 0.076595 |
-| check Slurm shell syntax | true | 0 | 0.003409 |
+| monitor active Stage-2 extension | true | 0 | 0.129742 |
+| audit 655M ingestion | true | 0 | 0.099823 |
+| audit Stage-2 snapshot salvage | true | 0 | 0.085947 |
+| audit 655M handoff preflight | true | 0 | 7.790375 |
+| audit active Slurm batch scripts | true | 0 | 0.186357 |
+| build next decision | true | 0 | 0.070566 |
+| build next experiment blueprint | true | 0 | 0.066069 |
+| build current goal status | true | 0 | 0.087204 |
+| build deep research handoff | true | 0 | 0.075860 |
+| build goal traceability | true | 0 | 0.095381 |
+| build paper alignment audit | true | 0 | 0.069718 |
+| build publication/product plan | true | 0 | 0.067144 |
+| validate fail-closed reports | true | 0 | 0.073500 |
+| compile Python sources | true | 0 | 0.072759 |
+| check Slurm shell syntax | true | 0 | 0.003529 |
 
 ## Failures
 

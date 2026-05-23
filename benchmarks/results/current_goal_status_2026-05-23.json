@@ -5,31 +5,31 @@
     "afterany_status": "dependency_pending",
     "downstream_complete": false,
     "downstream_status": "waiting_for_handoff",
-    "eta_hours": 16.9213739085773,
-    "latest_ce": 3.607363,
+    "eta_hours": 16.875914893617022,
+    "latest_ce": 3.750599,
     "latest_complete_snapshot_step": null,
-    "latest_step": 6490,
+    "latest_step": 6580,
     "log_health_status": "healthy",
     "max_steps": 40000,
-    "next_snapshot_eta_hours": 1.772426810477658,
+    "next_snapshot_eta_hours": 1.7269787234042553,
     "next_snapshot_step": 10000,
     "producer_config_status": "matched",
-    "progress": 0.16225,
+    "progress": 0.1645,
     "snapshot_salvage_complete_count": 0,
     "snapshot_salvage_status": "no_snapshot_expected_yet",
     "stage2_job_id": "10250",
     "stage2_slurm_state": "RUNNING",
     "stage2_status": "running",
-    "steps_to_next_snapshot": 3510,
+    "steps_to_next_snapshot": 3420,
     "telemetry_job_id": "10257",
     "telemetry_slurm_state": "PENDING",
-    "time_limit_margin_seconds": 13627.053929121721,
+    "time_limit_margin_seconds": 13626.706382978722,
     "time_limit_status": "within_time_limit"
   },
   "artifacts": {
     "active_monitor": {
       "path": "benchmarks/results/active_stage2_extension_monitor_2026-05-23.json",
-      "sha256": "9338dc078be5c42d197bde661b8d9fbedfcdd441dd5f595d5eae080d4b587d72"
+      "sha256": "0c34b2304263f7d5ca788cee632c4f1f6d4ca0c3be9eee58ac2b1a341b567e62"
     },
     "afterany_submission": {
       "path": "benchmarks/results/stage2_655m_afterany_submission_2026-05-23.json",
@@ -45,13 +45,13 @@
     },
     "snapshot_salvage": {
       "path": "benchmarks/results/stage2_snapshot_salvage_2026-05-23.json",
-      "sha256": "f54f60d654e75445bc3e5ae543aed3a749f85db03f9023bcd27ab95dc72225e8"
+      "sha256": "bb4ac17408642bdf72d2f6e8d7e2db43ab9b00159e2c47df9ef1630f1f5c4c22"
     }
   },
   "completion_status": "in_progress",
-  "created_utc": "2026-05-23T18:55:10.399617+00:00",
+  "created_utc": "2026-05-23T18:57:53.415280+00:00",
   "current_verdict": "Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style recovery status is not_reproduced; the active 655.36M Stage-2 gate is testing whether recovery continues with more tokens.",
-  "git_head": "32ba008bd5ee3a5e723b53541712f96fbc0160fd",
+  "git_head": "d7709c145aae5b2b67c68711d23eb60473bde79a",
   "headline_metrics": {
     "bitdistill_327_68m_delta_vs_fp": -0.0881304126337239,
     "bitdistill_327_68m_mnli": 0.7200203769740193,

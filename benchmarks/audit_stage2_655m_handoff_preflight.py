@@ -93,6 +93,48 @@ def check_command(label: str, command: list[str], *, required_now: bool = True) 
     }
 
 
+def training_save_contract() -> dict[str, Any]:
+    source_path = Path("train_bitdistill.py")
+    text = source_path.read_text(encoding="utf-8", errors="replace") if source_path.exists() else ""
+    checks = [
+        {
+            "label": "root metrics are written regardless of save_model_artifacts",
+            "pattern": '(output_dir / "metrics.json").write_text',
+            "passed": '(output_dir / "metrics.json").write_text' in text,
+        },
+        {
+            "label": "root state dict is gated by save_model_artifacts",
+            "pattern": 'if args.save_model_artifacts:',
+            "passed": 'if args.save_model_artifacts:' in text and 'output_dir / "custom_state_dict.pt"' in text,
+        },
+        {
+            "label": "snapshots write custom_state_dict.pt",
+            "pattern": 'snapshot_dir / "custom_state_dict.pt"',
+            "passed": 'snapshot_dir / "custom_state_dict.pt"' in text,
+        },
+        {
+            "label": "snapshots write metrics.json",
+            "pattern": 'snapshot_dir / "metrics.json"',
+            "passed": 'snapshot_dir / "metrics.json"' in text,
+        },
+        {
+            "label": "active producer snapshot.complete flag is legacy false",
+            "pattern": '"snapshot"] = {"step": step, "complete": False}',
+            "passed": '"snapshot"] = {"step": step, "complete": False}' in text,
+        },
+    ]
+    return {
+        "source_path": str(source_path),
+        "passed": all(check["passed"] for check in checks),
+        "checks": checks,
+        "caveat": (
+            "The running 655M producer was submitted before any code change here. "
+            "For this active run, snapshot usability is audited from actual state/metrics files, "
+            "not from the legacy snapshot.complete flag."
+        ),
+    }
+
+
 def manifest_command(
     *,
     output_dir: Path,
@@ -229,6 +271,17 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             Path("checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1"),
         ),
     ]
+    save_contract = training_save_contract()
+    preflight_checks.append(
+        {
+            "label": "training save contract matches handoff assumptions",
+            "kind": "source_contract",
+            "path": save_contract["source_path"],
+            "required_now": True,
+            "passed": save_contract["passed"],
+            "exists": Path(save_contract["source_path"]).exists(),
+        }
+    )
 
     final_artifact_checks = [
         {**final_state, "label": "final state dict", "required_now": False, "passed": True},
@@ -282,6 +335,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "final_snapshot": str(final_snapshot),
         "final_artifact_checks": final_artifact_checks,
         "preflight_checks": preflight_checks,
+        "training_save_contract": save_contract,
         "expected_manifest_command": expected_command,
         "dry_run_manifest_command": dry_run_command,
         "dry_run": dry_run,
@@ -311,6 +365,10 @@ def render_markdown(report: dict[str, Any]) -> str:
         [check["label"], check["path"], check["exists"], check["size_bytes"]]
         for check in report["final_artifact_checks"]
     ]
+    contract_rows = [
+        [check["label"], check["pattern"], check["passed"]]
+        for check in report["training_save_contract"]["checks"]
+    ]
     dry_run = report["dry_run"] or {}
     return "\n\n".join(
         [
@@ -338,6 +396,9 @@ def render_markdown(report: dict[str, Any]) -> str:
             md_table(["check", "kind", "path/command", "passed", "exists", "returncode"], preflight_rows),
             "## Final Artifact Checks",
             md_table(["artifact", "path", "exists", "size_bytes"], final_rows),
+            "## Training Save Contract",
+            md_table(["check", "source pattern", "passed"], contract_rows),
+            report["training_save_contract"]["caveat"],
             "## Manifest Command",
             "`" + " ".join(report["expected_manifest_command"]) + "`",
             "## Dry Run",
