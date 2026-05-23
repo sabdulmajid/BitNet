@@ -72,6 +72,27 @@ def file_info(path: Path) -> dict[str, Any]:
     return {"path": str(path), "exists": path.exists(), "size_bytes": path.stat().st_size if path.exists() else None}
 
 
+def expected_snapshots(output_dir: Path, max_steps: int, save_every_steps: int) -> list[dict[str, Any]]:
+    if save_every_steps <= 0:
+        return []
+    rows: list[dict[str, Any]] = []
+    for step in range(save_every_steps, max_steps + 1, save_every_steps):
+        snapshot_dir = output_dir / f"checkpoint-{step}"
+        state = snapshot_dir / "custom_state_dict.pt"
+        metrics = snapshot_dir / "metrics.json"
+        rows.append(
+            {
+                "step": step,
+                "snapshot_dir": str(snapshot_dir),
+                "snapshot_exists": snapshot_dir.exists(),
+                "state": file_info(state),
+                "metrics": file_info(metrics),
+                "complete": state.exists() and metrics.exists(),
+            }
+        )
+    return rows
+
+
 def estimate_progress(latest_step: dict[str, Any], max_steps: int, segment_tokens: int | None) -> dict[str, Any]:
     step = latest_step.get("step")
     elapsed = latest_step.get("elapsed_seconds")
@@ -143,12 +164,15 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
     final_snapshot_metrics = final_snapshot / "metrics.json"
     latest_step = parse_latest_step(args.stage2_log)
     max_steps = int(stage2_config["max_steps"])
+    save_every_steps = int(stage2_config.get("save_every_steps") or 0)
     step = latest_step.get("step")
     progress_estimate = estimate_progress(
         latest_step,
         max_steps,
         stage2_config.get("segment_token_presentations"),
     )
+    snapshots = expected_snapshots(stage2_output, max_steps, save_every_steps)
+    complete_snapshots = [snapshot for snapshot in snapshots if snapshot["complete"]]
 
     return {
         "schema": "bitnet-active-stage2-extension-monitor-v1",
@@ -164,8 +188,11 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
             "slurm": rows.get(stage2_job_id, {"job_id": stage2_job_id, "state": "not_in_squeue"}),
             "latest_step": latest_step,
             "max_steps": max_steps,
+            "save_every_steps": save_every_steps,
             "progress": (float(step) / float(max_steps)) if isinstance(step, int) and max_steps else None,
             "progress_estimate": progress_estimate,
+            "expected_snapshots": snapshots,
+            "latest_complete_snapshot_step": complete_snapshots[-1]["step"] if complete_snapshots else None,
             "root_metrics": file_info(root_metrics),
             "final_state": file_info(final_state),
             "final_snapshot_metrics": file_info(final_snapshot_metrics),
@@ -193,6 +220,8 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def fmt(value: Any) -> str:
+    if value is None:
+        return "-"
     if isinstance(value, float):
         return f"{value:.6f}"
     return str(value)
@@ -225,6 +254,16 @@ def render_markdown(report: dict[str, Any]) -> str:
         [f"telemetry artifact {idx}", artifact["exists"], artifact["path"]]
         for idx, artifact in enumerate(telemetry["expected_artifacts"], start=1)
     )
+    snapshot_rows = [
+        [
+            snapshot["step"],
+            snapshot["snapshot_exists"],
+            snapshot["state"]["exists"],
+            snapshot["metrics"]["exists"],
+            snapshot["complete"],
+        ]
+        for snapshot in stage2["expected_snapshots"]
+    ]
     return "\n\n".join(
         [
             "# Active Stage-2 Extension Monitor",
@@ -261,6 +300,7 @@ def render_markdown(report: dict[str, Any]) -> str:
                 [
                     ["latest_step", latest.get("step", "")],
                     ["max_steps", stage2["max_steps"]],
+                    ["save_every_steps", stage2["save_every_steps"]],
                     ["progress", stage2["progress"]],
                     ["latest_ce", latest.get("ce", "")],
                     ["latest_lr", latest.get("lr", "")],
@@ -270,9 +310,12 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["eta_hours", estimate.get("eta_hours")],
                     ["estimated_completion_utc", estimate.get("estimated_completion_utc")],
                     ["segment_token_presentations_per_second", estimate.get("segment_token_presentations_per_second")],
+                    ["latest_complete_snapshot_step", stage2["latest_complete_snapshot_step"]],
                     ["cumulative_token_presentations", stage2["cumulative_token_presentations"]],
                 ],
             ),
+            "## Expected Snapshots",
+            md_table(["step", "dir exists", "state", "metrics", "complete"], snapshot_rows),
             "## Artifacts",
             md_table(["artifact", "exists", "path"], artifact_rows),
             "## Caveat",

@@ -1,5 +1,5 @@
 {
-  "created_utc": "2026-05-23T16:07:30.490528+00:00",
+  "created_utc": "2026-05-23T16:12:25.863633+00:00",
   "handoff": {
     "dependency": "afterok:10250",
     "expected_handoff_exists": false,
@@ -20,6 +20,72 @@
   "stage2": {
     "caveat": "This is a cumulative continuation from the verified 327.68M checkpoint with a fresh optimizer/scheduler segment. It is not an uninterrupted 80k-step Stage-2 run.",
     "cumulative_token_presentations": 655360000,
+    "expected_snapshots": [
+      {
+        "complete": false,
+        "metrics": {
+          "exists": false,
+          "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-10000/metrics.json",
+          "size_bytes": null
+        },
+        "snapshot_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-10000",
+        "snapshot_exists": false,
+        "state": {
+          "exists": false,
+          "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-10000/custom_state_dict.pt",
+          "size_bytes": null
+        },
+        "step": 10000
+      },
+      {
+        "complete": false,
+        "metrics": {
+          "exists": false,
+          "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-20000/metrics.json",
+          "size_bytes": null
+        },
+        "snapshot_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-20000",
+        "snapshot_exists": false,
+        "state": {
+          "exists": false,
+          "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-20000/custom_state_dict.pt",
+          "size_bytes": null
+        },
+        "step": 20000
+      },
+      {
+        "complete": false,
+        "metrics": {
+          "exists": false,
+          "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-30000/metrics.json",
+          "size_bytes": null
+        },
+        "snapshot_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-30000",
+        "snapshot_exists": false,
+        "state": {
+          "exists": false,
+          "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-30000/custom_state_dict.pt",
+          "size_bytes": null
+        },
+        "step": 30000
+      },
+      {
+        "complete": false,
+        "metrics": {
+          "exists": false,
+          "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/metrics.json",
+          "size_bytes": null
+        },
+        "snapshot_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000",
+        "snapshot_exists": false,
+        "state": {
+          "exists": false,
+          "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/custom_state_dict.pt",
+          "size_bytes": null
+        },
+        "step": 40000
+      }
+    ],
     "final_snapshot_metrics": {
       "exists": false,
       "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/metrics.json",
@@ -31,37 +97,39 @@
       "size_bytes": null
     },
     "job_id": "10250",
+    "latest_complete_snapshot_step": null,
     "latest_step": {
-      "ce": 3.48199,
-      "elapsed_seconds": 1743.0,
+      "ce": 3.96977,
+      "elapsed_seconds": 2033.9,
       "log_exists": true,
       "lr": 2e-06,
       "path": "logs/bd-s2-655m-10250.out",
-      "step": 960
+      "step": 1120
     },
     "max_steps": 40000,
     "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
-    "progress": 0.024,
+    "progress": 0.028,
     "progress_estimate": {
-      "estimated_completion_utc": "2026-05-24T11:48:52.490506+00:00",
-      "estimated_total_seconds": 72625.0,
-      "eta_hours": 19.689444444444444,
-      "eta_seconds": 70882.0,
-      "seconds_per_step": 1.815625,
-      "segment_token_presentations_per_second": 4511.944922547332,
-      "steps_per_hour": 1982.788296041308
+      "estimated_completion_utc": "2026-05-24T11:49:11.248894+00:00",
+      "estimated_total_seconds": 72639.28571428572,
+      "eta_hours": 19.612607142857144,
+      "eta_seconds": 70605.38571428572,
+      "seconds_per_step": 1.815982142857143,
+      "segment_token_presentations_per_second": 4511.057574118688,
+      "steps_per_hour": 1982.3983480013765
     },
     "root_metrics": {
       "exists": false,
       "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/metrics.json",
       "size_bytes": null
     },
+    "save_every_steps": 10000,
     "slurm": {
       "job_id": "10250",
       "name": "bd-s2-655m",
       "reason": "ece-nebula12",
       "state": "RUNNING",
-      "time": "30:05"
+      "time": "35:00"
     }
   },
   "status": "running",
