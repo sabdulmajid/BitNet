@@ -379,6 +379,50 @@ def validate_deep_research_handoff(report: dict[str, Any], errors: list[str]) ->
                 errors.append(f"deep research handoff artifact {label}: sha256 mismatch: {actual_sha} != {expected_sha}")
 
 
+def validate_benchmark_scoreboard(report: dict[str, Any], readme: str, errors: list[str]) -> None:
+    if report.get("schema") != "bitdistill-benchmark-scoreboard-v1":
+        errors.append(f"benchmark scoreboard: unexpected schema {report.get('schema')}")
+    if report.get("quality_claim") != "scoreboard_from_existing_artifacts_not_new_benchmark":
+        errors.append(f"benchmark scoreboard: unexpected quality_claim {report.get('quality_claim')}")
+    if report.get("status") != "mixed_supported_and_blocked":
+        errors.append(f"benchmark scoreboard: unexpected status {report.get('status')}")
+    coverage = report.get("coverage")
+    if not isinstance(coverage, dict):
+        errors.append("benchmark scoreboard: missing coverage object")
+    else:
+        if coverage.get("quality_benchmark_count") != 12:
+            errors.append(f"benchmark scoreboard: expected 12 quality benchmarks, got {coverage.get('quality_benchmark_count')}")
+        if coverage.get("lm_eval_task_count") != 10:
+            errors.append(f"benchmark scoreboard: expected 10 lm-eval tasks, got {coverage.get('lm_eval_task_count')}")
+        if coverage.get("coverage_gate_passed") is not True:
+            errors.append("benchmark scoreboard: coverage gate is not passed")
+        if coverage.get("coverage_failed") not in ([], None):
+            errors.append(f"benchmark scoreboard: coverage failed checks present: {coverage.get('coverage_failed')}")
+    rows = report.get("headline_rows")
+    if not isinstance(rows, list) or len(rows) < 10:
+        errors.append("benchmark scoreboard: missing headline rows")
+    else:
+        areas = {str(row.get("area")) for row in rows if isinstance(row, dict)}
+        for area in ("Blind ternary PTQ", "BitDistill reproduction", "Packed CPU I2_SR", "MoE / Kimi"):
+            if area not in areas:
+                errors.append(f"benchmark scoreboard: missing area {area}")
+    nonclaims = report.get("nonclaims")
+    if not isinstance(nonclaims, list) or len(nonclaims) < 5:
+        errors.append("benchmark scoreboard: missing nonclaims")
+    require_contains(
+        "README benchmark scoreboard report",
+        "bitdistill_benchmark_scoreboard_2026-05-23.md",
+        readme,
+        errors,
+    )
+    require_contains(
+        "README benchmark scoreboard json",
+        "bitdistill_benchmark_scoreboard_2026-05-23.json",
+        readme,
+        errors,
+    )
+
+
 def validate_readme(bundle: dict[str, Any], readme: str, errors: list[str]) -> None:
     claims = bundle["claims"]
     blind = claims["blind_ptq"]
@@ -577,6 +621,11 @@ def main() -> int:
         default=Path("benchmarks/results/deep_research_handoff_2026-05-23.json"),
     )
     parser.add_argument(
+        "--benchmark-scoreboard",
+        type=Path,
+        default=Path("benchmarks/results/bitdistill_benchmark_scoreboard_2026-05-23.json"),
+    )
+    parser.add_argument(
         "--active-slurm-batch-scripts",
         type=Path,
         default=Path("benchmarks/results/active_slurm_batch_scripts_2026-05-23.json"),
@@ -591,6 +640,7 @@ def main() -> int:
     stage2_monitor = load_json(args.stage2_monitor)
     current_goal_status = load_json(args.current_goal_status)
     deep_research_handoff = load_json(args.deep_research_handoff)
+    benchmark_scoreboard = load_json(args.benchmark_scoreboard)
     active_slurm_batch_scripts = load_json(args.active_slurm_batch_scripts)
     readme = read_text(args.readme)
     claims_doc = read_text(args.claims)
@@ -603,6 +653,7 @@ def main() -> int:
     validate_active_stage2_monitor(stage2_monitor, errors)
     validate_current_goal_status(current_goal_status, errors)
     validate_deep_research_handoff(deep_research_handoff, errors)
+    validate_benchmark_scoreboard(benchmark_scoreboard, readme, errors)
     validate_active_slurm_batch_scripts(active_slurm_batch_scripts, errors)
     validate_readme(bundle, readme, errors)
     validate_reproduction_gap_docs(reproduction_gap, readme, claims_doc, errors)

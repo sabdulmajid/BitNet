@@ -21,6 +21,8 @@ The current canonical evidence bundle is:
 
 - [canonical_evidence_bundle_2026-05-20.md](benchmarks/results/canonical_evidence_bundle_2026-05-20.md)
 - [canonical_evidence_bundle_2026-05-20.json](benchmarks/results/canonical_evidence_bundle_2026-05-20.json)
+- [bitdistill_benchmark_scoreboard_2026-05-23.md](benchmarks/results/bitdistill_benchmark_scoreboard_2026-05-23.md)
+- [bitdistill_benchmark_scoreboard_2026-05-23.json](benchmarks/results/bitdistill_benchmark_scoreboard_2026-05-23.json)
 
 | Claim | Status | Evidence | Caveat |
 | --- | --- | --- | --- |
