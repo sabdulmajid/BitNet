@@ -116,6 +116,57 @@ def expected_snapshots(output_dir: Path, max_steps: int, save_every_steps: int) 
     return rows
 
 
+def snapshot_gate(
+    *,
+    output_dir: Path,
+    latest_step: dict[str, Any],
+    max_steps: int,
+    save_every_steps: int,
+    snapshots: list[dict[str, Any]],
+) -> dict[str, Any]:
+    step = latest_step.get("step")
+    first_snapshot_step = save_every_steps if save_every_steps > 0 else None
+    complete_steps = [snapshot["step"] for snapshot in snapshots if snapshot["complete"]]
+    next_snapshot_step = None
+    if isinstance(step, int) and save_every_steps > 0:
+        for snapshot_step in range(save_every_steps, max_steps + 1, save_every_steps):
+            if snapshot_step > step:
+                next_snapshot_step = snapshot_step
+                break
+    if not isinstance(step, int):
+        status = "log_not_parsed"
+        missing_output_dir_is_expected = False
+    elif save_every_steps <= 0:
+        status = "snapshots_disabled"
+        missing_output_dir_is_expected = not output_dir.exists()
+    elif step < save_every_steps:
+        status = "pre_first_snapshot"
+        missing_output_dir_is_expected = not output_dir.exists()
+    elif complete_steps:
+        status = "snapshots_present"
+        missing_output_dir_is_expected = False
+    elif step >= save_every_steps:
+        status = "snapshot_due_missing"
+        missing_output_dir_is_expected = False
+    else:
+        status = "unknown"
+        missing_output_dir_is_expected = False
+    return {
+        "status": status,
+        "output_dir": str(output_dir),
+        "output_dir_exists": output_dir.exists(),
+        "save_every_steps": save_every_steps,
+        "first_snapshot_step": first_snapshot_step,
+        "next_snapshot_step": next_snapshot_step,
+        "latest_complete_snapshot_step": complete_steps[-1] if complete_steps else None,
+        "missing_output_dir_is_expected": missing_output_dir_is_expected,
+        "caveat": (
+            "A missing output directory is expected before the first snapshot when "
+            "save_every_steps has not been reached."
+        ),
+    }
+
+
 def estimate_progress(latest_step: dict[str, Any], max_steps: int, segment_tokens: int | None) -> dict[str, Any]:
     step = latest_step.get("step")
     elapsed = latest_step.get("elapsed_seconds")
@@ -273,6 +324,13 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
     )
     snapshots = expected_snapshots(stage2_output, max_steps, save_every_steps)
     complete_snapshots = [snapshot for snapshot in snapshots if snapshot["complete"]]
+    snapshot_status = snapshot_gate(
+        output_dir=stage2_output,
+        latest_step=latest_step,
+        max_steps=max_steps,
+        save_every_steps=save_every_steps,
+        snapshots=snapshots,
+    )
 
     return {
         "schema": "bitnet-active-stage2-extension-monitor-v1",
@@ -291,6 +349,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
             "save_every_steps": save_every_steps,
             "progress": (float(step) / float(max_steps)) if isinstance(step, int) and max_steps else None,
             "progress_estimate": progress_estimate,
+            "snapshot_status": snapshot_status,
             "expected_snapshots": snapshots,
             "latest_complete_snapshot_step": complete_snapshots[-1]["step"] if complete_snapshots else None,
             "root_metrics": file_info(root_metrics),
@@ -380,6 +439,7 @@ def render_markdown(report: dict[str, Any]) -> str:
     telemetry = report["telemetry"]
     latest = stage2["latest_step"]
     estimate = stage2["progress_estimate"]
+    snapshot_status = stage2["snapshot_status"]
     artifact_rows = [
         ["stage2 root metrics", stage2["root_metrics"]["exists"], stage2["root_metrics"]["path"]],
         ["stage2 final state", stage2["final_state"]["exists"], stage2["final_state"]["path"]],
@@ -456,6 +516,11 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["latest_step", latest.get("step", "")],
                     ["max_steps", stage2["max_steps"]],
                     ["save_every_steps", stage2["save_every_steps"]],
+                    ["snapshot_status", snapshot_status["status"]],
+                    ["output_dir_exists", snapshot_status["output_dir_exists"]],
+                    ["missing_output_dir_is_expected", snapshot_status["missing_output_dir_is_expected"]],
+                    ["first_snapshot_step", snapshot_status["first_snapshot_step"]],
+                    ["next_snapshot_step", snapshot_status["next_snapshot_step"]],
                     ["progress", stage2["progress"]],
                     ["latest_ce", latest.get("ce", "")],
                     ["latest_lr", latest.get("lr", "")],
@@ -472,6 +537,20 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["segment_token_presentations_per_second", estimate.get("segment_token_presentations_per_second")],
                     ["latest_complete_snapshot_step", stage2["latest_complete_snapshot_step"]],
                     ["cumulative_token_presentations", stage2["cumulative_token_presentations"]],
+                ],
+            ),
+            "## Snapshot Gate",
+            md_table(
+                ["field", "value"],
+                [
+                    ["status", snapshot_status["status"]],
+                    ["output_dir", snapshot_status["output_dir"]],
+                    ["output_dir_exists", snapshot_status["output_dir_exists"]],
+                    ["first_snapshot_step", snapshot_status["first_snapshot_step"]],
+                    ["next_snapshot_step", snapshot_status["next_snapshot_step"]],
+                    ["latest_complete_snapshot_step", snapshot_status["latest_complete_snapshot_step"]],
+                    ["missing_output_dir_is_expected", snapshot_status["missing_output_dir_is_expected"]],
+                    ["caveat", snapshot_status["caveat"]],
                 ],
             ),
             "## Expected Snapshots",

@@ -6,7 +6,7 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | job | id | slurm state | time | reason |
 | --- | --- | --- | --- | --- |
-| stage2 | 10250 | RUNNING | 2:10:20 | ece-nebula12 |
+| stage2 | 10250 | RUNNING | 2:13:27 | ece-nebula12 |
 | handoff | 10255 | PENDING | 0:00 | (Dependency) |
 | gamma60 telemetry | 10257 | PENDING | 0:00 | (Dependency) |
 | downstream MNLI | - | not_submitted |  |  |
@@ -14,25 +14,43 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | stage2 field | value |
 | --- | --- |
-| latest_step | 4270 |
+| latest_step | 4370 |
 | max_steps | 40000 |
 | save_every_steps | 10000 |
-| progress | 0.106750 |
-| latest_ce | 4.114625 |
+| snapshot_status | pre_first_snapshot |
+| output_dir_exists | False |
+| missing_output_dir_is_expected | True |
+| first_snapshot_step | 10000 |
+| next_snapshot_step | 10000 |
+| progress | 0.109250 |
+| latest_ce | 3.650113 |
 | latest_lr | 0.000002 |
-| log_elapsed_seconds | 7761.600000 |
-| parsed_log_rows | 428 |
+| log_elapsed_seconds | 7943.500000 |
+| parsed_log_rows | 438 |
 | recent_window_rows | 20 |
-| recent_ce_mean | 3.755745 |
-| recent_ce_min | 3.401356 |
+| recent_ce_mean | 3.808658 |
+| recent_ce_min | 3.452919 |
 | recent_ce_max | 4.206848 |
-| seconds_per_step | 1.817705 |
-| steps_per_hour | 1980.519481 |
-| eta_hours | 18.040721 |
-| estimated_completion_utc | 2026-05-24T11:50:11.876786+00:00 |
-| segment_token_presentations_per_second | 4506.782107 |
+| seconds_per_step | 1.817735 |
+| steps_per_hour | 1980.487191 |
+| eta_hours | 17.990523 |
+| estimated_completion_utc | 2026-05-24T11:50:18.026851+00:00 |
+| segment_token_presentations_per_second | 4506.708630 |
 | latest_complete_snapshot_step | - |
 | cumulative_token_presentations | 655360000 |
+
+## Snapshot Gate
+
+| field | value |
+| --- | --- |
+| status | pre_first_snapshot |
+| output_dir | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m |
+| output_dir_exists | False |
+| first_snapshot_step | 10000 |
+| next_snapshot_step | 10000 |
+| latest_complete_snapshot_step | - |
+| missing_output_dir_is_expected | True |
+| caveat | A missing output directory is expected before the first snapshot when save_every_steps has not been reached. |
 
 ## Expected Snapshots
 
