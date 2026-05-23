@@ -244,6 +244,52 @@ def validate_active_stage2_monitor(report: dict[str, Any], errors: list[str]) ->
             "stage2 monitor: unexpected cumulative tokens "
             f"{stage2.get('cumulative_token_presentations')}"
         )
+    downstream = report.get("downstream")
+    if not isinstance(downstream, dict):
+        errors.append("stage2 monitor: missing downstream object")
+        return
+    allowed_statuses = {
+        "waiting_for_handoff",
+        "handoff_failed",
+        "pending",
+        "running",
+        "slurm_completed",
+        "slurm_failed",
+        "submitted_downstream_not_in_squeue_incomplete",
+        "not_submitted_incomplete",
+        "complete_artifacts_present",
+    }
+    if downstream.get("status") not in allowed_statuses:
+        errors.append(f"stage2 monitor: unexpected downstream status {downstream.get('status')}")
+    output_dir = downstream.get("output_dir")
+    if not isinstance(output_dir, str) or "bitdistill-tensor-655mwarmup" not in output_dir:
+        errors.append(f"stage2 monitor: unexpected downstream output_dir {output_dir}")
+        return
+    metrics = downstream.get("metrics")
+    predictions = downstream.get("predictions")
+    if not isinstance(metrics, dict):
+        errors.append("stage2 monitor: downstream metrics is not an object")
+    elif metrics.get("path") != f"{output_dir}/metrics.json":
+        errors.append(f"stage2 monitor: unexpected downstream metrics path {metrics.get('path')}")
+    if not isinstance(predictions, dict):
+        errors.append("stage2 monitor: downstream predictions is not an object")
+    elif predictions.get("path") != f"{output_dir}/eval_predictions.jsonl":
+        errors.append(f"stage2 monitor: unexpected downstream predictions path {predictions.get('path')}")
+    complete = downstream.get("complete")
+    if complete is True:
+        if not isinstance(metrics, dict) or metrics.get("exists") is not True:
+            errors.append("stage2 monitor: downstream marked complete without metrics")
+        if not isinstance(predictions, dict) or predictions.get("exists") is not True:
+            errors.append("stage2 monitor: downstream marked complete without predictions")
+    elif complete is not False:
+        errors.append(f"stage2 monitor: downstream complete must be boolean, got {complete}")
+    caveat = downstream.get("caveat")
+    if not isinstance(caveat, str) or "does not compute or claim MNLI accuracy" not in caveat:
+        errors.append("stage2 monitor: downstream caveat must prohibit quality claims")
+    forbidden_quality_keys = {"accuracy", "mnli_accuracy", "quality", "score"}
+    present_forbidden = sorted(forbidden_quality_keys.intersection(downstream.keys()))
+    if present_forbidden:
+        errors.append(f"stage2 monitor: downstream contains quality-like keys {present_forbidden}")
 
 
 def validate_readme(bundle: dict[str, Any], readme: str, errors: list[str]) -> None:

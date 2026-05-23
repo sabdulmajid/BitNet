@@ -83,7 +83,9 @@ python benchmarks/monitor_active_stage2_extension.py
 ```
 
 The generated report must keep `quality_claim` set to `none` until downstream
-metrics and prediction traces exist.
+metrics and prediction traces exist. The active monitor must also track the
+expected downstream `metrics.json` and `eval_predictions.jsonl` paths; these
+paths are artifact-existence checks only and must not report MNLI accuracy.
 
 Queued Slurm batch scripts should also be audited after resubmission or script
 hardening:
