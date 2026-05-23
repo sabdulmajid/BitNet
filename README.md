@@ -50,6 +50,7 @@ The current objective snapshot is:
 
 For external technical review or a deep-research agent, use:
 
+- [EXPERIMENTS.md](EXPERIMENTS.md)
 - [deep_research_handoff_2026-05-23.md](benchmarks/results/deep_research_handoff_2026-05-23.md)
 - [deep_research_handoff_2026-05-23.json](benchmarks/results/deep_research_handoff_2026-05-23.json)
 - [bitdistill_goal_traceability_2026-05-23.md](benchmarks/results/bitdistill_goal_traceability_2026-05-23.md)

@@ -765,6 +765,21 @@ def validate_runtime_doc(bundle: dict[str, Any], runtime_doc: str, errors: list[
         require_contains(f"RUNTIME_CONTRACT {label}", needle, runtime_doc, errors)
 
 
+def validate_experiments_doc(experiments_doc: str, readme: str, errors: list[str]) -> None:
+    required = {
+        "watchdog_command": "python benchmarks/run_active_gate_watchdog.py",
+        "ingestion_command": "python benchmarks/audit_stage2_655m_ingestion.py",
+        "paper_alignment_command": "python benchmarks/build_bitdistill_paper_alignment_audit.py",
+        "watchdog_report": "active_gate_watchdog_2026-05-23.md",
+        "ingestion_status": "stage2_655m_ingestion.status == pending_handoff",
+        "paper_alignment_status": "bitdistill_paper_alignment.status == not_exact_reproduction",
+        "no_claim_until_ingested": "ingested_reports_rebuilt",
+    }
+    for label, needle in required.items():
+        require_contains(f"EXPERIMENTS {label}", needle, experiments_doc, errors)
+    require_contains("README experiments link", "EXPERIMENTS.md", readme, errors)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -774,6 +789,7 @@ def main() -> int:
     )
     parser.add_argument("--readme", type=Path, default=Path("README.md"))
     parser.add_argument("--claims", type=Path, default=Path("CLAIMS.md"))
+    parser.add_argument("--experiments", type=Path, default=Path("EXPERIMENTS.md"))
     parser.add_argument("--runtime-contract", type=Path, default=Path("RUNTIME_CONTRACT.md"))
     parser.add_argument(
         "--reproduction-gap",
@@ -864,6 +880,7 @@ def main() -> int:
     active_slurm_batch_scripts = load_json(args.active_slurm_batch_scripts)
     readme = read_text(args.readme)
     claims_doc = read_text(args.claims)
+    experiments_doc = read_text(args.experiments)
     errors: list[str] = []
     validate_artifacts(bundle, errors)
     validate_reproduction_gap(reproduction_gap, errors)
@@ -883,6 +900,7 @@ def main() -> int:
     validate_readme(bundle, readme, errors)
     validate_reproduction_gap_docs(reproduction_gap, readme, claims_doc, errors)
     validate_claims_doc(bundle, claims_doc, errors)
+    validate_experiments_doc(experiments_doc, readme, errors)
     validate_runtime_doc(bundle, read_text(args.runtime_contract), errors)
 
     if errors:

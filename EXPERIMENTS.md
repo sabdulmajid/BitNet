@@ -207,7 +207,34 @@ ratios, not task accuracy, for this diagnostic.
 
 ## Active Gate Monitor
 
-Use this while `10250`, `10255`, and `10257` are still live:
+Use the watchdog while `10250`, `10255`, and `10257` are still live:
+
+```bash
+python benchmarks/run_active_gate_watchdog.py
+```
+
+The watchdog refreshes and validates these status artifacts in one pass:
+
+- `benchmarks/results/active_stage2_extension_monitor_2026-05-23.{json,md}`
+- `benchmarks/results/stage2_655m_ingestion_2026-05-23.{json,md}`
+- `benchmarks/results/active_slurm_batch_scripts_2026-05-23.{json,md}`
+- `benchmarks/results/current_goal_status_2026-05-23.{json,md}`
+- `benchmarks/results/deep_research_handoff_2026-05-23.{json,md}`
+- `benchmarks/results/bitdistill_goal_traceability_2026-05-23.{json,md}`
+- `benchmarks/results/bitdistill_paper_alignment_2026-05-23.{json,md}`
+- `benchmarks/results/bitdistill_publication_product_plan_2026-05-23.{json,md}`
+- `benchmarks/results/bitdistill_next_decision_2026-05-23.{json,md}`
+
+The watchdog's own report is:
+
+```text
+benchmarks/results/active_gate_watchdog_2026-05-23.md
+benchmarks/results/active_gate_watchdog_2026-05-23.json
+```
+
+It is status evidence only. `quality_claim` must remain `none`.
+
+To inspect only the live Stage-2 job and artifact paths:
 
 ```bash
 python benchmarks/monitor_active_stage2_extension.py
@@ -215,11 +242,27 @@ python benchmarks/monitor_active_stage2_extension.py
 
 The monitor report is status-only and must not be used as quality evidence.
 
+To audit the 655M downstream-result ingestion gate:
+
+```bash
+python benchmarks/audit_stage2_655m_ingestion.py
+```
+
+The ingestion audit remains `pending_handoff`, `downstream_pending_or_running`,
+or `downstream_incomplete` until the downstream `metrics.json`,
+`eval_predictions.jsonl`, controlled-curve row, reproduction-gap report, and
+next-decision report are mutually consistent. It is the receipt that prevents a
+completed Slurm job from being treated as a quality result without paired
+prediction evidence.
+
 To generate a reviewer-facing snapshot of the current objective state:
 
 ```bash
 python benchmarks/build_current_goal_status.py
 python benchmarks/build_deep_research_handoff.py
+python benchmarks/build_goal_traceability_audit.py
+python benchmarks/build_bitdistill_paper_alignment_audit.py
+python benchmarks/build_publication_product_plan.py
 ```
 
 These reports are status ledgers, not completion declarations. They read the
@@ -231,6 +274,41 @@ script contents:
 ```bash
 python benchmarks/audit_active_slurm_batch_scripts.py
 ```
+
+## Reviewer Reproduction Checklist
+
+Use this sequence for an external technical review of the current state:
+
+```bash
+python benchmarks/run_active_gate_watchdog.py
+python benchmarks/validate_public_docs.py
+python benchmarks/validate_reports_fail_closed.py \
+  benchmarks/results/active_gate_watchdog_2026-05-23.json \
+  benchmarks/results/active_gate_watchdog_2026-05-23.md \
+  benchmarks/results/bitdistill_benchmark_scoreboard_2026-05-23.json \
+  benchmarks/results/bitdistill_goal_traceability_2026-05-23.json \
+  benchmarks/results/bitdistill_paper_alignment_2026-05-23.json \
+  benchmarks/results/stage2_655m_ingestion_2026-05-23.json \
+  benchmarks/results/bitdistill_next_decision_2026-05-23.json
+python -m py_compile train_bitdistill.py train_distill.py benchmarks/*.py
+bash -n slurm_gamma60_telemetry.sh \
+  slurm_stage2_655m_handoff.sh \
+  slurm_stage2_655m_postprocess.sh
+```
+
+Interpretation rules for the current state:
+
+- `active_gate_watchdog.status == passed` means the status pipeline is healthy,
+  not that BitDistill quality has recovered.
+- `stage2_655m_ingestion.status == pending_handoff` is expected while job
+  `10250` is still running.
+- `bitdistill_paper_alignment.status == not_exact_reproduction` is intentional:
+  the active experiment differs from the paper in Stage-2 budget, corpus,
+  hardware, effective batch size, and unfinished QNLI/SST2/CNNDM coverage.
+- `bitdistill_next_decision.status == pending_655m_downstream` must remain
+  until the 655M downstream prediction trace exists.
+- Do not update public quality claims until the ingestion audit is
+  `ingested_reports_rebuilt`.
 
 ## Validation
 
