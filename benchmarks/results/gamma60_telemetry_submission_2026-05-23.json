@@ -1,0 +1,46 @@
+{
+  "schema": "bitdistill-gradient-telemetry-submission-v1",
+  "created_utc": "2026-05-23T15:45:05+00:00",
+  "status": "dependency_pending",
+  "job_id": "10252",
+  "dependency": "afterok:10250",
+  "partition": "midcard",
+  "script": "slurm_bitdistill_glue.sh",
+  "purpose": "Materialize component-gradient telemetry for an equalized-gamma diagnostic to compare against existing paper-gamma telemetry.",
+  "model": "Qwen/Qwen2.5-0.5B",
+  "run_config": {
+    "stage": "task_sft",
+    "method": "bitdistill",
+    "task_name": "mnli",
+    "task_format": "sequence_classification",
+    "label_scheme": "letters",
+    "candidate_score": "mean",
+    "teacher_model": "checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1",
+    "init_state_dict": "checkpoints/bitdistill-glue-longwarmup/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-20k/custom_state_dict.pt",
+    "scale_mode": "tensor",
+    "distill_layer": -1,
+    "attention_split_heads": 8,
+    "logit_kd_weight": 10,
+    "attention_kd_weight": 60,
+    "logit_temperature": 5.0,
+    "attention_temperature": 1.0,
+    "init_output_head_from_teacher": true,
+    "max_steps": 200,
+    "learning_rate": 0.00002,
+    "lr_scheduler": "cosine",
+    "telemetry_every_steps": 25,
+    "telemetry_component_grad_norms": true,
+    "output_dir": "checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200"
+  },
+  "comparison_target": {
+    "paper_gamma_attention_kd_weight": 100000,
+    "existing_report": "benchmarks/results/bitdistill_training_dynamics_2026-05-23.json",
+    "paper_gamma_final_grad_attention_to_ce": 221.3849856028098,
+    "paper_gamma_final_loss_attention_to_ce": 2549.206537356322
+  },
+  "expected_artifacts": [
+    "checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/telemetry.jsonl",
+    "checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/metrics.json"
+  ],
+  "caveat": "This is a short gradient-balance diagnostic, not a quality benchmark. Do not compare its task accuracy to full downstream runs."
+}

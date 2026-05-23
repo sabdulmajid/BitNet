@@ -135,6 +135,17 @@ Job `10251` has dependency `afterok:10250`. If `10250` succeeds, it will build
 and validate the `655.36M` manifest and submit the matched downstream MNLI
 BitDistill job.
 
+## Gamma-Balanced Telemetry
+
+The loss-normalization gate now has a queued equalized-gamma telemetry job:
+
+- `benchmarks/results/gamma60_telemetry_submission_2026-05-23.json`
+- `benchmarks/results/gamma60_telemetry_submission_2026-05-23.md`
+
+Job `10252` is dependency-blocked on `afterok:10250`. It is a short 200-step
+component-gradient telemetry diagnostic with `ATTENTION_KD_WEIGHT=60`; it is
+not a task-quality benchmark.
+
 ## Validation
 
 ```bash

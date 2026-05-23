@@ -65,6 +65,13 @@ The dependent handoff submission is:
 benchmarks/results/stage2_655m_handoff_submission_2026-05-23.md
 ```
 
+Short gradient-balance telemetry jobs must be labeled as diagnostics, not
+quality benchmarks. The current equalized-gamma submission is:
+
+```text
+benchmarks/results/gamma60_telemetry_submission_2026-05-23.md
+```
+
 ## Preferred Public Labels
 
 | Label | Meaning |
