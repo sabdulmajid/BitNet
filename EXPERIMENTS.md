@@ -333,3 +333,27 @@ token-count hashes, and reports paired geometric speed ratios with Student-t
 intervals. The current Xeon 4116 result rejects a sequence-classification
 speedup for both tested I2_SR artifacts. It does not supersede the separate
 causal-decode benchmark.
+
+The allocation-free I2 output optimization is measured against the immutable
+pre-change revisions `a6cf836` / `7fe586546`. Build that revision in a separate
+worktree with the same CMake options, then run:
+
+```bash
+python benchmarks/benchmark_seqcls_i2sr_runtime_ab.py \
+  --baseline-root /tmp/bitnet-i2sr-baseline \
+  --candidate-root . \
+  --max-samples 128 \
+  --repetitions 4 \
+  --threads 12 \
+  --cpu-affinity 0-11 \
+  --cooldown-seconds 3
+```
+
+This gate requires identical CMake options, clean source trees, exactly one
+fingerprinted source difference (`3rdparty/llama.cpp/ggml/src/ggml.c`), stable
+predictions, and exact old/new logits. The controlled result is:
+
+```text
+benchmarks/results/seqcls_i2sr_runtime_ab_2026-09-04.json
+benchmarks/results/seqcls_i2sr_runtime_ab_2026-09-04.md
+```

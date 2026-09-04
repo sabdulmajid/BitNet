@@ -24,7 +24,8 @@ The frozen baseline bundle and current decision reports are:
 - [bitdistill_benchmark_scoreboard_2026-05-23.md](benchmarks/results/bitdistill_benchmark_scoreboard_2026-05-23.md)
 - [bitdistill_benchmark_scoreboard_2026-05-23.json](benchmarks/results/bitdistill_benchmark_scoreboard_2026-05-23.json)
 - [seqcls_native_cpu_matrix_2026-09-04.md](benchmarks/results/seqcls_native_cpu_matrix_2026-09-04.md)
-- [seqcls_native_cpu_repeated_2026-09-04.md](benchmarks/results/seqcls_native_cpu_repeated_2026-09-04.md)
+- [seqcls_native_cpu_repeated_inplace_2026-09-04.md](benchmarks/results/seqcls_native_cpu_repeated_inplace_2026-09-04.md)
+- [seqcls_i2sr_runtime_ab_2026-09-04.md](benchmarks/results/seqcls_i2sr_runtime_ab_2026-09-04.md)
 
 | Claim | Status | Evidence | Caveat |
 | --- | --- | --- | --- |
@@ -39,7 +40,8 @@ The frozen baseline bundle and current decision reports are:
 | `I2_SR` packed CPU inference works | **Yes, for compatible causal artifacts** | Xeon Silver 4116: row-scale `I2_SR` file `1211.3 MiB`, PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. | It does **not** beat Q4_K_M on quality or file size. Q4_K_M is `940.4 MiB` with PPL `12.8112`. |
 | Native packed sequence classification preserves task quality | **Yes, for one audited artifact; not product-ready** | Full MNLI native sequence-isolated path: `0.652165` versus PyTorch `0.653591`, paired delta `-0.001426`, 95% CI `[-0.004193, 0.001341]`, exact McNemar `p=0.348`; `7.456204` examples/s and RSS `960.15 MiB`. | Exact prediction agreement is `0.976668`, the 0.5-point non-inferiority gate is retrospective, multi-prompt batching remains excluded, and the underlying model quality is weak. |
 | Mixed `I2_SR` plus Q8 embedding improves deployed storage | **Yes, on one Qwen2.5 classifier** | The packed artifact is `230.90 MiB`: `4.106x` smaller than FP16 and `1.527x` smaller than the F16-embedding I2_SR artifact. On 512 MNLI examples it changes accuracy by `-0.001953`, paired CI `[-0.011719, 0.007812]`, with `0.982422` prediction agreement. | This is a same-student format comparison on a fixed, non-random sample; it is not evidence of FP-quality recovery. |
-| Packed ternary accelerates native sequence classification on the Xeon 4116 | **No, for the audited sequence-isolated workload** | Four interleaved pinned runs: I2_SR/FP16 geometric throughput ratio `0.637`, 95% CI `[0.575, 0.706]`; mixed I2_SR+Q8 ratio `0.528`, CI `[0.475, 0.588]`. | This does not contradict the causal decode result. Kernel benefit is workload-, shape-, and execution-path-dependent. |
+| Removing I2 output staging accelerates the classifier runtime | **Yes, for both audited I2_SR artifacts** | Old/new binaries, four rotated pinned pairs: base I2_SR speed ratio `1.4619`, 95% CI `[1.3686, 1.5616]`; mixed I2_SR+Q8 `1.4358`, CI `[1.2857, 1.6035]`. Logits are bit-identical. | `ggml.c` is the only fingerprinted source difference. This is a local implementation effect, not model-quality recovery. |
+| Packed ternary accelerates native sequence classification on the Xeon 4116 | **No, even after the runtime optimization** | Four interleaved pinned runs: I2_SR/FP16 geometric throughput ratio `0.650`, 95% CI `[0.646, 0.653]`; mixed I2_SR+Q8 ratio `0.605`, CI `[0.603, 0.607]`. | This does not contradict the causal decode result. Kernel benefit is workload-, shape-, and execution-path-dependent. |
 | Kimi/MoE support is proven | **No: not supported** | Only tiny Qwen2MoE fixture/plumbing exists. | No trained Kimi quality, MLA/shared-expert mapping, routed expert locality, or CPU product result is proven. |
 
 ## Current Reproduction Gap
@@ -179,10 +181,10 @@ predictions were stable across repetitions:
 
 | Artifact | Mean tok/s | Geometric speed / FP16 | Paired 95% CI |
 | --- | ---: | ---: | ---: |
-| FP16 teacher | `275.385` | `1.000` | `[1.000, 1.000]` |
-| Q4_0 teacher | `201.035` | `0.730` | `[0.666, 0.799]` |
-| I2_SR student | `175.285` | `0.637` | `[0.575, 0.706]` |
-| I2_SR + Q8 embedding | `145.642` | `0.528` | `[0.475, 0.588]` |
+| FP16 teacher | `440.733` | `1.000` | `[1.000, 1.000]` |
+| Q4_0 teacher | `389.748` | `0.884` | `[0.878, 0.890]` |
+| I2_SR student | `286.300` | `0.650` | `[0.646, 0.653]` |
+| I2_SR + Q8 embedding | `266.500` | `0.605` | `[0.603, 0.607]` |
 
 This is a useful negative systems result: the custom ternary path does not
 accelerate short, sequence-isolated classification on this CPU. The causal
@@ -190,6 +192,16 @@ decode path can still benefit because it has a different matrix-shape and
 memory-access regime. The high-vocabulary embedding also dominates small-Qwen
 storage unless it is compressed separately; Q8 embedding export closes that
 storage gap but does not improve this workload's throughput.
+
+The same protocol also isolated and fixed one runtime defect. The old I2 path
+allocated a temporary output for every matrix multiply, post-scaled it, copied
+it into the graph output, and freed it. The new path writes raw accumulators to
+the final destination and post-scales in place. A separate old/new binary A/B
+holds models, prompts, flags, cores, and affinity fixed; only the fingerprinted
+`ggml.c` differs. Base I2_SR improves `1.4619x`, CI `[1.3686, 1.5616]`, and
+mixed I2_SR+Q8 improves `1.4358x`, CI `[1.2857, 1.6035]`, with zero logit
+difference. This is a real kernel improvement, although it is not enough to
+overtake FP16 on the classifier workload.
 
 ## Active Method-Equivalence Gate
 
@@ -297,6 +309,8 @@ successful experiment.
   high-vocabulary embedding floor in small-model GGUF storage.
 - Interleaved, affinity-pinned CPU benchmarks that distinguish repeatable
   workload throughput from noisy one-shot timing.
+- An allocation-free I2 matrix-output path with bit-identical logits and a
+  controlled `1.44-1.46x` local runtime improvement on two classifier formats.
 - Manifest-based checkpoint handoff for long Stage-2 jobs, so downstream runs
   consume the actual snapshot state dict instead of guessed paths.
 - Pre-training run contracts that record the resolved recipe, source state,
