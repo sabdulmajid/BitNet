@@ -196,7 +196,10 @@ class SubLNLinear(nn.Module):
         return getattr(self.proj, "bias", None)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.proj(self.subln(x))
+        normalized = self.subln(x)
+        if normalized.dtype != x.dtype:
+            normalized = normalized.to(x.dtype)
+        return self.proj(normalized)
 
 
 def set_seed(seed: int) -> None:
