@@ -189,6 +189,11 @@ def git_identity(path: Path) -> dict[str, Any]:
     }
 
 
+def normalize_ldd_output(value: str) -> str:
+    """Remove randomized load addresses while preserving library identities."""
+    return re.sub(r"\(0x[0-9a-fA-F]+\)", "(0xADDR)", value.strip())
+
+
 def runtime_build_contract(binary: Path, root: Path) -> dict[str, Any]:
     """Fingerprint the executable, shared libraries, flags, and kernel sources.
 
@@ -235,7 +240,7 @@ def runtime_build_contract(binary: Path, root: Path) -> dict[str, Any]:
             capture_output=True,
             text=True,
         )
-        ldd_text = ldd_result.stdout.strip()
+        ldd_text = normalize_ldd_output(ldd_result.stdout)
         seen: set[Path] = set()
         for line in ldd_text.splitlines():
             match = re.search(r"(?:=>\s+)?(/\S+)", line)
@@ -289,6 +294,10 @@ def runtime_build_contract(binary: Path, root: Path) -> dict[str, Any]:
                 }
             )
 
+    repositories = {
+        "bitnet": git_identity(root),
+        "llama_cpp": git_identity(root / "3rdparty/llama.cpp"),
+    }
     contract: dict[str, Any] = {
         "build_dir": maybe_relative(build_dir, root),
         "cmake_options": cmake_options,
@@ -298,12 +307,23 @@ def runtime_build_contract(binary: Path, root: Path) -> dict[str, Any]:
         "linked_libraries": linked_libraries,
         "ldd": ldd_text,
         "source_files": source_files,
-        "repositories": {
-            "bitnet": git_identity(root),
-            "llama_cpp": git_identity(root / "3rdparty/llama.cpp"),
-        },
+        "repositories": repositories,
     }
-    canonical = json.dumps(contract, sort_keys=True, separators=(",", ":"))
+    fingerprint = {
+        "cmake_options": cmake_options,
+        "cmake_cache_sha256": contract["cmake_cache"]["sha256"] if contract["cmake_cache"] else None,
+        "compile_commands_sha256": (
+            contract["compile_commands"]["sha256"] if contract["compile_commands"] else None
+        ),
+        "compile_units": [
+            {"file": row["file"], "command_sha256": row["command_sha256"]}
+            for row in compile_units
+        ],
+        "linked_libraries": linked_libraries,
+        "source_files": source_files,
+    }
+    canonical = json.dumps(fingerprint, sort_keys=True, separators=(",", ":"))
+    contract["fingerprint_components"] = fingerprint
     contract["sha256"] = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     return contract
 
