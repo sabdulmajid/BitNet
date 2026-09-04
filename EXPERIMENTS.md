@@ -294,3 +294,42 @@ python benchmarks/validate_public_docs.py
 
 The report validator must reject silent `0/0` reports unless the report has an
 explicit `empty_expected_reason` or equivalent text.
+
+## Native Classifier CPU Matrix
+
+The public deployment matrix uses four immutable GGUF artifacts, the first 512
+MNLI `validation_matched` rows, sequence-isolated token-ID input, 12 threads,
+and CPU affinity `0-11`. Generate each raw `seqcls_native_cpu.v2` result with
+`benchmarks/benchmark_seqcls_native_i2sr_cpu.py`, then run the fail-closed
+paired audit:
+
+```bash
+python benchmarks/audit_seqcls_native_cpu_matrix.py
+```
+
+The audit refuses comparison if task inputs, labels, CPU contract, runtime
+build fingerprint, linked libraries, or source cleanliness differ. Its outputs
+are:
+
+```text
+benchmarks/results/seqcls_native_cpu_matrix_2026-09-04.json
+benchmarks/results/seqcls_native_cpu_matrix_2026-09-04.md
+```
+
+Run the timing protocol separately so host-load variation cannot be mistaken
+for a model-speed effect:
+
+```bash
+python benchmarks/benchmark_seqcls_native_cpu_repeated.py \
+  --max-samples 128 \
+  --repetitions 4 \
+  --threads 12 \
+  --cpu-affinity 0-11 \
+  --cooldown-seconds 3
+```
+
+This rotates artifact order across repetitions, requires stable prediction and
+token-count hashes, and reports paired geometric speed ratios with Student-t
+intervals. The current Xeon 4116 result rejects a sequence-classification
+speedup for both tested I2_SR artifacts. It does not supersede the separate
+causal-decode benchmark.

@@ -20,6 +20,8 @@ representation-learning problem plus a runtime-contract problem.
 | Row-scale runtime semantics matter | Supported | TL2 one-scale RMS error `1.904230`; exact row-scale RMS error `0.000197`. |
 | `I2_SR` is a working row-scale CPU path | Supported with caveat | Runs on Xeon and is faster than FP16 decode, but does not beat Q4_K_M on quality or file size. |
 | Native classifier runtime preserves task quality | Supported for one artifact; not product-ready | On 9,815 MNLI examples, native `I2_SR` accuracy is `0.652165` versus PyTorch `0.653591`: paired delta `-0.001426`, CI `[-0.004193, 0.001341]`, exact McNemar `p=0.348`. Exact prediction agreement remains `0.976668`; the non-inferiority margin was retrospective and the model itself is weak. |
+| Mixed `I2_SR` plus Q8 embedding reduces classifier storage | Supported for one artifact | `230.90 MiB`, `4.106x` smaller than FP16 and `1.527x` smaller than base I2_SR. Against base I2_SR on 512 fixed MNLI examples: delta `-0.001953`, paired CI `[-0.011719, 0.007812]`, prediction agreement `0.982422`. |
+| I2_SR accelerates sequence-isolated classification on Xeon 4116 | Rejected for tested workload | Four interleaved pinned runs give I2_SR/FP16 geometric throughput ratio `0.637`, CI `[0.575, 0.706]`; mixed I2_SR+Q8 is `0.528`, CI `[0.475, 0.588]`. This does not reject a causal-decode speedup. |
 | Kimi/MoE support is proven | Not supported | Tiny Qwen2MoE fixtures only. |
 
 ## Reproduction Gap Update
@@ -54,6 +56,8 @@ documented in
 - Do not say "reproduced BitDistill" until the controlled reproduction closes.
 - Do not say "`I2_SR` beats Q4" because current evidence says it does not on
   quality or file size.
+- Do not claim a general CPU speedup: the causal decode path improves, while
+  the controlled sequence-classification path is slower than FP16.
 - Do not say "Kimi support" without trained MoE quality and runtime evidence.
 
 ## Source Of Truth

@@ -23,6 +23,8 @@ The frozen baseline bundle and current decision reports are:
 - [canonical_evidence_bundle_2026-05-20.json](benchmarks/results/canonical_evidence_bundle_2026-05-20.json)
 - [bitdistill_benchmark_scoreboard_2026-05-23.md](benchmarks/results/bitdistill_benchmark_scoreboard_2026-05-23.md)
 - [bitdistill_benchmark_scoreboard_2026-05-23.json](benchmarks/results/bitdistill_benchmark_scoreboard_2026-05-23.json)
+- [seqcls_native_cpu_matrix_2026-09-04.md](benchmarks/results/seqcls_native_cpu_matrix_2026-09-04.md)
+- [seqcls_native_cpu_repeated_2026-09-04.md](benchmarks/results/seqcls_native_cpu_repeated_2026-09-04.md)
 
 | Claim | Status | Evidence | Caveat |
 | --- | --- | --- | --- |
@@ -36,6 +38,8 @@ The frozen baseline bundle and current decision reports are:
 | Row-scale semantics matter at runtime | **Yes: strong systems result** | TL2 one-scale relative output RMS error `1.904230`; exact FP16 row scales reduce it to `0.000197`. | Row scales are part of the learned function. TL2 row-scale support is not implemented. |
 | `I2_SR` packed CPU inference works | **Yes, for compatible causal artifacts** | Xeon Silver 4116: row-scale `I2_SR` file `1211.3 MiB`, PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. | It does **not** beat Q4_K_M on quality or file size. Q4_K_M is `940.4 MiB` with PPL `12.8112`. |
 | Native packed sequence classification preserves task quality | **Yes, for one audited artifact; not product-ready** | Full MNLI native sequence-isolated path: `0.652165` versus PyTorch `0.653591`, paired delta `-0.001426`, 95% CI `[-0.004193, 0.001341]`, exact McNemar `p=0.348`; `7.456204` examples/s and RSS `960.15 MiB`. | Exact prediction agreement is `0.976668`, the 0.5-point non-inferiority gate is retrospective, multi-prompt batching remains excluded, and the underlying model quality is weak. |
+| Mixed `I2_SR` plus Q8 embedding improves deployed storage | **Yes, on one Qwen2.5 classifier** | The packed artifact is `230.90 MiB`: `4.106x` smaller than FP16 and `1.527x` smaller than the F16-embedding I2_SR artifact. On 512 MNLI examples it changes accuracy by `-0.001953`, paired CI `[-0.011719, 0.007812]`, with `0.982422` prediction agreement. | This is a same-student format comparison on a fixed, non-random sample; it is not evidence of FP-quality recovery. |
+| Packed ternary accelerates native sequence classification on the Xeon 4116 | **No, for the audited sequence-isolated workload** | Four interleaved pinned runs: I2_SR/FP16 geometric throughput ratio `0.637`, 95% CI `[0.575, 0.706]`; mixed I2_SR+Q8 ratio `0.528`, CI `[0.475, 0.588]`. | This does not contradict the causal decode result. Kernel benefit is workload-, shape-, and execution-path-dependent. |
 | Kimi/MoE support is proven | **No: not supported** | Only tiny Qwen2MoE fixture/plumbing exists. | No trained Kimi quality, MLA/shared-expert mapping, routed expert locality, or CPU product result is proven. |
 
 ## Current Reproduction Gap
@@ -145,6 +149,48 @@ parity: predictions agree on `0.976668` of examples. It also does not repair the
 checkpoint's weak absolute accuracy or validate multi-prompt batching. See
 [seqcls_runtime_quality_equivalence_2026-09-04.md](benchmarks/results/seqcls_runtime_quality_equivalence_2026-09-04.md).
 
+## Controlled Xeon Deployment Matrix
+
+The native runtime now supports both Qwen2 sequence-classification heads and
+the row-scale BitNet-Qwen classifier. Classifier graphs stop at the dense task
+head instead of computing the unused `151,936`-token language-model logits.
+All four artifacts below were evaluated with the same binary and linked-library
+hashes, first 512 MNLI `validation_matched` examples, token IDs, sequence
+isolation, 12 threads, and CPU affinity `0-11` on the Xeon Silver 4116.
+
+| Artifact | Pre-deployment function | MNLI | GGUF MiB | Size vs FP16 |
+| --- | --- | ---: | ---: | ---: |
+| FP16 teacher | FP16-SFT teacher | `0.789062` | `948.11` | `1.000x` |
+| Q4_0 teacher | Same teacher, Q4_0 format | `0.675781` | `335.84` | `2.823x` smaller |
+| I2_SR student | Row-scale QAT student | `0.669922` | `352.62` | `2.689x` smaller |
+| I2_SR + Q8 embedding | Same student, mixed format | `0.667969` | `230.90` | `4.106x` smaller |
+
+Q4_0 versus FP16 isolates a same-model format effect: accuracy delta
+`-0.113281`, paired CI `[-0.154297, -0.074219]`, exact McNemar
+`p=4.842e-08`. I2_SR versus FP16 is instead a deployed-model comparison that
+includes the student training gap. The cleanest new format result is mixed
+I2_SR+Q8 versus base I2_SR: one net correct prediction is lost (`3` wins,
+`4` losses), delta `-0.001953`, CI `[-0.011719, 0.007812]`, while storage
+falls another `34.52%`.
+
+Throughput comes from a separate four-repetition interleaved benchmark over a
+fixed 128-example subset. Each run used the same 12 pinned physical cores and
+predictions were stable across repetitions:
+
+| Artifact | Mean tok/s | Geometric speed / FP16 | Paired 95% CI |
+| --- | ---: | ---: | ---: |
+| FP16 teacher | `275.385` | `1.000` | `[1.000, 1.000]` |
+| Q4_0 teacher | `201.035` | `0.730` | `[0.666, 0.799]` |
+| I2_SR student | `175.285` | `0.637` | `[0.575, 0.706]` |
+| I2_SR + Q8 embedding | `145.642` | `0.528` | `[0.475, 0.588]` |
+
+This is a useful negative systems result: the custom ternary path does not
+accelerate short, sequence-isolated classification on this CPU. The causal
+decode path can still benefit because it has a different matrix-shape and
+memory-access regime. The high-vocabulary embedding also dominates small-Qwen
+storage unless it is compressed separately; Q8 embedding export closes that
+storage gap but does not improve this workload's throughput.
+
 ## Active Method-Equivalence Gate
 
 The earlier fixed-gamma-60 proposal is superseded by a more fundamental audit:
@@ -197,14 +243,14 @@ activations back to the incoming activation dtype, with a regression test that
 forces the promotion path.
 
 To use otherwise idle compute while the dualcard queue is blocked, the
-surviving cosine split-1 adaptive contract is running a separately labeled,
-pre-registered cross-environment MNLI gate: 10,000 steps, all 392,702 available
-training examples, all 9,815 matched validation examples, and seeds `1234`,
-`1235`, and `1236`. Jobs `10392`, `10395`, and `10396` run serially on the
-A4500; only the first saves model artifacts. Success requires a statistically
-positive paired delta over the fixed-gamma 655M baseline and three-seed mean
-accuracy within one point of local FP16. Passing would support the adaptive
-method, not by itself establish paper-exact reproduction. See
+surviving cosine split-1 adaptive contract is being tested in a separately
+labeled, pre-registered cross-environment MNLI gate: 10,000 steps, all 392,702
+available training examples, all 9,815 matched validation examples, and seeds
+`1234`, `1235`, and `1236`. Jobs `10392`, `10395`, and `10396` run serially on
+the A4500; only the first saves model artifacts. Success requires a
+statistically positive paired delta over the fixed-gamma 655M baseline and
+three-seed mean accuracy within one point of local FP16. Passing would support
+the adaptive method, not by itself establish paper-exact reproduction. See
 [bitdistill_adaptive_full_submission_2026-09-04.md](benchmarks/results/bitdistill_adaptive_full_submission_2026-09-04.md).
 
 The six 120-step pilots are method diagnostics only. The active 10k-step,
@@ -245,7 +291,12 @@ successful experiment.
 - Deterministic invariance and gradient audits that expose method-definition
   mismatches before spending GPU time on downstream sweeps.
 - Row-scale ternary retrofit experiments and paired statistical audits.
-- A llama.cpp fork with a packed `I2_SR` row-scale CPU runtime path.
+- A llama.cpp fork with packed `I2_SR`, Qwen2 classifier-head execution, and
+  graph-level elimination of unused language-model logits for classifiers.
+- Mixed `I2_SR` plus Q8 embedding export, which exposes and reduces the
+  high-vocabulary embedding floor in small-model GGUF storage.
+- Interleaved, affinity-pinned CPU benchmarks that distinguish repeatable
+  workload throughput from noisy one-shot timing.
 - Manifest-based checkpoint handoff for long Stage-2 jobs, so downstream runs
   consume the actual snapshot state dict instead of guessed paths.
 - Pre-training run contracts that record the resolved recipe, source state,
@@ -298,7 +349,12 @@ Do not position this as a one-click converter. The credible direction is:
 3. Separate paper-style tensor-scale BitDistill from row-scale retrofit variants.
 4. Preserve learned scale semantics in packed CPU formats such as `I2_SR`.
 5. Report quality, memory, RSS, and speed as separate gates.
-6. Keep MoE/Kimi as future work until dense models are solved.
+6. Complete the pre-registered adaptive-versus-fixed, three-seed MNLI gate.
+7. If that gate fails, stop scaling the current objective and test
+   Hessian-aware ternary initialization plus group/row-scale hybrids.
+8. Extend only surviving methods to QNLI and SST-2, then optimize the measured
+   classifier bottleneck before making a CPU-speed claim.
+9. Keep MoE/Kimi as future work until dense models are solved.
 
 ## Upstream Projects
 
