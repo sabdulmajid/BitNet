@@ -1248,6 +1248,7 @@ def validate_experiments_doc(experiments_doc: str, readme: str, errors: list[str
 def validate_native_cpu_docs(
     matrix: dict[str, Any],
     repeated: dict[str, Any],
+    runtime_ab: dict[str, Any],
     readme: str,
     claims_doc: str,
     experiments_doc: str,
@@ -1263,6 +1264,12 @@ def validate_native_cpu_docs(
         errors.append(f"native CPU repeated: unexpected schema {repeated.get('schema')}")
     if repeated.get("status") != "valid" or repeated.get("errors") != []:
         errors.append("native CPU repeated: expected valid timing evidence with no errors")
+    if runtime_ab.get("schema") != "seqcls-i2sr-runtime-ab-v1":
+        errors.append(f"I2_SR runtime A/B: unexpected schema {runtime_ab.get('schema')}")
+    if runtime_ab.get("status") != "valid" or runtime_ab.get("errors") != []:
+        errors.append("I2_SR runtime A/B: expected valid timing evidence with no errors")
+    if runtime_ab.get("source_differences") != ["3rdparty/llama.cpp/ggml/src/ggml.c"]:
+        errors.append("I2_SR runtime A/B: source-difference contract is not isolated to ggml.c")
 
     try:
         hybrid_artifact = matrix["artifacts"]["i2_sr_q8_embedding_student"]
@@ -1273,12 +1280,20 @@ def validate_native_cpu_docs(
         hybrid_speed = repeated["paired_speed_ratios_vs_fp16"][
             "i2_sr_q8_embedding_student"
         ]
+        i2_ab = runtime_ab["summaries"]["i2_sr_student"]
+        hybrid_ab = runtime_ab["summaries"]["i2_sr_q8_embedding_student"]
     except (KeyError, TypeError) as exc:
         errors.append(f"native CPU evidence: missing required field {exc}")
         return
 
     quality = hybrid_comparison["quality"]
     system = hybrid_comparison["system"]
+    for label, summary in (("I2_SR", i2_ab), ("mixed I2_SR", hybrid_ab)):
+        numeric = summary.get("numeric_equivalence", {})
+        if numeric.get("predictions_identical") is not True:
+            errors.append(f"I2_SR runtime A/B: {label} predictions are not identical")
+        if numeric.get("max_abs_logit_difference") != 0.0:
+            errors.append(f"I2_SR runtime A/B: {label} logits are not bit-identical")
     required_claims = {
         "hybrid MiB": f"{float(hybrid_artifact['gguf_mib']):.2f}",
         "hybrid/base size factor": f"{float(system['size_ratio_reference_over_candidate']):.3f}",
@@ -1286,6 +1301,8 @@ def validate_native_cpu_docs(
         "hybrid/base agreement": f"{float(quality['prediction_agreement']):.6f}",
         "I2_SR speed ratio": f"{float(i2_speed['geometric_mean']):.3f}",
         "mixed speed ratio": f"{float(hybrid_speed['geometric_mean']):.3f}",
+        "I2_SR runtime A/B ratio": f"{float(i2_ab['candidate_over_baseline']['geometric_mean']):.4f}",
+        "mixed runtime A/B ratio": f"{float(hybrid_ab['candidate_over_baseline']['geometric_mean']):.4f}",
     }
     for label, needle in required_claims.items():
         require_contains(f"README native CPU {label}", needle, readme, errors)
@@ -1293,7 +1310,8 @@ def validate_native_cpu_docs(
 
     for report_name in (
         "seqcls_native_cpu_matrix_2026-09-04.md",
-        "seqcls_native_cpu_repeated_2026-09-04.md",
+        "seqcls_native_cpu_repeated_inplace_2026-09-04.md",
+        "seqcls_i2sr_runtime_ab_2026-09-04.md",
     ):
         require_contains(f"README native CPU report {report_name}", report_name, readme, errors)
     require_contains(
@@ -1305,6 +1323,12 @@ def validate_native_cpu_docs(
     require_contains(
         "EXPERIMENTS native CPU repeated command",
         "python benchmarks/benchmark_seqcls_native_cpu_repeated.py",
+        experiments_doc,
+        errors,
+    )
+    require_contains(
+        "EXPERIMENTS I2_SR runtime A/B command",
+        "python benchmarks/benchmark_seqcls_i2sr_runtime_ab.py",
         experiments_doc,
         errors,
     )
@@ -1419,7 +1443,12 @@ def main() -> int:
     parser.add_argument(
         "--native-cpu-repeated",
         type=Path,
-        default=Path("benchmarks/results/seqcls_native_cpu_repeated_2026-09-04.json"),
+        default=Path("benchmarks/results/seqcls_native_cpu_repeated_inplace_2026-09-04.json"),
+    )
+    parser.add_argument(
+        "--i2sr-runtime-ab",
+        type=Path,
+        default=Path("benchmarks/results/seqcls_i2sr_runtime_ab_2026-09-04.json"),
     )
     args = parser.parse_args()
 
@@ -1444,6 +1473,7 @@ def main() -> int:
     next_experiment_blueprint = load_json(args.next_experiment_blueprint)
     native_cpu_matrix = load_json(args.native_cpu_matrix)
     native_cpu_repeated = load_json(args.native_cpu_repeated)
+    i2sr_runtime_ab = load_json(args.i2sr_runtime_ab)
     readme = read_text(args.readme)
     claims_doc = read_text(args.claims)
     experiments_doc = read_text(args.experiments)
@@ -1474,6 +1504,7 @@ def main() -> int:
     validate_native_cpu_docs(
         native_cpu_matrix,
         native_cpu_repeated,
+        i2sr_runtime_ab,
         readme,
         claims_doc,
         experiments_doc,
