@@ -116,10 +116,11 @@ def summarize_ratios(candidate: list[float], reference: list[float]) -> dict[str
 
 def render_markdown(report: dict[str, Any]) -> str:
     rows = []
-    fp_tps = report["summaries"]["fp16_teacher"]["prompt_tokens_per_second"]["values"]
+    reference_name = report["speed_reference"]
+    reference_tps = report["summaries"][reference_name]["prompt_tokens_per_second"]["values"]
     for name, summary in report["summaries"].items():
         tps = summary["prompt_tokens_per_second"]
-        ratio = summarize_ratios(tps["values"], fp_tps)
+        ratio = summarize_ratios(tps["values"], reference_tps)
         rows.append(
             [
                 name,
@@ -132,7 +133,7 @@ def render_markdown(report: dict[str, Any]) -> str:
             ]
         )
     table = [
-        "| artifact | mean tok/s | mean 95% CI | range | speed / FP16 | ratio 95% CI | predictions stable |",
+        f"| artifact | mean tok/s | mean 95% CI | range | speed / {reference_name} | ratio 95% CI | predictions stable |",
         "| --- | ---: | ---: | ---: | ---: | ---: | --- |",
     ]
     table.extend("| " + " | ".join(str(value) for value in row) + " |" for row in rows)
@@ -156,7 +157,7 @@ def render_markdown(report: dict[str, Any]) -> str:
             "",
             f"- Intervals use a two-sided Student-t interval over {report['repetitions']} execution repetitions; they quantify run variability, not model-quality uncertainty.",
             "- Ratios are paired by repetition and summarized on the log scale.",
-            "- The I2_SR artifacts are trained students; speed comparisons are valid deployed-artifact comparisons, not isolated kernel microbenchmarks.",
+            "- Trained-student speed comparisons are valid deployed-artifact comparisons, not isolated kernel microbenchmarks.",
             "- Results apply to this CPU, affinity, executable, shared libraries, prompt set, and sequence-isolated classifier path.",
             "",
         ]
@@ -170,6 +171,18 @@ def main() -> int:
     parser.add_argument("--embedding-binary", type=Path, default=Path("build-portable-avx2/bin/llama-embedding"))
     for name, default in DEFAULT_MODELS.items():
         parser.add_argument(f"--{name.replace('_', '-')}", type=Path, default=default)
+    parser.add_argument(
+        "--model",
+        action="append",
+        default=[],
+        metavar="NAME=PATH",
+        help="Explicit artifact set; when present, replaces the built-in model set.",
+    )
+    parser.add_argument(
+        "--speed-reference",
+        default="fp16_teacher",
+        help="Artifact name used as the denominator for paired speed ratios.",
+    )
     parser.add_argument("--max-samples", type=int, default=128)
     parser.add_argument("--repetitions", type=int, default=4)
     parser.add_argument("--threads", type=int, default=12)
@@ -196,10 +209,25 @@ def main() -> int:
     root = args.repo_root.resolve()
     checkpoint = args.checkpoint_dir if args.checkpoint_dir.is_absolute() else root / args.checkpoint_dir
     binary = args.embedding_binary if args.embedding_binary.is_absolute() else root / args.embedding_binary
-    model_paths = {
-        name: value if value.is_absolute() else root / value
-        for name, value in ((name, getattr(args, name)) for name in DEFAULT_MODELS)
-    }
+    if args.model:
+        model_paths = {}
+        for item in args.model:
+            name, separator, raw_path = item.partition("=")
+            if not separator or not name or not raw_path:
+                raise SystemExit(f"invalid --model {item!r}; expected NAME=PATH")
+            if name in model_paths:
+                raise SystemExit(f"duplicate --model name: {name}")
+            path = Path(raw_path)
+            model_paths[name] = path if path.is_absolute() else root / path
+    else:
+        model_paths = {
+            name: value if value.is_absolute() else root / value
+            for name, value in ((name, getattr(args, name)) for name in DEFAULT_MODELS)
+        }
+    if args.speed_reference not in model_paths:
+        raise SystemExit(
+            f"--speed-reference {args.speed_reference!r} is not one of {sorted(model_paths)}"
+        )
 
     from transformers import AutoTokenizer
 
@@ -207,7 +235,7 @@ def main() -> int:
     dataset_rows = load_rows("mnli", args.max_samples)
     prompts = [render_prompt(tokenizer, "mnli", row, prompt_input="token_ids") for row in dataset_rows]
     labels = [int(row["label"]) for row in dataset_rows]
-    names = list(DEFAULT_MODELS)
+    names = list(model_paths)
     runs: list[dict[str, Any]] = []
 
     for repetition in range(args.repetitions):
@@ -278,9 +306,9 @@ def main() -> int:
             "load_time_ms": summarize([float(row["load_time_ms"]) for row in selected]),
         }
 
-    fp_values = summaries["fp16_teacher"]["prompt_tokens_per_second"]["values"]
+    reference_values = summaries[args.speed_reference]["prompt_tokens_per_second"]["values"]
     paired_speed_ratios = {
-        name: summarize_ratios(summary["prompt_tokens_per_second"]["values"], fp_values)
+        name: summarize_ratios(summary["prompt_tokens_per_second"]["values"], reference_values)
         for name, summary in summaries.items()
     }
     report = {
@@ -292,13 +320,14 @@ def main() -> int:
         "repetitions": args.repetitions,
         "threads": args.threads,
         "cpu_affinity": args.cpu_affinity,
+        "speed_reference": args.speed_reference,
         "hardware": cpu_environment(args.threads),
         "runtime_build": runtime_build_contract(binary, root),
         "benchmark_script": file_identity(Path(__file__).resolve(), root),
         "artifacts": {name: file_identity(path, root) for name, path in model_paths.items()},
         "runs": runs,
         "summaries": summaries,
-        "paired_speed_ratios_vs_fp16": paired_speed_ratios,
+        "paired_speed_ratios_vs_reference": paired_speed_ratios,
         "interpretation": (
             "All prediction and token-count contracts are stable across repetitions. Throughput "
             "comparisons may be reported with paired run-level intervals."
@@ -306,6 +335,8 @@ def main() -> int:
             else "A repeated-run contract failed; no throughput comparison is permitted."
         ),
     }
+    if args.speed_reference == "fp16_teacher":
+        report["paired_speed_ratios_vs_fp16"] = paired_speed_ratios
     args.output_json.parent.mkdir(parents=True, exist_ok=True)
     args.output_md.parent.mkdir(parents=True, exist_ok=True)
     args.output_json.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")

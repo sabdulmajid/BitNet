@@ -1,4 +1,6 @@
 import argparse
+import hashlib
+import io
 import os
 from configparser import ConfigParser
 
@@ -16,7 +18,9 @@ static void * aligned_malloc(size_t size) {\n\
     return _aligned_malloc(size, 64);\n\
 #else\n\
     void * ptr = nullptr;\n\
-    posix_memalign(&ptr, 64, size);\n\
+    if (posix_memalign(&ptr, 64, size) != 0) {\n\
+        return nullptr;\n\
+    }\n\
     return ptr;\n\
 #endif\n\
 }\n\
@@ -96,7 +100,6 @@ inline int32_t per_tensor_quant(int k, void* lut_scales_, void* b_) {\n\
 }\n\
 inline int32_t partial_max_reset(int32_t bs, void* lut_scales_) {\n\
     bitnet_float_type* lut_scales = (bitnet_float_type*)lut_scales_;\n\
-    #pragma unroll\n\
     for (int i=0; i< bs; i++) {\n\
         lut_scales[i] = 0.0;\n\
     }\n\
@@ -114,7 +117,6 @@ inline int32_t three_lut_ctor(int8_t* qlut, bitnet_float_type* b, bitnet_float_t
                                             0x0f, 0x0d, 0x0b, 0x09, 0x07, 0x05, 0x03, 0x01,\n\
                                             0x0e, 0x0c, 0x0a, 0x08, 0x06, 0x04, 0x02, 0x00\n\
                                             );\n\
-#pragma unroll\n\
     for (int k = 0; k < act_k / 24; ++k) {\n\
         __m256 vec_b0 = _mm256_i32gather_ps(b + k * 24 + 0, vec_bi, 1);\n\
         __m256 vec_b1 = _mm256_i32gather_ps(b + k * 24 + 1, vec_bi, 1);\n\
@@ -156,7 +158,6 @@ inline int32_t three_lut_ctor(int8_t* qlut, bitnet_float_type* b, bitnet_float_t
         vec_lut[0] = _mm256_setzero_si256();\n\
         __m256i ix[16];\n\
 \n\
-#pragma unroll\n\
         for (int g = 0; g < 16; ++g) {\n\
             ix[g] = vec_lut[g];\n\
         }\n\
@@ -164,7 +165,6 @@ inline int32_t three_lut_ctor(int8_t* qlut, bitnet_float_type* b, bitnet_float_t
         Transpose_8_8(&(ix[0]), &(ix[1]), &(ix[2]), &(ix[3]), &(ix[4]), &(ix[5]),&(ix[6]), &(ix[7]));\n\
         Transpose_8_8(&(ix[8]), &(ix[9]), &(ix[10]), &(ix[11]), &(ix[12]), &(ix[13]),&(ix[14]), &(ix[15]));\n\
 \n\
-#pragma unroll\n\
         for (int g = 0; g < 8; ++g) {\n\
             ix[g] = _mm256_packs_epi32(ix[g], ix[g + 8]);\n\
             ix[g] = _mm256_permute4x64_epi64(ix[g], _MM_SHUFFLE(3, 1, 2, 0));\n\
@@ -200,7 +200,6 @@ inline int32_t two_lut_ctor(int8_t* qlut, bitnet_float_type* b, bitnet_float_typ
                                             0x0f, 0x0d, 0x0b, 0x09, 0x07, 0x05, 0x03, 0x01,\n\
                                             0x0e, 0x0c, 0x0a, 0x08, 0x06, 0x04, 0x02, 0x00\n\
                                             );\n\
-#pragma unroll\n\
     for (int k = 0; k < act_k / 16; ++k) {\n\
         __m256 vec_b0f = _mm256_i32gather_ps(b + k * 16 + 0, vec_bi, 1);\n\
         __m256 vec_b1f = _mm256_i32gather_ps(b + k * 16 + 1, vec_bi, 1);\n\
@@ -233,7 +232,6 @@ inline int32_t two_lut_ctor(int8_t* qlut, bitnet_float_type* b, bitnet_float_typ
         vec_lut[0] = _mm256_sub_epi32(vec_lut[0], vec_b1);\n\
 \n\
         __m256i ix[16];\n\
-#pragma unroll\n\
         for (int g = 0; g < 16; ++g) {\n\
             ix[g] = vec_lut[g];\n\
         }\n\
@@ -241,7 +239,6 @@ inline int32_t two_lut_ctor(int8_t* qlut, bitnet_float_type* b, bitnet_float_typ
         Transpose_8_8(&(ix[0]), &(ix[1]), &(ix[2]), &(ix[3]), &(ix[4]), &(ix[5]),&(ix[6]), &(ix[7]));\n\
         Transpose_8_8(&(ix[8]), &(ix[9]), &(ix[10]), &(ix[11]), &(ix[12]), &(ix[13]),&(ix[14]), &(ix[15]));\n\
 \n\
-#pragma unroll\n\
         for (int g = 0; g < 8; ++g) {\n\
             ix[g] = _mm256_packs_epi32(ix[g], ix[g + 8]);\n\
             ix[g] = _mm256_permute4x64_epi64(ix[g], _MM_SHUFFLE(3, 1, 2, 0));\n\
@@ -267,7 +264,8 @@ inline int32_t two_lut_ctor(int8_t* qlut, bitnet_float_type* b, bitnet_float_typ
 }\n\
 static bool is_type_supported(enum ggml_type type) {\n\
     if (type == GGML_TYPE_Q4_0 ||\n\
-        type == GGML_TYPE_TL2) {\n\
+        type == GGML_TYPE_TL2 ||\n\
+        type == GGML_TYPE_TL2_SR) {\n\
         return true;\n\
     } else {\n\
         return false;\n\
@@ -276,7 +274,7 @@ static bool is_type_supported(enum ggml_type type) {\n\
 "
     return kernel_code
 
-def gen_tbl_impl(pre, BM, BK, bm, k_list):
+def gen_tbl_impl(pre, M, BM, BK, bm, k_list):
 
     kernel_code = "\
 #include <immintrin.h>\n\
@@ -290,27 +288,19 @@ inline void three_tbl_impl_{0}(int32_t* c, int8_t* lut, uint8_t* a, uint8_t* sig
     kernel_code = "".join([kernel_code, "\
 #ifdef __AVX2__\n\
     const __m256i vec_mask = _mm256_set1_epi8(0x0f);\n\
-    const __m256i vec_sign_mask  = _mm256_set1_epi16(0x8000);\n\
-    const __m256i vec_zero  = _mm256_set1_epi8(0x00);\n\
-    const __m256i vec_one  = _mm256_set1_epi8(0xff);\n\
     const int KK = BBK{0} / 3;\n\
-#pragma unroll\n\
         for (int i = 0; i < BM{0}; i += 32) {{\n\
         __m256i vec_as[KK / 2];\n\
         __m256i vec_signs[KK / 8];\n\
-        #pragma unroll\n\
         for (int ai = 0; ai < KK / 2; ai++) {{\n\
             vec_as[ai] = _mm256_loadu_si256(reinterpret_cast<__m256i*>(a + i * KK / 2 + ai * 32));\n\
         }}\n\
-        #pragma unroll\n\
         for (int as = 0; as < KK / 8; as++) {{\n\
             vec_signs[as] = _mm256_loadu_si256(reinterpret_cast<__m256i*>(sign + i * KK / 8 + as * 32));\n\
         }}\n\
-#pragma unroll\n\
     for (int bs = 0; bs < batch_size; bs++) {{\n\
         __m256i vec_c0 = _mm256_setzero_si256();\n\
         __m256i vec_c1 = _mm256_setzero_si256();\n\
-#pragma unroll\n\
         for (int k = 0; k < KK / 8; k++) {{\n\
             __m256i vec_sign = vec_signs[k];\n\
                 __m256i vec_a_0 = vec_as[k * 4 + 0];\n\
@@ -428,20 +418,15 @@ inline int32_t two_tbl_impl{0}(int32_t* c, int8_t* lut, uint8_t* a) {{\n\
 #ifdef __AVX2__\n\
     const __m256i vec_mask = _mm256_set1_epi8(0x0f);\n\
     const int KK = BK2 / 2;\n\
-#pragma unroll\n\
     for (int i = 0; i < BM{0}; i += 32) {{\n\
         __m256i vec_as[KK / 2];\n\
-        #pragma unroll\n\
         for (int ai = 0; ai < KK / 2; ai++) {{\n\
             vec_as[ai] = _mm256_loadu_si256(reinterpret_cast<__m256i*>(a + i * KK / 2 + ai * 32));\n\
         }}\n\
-#pragma unroll\n\
     for (int bs = 0; bs < batch_size; bs++) {{\n\
         __m256i vec_c0 = _mm256_setzero_si256();\n\
         __m256i vec_c1 = _mm256_setzero_si256();\n\
-#pragma unroll\n\
         for (int k = 0; k < KK / 8; k++) {{\n\
-            #pragma unroll\n\
             for (int j = 0; j < 4; j++) {{\n\
                 __m256i vec_a = vec_as[k * 4 + j];\n\
 \n\
@@ -465,7 +450,7 @@ inline int32_t two_tbl_impl{0}(int32_t* c, int8_t* lut, uint8_t* a) {{\n\
                 vec_c0 = _mm256_add_epi16(vec_c0, vec_v_top_hi);\n\
                 vec_c0 = _mm256_add_epi16(vec_c0, vec_v_bot_hi);\n\
                 vec_c1 = _mm256_add_epi16(vec_c1, vec_v_top_lo);\n\
-                vec_c1 = _mm256_add_epi16(vec_c1, vec_v_bot_lo); \n\
+                vec_c1 = _mm256_add_epi16(vec_c1, vec_v_bot_lo);\n\
             }}\n\
         }}\n\
 \n\
@@ -490,43 +475,41 @@ inline int32_t two_tbl_impl{0}(int32_t* c, int8_t* lut, uint8_t* a) {{\n\
 }}\n\
 \n\
 template<int BATCH_SIZE>\n\
-int32_t three_qgemm_lut_{0}(void* A, void* sign, void* LUT, void* Scales, void* LUT_Scales, void* C) {{\n\
+int32_t three_qgemm_lut_{0}(void* A, void* sign, void* LUT, void* Scales, int scale_stride, void* LUT_Scales, void* C) {{\n\
+    (void) Scales;\n\
+    (void) scale_stride;\n\
+    (void) LUT_Scales;\n\
     alignas(32) uint32_t CBits[BATCH_SIZE * BM{0}];\n\
     memset(&(CBits[0]), 0, BATCH_SIZE * BM{0} * sizeof(int32_t));\n\
-#pragma unroll\n\
     for (int32_t k_outer = 0; k_outer < {1} / BBK{0}; ++k_outer) {{\n\
         three_tbl_impl_{0}<BATCH_SIZE, {1}>((&(((int32_t*)CBits)[0])), (&(((int8_t*)LUT)[(k_outer * BBK{0} / 3 * 32)])), (&(((uint8_t*)A)[(k_outer * BBK{0} / 3 / 2 * BM{0})])), (&(((uint8_t*)sign)[(k_outer * BBK{0} / 3 / 8 * BM{0})])));\n\
     }}\n\
-#pragma unroll\n\
     for (int bs = 0; bs < BATCH_SIZE; bs++) {{\n\
-#pragma unroll\n\
         for (int i = 0; i < BM{0}; i++) {{\n\
-            ((int32_t*)C)[i] = (int32_t)(((int32_t*)CBits)[i + bs * BM{0}]);\n\
+            ((int32_t*)C)[i + bs * {3}] = (int32_t)(((int32_t*)CBits)[i + bs * BM{0}]);\n\
         }}\n\
   }}\n\
   return 0;\n\
 }}\n\
 \n\
 template<int BATCH_SIZE>\n\
-int32_t two_qgemm_lut_{0}(void* A, void* LUT, void* Scales, void* LUT_Scales, void* C) {{\n\
+int32_t two_qgemm_lut_{0}(void* A, void* LUT, void* Scales, int scale_stride, void* LUT_Scales, void* C) {{\n\
     alignas(32) uint32_t CBits[BATCH_SIZE * BM{0}];\n\
     memset(&(CBits[0]), 0, BATCH_SIZE * BM{0} * sizeof(int32_t));\n\
-#pragma unroll\n\
     for (int32_t k_outer = 0; k_outer < {2} / 32; ++k_outer) {{\n\
         two_tbl_impl{0}<BATCH_SIZE, {2}>((&(((int32_t*)CBits)[0])), (&(((int8_t*)LUT)[(k_outer * BK2 / 2 * 32)])), (&(((uint8_t*)A)[(k_outer * BK2 / 2 / 2 * BM{0})])));\n\
     }}\n\
-#pragma unroll\n\
     for (int bs = 0; bs < BATCH_SIZE; bs++) {{\n\
-#pragma unroll\n\
         for (int i = 0; i < BM{0}; i++) {{\n\
-            ((int32_t*)C)[i] += (int32_t)(((int32_t*)CBits)[i + bs * BM{0}]);\n\
-            ((float*)C)[i] = (float)(((int32_t*)C)[i]) / ((float*)LUT_Scales)[bs] * ((float*)Scales)[0];\n\
+            const int output_idx = i + bs * {3};\n\
+            ((int32_t*)C)[output_idx] += (int32_t)(((int32_t*)CBits)[i + bs * BM{0}]);\n\
+            ((float*)C)[output_idx] = (float)(((int32_t*)C)[output_idx]) / ((float*)LUT_Scales)[bs] * ((float*)Scales)[i * scale_stride];\n\
         }}\n\
     }}\n\
   return 0;\n\
 }}\n\
 \n\
-".format(pre, k_list[1], k_list[0])])
+".format(pre, k_list[1], k_list[0], M)])
     return kernel_code
 
 def gen_top_api(kernel_shapes, k_list):
@@ -552,36 +535,36 @@ def gen_top_api(kernel_shapes, k_list):
     kernel_code = "".join([kernel_code, "}\n"])
 
 
-    kernel_code = "".join([kernel_code, "void ggml_qgemm_lut(int bs, int m, int k, int BK, void* A, void* sign, void* LUT, void* Scales, void* LUT_Scales, void* C) {{\n\
+    kernel_code = "".join([kernel_code, "void ggml_qgemm_lut(int bs, int m, int k, int BK, void* A, void* sign, void* LUT, void* Scales, int scale_stride, void* LUT_Scales, void* C) {{\n\
     if (m == {0} && k == {1}) {{\n\
         if (BK == {2}) {{\n\
             if (bs == 1) {{\n\
-                two_qgemm_lut_{4}<1>(A, LUT, Scales, LUT_Scales, C);\n\
+                two_qgemm_lut_{4}<1>(A, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }} else if (bs == 8) {{\n\
-                two_qgemm_lut_{4}<8>(A, LUT, Scales, LUT_Scales, C);\n\
+                two_qgemm_lut_{4}<8>(A, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }} else if (bs == 32) {{\n\
-                two_qgemm_lut_{4}<32>(A, LUT, Scales, LUT_Scales, C);\n\
+                two_qgemm_lut_{4}<32>(A, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }} else if (bs == 128) {{\n\
-                two_qgemm_lut_{4}<128>(A, LUT, Scales, LUT_Scales, C);\n\
+                two_qgemm_lut_{4}<128>(A, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }} else if (bs == 256) {{\n\
-                two_qgemm_lut_{4}<256>(A, LUT, Scales, LUT_Scales, C);\n\
+                two_qgemm_lut_{4}<256>(A, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }} else if (bs == 512) {{\n\
-                two_qgemm_lut_{4}<512>(A, LUT, Scales, LUT_Scales, C);\n\
+                two_qgemm_lut_{4}<512>(A, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }}\n\
         }}\n\
         else if (BK == {3}) {{\n\
             if (bs == 1) {{\n\
-                three_qgemm_lut_{4}<1>(A, sign, LUT, Scales, LUT_Scales, C);\n\
+                three_qgemm_lut_{4}<1>(A, sign, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }}else if (bs == 8) {{\n\
-                three_qgemm_lut_{4}<8>(A, sign, LUT, Scales, LUT_Scales, C);\n\
+                three_qgemm_lut_{4}<8>(A, sign, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }}else if (bs == 32) {{\n\
-                three_qgemm_lut_{4}<32>(A, sign, LUT, Scales, LUT_Scales, C);\n\
+                three_qgemm_lut_{4}<32>(A, sign, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }}else if (bs == 128) {{\n\
-                three_qgemm_lut_{4}<128>(A, sign, LUT, Scales, LUT_Scales, C);\n\
+                three_qgemm_lut_{4}<128>(A, sign, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }}else if (bs == 256) {{\n\
-                three_qgemm_lut_{4}<256>(A, sign, LUT, Scales, LUT_Scales, C);\n\
+                three_qgemm_lut_{4}<256>(A, sign, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }}else if (bs == 512) {{\n\
-                three_qgemm_lut_{4}<512>(A, sign, LUT, Scales, LUT_Scales, C);\n\
+                three_qgemm_lut_{4}<512>(A, sign, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }}\n\
         }}\n\
     }}\n\
@@ -590,32 +573,32 @@ def gen_top_api(kernel_shapes, k_list):
         kernel_code = "".join([kernel_code, "    else if (m == {0} && k == {1}) {{\n\
         if (BK == {2}) {{\n\
             if (bs == 1) {{\n\
-                two_qgemm_lut_{4}<1>(A, LUT, Scales, LUT_Scales, C);\n\
+                two_qgemm_lut_{4}<1>(A, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }} else if (bs == 8) {{\n\
-                two_qgemm_lut_{4}<8>(A, LUT, Scales, LUT_Scales, C);\n\
+                two_qgemm_lut_{4}<8>(A, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }} else if (bs == 32) {{\n\
-                two_qgemm_lut_{4}<32>(A, LUT, Scales, LUT_Scales, C);\n\
+                two_qgemm_lut_{4}<32>(A, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }} else if (bs == 128) {{\n\
-                two_qgemm_lut_{4}<128>(A, LUT, Scales, LUT_Scales, C);\n\
+                two_qgemm_lut_{4}<128>(A, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }} else if (bs == 256) {{\n\
-                two_qgemm_lut_{4}<256>(A, LUT, Scales, LUT_Scales, C);\n\
+                two_qgemm_lut_{4}<256>(A, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }} else if (bs == 512) {{\n\
-                two_qgemm_lut_{4}<512>(A, LUT, Scales, LUT_Scales, C);\n\
+                two_qgemm_lut_{4}<512>(A, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }}\n\
         }}\n\
         else if (BK == {3}) {{\n\
             if (bs == 1) {{\n\
-                three_qgemm_lut_{4}<1>(A, sign, LUT, Scales, LUT_Scales, C);\n\
+                three_qgemm_lut_{4}<1>(A, sign, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }}else if (bs == 8) {{\n\
-                three_qgemm_lut_{4}<8>(A, sign, LUT, Scales, LUT_Scales, C);\n\
+                three_qgemm_lut_{4}<8>(A, sign, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }}else if (bs == 32) {{\n\
-                three_qgemm_lut_{4}<32>(A, sign, LUT, Scales, LUT_Scales, C);\n\
+                three_qgemm_lut_{4}<32>(A, sign, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }}else if (bs == 128) {{\n\
-                three_qgemm_lut_{4}<128>(A, sign, LUT, Scales, LUT_Scales, C);\n\
+                three_qgemm_lut_{4}<128>(A, sign, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }}else if (bs == 256) {{\n\
-                three_qgemm_lut_{4}<256>(A, sign, LUT, Scales, LUT_Scales, C);\n\
+                three_qgemm_lut_{4}<256>(A, sign, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }}else if (bs == 512) {{\n\
-                three_qgemm_lut_{4}<512>(A, sign, LUT, Scales, LUT_Scales, C);\n\
+                three_qgemm_lut_{4}<512>(A, sign, LUT, Scales, scale_stride, LUT_Scales, C);\n\
             }}\n\
         }}\n\
     }}\n\
@@ -632,7 +615,8 @@ void ggml_bitnet_transform_tensor(struct ggml_tensor * tensor) {\n\
 \n\
     int k = tensor->ne[0];\n\
     int m = tensor->ne[1];\n\
-    const int lut_scales_size = 1;\n\
+    const bool row_scale = tensor->type == GGML_TYPE_TL2_SR;\n\
+    const int lut_scales_size = row_scale ? m : 1;\n\
     int bk = 0;\n\
     int bm = 0;\n"
 
@@ -649,17 +633,22 @@ void ggml_bitnet_transform_tensor(struct ggml_tensor * tensor) {\n\
     }}\n".format(kernel_shapes[i][0], kernel_shapes[i][1])])
 
     kernel_code = "".join([kernel_code, "\n\
+    GGML_ASSERT(bm > 0 && bk > 0);\n\
+    GGML_ASSERT(bitnet_tensor_extras_index < GGML_BITNET_MAX_NODES);\n\
     const int n_tile_num = m / bm;\n\
     const int BK = bk;\n\
     uint8_t * qweights;\n\
     bitnet_float_type * scales;\n\
 \n\
-    scales = (bitnet_float_type *) aligned_malloc(sizeof(bitnet_float_type));\n\
+    scales = (bitnet_float_type *) aligned_malloc(lut_scales_size * sizeof(bitnet_float_type));\n\
+    GGML_ASSERT(scales != nullptr);\n\
     qweights = (uint8_t *) tensor->data;\n\
     int nbytes = (k - 256) * m / 3 * 5 / 8 + 256 * m / 2 * 4 / 8;\n\
     if (nbytes % 32 != 0) nbytes = 32 - nbytes % 32 + nbytes;\n\
     float * i2_scales = (float * )(qweights + nbytes);\n\
-    scales[0] = (bitnet_float_type) i2_scales[0];\n\
+    for (int i = 0; i < lut_scales_size; ++i) {\n\
+        scales[i] = (bitnet_float_type) i2_scales[i];\n\
+    }\n\
 \n\
     tensor->extra = bitnet_tensor_extras + bitnet_tensor_extras_index;\n\
     bitnet_tensor_extras[bitnet_tensor_extras_index++] = {\n\
@@ -706,15 +695,22 @@ if __name__ == "__main__":
                         help="using simd instructions to compute (bm, 192 / bm) in one block")
     parser.add_argument('--output-dir', default=None,
                         help="directory for bitnet-lut-kernels.h and kernel_config.ini; defaults to repo include/")
+    parser.add_argument('--header-name', default='bitnet-lut-kernels.h',
+                        help="generated header filename inside --output-dir")
+    parser.add_argument('--config-name', default='kernel_config.ini',
+                        help="generated kernel-config filename inside --output-dir")
     args = parser.parse_args()
 
     if args.shape:
         kernel_shapes = []
         for item in args.shape:
             parts = [int(part.strip()) for part in item.split(',')]
-            assert len(parts) == 2, "--shape entries must be M,K"
+            if len(parts) != 2:
+                parser.error("--shape entries must be M,K")
             kernel_shapes.append(parts)
     else:
+        if args.model not in ModelShapeDict:
+            parser.error(f"unknown --model {args.model!r}; pass one or more --shape M,K values")
         kernel_shapes = ModelShapeDict[args.model]
 
     BM_list = [int(item) for item in args.BM.split(',')]
@@ -729,31 +725,26 @@ if __name__ == "__main__":
 
     for i in range(len(kernel_shapes)):
         tbl_impl_code.append(
-            gen_tbl_impl("{}_{}".format(kernel_shapes[i][0], kernel_shapes[i][1]), BM_list[i], BK_list[i], bm_list[i], k_list[i])
+            gen_tbl_impl(
+                "{}_{}".format(kernel_shapes[i][0], kernel_shapes[i][1]),
+                kernel_shapes[i][0],
+                BM_list[i],
+                BK_list[i],
+                bm_list[i],
+                k_list[i],
+            )
         )
 
-    assert(len(BM_list) == len(BK_list) == len(bm_list) == len(kernel_shapes)), "number of BM / BK / bm shoud be {}".format(len(kernel_shapes))
+    if not len(BM_list) == len(BK_list) == len(bm_list) == len(kernel_shapes):
+        parser.error(f"number of BM, BK, and bm values must be {len(kernel_shapes)}")
     
     for i in range(len(kernel_shapes)):
-        assert kernel_shapes[i][0] % BM_list[i] == 0, "M %% BM should be 0"
-        assert (kernel_shapes[i][1] % BK_list[i]) % 32 == 0, "K %% BK %% 32 should be 0"
-        assert bm_list[i] in [32], "choose bm from [32]"
-
-    ctor_code = gen_ctor_code()
-    api_code = gen_top_api(kernel_shapes, k_list)
-    trans_code = gen_transform_code(kernel_shapes)
-
-    output_dir = args.output_dir or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "include")
-    os.makedirs(output_dir, exist_ok=True)
-
-    with open(''.join([output_dir, "/bitnet-lut-kernels.h"]), 'w') as f:
-        f.write(''.join("#if defined(GGML_BITNET_X86_TL2)"))
-        f.write(''.join(ctor_code))
-        for code in tbl_impl_code:
-            f.write(''.join(code))
-        f.write(''.join(api_code))
-        f.write(''.join(trans_code))
-        f.write(''.join("#endif"))
+        if kernel_shapes[i][0] % BM_list[i] != 0:
+            parser.error(f"shape {kernel_shapes[i]} requires M divisible by BM={BM_list[i]}")
+        if (kernel_shapes[i][1] % BK_list[i]) % 32 != 0:
+            parser.error(f"shape {kernel_shapes[i]} requires (K % BK) divisible by 32")
+        if bm_list[i] != 32:
+            parser.error("bm must be 32 for the current AVX2 kernel")
 
     config = ConfigParser()
 
@@ -765,5 +756,27 @@ if __name__ == "__main__":
         config.set('Kernels_{}'.format(i), 'BK'.format(i), str(BK_list[i]))
         config.set('Kernels_{}'.format(i), 'bmm'.format(i), str(bm_list[i]))
 
-    with open(''.join([output_dir, "/kernel_config.ini"]), 'w') as configfile:
-        config.write(configfile)
+    config_buffer = io.StringIO()
+    config.write(config_buffer)
+    config_text = config_buffer.getvalue()
+    config_sha256 = hashlib.sha256(config_text.encode('utf-8')).hexdigest()
+
+    ctor_code = gen_ctor_code()
+    api_code = gen_top_api(kernel_shapes, k_list)
+    trans_code = gen_transform_code(kernel_shapes)
+
+    output_dir = args.output_dir or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "include")
+    os.makedirs(output_dir, exist_ok=True)
+
+    with open(os.path.join(output_dir, args.header_name), 'w', encoding='utf-8') as f:
+        f.write(''.join("#if defined(GGML_BITNET_X86_TL2)\n"))
+        f.write(f'#define BITNET_TL2_KERNEL_CONFIG_SHA256 "{config_sha256}"\n')
+        f.write(''.join(ctor_code))
+        for code in tbl_impl_code:
+            f.write(''.join(code))
+        f.write(''.join(api_code))
+        f.write(''.join(trans_code))
+        f.write(''.join("#endif"))
+
+    with open(os.path.join(output_dir, args.config_name), 'w', encoding='utf-8') as configfile:
+        configfile.write(config_text)

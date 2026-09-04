@@ -373,3 +373,89 @@ python benchmarks/benchmark_i2_kernel_profile.py \
 The profiler validates every raw accumulator against a scalar decoder before
 reporting timings. Its projection-weighted aggregate is a bottleneck diagnostic,
 not an end-to-end throughput estimate.
+
+## Experimental Row-Scale TL2 Runtime
+
+`TL2_SR` is a retrofit variant, not a paper-reproduction format. It stores the
+same learned ternary codes and FP32 row scales as `I2_SR`, but replaces the I2
+projection payload with generated TL2 lookup-table layouts. The artifact is
+only valid with the exact generated header/config for its model shapes. The
+GGUF records the config hash, and the runtime fails at load time if its
+compiled kernel fingerprint differs.
+
+Generate and install the best tested BM64 kernel preset:
+
+```bash
+python utils/codegen_tl2.py \
+  --shape 896,896 \
+  --shape 128,896 \
+  --shape 4864,896 \
+  --shape 896,4864 \
+  --BM 64,64,64,64 \
+  --BK 192,192,192,192 \
+  --bm 32,32,32,32 \
+  --output-dir preset_kernels/Qwen2.5-0.5B-TL2SR-BM64 \
+  --header-name bitnet-lut-kernels-tl2sr.h \
+  --config-name kernel_config_tl2sr.ini
+
+cp preset_kernels/Qwen2.5-0.5B-TL2SR-BM64/bitnet-lut-kernels-tl2sr.h \
+  include/bitnet-lut-kernels.h
+cmake -S . -B build-qwen05b-tl2sr-bm64 \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DBITNET_X86_TL2=ON
+cmake --build build-qwen05b-tl2sr-bm64 --target llama-embedding -j12
+```
+
+Export the row-scale checkpoint with its matching packing config:
+
+```bash
+python benchmarks/convert_static_ternary_to_i2s_gguf.py \
+  --checkpoint-dir checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8 \
+  --row-scale-qtype tl2_sr \
+  --tl2-kernel-config preset_kernels/Qwen2.5-0.5B-TL2SR-BM64/kernel_config_tl2sr.ini \
+  --source-architecture-alias Qwen2ForCausalLM \
+  --gguf-arch bitnet-qwen \
+  --bitdistill-subln \
+  --classifier-head-gguf \
+  --expect-ternary-keys 168 \
+  --outfile models/seqcls-native-tl2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_tl2_sr_bm64_cls.gguf \
+  --summary-json benchmark_results/seqcls_native_tl2sr_bm64_gguf_2026-09-04.json
+```
+
+Run the direct numerical contract and paired timing gate:
+
+```bash
+python benchmarks/audit_tl2sr_kernel_contract.py \
+  --build-dir build-qwen05b-tl2sr-bm64 \
+  --kernel-config preset_kernels/Qwen2.5-0.5B-TL2SR-BM64/kernel_config_tl2sr.ini \
+  --output-json benchmark_results/tl2sr_bm64_kernel_contract_2026-09-04.json \
+  --output-md benchmarks/results/tl2sr_bm64_kernel_contract_2026-09-04.md
+
+python benchmarks/audit_tl2sr_layout_guard.py
+
+python benchmarks/benchmark_seqcls_native_cpu_repeated.py \
+  --model i2_sr=models/seqcls-native-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr_cls.gguf \
+  --model tl2_sr_bm64=models/seqcls-native-tl2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_tl2_sr_bm64_cls.gguf \
+  --speed-reference i2_sr \
+  --embedding-binary build-qwen05b-tl2sr-bm64/bin/llama-embedding \
+  --max-samples 128 \
+  --repetitions 5 \
+  --threads 12 \
+  --cpu-affinity 0-11 \
+  --cooldown-seconds 3
+```
+
+Synthesize all correctness, quality, storage, provenance, and speed gates:
+
+```bash
+python benchmarks/audit_tl2sr_evidence.py \
+  --output-json benchmarks/results/tl2sr_evidence_audit_2026-09-04.json \
+  --output-md benchmarks/results/tl2sr_evidence_audit_2026-09-04.md
+```
+
+The measured result is a `12.862%` packed-projection reduction and `3.154%`
+complete-GGUF reduction relative to `I2_SR`, with no demonstrated Xeon speed
+win. BM64 is the best tested tiling at a paired TL2_SR/I2_SR ratio of `0.939`,
+95% CI `[0.881, 1.000]`. Restore the repository placeholder header after
+building so generated model-specific code remains isolated under
+`preset_kernels/`.

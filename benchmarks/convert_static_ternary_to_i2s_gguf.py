@@ -4,8 +4,8 @@
 The default mode directly packs static ternary checkpoints as I2_S/I2_SR. A
 dense-f16 diagnostic mode writes the latent trainable weights from a checkpoint;
 for QAT models this intentionally does not preserve the ternary forward function.
-Row-scale ternary checkpoints are rejected unless --row-scale-prototype or
---row-scale-qtype=i2_sr is passed.
+Row-scale ternary checkpoints are rejected unless --row-scale-prototype or a
+dedicated row-scale qtype is passed.
 """
 
 from __future__ import annotations
@@ -47,9 +47,9 @@ class NamedInt(int):
         return f"{self._name}({int(self)})"
 
 
-def load_converter(path: Path) -> ModuleType:
+def load_converter(path: Path, *, module_name: str = "llama_convert_hf_to_gguf_i2s") -> ModuleType:
     sys.path.insert(0, str(path.parent))
-    spec = importlib.util.spec_from_file_location("llama_convert_hf_to_gguf_i2s", path)
+    spec = importlib.util.spec_from_file_location(module_name, path)
     if spec is None or spec.loader is None:
         raise ImportError(f"cannot import converter from {path}")
     module = importlib.util.module_from_spec(spec)
@@ -179,22 +179,79 @@ def pack_i2_s_row_prototype(codes: torch.Tensor, scale: torch.Tensor) -> np.ndar
     return output
 
 
-def get_gguf_i2s_types(gguf: Any, *, row_scale_qtype: str | None) -> tuple[Any, Any, Any, Any, bool, bool]:
+def tl2_payload_nbytes(rows: int, cols: int) -> int:
+    if rows <= 0 or cols < 256:
+        raise ValueError(f"TL2 packing requires positive rows and at least 256 columns, got {rows}x{cols}")
+    return (cols - 256) * rows // 3 * 5 // 8 + 256 * rows // 2 * 4 // 8
+
+
+def tl2_packed_nbytes(rows: int, cols: int) -> int:
+    payload = tl2_payload_nbytes(rows, cols)
+    return (payload + 31) // 32 * 32
+
+
+def pack_tl2_sr(
+    codes: torch.Tensor,
+    scale: torch.Tensor,
+    *,
+    bitnet_converter: ModuleType,
+    kernel_config: Path,
+) -> np.ndarray:
+    rows = i2_s_logical_rows(codes)
+    cols = int(codes.shape[-1])
+    row_scales = scale.reshape(-1)
+    if row_scales.numel() != rows:
+        raise ValueError(
+            f"row-scale TL2 packing expects {rows} logical row scales for "
+            f"weight shape {tuple(codes.shape)}, got scale shape {tuple(scale.shape)}"
+        )
+
+    dense_codes = codes.to(dtype=torch.float32).cpu().numpy()
+    packed = bitnet_converter.preprocess_weights_tl2(
+        dense_codes,
+        config_path=kernel_config,
+    )
+    expected_payload = tl2_payload_nbytes(rows, cols)
+    aligned_payload = tl2_packed_nbytes(rows, cols)
+    if packed.dtype != np.uint8 or packed.ndim != 1 or packed.size != expected_payload:
+        raise ValueError(
+            f"TL2 packer returned dtype={packed.dtype}, shape={packed.shape}; "
+            f"expected uint8[{expected_payload}] for {rows}x{cols}"
+        )
+
+    scale_bytes = row_scales.to(dtype=torch.float32).cpu().numpy().astype(np.float32, copy=False).view(np.uint8)
+    output = np.zeros(aligned_payload + scale_bytes.size + 32, dtype=np.uint8)
+    output[: packed.size] = packed
+    output[aligned_payload : aligned_payload + scale_bytes.size] = scale_bytes
+    return output
+
+
+def get_gguf_i2s_types(
+    gguf: Any,
+    *,
+    row_scale_qtype: str | None,
+) -> tuple[Any, Any, Any, Any, Any, Any, bool, bool, bool]:
     has_native_i2s_constants = hasattr(gguf.GGMLQuantizationType, "I2_S") and hasattr(gguf.LlamaFileType, "MOSTLY_I2_S")
     has_native_i2sr_constants = hasattr(gguf.GGMLQuantizationType, "I2_SR") and hasattr(gguf.LlamaFileType, "MOSTLY_I2_SR")
     i2_s_dtype = getattr(gguf.GGMLQuantizationType, "I2_S", NamedInt(36, "I2_S"))
     mostly_i2_s_ftype = getattr(gguf.LlamaFileType, "MOSTLY_I2_S", NamedInt(40, "MOSTLY_I2_S"))
     i2_sr_dtype = getattr(gguf.GGMLQuantizationType, "I2_SR", NamedInt(40, "I2_SR"))
     mostly_i2_sr_ftype = getattr(gguf.LlamaFileType, "MOSTLY_I2_SR", NamedInt(41, "MOSTLY_I2_SR"))
-    if row_scale_qtype not in {None, "i2_sr"}:
+    has_native_tl2sr_constants = hasattr(gguf.GGMLQuantizationType, "TL2_SR") and hasattr(gguf.LlamaFileType, "MOSTLY_TL2_SR")
+    tl2_sr_dtype = getattr(gguf.GGMLQuantizationType, "TL2_SR", NamedInt(41, "TL2_SR"))
+    mostly_tl2_sr_ftype = getattr(gguf.LlamaFileType, "MOSTLY_TL2_SR", NamedInt(42, "MOSTLY_TL2_SR"))
+    if row_scale_qtype not in {None, "i2_sr", "tl2_sr"}:
         raise ValueError(f"unsupported row_scale_qtype={row_scale_qtype!r}")
     return (
         i2_s_dtype,
         mostly_i2_s_ftype,
         i2_sr_dtype,
         mostly_i2_sr_ftype,
+        tl2_sr_dtype,
+        mostly_tl2_sr_ftype,
         has_native_i2s_constants,
         has_native_i2sr_constants,
+        has_native_tl2sr_constants,
     )
 
 
@@ -206,6 +263,8 @@ def make_i2s_model_class(
     summary: dict[str, Any],
     i2_s_dtype: Any,
     i2_sr_dtype: Any,
+    tl2_sr_dtype: Any,
+    bitnet_converter: ModuleType | None,
     config: dict[str, Any],
 ) -> type:
     gguf = converter.gguf
@@ -223,6 +282,13 @@ def make_i2s_model_class(
                     self.hparams["rope_theta"] = rope_theta
                     summary["rope_theta_from_rope_parameters"] = float(rope_theta)
             super().set_gguf_parameters()
+            if args.row_scale_qtype == "tl2_sr":
+                if args.tl2_kernel_config is None:
+                    raise ValueError("TL2_SR metadata requires --tl2-kernel-config")
+                self.gguf_writer.add_string(
+                    "bitnet.tl2_sr.kernel_config_sha256",
+                    sha256_file(args.tl2_kernel_config),
+                )
             if args.classifier_head_gguf:
                 if label_count is None:
                     raise ValueError("--classifier-head-gguf requires score.weight/classifier.weight or config.num_labels")
@@ -324,12 +390,12 @@ def make_i2s_model_class(
                     new_name = self.map_tensor_name(f"{mapped_prefix}.weight")
                     scale = state[scale_key]
                     is_output = args.keep_output_f16 and output_tensor_name is not None and new_name == output_tensor_name
-                    if scale.numel() != 1 and not (args.row_scale_prototype or args.row_scale_qtype == "i2_sr"):
+                    if scale.numel() != 1 and not (args.row_scale_prototype or args.row_scale_qtype in {"i2_sr", "tl2_sr"}):
                         row_scale_rejected += 1
                         raise ValueError(
                             f"{scale_key} has row or non-scalar scale shape {tuple(scale.shape)}; "
                             "direct packed writer supports row scales only with --row-scale-prototype "
-                            "or --row-scale-qtype=i2_sr"
+                            "or --row-scale-qtype=i2_sr|tl2_sr"
                         )
                     if is_output:
                         dense = tensor.to(dtype=torch.float16).mul(scale.to(dtype=torch.float16)).squeeze().numpy()
@@ -339,6 +405,17 @@ def make_i2s_model_class(
                         if scale.numel() == 1:
                             packed = pack_i2_s_scalar(tensor, scale)
                             raw_dtype = i2_s_dtype
+                        elif args.row_scale_qtype == "tl2_sr":
+                            if bitnet_converter is None or args.tl2_kernel_config is None:
+                                raise ValueError("TL2_SR export requires the BitNet converter and --tl2-kernel-config")
+                            packed = pack_tl2_sr(
+                                tensor,
+                                scale,
+                                bitnet_converter=bitnet_converter,
+                                kernel_config=args.tl2_kernel_config,
+                            )
+                            row_scale_packed += 1
+                            raw_dtype = tl2_sr_dtype
                         else:
                             packed = pack_i2_s_row_prototype(tensor, scale)
                             row_scale_packed += 1
@@ -433,6 +510,18 @@ def main() -> None:
     parser.add_argument("--ternary-state", type=Path, default=None)
     parser.add_argument("--outfile", type=Path, required=True)
     parser.add_argument("--converter", type=Path, default=Path("3rdparty/llama.cpp/convert_hf_to_gguf.py"))
+    parser.add_argument(
+        "--bitnet-converter",
+        type=Path,
+        default=Path("utils/convert-hf-to-gguf-bitnet.py"),
+        help="BitNet converter module that provides TL2 packing.",
+    )
+    parser.add_argument(
+        "--tl2-kernel-config",
+        type=Path,
+        default=None,
+        help="Generated kernel_config.ini used to pack TL2_SR tensors.",
+    )
     parser.add_argument("--expect-ternary-keys", type=int, default=None)
     parser.add_argument("--summary-json", type=Path, default=None)
     parser.add_argument(
@@ -501,11 +590,11 @@ def main() -> None:
     )
     parser.add_argument(
         "--row-scale-qtype",
-        choices=["i2_sr"],
+        choices=["i2_sr", "tl2_sr"],
         default=None,
         help=(
-            "Emit the stable row-scale qtype instead of overloading I2_S. "
-            "Requires a runtime with stable I2_SR qtype support."
+            "Emit I2_SR or experimental lookup-table TL2_SR instead of overloading I2_S. "
+            "TL2_SR additionally requires --tl2-kernel-config and a matching generated runtime."
         ),
     )
     args = parser.parse_args()
@@ -517,19 +606,32 @@ def main() -> None:
         raise SystemExit("--expect-ternary-keys is incompatible with --weight-format f16")
     if args.row_scale_prototype and args.row_scale_qtype is not None:
         raise SystemExit("--row-scale-prototype and --row-scale-qtype are mutually exclusive")
+    if args.row_scale_qtype == "tl2_sr":
+        if args.tl2_kernel_config is None:
+            raise SystemExit("--row-scale-qtype=tl2_sr requires --tl2-kernel-config")
+        if not args.tl2_kernel_config.is_file():
+            raise SystemExit(f"TL2 kernel config does not exist: {args.tl2_kernel_config}")
     state_path = args.state or args.ternary_state
     if state_path is None:
         state_path = args.checkpoint_dir / (
             "ternary_state_dict.pt" if args.weight_format == "ternary" else "custom_state_dict.pt"
         )
     converter = load_converter(args.converter)
+    bitnet_converter = (
+        load_converter(args.bitnet_converter, module_name="bitnet_convert_hf_to_gguf_tl2sr")
+        if args.row_scale_qtype == "tl2_sr"
+        else None
+    )
     (
         i2_s_dtype,
         mostly_i2_s_ftype,
         i2_sr_dtype,
         mostly_i2_sr_ftype,
+        tl2_sr_dtype,
+        mostly_tl2_sr_ftype,
         has_native_i2s_constants,
         has_native_i2sr_constants,
+        has_native_tl2sr_constants,
     ) = get_gguf_i2s_types(converter.gguf, row_scale_qtype=args.row_scale_qtype)
     config = load_config(args.checkpoint_dir)
     architecture = load_architecture(args.checkpoint_dir)
@@ -571,18 +673,27 @@ def main() -> None:
         "outfile": str(args.outfile),
         "converter": str(args.converter),
         "converter_sha256": sha256_file(args.converter),
+        "bitnet_converter": (
+            str(args.bitnet_converter) if args.row_scale_qtype == "tl2_sr" else None
+        ),
+        "bitnet_converter_sha256": (
+            sha256_file(args.bitnet_converter) if args.row_scale_qtype == "tl2_sr" else None
+        ),
         "exporter_sha256": sha256_file(Path(__file__)),
         "format_scope": (
             "latent dense F16 diagnostic; not the QAT ternary function"
             if args.weight_format == "f16"
-            else "scalar-scale I2_S by default; row-scale only with --row-scale-prototype or --row-scale-qtype=i2_sr"
+            else "scalar I2_S by default; dedicated I2_SR/TL2_SR formats preserve learned row scales"
         ),
         "i2_s_dtype": int(i2_s_dtype),
         "i2_sr_dtype": int(i2_sr_dtype),
+        "tl2_sr_dtype": int(tl2_sr_dtype),
         "mostly_i2_s_file_type": int(mostly_i2_s_ftype),
         "mostly_i2_sr_file_type": int(mostly_i2_sr_ftype),
+        "mostly_tl2_sr_file_type": int(mostly_tl2_sr_ftype),
         "has_native_i2s_gguf_python_constants": has_native_i2s_constants,
         "has_native_i2sr_gguf_python_constants": has_native_i2sr_constants,
+        "has_native_tl2sr_gguf_python_constants": has_native_tl2sr_constants,
         "limitations": (
             [
                 "Dense F16 mode executes the selected checkpoint's latent weights; for a QAT checkpoint this is not its ternary forward pass.",
@@ -590,16 +701,21 @@ def main() -> None:
             ]
             if args.weight_format == "f16"
             else [
-                "Rejects row-scale checkpoints unless --row-scale-prototype or --row-scale-qtype=i2_sr is passed.",
+                "Rejects row-scale checkpoints unless --row-scale-prototype or a dedicated row-scale qtype is passed.",
                 "Scalar mode uses the existing tensor-scale I2_S layout.",
                 "Row-scale prototype mode requires a matching experimental runtime layout and overloads I2_S.",
                 "Row-scale i2_sr mode requires a runtime with a stable I2_SR qtype.",
+                "Row-scale tl2_sr mode requires exact-shape generated TL2 kernels and a matching TL2_SR runtime.",
                 "Keeps output.weight in F16 by default to match llama-quantize policy.",
                 "Native GGUF classifier heads require this fork's Qwen2 or bitnet-qwen classifier path.",
             ]
         ),
         "row_scale_prototype": bool(args.row_scale_prototype),
         "row_scale_qtype": args.row_scale_qtype,
+        "tl2_kernel_config": str(args.tl2_kernel_config) if args.tl2_kernel_config is not None else None,
+        "tl2_kernel_config_sha256": (
+            sha256_file(args.tl2_kernel_config) if args.tl2_kernel_config is not None else None
+        ),
         "gguf_arch": args.gguf_arch,
         "bitdistill_subln": bool(args.bitdistill_subln),
         "synthetic_vocab_for_smoke": bool(args.synthetic_vocab_for_smoke),
@@ -608,11 +724,25 @@ def main() -> None:
         "embedding_qtype": args.embedding_qtype,
     }
 
-    model_cls = make_i2s_model_class(base_cls, state, converter, args, summary, i2_s_dtype, i2_sr_dtype, config)
+    model_cls = make_i2s_model_class(
+        base_cls,
+        state,
+        converter,
+        args,
+        summary,
+        i2_s_dtype,
+        i2_sr_dtype,
+        tl2_sr_dtype,
+        bitnet_converter,
+        config,
+    )
     if args.weight_format == "f16":
         output_ftype = converter.gguf.LlamaFileType.MOSTLY_F16
     else:
-        output_ftype = mostly_i2_sr_ftype if args.row_scale_qtype == "i2_sr" else mostly_i2_s_ftype
+        output_ftype = {
+            "i2_sr": mostly_i2_sr_ftype,
+            "tl2_sr": mostly_tl2_sr_ftype,
+        }.get(args.row_scale_qtype, mostly_i2_s_ftype)
     summary["output_ftype"] = int(output_ftype)
     summary["output_ftype_name"] = getattr(output_ftype, "name", str(output_ftype))
     args.outfile.parent.mkdir(parents=True, exist_ok=True)

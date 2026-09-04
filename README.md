@@ -27,6 +27,7 @@ The frozen baseline bundle and current decision reports are:
 - [seqcls_native_cpu_repeated_inplace_2026-09-04.md](benchmarks/results/seqcls_native_cpu_repeated_inplace_2026-09-04.md)
 - [seqcls_i2sr_runtime_ab_2026-09-04.md](benchmarks/results/seqcls_i2sr_runtime_ab_2026-09-04.md)
 - [i2_kernel_profile_2026-09-04.md](benchmarks/results/i2_kernel_profile_2026-09-04.md)
+- [tl2sr_evidence_audit_2026-09-04.md](benchmarks/results/tl2sr_evidence_audit_2026-09-04.md)
 
 | Claim | Status | Evidence | Caveat |
 | --- | --- | --- | --- |
@@ -37,7 +38,10 @@ The frozen baseline bundle and current decision reports are:
 | Paper gamma can be copied literally into this implementation | **No, not without matching loss normalization** | Historical telemetry measures attention/CE gradient ratio `221.384986` for the paper-gamma path versus `0.346044` at gamma 60. A controlled A4500 screen measures median ratio `69.2248` for cosine split-1 at fixed gamma `100,000`, versus `0.273975` with adaptive balancing. | This is not a task-quality result. The source-pinned dualcard replication remains required before a paper-aligned claim; the active 10k runs are explicitly cross-environment. |
 | The paper defines one unambiguous attention-relation objective | **No** | [attention_relation_equivalence_2026-09-04.md](benchmarks/results/attention_relation_equivalence_2026-09-04.md) proves that Equation 12 scaled-dot relations and Algorithm 1 normalized-cosine relations are not generally equivalent. In a deterministic probe their gradient-norm ratio is `18.7073` and gradient cosine is `0.2437`. | This is a mathematical contract result, not downstream quality evidence. For Qwen's 14:2 grouped-query attention, KV repetition leaves cosine relations invariant but multiplies scaled-dot logits by `sqrt(7)`. |
 | The local GLUE formulation is paper-exact | **Unresolved** | [bitdistill_task_formulation_audit_2026-09-04.md](benchmarks/results/bitdistill_task_formulation_audit_2026-09-04.md) separates sequence-classification from causal answer-token results. | Token-level CE and decoding language favor the causal interpretation, but no authoritative released templates or training code establish equivalence. |
-| Row-scale semantics matter at runtime | **Yes: strong systems result** | TL2 one-scale relative output RMS error `1.904230`; exact FP16 row scales reduce it to `0.000197`. | Row scales are part of the learned function. TL2 row-scale support is not implemented. |
+| Row-scale semantics matter at runtime | **Yes: strong systems result** | TL2 one-scale relative output RMS error `1.904230`; exact FP16 row scales reduce it to `0.000197`. | Row scales are part of the learned function. Scalar TL2 remains invalid for row-scale checkpoints. |
+| Experimental `TL2_SR` preserves row-scale ternary projections | **Yes, for the tested Qwen2.5-0.5B shapes** | Three generated-kernel layouts pass six deterministic W1.58A8 contracts each; worst relative RMS error is `5.50e-8`. On 512 MNLI examples, `TL2_SR` and `I2_SR` both score `0.667969`, agree on `0.988281` of predictions, and have balanced discordant correctness (`3/3`, exact McNemar `p=1`). | Exact-shape generated kernels and their matching packed layout are required. Full validation is still running. |
+| `TL2_SR` improves packed storage over `I2_SR` | **Yes, modestly for the complete model** | Packed projections fall from `86.478` to `75.355 MiB` (`12.862%`); the complete GGUF falls from `352.617` to `341.495 MiB` (`3.154%`). | The F16 token embedding and other dense tensors dominate most of this small model's file. |
+| `TL2_SR` accelerates this classifier over `I2_SR` on Xeon 4116 | **No speed win demonstrated** | Five interleaved 12-core runs: BM128 ratio `0.889`, CI `[0.796, 0.992]`; BM64 `0.939`, CI `[0.881, 1.000]`; BM32 `0.918`, CI `[0.908, 0.929]`. | BM64 is the best tested layout, but its interval does not establish superiority. Ratios are paired within each build. |
 | `I2_SR` packed CPU inference works | **Yes, for compatible causal artifacts** | Xeon Silver 4116: row-scale `I2_SR` file `1211.3 MiB`, PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. | It does **not** beat Q4_K_M on quality or file size. Q4_K_M is `940.4 MiB` with PPL `12.8112`. |
 | Native packed sequence classification preserves task quality | **Yes, for one audited artifact; not product-ready** | Full MNLI native sequence-isolated path: `0.652165` versus PyTorch `0.653591`, paired delta `-0.001426`, 95% CI `[-0.004193, 0.001341]`, exact McNemar `p=0.348`; `7.456204` examples/s and RSS `960.15 MiB`. | Exact prediction agreement is `0.976668`, the 0.5-point non-inferiority gate is retrospective, multi-prompt batching remains excluded, and the underlying model quality is weak. |
 | Mixed `I2_SR` plus Q8 embedding improves deployed storage | **Yes, on one Qwen2.5 classifier** | The packed artifact is `230.90 MiB`: `4.106x` smaller than FP16 and `1.527x` smaller than the F16-embedding I2_SR artifact. On 512 MNLI examples it changes accuracy by `-0.001953`, paired CI `[-0.011719, 0.007812]`, with `0.982422` prediction agreement. | This is a same-student format comparison on a fixed, non-random sample; it is not evidence of FP-quality recovery. |
@@ -317,6 +321,9 @@ successful experiment.
 - Row-scale ternary retrofit experiments and paired statistical audits.
 - A llama.cpp fork with packed `I2_SR`, Qwen2 classifier-head execution, and
   graph-level elimination of unused language-model logits for classifiers.
+- An experimental `TL2_SR` qtype and exact-shape Qwen code generation path that
+  preserves learned row scales, fixes inherited TL2 batch-stride and tail-offset
+  defects, and fails closed on weight/scale alignment mismatches.
 - Mixed `I2_SR` plus Q8 embedding export, which exposes and reduces the
   high-vocabulary embedding floor in small-model GGUF storage.
 - Interleaved, affinity-pinned CPU benchmarks that distinguish repeatable
@@ -373,7 +380,8 @@ Do not position this as a one-click converter. The credible direction is:
 1. Explain why blind ternary PTQ fails.
 2. Reproduce BitDistill-style task recovery with controlled token-budget curves.
 3. Separate paper-style tensor-scale BitDistill from row-scale retrofit variants.
-4. Preserve learned scale semantics in packed CPU formats such as `I2_SR`.
+4. Preserve learned scale semantics in packed CPU formats such as `I2_SR` and
+   experimental `TL2_SR`.
 5. Report quality, memory, RSS, and speed as separate gates.
 6. Complete the pre-registered adaptive-versus-fixed, three-seed MNLI gate.
 7. If that gate fails, stop scaling the current objective and test

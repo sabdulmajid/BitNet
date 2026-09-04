@@ -629,7 +629,8 @@ def preprocess_weights_tl2(
     w: np.ndarray,
     bits = 2,
     g    = 4,
-) -> Tuple[np.ndarray, np.ndarray]:
+    config_path: Path | None = None,
+) -> np.ndarray:
     from configparser import ConfigParser
     config = ConfigParser()
 
@@ -650,8 +651,8 @@ def preprocess_weights_tl2(
     weight = np.sign(weight)
     weight_num = np.prod(weight.shape)
 
-    config_path = kernel_config_path()
-    read_files = config.read(config_path)
+    resolved_config_path = config_path or kernel_config_path()
+    read_files = config.read(resolved_config_path)
     BM = -1
     BY = -1
     bm = -1
@@ -665,7 +666,7 @@ def preprocess_weights_tl2(
             break
 
     if BM == -1:
-        raise missing_kernel_config_error("TL2", config_path, M, K, read_files)
+        raise missing_kernel_config_error("TL2", resolved_config_path, M, K, read_files)
 
     if (weight.shape[1] % BY != 0):
         slice_k_idx = weight.shape[1] - weight.shape[1] % BY

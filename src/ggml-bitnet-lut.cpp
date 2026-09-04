@@ -40,7 +40,7 @@ void ggml_bitnet_free(void) {
     // wrapper = nullptr;
     for (size_t i = 0; i < bitnet_tensor_extras_index; i++) {
         // aligned_free(bitnet_tensor_extras[i].qweights);
-        // aligned_free(bitnet_tensor_extras[i].scales);
+        aligned_free(bitnet_tensor_extras[i].scales);
     }
     delete[] bitnet_tensor_extras;
     bitnet_tensor_extras = nullptr;
@@ -95,6 +95,10 @@ int ggml_bitnet_get_type_bits(enum ggml_type type) {
 
 #endif
 #if defined(GGML_BITNET_X86_TL2)
+const char * ggml_bitnet_tl2_kernel_config_sha256(void) {
+    return BITNET_TL2_KERNEL_CONFIG_SHA256;
+}
+
 void ggml_bitnet_init(void) {
     // LOG(INFO) << "ggml_bitnet_init";
 
@@ -124,7 +128,7 @@ void ggml_bitnet_free(void) {
     // wrapper = nullptr;
     for (size_t i = 0; i < bitnet_tensor_extras_index; i++) {
         // aligned_free(bitnet_tensor_extras[i].qweights);
-        // aligned_free(bitnet_tensor_extras[i].scales);
+        aligned_free(bitnet_tensor_extras[i].scales);
     }
     delete[] bitnet_tensor_extras;
     bitnet_tensor_extras = nullptr;
@@ -157,6 +161,7 @@ size_t ggml_bitnet_mul_mat_get_wsize(const struct ggml_tensor * src0, const stru
 int ggml_bitnet_get_type_bits(enum ggml_type type) {
     switch (type) {
         case GGML_TYPE_TL2:
+        case GGML_TYPE_TL2_SR:
             return 2;
         case GGML_TYPE_Q4_0:
             return 4;

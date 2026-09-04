@@ -32,6 +32,7 @@ does not preserve the trained checkpoint.
 | --- | --- |
 | `I2_SR` row-scale GGUF path | Working for compatible causal artifacts. |
 | TL2 one-scale path | Not valid for row-scale checkpoints. |
+| Experimental `TL2_SR` path | Exact-shape Qwen2.5-0.5B kernels are numerically valid; storage improves, CPU speed does not. |
 | Native sequence-classifier path | Task-quality parity supported for one artifact; numerical parity and batching remain below product gates. |
 | MoE/Kimi path | Not supported beyond tiny fixtures. |
 
@@ -71,3 +72,43 @@ underlying model is not competitive with FP16. The 0.5-point non-inferiority
 criterion was selected retrospectively. Multi-prompt batching is not part of
 this result. See
 `benchmarks/results/seqcls_runtime_quality_equivalence_2026-09-04.md`.
+
+## Experimental TL2_SR Contract
+
+`TL2_SR` is a dedicated row-scale lookup-table qtype. Its packed tensor layout
+is:
+
+```text
+[aligned TL2 ternary payload][M FP32 output-row scales][32 bytes padding]
+```
+
+For activation row `b` and output row `i`, the generated kernel computes:
+
+```text
+Y[b, i] = row_scale[i] * sum_j(T[i, j] * Q8(X[b, j])) / activation_scale[b]
+```
+
+The runtime passes a scale stride of zero for scalar `TL2` and one for
+`TL2_SR`. The exporter rejects raw payload sizes that do not match the exact
+matrix shape, inserts the required 32-byte alignment before scales, and
+requires the same generated kernel configuration used by the runtime.
+The exporter embeds the config SHA-256 in GGUF metadata. At load time, the
+runtime compares it with the fingerprint compiled into the generated kernel
+header and rejects missing or mismatched layouts. Non-TL2 builds reject
+`TL2_SR` artifacts outright.
+
+All generated Qwen2.5-0.5B projection shapes pass deterministic scalar-reference
+tests for batch sizes 1, 8, and 32 where applicable. Across the three tested
+tile layouts, the worst relative RMS error is `5.50e-8`.
+
+On the same 512 MNLI examples and same runtime build, `I2_SR` and `TL2_SR`
+both score `0.667969`; they agree on `0.988281` of predictions, with three
+examples correct only under each format (exact McNemar `p=1`). Packed ternary
+projection storage falls `12.862%`, but complete-model storage falls only
+`3.154%` because non-ternary tensors dominate.
+
+The speed result is negative. Five interleaved runs on 12 pinned Xeon 4116
+physical cores give paired TL2_SR/I2_SR throughput ratios of `0.889` for
+BM128, `0.939` for BM64, and `0.918` for BM32. BM64 is the best tested layout,
+but its 95% interval `[0.881, 1.000]` does not prove a speed advantage. See
+`benchmarks/results/tl2sr_evidence_audit_2026-09-04.md`.
