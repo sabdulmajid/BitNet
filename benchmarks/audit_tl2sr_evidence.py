@@ -30,6 +30,29 @@ def file_identity(path: Path) -> dict[str, Any]:
     }
 
 
+def conversion_output_identity(receipt: dict[str, Any], repo_root: Path) -> dict[str, Any]:
+    """Resolve and hash the artifact named by a conversion receipt.
+
+    Older I2_SR receipts predate exporter-side output hashes. They can still be
+    tied to validation traces by hashing the referenced artifact at audit time,
+    while newer receipts must also match their declared digest.
+    """
+    raw_path = receipt.get("outfile")
+    if not isinstance(raw_path, str) or not raw_path:
+        raise ValueError("conversion receipt does not declare outfile")
+    path = Path(raw_path)
+    if not path.is_absolute():
+        path = repo_root / path
+    identity = file_identity(path)
+    declared_sha256 = receipt.get("outfile_sha256")
+    return {
+        **identity,
+        "declared_sha256": declared_sha256,
+        "declared_sha256_present": declared_sha256 is not None,
+        "declared_sha256_matches": declared_sha256 is None or declared_sha256 == identity["sha256"],
+    }
+
+
 def exact_mcnemar_p(left_only: int, right_only: int) -> float:
     discordant = left_only + right_only
     if discordant == 0:
@@ -110,6 +133,12 @@ def native_gguf_sha256(report: dict[str, Any]) -> str | None:
     return artifacts.get("gguf_sha256") if isinstance(artifacts, dict) else None
 
 
+def audit_status(valid_runtime: bool, speed_superiority_proven: bool) -> str:
+    if not valid_runtime:
+        return "review"
+    return "valid_runtime_speed_win" if speed_superiority_proven else "valid_runtime_no_speed_win"
+
+
 def render_markdown(result: dict[str, Any]) -> str:
     sample = result["sample_quality"]
     storage = result["storage"]
@@ -182,7 +211,7 @@ def render_markdown(result: dict[str, Any]) -> str:
             "",
             "The JSON companion records SHA-256 identities for every generated kernel header/config,",
             "conversion receipt, validation trace, and repeated benchmark consumed by this audit.",
-            "`kernel_layout_receipt_matches` must pass before this report is publication evidence.",
+            "All correctness, identity, and full-validation gates must pass before this report is publication evidence.",
         ]
     )
     return "\n".join(lines) + "\n"
@@ -199,6 +228,8 @@ def main() -> None:
     parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/tl2sr_evidence_audit_2026-09-04.json"))
     parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/tl2sr_evidence_audit_2026-09-04.md"))
     args = parser.parse_args()
+
+    repo_root = Path.cwd().resolve()
 
     kernel_paths = [
         Path("benchmark_results/tl2sr_kernel_contract_2026-09-04.json"),
@@ -227,18 +258,29 @@ def main() -> None:
     tiling = [repeated_summary(path, artifact) for path, artifact in repeated_specs]
     i2_conversion = read_json(args.i2sr_conversion)
     tl2_conversion = read_json(args.tl2sr_conversion)
-    tl2_conversions = {
-        "tl2_sr": read_json(Path("benchmark_results/seqcls_native_tl2sr_gguf_2026-09-04.json")),
-        "tl2_sr_bm64": tl2_conversion,
-        "tl2_sr_bm32": read_json(Path("benchmark_results/seqcls_native_tl2sr_bm32_gguf_2026-09-04.json")),
+    tl2_conversion_paths = {
+        "tl2_sr": Path("benchmark_results/seqcls_native_tl2sr_gguf_2026-09-04.json"),
+        "tl2_sr_bm64": args.tl2sr_conversion,
+        "tl2_sr_bm32": Path("benchmark_results/seqcls_native_tl2sr_bm32_gguf_2026-09-04.json"),
     }
-    expected_config_hash = file_identity(
-        Path("preset_kernels/Qwen2.5-0.5B-TL2SR-BM64/kernel_config_tl2sr.ini")
-    )["sha256"]
-    bitnet_converter_path = Path(str(tl2_conversion.get("bitnet_converter", "")))
-    bitnet_converter_hash = (
-        file_identity(bitnet_converter_path)["sha256"] if bitnet_converter_path.is_file() else None
-    )
+    tl2_conversions = {
+        artifact: read_json(path) for artifact, path in tl2_conversion_paths.items()
+    }
+    conversion_identities = {
+        "i2_sr": conversion_output_identity(i2_conversion, repo_root),
+        **{
+            artifact: conversion_output_identity(receipt, repo_root)
+            for artifact, receipt in tl2_conversions.items()
+        },
+    }
+    preset_configs = {
+        "tl2_sr": Path("preset_kernels/Qwen2.5-0.5B-TL2SR/kernel_config_tl2sr.ini"),
+        "tl2_sr_bm64": Path("preset_kernels/Qwen2.5-0.5B-TL2SR-BM64/kernel_config_tl2sr.ini"),
+        "tl2_sr_bm32": Path("preset_kernels/Qwen2.5-0.5B-TL2SR-BM32/kernel_config_tl2sr.ini"),
+    }
+    expected_config_hashes = {
+        artifact: file_identity(path)["sha256"] for artifact, path in preset_configs.items()
+    }
     i2_file = int(i2_conversion["outfile_size_bytes"])
     tl2_file = int(tl2_conversion["outfile_size_bytes"])
     i2_projection = int(i2_conversion["packed_i2s_bytes"])
@@ -265,20 +307,28 @@ def main() -> None:
         artifact: read_json(path) for path, artifact in repeated_specs
     }
     artifact_receipts_match = (
-        native_gguf_sha256(i2_sample_report) == i2_conversion.get("outfile_sha256")
-        and native_gguf_sha256(tl2_sample_report) == tl2_conversions["tl2_sr"].get("outfile_sha256")
-        and native_gguf_sha256(i2_full_report) == i2_conversion.get("outfile_sha256")
+        native_gguf_sha256(i2_sample_report) == conversion_identities["i2_sr"]["sha256"]
+        and native_gguf_sha256(tl2_sample_report) == conversion_identities["tl2_sr_bm64"]["sha256"]
+        and native_gguf_sha256(i2_full_report) == conversion_identities["i2_sr"]["sha256"]
         and (
             tl2_full_report is None
-            or native_gguf_sha256(tl2_full_report) == tl2_conversion.get("outfile_sha256")
+            or native_gguf_sha256(tl2_full_report) == conversion_identities["tl2_sr_bm64"]["sha256"]
         )
         and all(
             report.get("artifacts", {}).get("i2_sr", {}).get("sha256")
-            == i2_conversion.get("outfile_sha256")
+            == conversion_identities["i2_sr"]["sha256"]
             and report.get("artifacts", {}).get(artifact, {}).get("sha256")
-            == tl2_conversions[artifact].get("outfile_sha256")
+            == conversion_identities[artifact]["sha256"]
             for artifact, report in repeated_reports.items()
         )
+    )
+    kernel_layout_receipts_match = all(
+        receipt.get("tl2_kernel_config_sha256") == expected_config_hashes[artifact]
+        and isinstance(receipt.get("bitnet_converter"), str)
+        and Path(str(receipt["bitnet_converter"])).is_file()
+        and receipt.get("bitnet_converter_sha256")
+        == file_identity(Path(str(receipt["bitnet_converter"])))["sha256"]
+        for artifact, receipt in tl2_conversions.items()
     )
     best = max(tiling, key=lambda row: row["paired_speed_ratio_vs_i2sr"])
     gates = {
@@ -288,9 +338,9 @@ def main() -> None:
         "sample_prediction_agreement_at_least_98_percent": sample["prediction_agreement"] >= 0.98,
         "projection_storage_reduced": storage["projection_reduction_fraction"] > 0,
         "repeated_benchmarks_valid": all(row["status"] == "valid" and row["predictions_stable"] for row in tiling),
-        "kernel_layout_receipt_matches": (
-            tl2_conversion.get("tl2_kernel_config_sha256") == expected_config_hash
-            and tl2_conversion.get("bitnet_converter_sha256") == bitnet_converter_hash
+        "kernel_layout_receipt_matches": kernel_layout_receipts_match,
+        "conversion_output_hashes_match": all(
+            identity["declared_sha256_matches"] for identity in conversion_identities.values()
         ),
         "artifact_receipts_match": artifact_receipts_match,
         "speed_superiority_proven": best["paired_speed_ratio_ci95_t"][0] > 1.0,
@@ -306,13 +356,15 @@ def main() -> None:
             "projection_storage_reduced",
             "repeated_benchmarks_valid",
             "kernel_layout_receipt_matches",
+            "conversion_output_hashes_match",
             "artifact_receipts_match",
+            "full_validation_complete",
         )
     )
     result = {
         "schema": "tl2sr-evidence-audit-v1",
         "created_utc": datetime.now(timezone.utc).isoformat(),
-        "status": "valid_runtime_no_speed_win" if valid_runtime and not gates["speed_superiority_proven"] else "review",
+        "status": audit_status(valid_runtime, gates["speed_superiority_proven"]),
         "kernel_contracts_passed": sum(report.get("status") == "pass" for report in kernel_reports),
         "kernel_contracts_total": len(kernel_reports),
         "sample_quality": sample,
@@ -326,15 +378,9 @@ def main() -> None:
             "layout_guard": file_identity(layout_guard_path),
             "conversion_receipts": [
                 file_identity(args.i2sr_conversion),
-                *[
-                    file_identity(Path(str(report_path)))
-                    for report_path in (
-                        "benchmark_results/seqcls_native_tl2sr_gguf_2026-09-04.json",
-                        args.tl2sr_conversion,
-                        "benchmark_results/seqcls_native_tl2sr_bm32_gguf_2026-09-04.json",
-                    )
-                ],
+                *[file_identity(path) for path in tl2_conversion_paths.values()],
             ],
+            "conversion_outputs": conversion_identities,
             "validation_traces": [
                 file_identity(args.i2sr_sample),
                 file_identity(args.tl2sr_sample),

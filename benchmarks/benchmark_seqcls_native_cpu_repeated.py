@@ -44,6 +44,116 @@ DEFAULT_MODELS = {
 }
 
 
+def parse_cpu_list(spec: str) -> list[int]:
+    cpus: set[int] = set()
+    for part in spec.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        if "-" in part:
+            start_text, end_text = part.split("-", maxsplit=1)
+            start, end = int(start_text), int(end_text)
+            if end < start:
+                raise ValueError(f"invalid descending CPU range: {part}")
+            cpus.update(range(start, end + 1))
+        else:
+            cpus.add(int(part))
+    if not cpus:
+        raise ValueError("CPU list is empty")
+    return sorted(cpus)
+
+
+def monitored_cpu_set(
+    affinity: str,
+    topology_root: Path = Path("/sys/devices/system/cpu"),
+) -> list[int]:
+    cpus = set(parse_cpu_list(affinity))
+    for cpu in tuple(cpus):
+        sibling_path = topology_root / f"cpu{cpu}" / "topology" / "thread_siblings_list"
+        if sibling_path.is_file():
+            cpus.update(parse_cpu_list(sibling_path.read_text(encoding="utf-8").strip()))
+    return sorted(cpus)
+
+
+def read_cpu_snapshot(cpus: list[int], proc_stat: Path = Path("/proc/stat")) -> dict[int, tuple[int, int]]:
+    selected = set(cpus)
+    snapshot: dict[int, tuple[int, int]] = {}
+    for line in proc_stat.read_text(encoding="utf-8").splitlines():
+        fields = line.split()
+        if not fields or not fields[0].startswith("cpu") or fields[0] == "cpu":
+            continue
+        cpu_text = fields[0][3:]
+        if not cpu_text.isdigit() or int(cpu_text) not in selected:
+            continue
+        values = [int(value) for value in fields[1:]]
+        if len(values) < 5:
+            raise ValueError(f"incomplete CPU counters for {fields[0]}")
+        idle = values[3] + values[4]
+        snapshot[int(cpu_text)] = (sum(values), idle)
+    missing = selected.difference(snapshot)
+    if missing:
+        raise ValueError(f"missing /proc/stat counters for CPUs {sorted(missing)}")
+    return snapshot
+
+
+def cpu_utilization(
+    before: dict[int, tuple[int, int]],
+    after: dict[int, tuple[int, int]],
+) -> dict[int, float]:
+    if before.keys() != after.keys():
+        raise ValueError("CPU snapshots cover different logical CPUs")
+    utilization: dict[int, float] = {}
+    for cpu in before:
+        total_delta = after[cpu][0] - before[cpu][0]
+        idle_delta = after[cpu][1] - before[cpu][1]
+        if total_delta <= 0 or idle_delta < 0:
+            raise ValueError(f"non-monotonic CPU counters for cpu{cpu}")
+        utilization[cpu] = max(0.0, min(1.0, 1.0 - idle_delta / total_delta))
+    return utilization
+
+
+def wait_for_idle_cpus(
+    affinity: str,
+    *,
+    max_utilization: float,
+    sample_seconds: float,
+    consecutive_samples: int,
+    timeout_seconds: float,
+) -> dict[str, Any]:
+    cpus = monitored_cpu_set(affinity)
+    started = time.monotonic()
+    accepted: list[dict[str, Any]] = []
+    attempts = 0
+    while time.monotonic() - started < timeout_seconds:
+        before = read_cpu_snapshot(cpus)
+        time.sleep(sample_seconds)
+        utilization = cpu_utilization(before, read_cpu_snapshot(cpus))
+        attempts += 1
+        sample = {
+            "maximum": max(utilization.values()),
+            "mean": statistics.fmean(utilization.values()),
+            "per_cpu": {str(cpu): value for cpu, value in utilization.items()},
+        }
+        if sample["maximum"] <= max_utilization:
+            accepted.append(sample)
+            if len(accepted) == consecutive_samples:
+                return {
+                    "logical_cpus": cpus,
+                    "maximum_allowed_utilization": max_utilization,
+                    "sample_seconds": sample_seconds,
+                    "consecutive_samples": consecutive_samples,
+                    "attempts": attempts,
+                    "wait_seconds": time.monotonic() - started,
+                    "accepted_samples": accepted,
+                }
+        else:
+            accepted = []
+    raise RuntimeError(
+        f"CPUs {cpus} did not remain below {max_utilization:.1%} utilization for "
+        f"{consecutive_samples} consecutive {sample_seconds:g}s samples within {timeout_seconds:g}s"
+    )
+
+
 def mean_ci95(values: list[float]) -> list[float]:
     if not values:
         raise ValueError("cannot summarize an empty sample")
@@ -192,6 +302,10 @@ def main() -> int:
     parser.add_argument("--ubatch-size", type=int, default=512)
     parser.add_argument("--timeout-seconds", type=int, default=1800)
     parser.add_argument("--cooldown-seconds", type=float, default=2.0)
+    parser.add_argument("--idle-max-utilization", type=float, default=0.20)
+    parser.add_argument("--idle-sample-seconds", type=float, default=1.0)
+    parser.add_argument("--idle-consecutive-samples", type=int, default=2)
+    parser.add_argument("--idle-timeout-seconds", type=float, default=900.0)
     parser.add_argument(
         "--output-json",
         type=Path,
@@ -205,6 +319,10 @@ def main() -> int:
     args = parser.parse_args()
     if args.max_samples <= 0 or args.repetitions < 2:
         raise SystemExit("--max-samples must be positive and --repetitions must be at least 2")
+    if not 0.0 <= args.idle_max_utilization <= 1.0:
+        raise SystemExit("--idle-max-utilization must be between 0 and 1")
+    if args.idle_sample_seconds <= 0 or args.idle_consecutive_samples <= 0 or args.idle_timeout_seconds <= 0:
+        raise SystemExit("idle-check durations and sample count must be positive")
 
     root = args.repo_root.resolve()
     checkpoint = args.checkpoint_dir if args.checkpoint_dir.is_absolute() else root / args.checkpoint_dir
@@ -237,10 +355,26 @@ def main() -> int:
     labels = [int(row["label"]) for row in dataset_rows]
     names = list(model_paths)
     runs: list[dict[str, Any]] = []
+    idle_preflights: list[dict[str, Any]] = []
 
     for repetition in range(args.repetitions):
         order = names[repetition % len(names) :] + names[: repetition % len(names)]
         for order_index, name in enumerate(order):
+            idle_preflight = wait_for_idle_cpus(
+                args.cpu_affinity,
+                max_utilization=args.idle_max_utilization,
+                sample_seconds=args.idle_sample_seconds,
+                consecutive_samples=args.idle_consecutive_samples,
+                timeout_seconds=args.idle_timeout_seconds,
+            )
+            idle_preflights.append(
+                {
+                    "repetition": repetition,
+                    "order_index": order_index,
+                    "artifact": name,
+                    **idle_preflight,
+                }
+            )
             load_start = list(os.getloadavg())
             logits, meta = run_native_classifier(
                 binary=binary,
@@ -320,6 +454,7 @@ def main() -> int:
         "repetitions": args.repetitions,
         "threads": args.threads,
         "cpu_affinity": args.cpu_affinity,
+        "idle_preflights": idle_preflights,
         "speed_reference": args.speed_reference,
         "hardware": cpu_environment(args.threads),
         "runtime_build": runtime_build_contract(binary, root),
