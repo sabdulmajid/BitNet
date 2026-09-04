@@ -30,7 +30,7 @@ The frozen baseline bundle and current decision reports are:
 | QAT/distillation recovers signal | **Partial recovery, not FP quality** | Best row-scale QAT ten-task mean `0.499459`, a `+0.150788` recovery over naive PTQ and still `-0.144710` below FP. | Row-scale QAT is this fork's retrofit variant, not standard BitDistill. |
 | BitDistill paper-level GLUE reproduction is complete | **No** | Qwen2.5-0.5B local FP16-SFT MNLI is `0.808151`. Controlled Stage-2 rows are `0.616607` at `40.96M`, `0.691187` at `163.84M`, `0.720020` at `327.68M`, and `0.729903` at `655.36M` token presentations. | The 655M row remains `-0.078248` below FP16 with paired CI `[-0.086720, -0.069775]`; the paper-level recovery target is not met. |
 | The `655.36M` Stage-2 checkpoint is usable | **Yes, with a verified manifest** | [stage2_manifest_655m_2026-05-23.md](benchmarks/results/stage2_manifest_655m_2026-05-23.md) records job `10250`, four complete snapshots, final CE `3.426713`, the state-dict SHA-256, and downstream job `10260`. | This was a `327.68M` continuation with a fresh optimizer/scheduler segment, not one uninterrupted 80k-step run. |
-| Paper gamma can be copied literally into this implementation | **No, not without matching loss normalization** | Component-gradient telemetry measures attention/CE gradient ratio `221.384986` for the paper-gamma path and `0.346044` at gamma 60, a `639.76x` reduction. | The fixed-gamma probe is not a task-quality result. The active gate now compares explicit relation definitions and gradient-balanced weighting before any 10k-step quality run. |
+| Paper gamma can be copied literally into this implementation | **No, not without matching loss normalization** | Historical telemetry measures attention/CE gradient ratio `221.384986` for the paper-gamma path versus `0.346044` at gamma 60. A controlled A4500 screen measures median ratio `69.2248` for cosine split-1 at fixed gamma `100,000`, versus `0.273975` with adaptive balancing. | This is not a task-quality result. The source-pinned reference-environment gate remains required before any 10k-step quality run. |
 | The paper defines one unambiguous attention-relation objective | **No** | [attention_relation_equivalence_2026-09-04.md](benchmarks/results/attention_relation_equivalence_2026-09-04.md) proves that Equation 12 scaled-dot relations and Algorithm 1 normalized-cosine relations are not generally equivalent. In a deterministic probe their gradient-norm ratio is `18.7073` and gradient cosine is `0.2437`. | This is a mathematical contract result, not downstream quality evidence. For Qwen's 14:2 grouped-query attention, KV repetition leaves cosine relations invariant but multiplies scaled-dot logits by `sqrt(7)`. |
 | The local GLUE formulation is paper-exact | **Unresolved** | [bitdistill_task_formulation_audit_2026-09-04.md](benchmarks/results/bitdistill_task_formulation_audit_2026-09-04.md) separates sequence-classification from causal answer-token results. | Token-level CE and decoding language favor the causal interpretation, but no authoritative released templates or training code establish equivalence. |
 | Row-scale semantics matter at runtime | **Yes: strong systems result** | TL2 one-scale relative output RMS error `1.904230`; exact FP16 row scales reduce it to `0.000197`. | Row scales are part of the learned function. TL2 row-scale support is not implemented. |
@@ -127,6 +127,23 @@ currently verified to see the shared filesystem and refuses to run if its
 expected Git revision differs from the checkout. Submission history and
 infrastructure probes are recorded in
 [bitdistill_method_parity_submission_2026-09-04.md](benchmarks/results/bitdistill_method_parity_submission_2026-09-04.md).
+
+An exploratory cross-environment screen has completed on an RTX A4500. It is
+not the reference-environment result, but it is sufficient to reject unstable
+contracts. With sequence classification, fixed `gamma=100,000` produced median
+attention/CE gradient ratios of `69.22` for cosine split-1, `119.82` for cosine
+split-8, and `61,810.61` for scaled-dot split-1. Gradient-norm EMA balancing
+reduced the cosine split-1 median ratio to `0.274` with median effective gamma
+`146.27`. The scaled-dot arm was also `-0.142578` behind cosine split-1 on the
+paired 512-example diagnostic, CI `[-0.199489, -0.085667]`, exact McNemar
+`p=1.79e-6`. This is contract-selection evidence, not a downstream benchmark:
+[bitdistill_method_parity_midcard_exploratory_2026-09-04.md](benchmarks/results/bitdistill_method_parity_midcard_exploratory_2026-09-04.md).
+
+The screen also exposed and fixed a PyTorch-version-dependent SubLN dtype
+contract: older supported PyTorch versions can promote BF16 RMSNorm inputs to
+FP32, which then fails at BF16 projections. `SubLNLinear` now casts normalized
+activations back to the incoming activation dtype, with a regression test that
+forces the promotion path.
 
 These pilots are method diagnostics only. A surviving contract must then run
 the matched 10k-step schedule, evaluate all `9,815` MNLI examples, emit paired

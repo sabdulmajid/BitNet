@@ -1,0 +1,368 @@
+{
+  "artifact_root_label": "external-midcard-10373-10380",
+  "created_utc": "2026-09-04T05:50:13.343791+00:00",
+  "decision_rule": "Use these pilots to reject numerically unstable contracts and verify adaptive balancing. Do not select a downstream-quality winner from 512 examples or 120 steps. A full run requires an explicit paper-definition choice, all 9,815 MNLI examples, paired predictions, and replication.",
+  "environment_note": "NVIDIA RTX A4500; torch 2.6.0+cu118; Transformers 5.7.0; Datasets 2.18.0; source 18ec2c9 includes the SubLN dtype portability fix. This screens numerical contracts and is not the reference-environment quality run.",
+  "evidence_scope": "exploratory_cross_environment",
+  "expected": {
+    "eval_examples_per_case": 512,
+    "steps_per_case": 120,
+    "telemetry_rows_per_case": 7,
+    "telemetry_steps_per_case": [
+      1,
+      20,
+      40,
+      60,
+      80,
+      100,
+      120
+    ]
+  },
+  "paired_comparisons": [
+    {
+      "candidate": "seqcls-cosine-s1-fixed",
+      "candidate_accuracy": 0.470703125,
+      "candidate_wins": 52,
+      "comparison": "seqcls_split_s1_minus_s8",
+      "delta_candidate_minus_reference": -0.02734375,
+      "errors": [],
+      "matched": 512,
+      "mcnemar_exact_p": 0.23126568219747645,
+      "paired_ci95": [
+        -0.06890016317213879,
+        0.01421266317213879
+      ],
+      "reference": "seqcls-cosine-s8-fixed",
+      "reference_accuracy": 0.498046875,
+      "reference_wins": 66,
+      "status": "pass"
+    },
+    {
+      "candidate": "seqcls-scaled-dot-s1-fixed",
+      "candidate_accuracy": 0.328125,
+      "candidate_wins": 79,
+      "comparison": "seqcls_scaled_dot_minus_cosine",
+      "delta_candidate_minus_reference": -0.142578125,
+      "errors": [],
+      "matched": 512,
+      "mcnemar_exact_p": 1.7948521478079673e-06,
+      "paired_ci95": [
+        -0.19948927214017392,
+        -0.08566697785982608
+      ],
+      "reference": "seqcls-cosine-s1-fixed",
+      "reference_accuracy": 0.470703125,
+      "reference_wins": 152,
+      "status": "pass"
+    },
+    {
+      "candidate": "seqcls-cosine-s1-adaptive",
+      "candidate_accuracy": 0.4921875,
+      "candidate_wins": 116,
+      "comparison": "seqcls_adaptive_minus_fixed",
+      "delta_candidate_minus_reference": 0.021484375,
+      "errors": [],
+      "matched": 512,
+      "mcnemar_exact_p": 0.5012449184875282,
+      "paired_ci95": [
+        -0.035448939099578365,
+        0.07841768909957836
+      ],
+      "reference": "seqcls-cosine-s1-fixed",
+      "reference_accuracy": 0.470703125,
+      "reference_wins": 105,
+      "status": "pass"
+    },
+    {
+      "candidate": "causal-cosine-s1-adaptive",
+      "candidate_accuracy": 0.37109375,
+      "candidate_wins": 143,
+      "comparison": "causal_adaptive_minus_fixed",
+      "delta_candidate_minus_reference": 0.021484375,
+      "errors": [],
+      "matched": 512,
+      "mcnemar_exact_p": 0.5465716019826448,
+      "paired_ci95": [
+        -0.04203150451862761,
+        0.08500025451862761
+      ],
+      "reference": "causal-cosine-s1-fixed",
+      "reference_accuracy": 0.349609375,
+      "reference_wins": 132,
+      "status": "pass"
+    }
+  ],
+  "quality_claim": "none_diagnostic_subset_only",
+  "rows": [
+    {
+      "balance_strategy": "fixed",
+      "blockers": [],
+      "case": "seqcls-cosine-s8-fixed",
+      "configured_attention_weight": 100000.0,
+      "diagnostic_accuracy": 0.498046875,
+      "diagnostic_eval_examples": 512,
+      "effective_attention_weight": {
+        "max": 100000.0,
+        "mean": 100000.0,
+        "median": 100000.0,
+        "min": 100000.0
+      },
+      "gradient_attention_to_ce": {
+        "max": 177.28536741171936,
+        "mean": 126.18791531856948,
+        "median": 119.81671728743329,
+        "min": 72.99406861136623
+      },
+      "loss_attention_to_ce": {
+        "max": 2835.370625,
+        "mean": 1993.655913786232,
+        "median": 1646.4357734806629,
+        "min": 1331.6240234375
+      },
+      "metrics_path": "external-midcard-10373-10380/seqcls-cosine-s8-fixed/metrics.json",
+      "prediction_path": "external-midcard-10373-10380/seqcls-cosine-s8-fixed/eval_predictions.jsonl",
+      "relation_mode": "cosine",
+      "source_revision": "18ec2c95eb5667e48fb16c79dc0b739ab153307a",
+      "split_heads": 8,
+      "status": "complete",
+      "task_contract": {
+        "architecture": "AutoModelForSequenceClassification",
+        "candidate_score": null,
+        "evaluation": "class_logit_argmax",
+        "label_scheme": "integer_class_id",
+        "paper_equivalence": "not_established",
+        "prompt_template": null,
+        "training_objective": "class_logit_cross_entropy"
+      },
+      "task_format": "sequence_classification",
+      "telemetry_path": "external-midcard-10373-10380/seqcls-cosine-s8-fixed/telemetry.jsonl",
+      "telemetry_rows": 7
+    },
+    {
+      "balance_strategy": "fixed",
+      "blockers": [],
+      "case": "seqcls-cosine-s1-fixed",
+      "configured_attention_weight": 100000.0,
+      "diagnostic_accuracy": 0.470703125,
+      "diagnostic_eval_examples": 512,
+      "effective_attention_weight": {
+        "max": 100000.0,
+        "mean": 100000.0,
+        "median": 100000.0,
+        "min": 100000.0
+      },
+      "gradient_attention_to_ce": {
+        "max": 108.87843715107218,
+        "mean": 72.69573062234132,
+        "median": 69.22481595624886,
+        "min": 43.33155932996879
+      },
+      "loss_attention_to_ce": {
+        "max": 643.085516826923,
+        "mean": 471.19209966931516,
+        "median": 441.5127766927083,
+        "min": 338.1969299316406
+      },
+      "metrics_path": "external-midcard-10373-10380/seqcls-cosine-s1-fixed/metrics.json",
+      "prediction_path": "external-midcard-10373-10380/seqcls-cosine-s1-fixed/eval_predictions.jsonl",
+      "relation_mode": "cosine",
+      "source_revision": "18ec2c95eb5667e48fb16c79dc0b739ab153307a",
+      "split_heads": 1,
+      "status": "complete",
+      "task_contract": {
+        "architecture": "AutoModelForSequenceClassification",
+        "candidate_score": null,
+        "evaluation": "class_logit_argmax",
+        "label_scheme": "integer_class_id",
+        "paper_equivalence": "not_established",
+        "prompt_template": null,
+        "training_objective": "class_logit_cross_entropy"
+      },
+      "task_format": "sequence_classification",
+      "telemetry_path": "external-midcard-10373-10380/seqcls-cosine-s1-fixed/telemetry.jsonl",
+      "telemetry_rows": 7
+    },
+    {
+      "balance_strategy": "fixed",
+      "blockers": [],
+      "case": "seqcls-scaled-dot-s1-fixed",
+      "configured_attention_weight": 100000.0,
+      "diagnostic_accuracy": 0.328125,
+      "diagnostic_eval_examples": 512,
+      "effective_attention_weight": {
+        "max": 100000.0,
+        "mean": 100000.0,
+        "median": 100000.0,
+        "min": 100000.0
+      },
+      "gradient_attention_to_ce": {
+        "max": 109256.86551997223,
+        "mean": 61451.51333155305,
+        "median": 61810.606303793174,
+        "min": 25603.029797841373
+      },
+      "loss_attention_to_ce": {
+        "max": 343217.42995169084,
+        "mean": 212695.60913744246,
+        "median": 207904.53987730062,
+        "min": 141138.1157894737
+      },
+      "metrics_path": "external-midcard-10373-10380/seqcls-scaled-dot-s1-fixed/metrics.json",
+      "prediction_path": "external-midcard-10373-10380/seqcls-scaled-dot-s1-fixed/eval_predictions.jsonl",
+      "relation_mode": "scaled_dot",
+      "source_revision": "18ec2c95eb5667e48fb16c79dc0b739ab153307a",
+      "split_heads": 1,
+      "status": "complete",
+      "task_contract": {
+        "architecture": "AutoModelForSequenceClassification",
+        "candidate_score": null,
+        "evaluation": "class_logit_argmax",
+        "label_scheme": "integer_class_id",
+        "paper_equivalence": "not_established",
+        "prompt_template": null,
+        "training_objective": "class_logit_cross_entropy"
+      },
+      "task_format": "sequence_classification",
+      "telemetry_path": "external-midcard-10373-10380/seqcls-scaled-dot-s1-fixed/telemetry.jsonl",
+      "telemetry_rows": 7
+    },
+    {
+      "balance_strategy": "gradnorm_ema",
+      "blockers": [],
+      "case": "seqcls-cosine-s1-adaptive",
+      "configured_attention_weight": 100000.0,
+      "diagnostic_accuracy": 0.4921875,
+      "diagnostic_eval_examples": 512,
+      "effective_attention_weight": {
+        "max": 158.31755239043727,
+        "mean": 144.41808091638578,
+        "median": 146.27119545482134,
+        "min": 132.62630464082235
+      },
+      "gradient_attention_to_ce": {
+        "max": 0.7133857073512814,
+        "mean": 0.32894589375900685,
+        "median": 0.2739750695818215,
+        "min": 0.09585010729394174
+      },
+      "loss_attention_to_ce": {
+        "max": 1.6273472533632287,
+        "mean": 0.9270839192742565,
+        "median": 0.8704757996831074,
+        "min": 0.49468469619750977
+      },
+      "metrics_path": "external-midcard-10373-10380/seqcls-cosine-s1-adaptive/metrics.json",
+      "prediction_path": "external-midcard-10373-10380/seqcls-cosine-s1-adaptive/eval_predictions.jsonl",
+      "relation_mode": "cosine",
+      "source_revision": "18ec2c95eb5667e48fb16c79dc0b739ab153307a",
+      "split_heads": 1,
+      "status": "complete",
+      "task_contract": {
+        "architecture": "AutoModelForSequenceClassification",
+        "candidate_score": null,
+        "evaluation": "class_logit_argmax",
+        "label_scheme": "integer_class_id",
+        "paper_equivalence": "not_established",
+        "prompt_template": null,
+        "training_objective": "class_logit_cross_entropy"
+      },
+      "task_format": "sequence_classification",
+      "telemetry_path": "external-midcard-10373-10380/seqcls-cosine-s1-adaptive/telemetry.jsonl",
+      "telemetry_rows": 7
+    },
+    {
+      "balance_strategy": "fixed",
+      "blockers": [],
+      "case": "causal-cosine-s1-fixed",
+      "configured_attention_weight": 100000.0,
+      "diagnostic_accuracy": 0.349609375,
+      "diagnostic_eval_examples": 512,
+      "effective_attention_weight": {
+        "max": 100000.0,
+        "mean": 100000.0,
+        "median": 100000.0,
+        "min": 100000.0
+      },
+      "gradient_attention_to_ce": {
+        "max": 172.9745937139047,
+        "mean": 71.60567398268553,
+        "median": 57.3127446871526,
+        "min": 29.481775330254433
+      },
+      "loss_attention_to_ce": {
+        "max": 2156.8620511389854,
+        "mean": 640.2719559222294,
+        "median": 366.37558700207467,
+        "min": 253.535905544072
+      },
+      "metrics_path": "external-midcard-10373-10380/causal-cosine-s1-fixed/metrics.json",
+      "prediction_path": "external-midcard-10373-10380/causal-cosine-s1-fixed/eval_predictions.jsonl",
+      "relation_mode": "cosine",
+      "source_revision": "18ec2c95eb5667e48fb16c79dc0b739ab153307a",
+      "split_heads": 1,
+      "status": "complete",
+      "task_contract": {
+        "architecture": "AutoModelForCausalLM",
+        "candidate_score": "mean",
+        "evaluation": "single_forward_single_token_labels",
+        "label_scheme": "letters",
+        "paper_equivalence": "unresolved_without_authoritative_training_code_and_templates",
+        "prompt_template": "local_glue_plain_v1",
+        "training_objective": "answer_token_cross_entropy"
+      },
+      "task_format": "causal_lm",
+      "telemetry_path": "external-midcard-10373-10380/causal-cosine-s1-fixed/telemetry.jsonl",
+      "telemetry_rows": 7
+    },
+    {
+      "balance_strategy": "gradnorm_ema",
+      "blockers": [],
+      "case": "causal-cosine-s1-adaptive",
+      "configured_attention_weight": 100000.0,
+      "diagnostic_accuracy": 0.37109375,
+      "diagnostic_eval_examples": 512,
+      "effective_attention_weight": {
+        "max": 118.4936743663656,
+        "mean": 105.97279380795489,
+        "median": 109.98017109360913,
+        "min": 89.2609687646714
+      },
+      "gradient_attention_to_ce": {
+        "max": 0.3473500015615106,
+        "mean": 0.17051316465097144,
+        "median": 0.10552276987143477,
+        "min": 0.04415472822817517
+      },
+      "loss_attention_to_ce": {
+        "max": 0.718277619171561,
+        "mean": 0.5112280406280525,
+        "median": 0.5318301651825675,
+        "min": 0.34747890314861535
+      },
+      "metrics_path": "external-midcard-10373-10380/causal-cosine-s1-adaptive/metrics.json",
+      "prediction_path": "external-midcard-10373-10380/causal-cosine-s1-adaptive/eval_predictions.jsonl",
+      "relation_mode": "cosine",
+      "source_revision": "18ec2c95eb5667e48fb16c79dc0b739ab153307a",
+      "split_heads": 1,
+      "status": "complete",
+      "task_contract": {
+        "architecture": "AutoModelForCausalLM",
+        "candidate_score": "mean",
+        "evaluation": "single_forward_single_token_labels",
+        "label_scheme": "letters",
+        "paper_equivalence": "unresolved_without_authoritative_training_code_and_templates",
+        "prompt_template": "local_glue_plain_v1",
+        "training_objective": "answer_token_cross_entropy"
+      },
+      "task_format": "causal_lm",
+      "telemetry_path": "external-midcard-10373-10380/causal-cosine-s1-adaptive/telemetry.jsonl",
+      "telemetry_rows": 7
+    }
+  ],
+  "schema": "bitdistill-method-parity-pilots-v1",
+  "source_revisions": [
+    "18ec2c95eb5667e48fb16c79dc0b739ab153307a"
+  ],
+  "status": "complete_diagnostic",
+  "submission_job_id": "midcard-10373-10380"
+}
