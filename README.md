@@ -145,6 +145,15 @@ FP32, which then fails at BF16 projections. `SubLNLinear` now casts normalized
 activations back to the incoming activation dtype, with a regression test that
 forces the promotion path.
 
+The surviving cosine split-1 adaptive contract is now running a pre-registered
+full MNLI gate: 10,000 steps, all 392,702 available training examples, all
+9,815 matched validation examples, and seeds `1234`, `1235`, and `1236`.
+Jobs `10392`, `10395`, and `10396` run serially on the A4500; only the first
+saves model artifacts. Success requires a statistically positive paired delta
+over the fixed-gamma 655M baseline and three-seed mean accuracy within one
+point of local FP16. See
+[bitdistill_adaptive_full_submission_2026-09-04.md](benchmarks/results/bitdistill_adaptive_full_submission_2026-09-04.md).
+
 These pilots are method diagnostics only. A surviving contract must then run
 the matched 10k-step schedule, evaluate all `9,815` MNLI examples, emit paired
 predictions and a confidence interval against FP16, and replicate across seeds

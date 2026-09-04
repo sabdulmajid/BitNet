@@ -1,0 +1,77 @@
+{
+  "schema": "bitdistill-adaptive-full-submission-v1",
+  "status": "running",
+  "created_utc": "2026-09-04T05:59:00Z",
+  "claim_boundary": "Pre-registered full validation; no quality conclusion until all three runs and paired audits complete.",
+  "source_revision": "526ede7b2c3f33c6a9638de54bdae91e8afe39c6",
+  "environment": {
+    "accelerate": "1.13.0",
+    "datasets": "2.18.0",
+    "gpu": "NVIDIA RTX A4500 20GB",
+    "node": "ece-nebula12",
+    "scope": "cross_environment",
+    "torch": "2.6.0+cu118",
+    "transformers": "5.7.0"
+  },
+  "jobs": [
+    {
+      "job_id": "10392",
+      "save_model_artifacts": true,
+      "seed": 1234,
+      "status": "running"
+    },
+    {
+      "dependency": "afterok:10392",
+      "job_id": "10395",
+      "save_model_artifacts": false,
+      "seed": 1235,
+      "status": "pending"
+    },
+    {
+      "dependency": "afterok:10395",
+      "job_id": "10396",
+      "save_model_artifacts": false,
+      "seed": 1236,
+      "status": "pending"
+    }
+  ],
+  "method": {
+    "activation_quantization": true,
+    "attention_balance": "gradnorm_ema",
+    "attention_balance_beta": 0.9,
+    "attention_balance_every_steps": 20,
+    "attention_balance_target_ratio": 1.0,
+    "attention_relation_mode": "cosine",
+    "attention_split_heads": 1,
+    "base_model": "Qwen/Qwen2.5-0.5B",
+    "distill_layer": -1,
+    "initial_attention_weight": 100000.0,
+    "logit_kd_temperature": 5.0,
+    "logit_kd_weight": 10.0,
+    "scale_mode": "tensor",
+    "stage2_manifest": "benchmarks/results/stage2_manifest_655m_2026-05-23.json",
+    "subln": true,
+    "task_format": "sequence_classification"
+  },
+  "training": {
+    "eval_examples": 9815,
+    "gradient_accumulation_steps": 4,
+    "learning_rate": 0.00002,
+    "max_sequence_length": 512,
+    "optimizer_steps": 10000,
+    "per_device_batch_size": 4,
+    "scheduler": "cosine",
+    "train_examples_available": 392702,
+    "warmup_steps": 100
+  },
+  "references": {
+    "fixed_gamma_655m_accuracy": 0.729903,
+    "fp16_accuracy": 0.808151
+  },
+  "decision_rules": [
+    "All three runs must complete 10000 steps and evaluate exactly 9815 MNLI validation examples.",
+    "Adaptive balancing is a quality improvement only if its paired delta over the fixed-gamma 655M reference is positive with a 95% confidence interval excluding zero.",
+    "Paper-level local recovery requires three-seed mean accuracy >= 0.798151, within one absolute accuracy point of the 0.808151 local FP16 reference.",
+    "A numerically stable loss without downstream improvement is not a quality success."
+  ]
+}
