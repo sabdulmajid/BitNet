@@ -16,3 +16,5 @@ The first submission attempt requested 32 GiB and was rejected before creating a
 The resulting midcard array `10298` and audit `10299` then failed before script execution. Compute-node probes `10309` through `10312` proved that the shared project and log paths were unavailable on `ece-nebula12`; a `/dev/null` control completed as job `10305`. The idle bigcard node had the same missing mount, while dualcard probe `10315` passed.
 
 Dualcard array `10316` and audit `10317` were queued but cancelled before allocation when a final preflight found that the login environment had no `python` alias and queued jobs were not pinned against source drift. No training step ran. The launcher now resolves an interpreter that can import the required ML packages and rejects a checkout whose Git revision differs from `EXPECTED_SOURCE_REVISION`.
+
+Revision-pinned array `10318` and audit `10319` were also cancelled before allocation after a postprocessor review found an off-by-one contract: telemetry emits at steps `1,20,40,60,80,100,120`, while the auditor expected six rows. The auditor now verifies all seven exact step numbers, with regression tests.

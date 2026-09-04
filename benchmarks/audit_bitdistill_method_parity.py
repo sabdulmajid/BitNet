@@ -16,7 +16,8 @@ from typing import Any
 DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
 EXPECTED_STEPS = 120
 EXPECTED_EVAL_EXAMPLES = 512
-EXPECTED_TELEMETRY_ROWS = 6
+EXPECTED_TELEMETRY_STEPS = (1, 20, 40, 60, 80, 100, 120)
+EXPECTED_TELEMETRY_ROWS = len(EXPECTED_TELEMETRY_STEPS)
 
 CASES = (
     "seqcls-cosine-s8-fixed",
@@ -106,6 +107,9 @@ def summarize_case(root: Path, case: str) -> dict[str, Any]:
         blockers.append(f"expected {EXPECTED_EVAL_EXAMPLES} diagnostic eval examples")
     if len(telemetry) != EXPECTED_TELEMETRY_ROWS:
         blockers.append(f"expected {EXPECTED_TELEMETRY_ROWS} telemetry rows")
+    telemetry_steps = [int(row.get("step", -1) or -1) for row in telemetry]
+    if telemetry_steps != list(EXPECTED_TELEMETRY_STEPS):
+        blockers.append(f"expected telemetry steps {list(EXPECTED_TELEMETRY_STEPS)}")
     if not gradient_ratios:
         blockers.append("missing finite component-gradient ratios")
     if not metrics.get("source_revision"):
@@ -146,6 +150,7 @@ def build_report(root: Path, submission_job_id: str) -> dict[str, Any]:
             "steps_per_case": EXPECTED_STEPS,
             "eval_examples_per_case": EXPECTED_EVAL_EXAMPLES,
             "telemetry_rows_per_case": EXPECTED_TELEMETRY_ROWS,
+            "telemetry_steps_per_case": list(EXPECTED_TELEMETRY_STEPS),
         },
         "source_revisions": revisions,
         "rows": rows,
