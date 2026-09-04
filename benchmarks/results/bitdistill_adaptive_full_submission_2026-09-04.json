@@ -66,7 +66,18 @@
   },
   "references": {
     "fixed_gamma_655m_accuracy": 0.729903,
-    "fp16_accuracy": 0.808151
+    "fp16_accuracy": 0.808151,
+    "prediction_sha256": {
+      "fixed_gamma_655m": "d18a994d994e0800c7b48644dd123d4acc82110262323f9d0fac03b9cb0959b3",
+      "fp16": "6e708242b8c086f0b2aa9b1c7805fc088b4391de3b8442e6f5b66fa44c8f5590",
+      "historical_gamma60_163m": "81151391f29321532326b70d3d258c756d1b6835b00c36072f240eef98f97edf"
+    }
+  },
+  "postprocess": {
+    "audit_job_id": "10398",
+    "dependency": "afterany:10396",
+    "fail_closed": true,
+    "supplemental_historical_gamma60_comparison": true
   },
   "decision_rules": [
     "All three runs must complete 10000 steps and evaluate exactly 9815 MNLI validation examples.",
