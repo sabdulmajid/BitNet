@@ -178,7 +178,7 @@ def telemetry_health(rows: list[dict[str, Any]]) -> dict[str, Any]:
     attention_ratios: list[float] = []
     logit_ratios: list[float] = []
     probe_attention_ratios: list[float] = []
-    global_to_probe_attention_ratios: list[float] = []
+    global_to_last_controller_probe_ratios: list[float] = []
     for row in rows:
         ce_norm = nested(row, "component_grad_norms_microbatch", "ce")
         attention_norm = nested(row, "component_grad_norms_microbatch", "weighted_attention_kd")
@@ -194,7 +194,7 @@ def telemetry_health(rows: list[dict[str, Any]]) -> dict[str, Any]:
                 global_ratio = float(attention_norm / ce_norm)
                 attention_ratios.append(global_ratio)
                 if isinstance(probe_ratio, (int, float)) and math.isfinite(probe_ratio) and probe_ratio > 0.0:
-                    global_to_probe_attention_ratios.append(global_ratio / float(probe_ratio))
+                    global_to_last_controller_probe_ratios.append(global_ratio / float(probe_ratio))
             if isinstance(logit_norm, (int, float)) and math.isfinite(logit_norm):
                 logit_ratios.append(float(logit_norm / ce_norm))
         if isinstance(probe_ratio, (int, float)) and math.isfinite(probe_ratio):
@@ -220,11 +220,22 @@ def telemetry_health(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "min": min(probe_attention_ratios) if probe_attention_ratios else None,
             "max": max(probe_attention_ratios) if probe_attention_ratios else None,
         },
-        "global_to_probe_attention_gradient_ratio": {
-            "final": global_to_probe_attention_ratios[-1] if global_to_probe_attention_ratios else None,
-            "median": percentile(global_to_probe_attention_ratios, 0.5),
-            "min": min(global_to_probe_attention_ratios) if global_to_probe_attention_ratios else None,
-            "max": max(global_to_probe_attention_ratios) if global_to_probe_attention_ratios else None,
+        "global_to_last_controller_probe_ratio": {
+            "final": global_to_last_controller_probe_ratios[-1]
+            if global_to_last_controller_probe_ratios
+            else None,
+            "median": percentile(global_to_last_controller_probe_ratios, 0.5),
+            "min": min(global_to_last_controller_probe_ratios)
+            if global_to_last_controller_probe_ratios
+            else None,
+            "max": max(global_to_last_controller_probe_ratios)
+            if global_to_last_controller_probe_ratios
+            else None,
+            "comparison_contract": (
+                "descriptive_only: global norm uses the telemetry microbatch and all trainable "
+                "parameters; probe ratio uses the most recent controller-update microbatch and "
+                "selected-layer Q/K/V parameters"
+            ),
         },
         "weighted_logit_to_ce_gradient_ratio": {
             "final": logit_ratios[-1] if logit_ratios else None,
@@ -531,7 +542,7 @@ def render_markdown(report: dict[str, Any]) -> str:
                 run["effective_attention_weight"],
                 nested(run, "telemetry_health", "weighted_attention_to_ce_gradient_ratio", "median"),
                 nested(run, "telemetry_health", "probe_weighted_attention_to_ce_gradient_ratio", "median"),
-                nested(run, "telemetry_health", "global_to_probe_attention_gradient_ratio", "median"),
+                nested(run, "telemetry_health", "global_to_last_controller_probe_ratio", "median"),
                 nested(run, "telemetry_health", "weighted_attention_to_ce_gradient_ratio", "max"),
                 nested(run, "telemetry_health", "max_activation_clipped_fraction"),
                 nested(run, "telemetry_health", "mean_ternary_flip_fraction"),
@@ -561,7 +572,7 @@ def render_markdown(report: dict[str, Any]) -> str:
                     "final gamma",
                     "median grad A/CE",
                     "median probe A/CE",
-                    "median global/probe",
+                    "median global/last probe",
                     "max grad A/CE",
                     "max A8 clipped",
                     "mean ternary flips",
@@ -582,6 +593,13 @@ def render_markdown(report: dict[str, Any]) -> str:
                     ["all seeds improve over fixed gamma with paired CI > 0", decisions["quality_improvement_gate"]],
                     ["three-seed mean within one point of FP16", decisions["paper_level_local_recovery_gate"]],
                 ],
+            ),
+            "## Telemetry Boundary",
+            (
+                "The global attention/CE norm and controller probe are not same-support, "
+                "same-microbatch measurements. Their reported ratio is descriptive only: the "
+                "global norm covers all trainable parameters on the telemetry microbatch, while "
+                "the probe is the most recent controller update on selected-layer Q/K/V parameters."
             ),
         ]
     ) + "\n"

@@ -56,7 +56,10 @@ def test_telemetry_health_summarizes_training_contracts() -> None:
     assert health["weighted_attention_to_ce_gradient_ratio"]["median"] == 0.75
     assert health["weighted_logit_to_ce_gradient_ratio"]["final"] == 0.5
     assert health["probe_weighted_attention_to_ce_gradient_ratio"]["median"] == 0.9
-    assert health["global_to_probe_attention_gradient_ratio"]["median"] == 0.8125
+    assert health["global_to_last_controller_probe_ratio"]["median"] == 0.8125
+    assert health["global_to_last_controller_probe_ratio"]["comparison_contract"].startswith(
+        "descriptive_only"
+    )
     assert health["max_activation_clipped_fraction"] == 0.0
     assert health["mean_ternary_flip_fraction"] == 0.02
 

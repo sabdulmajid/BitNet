@@ -75,7 +75,7 @@
   },
   "postprocess": {
     "audit_job_id": "10398",
-    "audit_script_sha256": "65e26db90890ba1d4e7d7afa893dc41c0d0b488c38fd43a42c4102b1aacb53e6",
+    "audit_script_sha256": "1bef873f99e1e192ef012e0810033af963e4ca17c603506bbe0e0faa883b5267",
     "dependency": "afterany:10396",
     "fail_closed": true,
     "supplemental_historical_gamma60_comparison": true

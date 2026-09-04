@@ -14,7 +14,7 @@ the exact source/seed/step/evaluation/telemetry contract, and writes both JSON
 and Markdown reports. A supplemental paired comparison against the historical
 gamma-60 run is reported for context but does not alter the pre-registered
 decision rules below. The node-local audit script SHA-256 is
-`65e26db90890ba1d4e7d7afa893dc41c0d0b488c38fd43a42c4102b1aacb53e6`.
+`1bef873f99e1e192ef012e0810033af963e4ca17c603506bbe0e0faa883b5267`.
 
 The reference prediction traces were staged to node-local storage with these
 SHA-256 digests:
