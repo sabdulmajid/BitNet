@@ -1,0 +1,322 @@
+{
+  "best_tested_tiling": 32,
+  "created_utc": "2026-09-04T14:14:09.514323+00:00",
+  "full_validation": {
+    "accuracy_delta_ci95_paired_bootstrap": [
+      -0.0009169638308711156,
+      0.003871625063678044
+    ],
+    "accuracy_delta_right_minus_left": 0.0014263881813550983,
+    "disagreements": 171,
+    "exact_mcnemar_p_two_sided": 0.27861454634422106,
+    "examples": 9815,
+    "first_disagreement_indices": [
+      15,
+      63,
+      93,
+      136,
+      184,
+      372,
+      563,
+      585,
+      651,
+      837,
+      855,
+      861,
+      922,
+      1048,
+      1142,
+      1189,
+      1206,
+      1249,
+      1385,
+      1620
+    ],
+    "left_accuracy": 0.6514518593988793,
+    "left_only_correct": 65,
+    "paired_bootstrap_samples": 100000,
+    "paired_bootstrap_seed": 1234,
+    "prediction_agreement": 0.9825776872134488,
+    "right_accuracy": 0.6528782475802344,
+    "right_only_correct": 79
+  },
+  "gates": {
+    "all_kernel_contracts": true,
+    "artifact_receipts_match": true,
+    "conversion_output_hashes_match": true,
+    "full_accuracy_within_one_point": true,
+    "full_prediction_agreement_at_least_98_percent": true,
+    "full_validation_complete": true,
+    "kernel_layout_receipt_matches": true,
+    "layout_guard": true,
+    "projection_storage_reduced": true,
+    "repeated_benchmarks_idle_gated": true,
+    "repeated_benchmarks_valid": true,
+    "sample_accuracy_within_one_point": true,
+    "sample_prediction_agreement_at_least_98_percent": true,
+    "speed_superiority_proven": false
+  },
+  "kernel_cases_passed": 18,
+  "kernel_cases_total": 18,
+  "kernel_contracts_passed": 3,
+  "kernel_contracts_total": 3,
+  "provenance": {
+    "conversion_outputs": {
+      "i2_sr": {
+        "declared_sha256": null,
+        "declared_sha256_matches": true,
+        "declared_sha256_present": false,
+        "path": "models/seqcls-native-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr_cls.gguf",
+        "sha256": "b8d285a6008750ab0852dc691d6d10f704cf7df7cf85ef212abf6c77249e13d7",
+        "size_bytes": 369746176
+      },
+      "tl2_sr": {
+        "declared_sha256": "c91372b966a3737acf0b05c8e6fd336d564463a9e89d520dcdba9e2d2a1a971b",
+        "declared_sha256_matches": true,
+        "declared_sha256_present": true,
+        "path": "models/seqcls-native-tl2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_tl2_sr_cls.gguf",
+        "sha256": "c91372b966a3737acf0b05c8e6fd336d564463a9e89d520dcdba9e2d2a1a971b",
+        "size_bytes": 358083456
+      },
+      "tl2_sr_bm32": {
+        "declared_sha256": "5ccb8838a88411f4fbe5d3a401718f141b67fe6223ed6b34cd30ba91d8dcecf2",
+        "declared_sha256_matches": true,
+        "declared_sha256_present": true,
+        "path": "models/seqcls-native-tl2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_tl2_sr_bm32_cls.gguf",
+        "sha256": "5ccb8838a88411f4fbe5d3a401718f141b67fe6223ed6b34cd30ba91d8dcecf2",
+        "size_bytes": 358083456
+      },
+      "tl2_sr_bm64": {
+        "declared_sha256": "d66dcf79a71d8855116e7987727195ab0922acf7421dbeb536fc8ef4aaa09f74",
+        "declared_sha256_matches": true,
+        "declared_sha256_present": true,
+        "path": "models/seqcls-native-tl2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_tl2_sr_bm64_cls.gguf",
+        "sha256": "d66dcf79a71d8855116e7987727195ab0922acf7421dbeb536fc8ef4aaa09f74",
+        "size_bytes": 358083456
+      }
+    },
+    "conversion_receipts": [
+      {
+        "path": "benchmark_results/seqcls_native_i2sr_gguf_2026-05-15.json",
+        "sha256": "751503ec46727639941d902532a044d312199d00f4fd094d41bcc254f04971d2",
+        "size_bytes": 2245
+      },
+      {
+        "path": "benchmark_results/seqcls_native_tl2sr_gguf_2026-09-04.json",
+        "sha256": "31d8fbf8a46eb8db2778cad228154bd9e3e1d4784977adb9971d94562e97b955",
+        "size_bytes": 3402
+      },
+      {
+        "path": "benchmark_results/seqcls_native_tl2sr_bm64_gguf_2026-09-04.json",
+        "sha256": "525b5d63608053377c39c5390e332994791ddc6ec75ff1475d42525c006e63d2",
+        "size_bytes": 3412
+      },
+      {
+        "path": "benchmark_results/seqcls_native_tl2sr_bm32_gguf_2026-09-04.json",
+        "sha256": "14e53604f8aa6aa271b62309b410da58058ab9ca780960647327c0561c8ce628",
+        "size_bytes": 3412
+      }
+    ],
+    "kernel_contracts": [
+      {
+        "path": "benchmark_results/tl2sr_kernel_contract_2026-09-04.json",
+        "sha256": "47104bd4b35a2e7be35fcd81deb33feeff5126c21639f1346d7aa0c6561fa0d7",
+        "size_bytes": 2291
+      },
+      {
+        "path": "benchmark_results/tl2sr_bm64_kernel_contract_2026-09-04.json",
+        "sha256": "1ad57ba760d19162779649ebb0e4f0cddd5cc68619fd8daa23f6493fc9021d09",
+        "size_bytes": 2295
+      },
+      {
+        "path": "benchmark_results/tl2sr_bm32_kernel_contract_2026-09-04.json",
+        "sha256": "eec86dd968deb87c48dca005bb242c57191fb355895e237aa768f998b1bd256d",
+        "size_bytes": 2295
+      }
+    ],
+    "kernel_presets": [
+      {
+        "path": "preset_kernels/Qwen2.5-0.5B-TL2SR/bitnet-lut-kernels-tl2sr.h",
+        "sha256": "13235a6d2be4fb84c46bfd89ee8c94ce5fcc647de6d84de92eec41cb199b61dd",
+        "size_bytes": 95528
+      },
+      {
+        "path": "preset_kernels/Qwen2.5-0.5B-TL2SR/kernel_config_tl2sr.ini",
+        "sha256": "baeed3c60a3b027e5e7492a58fe7268837eeaf3c05734d67d7fe2e71fd9d47f9",
+        "size_bytes": 226
+      },
+      {
+        "path": "preset_kernels/Qwen2.5-0.5B-TL2SR-BM64/bitnet-lut-kernels-tl2sr.h",
+        "sha256": "fab0a30608648aae0d6b1998e8edf0ab447d12558ef9aa9b6bea80689ceeb6a4",
+        "size_bytes": 95524
+      },
+      {
+        "path": "preset_kernels/Qwen2.5-0.5B-TL2SR-BM64/kernel_config_tl2sr.ini",
+        "sha256": "961ad2f3178e7e813d8fcadd841fefad6636cd2125389df0d4bb8319551f2fd5",
+        "size_bytes": 222
+      },
+      {
+        "path": "preset_kernels/Qwen2.5-0.5B-TL2SR-BM32/bitnet-lut-kernels-tl2sr.h",
+        "sha256": "78e70f45150efd5a9086a02088c8bdca809c23347294c37aae667a083dbd6929",
+        "size_bytes": 95524
+      },
+      {
+        "path": "preset_kernels/Qwen2.5-0.5B-TL2SR-BM32/kernel_config_tl2sr.ini",
+        "sha256": "62c13da1f24785b9f57bcc1d1cf07f6cd7ceebd8f972ad0bb6405975f7f26f2e",
+        "size_bytes": 222
+      }
+    ],
+    "layout_guard": {
+      "path": "benchmark_results/tl2sr_layout_guard_2026-09-04.json",
+      "sha256": "60145e3e92798639cc10b1a1fc20f45444724e821378223e36dd8a199a6754ec",
+      "size_bytes": 5001
+    },
+    "repeated_benchmarks": [
+      {
+        "path": "benchmarks/results/seqcls_tl2sr_vs_i2sr_repeated_2026-09-04.json",
+        "sha256": "92541855bc3b70dcbbf7d8be14516716dbc3ad3adc0679017bf6f27aa013d1dc",
+        "size_bytes": 50221
+      },
+      {
+        "path": "benchmarks/results/seqcls_tl2sr_bm64_vs_i2sr_repeated_2026-09-04.json",
+        "sha256": "5b773cec8a6730ab4278c3c6c1b6d48fd3d9d9cdea0a0112d547ced865121734",
+        "size_bytes": 50854
+      },
+      {
+        "path": "benchmarks/results/seqcls_tl2sr_bm32_vs_i2sr_repeated_2026-09-04.json",
+        "sha256": "c6e61bb21cdba07f76dba3840b939f55107ad4a6125182fe0c9acf8b7244ed25",
+        "size_bytes": 49333
+      }
+    ],
+    "validation_traces": [
+      {
+        "path": "benchmark_results/seqcls_native_i2sr_tl2build_cpu_mnli_512_2026-09-04.json",
+        "sha256": "a9c67d6a884437a83272e192f3c0ccd2b1b94749d8f7a6d340c9f54b4fa6cd2c",
+        "size_bytes": 31884
+      },
+      {
+        "path": "benchmark_results/seqcls_native_tl2sr_cpu_mnli_512_2026-09-04.json",
+        "sha256": "3e0498a44a616e203da8315a17868b9a2347bb6176b66f114c6bc1dac882347a",
+        "size_bytes": 31857
+      },
+      {
+        "path": "benchmark_results/seqcls_native_i2sr_cpu_mnli_full_tl2build_final_2026-09-04.json",
+        "sha256": "02497cc691986e6497c15eaea74afc0d68e57063eb311b026d2fece4910ba15e",
+        "size_bytes": 162177
+      },
+      {
+        "path": "benchmark_results/seqcls_native_tl2sr_bm64_cpu_mnli_full_final_2026-09-04.json",
+        "sha256": "39fb6e4b1817504ec4935a092235a24df2e297c195a39c4da475888a6682c54a",
+        "size_bytes": 162178
+      }
+    ]
+  },
+  "sample_quality": {
+    "accuracy_delta_ci95_paired_bootstrap": [
+      -0.009765625,
+      0.009765625
+    ],
+    "accuracy_delta_right_minus_left": 0.0,
+    "disagreements": 6,
+    "exact_mcnemar_p_two_sided": 1.0,
+    "examples": 512,
+    "first_disagreement_indices": [
+      15,
+      63,
+      93,
+      136,
+      184,
+      372
+    ],
+    "left_accuracy": 0.66796875,
+    "left_only_correct": 3,
+    "paired_bootstrap_samples": 100000,
+    "paired_bootstrap_seed": 1234,
+    "prediction_agreement": 0.98828125,
+    "right_accuracy": 0.66796875,
+    "right_only_correct": 3
+  },
+  "schema": "tl2sr-evidence-audit-v1",
+  "status": "valid_runtime_no_speed_win",
+  "storage": {
+    "file_reduction_fraction": 0.03154250336317199,
+    "i2sr_file_bytes": 369746176,
+    "i2sr_file_mib": 352.617431640625,
+    "i2sr_projection_bytes": 90678528,
+    "i2sr_projection_mib": 86.477783203125,
+    "projection_reduction_fraction": 0.1286175267423838,
+    "tl2sr_file_bytes": 358083456,
+    "tl2sr_file_mib": 341.4949951171875,
+    "tl2sr_projection_bytes": 79015680,
+    "tl2sr_projection_mib": 75.355224609375
+  },
+  "tiling_sweep": [
+    {
+      "artifact": "tl2_sr",
+      "cpu_affinity": "0-11",
+      "examples": 128,
+      "idle_preflight_complete": true,
+      "mean_tokens_per_second": 211.988,
+      "mean_tokens_per_second_ci95_t": [
+        211.5171917094358,
+        212.4588082905642
+      ],
+      "paired_speed_ratio_ci95_t": [
+        0.8479787149001708,
+        0.8580896416283338
+      ],
+      "paired_speed_ratio_vs_i2sr": 0.8530191976603707,
+      "path": "benchmarks/results/seqcls_tl2sr_vs_i2sr_repeated_2026-09-04.json",
+      "predictions_stable": true,
+      "repetitions": 5,
+      "status": "valid",
+      "threads": 12,
+      "tile_bm": 128
+    },
+    {
+      "artifact": "tl2_sr_bm64",
+      "cpu_affinity": "0-11",
+      "examples": 128,
+      "idle_preflight_complete": true,
+      "mean_tokens_per_second": 210.406,
+      "mean_tokens_per_second_ci95_t": [
+        198.06808494207485,
+        222.74391505792516
+      ],
+      "paired_speed_ratio_ci95_t": [
+        0.8349454452618185,
+        0.8972074604092748
+      ],
+      "paired_speed_ratio_vs_i2sr": 0.8655167719482085,
+      "path": "benchmarks/results/seqcls_tl2sr_bm64_vs_i2sr_repeated_2026-09-04.json",
+      "predictions_stable": true,
+      "repetitions": 5,
+      "status": "valid",
+      "threads": 12,
+      "tile_bm": 64
+    },
+    {
+      "artifact": "tl2_sr_bm32",
+      "cpu_affinity": "0-11",
+      "examples": 128,
+      "idle_preflight_complete": true,
+      "mean_tokens_per_second": 228.638,
+      "mean_tokens_per_second_ci95_t": [
+        228.30680563231843,
+        228.96919436768158
+      ],
+      "paired_speed_ratio_ci95_t": [
+        0.916672629156392,
+        0.9209786393516104
+      ],
+      "paired_speed_ratio_vs_i2sr": 0.9188231117746861,
+      "path": "benchmarks/results/seqcls_tl2sr_bm32_vs_i2sr_repeated_2026-09-04.json",
+      "predictions_stable": true,
+      "repetitions": 5,
+      "status": "valid",
+      "threads": 12,
+      "tile_bm": 32
+    }
+  ],
+  "verdict": "TL2_SR is a functionally valid row-scale ternary storage/runtime contract for the tested Qwen student. It reduces packed projection storage, but no tested tile layout proves a CPU throughput advantage over I2_SR."
+}

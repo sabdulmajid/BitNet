@@ -1,0 +1,33 @@
+{
+  "schema": "bitdistill-fixed60-resubmission-v1",
+  "created_utc": "2026-09-04T14:10:00Z",
+  "status": "running",
+  "claim_boundary": "Infrastructure recovery for the preregistered matched fixed-60 control; no method comparison is valid until all three controls and the fail-closed audit complete.",
+  "root_cause": [
+    "The original job 10399 embedded EXCLUDE_LINEAR_REGEX=score|classifier in unquoted shell text, so the shell attempted to execute classifier.",
+    "The first corrected wrappers inherited an NFS SLURM_SUBMIT_DIR that ece-nebula12 cannot mount.",
+    "The first local-directory wrapper did not pin the node-local Hugging Face cache and failed before training while resolving GLUE."
+  ],
+  "failed_zero_step_jobs": [10399, 10423, 10428, 10433],
+  "jobs": [
+    {"arm": "fixed60", "seed": 1234, "job_id": 10440, "dependency": null},
+    {"arm": "fixed60", "seed": 1235, "job_id": 10441, "dependency": "afterok:10440"},
+    {"arm": "fixed60", "seed": 1236, "job_id": 10442, "dependency": "afterok:10441"},
+    {"arm": "audit", "seed": null, "job_id": 10443, "dependency": "afterany:10442"}
+  ],
+  "repairs": [
+    "Pass the regex through sbatch --export instead of executable shell text.",
+    "Override SLURM_SUBMIT_DIR inside the wrapper before executing the training script.",
+    "Pin HF_HOME and HF_DATASETS_CACHE to the verified node-local cache and enable offline dataset/model loading.",
+    "Parameterize fixed-control job IDs in the audit and stage the audit outside the training checkout."
+  ],
+  "verification": {
+    "glue_cache_rows": {"train": 392702, "validation_matched": 9815},
+    "job_10440_reached_dataset_mapping": true,
+    "job_10440_reached_optimization_step": 490,
+    "training_checkout_revision": "526ede7b2c3f33c6a9638de54bdae91e8afe39c6",
+    "launcher_sha256": "d05fda58eff62ec3ef57eae7e7305e8788925e00f56a6b515c0add7e52c9bcb3",
+    "staged_audit_sha256": "1907e303892104d70c12f89652b22b45c94630df3384e343211792cf637111ea",
+    "job_10440_batch_script_sha256": "4429178861c5e26b479107fbb278e45a7604256a7751fcc3958b82b521db87ef"
+  }
+}

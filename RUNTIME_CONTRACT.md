@@ -107,8 +107,16 @@ examples correct only under each format (exact McNemar `p=1`). Packed ternary
 projection storage falls `12.862%`, but complete-model storage falls only
 `3.154%` because non-ternary tensors dominate.
 
+The same-binary full validation covers all `9,815` MNLI examples. I2_SR scores
+`0.651452`; BM64 TL2_SR scores `0.652878`. The paired delta is `+0.001426`
+with bootstrap 95% CI `[-0.000917, +0.003872]`; prediction agreement is
+`0.982578`, discordant correctness is `65/79`, and exact McNemar `p=0.278615`.
+This supports function preservation, not TL2 quality superiority.
+
 The speed result is negative. Five interleaved runs on 12 pinned Xeon 4116
-physical cores give paired TL2_SR/I2_SR throughput ratios of `0.889` for
-BM128, `0.939` for BM64, and `0.918` for BM32. BM64 is the best tested layout,
-but its 95% interval `[0.881, 1.000]` does not prove a speed advantage. See
+physical cores give paired TL2_SR/I2_SR throughput ratios of `0.853` for
+BM128, `0.866` for BM64, and `0.919` for BM32. The respective 95% intervals
+are `[0.848, 0.858]`, `[0.835, 0.897]`, and `[0.917, 0.921]`, all below `1.0`.
+Each run passed recorded idle checks across the selected cores and their
+hyperthread siblings. See
 `benchmarks/results/tl2sr_evidence_audit_2026-09-04.md`.

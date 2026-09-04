@@ -245,6 +245,36 @@ script contents:
 python benchmarks/audit_active_slurm_batch_scripts.py
 ```
 
+The node-local matched fixed-`gamma=60` recovery chain is submitted with:
+
+```bash
+bash benchmarks/resubmit_bitdistill_fixed60.sh
+```
+
+The launcher passes shell-sensitive values through `sbatch --export`, pins the
+verified offline Hugging Face cache, runs seeds `1234-1236` serially, and
+schedules `audit_bitdistill_adaptive_vs_fixed.py` with an `afterany`
+dependency. Do not interpret a queued or running chain as method evidence; the
+audit must return `status=complete` and a non-pending recommendation.
+
+To publish independently auditable paired predictions without logits or input
+text, pass every aligned trace as `MODEL_ID=PATH`:
+
+```bash
+python benchmarks/build_compact_prediction_bundle.py \
+  --trace fp16=/path/to/fp16/eval_predictions.jsonl \
+  --trace fixed_gamma_655m=/path/to/fixed/eval_predictions.jsonl \
+  --trace historical_gamma60_163m=/path/to/gamma60/eval_predictions.jsonl \
+  --trace adaptive_seed1234=/path/to/seed1234/eval_predictions.jsonl \
+  --trace adaptive_seed1235=/path/to/seed1235/eval_predictions.jsonl \
+  --trace adaptive_seed1236=/path/to/seed1236/eval_predictions.jsonl
+```
+
+The builder rejects duplicate/noncontiguous indices, incorrect correctness
+flags, label misalignment, row-count mismatches, and duplicate model IDs. Its
+compact JSON is the public source for recomputing adaptive accuracy and paired
+tests.
+
 ## Reviewer Reproduction Checklist
 
 Use this sequence for an external technical review of the current state:
@@ -426,7 +456,7 @@ Run the direct numerical contract and paired timing gate:
 
 ```bash
 python benchmarks/audit_tl2sr_kernel_contract.py \
-  --build-dir build-qwen05b-tl2sr-bm64 \
+  --library build-qwen05b-tl2sr-bm64/3rdparty/llama.cpp/ggml/src/libggml.so \
   --kernel-config preset_kernels/Qwen2.5-0.5B-TL2SR-BM64/kernel_config_tl2sr.ini \
   --output-json benchmark_results/tl2sr_bm64_kernel_contract_2026-09-04.json \
   --output-md benchmarks/results/tl2sr_bm64_kernel_contract_2026-09-04.md
@@ -442,7 +472,52 @@ python benchmarks/benchmark_seqcls_native_cpu_repeated.py \
   --repetitions 5 \
   --threads 12 \
   --cpu-affinity 0-11 \
-  --cooldown-seconds 3
+  --cooldown-seconds 5 \
+  --idle-max-utilization 0.15 \
+  --idle-sample-seconds 1 \
+  --idle-consecutive-samples 3 \
+  --idle-timeout-seconds 1800 \
+  --output-json benchmarks/results/seqcls_tl2sr_bm64_vs_i2sr_repeated_2026-09-04.json \
+  --output-md benchmarks/results/seqcls_tl2sr_bm64_vs_i2sr_repeated_2026-09-04.md
+```
+
+Run the same command for all three generated layouts before synthesizing the
+tiling sweep. Only these fields change:
+
+| layout | build | TL2 model name | public report stem |
+| --- | --- | --- | --- |
+| BM128 | `build-qwen05b-tl2sr` | `tl2_sr=..._tl2_sr_cls.gguf` | `seqcls_tl2sr_vs_i2sr_repeated_2026-09-04` |
+| BM64 | `build-qwen05b-tl2sr-bm64` | `tl2_sr_bm64=..._tl2_sr_bm64_cls.gguf` | `seqcls_tl2sr_bm64_vs_i2sr_repeated_2026-09-04` |
+| BM32 | `build-qwen05b-tl2sr-bm32` | `tl2_sr_bm32=..._tl2_sr_bm32_cls.gguf` | `seqcls_tl2sr_bm32_vs_i2sr_repeated_2026-09-04` |
+
+Run the full same-binary quality comparison separately from timing. The
+progress traces make both commands resumable with `--resume-progress`:
+
+```bash
+COMMON_FULL=(
+  --task mnli
+  --checkpoint-dir checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8
+  --embedding-binary build-qwen05b-tl2sr-bm64/bin/llama-embedding
+  --max-samples 0
+  --prompt-batch-size 64
+  --embedding-sequential
+  --threads 12
+  --cpu-affinity 0-11
+  --ctx-size 512
+  --progress-every 512
+)
+
+python benchmarks/benchmark_seqcls_native_i2sr_cpu.py "${COMMON_FULL[@]}" \
+  --gguf models/seqcls-native-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr_cls.gguf \
+  --progress-jsonl benchmark_results/seqcls_native_i2sr_cpu_mnli_full_tl2build_progress_final_2026-09-04.jsonl \
+  --output-json benchmark_results/seqcls_native_i2sr_cpu_mnli_full_tl2build_final_2026-09-04.json \
+  --output-md benchmarks/results/seqcls_native_i2sr_tl2build_cpu_mnli_full_2026-09-04.md
+
+python benchmarks/benchmark_seqcls_native_i2sr_cpu.py "${COMMON_FULL[@]}" \
+  --gguf models/seqcls-native-tl2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_tl2_sr_bm64_cls.gguf \
+  --progress-jsonl benchmark_results/seqcls_native_tl2sr_bm64_cpu_mnli_full_progress_final_2026-09-04.jsonl \
+  --output-json benchmark_results/seqcls_native_tl2sr_bm64_cpu_mnli_full_final_2026-09-04.json \
+  --output-md benchmarks/results/seqcls_native_tl2sr_bm64_cpu_mnli_full_2026-09-04.md
 ```
 
 Synthesize all correctness, quality, storage, provenance, and speed gates:
@@ -454,8 +529,11 @@ python benchmarks/audit_tl2sr_evidence.py \
 ```
 
 The measured result is a `12.862%` packed-projection reduction and `3.154%`
-complete-GGUF reduction relative to `I2_SR`, with no demonstrated Xeon speed
-win. BM64 is the best tested tiling at a paired TL2_SR/I2_SR ratio of `0.939`,
-95% CI `[0.881, 1.000]`. Restore the repository placeholder header after
-building so generated model-specific code remains isolated under
-`preset_kernels/`.
+complete-GGUF reduction relative to `I2_SR`. The full `9,815`-example MNLI
+comparison gives a paired accuracy delta of `+0.001426`, bootstrap 95% CI
+`[-0.000917, +0.003872]`, and exact McNemar `p=0.278615`; this supports
+cross-format preservation, not quality superiority. No tested tiling provides
+a Xeon speed win: BM128, BM64, and BM32 ratios are `0.853`, `0.866`, and
+`0.919`, with every 95% interval below `1.0`. Restore the repository
+placeholder header after building so generated model-specific code remains
+isolated under `preset_kernels/`.

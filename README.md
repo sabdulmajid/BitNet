@@ -27,21 +27,26 @@ The frozen baseline bundle and current decision reports are:
 - [seqcls_native_cpu_repeated_inplace_2026-09-04.md](benchmarks/results/seqcls_native_cpu_repeated_inplace_2026-09-04.md)
 - [seqcls_i2sr_runtime_ab_2026-09-04.md](benchmarks/results/seqcls_i2sr_runtime_ab_2026-09-04.md)
 - [i2_kernel_profile_2026-09-04.md](benchmarks/results/i2_kernel_profile_2026-09-04.md)
+- [bitdistill_adaptive_full_audit_2026-09-04.md](benchmarks/results/bitdistill_adaptive_full_audit_2026-09-04.md)
+- [bitdistill_adaptive_prediction_bundle_2026-09-04.md](benchmarks/results/bitdistill_adaptive_prediction_bundle_2026-09-04.md)
 - [tl2sr_evidence_audit_2026-09-04.md](benchmarks/results/tl2sr_evidence_audit_2026-09-04.md)
+- [seqcls_native_i2sr_tl2build_cpu_mnli_full_2026-09-04.md](benchmarks/results/seqcls_native_i2sr_tl2build_cpu_mnli_full_2026-09-04.md)
+- [seqcls_native_tl2sr_bm64_cpu_mnli_full_2026-09-04.md](benchmarks/results/seqcls_native_tl2sr_bm64_cpu_mnli_full_2026-09-04.md)
 
 | Claim | Status | Evidence | Caveat |
 | --- | --- | --- | --- |
 | Blind FP/BF16 to ternary PTQ works as a general retrofit | **No: strong negative result in the tested setup** | Qwen2.5-1.5B FP WikiText PPL `13.901`; naive ternary PTQ PPL `3,813,121.803`. FP ten-task mean `0.644169`; naive PTQ mean `0.348671`. | Dense Qwen2.5-1.5B tested setup; do not generalize as a theorem for every architecture. |
 | QAT/distillation recovers signal | **Partial recovery, not FP quality** | Best row-scale QAT ten-task mean `0.499459`, a `+0.150788` recovery over naive PTQ and still `-0.144710` below FP. | Row-scale QAT is this fork's retrofit variant, not standard BitDistill. |
-| BitDistill paper-level GLUE reproduction is complete | **No** | Qwen2.5-0.5B local FP16-SFT MNLI is `0.808151`. Fixed-gamma Stage-2 reaches `0.729903` at `655.36M`, delta `-0.078248`, CI `[-0.086720, -0.069775]`; the best completed loss-balanced tensor run is `0.738462`. | The loss-balanced run remains `-0.069689` below FP16 with paired CI `[-0.078431, -0.060947]`; the paper-level recovery target is not met. |
+| BitDistill paper-level GLUE reproduction is complete | **No** | Qwen2.5-0.5B local FP16-SFT MNLI is `0.808151`. Three adaptive loss-balanced runs score `0.755782`, `0.756903`, and `0.753337`; mean `0.755340`, seed-level CI `[0.750811, 0.759870]`. | The mean remains `-0.052811` below FP16. This is a cross-environment local method result, not paper-exact recovery. |
+| Adaptive attention-loss balancing improves the old local recipe | **Promising; matched attribution pending** | Every adaptive seed beats the fixed-gamma 655M trace by `+0.023434` to `+0.026999`, with each paired example-level CI above zero. Final effective gamma is `19.98-25.92`, versus the literal `100,000` initialization. | The reference is not a matched three-seed control. Jobs `10440-10442` now run that control; job `10443` audits it fail-closed. |
 | The `655.36M` Stage-2 checkpoint is usable | **Yes, with a verified manifest** | [stage2_manifest_655m_2026-05-23.md](benchmarks/results/stage2_manifest_655m_2026-05-23.md) records job `10250`, four complete snapshots, final CE `3.426713`, the state-dict SHA-256, and downstream job `10260`. | This was a `327.68M` continuation with a fresh optimizer/scheduler segment, not one uninterrupted 80k-step run. |
-| Paper gamma can be copied literally into this implementation | **No, not without matching loss normalization** | Historical telemetry measures attention/CE gradient ratio `221.384986` for the paper-gamma path versus `0.346044` at gamma 60. A controlled A4500 screen measures median ratio `69.2248` for cosine split-1 at fixed gamma `100,000`, versus `0.273975` with adaptive balancing. | This is not a task-quality result. The source-pinned dualcard replication remains required before a paper-aligned claim; the active 10k runs are explicitly cross-environment. |
+| Paper gamma can be copied literally into this implementation | **No, not without matching loss normalization** | Historical telemetry measures attention/CE gradient ratio `221.384986` for the paper-gamma path versus `0.346044` at gamma 60. A controlled A4500 screen measures median ratio `69.2248` for cosine split-1 at fixed gamma `100,000`, versus `0.273975` with adaptive balancing. | The screen is not a task-quality result. The completed adaptive result remains cross-environment, and source-pinned reference-environment confirmation is required before a paper-aligned claim. |
 | The paper defines one unambiguous attention-relation objective | **No** | [attention_relation_equivalence_2026-09-04.md](benchmarks/results/attention_relation_equivalence_2026-09-04.md) proves that Equation 12 scaled-dot relations and Algorithm 1 normalized-cosine relations are not generally equivalent. In a deterministic probe their gradient-norm ratio is `18.7073` and gradient cosine is `0.2437`. | This is a mathematical contract result, not downstream quality evidence. For Qwen's 14:2 grouped-query attention, KV repetition leaves cosine relations invariant but multiplies scaled-dot logits by `sqrt(7)`. |
 | The local GLUE formulation is paper-exact | **Unresolved** | [bitdistill_task_formulation_audit_2026-09-04.md](benchmarks/results/bitdistill_task_formulation_audit_2026-09-04.md) separates sequence-classification from causal answer-token results. | Token-level CE and decoding language favor the causal interpretation, but no authoritative released templates or training code establish equivalence. |
 | Row-scale semantics matter at runtime | **Yes: strong systems result** | TL2 one-scale relative output RMS error `1.904230`; exact FP16 row scales reduce it to `0.000197`. | Row scales are part of the learned function. Scalar TL2 remains invalid for row-scale checkpoints. |
-| Experimental `TL2_SR` preserves row-scale ternary projections | **Yes, for the tested Qwen2.5-0.5B shapes** | Three generated-kernel layouts pass six deterministic W1.58A8 contracts each; worst relative RMS error is `5.50e-8`. On 512 MNLI examples, `TL2_SR` and `I2_SR` both score `0.667969`, agree on `0.988281` of predictions, and have balanced discordant correctness (`3/3`, exact McNemar `p=1`). | Exact-shape generated kernels and their matching packed layout are required. Full validation is still running. |
+| Experimental `TL2_SR` preserves row-scale ternary projections | **Yes, for the tested Qwen2.5-0.5B shapes** | Three layouts pass `18/18` deterministic W1.58A8 cases; worst relative RMS error is `5.50e-8`. On all `9,815` MNLI examples, I2_SR/TL2_SR accuracy is `0.651452`/`0.652878`, paired delta `+0.001426`, CI `[-0.000917, +0.003872]`, agreement `0.982578`, and McNemar `p=0.278615`. | This supports cross-format preservation, not TL2 quality superiority. Exact generated kernels and a matching layout fingerprint are required. |
 | `TL2_SR` improves packed storage over `I2_SR` | **Yes, modestly for the complete model** | Packed projections fall from `86.478` to `75.355 MiB` (`12.862%`); the complete GGUF falls from `352.617` to `341.495 MiB` (`3.154%`). | The F16 token embedding and other dense tensors dominate most of this small model's file. |
-| `TL2_SR` accelerates this classifier over `I2_SR` on Xeon 4116 | **No speed win demonstrated** | Five interleaved 12-core runs: BM128 ratio `0.889`, CI `[0.796, 0.992]`; BM64 `0.939`, CI `[0.881, 1.000]`; BM32 `0.918`, CI `[0.908, 0.929]`. | BM64 is the best tested layout, but its interval does not establish superiority. Ratios are paired within each build. |
+| `TL2_SR` accelerates this classifier over `I2_SR` on Xeon 4116 | **No: rejected for all tested layouts** | Five interleaved 12-core runs: BM128 ratio `0.853`, CI `[0.848, 0.858]`; BM64 `0.866`, CI `[0.835, 0.897]`; BM32 `0.919`, CI `[0.917, 0.921]`. | Every interval is below `1.0`. Runs require recorded idle preflights over pinned cores and hyperthread siblings; ratios are paired within each build. |
 | `I2_SR` packed CPU inference works | **Yes, for compatible causal artifacts** | Xeon Silver 4116: row-scale `I2_SR` file `1211.3 MiB`, PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. | It does **not** beat Q4_K_M on quality or file size. Q4_K_M is `940.4 MiB` with PPL `12.8112`. |
 | Native packed sequence classification preserves task quality | **Yes, for one audited artifact; not product-ready** | Full MNLI native sequence-isolated path: `0.652165` versus PyTorch `0.653591`, paired delta `-0.001426`, 95% CI `[-0.004193, 0.001341]`, exact McNemar `p=0.348`; `7.456204` examples/s and RSS `960.15 MiB`. | Exact prediction agreement is `0.976668`, the 0.5-point non-inferiority gate is retrospective, multi-prompt batching remains excluded, and the underlying model quality is weak. |
 | Mixed `I2_SR` plus Q8 embedding improves deployed storage | **Yes, on one Qwen2.5 classifier** | The packed artifact is `230.90 MiB`: `4.106x` smaller than FP16 and `1.527x` smaller than the F16-embedding I2_SR artifact. On 512 MNLI examples it changes accuracy by `-0.001953`, paired CI `[-0.011719, 0.007812]`, with `0.982422` prediction agreement. | This is a same-student format comparison on a fixed, non-random sample; it is not evidence of FP-quality recovery. |
@@ -118,7 +123,9 @@ declaring `100,000` from
 `0.691187` to `0.738462`: delta `+0.047275`, paired 95% CI
 `[0.039256, 0.055293]`, exact McNemar `p=9.07e-31`. Despite using one quarter
 of the Stage-2 budget, it also exceeds the `655.36M` fixed-gamma result by
-`+0.008558`, CI `[0.000919, 0.016197]`. It remains `-0.069689` behind FP16.
+`+0.008558`, CI `[0.000919, 0.016197]`. The `655.36M` result itself has a
+paired FP16 delta CI of `[-0.086720, -0.069775]`. The gamma-60 run remains
+`-0.069689` behind FP16.
 
 Every available serialized training field matches, and step-1 CE, logits-KD,
 and attention-KD values are exactly identical, fingerprinting the same initial
@@ -270,36 +277,32 @@ FP32, which then fails at BF16 projections. `SubLNLinear` now casts normalized
 activations back to the incoming activation dtype, with a regression test that
 forces the promotion path.
 
-To use otherwise idle compute while the dualcard queue is blocked, the
-surviving cosine split-1 adaptive contract is being tested in a separately
-labeled, pre-registered cross-environment MNLI gate: 10,000 steps, all 392,702
-available training examples, all 9,815 matched validation examples, and seeds
-`1234`, `1235`, and `1236`. Jobs `10392`, `10395`, and `10396` run serially on
-the A4500; only the first saves model artifacts. Success requires a
-statistically positive paired delta over the fixed-gamma 655M baseline and
-three-seed mean accuracy within one point of local FP16. Passing would support
-the adaptive method, not by itself establish paper-exact reproduction. See
-[bitdistill_adaptive_full_submission_2026-09-04.md](benchmarks/results/bitdistill_adaptive_full_submission_2026-09-04.md).
+The cosine split-1 adaptive contract has completed a separately labeled,
+pre-registered cross-environment MNLI gate: 10,000 steps, all `392,702`
+available training examples, all `9,815` matched validation examples, and
+seeds `1234`, `1235`, and `1236`. Accuracies are `0.755782`, `0.756903`, and
+`0.753337`; mean `0.755340`, sample SD `0.001824`, and seed-level 95% t-CI
+`[0.750811, 0.759870]`. Every seed improves over the old fixed-gamma 655M
+trace with a paired CI above zero, but the mean is still `0.052811` below local
+FP16 and fails the one-point recovery gate. See
+[bitdistill_adaptive_full_audit_2026-09-04.md](benchmarks/results/bitdistill_adaptive_full_audit_2026-09-04.md).
+All `9,815` labels and class predictions for the three adaptive seeds and three
+references are retained without logits or private paths in the
+[compact prediction bundle](benchmarks/results/bitdistill_adaptive_prediction_bundle_2026-09-04.md),
+so the paired quality statistics can be independently recomputed.
 
-The six 120-step pilots are method diagnostics only. The active 10k-step,
-three-seed series is the cross-environment quality gate and must evaluate all
-`9,815` MNLI examples with paired prediction traces. Any passing A4500 result
-still requires confirmation in the pinned reference environment before a
-reproduction claim. QNLI/SST2, row/group-scale sweeps, more Stage-2 tokens, and
-MoE remain blocked behind that gate.
+This is strong evidence that objective-scale control improves over the older
+local traces; it does not yet isolate adaptive control from a well-scaled,
+otherwise matched fixed coefficient. The original matched fixed-60 job failed before training because
+an unquoted regex was parsed as a shell pipeline. The corrected chain is jobs
+`10440`, `10441`, and `10442`, followed by fail-closed audit `10443`. The
+resubmission pins the node-local source, model, Stage-2 state, GLUE cache, and
+offline environment, and records all infrastructure failures as zero-step
+runs: [bitdistill_fixed60_resubmission_2026-09-04.md](benchmarks/results/bitdistill_fixed60_resubmission_2026-09-04.md).
 
-A matched fixed-`gamma=60` three-seed control is now queued as jobs `10399`,
-`10400`, and `10401` behind the adaptive series. This closes an important
-causal gap: the historical gamma-60 result changed checkpoint budget and
-relation-head partitioning, so adaptive balancing could not be credited from
-that comparison. The new control holds the 655M checkpoint, one-head cosine
-objective, 10k-step schedule, full validation set, and seeds fixed. Its method
-selection rule, practical-effect threshold, immutable asset hashes, and batch
-hashes were recorded before adaptive full-validation quality was observed:
-[bitdistill_adaptive_vs_fixed_submission_2026-09-04.md](benchmarks/results/bitdistill_adaptive_vs_fixed_submission_2026-09-04.md).
-Fail-closed audit job `10402` runs after the final control even when an upstream
-job fails, preventing a broken dependency chain from being mistaken for a
-successful experiment.
+QNLI/SST-2 and further scaling remain behind the matched method gate. Even a
+passing A4500 comparison still requires confirmation in the pinned reference
+environment before a paper-reproduction claim.
 
 ## What This Fork Adds
 
@@ -323,11 +326,12 @@ successful experiment.
   graph-level elimination of unused language-model logits for classifiers.
 - An experimental `TL2_SR` qtype and exact-shape Qwen code generation path that
   preserves learned row scales, fixes inherited TL2 batch-stride and tail-offset
-  defects, and fails closed on weight/scale alignment mismatches.
+  defects, and fails closed on weight/scale alignment or kernel-layout
+  fingerprint mismatches.
 - Mixed `I2_SR` plus Q8 embedding export, which exposes and reduces the
   high-vocabulary embedding floor in small-model GGUF storage.
-- Interleaved, affinity-pinned CPU benchmarks that distinguish repeatable
-  workload throughput from noisy one-shot timing.
+- Interleaved, affinity-pinned CPU benchmarks with recorded idle preflights on
+  every pinned core and hyperthread sibling.
 - An allocation-free I2 matrix-output path with bit-identical logits and a
   controlled `1.44-1.46x` local runtime improvement on two classifier formats.
 - Manifest-based checkpoint handoff for long Stage-2 jobs, so downstream runs
@@ -383,10 +387,13 @@ Do not position this as a one-click converter. The credible direction is:
 4. Preserve learned scale semantics in packed CPU formats such as `I2_SR` and
    experimental `TL2_SR`.
 5. Report quality, memory, RSS, and speed as separate gates.
-6. Complete the pre-registered adaptive-versus-fixed, three-seed MNLI gate.
-7. If that gate fails, stop scaling the current objective and test
-   Hessian-aware ternary initialization plus group/row-scale hybrids.
-8. Extend only surviving methods to QNLI and SST-2, then optimize the measured
+6. Complete the active pre-registered adaptive-versus-fixed, three-seed MNLI
+   gate. Promote adaptive balancing only if its seed-level paired interval is
+   positive and its mean gain is at least `0.005`; otherwise retain fixed
+   `gamma=60` for simplicity.
+7. Because both current arms miss the FP recovery target, test Hessian-aware
+   ternary initialization plus group/row-scale hybrids after the method gate.
+8. Extend only methods that survive MNLI to QNLI and SST-2, then optimize the measured
    classifier bottleneck before making a CPU-speed claim.
 9. Keep MoE/Kimi as future work until dense models are solved.
 

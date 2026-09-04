@@ -11,6 +11,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 
 def read_json(path: Path) -> dict[str, Any]:
     if not path.is_file():
@@ -44,6 +46,10 @@ def conversion_output_identity(receipt: dict[str, Any], repo_root: Path) -> dict
     if not path.is_absolute():
         path = repo_root / path
     identity = file_identity(path)
+    try:
+        identity["path"] = str(path.relative_to(repo_root))
+    except ValueError:
+        identity["path"] = str(path)
     declared_sha256 = receipt.get("outfile_sha256")
     return {
         **identity,
@@ -59,6 +65,28 @@ def exact_mcnemar_p(left_only: int, right_only: int) -> float:
         return 1.0
     tail = sum(math.comb(discordant, index) for index in range(min(left_only, right_only) + 1))
     return min(1.0, 2.0 * tail / (2**discordant))
+
+
+def paired_accuracy_delta_ci95(
+    *,
+    total: int,
+    left_only: int,
+    right_only: int,
+    seed: int = 1234,
+    samples: int = 100_000,
+) -> list[float]:
+    """Bootstrap the paired right-minus-left accuracy delta from outcome counts."""
+    tied = total - left_only - right_only
+    if total <= 0 or tied < 0:
+        raise ValueError("invalid paired outcome counts")
+    rng = np.random.default_rng(seed)
+    counts = rng.multinomial(
+        total,
+        [left_only / total, tied / total, right_only / total],
+        size=samples,
+    )
+    deltas = (counts[:, 2] - counts[:, 0]) / total
+    return [float(value) for value in np.quantile(deltas, [0.025, 0.975])]
 
 
 def compare_predictions(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
@@ -104,6 +132,13 @@ def compare_predictions(left: dict[str, Any], right: dict[str, Any]) -> dict[str
         "left_only_correct": left_only,
         "right_only_correct": right_only,
         "exact_mcnemar_p_two_sided": exact_mcnemar_p(left_only, right_only),
+        "accuracy_delta_ci95_paired_bootstrap": paired_accuracy_delta_ci95(
+            total=total,
+            left_only=left_only,
+            right_only=right_only,
+        ),
+        "paired_bootstrap_seed": 1234,
+        "paired_bootstrap_samples": 100_000,
     }
 
 
@@ -111,6 +146,12 @@ def repeated_summary(path: Path, artifact: str) -> dict[str, Any]:
     report = read_json(path)
     ratio = report["paired_speed_ratios_vs_reference"][artifact]
     throughput = report["summaries"][artifact]["prompt_tokens_per_second"]
+    idle_preflights = report.get("idle_preflights", [])
+    expected_preflights = report["repetitions"] * len(report["summaries"])
+    idle_preflight_complete = len(idle_preflights) == expected_preflights and all(
+        len(row.get("accepted_samples", [])) == row.get("consecutive_samples")
+        for row in idle_preflights
+    )
     return {
         "path": str(path),
         "status": report["status"],
@@ -125,6 +166,7 @@ def repeated_summary(path: Path, artifact: str) -> dict[str, Any]:
         "examples": report["examples"],
         "threads": report["threads"],
         "cpu_affinity": report["cpu_affinity"],
+        "idle_preflight_complete": idle_preflight_complete,
     }
 
 
@@ -156,6 +198,7 @@ def render_markdown(result: dict[str, Any]) -> str:
         "| evidence | result |",
         "| --- | ---: |",
         f"| generated kernel contracts passed | {result['kernel_contracts_passed']}/{result['kernel_contracts_total']} |",
+        f"| generated kernel cases passed | {result['kernel_cases_passed']}/{result['kernel_cases_total']} |",
         f"| 512-sample I2_SR accuracy | {sample['left_accuracy']:.6f} |",
         f"| 512-sample TL2_SR accuracy | {sample['right_accuracy']:.6f} |",
         f"| cross-format prediction agreement | {sample['prediction_agreement']:.6f} |",
@@ -200,8 +243,16 @@ def render_markdown(result: dict[str, Any]) -> str:
                 "",
                 "## Full Validation",
                 "",
-                f"TL2_SR MNLI accuracy is `{full['right_accuracy']:.6f}` over `{full['examples']}` examples; "
-                f"cross-format agreement with the established I2_SR trace is `{full['prediction_agreement']:.6f}`.",
+                "| evidence | result |",
+                "| --- | ---: |",
+                f"| examples | {full['examples']} |",
+                f"| I2_SR accuracy | {full['left_accuracy']:.6f} |",
+                f"| TL2_SR accuracy | {full['right_accuracy']:.6f} |",
+                f"| TL2_SR minus I2_SR | {full['accuracy_delta_right_minus_left']:+.6f} |",
+                f"| paired delta 95% bootstrap CI | [{full['accuracy_delta_ci95_paired_bootstrap'][0]:+.6f}, {full['accuracy_delta_ci95_paired_bootstrap'][1]:+.6f}] |",
+                f"| cross-format prediction agreement | {full['prediction_agreement']:.6f} |",
+                f"| I2-only / TL2-only correct | {full['left_only_correct']} / {full['right_only_correct']} |",
+                f"| exact McNemar p | {full['exact_mcnemar_p_two_sided']:.6g} |",
             ]
         )
     lines.extend(
@@ -223,8 +274,8 @@ def main() -> None:
     parser.add_argument("--tl2sr-conversion", type=Path, default=Path("benchmark_results/seqcls_native_tl2sr_bm64_gguf_2026-09-04.json"))
     parser.add_argument("--i2sr-sample", type=Path, default=Path("benchmark_results/seqcls_native_i2sr_tl2build_cpu_mnli_512_2026-09-04.json"))
     parser.add_argument("--tl2sr-sample", type=Path, default=Path("benchmark_results/seqcls_native_tl2sr_cpu_mnli_512_2026-09-04.json"))
-    parser.add_argument("--i2sr-full", type=Path, default=Path("benchmark_results/seqcls_native_i2sr_cpu_mnli_full_token_ids_sequence_isolated_2026-05-15.json"))
-    parser.add_argument("--tl2sr-full", type=Path, default=Path("benchmark_results/seqcls_native_tl2sr_bm64_cpu_mnli_full_2026-09-04.json"))
+    parser.add_argument("--i2sr-full", type=Path, default=Path("benchmark_results/seqcls_native_i2sr_cpu_mnli_full_tl2build_final_2026-09-04.json"))
+    parser.add_argument("--tl2sr-full", type=Path, default=Path("benchmark_results/seqcls_native_tl2sr_bm64_cpu_mnli_full_final_2026-09-04.json"))
     parser.add_argument("--output-json", type=Path, default=Path("benchmark_results/tl2sr_evidence_audit_2026-09-04.json"))
     parser.add_argument("--output-md", type=Path, default=Path("benchmarks/results/tl2sr_evidence_audit_2026-09-04.md"))
     args = parser.parse_args()
@@ -338,13 +389,28 @@ def main() -> None:
         "sample_prediction_agreement_at_least_98_percent": sample["prediction_agreement"] >= 0.98,
         "projection_storage_reduced": storage["projection_reduction_fraction"] > 0,
         "repeated_benchmarks_valid": all(row["status"] == "valid" and row["predictions_stable"] for row in tiling),
+        "repeated_benchmarks_idle_gated": all(row["idle_preflight_complete"] for row in tiling),
         "kernel_layout_receipt_matches": kernel_layout_receipts_match,
         "conversion_output_hashes_match": all(
             identity["declared_sha256_matches"] for identity in conversion_identities.values()
         ),
         "artifact_receipts_match": artifact_receipts_match,
         "speed_superiority_proven": best["paired_speed_ratio_ci95_t"][0] > 1.0,
-        "full_validation_complete": full is not None and full["examples"] == 9815,
+        "full_validation_complete": (
+            full is not None
+            and full["examples"] == 9815
+            and i2_full_report.get("status") == "pass"
+            and i2_full_report.get("full_validation_complete") is True
+            and tl2_full_report is not None
+            and tl2_full_report.get("status") == "pass"
+            and tl2_full_report.get("full_validation_complete") is True
+        ),
+        "full_accuracy_within_one_point": (
+            full is not None and abs(full["accuracy_delta_right_minus_left"]) <= 0.01
+        ),
+        "full_prediction_agreement_at_least_98_percent": (
+            full is not None and full["prediction_agreement"] >= 0.98
+        ),
     }
     valid_runtime = all(
         gates[name]
@@ -355,10 +421,13 @@ def main() -> None:
             "sample_prediction_agreement_at_least_98_percent",
             "projection_storage_reduced",
             "repeated_benchmarks_valid",
+            "repeated_benchmarks_idle_gated",
             "kernel_layout_receipt_matches",
             "conversion_output_hashes_match",
             "artifact_receipts_match",
             "full_validation_complete",
+            "full_accuracy_within_one_point",
+            "full_prediction_agreement_at_least_98_percent",
         )
     )
     result = {
@@ -367,6 +436,12 @@ def main() -> None:
         "status": audit_status(valid_runtime, gates["speed_superiority_proven"]),
         "kernel_contracts_passed": sum(report.get("status") == "pass" for report in kernel_reports),
         "kernel_contracts_total": len(kernel_reports),
+        "kernel_cases_passed": sum(
+            case.get("passed") is True
+            for report in kernel_reports
+            for case in report.get("cases", [])
+        ),
+        "kernel_cases_total": sum(len(report.get("cases", [])) for report in kernel_reports),
         "sample_quality": sample,
         "full_validation": full,
         "storage": storage,

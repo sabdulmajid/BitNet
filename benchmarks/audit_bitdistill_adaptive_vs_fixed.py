@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import shlex
 import statistics
 import sys
@@ -35,6 +36,9 @@ EXPECTED_STAGE2_SHA256 = "9fc648a7466adb5f170085cf73d2bf4bd90a500f9de4c2a8f6c68b
 FP16_ACCURACY = 0.808151
 RECOVERY_FLOOR = FP16_ACCURACY - 0.01
 MINIMUM_PRACTICAL_DELTA = 0.005
+DEFAULT_LOCAL_ROOT = Path(
+    os.environ.get("BITNET_LOCAL_ROOT", f"/local/{os.environ.get('USER', 'unknown')}/bitnet-b7fc773")
+)
 
 ARM_SPECS: dict[str, dict[str, Any]] = {
     "adaptive": {
@@ -93,9 +97,9 @@ def declared_contract_errors(values: dict[str, str], *, arm: str, seed: int) -> 
     spec = ARM_SPECS[arm]
     expected = {
         "SLURM_JOB_ID": str(spec["job_ids"][seed]),
-        "MODEL": "/local/a6abdulm/bitnet-b7fc773/assets/base_model",
-        "TEACHER_MODEL": "/local/a6abdulm/bitnet-b7fc773/assets/seqcls_teacher",
-        "INIT_STATE_DICT": "/local/a6abdulm/bitnet-b7fc773/assets/stage2.pt",
+        "MODEL": str(DEFAULT_LOCAL_ROOT / "assets/base_model"),
+        "TEACHER_MODEL": str(DEFAULT_LOCAL_ROOT / "assets/seqcls_teacher"),
+        "INIT_STATE_DICT": str(DEFAULT_LOCAL_ROOT / "assets/stage2.pt"),
         "STAGE": "task_sft",
         "METHOD": "bitdistill",
         "TASK_NAME": "mnli",
@@ -259,10 +263,10 @@ def summarize_run(root: Path, log_root: Path, *, arm: str, seed: int) -> dict[st
         "status": "complete" if not blockers else "pending_or_invalid",
         "blockers": blockers,
         "paths": {
-            "metrics": str(metrics_path),
-            "predictions": str(predictions_path),
-            "telemetry": str(telemetry_path),
-            "stdout": str(log_path),
+            "metrics": f"{arm}/{run_dir.name}/metrics.json",
+            "predictions": f"{arm}/{run_dir.name}/eval_predictions.jsonl",
+            "telemetry": f"{arm}/{run_dir.name}/telemetry.jsonl",
+            "stdout": f"logs/{log_path.name}",
         },
         "sha256": {
             "metrics": sha256(metrics_path),
@@ -410,7 +414,7 @@ def build_report(
         },
         "provenance": {
             "source_revision": EXPECTED_SOURCE_REVISION,
-            "stage2_path": str(stage2_path),
+            "stage2_path": "assets/stage2.pt",
             "stage2_sha256": stage2_digest,
             "expected_stage2_sha256": EXPECTED_STAGE2_SHA256,
             "stage2_valid": stage2_valid,
@@ -534,21 +538,25 @@ def render_markdown(report: dict[str, Any]) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--adaptive-root", type=Path, default=Path("/local/a6abdulm/bitnet-b7fc773/runs-full"))
-    parser.add_argument("--fixed-root", type=Path, default=Path("/local/a6abdulm/bitnet-b7fc773/runs-fixed60"))
-    parser.add_argument("--log-root", type=Path, default=Path("/local/a6abdulm/bitnet-b7fc773/logs"))
-    parser.add_argument("--stage2-path", type=Path, default=Path("/local/a6abdulm/bitnet-b7fc773/assets/stage2.pt"))
+    parser.add_argument("--adaptive-job-ids", nargs=3, type=int, default=[10392, 10395, 10396])
+    parser.add_argument("--fixed-job-ids", nargs=3, type=int, default=[10399, 10400, 10401])
+    parser.add_argument("--adaptive-root", type=Path, default=DEFAULT_LOCAL_ROOT / "runs-full")
+    parser.add_argument("--fixed-root", type=Path, default=DEFAULT_LOCAL_ROOT / "runs-fixed60")
+    parser.add_argument("--log-root", type=Path, default=DEFAULT_LOCAL_ROOT / "logs")
+    parser.add_argument("--stage2-path", type=Path, default=DEFAULT_LOCAL_ROOT / "assets/stage2.pt")
     parser.add_argument(
         "--output-json",
         type=Path,
-        default=Path("/local/a6abdulm/bitnet-b7fc773/audit-bundle/bitdistill_adaptive_vs_fixed_2026-09-04.json"),
+        default=DEFAULT_LOCAL_ROOT / "audit-bundle/bitdistill_adaptive_vs_fixed_2026-09-04.json",
     )
     parser.add_argument(
         "--output-md",
         type=Path,
-        default=Path("/local/a6abdulm/bitnet-b7fc773/audit-bundle/bitdistill_adaptive_vs_fixed_2026-09-04.md"),
+        default=DEFAULT_LOCAL_ROOT / "audit-bundle/bitdistill_adaptive_vs_fixed_2026-09-04.md",
     )
     args = parser.parse_args()
+    ARM_SPECS["adaptive"]["job_ids"] = dict(zip(SEEDS, args.adaptive_job_ids, strict=True))
+    ARM_SPECS["fixed60"]["job_ids"] = dict(zip(SEEDS, args.fixed_job_ids, strict=True))
     report = build_report(args.adaptive_root, args.fixed_root, args.log_root, args.stage2_path)
     args.output_json.parent.mkdir(parents=True, exist_ok=True)
     args.output_md.parent.mkdir(parents=True, exist_ok=True)

@@ -1,0 +1,368 @@
+{
+  "aggregate": {
+    "completed_seeds": 3,
+    "mean_accuracy": 0.75534046527424,
+    "sample_standard_deviation": 0.0018235209724787077,
+    "seed_mean_t_ci95": [
+      0.7508105880583942,
+      0.7598703424900859
+    ]
+  },
+  "claim_boundary": "Three-seed cross-environment MNLI quality gate; not a paper-exact reproduction.",
+  "created_utc": "2026-09-04T14:06:25.437022+00:00",
+  "decisions": {
+    "all_runs_complete": true,
+    "all_seeds_significantly_improve_over_fixed_gamma_655m": true,
+    "mean_within_one_point_of_fp16": false,
+    "paper_level_local_recovery_gate": "fail",
+    "quality_improvement_gate": "pass"
+  },
+  "expected": {
+    "eval_examples": 9815,
+    "seeds": [
+      1234,
+      1235,
+      1236
+    ],
+    "source_revision": "526ede7b2c3f33c6a9638de54bdae91e8afe39c6",
+    "steps": 10000,
+    "telemetry_steps": [
+      1,
+      500,
+      1000,
+      1500,
+      2000,
+      2500,
+      3000,
+      3500,
+      4000,
+      4500,
+      5000,
+      5500,
+      6000,
+      6500,
+      7000,
+      7500,
+      8000,
+      8500,
+      9000,
+      9500,
+      10000
+    ]
+  },
+  "references": {
+    "fixed_gamma_655m_accuracy": 0.729903,
+    "fp16_accuracy": 0.808151,
+    "historical_gamma60_163m_accuracy": 0.738462,
+    "prediction_sha256": {
+      "fixed_gamma_655m": "d18a994d994e0800c7b48644dd123d4acc82110262323f9d0fac03b9cb0959b3",
+      "fp16": "6e708242b8c086f0b2aa9b1c7805fc088b4391de3b8442e6f5b66fa44c8f5590",
+      "historical_gamma60_163m": "81151391f29321532326b70d3d258c756d1b6835b00c36072f240eef98f97edf"
+    },
+    "recovery_floor": 0.7981509999999999
+  },
+  "runs": [
+    {
+      "accuracy": 0.7557819663779929,
+      "artifact_sha256": {
+        "metrics": "757f4e35a8cefc3d9b0606104eaa587a0b0222e6a09d78067d5a9582b324ed19",
+        "predictions": "bc867707dcac2043c926e960289f65a0abd516edb50bf21b0a88b86d22baffef",
+        "telemetry": "005c036c67e3c9f850344e7b6d73875bf906b88412fae432b3d87e865f3f5dfb"
+      },
+      "blockers": [],
+      "effective_attention_weight": 22.848676079260564,
+      "metrics_path": "benchmark_results/node-recovery-2026-09-04/runs-full/mnli-seqcls-cosine-s1-adaptive-seed1234/metrics.json",
+      "predictions_path": "benchmark_results/node-recovery-2026-09-04/runs-full/mnli-seqcls-cosine-s1-adaptive-seed1234/eval_predictions.jsonl",
+      "seed": 1234,
+      "status": "complete",
+      "telemetry_health": {
+        "attention_weight": {
+          "final": 22.848676079260564,
+          "first": 200.52099259300115,
+          "max": 200.52099259300115,
+          "median": 22.9450007607725,
+          "min": 15.2413735362987
+        },
+        "final_ternary_flip_fraction": 0.001713290764297097,
+        "global_to_last_controller_probe_ratio": {
+          "comparison_contract": "descriptive_only: global norm uses the telemetry microbatch and all trainable parameters; probe ratio uses the most recent controller-update microbatch and selected-layer Q/K/V parameters",
+          "final": 0.023567278784677917,
+          "max": 0.6452938973107476,
+          "median": 0.040106937926816445,
+          "min": 0.0025162209354784664
+        },
+        "max_activation_clipped_fraction": 0.0,
+        "max_int8_edge_fraction": 0.00036985609266493053,
+        "max_scale_abs_delta": 0.00012581795454025269,
+        "mean_ternary_flip_fraction": 0.009060753235851551,
+        "points": 21,
+        "probe_weighted_attention_to_ce_gradient_ratio": {
+          "final": 0.7467880794914884,
+          "max": 7.222333474930259,
+          "median": 0.9568791990330882,
+          "min": 0.6670427377617011
+        },
+        "weighted_attention_to_ce_gradient_ratio": {
+          "final": 0.01759976286245012,
+          "max": 0.4304386079230791,
+          "median": 0.045801362920505066,
+          "p95": 0.15598975716908248
+        },
+        "weighted_logit_to_ce_gradient_ratio": {
+          "final": 0.2878056734480878,
+          "max": 0.8177997789024788,
+          "median": 0.408615486970313,
+          "p95": 0.6569328881216859
+        }
+      },
+      "telemetry_path": "benchmark_results/node-recovery-2026-09-04/runs-full/mnli-seqcls-cosine-s1-adaptive-seed1234/telemetry.jsonl",
+      "vs_fixed_gamma_655m": {
+        "candidate_accuracy": 0.7557819663779929,
+        "candidate_wins": 867,
+        "delta_candidate_minus_reference": 0.02587875700458482,
+        "errors": [],
+        "matched": 9815,
+        "mcnemar_exact_p": 4.332574025060121e-11,
+        "paired_ci95": [
+          0.01821319159020089,
+          0.03354432241896875
+        ],
+        "reference_accuracy": 0.729903209373408,
+        "reference_wins": 613,
+        "status": "pass"
+      },
+      "vs_fp16": {
+        "candidate_accuracy": 0.7557819663779929,
+        "candidate_wins": 662,
+        "delta_candidate_minus_reference": -0.05236882322975038,
+        "errors": [],
+        "matched": 9815,
+        "mcnemar_exact_p": 2.0541464458409724e-33,
+        "paired_ci95": [
+          -0.060867455152607275,
+          -0.043870191306893486
+        ],
+        "reference_accuracy": 0.8081507896077432,
+        "reference_wins": 1176,
+        "status": "pass"
+      },
+      "vs_historical_gamma60_163m": {
+        "candidate_accuracy": 0.7557819663779929,
+        "candidate_wins": 568,
+        "delta_candidate_minus_reference": 0.017320427916454408,
+        "errors": [],
+        "matched": 9815,
+        "mcnemar_exact_p": 5.007724798109387e-08,
+        "paired_ci95": [
+          0.011123084304479287,
+          0.02351777152842953
+        ],
+        "reference_accuracy": 0.7384615384615385,
+        "reference_wins": 398,
+        "status": "pass"
+      }
+    },
+    {
+      "accuracy": 0.7569026999490576,
+      "artifact_sha256": {
+        "metrics": "d9d30682137f678b93793e601d61a4c05e19eafdc764ee125fbbdb00d1f24796",
+        "predictions": "2253844dab85411e205da59287122ab66a38db2fe25b6ec7a88a2ef06106a3de",
+        "telemetry": "7f62be5f5ce3effde4743474abcdbc7870a6af4ef4e9020686447b1a619fc0dc"
+      },
+      "blockers": [],
+      "effective_attention_weight": 19.984242782967677,
+      "metrics_path": "benchmark_results/node-recovery-2026-09-04/runs-full/mnli-seqcls-cosine-s1-adaptive-seed1235/metrics.json",
+      "predictions_path": "benchmark_results/node-recovery-2026-09-04/runs-full/mnli-seqcls-cosine-s1-adaptive-seed1235/eval_predictions.jsonl",
+      "seed": 1235,
+      "status": "complete",
+      "telemetry_health": {
+        "attention_weight": {
+          "final": 19.984242782967677,
+          "first": 263.2017483180965,
+          "max": 263.2017483180965,
+          "median": 29.6327974468728,
+          "min": 19.984242782967677
+        },
+        "final_ternary_flip_fraction": 0.0016920681833252087,
+        "global_to_last_controller_probe_ratio": {
+          "comparison_contract": "descriptive_only: global norm uses the telemetry microbatch and all trainable parameters; probe ratio uses the most recent controller-update microbatch and selected-layer Q/K/V parameters",
+          "final": 0.0421009694905199,
+          "max": 0.36411907482073413,
+          "median": 0.04755315421477232,
+          "min": 0.013750678866150431
+        },
+        "max_activation_clipped_fraction": 0.0,
+        "max_int8_edge_fraction": 0.00036900838216145834,
+        "max_scale_abs_delta": 0.00010799244046211243,
+        "mean_ternary_flip_fraction": 0.009028641558076277,
+        "points": 21,
+        "probe_weighted_attention_to_ce_gradient_ratio": {
+          "final": 1.1023885199995582,
+          "max": 4.5232537155166765,
+          "median": 0.9305710668365446,
+          "min": 0.3557385847512452
+        },
+        "weighted_attention_to_ce_gradient_ratio": {
+          "final": 0.04641162544720079,
+          "max": 0.2495111324970707,
+          "median": 0.049451340698085794,
+          "p95": 0.1673003493808807
+        },
+        "weighted_logit_to_ce_gradient_ratio": {
+          "final": 0.4190943436463526,
+          "max": 0.9268199735359728,
+          "median": 0.4452264875576911,
+          "p95": 0.8275206623246047
+        }
+      },
+      "telemetry_path": "benchmark_results/node-recovery-2026-09-04/runs-full/mnli-seqcls-cosine-s1-adaptive-seed1235/telemetry.jsonl",
+      "vs_fixed_gamma_655m": {
+        "candidate_accuracy": 0.7569026999490576,
+        "candidate_wins": 896,
+        "delta_candidate_minus_reference": 0.026999490575649515,
+        "errors": [],
+        "matched": 9815,
+        "mcnemar_exact_p": 1.2652503089100148e-11,
+        "paired_ci95": [
+          0.019214114771046665,
+          0.03478486638025237
+        ],
+        "reference_accuracy": 0.729903209373408,
+        "reference_wins": 631,
+        "status": "pass"
+      },
+      "vs_fp16": {
+        "candidate_accuracy": 0.7569026999490576,
+        "candidate_wins": 648,
+        "delta_candidate_minus_reference": -0.051248089658685686,
+        "errors": [],
+        "matched": 9815,
+        "mcnemar_exact_p": 1.0004278389824155e-32,
+        "paired_ci95": [
+          -0.05965742155694094,
+          -0.04283875776043043
+        ],
+        "reference_accuracy": 0.8081507896077432,
+        "reference_wins": 1151,
+        "status": "pass"
+      },
+      "vs_historical_gamma60_163m": {
+        "candidate_accuracy": 0.7569026999490576,
+        "candidate_wins": 696,
+        "delta_candidate_minus_reference": 0.018441161487519103,
+        "errors": [],
+        "matched": 9815,
+        "mcnemar_exact_p": 2.198251443204727e-07,
+        "paired_ci95": [
+          0.01150127064147918,
+          0.025381052333559025
+        ],
+        "reference_accuracy": 0.7384615384615385,
+        "reference_wins": 515,
+        "status": "pass"
+      }
+    },
+    {
+      "accuracy": 0.7533367294956699,
+      "artifact_sha256": {
+        "metrics": "888fc53b6d74223571946c4e28c8b034b45e21626f11a0186aba23fec6fb4806",
+        "predictions": "38b72394b88a7bd114c97ce48ab4598c578c1596697ee90d5303844258874fa5",
+        "telemetry": "5ea6c3952da70b718a3bdd0df84b7124204d15b5429621d17452f9bd68e30004"
+      },
+      "blockers": [],
+      "effective_attention_weight": 25.919286001618893,
+      "metrics_path": "benchmark_results/node-recovery-2026-09-04/runs-full/mnli-seqcls-cosine-s1-adaptive-seed1236/metrics.json",
+      "predictions_path": "benchmark_results/node-recovery-2026-09-04/runs-full/mnli-seqcls-cosine-s1-adaptive-seed1236/eval_predictions.jsonl",
+      "seed": 1236,
+      "status": "complete",
+      "telemetry_health": {
+        "attention_weight": {
+          "final": 25.919286001618893,
+          "first": 110.61433291089519,
+          "max": 110.61433291089519,
+          "median": 28.707627950928693,
+          "min": 14.285617165344853
+        },
+        "final_ternary_flip_fraction": 0.001662010450618242,
+        "global_to_last_controller_probe_ratio": {
+          "comparison_contract": "descriptive_only: global norm uses the telemetry microbatch and all trainable parameters; probe ratio uses the most recent controller-update microbatch and selected-layer Q/K/V parameters",
+          "final": 0.0043280827635018195,
+          "max": 0.19124340658222144,
+          "median": 0.06943260481889699,
+          "min": 0.0043280827635018195
+        },
+        "max_activation_clipped_fraction": 0.0,
+        "max_int8_edge_fraction": 0.00038859049479166664,
+        "max_scale_abs_delta": 0.00013849418610334396,
+        "mean_ternary_flip_fraction": 0.009021559774082437,
+        "points": 21,
+        "probe_weighted_attention_to_ce_gradient_ratio": {
+          "final": 2.5903216416656405,
+          "max": 5.938458386728619,
+          "median": 1.031605566378069,
+          "min": 0.384802511550526
+        },
+        "weighted_attention_to_ce_gradient_ratio": {
+          "final": 0.011211126449218796,
+          "max": 0.12836961165659244,
+          "median": 0.05723010978351566,
+          "p95": 0.10405156557451391
+        },
+        "weighted_logit_to_ce_gradient_ratio": {
+          "final": 0.4471268025643637,
+          "max": 1.2330263096291618,
+          "median": 0.4737452496469973,
+          "p95": 0.8950013575846675
+        }
+      },
+      "telemetry_path": "benchmark_results/node-recovery-2026-09-04/runs-full/mnli-seqcls-cosine-s1-adaptive-seed1236/telemetry.jsonl",
+      "vs_fixed_gamma_655m": {
+        "candidate_accuracy": 0.7533367294956699,
+        "candidate_wins": 881,
+        "delta_candidate_minus_reference": 0.023433520122261846,
+        "errors": [],
+        "matched": 9815,
+        "mcnemar_exact_p": 4.5915097840703145e-09,
+        "paired_ci95": [
+          0.0156308363711826,
+          0.03123620387334109
+        ],
+        "reference_accuracy": 0.729903209373408,
+        "reference_wins": 651,
+        "status": "pass"
+      },
+      "vs_fp16": {
+        "candidate_accuracy": 0.7533367294956699,
+        "candidate_wins": 648,
+        "delta_candidate_minus_reference": -0.054814060112073355,
+        "errors": [],
+        "matched": 9815,
+        "mcnemar_exact_p": 1.4205265664643526e-36,
+        "paired_ci95": [
+          -0.06329725731934845,
+          -0.046330862904798265
+        ],
+        "reference_accuracy": 0.8081507896077432,
+        "reference_wins": 1186,
+        "status": "pass"
+      },
+      "vs_historical_gamma60_163m": {
+        "candidate_accuracy": 0.7533367294956699,
+        "candidate_wins": 678,
+        "delta_candidate_minus_reference": 0.014875191034131431,
+        "errors": [],
+        "matched": 9815,
+        "mcnemar_exact_p": 3.0037380414955142e-05,
+        "paired_ci95": [
+          0.00793482303300285,
+          0.021815559035260015
+        ],
+        "reference_accuracy": 0.7384615384615385,
+        "reference_wins": 532,
+        "status": "pass"
+      }
+    }
+  ],
+  "schema": "bitdistill-adaptive-full-audit-v1",
+  "status": "complete"
+}

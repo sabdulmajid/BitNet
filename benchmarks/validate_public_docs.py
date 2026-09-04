@@ -1386,6 +1386,143 @@ def validate_i2_kernel_profile_docs(
     )
 
 
+def validate_current_phase_docs(
+    tl2sr: dict[str, Any],
+    adaptive: dict[str, Any],
+    adaptive_predictions: dict[str, Any],
+    fixed60_recovery: dict[str, Any],
+    readme: str,
+    claims_doc: str,
+    runtime_doc: str,
+    errors: list[str],
+) -> None:
+    if tl2sr.get("schema") != "tl2sr-evidence-audit-v1":
+        errors.append(f"TL2_SR audit: unexpected schema {tl2sr.get('schema')}")
+    if tl2sr.get("status") != "valid_runtime_no_speed_win":
+        errors.append(f"TL2_SR audit: unexpected status {tl2sr.get('status')}")
+    gates = tl2sr.get("gates", {})
+    if gates.get("speed_superiority_proven") is not False:
+        errors.append("TL2_SR audit: speed-superiority gate must be false")
+    required_tl2_gates = (
+        "full_validation_complete",
+        "full_accuracy_within_one_point",
+        "full_prediction_agreement_at_least_98_percent",
+        "repeated_benchmarks_idle_gated",
+        "artifact_receipts_match",
+    )
+    for gate in required_tl2_gates:
+        if gates.get(gate) is not True:
+            errors.append(f"TL2_SR audit: required gate is not true: {gate}")
+
+    full = tl2sr.get("full_validation", {})
+    storage = tl2sr.get("storage", {})
+    tl2_needles = (
+        f"{int(full.get('examples', 0)):,}",
+        fmt(float(full.get("left_accuracy", float("nan")))),
+        fmt(float(full.get("right_accuracy", float("nan")))),
+        f"{float(full.get('accuracy_delta_right_minus_left', float('nan'))):+.6f}",
+        fmt(float(full.get("prediction_agreement", float("nan")))),
+        fmt(float(full.get("exact_mcnemar_p_two_sided", float("nan")))),
+        f"{100.0 * float(storage.get('projection_reduction_fraction', float('nan'))):.3f}%",
+        f"{100.0 * float(storage.get('file_reduction_fraction', float('nan'))):.3f}%",
+    )
+    for needle in tl2_needles:
+        require_contains("README current TL2_SR evidence", needle, readme, errors)
+        require_contains("runtime contract current TL2_SR evidence", needle, runtime_doc, errors)
+    for row in tl2sr.get("tiling_sweep", []):
+        ratio = fmt(float(row["paired_speed_ratio_vs_i2sr"]), 3)
+        require_contains("README TL2_SR speed ratio", ratio, readme, errors)
+        require_contains("CLAIMS TL2_SR speed ratio", ratio, claims_doc, errors)
+        require_contains("runtime contract TL2_SR speed ratio", ratio, runtime_doc, errors)
+
+    if adaptive.get("schema") != "bitdistill-adaptive-full-audit-v1":
+        errors.append(f"adaptive audit: unexpected schema {adaptive.get('schema')}")
+    if adaptive.get("status") != "complete":
+        errors.append(f"adaptive audit: unexpected status {adaptive.get('status')}")
+    decisions = adaptive.get("decisions", {})
+    if decisions.get("quality_improvement_gate") != "pass":
+        errors.append("adaptive audit: quality-improvement gate did not pass")
+    if decisions.get("paper_level_local_recovery_gate") != "fail":
+        errors.append("adaptive audit: paper-recovery gate must remain failed")
+    aggregate = adaptive.get("aggregate", {})
+    adaptive_needles = (
+        fmt(float(aggregate.get("mean_accuracy", float("nan")))),
+        fmt(float(aggregate.get("sample_standard_deviation", float("nan")))),
+        fmt(float(aggregate.get("seed_mean_t_ci95", [float("nan")])[0])),
+        fmt(float(aggregate.get("seed_mean_t_ci95", [float("nan"), float("nan")])[1])),
+    )
+    for needle in adaptive_needles:
+        require_contains("README adaptive evidence", needle, readme, errors)
+        require_contains("CLAIMS adaptive evidence", needle, claims_doc, errors)
+
+    if adaptive_predictions.get("schema") != "compact-classification-predictions-v1":
+        errors.append(
+            f"adaptive predictions: unexpected schema {adaptive_predictions.get('schema')}"
+        )
+    labels = adaptive_predictions.get("labels", [])
+    predictions = adaptive_predictions.get("predictions", {})
+    model_metadata = adaptive_predictions.get("models", {})
+    if adaptive_predictions.get("examples") != 9815 or len(labels) != 9815:
+        errors.append("adaptive predictions: expected 9,815 aligned labels")
+    reference_hashes = adaptive.get("references", {}).get("prediction_sha256", {})
+    expected_hashes = {
+        "fp16": reference_hashes.get("fp16"),
+        "fixed_gamma_655m": reference_hashes.get("fixed_gamma_655m"),
+        "historical_gamma60_163m": reference_hashes.get("historical_gamma60_163m"),
+        **{
+            f"adaptive_seed{run['seed']}": run.get("artifact_sha256", {}).get("predictions")
+            for run in adaptive.get("runs", [])
+        },
+    }
+    for model_id, expected_hash in expected_hashes.items():
+        model_predictions = predictions.get(model_id, [])
+        metadata = model_metadata.get(model_id, {})
+        if not labels or len(model_predictions) != len(labels):
+            errors.append(f"adaptive predictions: unaligned model {model_id}")
+            continue
+        if metadata.get("source_sha256") != expected_hash:
+            errors.append(f"adaptive predictions: source hash mismatch for {model_id}")
+        measured_accuracy = sum(
+            prediction == label
+            for prediction, label in zip(model_predictions, labels, strict=True)
+        ) / len(labels)
+        if metadata.get("accuracy") != measured_accuracy:
+            errors.append(f"adaptive predictions: accuracy mismatch for {model_id}")
+    require_contains(
+        "README adaptive prediction bundle",
+        "bitdistill_adaptive_prediction_bundle_2026-09-04.md",
+        readme,
+        errors,
+    )
+
+    if fixed60_recovery.get("schema") != "bitdistill-fixed60-resubmission-v1":
+        errors.append(f"fixed60 recovery: unexpected schema {fixed60_recovery.get('schema')}")
+    if fixed60_recovery.get("status") != "running":
+        errors.append(f"fixed60 recovery: unexpected status {fixed60_recovery.get('status')}")
+    verification = fixed60_recovery.get("verification", {})
+    for field, path in (
+        ("launcher_sha256", Path("benchmarks/resubmit_bitdistill_fixed60.sh")),
+        ("staged_audit_sha256", Path("benchmarks/audit_bitdistill_adaptive_vs_fixed.py")),
+    ):
+        expected = verification.get(field)
+        actual = sha256(path)
+        if expected != actual:
+            errors.append(f"fixed60 recovery: {field} mismatch: {expected} != {actual}")
+
+    public_payload = json.dumps(
+        {
+            "tl2sr": tl2sr,
+            "adaptive": adaptive,
+            "adaptive_predictions": adaptive_predictions,
+            "fixed60_recovery": fixed60_recovery,
+        },
+        sort_keys=True,
+    )
+    for private_prefix in ("/mnt/slurm_nfs/", "/local/a6abdulm/"):
+        if private_prefix in public_payload:
+            errors.append(f"current public evidence exposes private path prefix: {private_prefix}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -1507,6 +1644,26 @@ def main() -> int:
         type=Path,
         default=Path("benchmarks/results/i2_kernel_profile_2026-09-04.json"),
     )
+    parser.add_argument(
+        "--tl2sr-evidence",
+        type=Path,
+        default=Path("benchmarks/results/tl2sr_evidence_audit_2026-09-04.json"),
+    )
+    parser.add_argument(
+        "--adaptive-full-audit",
+        type=Path,
+        default=Path("benchmarks/results/bitdistill_adaptive_full_audit_2026-09-04.json"),
+    )
+    parser.add_argument(
+        "--adaptive-prediction-bundle",
+        type=Path,
+        default=Path("benchmarks/results/bitdistill_adaptive_prediction_bundle_2026-09-04.json"),
+    )
+    parser.add_argument(
+        "--fixed60-recovery",
+        type=Path,
+        default=Path("benchmarks/results/bitdistill_fixed60_resubmission_2026-09-04.json"),
+    )
     args = parser.parse_args()
 
     bundle = load_json(args.bundle)
@@ -1532,9 +1689,14 @@ def main() -> int:
     native_cpu_repeated = load_json(args.native_cpu_repeated)
     i2sr_runtime_ab = load_json(args.i2sr_runtime_ab)
     i2_kernel_profile = load_json(args.i2_kernel_profile)
+    tl2sr_evidence = load_json(args.tl2sr_evidence)
+    adaptive_full_audit = load_json(args.adaptive_full_audit)
+    adaptive_prediction_bundle = load_json(args.adaptive_prediction_bundle)
+    fixed60_recovery = load_json(args.fixed60_recovery)
     readme = read_text(args.readme)
     claims_doc = read_text(args.claims)
     experiments_doc = read_text(args.experiments)
+    runtime_doc = read_text(args.runtime_contract)
     errors: list[str] = []
     validate_artifacts(bundle, errors)
     validate_reproduction_gap(reproduction_gap, errors)
@@ -1575,7 +1737,17 @@ def main() -> int:
         experiments_doc,
         errors,
     )
-    validate_runtime_doc(bundle, read_text(args.runtime_contract), errors)
+    validate_current_phase_docs(
+        tl2sr_evidence,
+        adaptive_full_audit,
+        adaptive_prediction_bundle,
+        fixed60_recovery,
+        readme,
+        claims_doc,
+        runtime_doc,
+        errors,
+    )
+    validate_runtime_doc(bundle, runtime_doc, errors)
 
     if errors:
         for error in errors:
