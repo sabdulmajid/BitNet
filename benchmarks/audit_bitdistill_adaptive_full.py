@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import statistics
@@ -29,6 +30,16 @@ def read_json(path: Path) -> dict[str, Any]:
         return {}
     value = json.loads(path.read_text(encoding="utf-8"))
     return value if isinstance(value, dict) else {}
+
+
+def sha256(path: Path) -> str | None:
+    if not path.is_file():
+        return None
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def load_predictions(path: Path) -> tuple[list[dict[str, Any]], list[str]]:
@@ -286,6 +297,71 @@ def nested(value: dict[str, Any], *keys: str) -> Any:
     return current
 
 
+def run_contract_errors(metrics: dict[str, Any], seed: int) -> list[str]:
+    expected_fields = {
+        "source_revision": (metrics.get("source_revision"), EXPECTED_SOURCE_REVISION),
+        "seed": (metrics.get("seed"), seed),
+        "stage": (metrics.get("stage"), "task_sft"),
+        "method": (metrics.get("method"), "bitdistill"),
+        "task": (metrics.get("task"), "mnli"),
+        "steps": (metrics.get("steps"), EXPECTED_STEPS),
+        "eval_examples": (nested(metrics, "eval", "eval_examples"), float(EXPECTED_EVAL_EXAMPLES)),
+        "task_format": (metrics.get("task_format"), "sequence_classification"),
+        "label_scheme": (metrics.get("label_scheme"), "letters"),
+        "candidate_score": (metrics.get("candidate_score"), "mean"),
+        "scale_mode": (metrics.get("scale_mode"), "tensor"),
+        "exclude_linear_regex": (metrics.get("exclude_linear_regex"), "score|classifier"),
+        "distill_layer": (metrics.get("distill_layer"), -1),
+        "attention_split_heads": (metrics.get("attention_split_heads"), 1),
+        "activation_quantization": (nested(metrics, "preparation", "activation_quantization"), True),
+        "bitlinear_replaced": (nested(metrics, "preparation", "bitlinear_replaced"), 168),
+        "subln_inserted": (nested(metrics, "preparation", "subln_inserted"), 48),
+        "state_loaded": (nested(metrics, "state_load", "loaded"), True),
+        "output_head_copied": (nested(metrics, "output_head_init", "copied"), True),
+        "max_train_samples": (nested(metrics, "training_budget", "max_train_samples"), 0),
+        "max_eval_samples": (nested(metrics, "training_budget", "max_eval_samples"), 0),
+        "max_seq_len": (nested(metrics, "training_budget", "max_seq_len"), 512),
+        "per_device_batch_size": (nested(metrics, "training_budget", "per_device_batch_size"), 4),
+        "grad_accum_steps": (nested(metrics, "training_budget", "grad_accum_steps"), 4),
+        "max_steps": (nested(metrics, "training_budget", "max_steps"), EXPECTED_STEPS),
+        "logit_kd_weight": (nested(metrics, "loss_weights", "logit_kd_weight"), 10.0),
+        "attention_kd_weight": (nested(metrics, "loss_weights", "attention_kd_weight"), 100_000.0),
+        "attention_kd_balance": (nested(metrics, "loss_weights", "attention_kd_balance"), "gradnorm_ema"),
+        "attention_balance_target_ratio": (
+            nested(metrics, "loss_weights", "attention_balance_target_ratio"),
+            1.0,
+        ),
+        "attention_balance_beta": (nested(metrics, "loss_weights", "attention_balance_beta"), 0.9),
+        "attention_balance_every_steps": (
+            nested(metrics, "loss_weights", "attention_balance_every_steps"),
+            20,
+        ),
+        "logit_temperature": (nested(metrics, "loss_weights", "logit_temperature"), 5.0),
+        "logit_kd_temperature_scale": (
+            nested(metrics, "loss_weights", "logit_kd_temperature_scale"),
+            "none",
+        ),
+        "attention_temperature": (nested(metrics, "loss_weights", "attention_temperature"), 1.0),
+        "attention_relation_mode": (nested(metrics, "loss_weights", "attention_relation_mode"), "cosine"),
+        "attention_qkv_reduction": (nested(metrics, "loss_weights", "attention_qkv_reduction"), "sum"),
+        "telemetry_every_steps": (nested(metrics, "telemetry", "every_steps"), 500),
+        "telemetry_component_grad_norms": (nested(metrics, "telemetry", "component_grad_norms"), True),
+        "telemetry_max_elements_per_layer": (
+            nested(metrics, "telemetry", "max_elements_per_layer"),
+            65_536,
+        ),
+    }
+    errors = [
+        f"{field}={actual!r}, expected={expected!r}"
+        for field, (actual, expected) in expected_fields.items()
+        if actual != expected
+    ]
+    state_path = nested(metrics, "state_load", "path")
+    if not isinstance(state_path, str) or not state_path.endswith("/assets/stage2.pt"):
+        errors.append(f"state_load.path={state_path!r}, expected suffix='/assets/stage2.pt'")
+    return errors
+
+
 def summarize_run(
     root: Path,
     seed: int,
@@ -303,26 +379,33 @@ def summarize_run(
     predictions, prediction_errors = load_predictions(predictions_path)
     blockers = list(telemetry_errors) + list(prediction_errors)
 
-    expected_fields = {
-        "source_revision": (metrics.get("source_revision"), EXPECTED_SOURCE_REVISION),
-        "seed": (metrics.get("seed"), seed),
-        "steps": (metrics.get("steps"), EXPECTED_STEPS),
-        "eval_examples": (nested(metrics, "eval", "eval_examples"), float(EXPECTED_EVAL_EXAMPLES)),
-        "task_format": (metrics.get("task_format"), "sequence_classification"),
-        "scale_mode": (metrics.get("scale_mode"), "tensor"),
-        "attention_relation_mode": (nested(metrics, "loss_weights", "attention_relation_mode"), "cosine"),
-        "attention_split_heads": (metrics.get("attention_split_heads"), 1),
-        "attention_kd_balance": (nested(metrics, "loss_weights", "attention_kd_balance"), "gradnorm_ema"),
-    }
-    for field, (actual, expected) in expected_fields.items():
-        if actual != expected:
-            blockers.append(f"{field}={actual!r}, expected={expected!r}")
+    blockers.extend(run_contract_errors(metrics, seed))
     if telemetry_steps != list(EXPECTED_TELEMETRY_STEPS):
         blockers.append(f"telemetry steps={telemetry_steps}, expected={list(EXPECTED_TELEMETRY_STEPS)}")
     if len(predictions) != EXPECTED_EVAL_EXAMPLES:
         blockers.append(f"prediction rows={len(predictions)}, expected={EXPECTED_EVAL_EXAMPLES}")
 
+    vs_fp16 = compare_prediction_files(fp16_predictions, predictions_path)
+    vs_fixed = compare_prediction_files(fixed_predictions, predictions_path)
+    vs_gamma60 = compare_prediction_files(gamma60_predictions, predictions_path)
+    for label, comparison in (
+        ("fp16", vs_fp16),
+        ("fixed_gamma_655m", vs_fixed),
+        ("historical_gamma60_163m", vs_gamma60),
+    ):
+        if comparison["status"] != "pass":
+            blockers.extend(f"{label}: {error}" for error in comparison["errors"])
+
     accuracy = nested(metrics, "eval", "accuracy")
+    candidate_accuracy = vs_fp16.get("candidate_accuracy")
+    if (
+        isinstance(accuracy, (int, float))
+        and isinstance(candidate_accuracy, (int, float))
+        and not math.isclose(float(accuracy), float(candidate_accuracy), abs_tol=1e-15)
+    ):
+        blockers.append(
+            f"metrics accuracy={accuracy!r} disagrees with predictions accuracy={candidate_accuracy!r}"
+        )
     return {
         "seed": seed,
         "status": "complete" if not blockers else "pending_or_invalid",
@@ -330,12 +413,17 @@ def summarize_run(
         "metrics_path": str(metrics_path),
         "predictions_path": str(predictions_path),
         "telemetry_path": str(telemetry_path),
+        "artifact_sha256": {
+            "metrics": sha256(metrics_path),
+            "predictions": sha256(predictions_path),
+            "telemetry": sha256(telemetry_path),
+        },
         "accuracy": float(accuracy) if isinstance(accuracy, (int, float)) and math.isfinite(accuracy) else None,
         "effective_attention_weight": nested(metrics, "loss_weights", "effective_attention_kd_weight"),
         "telemetry_health": telemetry_health(telemetry_rows),
-        "vs_fp16": compare_prediction_files(fp16_predictions, predictions_path),
-        "vs_fixed_gamma_655m": compare_prediction_files(fixed_predictions, predictions_path),
-        "vs_historical_gamma60_163m": compare_prediction_files(gamma60_predictions, predictions_path),
+        "vs_fp16": vs_fp16,
+        "vs_fixed_gamma_655m": vs_fixed,
+        "vs_historical_gamma60_163m": vs_gamma60,
     }
 
 
@@ -383,6 +471,11 @@ def build_report(
             "fixed_gamma_655m_accuracy": FIXED_GAMMA_ACCURACY,
             "historical_gamma60_163m_accuracy": HISTORICAL_GAMMA60_ACCURACY,
             "recovery_floor": RECOVERY_FLOOR,
+            "prediction_sha256": {
+                "fp16": sha256(fp16_predictions),
+                "fixed_gamma_655m": sha256(fixed_predictions),
+                "historical_gamma60_163m": sha256(gamma60_predictions),
+            },
         },
         "runs": runs,
         "aggregate": {
