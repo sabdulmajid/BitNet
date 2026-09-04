@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Evaluate a native packed I2_SR sequence-classification GGUF."""
+"""Evaluate a native sequence-classification GGUF on CPU.
+
+The evaluator accepts F16, conventional quantized, and I2_SR artifacts so
+same-checkpoint format comparisons share one task, prompt, and runtime harness.
+"""
 
 from __future__ import annotations
 
@@ -8,8 +12,10 @@ import hashlib
 import json
 import math
 import os
+import platform
 import re
 import resource
+import shlex
 import signal
 import subprocess
 import tempfile
@@ -142,6 +148,207 @@ def maybe_relative(path: Path, root: Path) -> str:
         return str(path.resolve().relative_to(root.resolve()))
     except ValueError:
         return str(path)
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def file_identity(path: Path, root: Path) -> dict[str, Any]:
+    resolved = path.resolve()
+    return {
+        "path": maybe_relative(resolved, root),
+        "size_bytes": resolved.stat().st_size,
+        "sha256": sha256_file(resolved),
+    }
+
+
+def git_identity(path: Path) -> dict[str, Any]:
+    def git(*args: str) -> str:
+        result = subprocess.run(
+            ["git", "-C", str(path), *args],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        return result.stdout.strip()
+
+    try:
+        revision = git("rev-parse", "HEAD")
+        status = git("status", "--short", "--untracked-files=no")
+    except (OSError, subprocess.CalledProcessError):
+        return {"path": str(path), "revision": None, "tracked_files_dirty": None}
+    return {
+        "path": str(path.resolve()),
+        "revision": revision,
+        "tracked_files_dirty": bool(status),
+    }
+
+
+def runtime_build_contract(binary: Path, root: Path) -> dict[str, Any]:
+    """Fingerprint the executable, shared libraries, flags, and kernel sources.
+
+    Hashing only an ELF executable is insufficient for these shared-library
+    builds: changing libggml.so can alter both correctness and throughput while
+    leaving the launcher unchanged.
+    """
+    build_dir = binary.resolve().parent.parent
+    cmake_cache = build_dir / "CMakeCache.txt"
+    compile_commands = build_dir / "compile_commands.json"
+    option_names = {
+        "BITNET_ARM_TL1",
+        "BITNET_X86_TL2",
+        "BUILD_SHARED_LIBS",
+        "CMAKE_BUILD_TYPE",
+        "CMAKE_C_COMPILER",
+        "CMAKE_CXX_COMPILER",
+        "GGML_AVX",
+        "GGML_AVX2",
+        "GGML_AVX512",
+        "GGML_AVX512_BF16",
+        "GGML_AVX512_VBMI",
+        "GGML_AVX512_VNNI",
+        "GGML_FMA",
+        "GGML_NATIVE",
+        "GGML_OPENMP",
+    }
+    cmake_options: dict[str, str] = {}
+    if cmake_cache.exists():
+        for line in cmake_cache.read_text(encoding="utf-8", errors="replace").splitlines():
+            if not line or line.startswith(("#", "//")) or "=" not in line or ":" not in line:
+                continue
+            key_and_type, value = line.split("=", 1)
+            key = key_and_type.split(":", 1)[0]
+            if key in option_names:
+                cmake_options[key] = value
+
+    linked_libraries: list[dict[str, Any]] = []
+    ldd_text = ""
+    try:
+        ldd_result = subprocess.run(
+            ["ldd", str(binary.resolve())],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        ldd_text = ldd_result.stdout.strip()
+        seen: set[Path] = set()
+        for line in ldd_text.splitlines():
+            match = re.search(r"(?:=>\s+)?(/\S+)", line)
+            if not match:
+                continue
+            library = Path(match.group(1)).resolve()
+            if library in seen or not library.is_file():
+                continue
+            seen.add(library)
+            record: dict[str, Any] = {
+                "path": maybe_relative(library, root),
+                "size_bytes": library.stat().st_size,
+            }
+            try:
+                library.relative_to(build_dir)
+            except ValueError:
+                record["sha256"] = None
+            else:
+                record["sha256"] = sha256_file(library)
+            linked_libraries.append(record)
+    except (OSError, subprocess.CalledProcessError) as exc:
+        ldd_text = f"unavailable: {exc}"
+
+    source_candidates = [
+        root / "src/ggml-bitnet-mad.cpp",
+        root / "include/gemm-config.h",
+        root / "3rdparty/llama.cpp/ggml/src/ggml.c",
+        root / "3rdparty/llama.cpp/src/llama.cpp",
+        root / "3rdparty/llama.cpp/examples/embedding/embedding.cpp",
+    ]
+    source_files = [file_identity(path, root) for path in source_candidates if path.is_file()]
+    compile_units: list[dict[str, Any]] = []
+    if compile_commands.exists():
+        try:
+            entries = json.loads(compile_commands.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            entries = []
+        wanted = {str(path.resolve()) for path in source_candidates}
+        for entry in entries:
+            source = str(Path(entry.get("file", "")).resolve())
+            if source not in wanted:
+                continue
+            command = entry.get("command")
+            if not isinstance(command, str) and isinstance(entry.get("arguments"), list):
+                command = shlex.join(str(value) for value in entry["arguments"])
+            compile_units.append(
+                {
+                    "file": maybe_relative(Path(source), root),
+                    "command": command,
+                    "command_sha256": hashlib.sha256(str(command).encode("utf-8")).hexdigest(),
+                }
+            )
+
+    contract: dict[str, Any] = {
+        "build_dir": maybe_relative(build_dir, root),
+        "cmake_options": cmake_options,
+        "cmake_cache": file_identity(cmake_cache, root) if cmake_cache.exists() else None,
+        "compile_commands": file_identity(compile_commands, root) if compile_commands.exists() else None,
+        "compile_units": compile_units,
+        "linked_libraries": linked_libraries,
+        "ldd": ldd_text,
+        "source_files": source_files,
+        "repositories": {
+            "bitnet": git_identity(root),
+            "llama_cpp": git_identity(root / "3rdparty/llama.cpp"),
+        },
+    }
+    canonical = json.dumps(contract, sort_keys=True, separators=(",", ":"))
+    contract["sha256"] = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    return contract
+
+
+def cpu_environment(threads: int) -> dict[str, Any]:
+    cpuinfo = Path("/proc/cpuinfo")
+    processors = 0
+    model_names: dict[str, int] = {}
+    flags: set[str] = set()
+    physical_cores: set[tuple[str, str]] = set()
+    physical_id = ""
+    core_id = ""
+    if cpuinfo.exists():
+        for line in cpuinfo.read_text(encoding="utf-8", errors="replace").splitlines() + [""]:
+            if not line.strip():
+                if physical_id or core_id:
+                    physical_cores.add((physical_id, core_id))
+                physical_id = ""
+                core_id = ""
+                continue
+            if ":" not in line:
+                continue
+            key, value = (part.strip() for part in line.split(":", 1))
+            if key == "processor":
+                processors += 1
+            elif key == "model name":
+                model_names[value] = model_names.get(value, 0) + 1
+            elif key == "flags":
+                flags.update(value.split())
+            elif key == "physical id":
+                physical_id = value
+            elif key == "core id":
+                core_id = value
+    model_name = max(model_names, key=model_names.get) if model_names else ""
+    relevant_flags = ("avx512f", "avx512dq", "avx512bw", "avx512vl", "avx2", "fma", "bmi2")
+    return {
+        "platform": platform.platform(),
+        "python": platform.python_version(),
+        "cpu_model": model_name,
+        "logical_cpus_os": os.cpu_count(),
+        "logical_cpus_cpuinfo": processors or None,
+        "physical_cores_cpuinfo": len(physical_cores) if physical_cores else None,
+        "requested_threads": threads,
+        "isa_flags": {flag: flag in flags for flag in relevant_flags},
+    }
 
 
 def load_rows(task: str, limit: int) -> list[dict[str, Any]]:
@@ -348,9 +555,9 @@ def render_markdown(result: dict[str, Any]) -> str:
     checkpoint = result["checkpoint"]
     return "\n\n".join(
         [
-            f"# Sequence-Classification Native I2_SR CPU Benchmark, {result['date']}",
+            f"# Sequence-Classification Native CPU Benchmark, {result['date']}",
             (
-                "This benchmark evaluates one native GGUF artifact that contains the packed I2_SR "
+                "This benchmark evaluates one native GGUF artifact that contains the model "
                 "backbone and dense classifier head. It is the same-artifact runtime path, but it "
                 "is not product-ready unless full validation, runtime parity, RSS, and throughput "
                 "gates pass."
@@ -360,6 +567,14 @@ def render_markdown(result: dict[str, Any]) -> str:
                 [
                     ["status", result["status"]],
                     ["task", result["task"]],
+                    ["CPU", result["hardware"]["cpu_model"]],
+                    ["threads", result["hardware"]["requested_threads"]],
+                    ["GGUF MiB", result["artifacts"]["gguf_size_bytes"] / (1024 * 1024)],
+                    ["GGUF SHA256", result["artifacts"]["gguf_sha256"]],
+                    ["runtime build SHA256", result["runtime_build"]["sha256"]],
+                    ["embedding binary SHA256", result["artifacts"]["embedding_binary_sha256"]],
+                    ["BitNet revision", result["runtime_build"]["repositories"]["bitnet"]["revision"]],
+                    ["llama.cpp revision", result["runtime_build"]["repositories"]["llama_cpp"]["revision"]],
                     ["examples", summary["examples"]],
                     ["expected examples", result["expected_examples"]],
                     ["full validation", result["full_validation_complete"]],
@@ -637,8 +852,10 @@ def main() -> None:
     if runtime["examples_per_second"] is None or runtime["examples_per_second"] <= 0:
         product_gate_blockers.append("missing_positive_throughput")
     prediction_json = json.dumps(predictions, separators=(",", ":"))
+    label_json = json.dumps(labels, separators=(",", ":"))
+    build_contract = runtime_build_contract(embedding_binary, root)
     result = {
-        "schema": "seqcls_native_i2sr_cpu.v1",
+        "schema": "seqcls_native_cpu.v2",
         "date": DATE,
         "status": status,
         "task": args.task,
@@ -670,12 +887,22 @@ def main() -> None:
         },
         "artifacts": {
             "gguf": maybe_relative(gguf, root),
+            "gguf_size_bytes": gguf.stat().st_size,
+            "gguf_sha256": sha256_file(gguf),
             "embedding_binary": maybe_relative(embedding_binary, root),
+            "embedding_binary_size_bytes": embedding_binary.stat().st_size,
+            "embedding_binary_sha256": sha256_file(embedding_binary),
+            "benchmark_script": maybe_relative(Path(__file__).resolve(), root),
+            "benchmark_script_sha256": sha256_file(Path(__file__).resolve()),
         },
+        "runtime_build": build_contract,
+        "hardware": cpu_environment(args.threads),
         "summary": summary,
         "runtime": runtime,
         "predictions": predictions,
         "prediction_sha256": hashlib.sha256(prediction_json.encode("utf-8")).hexdigest(),
+        "labels": labels,
+        "label_sha256": hashlib.sha256(label_json.encode("utf-8")).hexdigest(),
         "sample_predictions": [
             {
                 "index": idx,
@@ -699,7 +926,7 @@ def main() -> None:
             if ready_to_productize
             else "Native same-artifact classifier execution is measurable, but the product gate remains blocked by: "
             + ", ".join(product_gate_blockers)
-            + ". Multi-prompt batched I2_SR remains blocked by position-dependent drift; sequence-isolated mode is "
+            + ". Multi-prompt batched execution remains blocked by position-dependent drift in the I2_SR path; sequence-isolated mode is "
             "a separate mitigation."
         ),
         "stderr_tail": metas[-1]["stderr_tail"] if metas else "",

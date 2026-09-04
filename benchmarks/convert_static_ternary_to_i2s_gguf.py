@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Directly pack static ternary checkpoints as I2_S/I2_SR GGUF.
+"""Export BitDistill checkpoints to a BitNet-Qwen-compatible GGUF.
 
-This writer handles the scalar/tensor-scale case by default. Row-scale
-checkpoints need a compatibility-safe GGUF type or versioned layout and are
-therefore rejected unless --row-scale-prototype or --row-scale-qtype=i2_sr is
-passed. The i2_sr mode emits the stable row-scale type IDs used by this fork's
-promoted I2_SR runtime.
+The default mode directly packs static ternary checkpoints as I2_S/I2_SR. A
+dense-f16 diagnostic mode writes the latent trainable weights from a checkpoint;
+for QAT models this intentionally does not preserve the ternary forward function.
+Row-scale ternary checkpoints are rejected unless --row-scale-prototype or
+--row-scale-qtype=i2_sr is passed.
 """
 
 from __future__ import annotations
@@ -270,6 +270,12 @@ def make_i2s_model_class(
                 output_tensor_name = None
 
             for key, tensor in state.items():
+                if args.weight_format == "f16" and (
+                    key.endswith(".ternary_weight") or key.endswith(".weight_scale")
+                ):
+                    raise ValueError(
+                        f"--weight-format f16 expects latent dense weights, found ternary state key {key}"
+                    )
                 if key.endswith(".weight_scale"):
                     continue
                 if key in {"score.weight", "score.bias", "classifier.weight", "classifier.bias"}:
@@ -357,6 +363,7 @@ def make_i2s_model_class(
 
             summary.update(
                 {
+                    "weight_format": args.weight_format,
                     "ternary_i2s_packed": ternary_packed,
                     "row_scale_i2s_packed": row_scale_packed,
                     "copied_tensors": copied_tensors,
@@ -378,6 +385,22 @@ def make_i2s_model_class(
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--checkpoint-dir", type=Path, required=True)
+    parser.add_argument(
+        "--weight-format",
+        choices=["ternary", "f16"],
+        default="ternary",
+        help=(
+            "Export packed ternary weights (default), or the latent dense weights from "
+            "custom_state_dict.pt as an F16 diagnostic. QAT latent weights do not reproduce "
+            "the checkpoint's fake-quantized forward function."
+        ),
+    )
+    parser.add_argument(
+        "--state",
+        type=Path,
+        default=None,
+        help="Explicit state-dict path. Defaults to ternary_state_dict.pt or custom_state_dict.pt by format.",
+    )
     parser.add_argument("--ternary-state", type=Path, default=None)
     parser.add_argument("--outfile", type=Path, required=True)
     parser.add_argument("--converter", type=Path, default=Path("3rdparty/llama.cpp/convert_hf_to_gguf.py"))
@@ -448,12 +471,19 @@ def main() -> None:
         ),
     )
     args = parser.parse_args()
+    if args.state is not None and args.ternary_state is not None:
+        raise SystemExit("--state and --ternary-state are mutually exclusive")
+    if args.weight_format == "f16" and (args.row_scale_prototype or args.row_scale_qtype is not None):
+        raise SystemExit("row-scale packing options require --weight-format ternary")
+    if args.weight_format == "f16" and args.expect_ternary_keys is not None:
+        raise SystemExit("--expect-ternary-keys is incompatible with --weight-format f16")
     if args.row_scale_prototype and args.row_scale_qtype is not None:
         raise SystemExit("--row-scale-prototype and --row-scale-qtype are mutually exclusive")
-    if args.classifier_head_gguf and args.gguf_arch != "bitnet-qwen":
-        raise SystemExit("--classifier-head-gguf currently requires --gguf-arch bitnet-qwen")
-
-    ternary_state = args.ternary_state or args.checkpoint_dir / "ternary_state_dict.pt"
+    state_path = args.state or args.ternary_state
+    if state_path is None:
+        state_path = args.checkpoint_dir / (
+            "ternary_state_dict.pt" if args.weight_format == "ternary" else "custom_state_dict.pt"
+        )
     converter = load_converter(args.converter)
     (
         i2_s_dtype,
@@ -467,6 +497,14 @@ def main() -> None:
     architecture = load_architecture(args.checkpoint_dir)
     converter_architecture = args.source_architecture_alias or architecture
     base_cls = converter.Model.from_model_architecture(converter_architecture)
+    if args.classifier_head_gguf and args.gguf_arch == "bitnet-25":
+        raise SystemExit("--classifier-head-gguf requires --gguf-arch source or bitnet-qwen")
+    if (
+        args.classifier_head_gguf
+        and args.gguf_arch == "source"
+        and base_cls.model_arch != converter.gguf.MODEL_ARCH.QWEN2
+    ):
+        raise SystemExit("source-architecture classifier GGUF is currently implemented only for Qwen2")
     if args.gguf_arch in {"bitnet-25", "bitnet-qwen"}:
         args._model_arch_override = (
             converter.gguf.MODEL_ARCH.BITNET_QWEN
@@ -479,32 +517,45 @@ def main() -> None:
             )
     else:
         args._model_arch_override = None
-    state = torch.load(ternary_state, map_location="cpu", weights_only=True)
+    state = torch.load(state_path, map_location="cpu", weights_only=True, mmap=True)
     if not isinstance(state, dict):
-        raise TypeError(f"expected a flat state dict in {ternary_state}")
+        raise TypeError(f"expected a flat state dict in {state_path}")
 
     summary: dict[str, Any] = {
         "checkpoint_dir": str(args.checkpoint_dir),
-        "ternary_state": str(ternary_state),
+        "state": str(state_path),
+        "ternary_state": str(state_path) if args.weight_format == "ternary" else None,
+        "weight_format": args.weight_format,
         "architecture": architecture,
         "converter_architecture": converter_architecture,
         "outfile": str(args.outfile),
         "converter": str(args.converter),
-        "format_scope": "scalar-scale I2_S by default; row-scale only with --row-scale-prototype or --row-scale-qtype=i2_sr",
+        "format_scope": (
+            "latent dense F16 diagnostic; not the QAT ternary function"
+            if args.weight_format == "f16"
+            else "scalar-scale I2_S by default; row-scale only with --row-scale-prototype or --row-scale-qtype=i2_sr"
+        ),
         "i2_s_dtype": int(i2_s_dtype),
         "i2_sr_dtype": int(i2_sr_dtype),
         "mostly_i2_s_file_type": int(mostly_i2_s_ftype),
         "mostly_i2_sr_file_type": int(mostly_i2_sr_ftype),
         "has_native_i2s_gguf_python_constants": has_native_i2s_constants,
         "has_native_i2sr_gguf_python_constants": has_native_i2sr_constants,
-        "limitations": [
-            "Rejects row-scale checkpoints unless --row-scale-prototype or --row-scale-qtype=i2_sr is passed.",
-            "Scalar mode uses the existing tensor-scale I2_S layout.",
-            "Row-scale prototype mode requires a matching experimental runtime layout and overloads I2_S.",
-            "Row-scale i2_sr mode requires a runtime with a stable I2_SR qtype.",
-            "Keeps output.weight in F16 by default to match llama-quantize policy.",
-            "Native GGUF classifier heads are supported only for the fork's bitnet-qwen path.",
-        ],
+        "limitations": (
+            [
+                "Dense F16 mode executes the selected checkpoint's latent weights; for a QAT checkpoint this is not its ternary forward pass.",
+                "Native GGUF classifier heads require this fork's Qwen2 or bitnet-qwen classifier path.",
+            ]
+            if args.weight_format == "f16"
+            else [
+                "Rejects row-scale checkpoints unless --row-scale-prototype or --row-scale-qtype=i2_sr is passed.",
+                "Scalar mode uses the existing tensor-scale I2_S layout.",
+                "Row-scale prototype mode requires a matching experimental runtime layout and overloads I2_S.",
+                "Row-scale i2_sr mode requires a runtime with a stable I2_SR qtype.",
+                "Keeps output.weight in F16 by default to match llama-quantize policy.",
+                "Native GGUF classifier heads require this fork's Qwen2 or bitnet-qwen classifier path.",
+            ]
+        ),
         "row_scale_prototype": bool(args.row_scale_prototype),
         "row_scale_qtype": args.row_scale_qtype,
         "gguf_arch": args.gguf_arch,
@@ -515,7 +566,10 @@ def main() -> None:
     }
 
     model_cls = make_i2s_model_class(base_cls, state, converter, args, summary, i2_s_dtype, i2_sr_dtype, config)
-    output_ftype = mostly_i2_sr_ftype if args.row_scale_qtype == "i2_sr" else mostly_i2_s_ftype
+    if args.weight_format == "f16":
+        output_ftype = converter.gguf.LlamaFileType.MOSTLY_F16
+    else:
+        output_ftype = mostly_i2_sr_ftype if args.row_scale_qtype == "i2_sr" else mostly_i2_s_ftype
     summary["output_ftype"] = int(output_ftype)
     summary["output_ftype_name"] = getattr(output_ftype, "name", str(output_ftype))
     args.outfile.parent.mkdir(parents=True, exist_ok=True)
