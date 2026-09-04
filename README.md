@@ -30,7 +30,9 @@ The frozen baseline bundle and current decision reports are:
 | QAT/distillation recovers signal | **Partial recovery, not FP quality** | Best row-scale QAT ten-task mean `0.499459`, a `+0.150788` recovery over naive PTQ and still `-0.144710` below FP. | Row-scale QAT is this fork's retrofit variant, not standard BitDistill. |
 | BitDistill paper-level GLUE reproduction is complete | **No** | Qwen2.5-0.5B local FP16-SFT MNLI is `0.808151`. Controlled Stage-2 rows are `0.616607` at `40.96M`, `0.691187` at `163.84M`, `0.720020` at `327.68M`, and `0.729903` at `655.36M` token presentations. | The 655M row remains `-0.078248` below FP16 with paired CI `[-0.086720, -0.069775]`; the paper-level recovery target is not met. |
 | The `655.36M` Stage-2 checkpoint is usable | **Yes, with a verified manifest** | [stage2_manifest_655m_2026-05-23.md](benchmarks/results/stage2_manifest_655m_2026-05-23.md) records job `10250`, four complete snapshots, final CE `3.426713`, the state-dict SHA-256, and downstream job `10260`. | This was a `327.68M` continuation with a fresh optimizer/scheduler segment, not one uninterrupted 80k-step run. |
-| Paper gamma can be copied literally into this implementation | **No, not without matching loss normalization** | Component-gradient telemetry measures attention/CE gradient ratio `221.384986` for the paper-gamma path and `0.346044` at gamma 60, a `639.76x` reduction. | The 200-step gamma-60 run is diagnostic, not a task-quality result. A matched 10k-step quality run is next. |
+| Paper gamma can be copied literally into this implementation | **No, not without matching loss normalization** | Component-gradient telemetry measures attention/CE gradient ratio `221.384986` for the paper-gamma path and `0.346044` at gamma 60, a `639.76x` reduction. | The fixed-gamma probe is not a task-quality result. The active gate now compares explicit relation definitions and gradient-balanced weighting before any 10k-step quality run. |
+| The paper defines one unambiguous attention-relation objective | **No** | [attention_relation_equivalence_2026-09-04.md](benchmarks/results/attention_relation_equivalence_2026-09-04.md) proves that Equation 12 scaled-dot relations and Algorithm 1 normalized-cosine relations are not generally equivalent. In a deterministic probe their gradient-norm ratio is `18.7073` and gradient cosine is `0.2437`. | This is a mathematical contract result, not downstream quality evidence; the paper does not identify which executable definition produced its tables. |
+| The local GLUE formulation is paper-exact | **Unresolved** | [bitdistill_task_formulation_audit_2026-09-04.md](benchmarks/results/bitdistill_task_formulation_audit_2026-09-04.md) separates sequence-classification from causal answer-token results. | Token-level CE and decoding language favor the causal interpretation, but no authoritative released templates or training code establish equivalence. |
 | Row-scale semantics matter at runtime | **Yes: strong systems result** | TL2 one-scale relative output RMS error `1.904230`; exact FP16 row scales reduce it to `0.000197`. | Row scales are part of the learned function. TL2 row-scale support is not implemented. |
 | `I2_SR` packed CPU inference works | **Yes, for compatible causal artifacts** | Xeon Silver 4116: row-scale `I2_SR` file `1211.3 MiB`, PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. | It does **not** beat Q4_K_M on quality or file size. Q4_K_M is `940.4 MiB` with PPL `12.8112`. |
 | Native packed sequence classification is product-ready | **No: research demo only** | Full MNLI native sequence-isolated path: accuracy `0.652165`, PyTorch agreement `0.976668`, `7.456204` examples/s, RSS `960.15 MiB`. | Agreement is below the `0.99` product gate and the model quality is weak. |
@@ -94,17 +96,43 @@ Evidence and decision artifacts:
 - [active_gate_watchdog_2026-05-23.md](benchmarks/results/active_gate_watchdog_2026-05-23.md)
 - [active_gate_watchdog_2026-05-23.json](benchmarks/results/active_gate_watchdog_2026-05-23.json)
 
-## Next Controlled Experiment
+## Active Method-Equivalence Gate
 
-The pre-registered next action is one matched 10k-step MNLI run from the
-verified 655M checkpoint with only `ATTENTION_KD_WEIGHT` changed from
-`100000` to `60`. All other model, data, teacher, optimizer, and evaluation
-axes remain fixed. This directly tests whether the measured loss-gradient
-imbalance, rather than Stage-2 token budget alone, is limiting recovery.
+The earlier fixed-gamma-60 proposal is superseded by a more fundamental audit:
+the paper's Equation 12 and Algorithm 1 specify different attention-relation
+objectives, and the historical local path also used eight relation heads where
+the pseudocode recommends one. Comparing gamma values before fixing those
+contracts would confound loss definition, head partitioning, and coefficient
+scale.
 
-Do not broaden to QNLI/SST2, row/group-scale sweeps, or a larger Stage-2 budget
-until this ablation produces a full prediction trace and paired confidence
-interval. The exact command is recorded in the next-experiment blueprint.
+The code now exposes both published definitions and records them in every run:
+
+```text
+cosine:    softmax(normalize(A) normalize(A)^T / temperature)
+scaled_dot: softmax(A A^T / (sqrt(d_r) * temperature))
+```
+
+It also provides optional gradient-norm EMA balancing. At each balance update,
+the attention coefficient is estimated from the Q/K/V projection gradients:
+
+```text
+gamma* = target_ratio * ||grad(CE)|| / (||grad(attention_KD)|| + epsilon)
+```
+
+Six pre-registered 120-step MNLI pilots compare cosine versus scaled-dot,
+one versus eight relation heads, fixed versus adaptive weighting, and local
+sequence-classification versus causal answer-token training. They all start
+from the verified 655M Stage-2 manifest. The launcher targets the only GPU node
+currently verified to see the shared filesystem and refuses to run if its
+expected Git revision differs from the checkout. Submission history and
+infrastructure probes are recorded in
+[bitdistill_method_parity_submission_2026-09-04.md](benchmarks/results/bitdistill_method_parity_submission_2026-09-04.md).
+
+These pilots are method diagnostics only. A surviving contract must then run
+the matched 10k-step schedule, evaluate all `9,815` MNLI examples, emit paired
+predictions and a confidence interval against FP16, and replicate across seeds
+before supporting a quality claim. QNLI/SST2, row/group-scale sweeps, more
+Stage-2 tokens, and MoE remain blocked behind that gate.
 
 ## What This Fork Adds
 
@@ -112,7 +140,10 @@ interval. The exact command is recorded in the next-experiment blueprint.
   tested dense-Qwen checkpoints.
 - BitDistill-style training components for Qwen-family models: SubLN, Stage-2
   continued pretraining, Stage-3 CE + logits KL + Q/K/V attention-relation
-  distillation, layer sweeps, and training telemetry.
+  distillation, explicit Equation-12/Algorithm-1 relation modes, adaptive
+  gradient balancing, layer sweeps, and training telemetry.
+- Deterministic invariance and gradient audits that expose method-definition
+  mismatches before spending GPU time on downstream sweeps.
 - Row-scale ternary retrofit experiments and paired statistical audits.
 - A llama.cpp fork with a packed `I2_SR` row-scale CPU runtime path.
 - Manifest-based checkpoint handoff for long Stage-2 jobs, so downstream runs

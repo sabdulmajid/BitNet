@@ -120,6 +120,17 @@ def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def latest_controlled_curve(root: Path) -> Path:
+    candidates = [
+        *root.glob("benchmark_results/bitdistill_controlled_curve_*.json"),
+        *root.glob("benchmarks/results/bitdistill_controlled_curve_*.json"),
+    ]
+    if not candidates:
+        raise FileNotFoundError("No bitdistill_controlled_curve_*.json evidence file found")
+    public_dir = root / "benchmarks" / "results"
+    return max(candidates, key=lambda path: (path.stem.rsplit("_", 1)[-1], path.parent == public_dir))
+
+
 def summarize_live_control(controlled_curve: dict[str, Any]) -> dict[str, Any]:
     rows = controlled_curve.get("rows", []) if isinstance(controlled_curve.get("rows"), list) else []
     live_rows: list[dict[str, Any]] = []
@@ -263,7 +274,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     parser.add_argument("--source", type=Path, default=Path("train_bitdistill.py"))
-    parser.add_argument("--controlled-json", type=Path, default=Path(f"benchmark_results/bitdistill_controlled_curve_{DATE}.json"))
+    parser.add_argument("--controlled-json", type=Path)
     parser.add_argument("--output-json", type=Path, default=Path(f"benchmark_results/bitdistill_loss_contract_{DATE}.json"))
     parser.add_argument("--output-md", type=Path, default=Path(f"benchmarks/results/bitdistill_loss_contract_{DATE}.md"))
     args = parser.parse_args()
@@ -272,7 +283,10 @@ def main() -> None:
     source_path = args.source if args.source.is_absolute() else root / args.source
     source = source_path.read_text(encoding="utf-8")
     checks = static_contract(source)
-    controlled_path = args.controlled_json if args.controlled_json.is_absolute() else root / args.controlled_json
+    if args.controlled_json is None:
+        controlled_path = latest_controlled_curve(root)
+    else:
+        controlled_path = args.controlled_json if args.controlled_json.is_absolute() else root / args.controlled_json
     live = summarize_live_control(load_json(controlled_path))
     risk = live["risk"]
     status = "loss_normalization_risk" if risk else "pass"

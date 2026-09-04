@@ -15,6 +15,27 @@ set -euo pipefail
 cd "${SLURM_SUBMIT_DIR:-$PWD}"
 mkdir -p logs checkpoints benchmark_results/bitdistill
 
+if [ -n "${PYTHON_BIN:-}" ]; then
+  python_candidates=("$PYTHON_BIN")
+else
+  python_candidates=()
+  command -v python >/dev/null 2>&1 && python_candidates+=("$(command -v python)")
+  [ -x "$HOME/miniconda3/bin/python" ] && python_candidates+=("$HOME/miniconda3/bin/python")
+  command -v python3 >/dev/null 2>&1 && python_candidates+=("$(command -v python3)")
+fi
+PYTHON_BIN=""
+for candidate in "${python_candidates[@]}"; do
+  if "$candidate" -c 'import torch, transformers, datasets' >/dev/null 2>&1; then
+    PYTHON_BIN="$candidate"
+    break
+  fi
+done
+if [ -z "$PYTHON_BIN" ]; then
+  echo "No Python interpreter can import torch, transformers, and datasets. Set PYTHON_BIN explicitly." >&2
+  exit 2
+fi
+echo "PYTHON_BIN=$PYTHON_BIN"
+
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-12}"
 export TOKENIZERS_PARALLELISM=false
 export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
@@ -97,7 +118,7 @@ echo "STAGE=$STAGE METHOD=$METHOD TASK_NAME=$TASK_NAME TASK_FORMAT=$TASK_FORMAT 
 echo "TEACHER_MODEL=${TEACHER_MODEL:-none}"
 echo "INIT_STATE_MANIFEST=${INIT_STATE_MANIFEST:-none}"
 if [ -n "$INIT_STATE_MANIFEST" ] && [ -z "$INIT_STATE_DICT" ]; then
-  INIT_STATE_DICT="$(python benchmarks/resolve_stage2_state_dict.py "$INIT_STATE_MANIFEST")"
+  INIT_STATE_DICT="$("$PYTHON_BIN" benchmarks/resolve_stage2_state_dict.py "$INIT_STATE_MANIFEST")"
 fi
 echo "INIT_STATE_DICT=${INIT_STATE_DICT:-none}"
 echo "SCALE_MODE=$SCALE_MODE EXCLUDE_LINEAR_REGEX=$EXCLUDE_LINEAR_REGEX DISTILL_LAYER=$DISTILL_LAYER ATTENTION_SPLIT_HEADS=$ATTENTION_SPLIT_HEADS"
@@ -152,7 +173,7 @@ elif [ "$USE_SUBLN" = "0" ]; then
   SUBLN_ARGS=(--no-use-subln)
 fi
 
-python train_bitdistill.py \
+"$PYTHON_BIN" train_bitdistill.py \
   --stage "$STAGE" \
   --method "$METHOD" \
   --student-model "$MODEL" \

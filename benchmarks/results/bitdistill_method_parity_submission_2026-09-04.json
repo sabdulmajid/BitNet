@@ -1,9 +1,10 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "submitted_at_utc": "2026-09-04",
-  "source_revision": "11419d53f62712a1a0ca170c5f47207a1b25ad3b",
-  "array_job_id": "10316",
-  "postprocess_job_id": "10317",
+  "source_revision": null,
+  "array_job_id": null,
+  "postprocess_job_id": null,
+  "status": "ready_for_revision_pinned_resubmission",
   "partition": "dualcard",
   "array": "0-5%1",
   "resources_per_pilot": {
@@ -49,10 +50,10 @@
     {
       "array_job_id": "10316",
       "postprocess_job_id": "10317",
-      "result": "submitted",
+      "result": "cancelled_before_start",
       "partition": "dualcard",
       "memory_gib": 24,
-      "reason": "Compute-node probe 10315 verified that the shared BitNet project path exists on ece-nebula10."
+      "reason": "Probe 10315 verified the shared path, but the queued jobs were cancelled before allocation after preflight found an inherited-PATH interpreter risk and no immutable source-revision guard. No training step ran."
     }
   ]
 }

@@ -1,0 +1,89 @@
+{
+  "checks": {
+    "cosine_definition_is_norm_invariant": true,
+    "equation_and_pseudocode_gradients_differ": true,
+    "equation_and_pseudocode_losses_differ": true,
+    "scaled_dot_definition_is_not_norm_invariant": true,
+    "split_count_changes_objective": true
+  },
+  "comparisons": {
+    "algorithm_rescaling_loss_ratio": 1.0,
+    "equation_rescaling_loss_ratio": 5.594650613334114,
+    "equation_vs_algorithm_gradient_cosine": 0.24374260008335114,
+    "equation_vs_algorithm_gradient_norm_ratio": 18.707326496271865,
+    "equation_vs_algorithm_loss_ratio": 12.899036980847226,
+    "split8_vs_split1_gradient_cosine": 0.11022082716226578,
+    "split8_vs_split1_gradient_norm_ratio": 4.467545227350304,
+    "split8_vs_split1_loss_ratio": 7.1568003189036835
+  },
+  "created_utc": "2026-09-04T04:54:47.801940+00:00",
+  "decision": "Do not interpret gamma sweeps until relation_mode and split_heads are explicit. Run short telemetry pilots for cosine/split1, scaled_dot/split1, and the legacy cosine/split8 control before selecting one full-quality MNLI run.",
+  "definitions": {
+    "algorithm_1": "softmax(normalize(A) normalize(A)^T / temperature)",
+    "equation_12": "softmax(A A^T / sqrt(d_r))",
+    "legacy_local": "Algorithm-1 cosine form with split_heads=8"
+  },
+  "paper_source": "https://arxiv.org/abs/2510.13998",
+  "proof": "Equation 12 scales each dot product by the single factor sqrt(d_r), whereas Algorithm 1 scales it by the pair-dependent factor temperature*||a_i||*||a_j||. No global temperature makes those logits equal for arbitrary hidden states unless the relevant norm products are constant (apart from degenerate softmax-equivalent cases). Their KL scales and gradients therefore need not agree, so a fixed attention coefficient is not portable between them.",
+  "quality_claim": "mathematical_contract_not_task_quality",
+  "results": {
+    "algorithm1_cosine_split1": {
+      "components": {
+        "k": 0.04658918455243111,
+        "q": 0.020156320184469223,
+        "v": 0.0456964485347271
+      },
+      "gradient_norm": 0.013574003241956234,
+      "loss": 0.11244195699691772,
+      "relation_mode": "cosine",
+      "split_heads": 1
+    },
+    "algorithm1_cosine_split1_rescaled": {
+      "components": {
+        "k": 0.046589192003011703,
+        "q": 0.020156309008598328,
+        "v": 0.0456964485347271
+      },
+      "gradient_norm": 0.016631457954645157,
+      "loss": 0.11244195699691772,
+      "relation_mode": "cosine",
+      "split_heads": 1
+    },
+    "equation12_scaled_dot_split1": {
+      "components": {
+        "k": 0.7470574378967285,
+        "q": 0.17247365415096283,
+        "v": 0.5308618545532227
+      },
+      "gradient_norm": 0.253933310508728,
+      "loss": 1.4503929615020752,
+      "relation_mode": "scaled_dot",
+      "split_heads": 1
+    },
+    "equation12_scaled_dot_split1_rescaled": {
+      "components": {
+        "k": 3.4878787994384766,
+        "q": 1.8254131078720093,
+        "v": 2.801149606704712
+      },
+      "gradient_norm": 0.28883400559425354,
+      "loss": 8.114441871643066,
+      "relation_mode": "scaled_dot",
+      "split_heads": 1
+    },
+    "legacy_cosine_split8": {
+      "components": {
+        "k": 0.32873958349227905,
+        "q": 0.17227229475975037,
+        "v": 0.30371278524398804
+      },
+      "gradient_norm": 0.06064247339963913,
+      "loss": 0.8047246336936951,
+      "relation_mode": "cosine",
+      "split_heads": 8
+    }
+  },
+  "schema": "bitdistill-attention-relation-equivalence-v1",
+  "seed": 20260904,
+  "status": "published_specification_ambiguous"
+}

@@ -116,5 +116,10 @@ export SAVE_MODEL_ARTIFACTS=0
 export OUTPUT_DIR="checkpoints/bitdistill-method-parity/${RUN_NAME}"
 
 echo "METHOD_PARITY_CASE=$case_id RUN_NAME=$RUN_NAME"
-echo "SOURCE_REVISION=$(git rev-parse HEAD)"
+source_revision="$(git rev-parse HEAD)"
+if [ -n "${EXPECTED_SOURCE_REVISION:-}" ] && [ "$source_revision" != "$EXPECTED_SOURCE_REVISION" ]; then
+  echo "Source revision mismatch: expected $EXPECTED_SOURCE_REVISION, found $source_revision" >&2
+  exit 2
+fi
+echo "SOURCE_REVISION=$source_revision"
 exec bash slurm_bitdistill_glue.sh
