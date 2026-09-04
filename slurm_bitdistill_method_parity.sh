@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH --job-name=bd-parity
-#SBATCH --partition=midcard
+#SBATCH --partition=dualcard
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=12
 #SBATCH --mem=24G
 #SBATCH --time=06:00:00
-#SBATCH --array=0-5%2
+#SBATCH --array=0-5%1
 #SBATCH --output=/mnt/slurm_nfs/a6abdulm/projects/BitNet/logs/%x-%A_%a.out
 #SBATCH --error=/mnt/slurm_nfs/a6abdulm/projects/BitNet/logs/%x-%A_%a.err
 
