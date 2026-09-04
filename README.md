@@ -85,10 +85,20 @@ The result is useful but not a reproduction: doubling the latest Stage-2
 budget bought less than one accuracy point, and the paired confidence interval
 still excludes the FP16 recovery gate by a wide margin.
 
+A conditional saturation audit now quantifies why the unchanged fixed-gamma
+recipe should not simply be scaled to 10B token presentations. Fitting the last
+two exact budget doublings gives a gain contraction of `0.342756`, a projected
+10B accuracy of `0.734981`, and a paired-bootstrap 95% interval
+`[0.723750, 0.755819]`. The interval remains below the pre-registered
+`0.798151` recovery target. This is evidence against budget-only scaling for
+this fixed local recipe, not evidence against BitDistill generally:
+[bitdistill_stage2_saturation_2026-09-04.md](benchmarks/results/bitdistill_stage2_saturation_2026-09-04.md).
+
 Evidence and decision artifacts:
 
 - [stage2_655m_ingestion_2026-05-23.md](benchmarks/results/stage2_655m_ingestion_2026-05-23.md)
 - [bitdistill_controlled_curve_2026-05-23.md](benchmarks/results/bitdistill_controlled_curve_2026-05-23.md)
+- [bitdistill_stage2_saturation_2026-09-04.md](benchmarks/results/bitdistill_stage2_saturation_2026-09-04.md)
 - [gamma60_gradient_balance_2026-05-23.md](benchmarks/results/gamma60_gradient_balance_2026-05-23.md)
 - [bitdistill_next_decision_2026-05-23.md](benchmarks/results/bitdistill_next_decision_2026-05-23.md)
 - [bitdistill_next_experiment_blueprint_2026-05-23.md](benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.md)

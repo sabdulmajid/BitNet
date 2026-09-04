@@ -1,0 +1,55 @@
+{
+  "decision": "Under the fitted diminishing-returns model, Stage-2 budget alone does not close the local FP16 recovery gap: even the bootstrap upper bound `0.755819` is below the pre-registered recovery target `0.798151`. Change the training objective or method contract before scaling this fixed recipe.",
+  "fp_accuracy": 0.8081507896077432,
+  "limitations": [
+    "Three observed budgets identify only two doubling gains.",
+    "The geometric contraction model is an extrapolation assumption.",
+    "Token presentations are not proven equivalent to the paper's corpus-token accounting.",
+    "The result applies to the fixed-gamma tensor-scale local recipe, not adaptive balancing or all BitDistill variants."
+  ],
+  "misses_recovery_target": true,
+  "observed": {
+    "asymptote": 0.7350571596031967,
+    "contraction": 0.3427561837455836,
+    "rows": [
+      {
+        "accuracy": 0.6911869587366276,
+        "prediction_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
+        "tokens": 163840000
+      },
+      {
+        "accuracy": 0.7200203769740193,
+        "prediction_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit-rerun/eval_predictions.jsonl",
+        "tokens": 327680000
+      },
+      {
+        "accuracy": 0.729903209373408,
+        "prediction_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
+        "tokens": 655360000
+      }
+    ],
+    "target_projection": 0.7349806170337967
+  },
+  "paired_bootstrap": {
+    "asymptote_ci95": [
+      0.7237661541842726,
+      0.7600986757062671
+    ],
+    "contraction_ci95": [
+      0.12670055939149916,
+      0.6409165496665497
+    ],
+    "requested_samples": 20000,
+    "target_projection_ci95": [
+      0.7237504667011866,
+      0.7558191269772756
+    ],
+    "valid_fraction": 0.9992,
+    "valid_samples": 19984
+  },
+  "recovery_margin": 0.01,
+  "recovery_target": 0.7981507896077432,
+  "schema": "bitdistill-stage2-saturation-v1",
+  "scope": "conditional_fixed_recipe_extrapolation",
+  "target_tokens": 10000000000
+}
