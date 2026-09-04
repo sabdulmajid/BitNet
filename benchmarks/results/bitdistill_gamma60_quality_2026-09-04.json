@@ -1,0 +1,113 @@
+{
+  "artifacts": {
+    "candidate": {
+      "metrics": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-gamma60-headinit/metrics.json",
+      "metrics_sha256": "6361e70a8c3d147b75189a090bcc1fd112303cc8e9070256da2e8a579c3c8a5c",
+      "predictions": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-gamma60-headinit/eval_predictions.jsonl",
+      "predictions_sha256": "81151391f29321532326b70d3d258c756d1b6835b00c36072f240eef98f97edf",
+      "run_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-gamma60-headinit"
+    },
+    "candidate_log": {
+      "path": "logs/bitdistill-gamma60-10077.out",
+      "sha256": "020fe7f39861846e8e0758aece3c9c0b08b2da23b5970e1c0cdeb6df0f317651"
+    },
+    "fixed_163m": {
+      "metrics": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json",
+      "metrics_sha256": "25c8c133a9e21f4b145ad9a9ebcc0c0563e68c0b83439d8759b490eaa1335ba3",
+      "predictions": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
+      "predictions_sha256": "1f04bf41cf4d5da89aac1740ad7109133856883c6e8bf6fb4f01195973b6667f",
+      "run_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-papergamma-headinit"
+    },
+    "fixed_163m_log": {
+      "path": "logs/bitdistill-glue-10068.out",
+      "sha256": "e0943810fe32249b68bbcc2b9892ed6f84cab289d1408cba3cdf47c04862b029"
+    },
+    "fixed_655m": {
+      "metrics": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json",
+      "metrics_sha256": "14fabdfc74e374ced5e7853e5036eac5099f41ed0bc56a76818c64d7cac24c7c",
+      "predictions": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
+      "predictions_sha256": "d18a994d994e0800c7b48644dd123d4acc82110262323f9d0fac03b9cb0959b3",
+      "run_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit"
+    },
+    "fp16": {
+      "metrics": "checkpoints/bitdistill-glue-seqcls-predtrace/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1/metrics.json",
+      "metrics_sha256": "0248843104fd1746771ab2027472d97d35b76a6fd595f1c8afdc10fe1d92c66a",
+      "predictions": "checkpoints/bitdistill-glue-seqcls-predtrace/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl",
+      "predictions_sha256": "6e708242b8c086f0b2aa9b1c7805fc088b4391de3b8442e6f5b66fa44c8f5590",
+      "run_dir": "checkpoints/bitdistill-glue-seqcls-predtrace/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1"
+    }
+  },
+  "candidate_gamma": 60.0,
+  "claim_scope": "matched_historical_gamma_control_without_seed_or_source_revision",
+  "comparisons": {
+    "fixed_gamma_655m": {
+      "candidate_accuracy": 0.7384615384615385,
+      "candidate_wins": 774,
+      "delta_candidate_minus_reference": 0.008558329088130413,
+      "errors": [],
+      "matched": 9815,
+      "mcnemar_exact_p": 0.030029749668937247,
+      "paired_ci95": [
+        0.0009192009680007779,
+        0.016197457208260047
+      ],
+      "reference_accuracy": 0.729903209373408,
+      "reference_wins": 690,
+      "status": "pass"
+    },
+    "fp16": {
+      "candidate_accuracy": 0.7384615384615385,
+      "candidate_wins": 640,
+      "delta_candidate_minus_reference": -0.06968925114620479,
+      "errors": [],
+      "matched": 9815,
+      "mcnemar_exact_p": 1.1019313339450083e-54,
+      "paired_ci95": [
+        -0.0784313427049032,
+        -0.06094715958750638
+      ],
+      "reference_accuracy": 0.8081507896077432,
+      "reference_wins": 1324,
+      "status": "pass"
+    },
+    "matched_fixed_gamma_163m": {
+      "candidate_accuracy": 0.7384615384615385,
+      "candidate_wins": 1049,
+      "delta_candidate_minus_reference": 0.04727457972491085,
+      "errors": [],
+      "matched": 9815,
+      "mcnemar_exact_p": 9.070700837806257e-31,
+      "paired_ci95": [
+        0.039256485932005106,
+        0.055292673517816596
+      ],
+      "reference_accuracy": 0.6911869587366276,
+      "reference_wins": 585,
+      "status": "pass"
+    }
+  },
+  "conclusion": "In the matched historical 163.84M Stage-2 comparison, the run declaring local attention-KD coefficient 60 improves MNLI over the run declaring 100,000 by `+0.047275` with paired 95% CI `[0.039256, 0.055293]`. The exact step-1 execution fingerprint and matching serialized contract make this strong local evidence that loss-scale alignment matters, pending source-pinned seeded replication.",
+  "created_utc": "2026-09-04T06:35:56.955065+00:00",
+  "errors": [],
+  "limitations": [
+    "Historical metrics omitted seed and source revision; this is not a fully provenance-pinned replicate.",
+    "Paired intervals measure validation-example uncertainty, not training-seed uncertainty.",
+    "Gamma is not portable across different loss reductions or method definitions."
+  ],
+  "matched_reference_gamma": 100000.0,
+  "schema": "bitdistill-gamma60-quality-v1",
+  "status": "matched_historical_control",
+  "step1_execution_fingerprint": {
+    "candidate": {
+      "attention_kd": 0.043257,
+      "ce": 1.492188,
+      "logit_kd": 0.090411
+    },
+    "exact_match": true,
+    "fixed_163m": {
+      "attention_kd": 0.043257,
+      "ce": 1.492188,
+      "logit_kd": 0.090411
+    }
+  }
+}

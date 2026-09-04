@@ -28,7 +28,7 @@ The frozen baseline bundle and current decision reports are:
 | --- | --- | --- | --- |
 | Blind FP/BF16 to ternary PTQ works as a general retrofit | **No: strong negative result in the tested setup** | Qwen2.5-1.5B FP WikiText PPL `13.901`; naive ternary PTQ PPL `3,813,121.803`. FP ten-task mean `0.644169`; naive PTQ mean `0.348671`. | Dense Qwen2.5-1.5B tested setup; do not generalize as a theorem for every architecture. |
 | QAT/distillation recovers signal | **Partial recovery, not FP quality** | Best row-scale QAT ten-task mean `0.499459`, a `+0.150788` recovery over naive PTQ and still `-0.144710` below FP. | Row-scale QAT is this fork's retrofit variant, not standard BitDistill. |
-| BitDistill paper-level GLUE reproduction is complete | **No** | Qwen2.5-0.5B local FP16-SFT MNLI is `0.808151`. Controlled Stage-2 rows are `0.616607` at `40.96M`, `0.691187` at `163.84M`, `0.720020` at `327.68M`, and `0.729903` at `655.36M` token presentations. | The 655M row remains `-0.078248` below FP16 with paired CI `[-0.086720, -0.069775]`; the paper-level recovery target is not met. |
+| BitDistill paper-level GLUE reproduction is complete | **No** | Qwen2.5-0.5B local FP16-SFT MNLI is `0.808151`. Fixed-gamma Stage-2 reaches `0.729903` at `655.36M`, delta `-0.078248`, CI `[-0.086720, -0.069775]`; the best completed loss-balanced tensor run is `0.738462`. | The loss-balanced run remains `-0.069689` below FP16 with paired CI `[-0.078431, -0.060947]`; the paper-level recovery target is not met. |
 | The `655.36M` Stage-2 checkpoint is usable | **Yes, with a verified manifest** | [stage2_manifest_655m_2026-05-23.md](benchmarks/results/stage2_manifest_655m_2026-05-23.md) records job `10250`, four complete snapshots, final CE `3.426713`, the state-dict SHA-256, and downstream job `10260`. | This was a `327.68M` continuation with a fresh optimizer/scheduler segment, not one uninterrupted 80k-step run. |
 | Paper gamma can be copied literally into this implementation | **No, not without matching loss normalization** | Historical telemetry measures attention/CE gradient ratio `221.384986` for the paper-gamma path versus `0.346044` at gamma 60. A controlled A4500 screen measures median ratio `69.2248` for cosine split-1 at fixed gamma `100,000`, versus `0.273975` with adaptive balancing. | This is not a task-quality result. The source-pinned dualcard replication remains required before a paper-aligned claim; the active 10k runs are explicitly cross-environment. |
 | The paper defines one unambiguous attention-relation objective | **No** | [attention_relation_equivalence_2026-09-04.md](benchmarks/results/attention_relation_equivalence_2026-09-04.md) proves that Equation 12 scaled-dot relations and Algorithm 1 normalized-cosine relations are not generally equivalent. In a deterministic probe their gradient-norm ratio is `18.7073` and gradient cosine is `0.2437`. | This is a mathematical contract result, not downstream quality evidence. For Qwen's 14:2 grouped-query attention, KV repetition leaves cosine relations invariant but multiplies scaled-dot logits by `sqrt(7)`. |
@@ -97,11 +97,32 @@ the latest observed gain. This is evidence against budget-only scaling for this
 fixed local recipe, not evidence against BitDistill generally:
 [bitdistill_stage2_saturation_2026-09-04.md](benchmarks/results/bitdistill_stage2_saturation_2026-09-04.md).
 
+## Completed Loss-Scale Quality Control
+
+A previously completed 10,000-step run pair provides a matched historical
+quality test of the loss-scale hypothesis at the `163.84M` Stage-2 checkpoint.
+The run declaring local attention-KD coefficient `60` raises MNLI over the run
+declaring `100,000` from
+`0.691187` to `0.738462`: delta `+0.047275`, paired 95% CI
+`[0.039256, 0.055293]`, exact McNemar `p=9.07e-31`. Despite using one quarter
+of the Stage-2 budget, it also exceeds the `655.36M` fixed-gamma result by
+`+0.008558`, CI `[0.000919, 0.016197]`. It remains `-0.069689` behind FP16.
+
+Every available serialized training field matches, and step-1 CE, logits-KD,
+and attention-KD values are exactly identical, fingerprinting the same initial
+state and first batch. This is strong local evidence that objective-scale
+alignment is more valuable than additional Stage-2 compute under the old fixed
+recipe. It does not validate gamma `60` across implementations; the historical
+metrics predate source-revision and seed serialization, so the source-pinned
+adaptive replications remain necessary. See
+[bitdistill_gamma60_quality_2026-09-04.md](benchmarks/results/bitdistill_gamma60_quality_2026-09-04.md).
+
 Evidence and decision artifacts:
 
 - [stage2_655m_ingestion_2026-05-23.md](benchmarks/results/stage2_655m_ingestion_2026-05-23.md)
 - [bitdistill_controlled_curve_2026-05-23.md](benchmarks/results/bitdistill_controlled_curve_2026-05-23.md)
 - [bitdistill_stage2_saturation_2026-09-04.md](benchmarks/results/bitdistill_stage2_saturation_2026-09-04.md)
+- [bitdistill_gamma60_quality_2026-09-04.md](benchmarks/results/bitdistill_gamma60_quality_2026-09-04.md)
 - [gamma60_gradient_balance_2026-05-23.md](benchmarks/results/gamma60_gradient_balance_2026-05-23.md)
 - [bitdistill_next_decision_2026-05-23.md](benchmarks/results/bitdistill_next_decision_2026-05-23.md)
 - [bitdistill_next_experiment_blueprint_2026-05-23.md](benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.md)
