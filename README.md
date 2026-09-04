@@ -35,7 +35,7 @@ The frozen baseline bundle and current decision reports are:
 | The local GLUE formulation is paper-exact | **Unresolved** | [bitdistill_task_formulation_audit_2026-09-04.md](benchmarks/results/bitdistill_task_formulation_audit_2026-09-04.md) separates sequence-classification from causal answer-token results. | Token-level CE and decoding language favor the causal interpretation, but no authoritative released templates or training code establish equivalence. |
 | Row-scale semantics matter at runtime | **Yes: strong systems result** | TL2 one-scale relative output RMS error `1.904230`; exact FP16 row scales reduce it to `0.000197`. | Row scales are part of the learned function. TL2 row-scale support is not implemented. |
 | `I2_SR` packed CPU inference works | **Yes, for compatible causal artifacts** | Xeon Silver 4116: row-scale `I2_SR` file `1211.3 MiB`, PPL `38.8477`, prompt `211.67 tok/s`, decode `19.07 tok/s`. | It does **not** beat Q4_K_M on quality or file size. Q4_K_M is `940.4 MiB` with PPL `12.8112`. |
-| Native packed sequence classification is product-ready | **No: research demo only** | Full MNLI native sequence-isolated path: accuracy `0.652165`, PyTorch agreement `0.976668`, `7.456204` examples/s, RSS `960.15 MiB`. | Agreement is below the `0.99` product gate and the model quality is weak. |
+| Native packed sequence classification preserves task quality | **Yes, for one audited artifact; not product-ready** | Full MNLI native sequence-isolated path: `0.652165` versus PyTorch `0.653591`, paired delta `-0.001426`, 95% CI `[-0.004193, 0.001341]`, exact McNemar `p=0.348`; `7.456204` examples/s and RSS `960.15 MiB`. | Exact prediction agreement is `0.976668`, the 0.5-point non-inferiority gate is retrospective, multi-prompt batching remains excluded, and the underlying model quality is weak. |
 | Kimi/MoE support is proven | **No: not supported** | Only tiny Qwen2MoE fixture/plumbing exists. | No trained Kimi quality, MLA/shared-expert mapping, routed expert locality, or CPU product result is proven. |
 
 ## Current Reproduction Gap
@@ -129,6 +129,21 @@ Evidence and decision artifacts:
 - [bitdistill_next_experiment_blueprint_2026-05-23.json](benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.json)
 - [active_gate_watchdog_2026-05-23.md](benchmarks/results/active_gate_watchdog_2026-05-23.md)
 - [active_gate_watchdog_2026-05-23.json](benchmarks/results/active_gate_watchdog_2026-05-23.json)
+
+## Packed Classifier Quality Contract
+
+The native `I2_SR` sequence-classification path now has a paired full-split
+quality audit. On the same 9,815 MNLI labels, the saved GPU-BF16 PyTorch trace
+is correct on `6,415` examples and the sequence-isolated CPU artifact is correct
+on `6,401`. The runtime wins `89` discordant examples and loses `103`, yielding
+delta `-0.001426`, paired bootstrap CI `[-0.004177, 0.001325]`, and exact
+McNemar `p=0.348`. This passes a clearly labeled retrospective 0.5-accuracy-point
+non-inferiority criterion.
+
+This closes task-accuracy preservation for that artifact, not exact numerical
+parity: predictions agree on `0.976668` of examples. It also does not repair the
+checkpoint's weak absolute accuracy or validate multi-prompt batching. See
+[seqcls_runtime_quality_equivalence_2026-09-04.md](benchmarks/results/seqcls_runtime_quality_equivalence_2026-09-04.md).
 
 ## Active Method-Equivalence Gate
 

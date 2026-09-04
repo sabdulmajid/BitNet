@@ -32,7 +32,7 @@ does not preserve the trained checkpoint.
 | --- | --- |
 | `I2_SR` row-scale GGUF path | Working for compatible causal artifacts. |
 | TL2 one-scale path | Not valid for row-scale checkpoints. |
-| Native sequence-classifier path | Research demo; agreement below product gate. |
+| Native sequence-classifier path | Task-quality parity supported for one artifact; numerical parity and batching remain below product gates. |
 | MoE/Kimi path | Not supported beyond tiny fixtures. |
 
 ## CPU Result
@@ -48,3 +48,26 @@ On the Xeon Silver 4116 CPU evidence bundle:
 Interpretation: `I2_SR` proves a row-scale packed runtime path and improves
 decode speed versus FP16, but it is not quality/storage competitive with Q4_K_M
 in this run.
+
+## Sequence-Classification Result
+
+The same-artifact native classifier was also evaluated on all 9,815 MNLI
+validation examples using direct token IDs and sequence-isolated execution:
+
+| Metric | Result |
+| --- | ---: |
+| PyTorch accuracy | `0.653591` |
+| native `I2_SR` accuracy | `0.652165` |
+| paired delta | `-0.001426` |
+| paired 95% CI | `[-0.004193, 0.001341]` |
+| exact McNemar p | `0.348171` |
+| exact prediction agreement | `0.976668` |
+| throughput | `7.456204 examples/s` |
+| child peak RSS | `960.15 MiB` |
+
+The packed runtime preserves task accuracy for this artifact within measured
+uncertainty, but it is not numerically identical to GPU-BF16 PyTorch and the
+underlying model is not competitive with FP16. The 0.5-point non-inferiority
+criterion was selected retrospectively. Multi-prompt batching is not part of
+this result. See
+`benchmarks/results/seqcls_runtime_quality_equivalence_2026-09-04.md`.

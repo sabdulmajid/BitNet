@@ -19,7 +19,7 @@ representation-learning problem plus a runtime-contract problem.
 | Scaling the unchanged fixed recipe to 10B presentations is justified | Rejected conditionally | A geometric fit projects `0.734981` at 10B (95% interval `[0.723750, 0.755819]`). Even repeating the latest gain without further decay projects `0.768758` (95% interval `[0.741530, 0.795733]`), below the `0.798151` gate. This is not a general BitDistill limit. |
 | Row-scale runtime semantics matter | Supported | TL2 one-scale RMS error `1.904230`; exact row-scale RMS error `0.000197`. |
 | `I2_SR` is a working row-scale CPU path | Supported with caveat | Runs on Xeon and is faster than FP16 decode, but does not beat Q4_K_M on quality or file size. |
-| Native classifier runtime is product-ready | Not yet | Full MNLI native path runs, but accuracy `0.652165` and PyTorch agreement `0.976668` are below product gates. |
+| Native classifier runtime preserves task quality | Supported for one artifact; not product-ready | On 9,815 MNLI examples, native `I2_SR` accuracy is `0.652165` versus PyTorch `0.653591`: paired delta `-0.001426`, CI `[-0.004193, 0.001341]`, exact McNemar `p=0.348`. Exact prediction agreement remains `0.976668`; the non-inferiority margin was retrospective and the model itself is weak. |
 | Kimi/MoE support is proven | Not supported | Tiny Qwen2MoE fixtures only. |
 
 ## Reproduction Gap Update

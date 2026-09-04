@@ -1,0 +1,47 @@
+{
+  "artifacts": {
+    "comparison_trace": "benchmark_results/seqcls_native_i2sr_quality_trace_2026-09-04.jsonl",
+    "comparison_trace_sha256": "dc170141dce99ac1b9fa79c8124e387b001d054fdd669cbe42c2d047d55e0da7",
+    "pytorch_predictions": "checkpoints/bitdistill-glue-seqcls-longwarmup/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8/eval_predictions.jsonl",
+    "pytorch_predictions_sha256": "8ef352b7e386f5faf3ddbc9e0619d1b4df42d08360da1bc9dcdfe59a73b1fb1e",
+    "runtime_json": "benchmark_results/seqcls_native_i2sr_cpu_mnli_full_token_ids_sequence_isolated_2026-05-15.json",
+    "runtime_json_sha256": "1a78dc21dc0ccb0c3be0fca41ccb7c6228ccdd5117c5ef5f2dd82ea97d84d75a"
+  },
+  "created_utc": "2026-09-04T06:46:27.105491+00:00",
+  "errors": [],
+  "interpretation": "On all 9,815 MNLI validation examples, native I2_SR loses 14 net correct predictions relative to the saved PyTorch trace. The paired 95% interval includes zero, exact McNemar does not reject equal marginal accuracy, and the retrospective 0.5-point non-inferiority criterion passes. The runtime therefore preserves task accuracy for this artifact within the measured uncertainty, despite failing strict prediction identity.",
+  "schema": "seqcls-runtime-quality-equivalence-v1",
+  "statistics": {
+    "bootstrap_samples": 50000,
+    "bootstrap_seed": 20260904,
+    "delta_runtime_minus_pytorch": -0.0014263881813550688,
+    "examples": 9815,
+    "mcnemar_exact_p": 0.34817116713180685,
+    "paired_bootstrap_ci95": [
+      -0.004177279673968416,
+      0.0013245033112582781
+    ],
+    "paired_normal_ci95": [
+      -0.004193380416913859,
+      0.0013406040542037214
+    ],
+    "paired_standard_error": 0.0014117566737881268,
+    "prediction_agreement": 0.9766683647478349,
+    "pytorch_accuracy": 0.6535914416709119,
+    "pytorch_correct": 6415,
+    "pytorch_wins": 103,
+    "quality_agreement": 0.9804381049414161,
+    "retrospective_noninferiority": {
+      "criterion": "lower endpoint of two-sided paired 95% normal CI > -margin",
+      "margin": 0.005,
+      "one_sided_p": 0.005681661324590428,
+      "passed": true,
+      "preregistered": false,
+      "z": 2.5313227732481405
+    },
+    "runtime_accuracy": 0.6521650534895568,
+    "runtime_correct": 6401,
+    "runtime_wins": 89
+  },
+  "status": "task_quality_preserved_for_artifact"
+}
