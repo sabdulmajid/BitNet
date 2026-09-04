@@ -1,0 +1,13 @@
+{
+  "attention_kd_weight": 60,
+  "caveat": "This is a component-gradient diagnostic, not a quality benchmark.",
+  "exit_code": 0,
+  "job_id": "10257",
+  "max_steps": 200,
+  "metrics_path": "checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/metrics.json",
+  "output_dir": "checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200",
+  "quality_claim": "none",
+  "schema": "bitdistill-gamma60-telemetry-status-v1",
+  "status": "complete",
+  "telemetry_path": "checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/telemetry.jsonl"
+}

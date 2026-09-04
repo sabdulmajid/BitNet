@@ -16,7 +16,7 @@
     "partial": 1,
     "under_budget_active_extension_running": 1
   },
-  "created_utc": "2026-05-23T19:08:52.053180+00:00",
+  "created_utc": "2026-09-04T03:53:38.206680+00:00",
   "highest_risks": [
     "Stage-2 token budget is far below 10B and the 655M gate is still running.",
     "Stage-2 corpus differs from the paper's FALCON corpus unless explicitly overridden.",
@@ -49,7 +49,7 @@
     },
     {
       "axis": "Baselines",
-      "local_state": "MNLI FP16-SFT 0.808151; BitNet-SFT best 0.628935; BitDistill latest 0.720020.",
+      "local_state": "MNLI FP16-SFT 0.808151; BitNet-SFT best 0.628935; BitDistill latest 0.729903.",
       "paper_recipe": "FP16-SFT, BitNet-SFT, and BitDistill.",
       "risk": "BitDistill is still below FP; QNLI/SST2 baselines should wait for MNLI recovery gate.",
       "status": "mnli_present"
@@ -84,7 +84,7 @@
     },
     {
       "axis": "Stage-2 token budget",
-      "local_state": "Completed controlled row 327,680,000 tokens (3.2768% of paper); active gate targets 655,360,000 tokens (6.5536% of paper).",
+      "local_state": "Completed controlled row 655,360,000 tokens (6.5536% of paper); active gate targets 655,360,000 tokens (6.5536% of paper).",
       "paper_recipe": "10B continued-pretraining tokens.",
       "risk": "Current non-reproduction cannot disprove paper-scale BitDistill.",
       "status": "under_budget_active_extension_running"
@@ -105,7 +105,7 @@
     },
     {
       "axis": "Attention-relation coefficient",
-      "local_state": "Paper-gamma local telemetry showed attention/CE imbalance; gamma status is pending_gamma60_telemetry.",
+      "local_state": "Paper-gamma local telemetry showed attention/CE imbalance; gamma status is gamma60_rebalanced_attention_updates.",
       "paper_recipe": "Classification uses large attention-KD coefficient; exact meaning depends on reductions.",
       "risk": "Copying gamma numerically is not enough unless reductions match.",
       "status": "normalization_not_proven_equivalent"
@@ -140,7 +140,7 @@
     },
     {
       "axis": "Success criterion",
-      "local_state": "Latest completed MNLI delta vs FP16 is -0.088130; configured recovery gate is -0.010000.",
+      "local_state": "Latest completed MNLI delta vs FP16 is -0.078248; configured recovery gate is -0.010000.",
       "paper_recipe": "BitDistill comparable to FP16-SFT on downstream tasks.",
       "risk": "No public claim of paper-level reproduction.",
       "status": "not_met"

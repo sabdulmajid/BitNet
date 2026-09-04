@@ -1,8 +1,8 @@
 # Stage-2 655.36M Ingestion Audit
 
-Generated: `2026-05-23T19:08:43.511666+00:00`
+Generated: `2026-09-04T03:53:18.842782+00:00`
 
-Status: **pending_handoff**.
+Status: **ingested_reports_rebuilt**.
 
 Quality claim: **none_until_complete_downstream_trace**.
 
@@ -12,39 +12,39 @@ This report is an ingestion receipt. It does not create a quality claim; it veri
 
 | job | id | state | time | reason |
 | --- | --- | --- | --- | --- |
-| stage2 | 10250 | RUNNING | 3:31:18 | ece-nebula12 |
-| handoff | 10259 | PENDING | 0:00 | (Dependency) |
+| stage2 | 10250 | not_in_squeue |  |  |
+| handoff | 10259 | not_in_squeue |  |  |
 
 ## Downstream Artifacts
 
 | artifact | exists | path/value |
 | --- | --- | --- |
-| metrics | false | checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json |
-| predictions | false | checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl |
-| metric_accuracy | false | - |
-| metric_eval_examples | false | - |
-| prediction_rows | false | 0 |
-| paired_status | true | pending |
-| paired_matched | true | 0 |
+| metrics | true | checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json |
+| predictions | true | checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl |
+| metric_accuracy | true | 0.729903 |
+| metric_eval_examples | true | 9815.000000 |
+| prediction_rows | true | 9815 |
+| paired_status | true | pass |
+| paired_matched | true | 9815 |
 
 ## Report Ingestion
 
 | item | status/value |
 | --- | --- |
-| postprocess_status | - |
-| controlled_target_row_exists | false |
-| controlled_accuracy | - |
-| controlled_delta_vs_fp16 | - |
-| controlled_paired_status | - |
-| gap_latest_stage2_tokens | - |
-| gap_latest_mnli | - |
-| next_decision_status | pending_655m_downstream |
+| postprocess_status | reports_rebuilt |
+| controlled_target_row_exists | true |
+| controlled_accuracy | 0.729903 |
+| controlled_delta_vs_fp16 | -0.078248 |
+| controlled_paired_status | pass |
+| gap_latest_stage2_tokens | 655360000 |
+| gap_latest_mnli | 0.729903 |
+| next_decision_status | run_gamma_balanced_downstream |
 
 ## Consistency
 
 | field | value |
 | --- | --- |
-| complete | false |
+| complete | true |
 | consistency_errors | none |
 
 ## Source Artifacts

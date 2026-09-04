@@ -1,80 +1,135 @@
 {
-  "complete": false,
+  "complete": true,
   "consistency_errors": [],
   "controlled_curve": {
-    "exists": false,
+    "exists": true,
     "path": "benchmarks/results/bitdistill_controlled_curve_2026-05-23.json",
-    "target_row": {},
-    "target_row_exists": false
+    "target_row": {
+      "claim_label": "paper-inspired",
+      "dependency": "",
+      "job_id": "10260",
+      "label": "80k-warmup downstream control",
+      "last": {
+        "attention_kd": 0.01103295013308525,
+        "ce": 0.28125,
+        "logit_kd": 0.004599958658218384,
+        "weighted_attention_kd": 1103.2950439453125,
+        "weighted_logit_kd": 0.04599958658218384
+      },
+      "live_log": {
+        "exists": false,
+        "path": "logs/bitdistill-glue-10260.out"
+      },
+      "metric_accuracy": 0.729903209373408,
+      "metric_eval_examples": 9815.0,
+      "metrics_exists": true,
+      "metrics_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json",
+      "output_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit",
+      "paired": {
+        "both_correct": 6618,
+        "both_wrong": 1337,
+        "candidate_accuracy": 0.729903209373408,
+        "candidate_wins": 546,
+        "delta_vs_reference": -0.0782475802343352,
+        "errors": [],
+        "matched": 9815,
+        "mcnemar_exact_p": 7.550166044128994e-73,
+        "missing": [],
+        "paired_ci95": [
+          -0.08671994816137527,
+          -0.06977521230729514
+        ],
+        "reference_accuracy": 0.8081507896077432,
+        "reference_wins": 1314,
+        "status": "pass"
+      },
+      "paper_stage2_fraction": 0.065536,
+      "partition": "midcard",
+      "passed_fp_recovery_gate": false,
+      "predictions_exists": true,
+      "predictions_path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
+      "squeue": {
+        "job_id": "10260",
+        "state": "not_in_squeue"
+      },
+      "stage2_token_presentations": 655360000,
+      "steps": 10000
+    },
+    "target_row_exists": true
   },
-  "created_utc": "2026-05-23T19:08:43.511666+00:00",
+  "created_utc": "2026-09-04T03:53:18.842782+00:00",
   "downstream": {
-    "metric_accuracy": null,
-    "metric_eval_examples": null,
+    "metric_accuracy": 0.729903209373408,
+    "metric_eval_examples": 9815.0,
     "metrics": {
-      "exists": false,
+      "exists": true,
       "path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json",
-      "size_bytes": null
+      "size_bytes": 2775
     },
     "paired": {
+      "both_correct": 6618,
+      "both_wrong": 1337,
+      "candidate_accuracy": 0.729903209373408,
+      "candidate_wins": 546,
+      "delta_vs_reference": -0.0782475802343352,
       "errors": [],
-      "matched": 0,
-      "missing": [
-        "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl"
+      "matched": 9815,
+      "mcnemar_exact_p": 7.550166044128994e-73,
+      "missing": [],
+      "paired_ci95": [
+        -0.08671994816137527,
+        -0.06977521230729514
       ],
-      "status": "pending"
+      "reference_accuracy": 0.8081507896077432,
+      "reference_wins": 1314,
+      "status": "pass"
     },
-    "prediction_error_count": 1,
-    "prediction_errors": [
-      "missing checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl"
-    ],
-    "prediction_rows": 0,
+    "prediction_error_count": 0,
+    "prediction_errors": [],
+    "prediction_rows": 9815,
     "predictions": {
-      "exists": false,
+      "exists": true,
       "path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
-      "size_bytes": null
+      "size_bytes": 1026645
     }
   },
   "handoff": {
-    "downstream_job_id": "",
+    "downstream_job_id": "10260",
     "job_id": "10259",
     "report": {
-      "exists": false,
+      "exists": true,
       "path": "benchmarks/results/stage2_655m_handoff_2026-05-23.json",
-      "size_bytes": null
+      "size_bytes": 1076
     },
     "slurm": {
       "job_id": "10259",
-      "name": "bd-655m-handoff",
-      "reason": "(Dependency)",
-      "state": "PENDING",
-      "time": "0:00"
+      "state": "not_in_squeue"
     },
-    "status": "dependency_pending",
+    "status": "submitted_downstream",
     "submission": "benchmarks/results/stage2_655m_handoff_submission_2026-05-23.json"
   },
   "next_decision": {
     "exists": true,
     "path": "benchmarks/results/bitdistill_next_decision_2026-05-23.json",
-    "recommendation": "Wait for the active 655.36M Stage-2 producer, downstream MNLI, and postprocess reports.",
-    "status": "pending_655m_downstream"
+    "recommendation": "The Stage-2 marginal gain is weak and gamma-60 rebalances updates. Run a matched 10k-step downstream MNLI row with the balanced coefficient before spending more Stage-2 tokens.",
+    "status": "run_gamma_balanced_downstream"
   },
   "postprocess": {
-    "downstream_job_id": "",
-    "job_id": "",
+    "downstream_job_id": "10260",
+    "job_id": "10261",
     "report": {
-      "exists": false,
+      "exists": true,
       "path": "benchmarks/results/stage2_655m_postprocess_2026-05-23.json",
-      "size_bytes": null
+      "size_bytes": 1393
     },
-    "status": null
+    "status": "reports_rebuilt"
   },
   "quality_claim": "none_until_complete_downstream_trace",
   "reproduction_gap": {
     "exists": true,
-    "latest_delta_vs_fp16": null,
-    "latest_mnli": null,
-    "latest_stage2_tokens": null,
+    "latest_delta_vs_fp16": -0.0782475802343352,
+    "latest_mnli": 0.729903209373408,
+    "latest_stage2_tokens": 655360000,
     "path": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json",
     "status": "not_reproduced"
   },
@@ -94,13 +149,10 @@
     "job_id": "10250",
     "slurm": {
       "job_id": "10250",
-      "name": "bd-s2-655m",
-      "reason": "ece-nebula12",
-      "state": "RUNNING",
-      "time": "3:31:18"
+      "state": "not_in_squeue"
     }
   },
-  "status": "pending_handoff",
+  "status": "ingested_reports_rebuilt",
   "success_delta_from_fp": -0.01,
   "target_stage2_tokens": 655360000
 }

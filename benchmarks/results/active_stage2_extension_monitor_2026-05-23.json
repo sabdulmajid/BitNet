@@ -1,58 +1,54 @@
 {
-  "created_utc": "2026-05-23T19:08:43.432585+00:00",
+  "created_utc": "2026-09-04T03:53:18.643317+00:00",
   "downstream": {
     "caveat": "This section tracks downstream artifact existence only; it does not compute or claim MNLI accuracy.",
-    "complete": false,
-    "handoff_report_exists": false,
-    "handoff_report_status": null,
-    "job_id": "",
+    "complete": true,
+    "handoff_report_exists": true,
+    "handoff_report_status": "submitted_downstream",
+    "job_id": "10260",
     "metrics": {
-      "exists": false,
+      "exists": true,
       "path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json",
-      "size_bytes": null
+      "size_bytes": 2775
     },
     "output_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit",
     "predictions": {
-      "exists": false,
+      "exists": true,
       "path": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
-      "size_bytes": null
+      "size_bytes": 1026645
     },
     "slurm": {
-      "job_id": "",
+      "job_id": "10260",
       "state": "not_submitted"
     },
-    "status": "waiting_for_handoff"
+    "status": "complete_artifacts_present"
   },
   "handoff": {
     "dependency": "afterok:10250",
-    "expected_handoff_exists": false,
+    "expected_handoff_exists": true,
     "expected_handoff_json": "benchmarks/results/stage2_655m_handoff_2026-05-23.json",
-    "expected_manifest_exists": false,
+    "expected_manifest_exists": true,
     "expected_manifest_json": "benchmarks/results/stage2_manifest_655m_2026-05-23.json",
-    "handoff_report_status": null,
+    "handoff_report_status": "submitted_downstream",
     "job_id": "10259",
     "slurm": {
       "job_id": "10259",
-      "name": "bd-655m-handoff",
-      "reason": "(Dependency)",
-      "state": "PENDING",
-      "time": "0:00",
-      "time_limit": "20:00"
+      "state": "not_in_squeue"
     }
   },
   "postprocess": {
     "caveat": "This section tracks report-regeneration job state only; it is not quality evidence.",
     "expected_json": "benchmarks/results/stage2_655m_postprocess_2026-05-23.json",
-    "expected_json_exists": false,
+    "expected_json_exists": true,
     "expected_md": "benchmarks/results/stage2_655m_postprocess_2026-05-23.md",
-    "expected_md_exists": false,
+    "expected_md_exists": true,
     "expected_next_decision_json": "benchmarks/results/bitdistill_next_decision_2026-05-23.json",
     "expected_next_decision_json_exists": true,
     "expected_next_decision_md": "benchmarks/results/bitdistill_next_decision_2026-05-23.md",
     "expected_next_decision_md_exists": true,
-    "job_id": "",
+    "job_id": "10261",
     "slurm": {
-      "job_id": "",
+      "job_id": "10261",
       "state": "not_submitted"
     }
   },
@@ -63,108 +59,108 @@
     "cumulative_token_presentations": 655360000,
     "expected_snapshots": [
       {
-        "complete": false,
+        "complete": true,
         "metrics": {
-          "exists": false,
+          "exists": true,
           "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-10000/metrics.json",
-          "size_bytes": null
+          "size_bytes": 1461
         },
         "snapshot_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-10000",
-        "snapshot_exists": false,
+        "snapshot_exists": true,
         "state": {
-          "exists": false,
+          "exists": true,
           "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-10000/custom_state_dict.pt",
-          "size_bytes": null
+          "size_bytes": 2249003667
         },
         "step": 10000
       },
       {
-        "complete": false,
+        "complete": true,
         "metrics": {
-          "exists": false,
+          "exists": true,
           "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-20000/metrics.json",
-          "size_bytes": null
+          "size_bytes": 1459
         },
         "snapshot_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-20000",
-        "snapshot_exists": false,
+        "snapshot_exists": true,
         "state": {
-          "exists": false,
+          "exists": true,
           "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-20000/custom_state_dict.pt",
-          "size_bytes": null
+          "size_bytes": 2249003667
         },
         "step": 20000
       },
       {
-        "complete": false,
+        "complete": true,
         "metrics": {
-          "exists": false,
+          "exists": true,
           "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-30000/metrics.json",
-          "size_bytes": null
+          "size_bytes": 1459
         },
         "snapshot_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-30000",
-        "snapshot_exists": false,
+        "snapshot_exists": true,
         "state": {
-          "exists": false,
+          "exists": true,
           "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-30000/custom_state_dict.pt",
-          "size_bytes": null
+          "size_bytes": 2249003667
         },
         "step": 30000
       },
       {
-        "complete": false,
+        "complete": true,
         "metrics": {
-          "exists": false,
+          "exists": true,
           "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/metrics.json",
-          "size_bytes": null
+          "size_bytes": 1459
         },
         "snapshot_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000",
-        "snapshot_exists": false,
+        "snapshot_exists": true,
         "state": {
-          "exists": false,
+          "exists": true,
           "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/custom_state_dict.pt",
-          "size_bytes": null
+          "size_bytes": 2249003667
         },
         "step": 40000
       }
     ],
     "final_snapshot_metrics": {
-      "exists": false,
+      "exists": true,
       "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/metrics.json",
-      "size_bytes": null
+      "size_bytes": 1459
     },
     "final_state": {
-      "exists": false,
+      "exists": true,
       "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/custom_state_dict.pt",
-      "size_bytes": null
+      "size_bytes": 2249003667
     },
     "job_id": "10250",
-    "latest_complete_snapshot_step": null,
+    "latest_complete_snapshot_step": 40000,
     "latest_step": {
-      "ce": 3.939427,
-      "elapsed_seconds": 12616.1,
+      "ce": 3.426713,
+      "elapsed_seconds": 72805.9,
       "first_elapsed_seconds": 2.0,
       "first_step": 1,
-      "line_no": 713,
+      "line_no": 4019,
       "log_exists": true,
       "lr": 2e-06,
-      "parsed_log_rows": 695,
+      "parsed_log_rows": 4001,
       "path": "logs/bd-s2-655m-10250.out",
-      "recent_ce_max": 4.062924,
-      "recent_ce_mean": 3.7827336000000003,
-      "recent_ce_min": 3.420485,
+      "recent_ce_max": 3.80344,
+      "recent_ce_mean": 3.46343685,
+      "recent_ce_min": 3.155323,
       "recent_window_rows": 20,
-      "step": 6940
+      "step": 40000
     },
     "log_freshness": {
-      "age_seconds": 4.705353,
+      "age_seconds": 8870465.347391,
       "caveat": "Fresh logs are required while the Stage-2 producer is running.",
-      "checked_utc": "2026-05-23T19:08:43.432647+00:00",
+      "checked_utc": "2026-09-04T03:53:18.643350+00:00",
       "exists": true,
-      "mtime_utc": "2026-05-23T19:08:38.727294+00:00",
+      "mtime_utc": "2026-05-24T11:52:13.295959+00:00",
       "path": "logs/bd-s2-655m-10250.out",
-      "slurm_state": "RUNNING",
+      "slurm_state": "",
       "stale_after_seconds": 900,
-      "status": "fresh_running_log"
+      "status": "not_running"
     },
     "log_health": {
       "caveat": "This checks producer log structure and fatal patterns; it is not quality evidence.",
@@ -179,15 +175,15 @@
       "fatal_matches": [],
       "first_step": 1,
       "issues": [],
-      "latest_ce": 3.939427,
-      "latest_elapsed_seconds": 12616.1,
+      "latest_ce": 3.426713,
+      "latest_elapsed_seconds": 72805.9,
       "latest_lr": 2e-06,
-      "latest_step": 6940,
-      "parsed_step_rows": 695,
+      "latest_step": 40000,
+      "parsed_step_rows": 4001,
       "path": "logs/bd-s2-655m-10250.out",
-      "recent_ce_max": 4.062924,
-      "recent_ce_mean": 3.7827336000000003,
-      "recent_ce_min": 3.420485,
+      "recent_ce_max": 3.80344,
+      "recent_ce_mean": 3.46343685,
+      "recent_ce_min": 3.155323,
       "recent_window_rows": 20,
       "status": "healthy"
     },
@@ -372,83 +368,75 @@
       "mismatches": [],
       "status": "matched"
     },
-    "progress": 0.1735,
+    "progress": 1.0,
     "progress_estimate": {
-      "estimated_completion_utc": "2026-05-24T11:50:22.605862+00:00",
-      "estimated_total_seconds": 72715.27377521613,
-      "eta_hours": 16.694214937560037,
-      "eta_seconds": 60099.173775216135,
-      "seconds_per_step": 1.8178818443804035,
-      "segment_token_presentations_per_second": 4506.343481741585,
-      "steps_per_hour": 1980.3267253747197
+      "estimated_completion_utc": "2026-09-04T03:53:18.643039+00:00",
+      "estimated_total_seconds": 72805.9,
+      "eta_hours": 0.0,
+      "eta_seconds": 0.0,
+      "seconds_per_step": 1.8201474999999998,
+      "segment_token_presentations_per_second": 4500.734143798786,
+      "steps_per_hour": 1977.8616842865758
     },
     "root_metrics": {
-      "exists": false,
+      "exists": true,
       "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/metrics.json",
-      "size_bytes": null
+      "size_bytes": 1581
     },
     "save_every_steps": 10000,
     "slurm": {
       "job_id": "10250",
-      "name": "bd-s2-655m",
-      "reason": "ece-nebula12",
-      "state": "RUNNING",
-      "time": "3:31:18",
-      "time_limit": "1-00:00:00"
+      "state": "not_in_squeue"
     },
     "snapshot_status": {
       "caveat": "A missing output directory is expected before the first snapshot when save_every_steps has not been reached.",
-      "estimated_next_snapshot_utc": "2026-05-23T20:41:26.151016+00:00",
+      "estimated_next_snapshot_utc": null,
       "first_snapshot_step": 10000,
-      "latest_complete_snapshot_step": null,
-      "missing_output_dir_is_expected": true,
-      "next_snapshot_eta_hours": 1.545199567723343,
-      "next_snapshot_eta_seconds": 5562.718443804035,
-      "next_snapshot_step": 10000,
+      "latest_complete_snapshot_step": 40000,
+      "missing_output_dir_is_expected": false,
+      "next_snapshot_eta_hours": null,
+      "next_snapshot_eta_seconds": null,
+      "next_snapshot_step": null,
       "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
-      "output_dir_exists": false,
+      "output_dir_exists": true,
       "save_every_steps": 10000,
-      "status": "pre_first_snapshot",
-      "steps_to_next_snapshot": 3060
+      "status": "snapshots_present",
+      "steps_to_next_snapshot": null
     },
     "time_limit_gate": {
       "caveat": "Compares current ETA with Slurm time remaining; it is a runtime-risk signal, not quality evidence.",
-      "elapsed": "3:31:18",
-      "elapsed_seconds": 12678,
-      "eta_seconds": 60099.173775216135,
-      "margin_seconds": 13622.826224783865,
-      "remaining_seconds": 73722,
-      "slurm_state": "RUNNING",
-      "status": "within_time_limit",
+      "elapsed": null,
+      "elapsed_seconds": null,
+      "eta_seconds": 0.0,
+      "margin_seconds": null,
+      "remaining_seconds": null,
+      "slurm_state": "",
+      "status": "not_running",
       "tight_margin_threshold_seconds": 1800,
-      "time_limit": "1-00:00:00",
-      "time_limit_seconds": 86400
+      "time_limit": null,
+      "time_limit_seconds": null
     }
   },
-  "status": "running",
+  "status": "complete_artifacts_present",
   "telemetry": {
     "caveat": "This is a short gradient-balance diagnostic, not a quality benchmark. Do not compare its task accuracy to full downstream runs.",
     "dependency": "afterok:10250",
     "expected_artifacts": [
       {
-        "exists": false,
+        "exists": true,
         "path": "checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/telemetry.jsonl",
-        "size_bytes": null
+        "size_bytes": 21648
       },
       {
-        "exists": false,
+        "exists": true,
         "path": "checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/metrics.json",
-        "size_bytes": null
+        "size_bytes": 5843
       }
     ],
     "job_id": "10257",
     "slurm": {
       "job_id": "10257",
-      "name": "bd-g60-telemetry",
-      "reason": "(Dependency)",
-      "state": "PENDING",
-      "time": "0:00",
-      "time_limit": "1-00:00:00"
+      "state": "not_in_squeue"
     }
   }
 }

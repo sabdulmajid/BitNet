@@ -1,6 +1,6 @@
 # BitDistill Benchmark Scoreboard
 
-Generated: `2026-05-23T17:14:02.298529+00:00`
+Generated: `2026-09-04T03:43:39.988793+00:00`
 
 Quality claim: **scoreboard_from_existing_artifacts_not_new_benchmark**.
 
@@ -35,15 +35,15 @@ Benchmarks covered: WikiText perplexity, FineWeb heldout perplexity, arc_challen
 | --- | --- | --- | --- | --- |
 | Blind ternary PTQ | rejected_for_tested_dense_qwen | FP WikiText PPL 13.901475; naive PTQ PPL 3,813,121.803327; FP ten-task mean 0.644169; PTQ mean 0.348671 | The universal one-click arbitrary FP/BF16-to-ternary retrofit claim is not supported. | Dense Qwen2.5-1.5B tested setup; not a theorem for every architecture. |
 | QAT/distillation recovery | partial_recovery_not_fp | best row-scale QAT mean 0.499459; recovery vs PTQ +0.150788; gap vs FP -0.144710 | Training under ternary constraints recovers real signal, but not FP quality. | Row-scale QAT is a retrofit variant, not standard BitDistill. |
-| BitDistill reproduction | not_reproduced_327m_complete | MNLI 40.96M 0.616607; 163.84M 0.691187; 327.68M 0.720020; delta vs FP -0.088130 | Paper-level BitDistill quality is not reproduced yet; the curve is still improving. | The 327.68M row improves over 163.84M but remains below the FP16 recovery gate. |
+| BitDistill reproduction | not_reproduced_327m_complete | MNLI 40.96M 0.616607; 163.84M 0.691187; 327.68M 0.720020; 655.36M 0.729903; latest delta vs FP -0.078248 | Paper-level BitDistill quality is not reproduced; the 655M marginal gain is modest. | The 327.68M row improves over 163.84M but remains below the FP16 recovery gate. |
 | Loss normalization / gamma | local_loss_normalization_mismatch | gamma-60 MNLI 0.738462; delta vs FP -0.069689 | The attention-KD coefficient cannot be interpreted without matching loss reductions. | This is a local normalization diagnostic, not a claim that the paper coefficient is wrong. |
 | Row-scale runtime contract | strong_systems_result | one-scale TL2 RMS error 1.904230; exact row-scale RMS error 0.000197 | Row scales are model semantics, not optional metadata. | This supports I2_SR/row-scale contracts; TL2 row-scale support is not implemented. |
 | Packed CPU I2_SR | working_not_q4_quality_competitive | I2_SR file 1211.3 MiB, PPL 38.8477, prompt 211.67 tok/s, decode 19.07 tok/s; Q4_K_M file 940.4 MiB, PPL 12.8112 | Dense row-scale ternary CPU execution works; audited Q4 comparison has 1.191x decode and 2.299x prefill speedups for I2_SR. | I2_SR is a speed-oriented proof of row-scale ternary runtime semantics. It improves decode speed versus FP16 and is faster than Q4_K_M in the audited run, but it is larger than Q4_K_M and has much worse PPL. It should not be claimed as a quality/storage win over mature Q4 quantization. |
 | Native sequence classification | research_demo_not_product_ready | MNLI 0.652165; PyTorch agreement 0.976668; sequence-isolated 7.456204 ex/s; token-id runner 2.724140 ex/s | Native packed classifier plumbing exists as a research demo. | Agreement remains below the 0.99 product gate. |
 | MoE / Kimi | not_supported | local Kimi artifacts 0; MoE product gates passed 6/9 | Synthetic Qwen2MoE plumbing is useful, but Kimi is future work. | Only tiny Qwen2MoE fixture/plumbing exists; no Kimi quality or routed CPU runtime is proven. |
-| Benchmark coverage | passed | 12 quality benchmarks; 108 coverage checks; failed checks 0 | The current negative and partial-recovery claims are backed by broad audited coverage. | This coverage predates the active 655M Stage-2 extension. |
+| Benchmark coverage | passed | 12 quality benchmarks; 108 coverage checks; failed checks 0 | The current negative and partial-recovery claims are backed by broad audited coverage. | The broad coverage predates 655M, but the paired 655M MNLI row is included in the controlled curve. |
 | Product scope | research_mvp_only | supported claims 5; unsupported claims 4 | CPU-first dense-Qwen retrofit evaluator with stable I2_SR runtime support; keep BitDistill quality claims behind the full GLUE reproduction gate. | This is a research MVP, not a universal converter product. |
-| Active next decision | pending_655m_downstream | latest controlled row 0.720020; latest tokens 327,680,000; gamma status pending_gamma60_telemetry | Wait for the active 655.36M Stage-2 producer, downstream MNLI, and postprocess reports. | Decision is pending until the 655M downstream row and gamma-60 telemetry complete. |
+| Active next decision | run_gamma_balanced_downstream | latest controlled row 0.729903; latest tokens 655,360,000; gamma status gamma60_rebalanced_attention_updates | The Stage-2 marginal gain is weak and gamma-60 rebalances updates. Run a matched 10k-step downstream MNLI row with the balanced coefficient before spending more Stage-2 tokens. | The next result must be a matched quality run; the 200-step gamma-60 trace is diagnostic only. |
 
 ## Novelty
 
@@ -63,10 +63,10 @@ Benchmarks covered: WikiText perplexity, FineWeb heldout perplexity, arc_challen
 
 ## Next Steps
 
-- Wait for the active 655.36M Stage-2 extension, downstream MNLI row, and postprocess reports.
-- Use gamma-60 component-gradient telemetry to determine whether the next run should extend Stage-2 or rebalance the attention-KD coefficient.
-- If 655M shows meaningful marginal gain, continue the controlled Stage-2 token curve before broadening tasks.
-- If 655M saturates, audit recipe alignment and loss normalization before spending more compute.
+- Run the matched 10k-step gamma-60 MNLI ablation from the verified 655.36M checkpoint.
+- Compare the gamma-60 paired prediction trace directly against FP16 and the paper-gamma 655M row.
+- Only continue Stage-2 scaling if the loss-balanced result fails and a pre-registered budget hypothesis remains justified.
+- Do not expand to QNLI/SST2 until MNLI reaches and replicates the within-1-point recovery gate.
 - Keep MoE/Kimi work outside the main claim path until dense quality/runtime evidence is resolved.
 
 ## Source Artifacts

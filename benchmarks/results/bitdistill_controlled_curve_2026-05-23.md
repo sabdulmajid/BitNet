@@ -1,0 +1,32 @@
+# BitDistill Controlled Stage-2 Curve Audit, 2026-05-23
+
+Controlled Stage-2 curve rows are complete, but at least one row misses the FP16 recovery gate.
+
+| field | value |
+| --- | --- |
+| reference_predictions | checkpoints/bitdistill-glue-seqcls-predtrace/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1/eval_predictions.jsonl |
+| complete | 4/4 |
+| passed FP recovery gate | 0/4 |
+| success delta from FP16 | -0.010000 |
+
+## Rows
+
+| job | label | claim | state | Stage-2 tokens | paper fraction | metrics | predictions | accuracy | delta vs FP16 | paired CI95 | passes gate | errors |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 10069 | 5k-warmup downstream control | paper-inspired | not_in_squeue | 40960000 | 0.004096 | true | true | 0.616607 | -0.191544 | [-0.201893, -0.181194] | false |  |
+| 10068 | 20k-warmup downstream control | paper-inspired | not_in_squeue | 163840000 | 0.016384 | true | true | 0.691187 | -0.116964 | [-0.126110, -0.107817] | false |  |
+| 10169 | 40k-warmup downstream control | paper-inspired | not_in_squeue | 327680000 | 0.032768 | true | true | 0.720020 | -0.088130 | [-0.096749, -0.079511] | false |  |
+| 10260 | 80k-warmup downstream control | paper-inspired | not_in_squeue | 655360000 | 0.065536 | true | true | 0.729903 | -0.078248 | [-0.086720, -0.069775] | false |  |
+
+## Loss Components
+
+| job | label | live step | live attn/CE | live max attn/CE | live median attn/CE | live p95 attn/CE | median CE/attn gamma | p95 CE/attn gamma | final CE | final logit KD | final weighted logit KD | final attention KD | final weighted attention KD | live CE | live logit KD | live weighted logit KD | live attention KD | live weighted attention KD |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 10069 | 5k-warmup downstream control | 10000 | 4718.947626 | 15427.580675 | 1637.956123 | 3908.755310 | 61.052380 | 120.050236 | 0.279297 | 0.015239 | 0.152390 | 0.013180 | 1317.987915 | 0.279297 | 0.015239 | 0.152390 | 0.013180 | 1317.987915 |
+| 10068 | 20k-warmup downstream control | 10000 | 5945.070866 | 37819.641342 | 1729.105844 | 6080.253825 | 57.831811 | 135.086455 | 0.200195 | 0.007469 | 0.074691 | 0.011902 | 1190.173462 | 0.200195 | 0.007469 | 0.074691 | 0.011902 | 1190.173462 |
+| 10169 | 40k-warmup downstream control | 10000 | 3190.995498 | 24038.027696 | 1755.253104 | 7327.265686 | 56.969902 | 137.370117 | 0.339844 | 0.010467 | 0.104675 | 0.010844 | 1084.440674 | 0.339844 | 0.010467 | 0.104675 | 0.010844 | 1084.440674 |
+| 10260 | 80k-warmup downstream control | - | - | - | - | - | - | - | 0.281250 | 0.004600 | 0.046000 | 0.011033 | 1103.295044 | - | - | - | - | - |
+
+## Interpretation
+
+These rows are the controlled budget test. They should be interpreted only after full MNLI prediction traces exist for each output directory.

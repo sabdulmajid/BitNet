@@ -1,12 +1,12 @@
 {
-  "controlled_trace_count": 2,
+  "controlled_trace_count": 3,
   "date": "2026-05-23",
-  "materialized_controlled_count": 2,
-  "non_smoke_trace_count": 2,
+  "materialized_controlled_count": 3,
+  "non_smoke_trace_count": 3,
   "schema": "bitdistill-training-dynamics-audit-v1",
   "smoke_materialized_count": 0,
   "status": "controlled_materialized",
-  "trace_count": 2,
+  "trace_count": 3,
   "traces": [
     {
       "final_grad_attention_to_ce": 221.3849856028098,
@@ -74,6 +74,40 @@
       "mean_flip_fraction": 0.0025930774437592907,
       "mean_scale_abs_delta_mean": 2.0783946162001008e-07,
       "path": "checkpoints/bitdistill-glue-seqcls-telemetry-fast/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-papergamma-headinit-after10069-steps200/telemetry.jsonl",
+      "rows": 9
+    },
+    {
+      "final_grad_attention_to_ce": 0.34604429926449537,
+      "final_grad_logit_to_ce": 0.6296927314388053,
+      "final_loss_attention_to_ce": 1.2706237570212706,
+      "final_loss_logit_to_ce": 0.4474503732945797,
+      "final_qkv_grad_norms": {
+        "weighted_attention_k_kd": 1.5872128303727677,
+        "weighted_attention_q_kd": 0.47904485795743745,
+        "weighted_attention_v_kd": 8.194145778888158
+      },
+      "final_qkv_weighted_losses": {
+        "weighted_attention_k_kd": 0.13298870623111725,
+        "weighted_attention_q_kd": 0.03947150707244873,
+        "weighted_attention_v_kd": 1.1875042915344238
+      },
+      "first_step": 1,
+      "has_activation": true,
+      "has_component_grad_norms": true,
+      "has_dynamics": true,
+      "inferred_attention_kd_weight": 60.0000013148427,
+      "kind": "controlled",
+      "label": "bitdistill-tensor-20kwarmup-gamma60-headinit-steps200",
+      "last_step": 200,
+      "max_activation_clipped_fraction": 0.0,
+      "max_activation_edge_fraction": 0.0004008520217168899,
+      "max_flip_fraction": 0.003496625154205277,
+      "max_grad_attention_to_ce": 0.3843924830133077,
+      "max_loss_attention_to_ce": 2.7410503680889424,
+      "max_scale_abs_delta_max": 9.844079613685608e-06,
+      "mean_flip_fraction": 0.0022063628212442956,
+      "mean_scale_abs_delta_mean": 1.6196836007847672e-07,
+      "path": "checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/telemetry.jsonl",
       "rows": 9
     }
   ],

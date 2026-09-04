@@ -1,8 +1,8 @@
 # BitDistill Gamma Balance Audit
 
-Generated: `2026-05-23T16:53:51.895992+00:00`
+Generated: `2026-09-04T03:45:19.306256+00:00`
 
-Gamma-60 telemetry is pending; no loss-normalization conclusion is available yet.
+Gamma-60 materially rebalances attention-KD updates under the local reductions.
 
 This audit compares gradient/loss balance only. It is not a task-quality benchmark and does not update BitDistill reproduction status.
 
@@ -10,28 +10,28 @@ This audit compares gradient/loss balance only. It is not a task-quality benchma
 
 | field | value |
 | --- | --- |
-| status | pending_gamma60_telemetry |
+| status | gamma60_rebalanced_attention_updates |
 | quality claim | none |
-| job id | 10256 |
-| squeue state | PENDING |
-| squeue elapsed | 0:00 |
-| gamma telemetry exists | false |
-| gamma telemetry rows | 0 |
-| gamma status report | - |
+| job id | 10257 |
+| squeue state | not_in_squeue |
+| squeue elapsed | - |
+| gamma telemetry exists | true |
+| gamma telemetry rows | 9 |
+| gamma status report | complete |
 
 ## Balance Metrics
 
 | metric | value |
 | --- | --- |
 | paper final grad attention/CE | 221.384986 |
-| gamma60 final grad attention/CE | - |
-| attention grad reduction factor | - |
+| gamma60 final grad attention/CE | 0.346044 |
+| attention grad reduction factor | 639.759089 |
 | paper final loss attention/CE | 2.549e+03 |
-| gamma60 final loss attention/CE | - |
-| attention loss reduction factor | - |
-| gamma60 max activation clipped | - |
-| gamma60 max activation edge | - |
-| gamma60 mean ternary flip fraction | - |
+| gamma60 final loss attention/CE | 1.270624 |
+| attention loss reduction factor | 2.006e+03 |
+| gamma60 max activation clipped | 0.000000 |
+| gamma60 max activation edge | 0.000401 |
+| gamma60 mean ternary flip fraction | 0.002206 |
 
 ## Paths
 

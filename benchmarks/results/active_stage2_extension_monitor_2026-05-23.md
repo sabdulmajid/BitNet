@@ -1,65 +1,65 @@
 # Active Stage-2 Extension Monitor
 
-Status: **running**.
+Status: **complete_artifacts_present**.
 
 Quality claim: **none**. This report monitors job/artifact state only.
 
 | job | id | slurm state | time | reason |
 | --- | --- | --- | --- | --- |
-| stage2 | 10250 | RUNNING | 3:31:18 | ece-nebula12 |
-| handoff | 10259 | PENDING | 0:00 | (Dependency) |
-| gamma60 telemetry | 10257 | PENDING | 0:00 | (Dependency) |
-| downstream MNLI | - | not_submitted |  |  |
-| postprocess | - | not_submitted |  |  |
+| stage2 | 10250 | not_in_squeue |  |  |
+| handoff | 10259 | not_in_squeue |  |  |
+| gamma60 telemetry | 10257 | not_in_squeue |  |  |
+| downstream MNLI | 10260 | not_submitted |  |  |
+| postprocess | 10261 | not_submitted |  |  |
 
 | stage2 field | value |
 | --- | --- |
-| latest_step | 6940 |
+| latest_step | 40000 |
 | max_steps | 40000 |
 | save_every_steps | 10000 |
-| snapshot_status | pre_first_snapshot |
-| output_dir_exists | False |
-| missing_output_dir_is_expected | True |
+| snapshot_status | snapshots_present |
+| output_dir_exists | True |
+| missing_output_dir_is_expected | False |
 | first_snapshot_step | 10000 |
-| next_snapshot_step | 10000 |
-| steps_to_next_snapshot | 3060 |
-| next_snapshot_eta_hours | 1.545200 |
-| progress | 0.173500 |
-| latest_ce | 3.939427 |
+| next_snapshot_step | - |
+| steps_to_next_snapshot | - |
+| next_snapshot_eta_hours | - |
+| progress | 1.000000 |
+| latest_ce | 3.426713 |
 | latest_lr | 0.000002 |
-| log_freshness_status | fresh_running_log |
+| log_freshness_status | not_running |
 | log_health_status | healthy |
 | producer_config_status | matched |
-| log_age_seconds | 4.705353 |
-| time_limit_status | within_time_limit |
-| time_limit_margin_seconds | 13622.826225 |
-| log_elapsed_seconds | 12616.100000 |
-| parsed_log_rows | 695 |
+| log_age_seconds | 8870465.347391 |
+| time_limit_status | not_running |
+| time_limit_margin_seconds | - |
+| log_elapsed_seconds | 72805.900000 |
+| parsed_log_rows | 4001 |
 | recent_window_rows | 20 |
-| recent_ce_mean | 3.782734 |
-| recent_ce_min | 3.420485 |
-| recent_ce_max | 4.062924 |
-| seconds_per_step | 1.817882 |
-| steps_per_hour | 1980.326725 |
-| eta_hours | 16.694215 |
-| estimated_completion_utc | 2026-05-24T11:50:22.605862+00:00 |
-| segment_token_presentations_per_second | 4506.343482 |
-| latest_complete_snapshot_step | - |
+| recent_ce_mean | 3.463437 |
+| recent_ce_min | 3.155323 |
+| recent_ce_max | 3.803440 |
+| seconds_per_step | 1.820147 |
+| steps_per_hour | 1977.861684 |
+| eta_hours | 0.000000 |
+| estimated_completion_utc | 2026-09-04T03:53:18.643039+00:00 |
+| segment_token_presentations_per_second | 4500.734144 |
+| latest_complete_snapshot_step | 40000 |
 | cumulative_token_presentations | 655360000 |
 
 ## Time Limit Gate
 
 | field | value |
 | --- | --- |
-| status | within_time_limit |
-| slurm_state | RUNNING |
-| elapsed | 3:31:18 |
-| time_limit | 1-00:00:00 |
-| elapsed_seconds | 12678 |
-| time_limit_seconds | 86400 |
-| eta_seconds | 60099.173775 |
-| remaining_seconds | 73722 |
-| margin_seconds | 13622.826225 |
+| status | not_running |
+| slurm_state |  |
+| elapsed | - |
+| time_limit | - |
+| elapsed_seconds | - |
+| time_limit_seconds | - |
+| eta_seconds | 0.000000 |
+| remaining_seconds | - |
+| margin_seconds | - |
 | tight_margin_threshold_seconds | 1800 |
 | caveat | Compares current ETA with Slurm time remaining; it is a runtime-risk signal, not quality evidence. |
 
@@ -67,14 +67,14 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | field | value |
 | --- | --- |
-| status | fresh_running_log |
+| status | not_running |
 | path | logs/bd-s2-655m-10250.out |
 | exists | True |
-| checked_utc | 2026-05-23T19:08:43.432647+00:00 |
-| mtime_utc | 2026-05-23T19:08:38.727294+00:00 |
-| age_seconds | 4.705353 |
+| checked_utc | 2026-09-04T03:53:18.643350+00:00 |
+| mtime_utc | 2026-05-24T11:52:13.295959+00:00 |
+| age_seconds | 8870465.347391 |
 | stale_after_seconds | 900 |
-| slurm_state | RUNNING |
+| slurm_state |  |
 | caveat | Fresh logs are required while the Stage-2 producer is running. |
 
 ## Producer Log Health
@@ -83,16 +83,16 @@ Quality claim: **none**. This report monitors job/artifact state only.
 | --- | --- |
 | status | healthy |
 | path | logs/bd-s2-655m-10250.out |
-| parsed_step_rows | 695 |
+| parsed_step_rows | 4001 |
 | first_step | 1 |
-| latest_step | 6940 |
-| latest_ce | 3.939427 |
+| latest_step | 40000 |
+| latest_ce | 3.426713 |
 | latest_lr | 0.000002 |
-| latest_elapsed_seconds | 12616.100000 |
+| latest_elapsed_seconds | 72805.900000 |
 | recent_window_rows | 20 |
-| recent_ce_mean | 3.782734 |
-| recent_ce_min | 3.420485 |
-| recent_ce_max | 4.062924 |
+| recent_ce_mean | 3.463437 |
+| recent_ce_min | 3.155323 |
+| recent_ce_max | 3.803440 |
 | issue_count | 0 |
 | fatal_match_count | 0 |
 | caveat | This checks producer log structure and fatal patterns; it is not quality evidence. |
@@ -142,64 +142,64 @@ Quality claim: **none**. This report monitors job/artifact state only.
 
 | field | value |
 | --- | --- |
-| status | pre_first_snapshot |
+| status | snapshots_present |
 | output_dir | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m |
-| output_dir_exists | False |
+| output_dir_exists | True |
 | first_snapshot_step | 10000 |
-| next_snapshot_step | 10000 |
-| steps_to_next_snapshot | 3060 |
-| next_snapshot_eta_hours | 1.545200 |
-| estimated_next_snapshot_utc | 2026-05-23T20:41:26.151016+00:00 |
-| latest_complete_snapshot_step | - |
-| missing_output_dir_is_expected | True |
+| next_snapshot_step | - |
+| steps_to_next_snapshot | - |
+| next_snapshot_eta_hours | - |
+| estimated_next_snapshot_utc | - |
+| latest_complete_snapshot_step | 40000 |
+| missing_output_dir_is_expected | False |
 | caveat | A missing output directory is expected before the first snapshot when save_every_steps has not been reached. |
 
 ## Expected Snapshots
 
 | step | dir exists | state | metrics | complete |
 | --- | --- | --- | --- | --- |
-| 10000 | False | False | False | False |
-| 20000 | False | False | False | False |
-| 30000 | False | False | False | False |
-| 40000 | False | False | False | False |
+| 10000 | True | True | True | True |
+| 20000 | True | True | True | True |
+| 30000 | True | True | True | True |
+| 40000 | True | True | True | True |
 
 ## Artifacts
 
 | artifact | exists | path |
 | --- | --- | --- |
-| stage2 root metrics | False | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/metrics.json |
-| stage2 final state | False | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/custom_state_dict.pt |
-| stage2 final snapshot metrics | False | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/metrics.json |
-| handoff manifest | False | benchmarks/results/stage2_manifest_655m_2026-05-23.json |
-| handoff report | False | benchmarks/results/stage2_655m_handoff_2026-05-23.json |
-| downstream metrics | False | checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json |
-| downstream predictions | False | checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl |
-| postprocess report | False | benchmarks/results/stage2_655m_postprocess_2026-05-23.json |
+| stage2 root metrics | True | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/metrics.json |
+| stage2 final state | True | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/custom_state_dict.pt |
+| stage2 final snapshot metrics | True | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/metrics.json |
+| handoff manifest | True | benchmarks/results/stage2_manifest_655m_2026-05-23.json |
+| handoff report | True | benchmarks/results/stage2_655m_handoff_2026-05-23.json |
+| downstream metrics | True | checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json |
+| downstream predictions | True | checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl |
+| postprocess report | True | benchmarks/results/stage2_655m_postprocess_2026-05-23.json |
 | next decision report | True | benchmarks/results/bitdistill_next_decision_2026-05-23.json |
-| telemetry artifact 1 | False | checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/telemetry.jsonl |
-| telemetry artifact 2 | False | checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/metrics.json |
+| telemetry artifact 1 | True | checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/telemetry.jsonl |
+| telemetry artifact 2 | True | checkpoints/bitdistill-glue-seqcls-telemetry-gamma60/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-gamma60-headinit-steps200/metrics.json |
 
 ## Downstream
 
 | field | value |
 | --- | --- |
-| status | waiting_for_handoff |
-| handoff_report_exists | False |
-| handoff_report_status | - |
+| status | complete_artifacts_present |
+| handoff_report_exists | True |
+| handoff_report_status | submitted_downstream |
 | output_dir | checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit |
-| complete | False |
+| complete | True |
 | caveat | This section tracks downstream artifact existence only; it does not compute or claim MNLI accuracy. |
 
 ## Postprocess
 
 | field | value |
 | --- | --- |
-| job_id |  |
+| job_id | 10261 |
 | slurm_state | not_submitted |
 | expected_json | benchmarks/results/stage2_655m_postprocess_2026-05-23.json |
-| expected_json_exists | False |
+| expected_json_exists | True |
 | expected_md | benchmarks/results/stage2_655m_postprocess_2026-05-23.md |
-| expected_md_exists | False |
+| expected_md_exists | True |
 | expected_next_decision_json | benchmarks/results/bitdistill_next_decision_2026-05-23.json |
 | expected_next_decision_json_exists | True |
 | expected_next_decision_md | benchmarks/results/bitdistill_next_decision_2026-05-23.md |

@@ -98,122 +98,66 @@ python benchmarks/build_reproduction_gap_report.py
 
 Current result: the best 10k-step BitNet-SFT budget row reaches MNLI
 `0.628935`, clearing the paper BitNet-SFT anchor by `+0.020935`, but the
-completed `327.68M` BitDistill row is still `-0.088130` below local FP16-SFT.
+completed `655.36M` BitDistill row reaches `0.729903` and remains
+`-0.078248` below local FP16-SFT.
 
-## 655.36M Stage-2 Continuation
+## Completed 655.36M Stage-2 Continuation
 
-The next Stage-2 point has been submitted as a cumulative continuation from the
-verified `327.68M` checkpoint:
+Job `10250` completed the cumulative continuation from the verified
+`327.68M` checkpoint:
 
 - `benchmarks/results/stage2_655m_submission_2026-05-23.json`
 - `benchmarks/results/stage2_655m_submission_2026-05-23.md`
+- `benchmarks/results/stage2_manifest_655m_2026-05-23.json`
+- `benchmarks/results/stage2_manifest_655m_2026-05-23.md`
 
-Job `10250` extends the 327.68M checkpoint by another 327.68M token
-presentations, for a cumulative `655,360,000` token presentations. This is a
-continuation with a fresh optimizer/scheduler segment, not an uninterrupted
-80k-step Stage-2 run.
+The segment adds `327,680,000` token presentations for a cumulative
+`655,360,000`. It ran `40,000` steps, wrote four complete snapshots, and
+ended at CE `3.426713`. This is a continuation with a fresh
+optimizer/scheduler segment, not an uninterrupted 80k-step run.
 
-After completion, build the manifest with:
-
-```bash
-python benchmarks/build_stage2_manifest.py \
-  --output-dir checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m \
-  --parent-manifest benchmarks/results/stage2_manifest_2026-05-20.json \
-  --run-id qwen25-05b-bitdistill-tensor-stage2-655m-from327m-job10250 \
-  --job-id 10250 \
-  --downstream-status pending_submission \
-  --downstream-failed-job-id "" \
-  --downstream-failure-mode "" \
-  --output-json benchmarks/results/stage2_manifest_655m_2026-05-23.json \
-  --output-md benchmarks/results/stage2_manifest_655m_2026-05-23.md
-```
-
-A dependent handoff has also been queued:
-
-- `benchmarks/results/stage2_655m_handoff_submission_2026-05-23.json`
-- `benchmarks/results/stage2_655m_handoff_submission_2026-05-23.md`
-
-Job `10259` has dependency `afterok:10250`. If `10250` succeeds, it will build
-and validate the `655.36M` manifest, submit the matched downstream MNLI
-BitDistill job, and queue `slurm_stage2_655m_postprocess.sh` after the
-downstream job terminates.
-
-After the downstream job submitted by `10259` produces both `metrics.json` and
-`eval_predictions.jsonl`, the queued postprocess job should rebuild the
-controlled curve with the same fixed recipe. The manual command is:
+Validate the materialized manifest with:
 
 ```bash
-BITNET_REPORT_DATE=2026-05-20 python benchmarks/audit_bitdistill_controlled_curve.py \
-  --submission-json benchmark_results/bitdistill_stage2_curve_submission_2026-05-15.json \
-  --recovery-submission-json benchmark_results/bitdistill_recovery_submission_2026-05-15.json \
-  --output-json benchmarks/results/bitdistill_controlled_curve_2026-05-20.json \
-  --output-md benchmarks/results/bitdistill_controlled_curve_2026-05-20.md
-
-python benchmarks/build_reproduction_gap_report.py
+python benchmarks/validate_stage2_manifest.py \
+  benchmarks/results/stage2_manifest_655m_2026-05-23.json
 ```
 
-The audit auto-loads the verified `327.68M` manifest and the expected
-`655.36M` manifest path. If the 655M downstream result is still pending, the row
-must remain pending and public quality claims must not change.
+Handoff job `10259` submitted downstream MNLI job `10260`, which completed
+the fixed paper-gamma 10k-step recipe over all `9,815` validation examples.
+Postprocess job `10261` rebuilt the curve and paired evidence:
 
-The downstream postprocess also writes:
+| Stage-2 tokens | MNLI | Gain vs prior row | Delta vs FP16 |
+| ---: | ---: | ---: | ---: |
+| `40.96M` | `0.616607` | - | `-0.191544` |
+| `163.84M` | `0.691187` | `+0.074580` | `-0.116964` |
+| `327.68M` | `0.720020` | `+0.028833` | `-0.088130` |
+| `655.36M` | `0.729903` | `+0.009883` | `-0.078248` |
 
-```bash
-benchmarks/results/bitdistill_next_decision_2026-05-23.md
-benchmarks/results/bitdistill_next_decision_2026-05-23.json
-benchmarks/results/bitdistill_decision_scenarios_2026-05-23.md
-benchmarks/results/bitdistill_decision_scenarios_2026-05-23.json
-benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.md
-benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.json
-```
-
-That report is decision support, not a new benchmark. It remains pending until
-the `655.36M` downstream row exists, then records whether the next step should
-be a larger Stage-2 point, a loss-normalization ablation, or a replication run.
-The scenario matrix applies the same thresholds to representative hypothetical
-655M outcomes so the decision policy can be reviewed before the result arrives.
-The next-experiment blueprint consumes the decision report and records the
-allowed command template plus claim boundary for each possible decision state.
-While the status is `pending_655m_downstream`, it only allows status refresh and
-ingestion audit commands.
+The latest paired 95% confidence interval is
+`[-0.086720, -0.069775]`. The ingestion audit is
+`ingested_reports_rebuilt`: the result has metrics, all 9,815 prediction rows,
+a paired comparison, and mutually consistent downstream reports.
 
 ## Gamma-Balanced Telemetry
 
-The loss-normalization gate now has a queued equalized-gamma telemetry job:
+Job `10257` completed the 200-step gamma-60 component-gradient diagnostic:
 
 - `benchmarks/results/gamma60_telemetry_submission_2026-05-23.json`
 - `benchmarks/results/gamma60_telemetry_submission_2026-05-23.md`
+- `benchmarks/results/gamma60_gradient_balance_2026-05-23.json`
+- `benchmarks/results/gamma60_gradient_balance_2026-05-23.md`
 
-Job `10257` is dependency-blocked on `afterok:10250`. It is a short 200-step
-component-gradient telemetry diagnostic with `ATTENTION_KD_WEIGHT=60`; it is
-not a task-quality benchmark. It replaces pending job `10256` so the stored
-Slurm script also writes the post-run gamma-balance audit and refreshes the
-next-decision report.
+The measured attention/CE gradient ratio drops from `221.384986` on the
+paper-gamma path to `0.346044` at gamma 60, a `639.759x` reduction. This is
+not a quality result. It justifies one matched 10k-step quality ablation from
+the 655M checkpoint. The exact command is generated in
+`bitdistill_next_experiment_blueprint_2026-05-23.md`; its status is
+`run_gamma_balanced_downstream`.
 
-After it materializes, rebuild the training-dynamics audit:
+## Evidence Refresh
 
-```bash
-python benchmarks/audit_bitdistill_training_dynamics.py \
-  --output-json benchmarks/results/bitdistill_training_dynamics_2026-05-23.json \
-  --output-md benchmarks/results/bitdistill_training_dynamics_2026-05-23.md
-```
-
-The Slurm script now performs this rebuild automatically and also writes:
-
-```bash
-benchmarks/results/gamma60_gradient_balance_2026-05-23.md
-benchmarks/results/gamma60_gradient_balance_2026-05-23.json
-benchmarks/results/bitdistill_next_decision_2026-05-23.md
-benchmarks/results/bitdistill_next_decision_2026-05-23.json
-```
-
-The audit includes both paper-gamma telemetry directories and the queued
-`bitdistill-glue-seqcls-telemetry-gamma60` directory. Compare component-gradient
-ratios, not task accuracy, for this diagnostic.
-
-## Active Gate Monitor
-
-Use the watchdog while `10250`, `10259`, and `10257` are still live:
+Use the watchdog to rebuild and validate the completed-gate reports:
 
 ```bash
 python benchmarks/run_active_gate_watchdog.py
@@ -241,7 +185,7 @@ benchmarks/results/active_gate_watchdog_2026-05-23.json
 
 It is status evidence only. `quality_claim` must remain `none`.
 
-To inspect only the live Stage-2 job and artifact paths:
+To inspect the Stage-2 job and artifact paths:
 
 ```bash
 python benchmarks/monitor_active_stage2_extension.py
@@ -255,12 +199,10 @@ To audit the 655M downstream-result ingestion gate:
 python benchmarks/audit_stage2_655m_ingestion.py
 ```
 
-The ingestion audit remains `pending_handoff`, `downstream_pending_or_running`,
-or `downstream_incomplete` until the downstream `metrics.json`,
-`eval_predictions.jsonl`, controlled-curve row, reproduction-gap report, and
-next-decision report are mutually consistent. It is the receipt that prevents a
-completed Slurm job from being treated as a quality result without paired
-prediction evidence.
+The current expected state is
+`stage2_655m_ingestion.status == ingested_reports_rebuilt`. This receipt
+prevents a completed Slurm job from being treated as a quality result without
+the matching metrics, prediction trace, paired comparison, and rebuilt reports.
 
 To generate a reviewer-facing snapshot of the current objective state:
 
@@ -273,7 +215,7 @@ python benchmarks/build_publication_product_plan.py
 ```
 
 These reports are status ledgers, not completion declarations. They read the
-canonical evidence bundle, reproduction-gap report, and active 655M monitor.
+canonical evidence bundle, reproduction-gap report, and completed 655M monitor.
 
 After changing or resubmitting queued Slurm scripts, verify the stored batch
 script contents:
@@ -308,17 +250,17 @@ Interpretation rules for the current state:
 
 - `active_gate_watchdog.status == passed` means the status pipeline is healthy,
   not that BitDistill quality has recovered.
-- `stage2_655m_ingestion.status == pending_handoff` is expected while job
-  `10250` is still running.
+- `stage2_655m_ingestion.status == ingested_reports_rebuilt` means the completed
+  655M result has a consistent paired evidence chain.
 - `bitdistill_paper_alignment.status == not_exact_reproduction` is intentional:
   the active experiment differs from the paper in Stage-2 budget, corpus,
   hardware, effective batch size, and unfinished QNLI/SST2/CNNDM coverage.
-- `bitdistill_next_decision.status == pending_655m_downstream` must remain
-  until the 655M downstream prediction trace exists.
-- `bitdistill_next_experiment_blueprint.status == pending_655m_downstream`
-  means the only runnable action is watchdog/ingestion status refresh.
-- Do not update public quality claims until the ingestion audit is
-  `ingested_reports_rebuilt`.
+- `bitdistill_next_decision.status == run_gamma_balanced_downstream` records
+  the bounded next experiment; it is decision support, not new quality evidence.
+- `bitdistill_next_experiment_blueprint.status == run_gamma_balanced_downstream`
+  permits only the matched gamma-60 MNLI quality run.
+- Do not update quality claims from gamma-60 until its 10k-step run produces a
+  complete paired prediction trace.
 
 ## Validation
 

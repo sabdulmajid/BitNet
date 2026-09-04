@@ -116,26 +116,24 @@
         "stage2_manifest_655m_2026-05-23.json exists and validates",
         "gamma60_gradient_balance status indicates rebalanced updates"
       ],
-      "runnable_now": false,
-      "why": "Only run this if the 655M curve saturates and gamma60 telemetry shows attention-KD updates are rebalanced."
+      "runnable_now": true,
+      "why": "The completed 655M row has weak marginal gain and gamma60 telemetry shows attention-KD updates are rebalanced, so the matched one-axis MNLI ablation is ready."
     }
   },
-  "created_utc": "2026-05-23T19:08:51.722915+00:00",
+  "created_utc": "2026-09-04T03:53:37.930806+00:00",
   "current_action": {
-    "action": "wait_and_watch_655m_gate",
-    "claim_boundary": "status only; quality_claim remains none until ingestion is ingested_reports_rebuilt",
+    "action": "run_matched_gamma60_mnli_downstream",
+    "claim_boundary": "single MNLI ablation; do not broaden to QNLI/SST2 until paired MNLI result is ingested",
     "commands": [
-      "python benchmarks/run_active_gate_watchdog.py",
-      "python benchmarks/audit_stage2_655m_ingestion.py"
+      "MODEL=Qwen/Qwen2.5-0.5B \\\n        STAGE=task_sft \\\n        METHOD=bitdistill \\\n        TASK_NAME=mnli \\\n        TASK_FORMAT=sequence_classification \\\n        LABEL_SCHEME=letters \\\n        CANDIDATE_SCORE=mean \\\n        TEACHER_MODEL=checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1 \\\n        INIT_STATE_MANIFEST=benchmarks/results/stage2_manifest_655m_2026-05-23.json \\\n        SCALE_MODE=tensor \\\n        EXCLUDE_LINEAR_REGEX='score|classifier' \\\n        DISTILL_LAYER=-1 \\\n        ATTENTION_SPLIT_HEADS=8 \\\n        ACTIVATION_QUANTIZATION=1 \\\n        USE_SUBLN=1 \\\n        LOGIT_KD_WEIGHT=10 \\\n        ATTENTION_KD_WEIGHT=60 \\\n        LOGIT_TEMPERATURE=5.0 \\\n        LOGIT_KD_TEMPERATURE_SCALE=none \\\n        ATTENTION_TEMPERATURE=1.0 \\\n        INIT_OUTPUT_HEAD_FROM_TEACHER=1 \\\n        MAX_SEQ_LEN=512 \\\n        MAX_STEPS=10000 \\\n        PER_DEVICE_BATCH_SIZE=4 \\\n        GRAD_ACCUM_STEPS=4 \\\n        LR=2e-5 \\\n        LR_SCHEDULER=cosine \\\n        SAVE_EVERY_STEPS=0 \\\n        SAVE_MODEL_ARTIFACTS=0 \\\n        OUTPUT_DIR=checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-gamma60-headinit \\\n        sbatch --partition=midcard --job-name=bd-mnli-655m-g60 slurm_bitdistill_glue.sh"
     ],
     "evidence_required": [
-      "655M Stage-2 manifest",
-      "655M downstream metrics.json",
-      "655M downstream eval_predictions.jsonl",
-      "rebuilt controlled curve and next-decision report"
+      "next-decision status run_gamma_balanced_downstream",
+      "stage2_manifest_655m_2026-05-23.json exists and validates",
+      "gamma60_gradient_balance status indicates rebalanced updates"
     ],
     "runnable_now": true,
-    "why": "The active 655.36M producer/downstream chain is already queued; launching another broad run would confound the token-budget curve."
+    "why": "The completed 655M row has weak marginal gain and gamma60 telemetry shows attention-KD updates are rebalanced, so the matched one-axis MNLI ablation is ready."
   },
   "nonclaims": [
     "This report does not add benchmark evidence.",
@@ -143,12 +141,12 @@
     "Broad sweeps remain disallowed until the 655M gate is ingested."
   ],
   "quality_claim": "experiment_blueprint_not_benchmark",
-  "recommendation": "Wait for the active 655.36M Stage-2 producer, downstream MNLI, and postprocess reports.",
+  "recommendation": "The Stage-2 marginal gain is weak and gamma-60 rebalances updates. Run a matched 10k-step downstream MNLI row with the balanced coefficient before spending more Stage-2 tokens.",
   "schema": "bitdistill-next-experiment-blueprint-v1",
   "source_paths": {
     "gamma_balance": "benchmarks/results/gamma60_gradient_balance_2026-05-23.json",
     "next_decision": "benchmarks/results/bitdistill_next_decision_2026-05-23.json",
     "stage2_ingestion": "benchmarks/results/stage2_655m_ingestion_2026-05-23.json"
   },
-  "status": "pending_655m_downstream"
+  "status": "run_gamma_balanced_downstream"
 }

@@ -73,7 +73,7 @@
       "naive PTQ": 22382
     }
   },
-  "created_utc": "2026-05-23T17:14:02.298529+00:00",
+  "created_utc": "2026-09-04T03:43:39.988793+00:00",
   "headline_rows": [
     {
       "area": "Blind ternary PTQ",
@@ -91,8 +91,8 @@
     },
     {
       "area": "BitDistill reproduction",
-      "evidence": "MNLI 40.96M 0.616607; 163.84M 0.691187; 327.68M 0.720020; delta vs FP -0.088130",
-      "impact": "Paper-level BitDistill quality is not reproduced yet; the curve is still improving.",
+      "evidence": "MNLI 40.96M 0.616607; 163.84M 0.691187; 327.68M 0.720020; 655.36M 0.729903; latest delta vs FP -0.078248",
+      "impact": "Paper-level BitDistill quality is not reproduced; the 655M marginal gain is modest.",
       "limitation": "The 327.68M row improves over 163.84M but remains below the FP16 recovery gate.",
       "status": "not_reproduced_327m_complete"
     },
@@ -135,7 +135,7 @@
       "area": "Benchmark coverage",
       "evidence": "12 quality benchmarks; 108 coverage checks; failed checks 0",
       "impact": "The current negative and partial-recovery claims are backed by broad audited coverage.",
-      "limitation": "This coverage predates the active 655M Stage-2 extension.",
+      "limitation": "The broad coverage predates 655M, but the paired 655M MNLI row is included in the controlled curve.",
       "status": "passed"
     },
     {
@@ -147,17 +147,17 @@
     },
     {
       "area": "Active next decision",
-      "evidence": "latest controlled row 0.720020; latest tokens 327,680,000; gamma status pending_gamma60_telemetry",
-      "impact": "Wait for the active 655.36M Stage-2 producer, downstream MNLI, and postprocess reports.",
-      "limitation": "Decision is pending until the 655M downstream row and gamma-60 telemetry complete.",
-      "status": "pending_655m_downstream"
+      "evidence": "latest controlled row 0.729903; latest tokens 655,360,000; gamma status gamma60_rebalanced_attention_updates",
+      "impact": "The Stage-2 marginal gain is weak and gamma-60 rebalances updates. Run a matched 10k-step downstream MNLI row with the balanced coefficient before spending more Stage-2 tokens.",
+      "limitation": "The next result must be a matched quality run; the 200-step gamma-60 trace is diagnostic only.",
+      "status": "run_gamma_balanced_downstream"
     }
   ],
   "next_steps": [
-    "Wait for the active 655.36M Stage-2 extension, downstream MNLI row, and postprocess reports.",
-    "Use gamma-60 component-gradient telemetry to determine whether the next run should extend Stage-2 or rebalance the attention-KD coefficient.",
-    "If 655M shows meaningful marginal gain, continue the controlled Stage-2 token curve before broadening tasks.",
-    "If 655M saturates, audit recipe alignment and loss normalization before spending more compute.",
+    "Run the matched 10k-step gamma-60 MNLI ablation from the verified 655.36M checkpoint.",
+    "Compare the gamma-60 paired prediction trace directly against FP16 and the paper-gamma 655M row.",
+    "Only continue Stage-2 scaling if the loss-balanced result fails and a pre-registered budget hypothesis remains justified.",
+    "Do not expand to QNLI/SST2 until MNLI reaches and replicates the within-1-point recovery gate.",
     "Keep MoE/Kimi work outside the main claim path until dense quality/runtime evidence is resolved."
   ],
   "nonclaims": [

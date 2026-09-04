@@ -1,8 +1,8 @@
 # Stage-2 655M Handoff Preflight
 
-Generated: `2026-05-23T19:08:51.388051+00:00`
+Generated: `2026-09-04T03:53:37.599955+00:00`
 
-Status: **pending_stage2_completion**.
+Status: **ready_for_handoff**.
 
 Quality claim: **none**.
 
@@ -13,12 +13,12 @@ This validates the queued handoff path only. It does not run downstream evaluati
 | field | value |
 | --- | --- |
 | stage2_job_id | 10250 |
-| slurm_state | RUNNING |
-| slurm_time | 3:31:18 |
-| latest_step | 6940 |
-| snapshot_status | pre_first_snapshot |
-| next_snapshot_step | 10000 |
-| steps_to_next_snapshot | 3060 |
+| slurm_state | not_in_squeue |
+| slurm_time | - |
+| latest_step | 40000 |
+| snapshot_status | snapshots_present |
+| next_snapshot_step | - |
+| steps_to_next_snapshot | - |
 | output_dir | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m |
 | final_snapshot | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000 |
 
@@ -44,9 +44,9 @@ This validates the queued handoff path only. It does not run downstream evaluati
 
 | artifact | path | exists | size_bytes |
 | --- | --- | --- | --- |
-| final state dict | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/custom_state_dict.pt | false | - |
-| final snapshot metrics | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/metrics.json | false | - |
-| root metrics | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/metrics.json | false | - |
+| final state dict | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/custom_state_dict.pt | true | 2249003667 |
+| final snapshot metrics | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/metrics.json | true | 1459 |
+| root metrics | checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/metrics.json | true | 1581 |
 
 ## Training Save Contract
 
@@ -68,10 +68,10 @@ The running 655M producer was submitted before any code change here. For this ac
 
 | field | value |
 | --- | --- |
-| attempted | false |
-| passed | - |
-| build_returncode | - |
-| validate_returncode | - |
+| attempted | true |
+| passed | true |
+| build_returncode | 0 |
+| validate_returncode | 0 |
 
 ## Source Artifacts
 

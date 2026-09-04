@@ -1,6 +1,6 @@
 # BitDistill Reproduction Gap Report
 
-Status: **not reproduced**. This report separates the now-improved BitNet-SFT baseline from the remaining BitDistill/FP recovery gap.
+Status: **not_reproduced**. This report separates the now-improved BitNet-SFT baseline from the remaining BitDistill/FP recovery gap.
 
 | metric | value |
 | --- | --- |
@@ -17,9 +17,16 @@ Status: **not reproduced**. This report separates the now-improved BitNet-SFT ba
 | BitDistill 327.68M vs FP16 | -0.088130 |
 | BitDistill 327.68M CI95 | [-0.0967494587122408, -0.07951136655520699] |
 | 327.68M as paper Stage-2 fraction | 3.2768% |
+| BitDistill latest Stage-2 tokens | 655360000 |
+| BitDistill latest MNLI | 0.729903 |
+| BitDistill latest vs BitNet-SFT best | 0.100968 |
+| BitDistill latest vs FP16 | -0.078248 |
+| BitDistill latest CI95 | [-0.08671994816137527, -0.06977521230729514] |
+| latest as paper Stage-2 fraction | 6.5536% |
+| success delta from FP16 | -0.010000 |
 | final grad attention/CE | 221.384986 |
 | final loss attention/CE | 2549.206537 |
-| controlled telemetry traces | 2 |
+| controlled telemetry traces | 3 |
 
 ## Conclusions
 
@@ -27,16 +34,16 @@ Status: **not reproduced**. This report separates the now-improved BitNet-SFT ba
 | --- | --- |
 | The short BitNet-SFT default was undertrained. | default 0.487621; best budget row 0.628935; gain +0.141314 |
 | The local BitNet-SFT anchor is no longer the primary blocker. | best BitNet-SFT 0.628935; paper BitNet-SFT anchor 0.608000; delta +0.020935 |
-| BitDistill is still not reproduced. | 327.68M BitDistill MNLI 0.720020; FP16 0.808151; delta -0.088130 |
-| Stage-2 budget helps, but current budget is still small relative to the paper. | 40.96M 0.616607; 163.84M 0.691187; 327.68M 0.720020; paper fraction 3.2768% |
+| BitDistill recovery is evaluated against the latest completed Stage-2 row. | 655.36M BitDistill MNLI 0.729903; FP16 0.808151; delta -0.078248; gate -0.010000 |
+| Stage-2 budget helps, but current budget is still small relative to the paper. | 40.96M 0.616607; 163.84M 0.691187; 327.68M 0.720020; latest 655.36M 0.729903; latest paper fraction 6.5536% |
 | Local paper-gamma training dynamics are still suspect. | final grad attention/CE 221.384986; final loss attention/CE 2549.206537 |
 
 ## Next Gates
 
 | gate | why | minimum next point |
 | --- | --- | --- |
-| Stage-2 token-budget curve | Determine whether MNLI continues improving toward FP or saturates far below it. | 655.36M cumulative token presentations with the same downstream recipe |
-| Loss-normalization/gradient-balance sweep | Paper gamma is only comparable if CE, logits KD, and attention KD reductions match. | component-gradient telemetry for gamma near equalized and paper values |
+| Gamma-balanced downstream MNLI | The 327.68M to 655.36M gain is modest while paper-gamma attention gradients dominate CE under the local reductions. | matched 10k-step MNLI from the 655.36M checkpoint with attention-KD gamma 60 |
+| Loss-normalization/gradient-balance sweep | Paper gamma is only comparable if CE, logits KD, and attention KD reductions match. | full-quality comparison of gamma 60 versus paper gamma with all other axes fixed |
 | Same-artifact runtime quality | The strongest PyTorch classifier result and strongest packed causal runtime are still separate artifacts. | packed classifier head or primary causal prompt-scoring evaluation |
 | Backbone alignment | Paper-scale claims need exact/closest public Qwen3/Qwen2.5 recipe alignment. | one Qwen3-0.6B or exact Qwen2.5-0.5B MNLI run with matched logging |
 
@@ -46,5 +53,5 @@ Status: **not reproduced**. This report separates the now-improved BitNet-SFT ba
 | --- | --- | --- |
 | bitnet_sft_budget | benchmarks/results/bitnet_sft_budget_sweep_2026-05-23.json | b9bec4ae74fbadf2e82488f7be53fbb2fb31ddeb375a61d42070bc93248191f6 |
 | canonical_bundle | benchmarks/results/canonical_evidence_bundle_2026-05-20.json | af9ec2e35931986c7caf63c178b7c482c3e93406f8d880774bbf8d114f27824c |
-| controlled_curve | benchmarks/results/bitdistill_controlled_curve_2026-05-20.json | d892817f387ff52f1105439e6b7a7c2417d7c0124b0d0dbf56adb3f7585f6356 |
-| training_dynamics | benchmarks/results/bitdistill_training_dynamics_2026-05-23.json | 8861b2102e7b06f5967ae9497303bc66febab6d6a18ee21f553d8b0d5a57ca39 |
+| controlled_curve | benchmarks/results/bitdistill_controlled_curve_2026-05-23.json | 14ee524758e072c69607b182403ed11303ee89b7355ab6dd38e86a4546a35113 |
+| training_dynamics | benchmarks/results/bitdistill_training_dynamics_2026-05-23.json | 42bb44318639ab9be4c980022181478a9b2f48f63e9113babf1bfe2e5c9cab0b |

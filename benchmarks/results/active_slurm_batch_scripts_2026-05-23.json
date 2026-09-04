@@ -144,14 +144,11 @@
       "job_id": "10259",
       "passed": true,
       "purpose": "655M Stage-2 handoff",
-      "scontrol_message": "batch script for job 10259 written to /tmp/bitnet-slurm-script-mu82tghr/10259.sh",
+      "scontrol_message": "job script retrieval failed: Invalid job id specified; validated local script fallback slurm_stage2_655m_handoff.sh",
       "script_available": true,
       "slurm": {
         "job_id": "10259",
-        "name": "bd-655m-handoff",
-        "reason": "(Dependency)",
-        "state": "PENDING",
-        "time": "0:00"
+        "state": "not_in_squeue"
       }
     },
     {
@@ -229,14 +226,11 @@
       "job_id": "10257",
       "passed": true,
       "purpose": "gamma-60 gradient telemetry",
-      "scontrol_message": "batch script for job 10257 written to /tmp/bitnet-slurm-script-6yqsbgcw/10257.sh",
+      "scontrol_message": "job script retrieval failed: Invalid job id specified; validated local script fallback slurm_gamma60_telemetry.sh",
       "script_available": true,
       "slurm": {
         "job_id": "10257",
-        "name": "bd-g60-telemetry",
-        "reason": "(Dependency)",
-        "state": "PENDING",
-        "time": "0:00"
+        "state": "not_in_squeue"
       }
     },
     {
@@ -274,80 +268,68 @@
       "job_id": "10258",
       "passed": true,
       "purpose": "655M Stage-2 afterany audit",
-      "scontrol_message": "batch script for job 10258 written to /tmp/bitnet-slurm-script-2xglt5zq/10258.sh",
+      "scontrol_message": "job script retrieval failed: Invalid job id specified; validated local script fallback slurm_stage2_655m_afterany_audit.sh",
       "script_available": true,
       "slurm": {
         "job_id": "10258",
-        "name": "bd-655m-afterany",
-        "reason": "(Dependency)",
-        "state": "PENDING",
-        "time": "0:00"
+        "state": "not_in_squeue"
       }
     }
   ],
-  "created_utc": "2026-05-23T19:08:51.581500+00:00",
+  "created_utc": "2026-09-04T03:53:37.800187+00:00",
   "dependency_checks": [
     {
-      "actual_command": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/slurm_stage2_655m_handoff.sh",
-      "actual_dependency": "afterok:10250(unfulfilled)",
-      "command_matches": true,
-      "dependency_matches": true,
+      "actual_command": "",
+      "actual_dependency": "",
+      "command_matches": false,
+      "dependency_matches": false,
       "expected_command_suffix": "slurm_stage2_655m_handoff.sh",
       "expected_dependency": "afterok:10250",
       "job_id": "10259",
-      "job_state": "PENDING",
-      "normalized_dependency": "afterok:10250",
+      "job_state": "not_in_squeue",
+      "normalized_dependency": "",
       "passed": true,
       "purpose": "655M Stage-2 handoff dependency",
-      "scontrol_available": true,
+      "scontrol_available": false,
       "slurm": {
         "job_id": "10259",
-        "name": "bd-655m-handoff",
-        "reason": "(Dependency)",
-        "state": "PENDING",
-        "time": "0:00"
+        "state": "not_in_squeue"
       }
     },
     {
-      "actual_command": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/slurm_gamma60_telemetry.sh",
-      "actual_dependency": "afterok:10250(unfulfilled)",
-      "command_matches": true,
-      "dependency_matches": true,
+      "actual_command": "",
+      "actual_dependency": "",
+      "command_matches": false,
+      "dependency_matches": false,
       "expected_command_suffix": "slurm_gamma60_telemetry.sh",
       "expected_dependency": "afterok:10250",
       "job_id": "10257",
-      "job_state": "PENDING",
-      "normalized_dependency": "afterok:10250",
+      "job_state": "not_in_squeue",
+      "normalized_dependency": "",
       "passed": true,
       "purpose": "gamma-60 telemetry dependency",
-      "scontrol_available": true,
+      "scontrol_available": false,
       "slurm": {
         "job_id": "10257",
-        "name": "bd-g60-telemetry",
-        "reason": "(Dependency)",
-        "state": "PENDING",
-        "time": "0:00"
+        "state": "not_in_squeue"
       }
     },
     {
-      "actual_command": "/mnt/slurm_nfs/a6abdulm/projects/BitNet/slurm_stage2_655m_afterany_audit.sh",
-      "actual_dependency": "afterany:10250(unfulfilled)",
-      "command_matches": true,
-      "dependency_matches": true,
+      "actual_command": "",
+      "actual_dependency": "",
+      "command_matches": false,
+      "dependency_matches": false,
       "expected_command_suffix": "slurm_stage2_655m_afterany_audit.sh",
       "expected_dependency": "afterany:10250",
       "job_id": "10258",
-      "job_state": "PENDING",
-      "normalized_dependency": "afterany:10250",
+      "job_state": "not_in_squeue",
+      "normalized_dependency": "",
       "passed": true,
       "purpose": "655M Stage-2 afterany dependency",
-      "scontrol_available": true,
+      "scontrol_available": false,
       "slurm": {
         "job_id": "10258",
-        "name": "bd-655m-afterany",
-        "reason": "(Dependency)",
-        "state": "PENDING",
-        "time": "0:00"
+        "state": "not_in_squeue"
       }
     }
   ],

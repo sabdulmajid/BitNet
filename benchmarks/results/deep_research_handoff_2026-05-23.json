@@ -2,29 +2,29 @@
   "active_gate": {
     "afterany_dependency": "afterany:10250",
     "afterany_job_id": "10258",
-    "afterany_status": "dependency_pending",
-    "downstream_complete": false,
-    "downstream_status": "waiting_for_handoff",
-    "eta_hours": 16.694214937560037,
-    "latest_ce": 3.939427,
-    "latest_complete_snapshot_step": null,
-    "latest_step": 6940,
+    "afterany_status": "historical_audit_failed_later_watchdog_passed",
+    "downstream_complete": true,
+    "downstream_status": "complete_artifacts_present",
+    "eta_hours": 0.0,
+    "latest_ce": 3.426713,
+    "latest_complete_snapshot_step": 40000,
+    "latest_step": 40000,
     "log_health_status": "healthy",
     "max_steps": 40000,
-    "next_snapshot_eta_hours": 1.545199567723343,
-    "next_snapshot_step": 10000,
+    "next_snapshot_eta_hours": null,
+    "next_snapshot_step": null,
     "producer_config_status": "matched",
-    "progress": 0.1735,
-    "snapshot_salvage_complete_count": 0,
-    "snapshot_salvage_status": "no_snapshot_expected_yet",
+    "progress": 1.0,
+    "snapshot_salvage_complete_count": 4,
+    "snapshot_salvage_status": "final_snapshot_available",
     "stage2_job_id": "10250",
-    "stage2_slurm_state": "RUNNING",
-    "stage2_status": "running",
-    "steps_to_next_snapshot": 3060,
+    "stage2_slurm_state": "not_in_squeue",
+    "stage2_status": "complete_artifacts_present",
+    "steps_to_next_snapshot": null,
     "telemetry_job_id": "10257",
-    "telemetry_slurm_state": "PENDING",
-    "time_limit_margin_seconds": 13622.826224783865,
-    "time_limit_status": "within_time_limit"
+    "telemetry_slurm_state": "not_in_squeue",
+    "time_limit_margin_seconds": null,
+    "time_limit_status": "not_running"
   },
   "completed_findings": [
     {
@@ -38,9 +38,9 @@
       "interpretation": "Training can move some function into the ternary family, but current runs do not close the gap."
     },
     {
-      "evidence": "FP16-SFT MNLI 0.808151; latest 327.68M BitDistill 0.720020; delta -0.088130; status not_reproduced.",
+      "evidence": "FP16-SFT MNLI 0.808151; latest 655.36M BitDistill 0.729903; delta -0.078248; status not_reproduced.",
       "finding": "BitDistill paper-level recovery remains governed by the latest completed Stage-2 row.",
-      "interpretation": "The local implementation remains below the paper recovery gate; more Stage-2 budget is being tested."
+      "interpretation": "The 655.36M row is complete; its marginal gain over 327.68M is +0.009883, so loss balance is the next controlled variable."
     },
     {
       "evidence": "default BitNet-SFT 0.487621; best budget row 0.628935; delta vs paper anchor +0.020935.",
@@ -58,21 +58,19 @@
       "interpretation": "The systems path is real, but quality/storage tradeoffs remain unfavorable versus mature Q4."
     }
   ],
-  "created_utc": "2026-05-23T19:08:51.884671+00:00",
+  "created_utc": "2026-09-04T03:53:38.058573+00:00",
   "next_action": {
-    "blueprint_action": "wait_and_watch_655m_gate",
-    "claim_boundary": "status only; quality_claim remains none until ingestion is ingested_reports_rebuilt",
+    "blueprint_action": "run_matched_gamma60_mnli_downstream",
+    "claim_boundary": "single MNLI ablation; do not broaden to QNLI/SST2 until paired MNLI result is ingested",
     "commands": [
-      "python benchmarks/run_active_gate_watchdog.py",
-      "python benchmarks/audit_stage2_655m_ingestion.py"
+      "MODEL=Qwen/Qwen2.5-0.5B \\\n        STAGE=task_sft \\\n        METHOD=bitdistill \\\n        TASK_NAME=mnli \\\n        TASK_FORMAT=sequence_classification \\\n        LABEL_SCHEME=letters \\\n        CANDIDATE_SCORE=mean \\\n        TEACHER_MODEL=checkpoints/bitdistill-glue-seqcls/Qwen-Qwen2.5-0.5B/mnli/fp16_sft-tensor-layer-1 \\\n        INIT_STATE_MANIFEST=benchmarks/results/stage2_manifest_655m_2026-05-23.json \\\n        SCALE_MODE=tensor \\\n        EXCLUDE_LINEAR_REGEX='score|classifier' \\\n        DISTILL_LAYER=-1 \\\n        ATTENTION_SPLIT_HEADS=8 \\\n        ACTIVATION_QUANTIZATION=1 \\\n        USE_SUBLN=1 \\\n        LOGIT_KD_WEIGHT=10 \\\n        ATTENTION_KD_WEIGHT=60 \\\n        LOGIT_TEMPERATURE=5.0 \\\n        LOGIT_KD_TEMPERATURE_SCALE=none \\\n        ATTENTION_TEMPERATURE=1.0 \\\n        INIT_OUTPUT_HEAD_FROM_TEACHER=1 \\\n        MAX_SEQ_LEN=512 \\\n        MAX_STEPS=10000 \\\n        PER_DEVICE_BATCH_SIZE=4 \\\n        GRAD_ACCUM_STEPS=4 \\\n        LR=2e-5 \\\n        LR_SCHEDULER=cosine \\\n        SAVE_EVERY_STEPS=0 \\\n        SAVE_MODEL_ARTIFACTS=0 \\\n        OUTPUT_DIR=checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-gamma60-headinit \\\n        sbatch --partition=midcard --job-name=bd-mnli-655m-g60 slurm_bitdistill_glue.sh"
     ],
-    "decision_status": "pending_655m_downstream",
-    "recommendation": "Wait for the active 655.36M Stage-2 producer, downstream MNLI, and postprocess reports.",
+    "decision_status": "run_gamma_balanced_downstream",
+    "recommendation": "The Stage-2 marginal gain is weak and gamma-60 rebalances updates. Run a matched 10k-step downstream MNLI row with the balanced coefficient before spending more Stage-2 tokens.",
     "required_evidence": [
-      "655M Stage-2 manifest",
-      "655M downstream metrics.json",
-      "655M downstream eval_predictions.jsonl",
-      "rebuilt controlled curve and next-decision report"
+      "next-decision status run_gamma_balanced_downstream",
+      "stage2_manifest_655m_2026-05-23.json exists and validates",
+      "gamma60_gradient_balance status indicates rebalanced updates"
     ],
     "runnable_now": true
   },
@@ -106,13 +104,13 @@
   ],
   "open_questions": [
     {
-      "current_state": "running; step 6940/40000; downstream waiting_for_handoff.",
-      "evidence_needed": "Completed 655M Stage-2 manifest plus downstream MNLI metrics.json and eval_predictions.jsonl.",
-      "question": "Does the Stage-2 token-budget curve keep improving at 655.36M tokens?"
+      "current_state": "Answered: gain +0.009883; latest MNLI 0.729903; delta vs FP16 -0.078248.",
+      "evidence_needed": "Completed 655M paired prediction trace against the fixed FP16 reference.",
+      "question": "Did doubling Stage-2 from 327.68M to 655.36M close the MNLI gap?"
     },
     {
-      "current_state": "paper-gamma grad attention/CE 221.384986; gamma-60 telemetry queued.",
-      "evidence_needed": "655M/longer budget curve and gamma-balanced component-gradient telemetry.",
+      "current_state": "paper-gamma grad attention/CE 221.384986; gamma-60 0.346044; quality ablation not yet run.",
+      "evidence_needed": "Matched 10k-step gamma-60 and paper-gamma MNLI runs from the same 655M checkpoint.",
       "question": "Is the remaining BitDistill gap mostly compute budget or loss-normalization mismatch?"
     },
     {
@@ -146,19 +144,19 @@
     },
     "current_status": {
       "path": "benchmarks/results/current_goal_status_2026-05-23.json",
-      "sha256": "21939862d941a19b99c59ade7473d89e795b2e1fc6c7e441f89a396f407ff6ac"
+      "sha256": "0a53d5c46e041e4ad5b8876ddf72a51772793999784522f58309d99646396766"
     },
     "next_decision": {
       "path": "benchmarks/results/bitdistill_next_decision_2026-05-23.json",
-      "sha256": "da7e7b6292b635e523c0c056cba7d753c57b359a11da6311450ee126da1512d8"
+      "sha256": "039f2ebb6d36d85073f7433fed5a21b35e966af60c646e4fc3d65cef60cbb071"
     },
     "next_experiment_blueprint": {
       "path": "benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.json",
-      "sha256": "065b02b00cd1ceb4e8c2bb50119792e7575777a55d0a5974cb0439fc737a6d11"
+      "sha256": "e0ca9ab3f1a637ba0a89e6ca6cae6e1b5a7f3c0585c30643f8f5673642731955"
     },
     "reproduction_gap": {
       "path": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json",
-      "sha256": "b5a37266b33dc7318b55a23569673467d11fa7aa67ba6725baaa374210a42820"
+      "sha256": "e93c4db2b5363d9999c0bab1a6e637526eca3e62be9541f1f99ad1291174cd10"
     }
   },
   "status": "handoff_not_completion",

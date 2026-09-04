@@ -2,34 +2,34 @@
   "active_gate": {
     "afterany_dependency": "afterany:10250",
     "afterany_job_id": "10258",
-    "afterany_status": "dependency_pending",
-    "downstream_complete": false,
-    "downstream_status": "waiting_for_handoff",
-    "eta_hours": 16.694214937560037,
-    "latest_ce": 3.939427,
-    "latest_complete_snapshot_step": null,
-    "latest_step": 6940,
+    "afterany_status": "historical_audit_failed_later_watchdog_passed",
+    "downstream_complete": true,
+    "downstream_status": "complete_artifacts_present",
+    "eta_hours": 0.0,
+    "latest_ce": 3.426713,
+    "latest_complete_snapshot_step": 40000,
+    "latest_step": 40000,
     "log_health_status": "healthy",
     "max_steps": 40000,
-    "next_snapshot_eta_hours": 1.545199567723343,
-    "next_snapshot_step": 10000,
+    "next_snapshot_eta_hours": null,
+    "next_snapshot_step": null,
     "producer_config_status": "matched",
-    "progress": 0.1735,
-    "snapshot_salvage_complete_count": 0,
-    "snapshot_salvage_status": "no_snapshot_expected_yet",
+    "progress": 1.0,
+    "snapshot_salvage_complete_count": 4,
+    "snapshot_salvage_status": "final_snapshot_available",
     "stage2_job_id": "10250",
-    "stage2_slurm_state": "RUNNING",
-    "stage2_status": "running",
-    "steps_to_next_snapshot": 3060,
+    "stage2_slurm_state": "not_in_squeue",
+    "stage2_status": "complete_artifacts_present",
+    "steps_to_next_snapshot": null,
     "telemetry_job_id": "10257",
-    "telemetry_slurm_state": "PENDING",
-    "time_limit_margin_seconds": 13622.826224783865,
-    "time_limit_status": "within_time_limit"
+    "telemetry_slurm_state": "not_in_squeue",
+    "time_limit_margin_seconds": null,
+    "time_limit_status": "not_running"
   },
   "artifacts": {
     "active_monitor": {
       "path": "benchmarks/results/active_stage2_extension_monitor_2026-05-23.json",
-      "sha256": "803cbc3701c039c8d262cec249cdaee6206a722847506093560cd4e9f8b7e04c"
+      "sha256": "d77c22b665d1a0bef087476eb7d2518ea305276f01852c15939fe702105c0c30"
     },
     "afterany_submission": {
       "path": "benchmarks/results/stage2_655m_afterany_submission_2026-05-23.json",
@@ -41,24 +41,25 @@
     },
     "reproduction_gap": {
       "path": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json",
-      "sha256": "b5a37266b33dc7318b55a23569673467d11fa7aa67ba6725baaa374210a42820"
+      "sha256": "e93c4db2b5363d9999c0bab1a6e637526eca3e62be9541f1f99ad1291174cd10"
     },
     "snapshot_salvage": {
       "path": "benchmarks/results/stage2_snapshot_salvage_2026-05-23.json",
-      "sha256": "68cb6e539e72cb309f89cb1b0009c6cddc5c98188bbede8aaf4ddc5d9cf49ad2"
+      "sha256": "149e130bde1a2a2225c040f5b64d9f580b61a1fcd7a2b159ab5bf2657470d33a"
     }
   },
   "completion_status": "in_progress",
-  "created_utc": "2026-05-23T19:08:51.803418+00:00",
-  "current_verdict": "Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style recovery status is not_reproduced; the active 655.36M Stage-2 gate is testing whether recovery continues with more tokens.",
-  "git_head": "a205c4fac75bb2256a76746e511f17faf744d627",
+  "created_utc": "2026-09-04T03:53:37.994031+00:00",
+  "current_verdict": "Blind ternary PTQ is rejected for the tested dense-Qwen setup. BitDistill-style recovery status is not_reproduced; the completed 655.36M row reaches 0.729903 MNLI, -0.078248 versus FP16, so the next controlled gate is loss balance.",
+  "git_head": "5ac81035fa995589c42c760d3a91816368144dae",
   "headline_metrics": {
     "bitdistill_327_68m_delta_vs_fp": -0.0881304126337239,
     "bitdistill_327_68m_mnli": 0.7200203769740193,
-    "bitdistill_655_36m_status": "waiting_for_handoff",
-    "bitdistill_latest_delta_vs_fp": -0.0881304126337239,
-    "bitdistill_latest_mnli": 0.7200203769740193,
-    "bitdistill_latest_stage2_tokens": 327680000,
+    "bitdistill_655_36m_status": "complete_artifacts_present",
+    "bitdistill_latest_delta_vs_fp": -0.0782475802343352,
+    "bitdistill_latest_gain_vs_327_68m": 0.009882832399388697,
+    "bitdistill_latest_mnli": 0.729903209373408,
+    "bitdistill_latest_stage2_tokens": 655360000,
     "blind_ptq_fp_ppl": 13.901475466625362,
     "blind_ptq_naive_ppl": 3813121.80332679,
     "fp16_sft_mnli": 0.8081507896077432,
@@ -68,13 +69,13 @@
   },
   "next_gates": [
     {
-      "gate": "Stage-2 token-budget curve",
-      "minimum_next_point": "655.36M cumulative token presentations with the same downstream recipe",
-      "why": "Determine whether MNLI continues improving toward FP or saturates far below it."
+      "gate": "Gamma-balanced downstream MNLI",
+      "minimum_next_point": "matched 10k-step MNLI from the 655.36M checkpoint with attention-KD gamma 60",
+      "why": "The 327.68M to 655.36M gain is modest while paper-gamma attention gradients dominate CE under the local reductions."
     },
     {
       "gate": "Loss-normalization/gradient-balance sweep",
-      "minimum_next_point": "component-gradient telemetry for gamma near equalized and paper values",
+      "minimum_next_point": "full-quality comparison of gamma 60 versus paper gamma with all other axes fixed",
       "why": "Paper gamma is only comparable if CE, logits KD, and attention KD reductions match."
     },
     {
@@ -104,7 +105,7 @@
       "boundary study separating task quality, LM perplexity, RSS, file size, and throughput"
     ]
   },
-  "quality_claim": "mixed_completed_evidence_plus_active_pending_gate",
+  "quality_claim": "completed_655m_evidence_with_unmet_quality_gate",
   "requirements": [
     {
       "evidence": "FP WikiText PPL 13.901; naive PTQ PPL 3813121.803; FP ten-task mean 0.644169; PTQ mean 0.348671",
@@ -113,8 +114,8 @@
       "status": "rejected_for_tested_dense_qwen_setup"
     },
     {
-      "evidence": "FP16-SFT 0.808151; latest 327.68M BitDistill 0.720020; delta -0.088130",
-      "remaining_gap": "655.36M downstream MNLI is pending behind the active Stage-2 producer.",
+      "evidence": "FP16-SFT 0.808151; latest 655.36M BitDistill 0.729903; delta -0.078248",
+      "remaining_gap": "The completed 655.36M row remains 7.825 accuracy points below FP16.",
       "requirement": "BitDistill paper-level MNLI recovery",
       "status": "not_reproduced"
     },
@@ -149,10 +150,10 @@
       "status": "not_supported"
     },
     {
-      "evidence": "producer_config matched; log_health healthy; snapshot_salvage no_snapshot_expected_yet; afterany job 10258 dependency_pending",
-      "remaining_gap": "These are integrity controls only; MNLI quality still requires downstream metrics and paired predictions.",
-      "requirement": "Active 655M evidence-chain guardrails",
-      "status": "watching_no_quality_claim"
+      "evidence": "producer_config matched; four complete snapshots; 655M manifest verified; downstream metrics and paired predictions complete",
+      "remaining_gap": "The evidence chain is complete; the quality gate itself failed.",
+      "requirement": "655M evidence-chain guardrails",
+      "status": "completed_with_paired_trace"
     }
   ],
   "schema": "bitnet-current-goal-status-v1"

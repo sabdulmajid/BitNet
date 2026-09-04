@@ -1,0 +1,18 @@
+{
+  "caveat": "The controlled curve and reproduction-gap reports were rebuilt from completed downstream metrics and prediction traces.",
+  "controlled_curve_json": "benchmarks/results/bitdistill_controlled_curve_2026-05-23.json",
+  "controlled_curve_md": "benchmarks/results/bitdistill_controlled_curve_2026-05-23.md",
+  "downstream_job_id": "10260",
+  "downstream_output_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit",
+  "metrics_exists": true,
+  "metrics_json": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/metrics.json",
+  "next_decision_json": "benchmarks/results/bitdistill_next_decision_2026-05-23.json",
+  "next_decision_md": "benchmarks/results/bitdistill_next_decision_2026-05-23.md",
+  "postprocess_job_id": "10261",
+  "predictions_exists": true,
+  "predictions_jsonl": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl",
+  "reproduction_gap_json": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json",
+  "reproduction_gap_md": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.md",
+  "schema": "bitnet-stage2-extension-postprocess-v1",
+  "status": "reports_rebuilt"
+}

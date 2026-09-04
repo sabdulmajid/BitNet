@@ -1,31 +1,31 @@
 # BitDistill Next Decision
 
-Generated: `2026-05-23T19:08:51.655067+00:00`
+Generated: `2026-09-04T03:53:37.872608+00:00`
 
-Status: **pending_655m_downstream**.
+Status: **run_gamma_balanced_downstream**.
 
 Quality claim: **decision_support_not_new_benchmark**.
 
 ## Recommendation
 
-Wait for the active 655.36M Stage-2 producer, downstream MNLI, and postprocess reports.
+The Stage-2 marginal gain is weak and gamma-60 rebalances updates. Run a matched 10k-step downstream MNLI row with the balanced coefficient before spending more Stage-2 tokens.
 
 ## Evidence
 
 | field | value |
 | --- | --- |
-| latest Stage-2 tokens | 327680000 |
-| latest accuracy | 0.720020 |
-| latest delta vs FP16 | -0.088130 |
-| latest paired CI95 | -0.096749, -0.079511 |
+| latest Stage-2 tokens | 655360000 |
+| latest accuracy | 0.729903 |
+| latest delta vs FP16 | -0.078248 |
+| latest paired CI95 | -0.086720, -0.069775 |
 | latest passes FP recovery gate | false |
-| previous Stage-2 tokens | 163840000 |
-| previous accuracy | 0.691187 |
-| marginal Stage-2 gain | 0.028833 |
-| gamma status | pending_gamma60_telemetry |
+| previous Stage-2 tokens | 327680000 |
+| previous accuracy | 0.720020 |
+| marginal Stage-2 gain | 0.009883 |
+| gamma status | gamma60_rebalanced_attention_updates |
 | paper grad attention/CE | 221.384986 |
-| gamma60 grad attention/CE | - |
-| gamma60 grad reduction factor | - |
+| gamma60 grad attention/CE | 0.346044 |
+| gamma60 grad reduction factor | 639.759089 |
 
 ## Thresholds
 
@@ -42,14 +42,14 @@ Wait for the active 655.36M Stage-2 producer, downstream MNLI, and postprocess r
 
 | gap |
 | --- |
-| latest controlled row is 327,680,000 tokens, below 655.36M |
+| none |
 
 ## Source Paths
 
 | artifact | path |
 | --- | --- |
 | reproduction_gap | benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json |
-| controlled_curve | benchmarks/results/bitdistill_controlled_curve_2026-05-20.json |
+| controlled_curve | benchmarks/results/bitdistill_controlled_curve_2026-05-23.json |
 | gamma_balance | benchmarks/results/gamma60_gradient_balance_2026-05-23.json |
 | active_monitor | benchmarks/results/active_stage2_extension_monitor_2026-05-23.json |
 

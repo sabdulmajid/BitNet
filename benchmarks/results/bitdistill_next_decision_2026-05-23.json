@@ -1,45 +1,43 @@
 {
   "active_monitor": {
-    "downstream_status": "waiting_for_handoff",
-    "latest_step": 6940,
+    "downstream_status": "complete_artifacts_present",
+    "latest_step": 40000,
     "stage2_job_id": "10250",
-    "status": "running"
+    "status": "complete_artifacts_present"
   },
-  "created_utc": "2026-05-23T19:08:51.655067+00:00",
-  "evidence_gaps": [
-    "latest controlled row is 327,680,000 tokens, below 655.36M"
-  ],
+  "created_utc": "2026-09-04T03:53:37.872608+00:00",
+  "evidence_gaps": [],
   "gamma_balance": {
-    "gamma60_attention_grad_reduction_factor": null,
-    "gamma60_final_grad_attention_to_ce": null,
+    "gamma60_attention_grad_reduction_factor": 639.7590888604597,
+    "gamma60_final_grad_attention_to_ce": 0.34604429926449537,
     "paper_final_grad_attention_to_ce": 221.3849856028098,
-    "status": "pending_gamma60_telemetry"
+    "status": "gamma60_rebalanced_attention_updates"
   },
   "latest_controlled_row": {
-    "accuracy": 0.7200203769740193,
-    "delta_vs_fp16": -0.0881304126337239,
+    "accuracy": 0.729903209373408,
+    "delta_vs_fp16": -0.0782475802343352,
     "paired_ci95": [
-      -0.0967494587122408,
-      -0.07951136655520699
+      -0.08671994816137527,
+      -0.06977521230729514
     ],
     "passes_fp_recovery_gate": false,
+    "stage2_token_presentations": 655360000
+  },
+  "marginal_stage2_gain": 0.009882832399388697,
+  "previous_controlled_row": {
+    "accuracy": 0.7200203769740193,
     "stage2_token_presentations": 327680000
   },
-  "marginal_stage2_gain": 0.028833418237391717,
-  "previous_controlled_row": {
-    "accuracy": 0.6911869587366276,
-    "stage2_token_presentations": 163840000
-  },
   "quality_claim": "decision_support_not_new_benchmark",
-  "recommendation": "Wait for the active 655.36M Stage-2 producer, downstream MNLI, and postprocess reports.",
+  "recommendation": "The Stage-2 marginal gain is weak and gamma-60 rebalances updates. Run a matched 10k-step downstream MNLI row with the balanced coefficient before spending more Stage-2 tokens.",
   "schema": "bitdistill-next-decision-v1",
   "source_paths": {
     "active_monitor": "benchmarks/results/active_stage2_extension_monitor_2026-05-23.json",
-    "controlled_curve": "benchmarks/results/bitdistill_controlled_curve_2026-05-20.json",
+    "controlled_curve": "benchmarks/results/bitdistill_controlled_curve_2026-05-23.json",
     "gamma_balance": "benchmarks/results/gamma60_gradient_balance_2026-05-23.json",
     "reproduction_gap": "benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json"
   },
-  "status": "pending_655m_downstream",
+  "status": "run_gamma_balanced_downstream",
   "thresholds": {
     "balanced_max_grad_attention_to_ce": 10.0,
     "decision_eps": 1e-12,

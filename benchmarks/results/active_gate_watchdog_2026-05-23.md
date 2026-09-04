@@ -1,6 +1,6 @@
 # Active BitDistill Gate Watchdog
 
-Generated: `2026-05-23T19:08:52.286179+00:00`
+Generated: `2026-09-04T03:53:38.388215+00:00`
 
 Status: **passed**.
 
@@ -12,52 +12,52 @@ This watchdog refreshes status and validates artifacts; it does not create bench
 
 | field | value |
 | --- | --- |
-| monitor_status | running |
-| ingestion_status | pending_handoff |
-| snapshot_salvage_status | no_snapshot_expected_yet |
-| snapshot_salvage_complete_count | 0 |
-| handoff_preflight_status | pending_stage2_completion |
-| next_snapshot_step | 10000 |
-| steps_to_next_snapshot | 3060 |
-| next_snapshot_eta_hours | 1.545200 |
+| monitor_status | complete_artifacts_present |
+| ingestion_status | ingested_reports_rebuilt |
+| snapshot_salvage_status | final_snapshot_available |
+| snapshot_salvage_complete_count | 4 |
+| handoff_preflight_status | ready_for_handoff |
+| next_snapshot_step | - |
+| steps_to_next_snapshot | - |
+| next_snapshot_eta_hours | - |
 | afterany_job_id | 10258 |
 | afterany_status | dependency_pending |
 | slurm_script_status | passed |
 | traceability_status | in_progress |
-| next_decision_status | pending_655m_downstream |
-| next_blueprint_status | pending_655m_downstream |
-| next_blueprint_action | wait_and_watch_655m_gate |
+| next_decision_status | run_gamma_balanced_downstream |
+| next_blueprint_status | run_gamma_balanced_downstream |
+| next_blueprint_action | run_matched_gamma60_mnli_downstream |
 | stage2_job_id | 10250 |
-| stage2_latest_step | 6940 |
-| stage2_latest_ce | 3.939427 |
-| stage2_progress | 0.173500 |
-| stage2_log_freshness | fresh_running_log |
+| stage2_latest_step | 40000 |
+| stage2_latest_ce | 3.426713 |
+| stage2_progress | 1.000000 |
+| stage2_log_freshness | not_running |
 | stage2_log_health | healthy |
 | stage2_producer_config | matched |
-| stage2_time_limit_status | within_time_limit |
-| stage2_time_limit_margin_seconds | 1.362e+04 |
-| downstream_status | waiting_for_handoff |
-| telemetry_state | PENDING |
+| stage2_time_limit_status | not_running |
+| stage2_time_limit_margin_seconds | - |
+| downstream_status | complete_artifacts_present |
+| telemetry_state | not_in_squeue |
 
 ## Commands
 
 | label | passed | returncode | elapsed seconds |
 | --- | --- | --- | --- |
-| monitor active Stage-2 extension | true | 0 | 0.128682 |
-| audit 655M ingestion | true | 0 | 0.096697 |
-| audit Stage-2 snapshot salvage | true | 0 | 0.089132 |
-| audit 655M handoff preflight | true | 0 | 7.771569 |
-| audit active Slurm batch scripts | true | 0 | 0.190996 |
-| build next decision | true | 0 | 0.070181 |
-| build next experiment blueprint | true | 0 | 0.068287 |
-| build current goal status | true | 0 | 0.086555 |
-| build deep research handoff | true | 0 | 0.075955 |
-| build goal traceability | true | 0 | 0.097867 |
-| build paper alignment audit | true | 0 | 0.069402 |
-| build publication/product plan | true | 0 | 0.071086 |
-| validate fail-closed reports | true | 0 | 0.074071 |
-| compile Python sources | true | 0 | 0.074872 |
-| check Slurm shell syntax | true | 0 | 0.003479 |
+| monitor active Stage-2 extension | true | 0 | 0.137308 |
+| audit 655M ingestion | true | 0 | 0.234090 |
+| audit Stage-2 snapshot salvage | true | 0 | 0.080506 |
+| audit 655M handoff preflight | true | 0 | 18.650691 |
+| audit active Slurm batch scripts | true | 0 | 0.200844 |
+| build next decision | true | 0 | 0.060654 |
+| build next experiment blueprint | true | 0 | 0.057809 |
+| build current goal status | true | 0 | 0.069999 |
+| build deep research handoff | true | 0 | 0.058191 |
+| build goal traceability | true | 0 | 0.091953 |
+| build paper alignment audit | true | 0 | 0.055157 |
+| build publication/product plan | true | 0 | 0.057287 |
+| validate fail-closed reports | true | 0 | 0.055425 |
+| compile Python sources | true | 0 | 0.056352 |
+| check Slurm shell syntax | true | 0 | 0.006333 |
 
 ## Failures
 

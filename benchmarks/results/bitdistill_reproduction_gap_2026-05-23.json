@@ -9,12 +9,12 @@
       "sha256": "af9ec2e35931986c7caf63c178b7c482c3e93406f8d880774bbf8d114f27824c"
     },
     "controlled_curve": {
-      "path": "benchmarks/results/bitdistill_controlled_curve_2026-05-20.json",
-      "sha256": "d892817f387ff52f1105439e6b7a7c2417d7c0124b0d0dbf56adb3f7585f6356"
+      "path": "benchmarks/results/bitdistill_controlled_curve_2026-05-23.json",
+      "sha256": "14ee524758e072c69607b182403ed11303ee89b7355ab6dd38e86a4546a35113"
     },
     "training_dynamics": {
       "path": "benchmarks/results/bitdistill_training_dynamics_2026-05-23.json",
-      "sha256": "8861b2102e7b06f5967ae9497303bc66febab6d6a18ee21f553d8b0d5a57ca39"
+      "sha256": "42bb44318639ab9be4c980022181478a9b2f48f63e9113babf1bfe2e5c9cab0b"
     }
   },
   "conclusions": [
@@ -27,11 +27,11 @@
       "finding": "The local BitNet-SFT anchor is no longer the primary blocker."
     },
     {
-      "evidence": "327.68M BitDistill MNLI 0.720020; FP16 0.808151; delta -0.088130",
-      "finding": "BitDistill is still not reproduced."
+      "evidence": "655.36M BitDistill MNLI 0.729903; FP16 0.808151; delta -0.078248; gate -0.010000",
+      "finding": "BitDistill recovery is evaluated against the latest completed Stage-2 row."
     },
     {
-      "evidence": "40.96M 0.616607; 163.84M 0.691187; 327.68M 0.720020; paper fraction 3.2768%",
+      "evidence": "40.96M 0.616607; 163.84M 0.691187; 327.68M 0.720020; latest 655.36M 0.729903; latest paper fraction 6.5536%",
       "finding": "Stage-2 budget helps, but current budget is still small relative to the paper."
     },
     {
@@ -39,7 +39,7 @@
       "finding": "Local paper-gamma training dynamics are still suspect."
     }
   ],
-  "created_utc": "2026-05-23T16:01:39.199650+00:00",
+  "created_utc": "2026-09-04T03:43:39.149195+00:00",
   "metrics": {
     "bitdistill_163_84m_mnli": 0.6911869587366276,
     "bitdistill_327_68m_ci95": [
@@ -50,27 +50,37 @@
     "bitdistill_327_68m_delta_vs_fp16": -0.0881304126337239,
     "bitdistill_327_68m_mnli": 0.7200203769740193,
     "bitdistill_40_96m_mnli": 0.6166072338257769,
+    "bitdistill_latest_ci95": [
+      -0.08671994816137527,
+      -0.06977521230729514
+    ],
+    "bitdistill_latest_delta_vs_bitnet_best": 0.10096790626591945,
+    "bitdistill_latest_delta_vs_fp16": -0.0782475802343352,
+    "bitdistill_latest_fraction_of_paper": 0.065536,
+    "bitdistill_latest_mnli": 0.729903209373408,
+    "bitdistill_latest_stage2_tokens": 655360000,
     "bitnet_sft_best_delta_vs_default": 0.1413143148242486,
     "bitnet_sft_best_delta_vs_fp16": -0.17921548650025465,
     "bitnet_sft_best_delta_vs_paper_anchor": 0.02093530310748859,
     "bitnet_sft_best_mnli": 0.6289353031074886,
     "bitnet_sft_default_mnli": 0.48762098828323996,
-    "controlled_trace_count": 2,
+    "controlled_trace_count": 3,
     "final_grad_attention_to_ce": 221.3849856028098,
     "final_loss_attention_to_ce": 2549.206537356322,
     "fp16_sft_mnli": 0.8081507896077432,
-    "materialized_controlled_trace_count": 2,
-    "stage2_327_68m_fraction_of_paper": 0.032768
+    "materialized_controlled_trace_count": 3,
+    "stage2_327_68m_fraction_of_paper": 0.032768,
+    "success_delta_from_fp16": -0.01
   },
   "next_gates": [
     {
-      "gate": "Stage-2 token-budget curve",
-      "minimum_next_point": "655.36M cumulative token presentations with the same downstream recipe",
-      "why": "Determine whether MNLI continues improving toward FP or saturates far below it."
+      "gate": "Gamma-balanced downstream MNLI",
+      "minimum_next_point": "matched 10k-step MNLI from the 655.36M checkpoint with attention-KD gamma 60",
+      "why": "The 327.68M to 655.36M gain is modest while paper-gamma attention gradients dominate CE under the local reductions."
     },
     {
       "gate": "Loss-normalization/gradient-balance sweep",
-      "minimum_next_point": "component-gradient telemetry for gamma near equalized and paper values",
+      "minimum_next_point": "full-quality comparison of gamma 60 versus paper gamma with all other axes fixed",
       "why": "Paper gamma is only comparable if CE, logits KD, and attention KD reductions match."
     },
     {

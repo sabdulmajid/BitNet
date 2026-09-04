@@ -6,10 +6,10 @@ Quality claim: **none**. This validates queued script contents only.
 
 | purpose | job | state | script available | passed |
 | --- | --- | --- | --- | --- |
-| 655M Stage-2 handoff | 10259 | PENDING | true | true |
+| 655M Stage-2 handoff | 10259 | not_in_squeue | true | true |
 | 655M Stage-2 postprocess script | local | local_file | true | true |
-| gamma-60 gradient telemetry | 10257 | PENDING | true | true |
-| 655M Stage-2 afterany audit | 10258 | PENDING | true | true |
+| gamma-60 gradient telemetry | 10257 | not_in_squeue | true | true |
+| 655M Stage-2 afterany audit | 10258 | not_in_squeue | true | true |
 
 ## Required Snippets
 
@@ -75,6 +75,6 @@ Quality claim: **none**. This validates queued script contents only.
 
 | purpose | job | state | expected dependency | actual dependency | dependency matched | expected command | command matched | passed |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 655M Stage-2 handoff dependency | 10259 | PENDING | afterok:10250 | afterok:10250 | true | slurm_stage2_655m_handoff.sh | true | true |
-| gamma-60 telemetry dependency | 10257 | PENDING | afterok:10250 | afterok:10250 | true | slurm_gamma60_telemetry.sh | true | true |
-| 655M Stage-2 afterany dependency | 10258 | PENDING | afterany:10250 | afterany:10250 | true | slurm_stage2_655m_afterany_audit.sh | true | true |
+| 655M Stage-2 handoff dependency | 10259 | not_in_squeue | afterok:10250 |  | false | slurm_stage2_655m_handoff.sh | false | true |
+| gamma-60 telemetry dependency | 10257 | not_in_squeue | afterok:10250 |  | false | slurm_gamma60_telemetry.sh | false | true |
+| 655M Stage-2 afterany dependency | 10258 | not_in_squeue | afterany:10250 |  | false | slurm_stage2_655m_afterany_audit.sh | false | true |

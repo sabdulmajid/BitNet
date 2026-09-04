@@ -1,8 +1,86 @@
 {
   "caveat": "This validates the queued handoff path only. It does not run downstream evaluation or update quality claims.",
-  "created_utc": "2026-05-23T19:08:51.388051+00:00",
-  "dry_run": null,
-  "dry_run_manifest_command": [],
+  "created_utc": "2026-09-04T03:53:37.599955+00:00",
+  "dry_run": {
+    "build": {
+      "command": [
+        "python",
+        "benchmarks/build_stage2_manifest.py",
+        "--output-dir",
+        "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
+        "--parent-manifest",
+        "benchmarks/results/stage2_manifest_2026-05-20.json",
+        "--producer-bitnet-commit",
+        "10341701e5104c66d18fc9779ab9799bf2190c9a",
+        "--producer-llama-cpp-commit",
+        "dc0bc5ee0423a2202d6284a4fc2d78d1e39905d7",
+        "--producer-bitnet-commit-note",
+        "Inferred from the commit that captured the LR_SCHEDULER wrapper patch used by Stage-2 job 10250; the job log confirms LR_SCHEDULER=constant.",
+        "--producer-llama-cpp-commit-note",
+        "Recorded in the Stage-2 submission report for job 10250.",
+        "--run-id",
+        "qwen25-05b-bitdistill-tensor-stage2-655m-from327m-job10250",
+        "--job-id",
+        "10250",
+        "--downstream-status",
+        "pending_submission",
+        "--downstream-failed-job-id",
+        "",
+        "--downstream-failure-mode",
+        "",
+        "--output-json",
+        "/tmp/bitnet-655m-manifest-preflight-nlgt43mz/stage2_manifest_655m_preflight.json",
+        "--output-md",
+        "/tmp/bitnet-655m-manifest-preflight-nlgt43mz/stage2_manifest_655m_preflight.md"
+      ],
+      "passed": true,
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "{\n  \"created_utc\": \"2026-09-04T03:53:25.307254+00:00\",\n  \"downstream\": {\n    \"failed_job_id\": \"\",\n    \"failure_mode\": \"\",\n    \"recommended_init_state_dict\": \"checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/custom_state_dict.pt\",\n    \"rerun_job_id\": \"\",\n    \"rerun_output_dir\": \"\",\n    \"status\": \"pending_submission\"\n  },\n  \"final_ce\": 3.426712989807129,\n  \"final_grad_norm\": 5.698112964630127,\n  \"final_loss\": 3.426712989807129,\n  \"final_lr\": 2e-06,\n  \"git\": {\n    \"bitnet_commit\": \"10341701e5104c66d18fc9779ab9799bf2190c9a\",\n    \"llama_cpp_commit\": \"dc0bc5ee0423a2202d6284a4fc2d78d1e39905d7\",\n    \"manifest_bitnet_commit\": \"5ac81035fa995589c42c760d3a91816368144dae\",\n    \"manifest_llama_cpp_commit\": \"dc0bc5ee0423a2202d6284a4fc2d78d1e39905d7\",\n    \"producer_bitnet_commit\": \"10341701e5104c66d18fc9779ab9799bf2190c9a\",\n    \"producer_bitnet_commit_note\": \"Inferred from the commit that captured the LR_SCHEDULER wrapper patch used by Stage-2 job 10250; the job log confirms LR_SCHEDULER=constant.\",\n    \"producer_llama_cpp_commit\": \"dc0bc5ee0423a2202d6284a4fc2d78d1e39905d7\",\n    \"producer_llama_cpp_commit_note\": \"Recorded in the Stage-2 submission report for job 10250.\"\n  },\n  \"job_id\": \"10250\",\n  \"method\": \"bitdistill\",\n  \"model\": \"Qwen/Qwen2.5-0.5B\",\n  \"output_dir\": \"checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m\",\n  \"parent_manifest_path\": \"benchmarks/results/stage2_manifest_2026-05-20.json\",\n  \"parent_state_dict_path\": \"checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-40k/checkpoint-40000/custom_state_dict.pt\",\n  \"parent_token_presentations\": 327680000,\n  \"root_metrics_path\": \"checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/metrics.json\",\n  \"root_metrics_source\": \"root_metrics\",\n  \"run_id\": \"qwen25-05b-bitdistill-tensor-stage2-655m-from327m-job10250\",\n  \"scale_mode\": \"tensor\",\n  \"schema\": \"bitnet-stage2-checkpoint-manifest-v1\",\n  \"segment_token_presentations\": 327680000,\n  \"snapshot_complete\": false,\n  \"snapshot_dir\": \"checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000\",\n  \"snapshot_metrics_path\": \"checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/metrics.json\",\n  \"stage\": \"continued_pretrain\",\n  \"state_dict_path\": \"checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/custom_state_dict.pt\",\n  \"state_dict_sha256\": \"9fc648a7466adb5f170085cf73d2bf4bd90a500f9de4c2a8f6c68b6cc29fa57d\",\n  \"steps\": 40000,\n  \"token_presentations\": 655360000\n}\n"
+    },
+    "passed": true,
+    "validate": {
+      "command": [
+        "python",
+        "benchmarks/validate_stage2_manifest.py",
+        "/tmp/bitnet-655m-manifest-preflight-nlgt43mz/stage2_manifest_655m_preflight.json"
+      ],
+      "passed": true,
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "validated /tmp/bitnet-655m-manifest-preflight-nlgt43mz/stage2_manifest_655m_preflight.json\n"
+    }
+  },
+  "dry_run_manifest_command": [
+    "python",
+    "benchmarks/build_stage2_manifest.py",
+    "--output-dir",
+    "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
+    "--parent-manifest",
+    "benchmarks/results/stage2_manifest_2026-05-20.json",
+    "--producer-bitnet-commit",
+    "10341701e5104c66d18fc9779ab9799bf2190c9a",
+    "--producer-llama-cpp-commit",
+    "dc0bc5ee0423a2202d6284a4fc2d78d1e39905d7",
+    "--producer-bitnet-commit-note",
+    "Inferred from the commit that captured the LR_SCHEDULER wrapper patch used by Stage-2 job 10250; the job log confirms LR_SCHEDULER=constant.",
+    "--producer-llama-cpp-commit-note",
+    "Recorded in the Stage-2 submission report for job 10250.",
+    "--run-id",
+    "qwen25-05b-bitdistill-tensor-stage2-655m-from327m-job10250",
+    "--job-id",
+    "10250",
+    "--downstream-status",
+    "pending_submission",
+    "--downstream-failed-job-id",
+    "",
+    "--downstream-failure-mode",
+    "",
+    "--output-json",
+    "/tmp/bitnet-655m-manifest-preflight-nlgt43mz/stage2_manifest_655m_preflight.json",
+    "--output-md",
+    "/tmp/bitnet-655m-manifest-preflight-nlgt43mz/stage2_manifest_655m_preflight.md"
+  ],
   "expected_manifest_command": [
     "python",
     "benchmarks/build_stage2_manifest.py",
@@ -37,32 +115,32 @@
   "expected_manifest_md": "benchmarks/results/stage2_manifest_655m_2026-05-23.md",
   "final_artifact_checks": [
     {
-      "exists": false,
+      "exists": true,
       "label": "final state dict",
       "passed": true,
       "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/custom_state_dict.pt",
       "required_now": false,
-      "size_bytes": null
+      "size_bytes": 2249003667
     },
     {
-      "exists": false,
+      "exists": true,
       "label": "final snapshot metrics",
       "passed": true,
       "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000/metrics.json",
       "required_now": false,
-      "size_bytes": null
+      "size_bytes": 1459
     },
     {
-      "exists": false,
+      "exists": true,
       "label": "root metrics",
       "passed": true,
       "path": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/metrics.json",
       "required_now": false,
-      "size_bytes": null
+      "size_bytes": 1581
     }
   ],
   "final_snapshot": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m/checkpoint-40000",
-  "latest_step": 6940,
+  "latest_step": 40000,
   "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
   "preflight_checks": [
     {
@@ -201,26 +279,22 @@
   "schema": "bitdistill-655m-handoff-preflight-v1",
   "slurm": {
     "job_id": "10250",
-    "name": "bd-s2-655m",
-    "reason": "ece-nebula12",
-    "state": "RUNNING",
-    "time": "3:31:18",
-    "time_limit": "1-00:00:00"
+    "state": "not_in_squeue"
   },
   "snapshot_status": {
     "caveat": "A missing output directory is expected before the first snapshot when save_every_steps has not been reached.",
-    "estimated_next_snapshot_utc": "2026-05-23T20:41:26.151016+00:00",
+    "estimated_next_snapshot_utc": null,
     "first_snapshot_step": 10000,
-    "latest_complete_snapshot_step": null,
-    "missing_output_dir_is_expected": true,
-    "next_snapshot_eta_hours": 1.545199567723343,
-    "next_snapshot_eta_seconds": 5562.718443804035,
-    "next_snapshot_step": 10000,
+    "latest_complete_snapshot_step": 40000,
+    "missing_output_dir_is_expected": false,
+    "next_snapshot_eta_hours": null,
+    "next_snapshot_eta_seconds": null,
+    "next_snapshot_step": null,
     "output_dir": "checkpoints/bitdistill-glue-stage2-curve/Qwen-Qwen2.5-0.5B/continued_pretrain/bitdistill-tensor-655m-from327m",
-    "output_dir_exists": false,
+    "output_dir_exists": true,
     "save_every_steps": 10000,
-    "status": "pre_first_snapshot",
-    "steps_to_next_snapshot": 3060
+    "status": "snapshots_present",
+    "steps_to_next_snapshot": null
   },
   "source_paths": {
     "active_monitor": "benchmarks/results/active_stage2_extension_monitor_2026-05-23.json",
@@ -228,7 +302,7 @@
     "stage2_submission": "benchmarks/results/stage2_655m_submission_2026-05-23.json"
   },
   "stage2_job_id": "10250",
-  "status": "pending_stage2_completion",
+  "status": "ready_for_handoff",
   "training_save_contract": {
     "caveat": "The running 655M producer was submitted before any code change here. For this active run, snapshot usability is audited from actual state/metrics files, not from the legacy snapshot.complete flag.",
     "checks": [

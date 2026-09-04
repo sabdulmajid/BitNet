@@ -1,0 +1,20 @@
+{
+  "afterany_job_id": "10258",
+  "caveat": "This afterany audit refreshes postmortem/salvage status only. It does not create downstream quality evidence.",
+  "created_utc": "2026-05-24T11:57:25.527151+00:00",
+  "dependency": "afterany:10250",
+  "quality_claim": "none",
+  "returncodes": {
+    "ingestion": 0,
+    "snapshot_salvage": 0,
+    "watchdog": 1
+  },
+  "schema": "bitnet-stage2-afterany-audit-v1",
+  "source_paths": {
+    "ingestion": "benchmarks/results/stage2_655m_ingestion_2026-05-23.json",
+    "snapshot_salvage": "benchmarks/results/stage2_snapshot_salvage_2026-05-23.json",
+    "watchdog": "benchmarks/results/active_gate_watchdog_2026-05-23.json"
+  },
+  "stage2_job_id": "10250",
+  "status": "failed"
+}

@@ -14,7 +14,7 @@ representation-learning problem plus a runtime-contract problem.
 | --- | --- | --- |
 | Blind FP/BF16 to ternary PTQ is viable for tested Qwen2.5-1.5B | Rejected | FP PPL `13.901`; naive PTQ PPL `3,813,121.803`. FP ten-task mean `0.644169`; PTQ mean `0.348671`. |
 | QAT/distillation helps | Supported, partial | Best row-scale QAT mean `0.499459`, `+0.150788` over naive PTQ, still `-0.144710` below FP. |
-| BitDistill is reproduced | Not yet | Controlled MNLI rows improve with Stage-2 budget (`0.616607`, `0.691187`, `0.720020`) but the largest row remains `-0.088130` below FP. |
+| BitDistill is reproduced | Not yet | Controlled MNLI rows improve with Stage-2 budget (`0.616607`, `0.691187`, `0.720020`, `0.729903`), but the `655.36M` row remains `-0.078248` below FP (paired 95% CI `[-0.086720, -0.069775]`). |
 | Row-scale runtime semantics matter | Supported | TL2 one-scale RMS error `1.904230`; exact row-scale RMS error `0.000197`. |
 | `I2_SR` is a working row-scale CPU path | Supported with caveat | Runs on Xeon and is faster than FP16 decode, but does not beat Q4_K_M on quality or file size. |
 | Native classifier runtime is product-ready | Not yet | Full MNLI native path runs, but accuracy `0.652165` and PyTorch agreement `0.976668` are below product gates. |
@@ -30,9 +30,11 @@ The current gap report is:
 The earlier short BitNet-SFT default was undertrained: it measured `0.487621`.
 A 10k-step BitNet-SFT budget row reaches MNLI `0.628935`, which is `+0.020935`
 above the paper BitNet-SFT anchor for Qwen2.5-0.5B MNLI. The remaining failure
-is therefore not only the BitNet-SFT baseline: the completed `327.68M` Stage-2
-BitDistill row reaches `0.720020`, still `-0.088130` below the local FP16-SFT
-reference.
+is therefore not only the BitNet-SFT baseline. The completed `655.36M` Stage-2
+BitDistill row reaches `0.729903`, still `-0.078248` below the local FP16-SFT
+reference. Doubling continuation from `327.68M` to `655.36M` presentations adds
+only `+0.009883`, so the next controlled test changes the attention-distillation
+coefficient while holding the checkpoint, task, seed, and 10k-step budget fixed.
 
 ## Language To Avoid
 

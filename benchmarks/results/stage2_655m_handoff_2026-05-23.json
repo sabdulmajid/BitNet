@@ -1,0 +1,19 @@
+{
+  "downstream_job_id": "10260",
+  "downstream_output_dir": "checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit",
+  "handoff_job_id": "10259",
+  "manifest_json": "benchmarks/results/stage2_manifest_655m_2026-05-23.json",
+  "manifest_md": "benchmarks/results/stage2_manifest_655m_2026-05-23.md",
+  "next_after_downstream": [
+    "Wait for the postprocess job to rebuild the controlled curve and reproduction-gap reports.",
+    "Update canonical/public claims only after downstream metrics.json and eval_predictions.jsonl exist."
+  ],
+  "postprocess_job_id": "10261",
+  "postprocess_json": "benchmarks/results/stage2_655m_postprocess_2026-05-23.json",
+  "postprocess_md": "benchmarks/results/stage2_655m_postprocess_2026-05-23.md",
+  "producer_bitnet_commit": "10341701e5104c66d18fc9779ab9799bf2190c9a",
+  "producer_llama_cpp_commit": "dc0bc5ee0423a2202d6284a4fc2d78d1e39905d7",
+  "schema": "bitnet-stage2-extension-handoff-v1",
+  "stage2_job_id": "10250",
+  "status": "submitted_downstream"
+}
