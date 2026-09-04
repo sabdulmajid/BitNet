@@ -26,6 +26,7 @@ The frozen baseline bundle and current decision reports are:
 - [seqcls_native_cpu_matrix_2026-09-04.md](benchmarks/results/seqcls_native_cpu_matrix_2026-09-04.md)
 - [seqcls_native_cpu_repeated_inplace_2026-09-04.md](benchmarks/results/seqcls_native_cpu_repeated_inplace_2026-09-04.md)
 - [seqcls_i2sr_runtime_ab_2026-09-04.md](benchmarks/results/seqcls_i2sr_runtime_ab_2026-09-04.md)
+- [i2_kernel_profile_2026-09-04.md](benchmarks/results/i2_kernel_profile_2026-09-04.md)
 
 | Claim | Status | Evidence | Caveat |
 | --- | --- | --- | --- |
@@ -42,6 +43,7 @@ The frozen baseline bundle and current decision reports are:
 | Mixed `I2_SR` plus Q8 embedding improves deployed storage | **Yes, on one Qwen2.5 classifier** | The packed artifact is `230.90 MiB`: `4.106x` smaller than FP16 and `1.527x` smaller than the F16-embedding I2_SR artifact. On 512 MNLI examples it changes accuracy by `-0.001953`, paired CI `[-0.011719, 0.007812]`, with `0.982422` prediction agreement. | This is a same-student format comparison on a fixed, non-random sample; it is not evidence of FP-quality recovery. |
 | Removing I2 output staging accelerates the classifier runtime | **Yes, for both audited I2_SR artifacts** | Old/new binaries, four rotated pinned pairs: base I2_SR speed ratio `1.4619`, 95% CI `[1.3686, 1.5616]`; mixed I2_SR+Q8 `1.4358`, CI `[1.2857, 1.6035]`. Logits are bit-identical. | `ggml.c` is the only fingerprinted source difference. This is a local implementation effect, not model-quality recovery. |
 | Packed ternary accelerates native sequence classification on the Xeon 4116 | **No, even after the runtime optimization** | Four interleaved pinned runs: I2_SR/FP16 geometric throughput ratio `0.650`, 95% CI `[0.646, 0.653]`; mixed I2_SR+Q8 ratio `0.605`, CI `[0.603, 0.607]`. | This does not contradict the causal decode result. Kernel benefit is workload-, shape-, and execution-path-dependent. |
+| A8 activation quantization is the main remaining I2 projection bottleneck | **No: packed I2 arithmetic dominates** | Seven pinned one-core profiles at Qwen2.5-0.5B shapes put A8 quantization at `5.49%` of weighted projection cost, CI `[5.29%, 5.69%]`, versus `94.51%` for I2 GEMM. Making A8 quantization free has an ideal `1.0581x` upper bound. | This is a scalar-verified kernel decomposition, not end-to-end attribution. |
 | Kimi/MoE support is proven | **No: not supported** | Only tiny Qwen2MoE fixture/plumbing exists. | No trained Kimi quality, MLA/shared-expert mapping, routed expert locality, or CPU product result is proven. |
 
 ## Current Reproduction Gap
@@ -202,6 +204,16 @@ holds models, prompts, flags, cores, and affinity fixed; only the fingerprinted
 mixed I2_SR+Q8 improves `1.4358x`, CI `[1.2857, 1.6035]`, with zero logit
 difference. This is a real kernel improvement, although it is not enough to
 overtake FP16 on the classifier workload.
+
+A scalar-verified kernel profile now localizes the remaining projection cost.
+Across seven process repetitions on one pinned core, activation quantization is
+`5.49%` of the Qwen2.5-0.5B projection-weighted total, CI
+`[5.29%, 5.69%]`; packed I2 GEMM is `94.51%`. By Amdahl's law, deleting A8
+quantization entirely could improve this isolated mix by at most `1.0581x`.
+The next runtime work must therefore change packed-dot arithmetic or data
+layout, not merely vectorize the activation prepass. Every raw accumulator in
+the profile matches a scalar decoder exactly. See
+[i2_kernel_profile_2026-09-04.md](benchmarks/results/i2_kernel_profile_2026-09-04.md).
 
 ## Active Method-Equivalence Gate
 

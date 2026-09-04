@@ -1334,6 +1334,58 @@ def validate_native_cpu_docs(
     )
 
 
+def validate_i2_kernel_profile_docs(
+    report: dict[str, Any],
+    readme: str,
+    claims_doc: str,
+    experiments_doc: str,
+    errors: list[str],
+) -> None:
+    if report.get("schema") != "i2-kernel-profile-v1":
+        errors.append(f"I2 kernel profile: unexpected schema {report.get('schema')}")
+    if report.get("status") != "valid" or report.get("errors") != []:
+        errors.append("I2 kernel profile: expected valid evidence with no errors")
+    if report.get("maximum_abs_error") != 0.0:
+        errors.append("I2 kernel profile: scalar-reference error is nonzero")
+    for repository, identity in report.get("repositories", {}).items():
+        if not isinstance(identity, dict) or identity.get("tracked_files_dirty") is not False:
+            errors.append(f"I2 kernel profile: {repository} source was dirty")
+
+    try:
+        aggregate = report["aggregate_projection_mix"]
+        quantize_fraction = aggregate["quantize_fraction"]
+        ideal_speedup = aggregate["ideal_speedup_if_quantization_were_free"]
+        fraction_mean = float(quantize_fraction["mean"])
+        fraction_ci = [float(value) for value in quantize_fraction["mean_ci95_t"]]
+        ideal_mean = float(ideal_speedup["mean"])
+    except (KeyError, TypeError, ValueError) as exc:
+        errors.append(f"I2 kernel profile: missing aggregate field {exc}")
+        return
+
+    required_claims = {
+        "A8 fraction": f"{100.0 * fraction_mean:.2f}%",
+        "A8 CI low": f"{100.0 * fraction_ci[0]:.2f}%",
+        "A8 CI high": f"{100.0 * fraction_ci[1]:.2f}%",
+        "I2 fraction": f"{100.0 * (1.0 - fraction_mean):.2f}%",
+        "ideal speedup": f"{ideal_mean:.4f}x",
+    }
+    for label, needle in required_claims.items():
+        require_contains(f"README I2 kernel profile {label}", needle, readme, errors)
+        require_contains(f"CLAIMS I2 kernel profile {label}", needle, claims_doc, errors)
+    require_contains(
+        "README I2 kernel profile report",
+        "i2_kernel_profile_2026-09-04.md",
+        readme,
+        errors,
+    )
+    require_contains(
+        "EXPERIMENTS I2 kernel profile command",
+        "python benchmarks/benchmark_i2_kernel_profile.py",
+        experiments_doc,
+        errors,
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -1450,6 +1502,11 @@ def main() -> int:
         type=Path,
         default=Path("benchmarks/results/seqcls_i2sr_runtime_ab_2026-09-04.json"),
     )
+    parser.add_argument(
+        "--i2-kernel-profile",
+        type=Path,
+        default=Path("benchmarks/results/i2_kernel_profile_2026-09-04.json"),
+    )
     args = parser.parse_args()
 
     bundle = load_json(args.bundle)
@@ -1474,6 +1531,7 @@ def main() -> int:
     native_cpu_matrix = load_json(args.native_cpu_matrix)
     native_cpu_repeated = load_json(args.native_cpu_repeated)
     i2sr_runtime_ab = load_json(args.i2sr_runtime_ab)
+    i2_kernel_profile = load_json(args.i2_kernel_profile)
     readme = read_text(args.readme)
     claims_doc = read_text(args.claims)
     experiments_doc = read_text(args.experiments)
@@ -1505,6 +1563,13 @@ def main() -> int:
         native_cpu_matrix,
         native_cpu_repeated,
         i2sr_runtime_ab,
+        readme,
+        claims_doc,
+        experiments_doc,
+        errors,
+    )
+    validate_i2_kernel_profile_docs(
+        i2_kernel_profile,
         readme,
         claims_doc,
         experiments_doc,

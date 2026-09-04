@@ -1,0 +1,719 @@
+{
+  "aggregate_projection_mix": {
+    "combined_us": {
+      "maximum": 9724.555,
+      "mean": 9154.129142857144,
+      "mean_ci95_t": [
+        8804.59297917014,
+        9503.665306544148
+      ],
+      "median": 8944.413,
+      "minimum": 8872.212,
+      "standard_deviation": 377.92634382483794,
+      "values": [
+        9724.555,
+        8944.413,
+        9037.207,
+        8915.807,
+        8872.212,
+        8905.414999999999,
+        9679.295
+      ]
+    },
+    "ideal_speedup_if_quantization_were_free": {
+      "maximum": 1.0603884691485364,
+      "mean": 1.0581060934924438,
+      "mean_ci95_t": [
+        1.0558851635742996,
+        1.060327023410588
+      ],
+      "median": 1.0588693510306266,
+      "minimum": 1.0546793573807616,
+      "standard_deviation": 0.002401319265513821,
+      "values": [
+        1.0546793573807616,
+        1.0586334411880765,
+        1.059771278991621,
+        1.0588693510306266,
+        1.0603884691485364,
+        1.0596875560757428,
+        1.0547132006317408
+      ]
+    },
+    "multiply_us": {
+      "maximum": 9220.39,
+      "mean": 8652.139142857142,
+      "mean_ci95_t": [
+        8303.576006419262,
+        9000.702279295023
+      ],
+      "median": 8449.018,
+      "minimum": 8366.945,
+      "standard_deviation": 376.874284928201,
+      "values": [
+        9220.39,
+        8449.018,
+        8527.507,
+        8420.12,
+        8366.945,
+        8403.812,
+        9177.182
+      ]
+    },
+    "quantize_fraction": {
+      "maximum": 0.05694938308507507,
+      "mean": 0.054911007655752395,
+      "mean_ci95_t": [
+        0.05292413254544004,
+        0.05689788276606475
+      ],
+      "median": 0.055596425539494065,
+      "minimum": 0.05184453170350726,
+      "standard_deviation": 0.002148253955059466,
+      "values": [
+        0.05184453170350726,
+        0.05538597110844501,
+        0.05640016876895705,
+        0.055596425539494065,
+        0.05694938308507507,
+        0.056325617615798934,
+        0.05187495576898937
+      ]
+    },
+    "quantize_us": {
+      "maximum": 509.70000000000005,
+      "mean": 501.99000000000007,
+      "mean_ci95_t": [
+        497.2393828009193,
+        506.7406171990808
+      ],
+      "median": 502.113,
+      "minimum": 495.395,
+      "standard_deviation": 5.136473920242716,
+      "values": [
+        504.1650000000001,
+        495.395,
+        509.70000000000005,
+        495.687,
+        505.26700000000005,
+        501.603,
+        502.113
+      ]
+    }
+  },
+  "artifacts": {
+    "benchmark_source": {
+      "path": "benchmarks/i2_kernel_profile.cpp",
+      "sha256": "08003eaa7ae3c9a7734c30078a665358aa9315af7606bd1b18fcc6ced7eb3486",
+      "size_bytes": 5903
+    },
+    "driver": {
+      "path": "benchmarks/benchmark_i2_kernel_profile.py",
+      "sha256": "ba4ee9e9f0e631f4745bb9592db15666b911413b7d2000397de2fcc1976fd089",
+      "size_bytes": 13105
+    },
+    "ggml_library": {
+      "path": "build-portable-avx2/3rdparty/llama.cpp/ggml/src/libggml.so",
+      "sha256": "a415141520262043d3417971a9b9aa7e523793acc434ac005773e50a67bd2362",
+      "size_bytes": 921304
+    },
+    "kernel_source": {
+      "path": "src/ggml-bitnet-mad.cpp",
+      "sha256": "e54f9cd30ec0ee5975a6402472ff29c158f91f8072d2e1997af340cebc1977b2",
+      "size_bytes": 47095
+    }
+  },
+  "compile_command": [
+    "c++",
+    "-O3",
+    "-std=c++17",
+    "-mavx2",
+    "-mfma",
+    "$REPO_ROOT/benchmarks/i2_kernel_profile.cpp",
+    "-L$REPO_ROOT/build-portable-avx2/3rdparty/llama.cpp/ggml/src",
+    "-Wl,-rpath,$REPO_ROOT/build-portable-avx2/3rdparty/llama.cpp/ggml/src",
+    "-lggml"
+  ],
+  "cpu_affinity": "0",
+  "created_utc": "2026-09-04T10:47:43.256574+00:00",
+  "errors": [],
+  "inner_iterations": 31,
+  "interpretation": "Activation quantization is a minority cost in the isolated projection mix. The packed I2 dot/GEMM implementation is therefore the material CPU optimization target; eliminating activation quantization alone cannot close the measured end-to-end gap to FP16.",
+  "maximum_abs_error": 0.0,
+  "outer_repetitions": 7,
+  "platform": "Linux-5.15.0-190-generic-x86_64-with-glibc2.35",
+  "processor": "x86_64",
+  "repositories": {
+    "bitnet": {
+      "path": "$REPO_ROOT",
+      "revision": "65e11ed9133c2035007f91df397981914c83136b",
+      "tracked_files_dirty": false
+    },
+    "llama_cpp": {
+      "path": "$REPO_ROOT/3rdparty/llama.cpp",
+      "revision": "d0223354b78e96656bcbe46d86b7808e90706df3",
+      "tracked_files_dirty": false
+    }
+  },
+  "runs": [
+    [
+      {
+        "checksum": -3510859,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 493.305,
+        "output": 896,
+        "quantize_fraction": 0.08072676,
+        "quantize_us": 43.32,
+        "tokens": 32
+      },
+      {
+        "checksum": -462979,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 69.25,
+        "output": 128,
+        "quantize_fraction": 0.38517677,
+        "quantize_us": 43.384,
+        "tokens": 32
+      },
+      {
+        "checksum": -19277658,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 2985.426,
+        "output": 4864,
+        "quantize_fraction": 0.01589215,
+        "quantize_us": 48.211,
+        "tokens": 32
+      },
+      {
+        "checksum": 5962185,
+        "input": 4864,
+        "max_abs_error": 0,
+        "multiply_us": 2124.428,
+        "output": 896,
+        "quantize_fraction": 0.09934656,
+        "quantize_us": 234.335,
+        "tokens": 32
+      }
+    ],
+    [
+      {
+        "checksum": -3510859,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 507.928,
+        "output": 896,
+        "quantize_fraction": 0.07868059,
+        "quantize_us": 43.377,
+        "tokens": 32
+      },
+      {
+        "checksum": -462979,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 66.182,
+        "output": 128,
+        "quantize_fraction": 0.39593468,
+        "quantize_us": 43.379,
+        "tokens": 32
+      },
+      {
+        "checksum": -19277658,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 2633.16,
+        "output": 4864,
+        "quantize_fraction": 0.01620786,
+        "quantize_us": 43.381,
+        "tokens": 32
+      },
+      {
+        "checksum": 5962185,
+        "input": 4864,
+        "max_abs_error": 0,
+        "multiply_us": 2034.478,
+        "output": 896,
+        "quantize_fraction": 0.10359583,
+        "quantize_us": 235.121,
+        "tokens": 32
+      }
+    ],
+    [
+      {
+        "checksum": -3510859,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 483.074,
+        "output": 896,
+        "quantize_fraction": 0.08279236,
+        "quantize_us": 43.605,
+        "tokens": 32
+      },
+      {
+        "checksum": -462979,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 66.193,
+        "output": 128,
+        "quantize_fraction": 0.41372316,
+        "quantize_us": 46.711,
+        "tokens": 32
+      },
+      {
+        "checksum": -19277658,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 2636.973,
+        "output": 4864,
+        "quantize_fraction": 0.01740043,
+        "quantize_us": 46.697,
+        "tokens": 32
+      },
+      {
+        "checksum": 5962185,
+        "input": 4864,
+        "max_abs_error": 0,
+        "multiply_us": 2155.027,
+        "output": 896,
+        "quantize_fraction": 0.09857945,
+        "quantize_us": 235.674,
+        "tokens": 32
+      }
+    ],
+    [
+      {
+        "checksum": -3510859,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 482.484,
+        "output": 896,
+        "quantize_fraction": 0.08253992,
+        "quantize_us": 43.407,
+        "tokens": 32
+      },
+      {
+        "checksum": -462979,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 66.377,
+        "output": 128,
+        "quantize_fraction": 0.39533041,
+        "quantize_us": 43.397,
+        "tokens": 32
+      },
+      {
+        "checksum": -19277658,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 2644.731,
+        "output": 4864,
+        "quantize_fraction": 0.01614212,
+        "quantize_us": 43.392,
+        "tokens": 32
+      },
+      {
+        "checksum": 5962185,
+        "input": 4864,
+        "max_abs_error": 0,
+        "multiply_us": 2032.936,
+        "output": 896,
+        "quantize_fraction": 0.10373503,
+        "quantize_us": 235.295,
+        "tokens": 32
+      }
+    ],
+    [
+      {
+        "checksum": -3510859,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 482.156,
+        "output": 896,
+        "quantize_fraction": 0.09089778,
+        "quantize_us": 48.209,
+        "tokens": 32
+      },
+      {
+        "checksum": -462979,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 69.135,
+        "output": 128,
+        "quantize_fraction": 0.38566871,
+        "quantize_us": 43.402,
+        "tokens": 32
+      },
+      {
+        "checksum": -19277658,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 2614.669,
+        "output": 4864,
+        "quantize_fraction": 0.01630211,
+        "quantize_us": 43.331,
+        "tokens": 32
+      },
+      {
+        "checksum": 5962185,
+        "input": 4864,
+        "max_abs_error": 0,
+        "multiply_us": 2035.025,
+        "output": 896,
+        "quantize_fraction": 0.10367432,
+        "quantize_us": 235.383,
+        "tokens": 32
+      }
+    ],
+    [
+      {
+        "checksum": -3510859,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 482.802,
+        "output": 896,
+        "quantize_fraction": 0.08248132,
+        "quantize_us": 43.402,
+        "tokens": 32
+      },
+      {
+        "checksum": -462979,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 66.174,
+        "output": 128,
+        "quantize_fraction": 0.41258555,
+        "quantize_us": 46.479,
+        "tokens": 32
+      },
+      {
+        "checksum": -19277658,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 2632.774,
+        "output": 4864,
+        "quantize_fraction": 0.01621461,
+        "quantize_us": 43.393,
+        "tokens": 32
+      },
+      {
+        "checksum": 5962185,
+        "input": 4864,
+        "max_abs_error": 0,
+        "multiply_us": 2040.312,
+        "output": 896,
+        "quantize_fraction": 0.10330421,
+        "quantize_us": 235.055,
+        "tokens": 32
+      }
+    ],
+    [
+      {
+        "checksum": -3510859,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 482.962,
+        "output": 896,
+        "quantize_fraction": 0.08242138,
+        "quantize_us": 43.382,
+        "tokens": 32
+      },
+      {
+        "checksum": -462979,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 66.412,
+        "output": 128,
+        "quantize_fraction": 0.41178346,
+        "quantize_us": 46.492,
+        "tokens": 32
+      },
+      {
+        "checksum": -19277658,
+        "input": 896,
+        "max_abs_error": 0,
+        "multiply_us": 2937.257,
+        "output": 4864,
+        "quantize_fraction": 0.01456088,
+        "quantize_us": 43.401,
+        "tokens": 32
+      },
+      {
+        "checksum": 5962185,
+        "input": 4864,
+        "max_abs_error": 0,
+        "multiply_us": 2203.92,
+        "output": 896,
+        "quantize_fraction": 0.09656267,
+        "quantize_us": 235.563,
+        "tokens": 32
+      }
+    ]
+  ],
+  "schema": "i2-kernel-profile-v1",
+  "shape_summaries": [
+    {
+      "input": 896,
+      "multiplicity": 2,
+      "multiply_us": {
+        "maximum": 507.928,
+        "mean": 487.81585714285717,
+        "mean_ci95_t": [
+          478.8307505190474,
+          496.80096376666694
+        ],
+        "median": 482.962,
+        "minimum": 482.156,
+        "standard_deviation": 9.714898908867955,
+        "values": [
+          493.305,
+          507.928,
+          483.074,
+          482.484,
+          482.156,
+          482.802,
+          482.962
+        ]
+      },
+      "output": 896,
+      "quantize_fraction": {
+        "maximum": 0.09089778,
+        "mean": 0.08293430142857142,
+        "mean_ci95_t": [
+          0.07941189501148235,
+          0.08645670784566048
+        ],
+        "median": 0.08248132,
+        "minimum": 0.07868059,
+        "standard_deviation": 0.0038085048615103044,
+        "values": [
+          0.08072676,
+          0.07868059,
+          0.08279236,
+          0.08253992,
+          0.09089778,
+          0.08248132,
+          0.08242138
+        ]
+      },
+      "quantize_us": {
+        "maximum": 48.209,
+        "mean": 44.10028571428571,
+        "mean_ci95_t": [
+          42.42257907724256,
+          45.77799235132886
+        ],
+        "median": 43.402,
+        "minimum": 43.32,
+        "standard_deviation": 1.8139740639716737,
+        "values": [
+          43.32,
+          43.377,
+          43.605,
+          43.407,
+          48.209,
+          43.402,
+          43.382
+        ]
+      }
+    },
+    {
+      "input": 896,
+      "multiplicity": 2,
+      "multiply_us": {
+        "maximum": 69.25,
+        "mean": 67.10328571428572,
+        "mean_ci95_t": [
+          65.77999893559931,
+          68.42657249297213
+        ],
+        "median": 66.377,
+        "minimum": 66.174,
+        "standard_deviation": 1.4307673598790402,
+        "values": [
+          69.25,
+          66.182,
+          66.193,
+          66.377,
+          69.135,
+          66.174,
+          66.412
+        ]
+      },
+      "output": 128,
+      "quantize_fraction": {
+        "maximum": 0.41372316,
+        "mean": 0.40002896285714284,
+        "mean_ci95_t": [
+          0.38839721484651757,
+          0.4116607108677681
+        ],
+        "median": 0.39593468,
+        "minimum": 0.38517677,
+        "standard_deviation": 0.01257650696734154,
+        "values": [
+          0.38517677,
+          0.39593468,
+          0.41372316,
+          0.39533041,
+          0.38566871,
+          0.41258555,
+          0.41178346
+        ]
+      },
+      "quantize_us": {
+        "maximum": 46.711,
+        "mean": 44.74914285714285,
+        "mean_ci95_t": [
+          43.1803509806623,
+          46.3179347336234
+        ],
+        "median": 43.402,
+        "minimum": 43.379,
+        "standard_deviation": 1.6962129807870456,
+        "values": [
+          43.384,
+          43.379,
+          46.711,
+          43.397,
+          43.402,
+          46.479,
+          46.492
+        ]
+      }
+    },
+    {
+      "input": 896,
+      "multiplicity": 2,
+      "multiply_us": {
+        "maximum": 2985.426,
+        "mean": 2726.4271428571424,
+        "mean_ci95_t": [
+          2577.2157915849803,
+          2875.6384941293045
+        ],
+        "median": 2636.973,
+        "minimum": 2614.669,
+        "standard_deviation": 161.33066132163532,
+        "values": [
+          2985.426,
+          2633.16,
+          2636.973,
+          2644.731,
+          2614.669,
+          2632.774,
+          2937.257
+        ]
+      },
+      "output": 4864,
+      "quantize_fraction": {
+        "maximum": 0.01740043,
+        "mean": 0.01610288,
+        "mean_ci95_t": [
+          0.015331788931718228,
+          0.016873971068281774
+        ],
+        "median": 0.01620786,
+        "minimum": 0.01456088,
+        "standard_deviation": 0.0008337209664310161,
+        "values": [
+          0.01589215,
+          0.01620786,
+          0.01740043,
+          0.01614212,
+          0.01630211,
+          0.01621461,
+          0.01456088
+        ]
+      },
+      "quantize_us": {
+        "maximum": 48.211,
+        "mean": 44.543714285714294,
+        "mean_ci95_t": [
+          42.660932577445124,
+          46.426495993983465
+        ],
+        "median": 43.393,
+        "minimum": 43.331,
+        "standard_deviation": 2.0357058328980724,
+        "values": [
+          48.211,
+          43.381,
+          46.697,
+          43.392,
+          43.331,
+          43.393,
+          43.401
+        ]
+      }
+    },
+    {
+      "input": 4864,
+      "multiplicity": 1,
+      "multiply_us": {
+        "maximum": 2203.92,
+        "mean": 2089.4465714285716,
+        "mean_ci95_t": [
+          2023.8088647473396,
+          2155.0842781098036
+        ],
+        "median": 2040.312,
+        "minimum": 2032.936,
+        "standard_deviation": 70.9689613842022,
+        "values": [
+          2124.428,
+          2034.478,
+          2155.027,
+          2032.936,
+          2035.025,
+          2040.312,
+          2203.92
+        ]
+      },
+      "output": 896,
+      "quantize_fraction": {
+        "maximum": 0.10373503,
+        "mean": 0.10125686714285716,
+        "mean_ci95_t": [
+          0.09846938709339352,
+          0.1040443471923208
+        ],
+        "median": 0.10330421,
+        "minimum": 0.09656267,
+        "standard_deviation": 0.003013885980970493,
+        "values": [
+          0.09934656,
+          0.10359583,
+          0.09857945,
+          0.10373503,
+          0.10367432,
+          0.10330421,
+          0.09656267
+        ]
+      },
+      "quantize_us": {
+        "maximum": 235.674,
+        "mean": 235.20371428571428,
+        "mean_ci95_t": [
+          234.79453962197377,
+          235.6128889494548
+        ],
+        "median": 235.295,
+        "minimum": 234.335,
+        "standard_deviation": 0.44240882838000456,
+        "values": [
+          234.335,
+          235.121,
+          235.674,
+          235.295,
+          235.383,
+          235.055,
+          235.563
+        ]
+      }
+    }
+  ],
+  "status": "valid",
+  "tokens": 32
+}

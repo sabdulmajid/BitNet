@@ -1,4 +1,7 @@
-from benchmarks.validate_public_docs import validate_native_cpu_docs
+from benchmarks.validate_public_docs import (
+    validate_i2_kernel_profile_docs,
+    validate_native_cpu_docs,
+)
 
 
 def evidence() -> tuple[dict, dict, dict]:
@@ -82,3 +85,57 @@ def test_native_cpu_claims_reject_invalid_timing_report() -> None:
     validate_native_cpu_docs(matrix, repeated, runtime_ab, "", "", "", errors)
 
     assert "native CPU repeated: expected valid timing evidence with no errors" in errors
+
+
+def test_i2_kernel_profile_claims_match_evidence() -> None:
+    report = {
+        "schema": "i2-kernel-profile-v1",
+        "status": "valid",
+        "errors": [],
+        "maximum_abs_error": 0.0,
+        "repositories": {
+            "bitnet": {"tracked_files_dirty": False},
+            "llama_cpp": {"tracked_files_dirty": False},
+        },
+        "aggregate_projection_mix": {
+            "quantize_fraction": {
+                "mean": 0.054911,
+                "mean_ci95_t": [0.052924, 0.056898],
+            },
+            "ideal_speedup_if_quantization_were_free": {"mean": 1.058106},
+        },
+    }
+    claims = "5.49% 5.29% 5.69% 94.51% 1.0581x"
+    errors: list[str] = []
+
+    validate_i2_kernel_profile_docs(
+        report,
+        claims + " i2_kernel_profile_2026-09-04.md",
+        claims,
+        "python benchmarks/benchmark_i2_kernel_profile.py",
+        errors,
+    )
+
+    assert errors == []
+
+
+def test_i2_kernel_profile_rejects_nonzero_reference_error() -> None:
+    report = {
+        "schema": "i2-kernel-profile-v1",
+        "status": "valid",
+        "errors": [],
+        "maximum_abs_error": 1.0,
+        "repositories": {},
+        "aggregate_projection_mix": {
+            "quantize_fraction": {
+                "mean": 0.054911,
+                "mean_ci95_t": [0.052924, 0.056898],
+            },
+            "ideal_speedup_if_quantization_were_free": {"mean": 1.058106},
+        },
+    }
+    errors: list[str] = []
+
+    validate_i2_kernel_profile_docs(report, "", "", "", errors)
+
+    assert "I2 kernel profile: scalar-reference error is nonzero" in errors

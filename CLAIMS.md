@@ -23,6 +23,7 @@ representation-learning problem plus a runtime-contract problem.
 | Mixed `I2_SR` plus Q8 embedding reduces classifier storage | Supported for one artifact | `230.90 MiB`, `4.106x` smaller than FP16 and `1.527x` smaller than base I2_SR. Against base I2_SR on 512 fixed MNLI examples: delta `-0.001953`, paired CI `[-0.011719, 0.007812]`, prediction agreement `0.982422`. |
 | Removing I2 output staging improves classifier throughput | Supported for tested workload | Old/new binary A/B gives base I2_SR ratio `1.4619`, CI `[1.3686, 1.5616]`, and mixed I2_SR+Q8 ratio `1.4358`, CI `[1.2857, 1.6035]`, with bit-identical logits and only `ggml.c` differing in the runtime source fingerprint. |
 | I2_SR accelerates sequence-isolated classification on Xeon 4116 | Rejected for tested workload | After the runtime optimization, four interleaved pinned runs give I2_SR/FP16 geometric throughput ratio `0.650`, CI `[0.646, 0.653]`; mixed I2_SR+Q8 is `0.605`, CI `[0.603, 0.607]`. This does not reject a causal-decode speedup. |
+| A8 quantization dominates the remaining I2 projection cost | Rejected for tested shapes | Seven pinned one-core profiles place A8 quantization at `5.49%`, CI `[5.29%, 5.69%]`, and I2 GEMM at `94.51%`; the ideal upper-bound gain from free A8 quantization is `1.0581x`. All raw accumulators match a scalar decoder. |
 | Kimi/MoE support is proven | Not supported | Tiny Qwen2MoE fixtures only. |
 
 ## Reproduction Gap Update
