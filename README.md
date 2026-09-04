@@ -232,7 +232,8 @@ successful experiment.
 - An independent open BitDistill-style training implementation. The audited
   Microsoft upstream `main` revision `0b341e58` provides inference/conversion
   tooling and training descriptions but no training/distillation/QAT
-  entrypoint; see
+  entrypoint. The upstream request for BitDistill code remains open in
+  [microsoft/BitNet#344](https://github.com/microsoft/BitNet/issues/344); see
   [upstream_training_surface_2026-09-04.md](benchmarks/results/upstream_training_surface_2026-09-04.md).
 - Mathematical and empirical audits showing why blind ternary PTQ collapses on
   tested dense-Qwen checkpoints.

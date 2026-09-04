@@ -16,6 +16,10 @@ The 29 Python/shell paths at this revision are inference, serving, conversion,
 packing, kernel generation, setup, test, and benchmark utilities. Upstream
 documentation describes how released embedding models were trained, but the
 audited tree does not include a corresponding model-training entrypoint.
+The public request for the BitDistill training code remains open as
+[microsoft/BitNet#344](https://github.com/microsoft/BitNet/issues/344). That
+issue corroborates the missing public surface; the pinned tree scan above is
+the reproducible evidence for this audit.
 
 Reproduce the scope check after configuring the upstream remote:
 
