@@ -133,6 +133,33 @@ class AttentionRelationContractTest(unittest.TestCase):
         torch.testing.assert_close(cosine, cosine_scaled, rtol=1e-6, atol=1e-7)
         self.assertGreater(float(torch.max(torch.abs(dot - dot_scaled))), 1e-3)
 
+    def test_gqa_kv_repetition_is_neutral_only_for_cosine_split1(self) -> None:
+        batch, seq_len, kv_heads, repeat_factor, head_dim = 2, 7, 2, 7, 16
+        values = self.student["q"].reshape(batch, seq_len, kv_heads, -1)
+        self.assertEqual(values.shape[-1], head_dim)
+        repeated = values.repeat_interleave(repeat_factor, dim=2).reshape(batch, seq_len, -1)
+        flat = values.reshape(batch, seq_len, -1)
+
+        cosine = relation_rows(flat, self.mask, split_heads=1, temperature=1.0, relation_mode="cosine")
+        repeated_cosine = relation_rows(
+            repeated,
+            self.mask,
+            split_heads=1,
+            temperature=1.0,
+            relation_mode="cosine",
+        )
+        scaled_dot = relation_rows(flat, self.mask, split_heads=1, temperature=1.0, relation_mode="scaled_dot")
+        repeated_scaled_dot = relation_rows(
+            repeated,
+            self.mask,
+            split_heads=1,
+            temperature=1.0,
+            relation_mode="scaled_dot",
+        )
+
+        torch.testing.assert_close(cosine, repeated_cosine, rtol=1e-6, atol=1e-7)
+        self.assertGreater(float(torch.max(torch.abs(scaled_dot - repeated_scaled_dot))), 1e-6)
+
     def test_invalid_relation_mode_fails_closed(self) -> None:
         with self.assertRaisesRegex(ValueError, "unsupported relation_mode"):
             relation_rows(
