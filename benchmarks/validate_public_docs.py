@@ -1245,6 +1245,71 @@ def validate_experiments_doc(experiments_doc: str, readme: str, errors: list[str
     require_contains("README experiments link", "EXPERIMENTS.md", readme, errors)
 
 
+def validate_native_cpu_docs(
+    matrix: dict[str, Any],
+    repeated: dict[str, Any],
+    readme: str,
+    claims_doc: str,
+    experiments_doc: str,
+    errors: list[str],
+) -> None:
+    if matrix.get("schema") != "seqcls-native-cpu-matrix-v1":
+        errors.append(f"native CPU matrix: unexpected schema {matrix.get('schema')}")
+    if matrix.get("status") != "valid_sample_matrix" or matrix.get("errors") != []:
+        errors.append(
+            "native CPU matrix: expected a valid_sample_matrix with no contract violations"
+        )
+    if repeated.get("schema") != "seqcls-native-cpu-repeated-v1":
+        errors.append(f"native CPU repeated: unexpected schema {repeated.get('schema')}")
+    if repeated.get("status") != "valid" or repeated.get("errors") != []:
+        errors.append("native CPU repeated: expected valid timing evidence with no errors")
+
+    try:
+        hybrid_artifact = matrix["artifacts"]["i2_sr_q8_embedding_student"]
+        hybrid_comparison = matrix["comparisons"][
+            "i2_sr_q8_embedding_student_vs_i2_sr_student"
+        ]
+        i2_speed = repeated["paired_speed_ratios_vs_fp16"]["i2_sr_student"]
+        hybrid_speed = repeated["paired_speed_ratios_vs_fp16"][
+            "i2_sr_q8_embedding_student"
+        ]
+    except (KeyError, TypeError) as exc:
+        errors.append(f"native CPU evidence: missing required field {exc}")
+        return
+
+    quality = hybrid_comparison["quality"]
+    system = hybrid_comparison["system"]
+    required_claims = {
+        "hybrid MiB": f"{float(hybrid_artifact['gguf_mib']):.2f}",
+        "hybrid/base size factor": f"{float(system['size_ratio_reference_over_candidate']):.3f}",
+        "hybrid/base accuracy delta": f"{float(quality['delta_candidate_minus_reference']):+.6f}",
+        "hybrid/base agreement": f"{float(quality['prediction_agreement']):.6f}",
+        "I2_SR speed ratio": f"{float(i2_speed['geometric_mean']):.3f}",
+        "mixed speed ratio": f"{float(hybrid_speed['geometric_mean']):.3f}",
+    }
+    for label, needle in required_claims.items():
+        require_contains(f"README native CPU {label}", needle, readme, errors)
+        require_contains(f"CLAIMS native CPU {label}", needle, claims_doc, errors)
+
+    for report_name in (
+        "seqcls_native_cpu_matrix_2026-09-04.md",
+        "seqcls_native_cpu_repeated_2026-09-04.md",
+    ):
+        require_contains(f"README native CPU report {report_name}", report_name, readme, errors)
+    require_contains(
+        "EXPERIMENTS native CPU matrix command",
+        "python benchmarks/audit_seqcls_native_cpu_matrix.py",
+        experiments_doc,
+        errors,
+    )
+    require_contains(
+        "EXPERIMENTS native CPU repeated command",
+        "python benchmarks/benchmark_seqcls_native_cpu_repeated.py",
+        experiments_doc,
+        errors,
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -1346,6 +1411,16 @@ def main() -> int:
         type=Path,
         default=Path("benchmarks/results/bitdistill_next_experiment_blueprint_2026-05-23.json"),
     )
+    parser.add_argument(
+        "--native-cpu-matrix",
+        type=Path,
+        default=Path("benchmarks/results/seqcls_native_cpu_matrix_2026-09-04.json"),
+    )
+    parser.add_argument(
+        "--native-cpu-repeated",
+        type=Path,
+        default=Path("benchmarks/results/seqcls_native_cpu_repeated_2026-09-04.json"),
+    )
     args = parser.parse_args()
 
     bundle = load_json(args.bundle)
@@ -1367,6 +1442,8 @@ def main() -> int:
     active_gate_watchdog = load_json(args.active_gate_watchdog)
     active_slurm_batch_scripts = load_json(args.active_slurm_batch_scripts)
     next_experiment_blueprint = load_json(args.next_experiment_blueprint)
+    native_cpu_matrix = load_json(args.native_cpu_matrix)
+    native_cpu_repeated = load_json(args.native_cpu_repeated)
     readme = read_text(args.readme)
     claims_doc = read_text(args.claims)
     experiments_doc = read_text(args.experiments)
@@ -1394,6 +1471,14 @@ def main() -> int:
     validate_reproduction_gap_docs(reproduction_gap, stage2_handoff, readme, claims_doc, errors)
     validate_claims_doc(bundle, claims_doc, errors)
     validate_experiments_doc(experiments_doc, readme, errors)
+    validate_native_cpu_docs(
+        native_cpu_matrix,
+        native_cpu_repeated,
+        readme,
+        claims_doc,
+        experiments_doc,
+        errors,
+    )
     validate_runtime_doc(bundle, read_text(args.runtime_contract), errors)
 
     if errors:
