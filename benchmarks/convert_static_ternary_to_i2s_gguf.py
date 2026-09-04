@@ -396,7 +396,13 @@ def make_i2s_model_class(
                     "embedding_q8_tensors": embedding_q8,
                     "row_scale_rejected": row_scale_rejected,
                     "packed_i2s_bytes": packed_bytes,
-                    "output_tensors": ternary_packed + copied_tensors + output_f16,
+                    "output_tensors": (
+                        ternary_packed
+                        + copied_tensors
+                        + output_f16
+                        + embedding_q8
+                        + len(classifier_gguf_tensors)
+                    ),
                 }
             )
 
