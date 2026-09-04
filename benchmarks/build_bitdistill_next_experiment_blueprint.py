@@ -255,7 +255,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "nonclaims": [
             "This report does not add benchmark evidence.",
             "A runnable command is not permission to update quality claims.",
-            "Broad sweeps remain disallowed until the 655M gate is ingested.",
+            "Broad sweeps remain disallowed until the matched gamma-60 MNLI result is ingested.",
         ],
         "source_paths": {
             "next_decision": str(args.next_decision),
@@ -306,8 +306,8 @@ def render_markdown(report: dict[str, Any]) -> str:
             "## Source Paths",
             md_table(["artifact", "path"], [[key, value] for key, value in report["source_paths"].items()]),
             (
-                "This blueprint is decision support. It should be regenerated after the "
-                "655M downstream row and gamma telemetry complete."
+                "This blueprint is decision support. Regenerate it whenever the controlled "
+                "curve, gamma telemetry, or next-decision report changes."
             ),
         ]
     ) + "\n"

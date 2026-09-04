@@ -120,7 +120,7 @@
       "why": "The completed 655M row has weak marginal gain and gamma60 telemetry shows attention-KD updates are rebalanced, so the matched one-axis MNLI ablation is ready."
     }
   },
-  "created_utc": "2026-09-04T03:53:37.930806+00:00",
+  "created_utc": "2026-09-04T03:54:33.752027+00:00",
   "current_action": {
     "action": "run_matched_gamma60_mnli_downstream",
     "claim_boundary": "single MNLI ablation; do not broaden to QNLI/SST2 until paired MNLI result is ingested",
@@ -138,7 +138,7 @@
   "nonclaims": [
     "This report does not add benchmark evidence.",
     "A runnable command is not permission to update quality claims.",
-    "Broad sweeps remain disallowed until the 655M gate is ingested."
+    "Broad sweeps remain disallowed until the matched gamma-60 MNLI result is ingested."
   ],
   "quality_claim": "experiment_blueprint_not_benchmark",
   "recommendation": "The Stage-2 marginal gain is weak and gamma-60 rebalances updates. Run a matched 10k-step downstream MNLI row with the balanced coefficient before spending more Stage-2 tokens.",

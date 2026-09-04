@@ -1,6 +1,6 @@
 # BitDistill Next Experiment Blueprint
 
-Generated: `2026-09-04T03:53:37.930806+00:00`
+Generated: `2026-09-04T03:54:33.752027+00:00`
 
 Status: **run_gamma_balanced_downstream**.
 
@@ -82,7 +82,7 @@ MODEL=Qwen/Qwen2.5-0.5B \
 | --- |
 | This report does not add benchmark evidence. |
 | A runnable command is not permission to update quality claims. |
-| Broad sweeps remain disallowed until the 655M gate is ingested. |
+| Broad sweeps remain disallowed until the matched gamma-60 MNLI result is ingested. |
 
 ## Source Paths
 
@@ -92,4 +92,4 @@ MODEL=Qwen/Qwen2.5-0.5B \
 | stage2_ingestion | benchmarks/results/stage2_655m_ingestion_2026-05-23.json |
 | gamma_balance | benchmarks/results/gamma60_gradient_balance_2026-05-23.json |
 
-This blueprint is decision support. It should be regenerated after the 655M downstream row and gamma telemetry complete.
+This blueprint is decision support. Regenerate it whenever the controlled curve, gamma telemetry, or next-decision report changes.
