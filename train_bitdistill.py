@@ -1806,6 +1806,7 @@ def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
             if args.save_every_steps > 0 and step % args.save_every_steps == 0:
                 snapshot_metrics = {
                     "source_revision": source_revision(),
+                    "seed": args.seed,
                     "stage": args.stage,
                     "method": args.method,
                     "student_model": args.student_model,
@@ -1831,6 +1832,7 @@ def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
 
     metrics = {
         "source_revision": source_revision(),
+        "seed": args.seed,
         "stage": args.stage,
         "method": args.method,
         "student_model": args.student_model,
@@ -2104,6 +2106,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
         eval_metrics = evaluate_accuracy(student, eval_loader, device, prediction_path=eval_prediction_path(args))
     metrics = {
         "source_revision": source_revision(),
+        "seed": args.seed,
         "stage": args.stage,
         "method": args.method,
         "student_model": args.student_model,

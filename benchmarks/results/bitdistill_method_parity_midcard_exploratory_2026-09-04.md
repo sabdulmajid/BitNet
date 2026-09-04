@@ -10,7 +10,7 @@ Evidence scope: **exploratory_cross_environment**.
 
 These bounded pilots compare numerical contracts. Their partial evaluation is not a task benchmark.
 
-Environment note: NVIDIA RTX A4500; torch 2.6.0+cu118; Transformers 5.7.0; Datasets 2.18.0; source 18ec2c9 includes the SubLN dtype portability fix. This screens numerical contracts and is not the reference-environment quality run.
+Environment note: NVIDIA RTX A4500; torch 2.6.0+cu118; Transformers 5.7.0; Datasets 2.18.0; parser-default seed 1234; source 18ec2c9 includes the SubLN dtype portability fix. This screens numerical contracts and is not the reference-environment quality run.
 
 | case | status | task format | relation | split | balance | median grad AD/CE | max grad AD/CE | median gamma | diagnostic accuracy | blockers |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

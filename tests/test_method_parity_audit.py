@@ -22,6 +22,7 @@ def write_valid_case(root: Path, case: str) -> None:
         case_dir / "metrics.json",
         {
             "steps": 120,
+            "seed": 1234,
             "source_revision": "test-revision",
             "task_format": "sequence_classification",
             "attention_split_heads": 1,

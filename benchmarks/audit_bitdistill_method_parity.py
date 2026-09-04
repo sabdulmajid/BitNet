@@ -18,6 +18,7 @@ EXPECTED_STEPS = 120
 EXPECTED_EVAL_EXAMPLES = 512
 EXPECTED_TELEMETRY_STEPS = (1, 20, 40, 60, 80, 100, 120)
 EXPECTED_TELEMETRY_ROWS = len(EXPECTED_TELEMETRY_STEPS)
+EXPECTED_SEED = 1234
 Z_95 = 1.959963984540054
 
 CASES = (
@@ -254,6 +255,8 @@ def summarize_case(root: Path, case: str, *, artifact_root_label: str = "") -> d
         blockers.append("missing finite component-gradient ratios")
     if not metrics.get("source_revision"):
         blockers.append("missing source revision")
+    if metrics.get("seed") != EXPECTED_SEED:
+        blockers.append(f"expected seed {EXPECTED_SEED}")
     if len(predictions) != EXPECTED_EVAL_EXAMPLES:
         blockers.append(f"expected {EXPECTED_EVAL_EXAMPLES} prediction rows")
     blockers.extend(prediction_errors)
@@ -266,6 +269,7 @@ def summarize_case(root: Path, case: str, *, artifact_root_label: str = "") -> d
         "telemetry_path": f"{display_dir}/telemetry.jsonl",
         "prediction_path": f"{display_dir}/eval_predictions.jsonl",
         "source_revision": metrics.get("source_revision"),
+        "seed": metrics.get("seed"),
         "task_format": metrics.get("task_format"),
         "task_contract": formulation,
         "relation_mode": loss_weights.get("attention_relation_mode"),

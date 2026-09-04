@@ -2,8 +2,12 @@
   "artifact_root_label": "external-midcard-10373-10380",
   "created_utc": "2026-09-04T05:50:13.343791+00:00",
   "decision_rule": "Use these pilots to reject numerically unstable contracts and verify adaptive balancing. Do not select a downstream-quality winner from 512 examples or 120 steps. A full run requires an explicit paper-definition choice, all 9,815 MNLI examples, paired predictions, and replication.",
-  "environment_note": "NVIDIA RTX A4500; torch 2.6.0+cu118; Transformers 5.7.0; Datasets 2.18.0; source 18ec2c9 includes the SubLN dtype portability fix. This screens numerical contracts and is not the reference-environment quality run.",
+  "environment_note": "NVIDIA RTX A4500; torch 2.6.0+cu118; Transformers 5.7.0; Datasets 2.18.0; parser-default seed 1234; source 18ec2c9 includes the SubLN dtype portability fix. This screens numerical contracts and is not the reference-environment quality run.",
   "evidence_scope": "exploratory_cross_environment",
+  "observed_seed": {
+    "source": "train_bitdistill.py parser default; the historical wrapper did not override or serialize the seed",
+    "value": 1234
+  },
   "expected": {
     "eval_examples_per_case": 512,
     "steps_per_case": 120,

@@ -113,6 +113,7 @@ export TELEMETRY_EVERY_STEPS=20
 export TELEMETRY_COMPONENT_GRAD_NORMS=1
 export SAVE_EVERY_STEPS=0
 export SAVE_MODEL_ARTIFACTS=0
+export SEED=1234
 export OUTPUT_DIR="checkpoints/bitdistill-method-parity/${RUN_NAME}"
 
 echo "METHOD_PARITY_CASE=$case_id RUN_NAME=$RUN_NAME"
