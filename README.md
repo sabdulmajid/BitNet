@@ -180,6 +180,11 @@ MoE remain blocked behind that gate.
 
 ## What This Fork Adds
 
+- An independent open BitDistill-style training implementation. The audited
+  Microsoft upstream `main` revision `0b341e58` provides inference/conversion
+  tooling and training descriptions but no training/distillation/QAT
+  entrypoint; see
+  [upstream_training_surface_2026-09-04.md](benchmarks/results/upstream_training_surface_2026-09-04.md).
 - Mathematical and empirical audits showing why blind ternary PTQ collapses on
   tested dense-Qwen checkpoints.
 - BitDistill-style training components for Qwen-family models: SubLN, Stage-2
