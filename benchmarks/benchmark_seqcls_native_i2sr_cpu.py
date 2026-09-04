@@ -359,6 +359,7 @@ def cpu_environment(threads: int) -> dict[str, Any]:
                 core_id = value
     model_name = max(model_names, key=model_names.get) if model_names else ""
     relevant_flags = ("avx512f", "avx512dq", "avx512bw", "avx512vl", "avx2", "fma", "bmi2")
+    governor_path = Path("/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
     return {
         "platform": platform.platform(),
         "python": platform.python_version(),
@@ -367,6 +368,10 @@ def cpu_environment(threads: int) -> dict[str, Any]:
         "logical_cpus_cpuinfo": processors or None,
         "physical_cores_cpuinfo": len(physical_cores) if physical_cores else None,
         "requested_threads": threads,
+        "process_affinity": sorted(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else None,
+        "scaling_governor": governor_path.read_text(encoding="utf-8").strip()
+        if governor_path.exists()
+        else None,
         "isa_flags": {flag: flag in flags for flag in relevant_flags},
     }
 
@@ -421,6 +426,7 @@ def run_native_classifier(
     ubatch_size: int,
     timeout_seconds: int,
     embedding_sequential: bool = False,
+    cpu_affinity: str | None = None,
 ) -> tuple[np.ndarray, dict[str, Any]]:
     if any(separator in prompt for prompt in prompts):
         raise ValueError("separator occurs inside a prompt")
@@ -456,6 +462,8 @@ def run_native_classifier(
     ]
     if embedding_sequential:
         command.append("--embd-sequential")
+    if cpu_affinity:
+        command = ["taskset", "-c", cpu_affinity, *command]
     before_rss_kib = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss
     started = time.perf_counter()
     try:
@@ -480,6 +488,7 @@ def run_native_classifier(
         "stderr_bytes": len(result.stderr.encode("utf-8")),
         "perf": parse_perf(result.stderr),
         "embedding_sequential": embedding_sequential,
+        "cpu_affinity": cpu_affinity,
         "child_peak_rss_kib_before": before_rss_kib,
         "child_peak_rss_kib_after": after_rss_kib,
         "stderr_tail": result.stderr[-4000:],
@@ -589,6 +598,7 @@ def render_markdown(result: dict[str, Any]) -> str:
                     ["task", result["task"]],
                     ["CPU", result["hardware"]["cpu_model"]],
                     ["threads", result["hardware"]["requested_threads"]],
+                    ["CPU affinity", result["cpu_affinity"]],
                     ["GGUF MiB", result["artifacts"]["gguf_size_bytes"] / (1024 * 1024)],
                     ["GGUF SHA256", result["artifacts"]["gguf_sha256"]],
                     ["runtime build SHA256", result["runtime_build"]["sha256"]],
@@ -653,6 +663,11 @@ def main() -> None:
         ),
     )
     parser.add_argument("--threads", type=int, default=24)
+    parser.add_argument(
+        "--cpu-affinity",
+        default=None,
+        help="Optional taskset CPU list, for example 0-11 for one thread per physical core.",
+    )
     parser.add_argument("--ctx-size", type=int, default=512)
     parser.add_argument("--timeout-seconds", type=int, default=7200)
     parser.add_argument("--separator", default="<#BITNET_NATIVE_EVAL_SEP#>")
@@ -744,6 +759,7 @@ def main() -> None:
         for row in progress_rows
     ]
     metas: list[dict[str, Any]] = []
+    load_average_start = list(os.getloadavg())
     started = time.perf_counter()
     start_index = len(logits_rows)
     if start_index:
@@ -761,6 +777,7 @@ def main() -> None:
             ubatch_size=args.ubatch_size,
             timeout_seconds=args.timeout_seconds,
             embedding_sequential=args.embedding_sequential,
+            cpu_affinity=args.cpu_affinity,
         )
         metas.append(meta)
         progress_batch_rows: list[dict[str, Any]] = []
@@ -808,6 +825,7 @@ def main() -> None:
                 flush=True,
             )
     wall_seconds = time.perf_counter() - started
+    load_average_end = list(os.getloadavg())
     logits = np.stack(logits_rows, axis=0) if logits_rows else np.zeros((0, 3), dtype=np.float32)
     predictions = [int(x) for x in np.argmax(logits, axis=-1)]
     summary = summarize_agreement(predictions, labels, prediction_trace)
@@ -837,6 +855,8 @@ def main() -> None:
         "child_peak_rss_mib": child_peak_rss_kib / 1024.0
         if isinstance(child_peak_rss_kib, (int, float))
         else None,
+        "host_load_average_start": load_average_start,
+        "host_load_average_end": load_average_end,
     }
     trace_agreement = summary["agreement_with_saved_pytorch_predictions"]
     status = "pass"
@@ -897,6 +917,7 @@ def main() -> None:
         "prompt_input": args.prompt_input,
         "prompt_batch_size": args.prompt_batch_size,
         "embedding_sequential": args.embedding_sequential,
+        "cpu_affinity": args.cpu_affinity,
         "batch_size": args.batch_size,
         "ubatch_size": args.ubatch_size,
         "checkpoint": {

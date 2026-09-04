@@ -114,6 +114,7 @@ def validate_matrix(artifacts: dict[str, dict[str, Any]]) -> list[str]:
         "prompt_input",
         "prompt_batch_size",
         "embedding_sequential",
+        "cpu_affinity",
         "batch_size",
         "ubatch_size",
     )
