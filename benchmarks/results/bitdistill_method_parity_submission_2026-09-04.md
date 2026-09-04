@@ -1,6 +1,8 @@
 # BitDistill method-parity pilot submission
 
-- Status: ready for revision-pinned resubmission
+- Status: reference-environment array queued
+- Source revision: `6d54884f2c0a5a64eaabeb04ea1ee11dc5613a23`
+- Reference array: `10387`; fail-closed audit: `10388`
 - Target array: `0-5%1` on `dualcard`
 - Postprocessor: fail-closed and dependent on the complete array
 - Per-pilot resources: 1 GPU, 12 CPUs, 24 GiB RAM, 6-hour limit
@@ -18,3 +20,9 @@ The resulting midcard array `10298` and audit `10299` then failed before script 
 Dualcard array `10316` and audit `10317` were queued but cancelled before allocation when a final preflight found that the login environment had no `python` alias and queued jobs were not pinned against source drift. No training step ran. The launcher now resolves an interpreter that can import the required ML packages and rejects a checkout whose Git revision differs from `EXPECTED_SOURCE_REVISION`.
 
 Revision-pinned array `10318` and audit `10319` were also cancelled before allocation after a postprocessor review found an off-by-one contract: telemetry emits at steps `1,20,40,60,80,100,120`, while the auditor expected six rows. The auditor now verifies all seven exact step numbers, with regression tests.
+
+Attempts to use the non-NFS GPU nodes were treated as infrastructure probes, not results. Initial bigcard jobs `10335` and `10336` stopped before training because Datasets 2.18 attempted to resolve the legacy unnamespaced GLUE URI through an incompatible Hub client. The exact cached MNLI Arrow data was then transferred and SHA-256 verified. Jobs `10341`-`10346` stopped in the Slurm wrapper before Python because `--wrap` used `/bin/sh` with a Bash-only `pipefail`; corrected jobs `10348`-`10353` stopped before step 1 because an unmanaged Ollama service occupied approximately 47.6 GiB on each 49.1 GiB A6000. The service was not modified.
+
+Midcard job `10368` reached the first model forward and exposed a PyTorch 2.6 portability defect: FP32 SubLN output could feed a BF16 projection. Commit `18ec2c9` makes `SubLNLinear` preserve the incoming activation dtype and adds a forced-promotion regression test. The corrected exploratory jobs `10373` and `10376`-`10380` then completed all six contracts on the RTX A4500. Their cross-environment diagnostic is published separately in [bitdistill_method_parity_midcard_exploratory_2026-09-04.md](bitdistill_method_parity_midcard_exploratory_2026-09-04.md); it carries no task-quality claim.
+
+Pending dualcard array `10331` and audit `10332` were cancelled before allocation when the validated dtype fix and stricter prediction auditor superseded their source revision. The live reference jobs `10387` and `10388` run from a detached worktree pinned to `6d54884f2c0a5a64eaabeb04ea1ee11dc5613a23`, with symlinks only to the shared checkpoint and Hugging Face caches. Advancing `main` therefore cannot alter their source tree.
