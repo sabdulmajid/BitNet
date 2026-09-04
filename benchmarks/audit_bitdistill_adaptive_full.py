@@ -111,10 +111,10 @@ def exact_mcnemar_pvalue(candidate_wins: int, reference_wins: int) -> float:
     )
 
 
-def read_telemetry_steps(path: Path) -> tuple[list[int], list[str]]:
+def read_telemetry(path: Path) -> tuple[list[dict[str, Any]], list[str]]:
     if not path.exists():
         return [], [f"missing {path}"]
-    steps: list[int] = []
+    rows: list[dict[str, Any]] = []
     errors: list[str] = []
     for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
         if not line.strip():
@@ -124,12 +124,83 @@ def read_telemetry_steps(path: Path) -> tuple[list[int], list[str]]:
         except json.JSONDecodeError as exc:
             errors.append(f"{path}:{line_number}: invalid json: {exc}")
             continue
-        step = row.get("step") if isinstance(row, dict) else None
+        if not isinstance(row, dict):
+            errors.append(f"{path}:{line_number}: expected object")
+            continue
+        step = row.get("step")
         if not isinstance(step, int):
             errors.append(f"{path}:{line_number}: missing integer step")
             continue
-        steps.append(step)
-    return steps, errors
+        rows.append(row)
+    return rows, errors
+
+
+def percentile(values: list[float], probability: float) -> float | None:
+    if not values:
+        return None
+    ordered = sorted(values)
+    position = (len(ordered) - 1) * probability
+    lower = math.floor(position)
+    upper = math.ceil(position)
+    if lower == upper:
+        return ordered[lower]
+    fraction = position - lower
+    return ordered[lower] * (1.0 - fraction) + ordered[upper] * fraction
+
+
+def finite_values(rows: list[dict[str, Any]], *keys: str) -> list[float]:
+    values: list[float] = []
+    for row in rows:
+        value = nested(row, *keys)
+        if isinstance(value, (int, float)) and math.isfinite(value):
+            values.append(float(value))
+    return values
+
+
+def telemetry_health(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    attention_weights = finite_values(rows, "loss", "effective_attention_kd_weight")
+    clipped = finite_values(rows, "activation_quantization", "clipped_fraction")
+    int8_edge = finite_values(rows, "activation_quantization", "int8_edge_fraction")
+    flips = finite_values(rows, "quantization_dynamics", "flip_fraction")
+    scale_deltas = finite_values(rows, "quantization_dynamics", "scale_abs_delta_max")
+    attention_ratios: list[float] = []
+    logit_ratios: list[float] = []
+    for row in rows:
+        ce_norm = nested(row, "component_grad_norms_microbatch", "ce")
+        attention_norm = nested(row, "component_grad_norms_microbatch", "weighted_attention_kd")
+        logit_norm = nested(row, "component_grad_norms_microbatch", "weighted_logit_kd")
+        if isinstance(ce_norm, (int, float)) and math.isfinite(ce_norm) and ce_norm > 0.0:
+            if isinstance(attention_norm, (int, float)) and math.isfinite(attention_norm):
+                attention_ratios.append(float(attention_norm / ce_norm))
+            if isinstance(logit_norm, (int, float)) and math.isfinite(logit_norm):
+                logit_ratios.append(float(logit_norm / ce_norm))
+    return {
+        "points": len(rows),
+        "attention_weight": {
+            "first": attention_weights[0] if attention_weights else None,
+            "final": attention_weights[-1] if attention_weights else None,
+            "median": percentile(attention_weights, 0.5),
+            "min": min(attention_weights) if attention_weights else None,
+            "max": max(attention_weights) if attention_weights else None,
+        },
+        "weighted_attention_to_ce_gradient_ratio": {
+            "final": attention_ratios[-1] if attention_ratios else None,
+            "median": percentile(attention_ratios, 0.5),
+            "p95": percentile(attention_ratios, 0.95),
+            "max": max(attention_ratios) if attention_ratios else None,
+        },
+        "weighted_logit_to_ce_gradient_ratio": {
+            "final": logit_ratios[-1] if logit_ratios else None,
+            "median": percentile(logit_ratios, 0.5),
+            "p95": percentile(logit_ratios, 0.95),
+            "max": max(logit_ratios) if logit_ratios else None,
+        },
+        "max_activation_clipped_fraction": max(clipped) if clipped else None,
+        "max_int8_edge_fraction": max(int8_edge) if int8_edge else None,
+        "mean_ternary_flip_fraction": statistics.fmean(flips) if flips else None,
+        "final_ternary_flip_fraction": flips[-1] if flips else None,
+        "max_scale_abs_delta": max(scale_deltas) if scale_deltas else None,
+    }
 
 
 def compare_prediction_files(reference_path: Path, candidate_path: Path) -> dict[str, Any]:
@@ -195,7 +266,8 @@ def summarize_run(root: Path, seed: int, fp16_predictions: Path, fixed_predictio
     predictions_path = run_dir / "eval_predictions.jsonl"
     telemetry_path = run_dir / "telemetry.jsonl"
     metrics = read_json(metrics_path)
-    telemetry_steps, telemetry_errors = read_telemetry_steps(telemetry_path)
+    telemetry_rows, telemetry_errors = read_telemetry(telemetry_path)
+    telemetry_steps = [int(row["step"]) for row in telemetry_rows]
     predictions, prediction_errors = load_predictions(predictions_path)
     blockers = list(telemetry_errors) + list(prediction_errors)
 
@@ -228,6 +300,7 @@ def summarize_run(root: Path, seed: int, fp16_predictions: Path, fixed_predictio
         "telemetry_path": str(telemetry_path),
         "accuracy": float(accuracy) if isinstance(accuracy, (int, float)) and math.isfinite(accuracy) else None,
         "effective_attention_weight": nested(metrics, "loss_weights", "effective_attention_kd_weight"),
+        "telemetry_health": telemetry_health(telemetry_rows),
         "vs_fp16": compare_prediction_files(fp16_predictions, predictions_path),
         "vs_fixed_gamma_655m": compare_prediction_files(fixed_predictions, predictions_path),
     }
@@ -318,6 +391,10 @@ def render_markdown(report: dict[str, Any]) -> str:
                 fp16["delta_candidate_minus_reference"],
                 fp16["paired_ci95"],
                 run["effective_attention_weight"],
+                nested(run, "telemetry_health", "weighted_attention_to_ce_gradient_ratio", "median"),
+                nested(run, "telemetry_health", "weighted_attention_to_ce_gradient_ratio", "max"),
+                nested(run, "telemetry_health", "max_activation_clipped_fraction"),
+                nested(run, "telemetry_health", "mean_ternary_flip_fraction"),
                 run["blockers"],
             ]
         )
@@ -340,6 +417,10 @@ def render_markdown(report: dict[str, Any]) -> str:
                     "delta vs FP16",
                     "paired CI vs FP16",
                     "final gamma",
+                    "median grad A/CE",
+                    "max grad A/CE",
+                    "max A8 clipped",
+                    "mean ternary flips",
                     "blockers",
                 ],
                 rows,
