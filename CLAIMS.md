@@ -40,6 +40,14 @@ unchanged fixed-gamma recipe as the next move. The active controlled test uses
 adaptive gradient balancing while holding the checkpoint, task, and 10k-step
 budget fixed, then replicates across three seeds.
 
+A second, matched three-seed arm now tests the adaptive controller directly
+against fixed `gamma=60`. This control was submitted before adaptive
+full-validation quality was available and holds source, checkpoint, objective,
+schedule, data, and seeds fixed. Until all six runs and the fail-closed paired
+audit complete, it supports no quality claim. The pre-registered method gate is
+documented in
+`benchmarks/results/bitdistill_adaptive_vs_fixed_submission_2026-09-04.json`.
+
 ## Language To Avoid
 
 - Do not say "universal BitNet converter."

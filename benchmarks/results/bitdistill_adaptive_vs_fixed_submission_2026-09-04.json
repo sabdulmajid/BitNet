@@ -1,0 +1,127 @@
+{
+  "schema": "bitdistill-adaptive-vs-fixed-submission-v1",
+  "status": "submitted_pending_results",
+  "created_utc": "2026-09-04T06:55:16Z",
+  "preregistered_before_quality_observation": true,
+  "claim_boundary": "Matched three-seed, cross-environment MNLI method comparison; not a paper-exact reproduction and not evidence beyond this model-task-runtime setup.",
+  "question": "Does gradient-norm EMA attention-loss balancing improve full-validation MNLI accuracy over a matched fixed gamma=60 implementation-specific control?",
+  "provenance": {
+    "source_revision": "526ede7b2c3f33c6a9638de54bdae91e8afe39c6",
+    "source_clean_at_preflight": true,
+    "stage2_sha256": "9fc648a7466adb5f170085cf73d2bf4bd90a500f9de4c2a8f6c68b6cc29fa57d",
+    "base_model_safetensors_sha256": "88c142557820ccad55bb59756bfcfcf891de9cc6202816bd346445188a0ed342",
+    "teacher_safetensors_sha256": "a41714f25c129f4c813e12c66fa876ca642f834887231ebcc40ad87098b26a6e",
+    "node": "ece-nebula12",
+    "gpu": "NVIDIA RTX A4500 20GB",
+    "environment_scope": "cross_environment"
+  },
+  "jobs": {
+    "adaptive": [
+      {
+        "seed": 1234,
+        "job_id": 10392,
+        "dependency": null,
+        "save_model_artifacts": true
+      },
+      {
+        "seed": 1235,
+        "job_id": 10395,
+        "dependency": "afterok:10392",
+        "save_model_artifacts": false
+      },
+      {
+        "seed": 1236,
+        "job_id": 10396,
+        "dependency": "afterok:10395",
+        "save_model_artifacts": false
+      }
+    ],
+    "fixed60": [
+      {
+        "seed": 1234,
+        "job_id": 10399,
+        "dependency": "afterok:10396",
+        "save_model_artifacts": false,
+        "batch_script_sha256": "331b1cf734a046ff23a1b32e4041c9925fc5b51f00946fd0ac80984d0918d7a9"
+      },
+      {
+        "seed": 1235,
+        "job_id": 10400,
+        "dependency": "afterok:10399",
+        "save_model_artifacts": false,
+        "batch_script_sha256": "f793c1ad9ffd0cacaec2b276b7aee7fe1be5a841929a30a7ea43177c81662cd9"
+      },
+      {
+        "seed": 1236,
+        "job_id": 10401,
+        "dependency": "afterok:10400",
+        "save_model_artifacts": false,
+        "batch_script_sha256": "c811699e9d062d148a622e5694afbdf8c88e92e98ad9a59b7118ab94e4a1bd8d"
+      }
+    ]
+  },
+  "held_constant": {
+    "model": "Qwen2.5-0.5B sequence classification",
+    "task": "MNLI matched validation",
+    "scale_mode": "tensor",
+    "quantization": "W1.58A8",
+    "subln": true,
+    "distill_layer": -1,
+    "attention_relation_mode": "cosine",
+    "attention_split_heads": 1,
+    "logit_kd_weight": 10.0,
+    "logit_temperature": 5.0,
+    "attention_temperature": 1.0,
+    "optimizer_steps": 10000,
+    "learning_rate": 0.00002,
+    "scheduler": "cosine",
+    "warmup_steps": 100,
+    "per_device_batch_size": 4,
+    "gradient_accumulation_steps": 4,
+    "max_sequence_length": 512,
+    "train_examples": 392702,
+    "eval_examples": 9815,
+    "seeds": [1234, 1235, 1236]
+  },
+  "intended_differences": {
+    "adaptive": {
+      "attention_kd_balance": "gradnorm_ema",
+      "initial_attention_kd_weight": 100000.0,
+      "target_gradient_ratio": 1.0,
+      "ema_beta": 0.9,
+      "update_every_steps": 20
+    },
+    "fixed60": {
+      "attention_kd_balance": "fixed",
+      "attention_kd_weight": 60.0
+    },
+    "storage_only_difference": "Only adaptive seed 1234 saves a model payload; this does not alter optimization or evaluation."
+  },
+  "preregistered_statistics": {
+    "primary_endpoint": "full MNLI matched-validation accuracy",
+    "primary_contrast": "adaptive minus fixed60, paired by training seed",
+    "minimum_practical_delta": 0.005,
+    "adaptive_success_rule": "All three seed deltas are positive, mean delta is at least 0.005, and the seed-level paired t-interval lower bound is above zero.",
+    "fixed_simplicity_rule": "Prefer fixed60 when the seed-level paired t-interval upper bound excludes a +0.005 adaptive gain.",
+    "paper_recovery_floor": 0.798151,
+    "secondary_statistics": [
+      "per-seed paired example interval",
+      "per-seed exact McNemar test",
+      "conditional example-level interval averaged across seeds"
+    ]
+  },
+  "timing_boundary": "Fixed controls and decision thresholds were recorded while adaptive seed 1234 was training and before any adaptive full-validation accuracy was available. Gamma=60 was selected from prior historical and gradient-balance evidence, not from these pending outcomes.",
+  "resource_policy": "Fixed runs omit model payloads because node-local storage had 31 GB free at submission; metrics, predictions, telemetry, and logs remain required.",
+  "postprocess": {
+    "job_id": 10402,
+    "dependency": "afterany:10401",
+    "fail_closed": true,
+    "audit_script_sha256": "3fd4d5fcc98879a213abe93aafef71f6b687a5d81a6a4ec215558af61db2274e",
+    "dependency_script_sha256": "1bef873f99e1e192ef012e0810033af963e4ca17c603506bbe0e0faa883b5267",
+    "batch_script_sha256": "aca5d215ad36d29536a90f23c4fa0082152455c11108d938f02cb15d2999748f",
+    "outputs": [
+      "bitdistill_adaptive_vs_fixed_2026-09-04.json",
+      "bitdistill_adaptive_vs_fixed_2026-09-04.md"
+    ]
+  }
+}

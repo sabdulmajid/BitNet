@@ -214,6 +214,19 @@ still requires confirmation in the pinned reference environment before a
 reproduction claim. QNLI/SST2, row/group-scale sweeps, more Stage-2 tokens, and
 MoE remain blocked behind that gate.
 
+A matched fixed-`gamma=60` three-seed control is now queued as jobs `10399`,
+`10400`, and `10401` behind the adaptive series. This closes an important
+causal gap: the historical gamma-60 result changed checkpoint budget and
+relation-head partitioning, so adaptive balancing could not be credited from
+that comparison. The new control holds the 655M checkpoint, one-head cosine
+objective, 10k-step schedule, full validation set, and seeds fixed. Its method
+selection rule, practical-effect threshold, immutable asset hashes, and batch
+hashes were recorded before adaptive full-validation quality was observed:
+[bitdistill_adaptive_vs_fixed_submission_2026-09-04.md](benchmarks/results/bitdistill_adaptive_vs_fixed_submission_2026-09-04.md).
+Fail-closed audit job `10402` runs after the final control even when an upstream
+job fails, preventing a broken dependency chain from being mistaken for a
+successful experiment.
+
 ## What This Fork Adds
 
 - An independent open BitDistill-style training implementation. The audited
