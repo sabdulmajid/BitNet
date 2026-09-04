@@ -60,6 +60,27 @@ def static_contract(source: str) -> list[dict[str, Any]]:
             "default Q/K/V reduction is not the audited sum setting.",
         ),
         (
+            "Attention relation definition is explicit",
+            'parser.add_argument("--attention-relation-mode", choices=["cosine", "scaled_dot"], default="cosine")',
+            None,
+            'parser.add_argument("--attention-relation-mode", choices=["cosine", "scaled_dot"], default="cosine")' in source,
+            "paper equation and pseudocode relation definitions cannot be distinguished.",
+        ),
+        (
+            "Gradient-balanced attention weighting is available",
+            'parser.add_argument("--attention-kd-balance", choices=["fixed", "gradnorm_ema"], default="fixed")',
+            None,
+            'parser.add_argument("--attention-kd-balance", choices=["fixed", "gradnorm_ema"], default="fixed")' in source,
+            "adaptive gradient balancing was not found.",
+        ),
+        (
+            "Task formulation provenance is recorded",
+            '"task_formulation_contract": task_formulation_contract(args, eval_metrics)',
+            None,
+            '"task_formulation_contract": task_formulation_contract(args, eval_metrics)' in source,
+            "task architecture and evaluation semantics are not recorded in metrics.",
+        ),
+        (
             "Logits KD temperature scaling defaults to none",
             "parser.add_argument(\"--logit-kd-temperature-scale\", choices=[\"none\", \"square\"], default=\"none\")",
             None,

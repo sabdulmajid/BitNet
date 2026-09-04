@@ -7,7 +7,7 @@ paper-specific ingredients needed for a fair reproduction:
 
 * optional SubLN wrappers before attention output and FFN down projections,
 * Stage-2 causal-LM continued pretraining with cross-entropy,
-* Stage-3 GLUE sequence-classification fine-tuning,
+* Stage-3 GLUE answer-token or sequence-classification fine-tuning,
 * logits distillation from a task-tuned FP teacher,
 * MiniLM-style Q/K/V attention-relation distillation at one selected layer.
 
@@ -25,6 +25,7 @@ import itertools
 import json
 import math
 import random
+import subprocess
 import time
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -114,6 +115,7 @@ class StepMetrics:
     weighted_attention_q_kd: float = 0.0
     weighted_attention_k_kd: float = 0.0
     weighted_attention_v_kd: float = 0.0
+    effective_attention_kd_weight: float = 0.0
     grad_norm: float = 0.0
     lr: float = 0.0
 
@@ -204,6 +206,16 @@ def set_seed(seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
+def source_revision() -> str:
+    result = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout.strip() if result.returncode == 0 else "unknown"
+
+
 def move_batch(batch: dict[str, torch.Tensor], device: torch.device) -> dict[str, torch.Tensor]:
     return {key: value.to(device, non_blocking=True) for key, value in batch.items()}
 
@@ -272,6 +284,75 @@ def component_grad_norms(components: dict[str, torch.Tensor], parameters: list[n
             total += float(torch.sum(grad_f * grad_f).cpu())
         norms[name] = math.sqrt(total)
     return norms
+
+
+class GradNormEmaBalancer:
+    """Choose an attention coefficient from CE/attention gradient norms."""
+
+    def __init__(
+        self,
+        *,
+        initial_weight: float,
+        target_ratio: float,
+        beta: float,
+        min_weight: float,
+        max_weight: float,
+        eps: float,
+    ) -> None:
+        if initial_weight <= 0 or target_ratio <= 0:
+            raise ValueError("initial_weight and target_ratio must be positive")
+        if not 0 <= beta < 1:
+            raise ValueError("beta must be in [0, 1)")
+        if min_weight <= 0 or max_weight < min_weight:
+            raise ValueError("attention balance weight bounds are invalid")
+        self.weight = float(initial_weight)
+        self.target_ratio = float(target_ratio)
+        self.beta = float(beta)
+        self.min_weight = float(min_weight)
+        self.max_weight = float(max_weight)
+        self.eps = float(eps)
+        self.updates = 0
+        self.last: dict[str, float] = {}
+
+    def update(
+        self,
+        ce: torch.Tensor,
+        attention_kd: torch.Tensor,
+        parameters: list[nn.Parameter],
+    ) -> dict[str, float]:
+        norms = component_grad_norms({"ce": ce, "attention_kd_raw": attention_kd}, parameters)
+        ce_norm = norms["ce"]
+        attention_norm = norms["attention_kd_raw"]
+        candidate = self.target_ratio * ce_norm / max(attention_norm, self.eps)
+        candidate = min(self.max_weight, max(self.min_weight, candidate))
+        if self.updates == 0:
+            self.weight = candidate
+        else:
+            log_weight = self.beta * math.log(self.weight) + (1.0 - self.beta) * math.log(candidate)
+            self.weight = min(self.max_weight, max(self.min_weight, math.exp(log_weight)))
+        self.updates += 1
+        self.last = {
+            "ce_gradient_norm": ce_norm,
+            "raw_attention_gradient_norm": attention_norm,
+            "candidate_weight": candidate,
+            "effective_weight": self.weight,
+            "predicted_weighted_attention_to_ce_gradient_ratio": (
+                self.weight * attention_norm / max(ce_norm, self.eps)
+            ),
+        }
+        return dict(self.last)
+
+    def summary(self) -> dict[str, Any]:
+        return {
+            "strategy": "gradnorm_ema",
+            "target_ratio": self.target_ratio,
+            "beta": self.beta,
+            "min_weight": self.min_weight,
+            "max_weight": self.max_weight,
+            "updates": self.updates,
+            "effective_weight": self.weight,
+            "last": dict(self.last),
+        }
 
 
 def sampled_weight_matrix(weight: torch.Tensor, max_elements: int) -> tuple[torch.Tensor, torch.Tensor | None]:
@@ -749,6 +830,31 @@ def find_qwen_layers(model: nn.Module) -> list[tuple[str, nn.Module]]:
     return layers
 
 
+def attention_distillation_probe_parameters(model: nn.Module, *, layer_index: int) -> tuple[list[nn.Parameter], list[str]]:
+    layers = find_qwen_layers(model)
+    if not layers:
+        raise RuntimeError("no Qwen-style layers with q_proj/k_proj/v_proj found")
+    if layer_index < 0:
+        layer_index = len(layers) + layer_index
+    if layer_index < 0 or layer_index >= len(layers):
+        raise IndexError(f"distill layer {layer_index} outside 0..{len(layers) - 1}")
+    layer_name, layer = layers[layer_index]
+    parameters: list[nn.Parameter] = []
+    names: list[str] = []
+    seen: set[int] = set()
+    for key in ("q", "k", "v"):
+        projection = unwrap_projection(getattr(layer.self_attn, f"{key}_proj"))
+        for parameter_name, parameter in projection.named_parameters():
+            if not parameter.requires_grad or id(parameter) in seen:
+                continue
+            seen.add(id(parameter))
+            parameters.append(parameter)
+            names.append(f"{layer_name}.self_attn.{key}_proj.{parameter_name}")
+    if not parameters:
+        raise RuntimeError("attention gradient-balance probe has no trainable parameters")
+    return parameters, names
+
+
 @contextmanager
 def capture_qkv(model: nn.Module, *, layer_index: int) -> Iterator[dict[str, torch.Tensor]]:
     layers = find_qwen_layers(model)
@@ -780,7 +886,14 @@ def capture_qkv(model: nn.Module, *, layer_index: int) -> Iterator[dict[str, tor
             handle.remove()
 
 
-def relation_rows(values: torch.Tensor, attention_mask: torch.Tensor, *, split_heads: int, temperature: float) -> torch.Tensor:
+def relation_rows(
+    values: torch.Tensor,
+    attention_mask: torch.Tensor,
+    *,
+    split_heads: int,
+    temperature: float,
+    relation_mode: str = "cosine",
+) -> torch.Tensor:
     if values.ndim != 3:
         raise ValueError(f"expected [batch, seq, channels], got {tuple(values.shape)}")
     batch, seq_len, channels = values.shape
@@ -788,8 +901,14 @@ def relation_rows(values: torch.Tensor, attention_mask: torch.Tensor, *, split_h
         raise ValueError(f"channels={channels} is not divisible by split_heads={split_heads}")
     width = channels // split_heads
     states = values.float().reshape(batch, seq_len, split_heads, width).transpose(1, 2)
-    states = F.normalize(states, dim=-1)
-    relation = torch.matmul(states, states.transpose(-2, -1)) / max(temperature, 1e-8)
+    temperature = max(temperature, 1e-8)
+    if relation_mode == "cosine":
+        states = F.normalize(states, dim=-1)
+        relation = torch.matmul(states, states.transpose(-2, -1)) / temperature
+    elif relation_mode == "scaled_dot":
+        relation = torch.matmul(states, states.transpose(-2, -1)) / (math.sqrt(width) * temperature)
+    else:
+        raise ValueError(f"unsupported relation_mode={relation_mode}")
     key_mask = attention_mask[:, None, None, :].bool()
     relation = relation.masked_fill(~key_mask, -1.0e4)
     probs = F.softmax(relation, dim=-1).clamp_min(1.0e-8)
@@ -805,13 +924,26 @@ def attention_relation_distillation_components(
     split_heads: int,
     temperature: float,
     qkv_reduction: str,
+    relation_mode: str = "cosine",
 ) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
     losses: dict[str, torch.Tensor] = {}
     for key in ("q", "k", "v"):
         if key not in student_qkv or key not in teacher_qkv:
             raise RuntimeError(f"missing captured {key}-projection state for attention distillation")
-        student_rows = relation_rows(student_qkv[key], attention_mask, split_heads=split_heads, temperature=temperature)
-        teacher_rows = relation_rows(teacher_qkv[key], attention_mask, split_heads=split_heads, temperature=temperature)
+        student_rows = relation_rows(
+            student_qkv[key],
+            attention_mask,
+            split_heads=split_heads,
+            temperature=temperature,
+            relation_mode=relation_mode,
+        )
+        teacher_rows = relation_rows(
+            teacher_qkv[key],
+            attention_mask,
+            split_heads=split_heads,
+            temperature=temperature,
+            relation_mode=relation_mode,
+        )
         losses[key] = F.kl_div(torch.log(student_rows), teacher_rows, reduction="batchmean", log_target=False)
     stacked = torch.stack([losses[key] for key in ("q", "k", "v")])
     if qkv_reduction == "sum":
@@ -1004,6 +1136,28 @@ def format_glue_prompt(task_name: str, row: dict[str, Any], *, label_scheme: str
     if task_name == "mnli":
         return f"Premise: {row['premise']}\nHypothesis: {row['hypothesis']}{options}\n{answer_field}:"
     raise ValueError(f"unsupported task_name={task_name}")
+
+
+def task_formulation_contract(args: argparse.Namespace, eval_metrics: dict[str, Any]) -> dict[str, Any]:
+    if args.task_format == "causal_lm":
+        return {
+            "architecture": "AutoModelForCausalLM",
+            "training_objective": "answer_token_cross_entropy",
+            "prompt_template": "local_glue_plain_v1",
+            "label_scheme": args.label_scheme,
+            "evaluation": eval_metrics.get("causal_eval_mode"),
+            "candidate_score": args.candidate_score,
+            "paper_equivalence": "unresolved_without_authoritative_training_code_and_templates",
+        }
+    return {
+        "architecture": "AutoModelForSequenceClassification",
+        "training_objective": "class_logit_cross_entropy",
+        "prompt_template": None,
+        "label_scheme": "integer_class_id",
+        "evaluation": "class_logit_argmax",
+        "candidate_score": None,
+        "paper_equivalence": "not_established",
+    }
 
 
 def encode_causal_glue_row(
@@ -1648,6 +1802,7 @@ def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
                 print(f"step={step} ce={last.ce:.6f}{telemetry_suffix} lr={lr:.3e} elapsed={time.time() - start:.1f}s", flush=True)
             if args.save_every_steps > 0 and step % args.save_every_steps == 0:
                 snapshot_metrics = {
+                    "source_revision": source_revision(),
                     "stage": args.stage,
                     "method": args.method,
                     "student_model": args.student_model,
@@ -1672,6 +1827,7 @@ def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
                 break
 
     metrics = {
+        "source_revision": source_revision(),
         "stage": args.stage,
         "method": args.method,
         "student_model": args.student_model,
@@ -1737,6 +1893,22 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
     telemetry_last: dict[str, Any] | None = None
     quantization_dynamics = BitLinearDynamicsTracker()
     trainable_parameters = [parameter for parameter in student.parameters() if parameter.requires_grad]
+    attention_balancer: GradNormEmaBalancer | None = None
+    attention_balance_parameters: list[nn.Parameter] = []
+    attention_balance_parameter_names: list[str] = []
+    if args.method == "bitdistill" and args.attention_kd_balance == "gradnorm_ema":
+        attention_balance_parameters, attention_balance_parameter_names = attention_distillation_probe_parameters(
+            student,
+            layer_index=args.distill_layer,
+        )
+        attention_balancer = GradNormEmaBalancer(
+            initial_weight=args.attention_kd_weight,
+            target_ratio=args.attention_balance_target_ratio,
+            beta=args.attention_balance_beta,
+            min_weight=args.attention_balance_min_weight,
+            max_weight=args.attention_balance_max_weight,
+            eps=args.attention_balance_eps,
+        )
     optimizer.zero_grad(set_to_none=True)
 
     while step < args.max_steps:
@@ -1792,6 +1964,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                         split_heads=args.attention_split_heads,
                         temperature=args.attention_temperature,
                         qkv_reduction=args.attention_qkv_reduction,
+                        relation_mode=args.attention_relation_mode,
                     )
                 else:
                     attention_kd = student_outputs.logits.new_zeros(())
@@ -1800,11 +1973,20 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                         "k": student_outputs.logits.new_zeros(()),
                         "v": student_outputs.logits.new_zeros(()),
                     }
+                if (
+                    attention_balancer is not None
+                    and batch_index % args.grad_accum_steps == 0
+                    and (next_step == 1 or (next_step - 1) % args.attention_balance_every_steps == 0)
+                ):
+                    attention_balancer.update(ce, attention_kd, attention_balance_parameters)
+                effective_attention_kd_weight = (
+                    attention_balancer.weight if attention_balancer is not None else args.attention_kd_weight
+                )
                 weighted_logit_kd = args.logit_kd_weight * logit_kd
-                weighted_attention_kd = args.attention_kd_weight * attention_kd
+                weighted_attention_kd = effective_attention_kd_weight * attention_kd
                 weighted_attention_components = attention_component_weights(
                     attention_kd_components,
-                    attention_kd_weight=args.attention_kd_weight,
+                    attention_kd_weight=effective_attention_kd_weight,
                     qkv_reduction=args.attention_qkv_reduction,
                 )
                 loss = ce + weighted_logit_kd + weighted_attention_kd
@@ -1822,6 +2004,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                 weighted_logit_kd = student_outputs.logits.new_zeros(())
                 weighted_attention_kd = student_outputs.logits.new_zeros(())
                 weighted_attention_components = dict(attention_kd_components)
+                effective_attention_kd_weight = 0.0
                 loss = ce
 
             grad_components = {
@@ -1870,6 +2053,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                 weighted_attention_q_kd=float(weighted_attention_components["q"].detach().cpu()),
                 weighted_attention_k_kd=float(weighted_attention_components["k"].detach().cpu()),
                 weighted_attention_v_kd=float(weighted_attention_components["v"].detach().cpu()),
+                effective_attention_kd_weight=float(effective_attention_kd_weight),
                 grad_norm=grad_norm,
                 lr=lr,
             )
@@ -1891,6 +2075,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                         max_elements_per_layer=args.telemetry_max_elements_per_layer,
                     ),
                     "activation_quantization": activation_capture.summary(),
+                    "attention_balance": attention_balancer.summary() if attention_balancer is not None else None,
                     "elapsed_seconds": time.time() - start,
                 }
                 append_telemetry(args, telemetry_last)
@@ -1900,7 +2085,8 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                     f"step={step} loss={last.loss:.6f} ce={last.ce:.6f} "
                     f"logit_kd={last.logit_kd:.6f} attention_kd={last.attention_kd:.6f} "
                     f"weighted_logit_kd={last.weighted_logit_kd:.6f} "
-                    f"weighted_attention_kd={last.weighted_attention_kd:.6f}{telemetry_suffix} "
+                    f"weighted_attention_kd={last.weighted_attention_kd:.6f} "
+                    f"attention_weight={last.effective_attention_kd_weight:.6f}{telemetry_suffix} "
                     f"lr={lr:.3e} elapsed={time.time() - start:.1f}s",
                     flush=True,
                 )
@@ -1914,6 +2100,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
             raise RuntimeError("sequence classification evaluation loader missing")
         eval_metrics = evaluate_accuracy(student, eval_loader, device, prediction_path=eval_prediction_path(args))
     metrics = {
+        "source_revision": source_revision(),
         "stage": args.stage,
         "method": args.method,
         "student_model": args.student_model,
@@ -1927,6 +2114,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
         "steps": step,
         "last": last.__dict__,
         "eval": eval_metrics,
+        "task_formulation_contract": task_formulation_contract(args, eval_metrics),
         "preparation": prep,
         "state_load": state_load,
         "output_head_init": output_head_init,
@@ -1946,9 +2134,19 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
         "loss_weights": {
             "logit_kd_weight": args.logit_kd_weight,
             "attention_kd_weight": args.attention_kd_weight,
+            "attention_kd_balance": args.attention_kd_balance,
+            "attention_balance_target_ratio": args.attention_balance_target_ratio,
+            "attention_balance_beta": args.attention_balance_beta,
+            "attention_balance_every_steps": args.attention_balance_every_steps,
+            "attention_balance_min_weight": args.attention_balance_min_weight,
+            "attention_balance_max_weight": args.attention_balance_max_weight,
+            "effective_attention_kd_weight": (
+                attention_balancer.weight if attention_balancer is not None else args.attention_kd_weight
+            ),
             "logit_temperature": args.logit_temperature,
             "logit_kd_temperature_scale": args.logit_kd_temperature_scale,
             "attention_temperature": args.attention_temperature,
+            "attention_relation_mode": args.attention_relation_mode,
             "attention_qkv_reduction": args.attention_qkv_reduction,
         },
         "elapsed_seconds": time.time() - start,
@@ -1958,6 +2156,8 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
             "component_grad_norms": args.telemetry_component_grad_norms,
             "max_elements_per_layer": args.telemetry_max_elements_per_layer,
             "last": telemetry_last,
+            "attention_balance": attention_balancer.summary() if attention_balancer is not None else None,
+            "attention_balance_probe_parameters": attention_balance_parameter_names,
         },
     }
     print(json.dumps(metrics, indent=2, sort_keys=True), flush=True)
@@ -2020,7 +2220,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--attention-temperature", type=float, default=1.0)
     parser.add_argument("--attention-kd-weight", type=float, default=100.0)
     parser.add_argument("--attention-split-heads", type=int, default=8)
+    parser.add_argument("--attention-relation-mode", choices=["cosine", "scaled_dot"], default="cosine")
     parser.add_argument("--attention-qkv-reduction", choices=["sum", "mean"], default="sum")
+    parser.add_argument("--attention-kd-balance", choices=["fixed", "gradnorm_ema"], default="fixed")
+    parser.add_argument("--attention-balance-target-ratio", type=float, default=1.0)
+    parser.add_argument("--attention-balance-beta", type=float, default=0.9)
+    parser.add_argument("--attention-balance-every-steps", type=int, default=20)
+    parser.add_argument("--attention-balance-min-weight", type=float, default=1e-3)
+    parser.add_argument("--attention-balance-max-weight", type=float, default=1e5)
+    parser.add_argument("--attention-balance-eps", type=float, default=1e-12)
     parser.add_argument("--distill-layer", type=int, default=-1)
     parser.add_argument("--init-output-head-from-teacher", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--gradient-checkpointing", action=argparse.BooleanOptionalAction, default=True)
@@ -2053,6 +2261,10 @@ def parse_args() -> argparse.Namespace:
         args.distill_layer = -1
     if args.method == "bitdistill" and args.stage == "task_sft" and not args.teacher_model and not args.smoke_test:
         raise SystemExit("--teacher-model must point to an FP16-SFT teacher checkpoint for BitDistill task_sft")
+    if args.attention_balance_every_steps <= 0:
+        raise SystemExit("--attention-balance-every-steps must be positive")
+    if args.attention_kd_balance == "gradnorm_ema" and args.attention_kd_weight <= 0:
+        raise SystemExit("--attention-kd-weight must be positive with gradnorm_ema balancing")
     return args
 
 

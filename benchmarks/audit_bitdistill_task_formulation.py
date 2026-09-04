@@ -3,11 +3,13 @@
 
 This report is deliberately conservative.  It separates:
 
-* sequence-classification GLUE runs, which are the closest local match to the
-  Qwen2.5-0.5B MNLI numbers quoted in the BitDistill excerpt, and
-* causal-LM prompt/classification runs, which are useful diagnostics but should
-  not be described as the same experimental formulation without paper/code
-  confirmation.
+* sequence-classification GLUE runs, which numerically resemble the reported
+  Qwen2.5-0.5B MNLI values but use a classifier head, and
+* causal-LM answer-token runs, which more closely match the paper's CE notation
+  and decoding description but use locally reconstructed prompts.
+
+Neither branch is labeled an exact reproduction without the missing reference
+training configuration and task templates.
 """
 
 from __future__ import annotations
@@ -150,10 +152,17 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         "model": args.model,
         "tasks": list(args.tasks),
         "paper_anchor_source": "BitDistill paper excerpt, Table 3 Qwen2.5-0.5B MNLI row.",
+        "paper_formulation_status": "unresolved",
+        "paper_formulation_cues": [
+            "Equations 7 and 14 optimize conditional token probabilities over target sequences.",
+            "The evaluation section specifies greedy decoding parameters for classification.",
+            "The public paper does not specify a sequence-classification head or release task templates.",
+        ],
         "paper_anchor_qwen25_mnli": PAPER_QWEN25_MNLI,
         "claim_controls": [
-            "Current strict reproduction claim should be limited to the sequence-classification branch until paper training code confirms a different task head/prompt formulation.",
-            "Causal-LM GLUE rows are diagnostics for deployment-style prompting and should not be mixed with sequence-classification rows in one headline accuracy table.",
+            "No local branch is an exact task-formulation reproduction until authoritative training code or templates resolve the paper's setup.",
+            "The paper's token-level CE and decoding language make causal answer-token training the leading interpretation, but this remains an inference.",
+            "Causal-LM and sequence-classification rows must remain separate because they optimize different functions.",
             "The provided excerpt only gives Qwen2.5-0.5B anchors for MNLI; QNLI/SST2 local Qwen2.5 rows are reproduction targets by task, not direct table-value reproductions.",
             "The strict tensor and row paper-gamma branches are complete and negative under the local budget; LR/head-init search is tracked in the reproduction gate, while full-budget/Qwen3 candidates remain pending.",
         ],
