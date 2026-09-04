@@ -18,6 +18,7 @@ EXPECTED_EVAL_EXAMPLES = 9_815
 EXPECTED_TELEMETRY_STEPS = (1, *range(500, EXPECTED_STEPS + 1, 500))
 FP16_ACCURACY = 0.808151
 FIXED_GAMMA_ACCURACY = 0.729903
+HISTORICAL_GAMMA60_ACCURACY = 0.738462
 RECOVERY_FLOOR = FP16_ACCURACY - 0.01
 T_95_DF2 = 4.302652729696142
 Z_95 = 1.959963984540054
@@ -165,15 +166,28 @@ def telemetry_health(rows: list[dict[str, Any]]) -> dict[str, Any]:
     scale_deltas = finite_values(rows, "quantization_dynamics", "scale_abs_delta_max")
     attention_ratios: list[float] = []
     logit_ratios: list[float] = []
+    probe_attention_ratios: list[float] = []
+    global_to_probe_attention_ratios: list[float] = []
     for row in rows:
         ce_norm = nested(row, "component_grad_norms_microbatch", "ce")
         attention_norm = nested(row, "component_grad_norms_microbatch", "weighted_attention_kd")
         logit_norm = nested(row, "component_grad_norms_microbatch", "weighted_logit_kd")
+        probe_ratio = nested(
+            row,
+            "attention_balance",
+            "last",
+            "predicted_weighted_attention_to_ce_gradient_ratio",
+        )
         if isinstance(ce_norm, (int, float)) and math.isfinite(ce_norm) and ce_norm > 0.0:
             if isinstance(attention_norm, (int, float)) and math.isfinite(attention_norm):
-                attention_ratios.append(float(attention_norm / ce_norm))
+                global_ratio = float(attention_norm / ce_norm)
+                attention_ratios.append(global_ratio)
+                if isinstance(probe_ratio, (int, float)) and math.isfinite(probe_ratio) and probe_ratio > 0.0:
+                    global_to_probe_attention_ratios.append(global_ratio / float(probe_ratio))
             if isinstance(logit_norm, (int, float)) and math.isfinite(logit_norm):
                 logit_ratios.append(float(logit_norm / ce_norm))
+        if isinstance(probe_ratio, (int, float)) and math.isfinite(probe_ratio):
+            probe_attention_ratios.append(float(probe_ratio))
     return {
         "points": len(rows),
         "attention_weight": {
@@ -188,6 +202,18 @@ def telemetry_health(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "median": percentile(attention_ratios, 0.5),
             "p95": percentile(attention_ratios, 0.95),
             "max": max(attention_ratios) if attention_ratios else None,
+        },
+        "probe_weighted_attention_to_ce_gradient_ratio": {
+            "final": probe_attention_ratios[-1] if probe_attention_ratios else None,
+            "median": percentile(probe_attention_ratios, 0.5),
+            "min": min(probe_attention_ratios) if probe_attention_ratios else None,
+            "max": max(probe_attention_ratios) if probe_attention_ratios else None,
+        },
+        "global_to_probe_attention_gradient_ratio": {
+            "final": global_to_probe_attention_ratios[-1] if global_to_probe_attention_ratios else None,
+            "median": percentile(global_to_probe_attention_ratios, 0.5),
+            "min": min(global_to_probe_attention_ratios) if global_to_probe_attention_ratios else None,
+            "max": max(global_to_probe_attention_ratios) if global_to_probe_attention_ratios else None,
         },
         "weighted_logit_to_ce_gradient_ratio": {
             "final": logit_ratios[-1] if logit_ratios else None,
@@ -260,7 +286,13 @@ def nested(value: dict[str, Any], *keys: str) -> Any:
     return current
 
 
-def summarize_run(root: Path, seed: int, fp16_predictions: Path, fixed_predictions: Path) -> dict[str, Any]:
+def summarize_run(
+    root: Path,
+    seed: int,
+    fp16_predictions: Path,
+    fixed_predictions: Path,
+    gamma60_predictions: Path,
+) -> dict[str, Any]:
     run_dir = root / f"mnli-seqcls-cosine-s1-adaptive-seed{seed}"
     metrics_path = run_dir / "metrics.json"
     predictions_path = run_dir / "eval_predictions.jsonl"
@@ -303,6 +335,7 @@ def summarize_run(root: Path, seed: int, fp16_predictions: Path, fixed_predictio
         "telemetry_health": telemetry_health(telemetry_rows),
         "vs_fp16": compare_prediction_files(fp16_predictions, predictions_path),
         "vs_fixed_gamma_655m": compare_prediction_files(fixed_predictions, predictions_path),
+        "vs_historical_gamma60_163m": compare_prediction_files(gamma60_predictions, predictions_path),
     }
 
 
@@ -314,8 +347,16 @@ def seed_mean_ci(values: list[float]) -> list[float] | None:
     return [mean - T_95_DF2 * standard_error, mean + T_95_DF2 * standard_error]
 
 
-def build_report(root: Path, fp16_predictions: Path, fixed_predictions: Path) -> dict[str, Any]:
-    runs = [summarize_run(root, seed, fp16_predictions, fixed_predictions) for seed in SEEDS]
+def build_report(
+    root: Path,
+    fp16_predictions: Path,
+    fixed_predictions: Path,
+    gamma60_predictions: Path,
+) -> dict[str, Any]:
+    runs = [
+        summarize_run(root, seed, fp16_predictions, fixed_predictions, gamma60_predictions)
+        for seed in SEEDS
+    ]
     complete = all(run["status"] == "complete" for run in runs)
     accuracies = [run["accuracy"] for run in runs if isinstance(run.get("accuracy"), float)]
     mean_accuracy = statistics.fmean(accuracies) if len(accuracies) == len(SEEDS) else None
@@ -340,6 +381,7 @@ def build_report(root: Path, fp16_predictions: Path, fixed_predictions: Path) ->
         "references": {
             "fp16_accuracy": FP16_ACCURACY,
             "fixed_gamma_655m_accuracy": FIXED_GAMMA_ACCURACY,
+            "historical_gamma60_163m_accuracy": HISTORICAL_GAMMA60_ACCURACY,
             "recovery_floor": RECOVERY_FLOOR,
         },
         "runs": runs,
@@ -379,6 +421,7 @@ def render_markdown(report: dict[str, Any]) -> str:
     rows = []
     for run in report["runs"]:
         fixed = run["vs_fixed_gamma_655m"]
+        gamma60 = run["vs_historical_gamma60_163m"]
         fp16 = run["vs_fp16"]
         rows.append(
             [
@@ -388,10 +431,14 @@ def render_markdown(report: dict[str, Any]) -> str:
                 fixed["delta_candidate_minus_reference"],
                 fixed["paired_ci95"],
                 fixed["mcnemar_exact_p"],
+                gamma60["delta_candidate_minus_reference"],
+                gamma60["paired_ci95"],
                 fp16["delta_candidate_minus_reference"],
                 fp16["paired_ci95"],
                 run["effective_attention_weight"],
                 nested(run, "telemetry_health", "weighted_attention_to_ce_gradient_ratio", "median"),
+                nested(run, "telemetry_health", "probe_weighted_attention_to_ce_gradient_ratio", "median"),
+                nested(run, "telemetry_health", "global_to_probe_attention_gradient_ratio", "median"),
                 nested(run, "telemetry_health", "weighted_attention_to_ce_gradient_ratio", "max"),
                 nested(run, "telemetry_health", "max_activation_clipped_fraction"),
                 nested(run, "telemetry_health", "mean_ternary_flip_fraction"),
@@ -414,10 +461,14 @@ def render_markdown(report: dict[str, Any]) -> str:
                     "delta vs fixed",
                     "paired CI vs fixed",
                     "McNemar vs fixed",
+                    "delta vs gamma60",
+                    "paired CI vs gamma60",
                     "delta vs FP16",
                     "paired CI vs FP16",
                     "final gamma",
                     "median grad A/CE",
+                    "median probe A/CE",
+                    "median global/probe",
                     "max grad A/CE",
                     "max A8 clipped",
                     "mean ternary flips",
@@ -457,6 +508,11 @@ def main() -> int:
         default=Path("checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-655mwarmup-steps10000-lr2em5-papergamma-headinit/eval_predictions.jsonl"),
     )
     parser.add_argument(
+        "--gamma60-predictions",
+        type=Path,
+        default=Path("checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-20kwarmup-steps10000-lr2em5-gamma60-headinit/eval_predictions.jsonl"),
+    )
+    parser.add_argument(
         "--output-json",
         type=Path,
         default=Path("benchmarks/results/bitdistill_adaptive_full_audit_2026-09-04.json"),
@@ -467,7 +523,12 @@ def main() -> int:
         default=Path("benchmarks/results/bitdistill_adaptive_full_audit_2026-09-04.md"),
     )
     args = parser.parse_args()
-    report = build_report(args.root, args.fp16_predictions, args.fixed_predictions)
+    report = build_report(
+        args.root,
+        args.fp16_predictions,
+        args.fixed_predictions,
+        args.gamma60_predictions,
+    )
     args.output_json.parent.mkdir(parents=True, exist_ok=True)
     args.output_md.parent.mkdir(parents=True, exist_ok=True)
     args.output_json.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
