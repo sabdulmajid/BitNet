@@ -109,11 +109,15 @@ def paired_bootstrap(
     contractions: list[float] = []
     asymptotes: list[float] = []
     projections: list[float] = []
+    constant_gain_projections: list[float] = []
+    future_doublings = math.log2(target_tokens / current_tokens)
     for offset in range(0, samples, batch_size):
         this_batch = min(batch_size, samples - offset)
         indexes = rng.integers(0, row_count, size=(this_batch, row_count))
         boot_accuracies = correctness[:, indexes].mean(axis=2).T
         for accuracies in boot_accuracies:
+            latest_gain = float(accuracies[2] - accuracies[1])
+            constant_gain_projections.append(float(accuracies[2] + latest_gain * future_doublings))
             projection = geometric_projection(
                 accuracies,
                 current_tokens=current_tokens,
@@ -132,6 +136,7 @@ def paired_bootstrap(
     contraction_array = np.asarray(contractions)
     asymptote_array = np.asarray(asymptotes)
     projection_array = np.asarray(projections)
+    constant_gain_array = np.asarray(constant_gain_projections)
     return {
         "requested_samples": samples,
         "valid_samples": valid,
@@ -139,6 +144,7 @@ def paired_bootstrap(
         "contraction_ci95": percentile_interval(contraction_array),
         "asymptote_ci95": percentile_interval(asymptote_array),
         "target_projection_ci95": percentile_interval(projection_array),
+        "constant_gain_target_projection_ci95": percentile_interval(constant_gain_array),
     }
 
 
@@ -169,10 +175,17 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Fitted asymptote: `{observed['asymptote']:.6f}`.",
             f"- Projection at `{payload['target_tokens']:,}` token presentations: "
             f"`{observed['target_projection']:.6f}`.",
+            f"- Constant-latest-gain sensitivity projection at the target: "
+            f"`{observed['constant_gain_target_projection']:.6f}`.",
+            f"- Required average gain per remaining doubling: `{observed['required_gain_per_doubling']:.6f}` "
+            f"(`{observed['required_to_latest_gain_ratio']:.3f}x` the latest observed gain).",
             f"- Paired-bootstrap 95% interval for the asymptote: "
             f"`[{bootstrap['asymptote_ci95'][0]:.6f}, {bootstrap['asymptote_ci95'][1]:.6f}]`.",
             f"- Paired-bootstrap 95% interval at the target budget: "
             f"`[{bootstrap['target_projection_ci95'][0]:.6f}, {bootstrap['target_projection_ci95'][1]:.6f}]`.",
+            f"- Paired-bootstrap 95% interval for the constant-latest-gain sensitivity: "
+            f"`[{bootstrap['constant_gain_target_projection_ci95'][0]:.6f}, "
+            f"{bootstrap['constant_gain_target_projection_ci95'][1]:.6f}]`.",
             f"- Valid monotone-contraction bootstrap replicates: `{bootstrap['valid_samples']}` / "
             f"`{bootstrap['requested_samples']}` (`{bootstrap['valid_fraction']:.3%}`).",
             "",
@@ -246,6 +259,10 @@ def main() -> None:
         raise RuntimeError("observed curve does not satisfy the monotone-contraction model")
     contraction, asymptote, target_projection = projection
     recovery_target = float(fp_correctness.mean() - args.recovery_margin)
+    future_doublings = math.log2(args.target_tokens / 655_360_000)
+    latest_gain = float(observed_accuracies[2] - observed_accuracies[1])
+    constant_gain_target_projection = float(observed_accuracies[2] + latest_gain * future_doublings)
+    required_gain_per_doubling = float((recovery_target - observed_accuracies[2]) / future_doublings)
     bootstrap = paired_bootstrap(
         correctness_matrix,
         samples=args.bootstrap_samples,
@@ -255,11 +272,15 @@ def main() -> None:
     )
     upper_projection = bootstrap["target_projection_ci95"][1]
     misses_recovery = upper_projection < recovery_target
+    constant_gain_upper = bootstrap["constant_gain_target_projection_ci95"][1]
+    constant_gain_misses_recovery = constant_gain_upper < recovery_target
     decision = (
         "Under the fitted diminishing-returns model, Stage-2 budget alone does not close the local FP16 recovery "
         f"gap: even the bootstrap upper bound `{upper_projection:.6f}` is below the pre-registered recovery "
-        f"target `{recovery_target:.6f}`. Change the training objective or method contract before scaling this "
-        "fixed recipe."
+        f"target `{recovery_target:.6f}`. Even repeating the latest gain without further decay has bootstrap upper "
+        f"bound `{constant_gain_upper:.6f}`. Reaching the gate requires the average future gain per doubling to be "
+        f"`{required_gain_per_doubling / latest_gain:.3f}x` the latest observed gain, reversing the measured "
+        "diminishing-return trend. Change the training objective or method contract before scaling this fixed recipe."
         if misses_recovery
         else "The extrapolation interval overlaps the recovery target; this curve does not reject budget-only scaling."
     )
@@ -275,13 +296,20 @@ def main() -> None:
             "contraction": contraction,
             "asymptote": asymptote,
             "target_projection": target_projection,
+            "future_doublings_to_target": future_doublings,
+            "latest_gain": latest_gain,
+            "constant_gain_target_projection": constant_gain_target_projection,
+            "required_gain_per_doubling": required_gain_per_doubling,
+            "required_to_latest_gain_ratio": required_gain_per_doubling / latest_gain,
         },
         "paired_bootstrap": bootstrap,
         "misses_recovery_target": misses_recovery,
+        "constant_gain_sensitivity_misses_recovery_target": constant_gain_misses_recovery,
         "decision": decision,
         "limitations": [
             "Three observed budgets identify only two doubling gains.",
             "The geometric contraction model is an extrapolation assumption.",
+            "The constant-gain sensitivity assumes future gains do not accelerate.",
             "Token presentations are not proven equivalent to the paper's corpus-token accounting.",
             "The result applies to the fixed-gamma tensor-scale local recipe, not adaptive balancing or all BitDistill variants.",
         ],

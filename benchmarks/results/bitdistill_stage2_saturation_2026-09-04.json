@@ -1,16 +1,23 @@
 {
-  "decision": "Under the fitted diminishing-returns model, Stage-2 budget alone does not close the local FP16 recovery gap: even the bootstrap upper bound `0.755819` is below the pre-registered recovery target `0.798151`. Change the training objective or method contract before scaling this fixed recipe.",
+  "constant_gain_sensitivity_misses_recovery_target": true,
+  "decision": "Under the fitted diminishing-returns model, Stage-2 budget alone does not close the local FP16 recovery gap: even the bootstrap upper bound `0.755819` is below the pre-registered recovery target `0.798151`. Even repeating the latest gain without further decay has bootstrap upper bound `0.795733`. Reaching the gate requires the average future gain per doubling to be `1.756x` the latest observed gain, reversing the measured diminishing-return trend. Change the training objective or method contract before scaling this fixed recipe.",
   "fp_accuracy": 0.8081507896077432,
   "limitations": [
     "Three observed budgets identify only two doubling gains.",
     "The geometric contraction model is an extrapolation assumption.",
+    "The constant-gain sensitivity assumes future gains do not accelerate.",
     "Token presentations are not proven equivalent to the paper's corpus-token accounting.",
     "The result applies to the fixed-gamma tensor-scale local recipe, not adaptive balancing or all BitDistill variants."
   ],
   "misses_recovery_target": true,
   "observed": {
     "asymptote": 0.7350571596031967,
+    "constant_gain_target_projection": 0.7687582426107432,
     "contraction": 0.3427561837455836,
+    "future_doublings_to_target": 3.931568569324174,
+    "latest_gain": 0.009882832399388697,
+    "required_gain_per_doubling": 0.017358868103390795,
+    "required_to_latest_gain_ratio": 1.7564669116987686,
     "rows": [
       {
         "accuracy": 0.6911869587366276,
@@ -34,6 +41,10 @@
     "asymptote_ci95": [
       0.7237661541842726,
       0.7600986757062671
+    ],
+    "constant_gain_target_projection_ci95": [
+      0.7415300383069567,
+      0.7957330681924654
     ],
     "contraction_ci95": [
       0.12670055939149916,

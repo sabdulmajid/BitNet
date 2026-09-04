@@ -15,7 +15,7 @@ representation-learning problem plus a runtime-contract problem.
 | Blind FP/BF16 to ternary PTQ is viable for tested Qwen2.5-1.5B | Rejected | FP PPL `13.901`; naive PTQ PPL `3,813,121.803`. FP ten-task mean `0.644169`; PTQ mean `0.348671`. |
 | QAT/distillation helps | Supported, partial | Best row-scale QAT mean `0.499459`, `+0.150788` over naive PTQ, still `-0.144710` below FP. |
 | BitDistill is reproduced | Not yet | Controlled MNLI rows improve with Stage-2 budget (`0.616607`, `0.691187`, `0.720020`, `0.729903`), but the `655.36M` row remains `-0.078248` below FP (paired 95% CI `[-0.086720, -0.069775]`). |
-| Scaling the unchanged fixed recipe to 10B presentations is justified | Rejected conditionally | A geometric diminishing-returns fit projects `0.734981` at 10B, with paired-bootstrap 95% interval `[0.723750, 0.755819]`, below the `0.798151` recovery gate. This is a model-dependent extrapolation, not a general BitDistill limit. |
+| Scaling the unchanged fixed recipe to 10B presentations is justified | Rejected conditionally | A geometric fit projects `0.734981` at 10B (95% interval `[0.723750, 0.755819]`). Even repeating the latest gain without further decay projects `0.768758` (95% interval `[0.741530, 0.795733]`), below the `0.798151` gate. This is not a general BitDistill limit. |
 | Row-scale runtime semantics matter | Supported | TL2 one-scale RMS error `1.904230`; exact row-scale RMS error `0.000197`. |
 | `I2_SR` is a working row-scale CPU path | Supported with caveat | Runs on Xeon and is faster than FP16 decode, but does not beat Q4_K_M on quality or file size. |
 | Native classifier runtime is product-ready | Not yet | Full MNLI native path runs, but accuracy `0.652165` and PyTorch agreement `0.976668` are below product gates. |

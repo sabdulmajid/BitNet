@@ -90,8 +90,11 @@ recipe should not simply be scaled to 10B token presentations. Fitting the last
 two exact budget doublings gives a gain contraction of `0.342756`, a projected
 10B accuracy of `0.734981`, and a paired-bootstrap 95% interval
 `[0.723750, 0.755819]`. The interval remains below the pre-registered
-`0.798151` recovery target. This is evidence against budget-only scaling for
-this fixed local recipe, not evidence against BitDistill generally:
+`0.798151` recovery target. Even repeating the latest gain without further
+decay projects `0.768758` with bootstrap interval `[0.741530, 0.795733]`;
+recovery would require the average future gain per doubling to be `1.756x`
+the latest observed gain. This is evidence against budget-only scaling for this
+fixed local recipe, not evidence against BitDistill generally:
 [bitdistill_stage2_saturation_2026-09-04.md](benchmarks/results/bitdistill_stage2_saturation_2026-09-04.md).
 
 Evidence and decision artifacts:
