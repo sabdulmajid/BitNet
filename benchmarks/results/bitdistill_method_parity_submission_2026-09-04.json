@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "submitted_at_utc": "2026-09-04",
+  "source_revision": "bb8e92b",
+  "array_job_id": "10298",
+  "postprocess_job_id": "10299",
+  "partition": "midcard",
+  "array": "0-5%2",
+  "resources_per_pilot": {
+    "gpus": 1,
+    "cpus": 12,
+    "memory_gib": 24,
+    "time_limit": "06:00:00"
+  },
+  "common_contract": {
+    "base_model": "Qwen/Qwen2.5-0.5B",
+    "task": "mnli",
+    "stage2_manifest": "benchmarks/results/stage2_manifest_655m_2026-05-23.json",
+    "scale_mode": "tensor",
+    "max_steps": 120,
+    "max_train_samples": 8192,
+    "max_eval_samples": 512,
+    "seed": 42
+  },
+  "cases": [
+    "seqcls-cosine-s8-fixed",
+    "seqcls-cosine-s1-fixed",
+    "seqcls-scaled-dot-s1-fixed",
+    "seqcls-cosine-s1-adaptive",
+    "causal-cosine-s1-fixed",
+    "causal-cosine-s1-adaptive"
+  ],
+  "claim_boundary": "Diagnostic method-selection pilots only; no full-validation quality claim is permitted.",
+  "launch_note": "The initial 32 GiB request was rejected before job creation because ece-nebula12 has 30000 MiB physical memory. Commit bb8e92b changed only the Slurm memory request to the previously proven 24 GiB envelope."
+}
