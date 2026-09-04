@@ -167,7 +167,8 @@ Stage-2 tokens, and MoE remain blocked behind that gate.
 - BitDistill-style training components for Qwen-family models: SubLN, Stage-2
   continued pretraining, Stage-3 CE + logits KL + Q/K/V attention-relation
   distillation, explicit Equation-12/Algorithm-1 relation modes, adaptive
-  gradient balancing, layer sweeps, and training telemetry.
+  gradient balancing, objective-gradient cosine diagnostics, layer sweeps, and
+  training telemetry.
 - Deterministic invariance and gradient audits that expose method-definition
   mismatches before spending GPU time on downstream sweeps.
 - Row-scale ternary retrofit experiments and paired statistical audits.

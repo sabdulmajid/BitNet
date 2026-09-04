@@ -44,7 +44,9 @@ Gap reports should distinguish:
 - the best tuned BitNet-SFT budget row,
 - controlled BitDistill Stage-2 rows,
 - FP16 recovery gap,
-- loss/gradient-balance telemetry.
+- loss/gradient-balance telemetry,
+- selected-layer pairwise gradient cosines for CE, logits KD, and attention KD
+  when objective compatibility is under investigation.
 
 The current report is:
 
@@ -71,6 +73,11 @@ quality benchmarks. The current equalized-gamma submission is:
 ```text
 benchmarks/results/gamma60_telemetry_submission_2026-05-23.md
 ```
+
+Gradient magnitudes and gradient directions answer different questions. A
+balanced attention/CE norm ratio does not imply compatible updates, so reports
+that interpret adaptive loss weighting should include pairwise gradient
+cosines when available and state the exact parameter probe used.
 
 `validate_public_docs.py` validates this submission as a diagnostic handoff:
 dependency, coefficient, telemetry settings, comparison report, and caveat must

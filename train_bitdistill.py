@@ -289,6 +289,57 @@ def component_grad_norms(components: dict[str, torch.Tensor], parameters: list[n
     return norms
 
 
+def component_gradient_geometry(
+    components: dict[str, torch.Tensor],
+    parameters: list[nn.Parameter],
+) -> dict[str, Any]:
+    """Measure exact norms and pairwise cosines on a bounded parameter probe.
+
+    Coefficient balancing controls objective magnitudes, but equal-norm
+    gradients can still reinforce, ignore, or oppose one another. Keeping this
+    diagnostic on one selected Q/K/V projection set bounds its memory cost.
+    """
+
+    gradients: dict[str, list[torch.Tensor | None]] = {}
+    norms: dict[str, float] = {}
+    for name, value in components.items():
+        if not value.requires_grad:
+            gradients[name] = [None] * len(parameters)
+            norms[name] = 0.0
+            continue
+        component_gradients = torch.autograd.grad(
+            value,
+            parameters,
+            retain_graph=True,
+            allow_unused=True,
+        )
+        detached = [
+            gradient.detach().float() if gradient is not None else None
+            for gradient in component_gradients
+        ]
+        gradients[name] = detached
+        norms[name] = math.sqrt(
+            sum(float(torch.sum(gradient * gradient).cpu()) for gradient in detached if gradient is not None)
+        )
+
+    cosines: dict[str, float | None] = {}
+    names = list(components)
+    for left_index, left_name in enumerate(names):
+        for right_name in names[left_index + 1 :]:
+            denominator = norms[left_name] * norms[right_name]
+            key = f"{left_name}__{right_name}"
+            if denominator == 0.0:
+                cosines[key] = None
+                continue
+            dot = 0.0
+            for left, right in zip(gradients[left_name], gradients[right_name]):
+                if left is not None and right is not None:
+                    dot += float(torch.sum(left * right).cpu())
+            cosines[key] = max(-1.0, min(1.0, dot / denominator))
+
+    return {"norms": norms, "cosines": cosines}
+
+
 class GradNormEmaBalancer:
     """Choose an attention coefficient from CE/attention gradient norms."""
 
@@ -1914,6 +1965,13 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
             max_weight=args.attention_balance_max_weight,
             eps=args.attention_balance_eps,
         )
+    gradient_geometry_parameters: list[nn.Parameter] = []
+    gradient_geometry_parameter_names: list[str] = []
+    if args.method == "bitdistill" and args.telemetry_gradient_cosines:
+        gradient_geometry_parameters, gradient_geometry_parameter_names = attention_distillation_probe_parameters(
+            student,
+            layer_index=args.distill_layer,
+        )
     optimizer.zero_grad(set_to_none=True)
 
     while step < args.max_steps:
@@ -2031,6 +2089,18 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                 if emit_telemetry and args.telemetry_component_grad_norms
                 else {}
             )
+            component_geometry = (
+                component_gradient_geometry(
+                    {
+                        "ce": ce,
+                        "weighted_logit_kd": weighted_logit_kd,
+                        "weighted_attention_kd": weighted_attention_kd,
+                    },
+                    gradient_geometry_parameters,
+                )
+                if emit_telemetry and args.telemetry_gradient_cosines
+                else {}
+            )
             (loss / args.grad_accum_steps).backward()
             if (batch_index + 1) % args.grad_accum_steps:
                 continue
@@ -2073,6 +2143,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
                     "method": args.method,
                     "loss": last.__dict__,
                     "component_grad_norms_microbatch": component_norms,
+                    "component_gradient_geometry_probe": component_geometry,
                     "quantization": quantization_summary,
                     "quantization_dynamics": quantization_dynamics.observe(
                         student,
@@ -2160,10 +2231,12 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
             "enabled": args.telemetry_every_steps > 0,
             "every_steps": args.telemetry_every_steps,
             "component_grad_norms": args.telemetry_component_grad_norms,
+            "gradient_cosines": args.telemetry_gradient_cosines,
             "max_elements_per_layer": args.telemetry_max_elements_per_layer,
             "last": telemetry_last,
             "attention_balance": attention_balancer.summary() if attention_balancer is not None else None,
             "attention_balance_probe_parameters": attention_balance_parameter_names,
+            "gradient_geometry_probe_parameters": gradient_geometry_parameter_names,
         },
     }
     print(json.dumps(metrics, indent=2, sort_keys=True), flush=True)
@@ -2246,6 +2319,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--log-every-steps", type=int, default=10)
     parser.add_argument("--telemetry-every-steps", type=int, default=0)
     parser.add_argument("--telemetry-component-grad-norms", action=argparse.BooleanOptionalAction, default=False)
+    parser.add_argument("--telemetry-gradient-cosines", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--telemetry-max-elements-per-layer", type=int, default=65536)
     parser.add_argument("--save-every-steps", type=int, default=0)
     parser.add_argument("--save-model-artifacts", action=argparse.BooleanOptionalAction, default=True)

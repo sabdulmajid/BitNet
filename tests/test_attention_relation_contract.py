@@ -6,7 +6,12 @@ import unittest
 import torch
 import torch.nn.functional as F
 
-from train_bitdistill import GradNormEmaBalancer, attention_relation_distillation_components, relation_rows
+from train_bitdistill import (
+    GradNormEmaBalancer,
+    attention_relation_distillation_components,
+    component_gradient_geometry,
+    relation_rows,
+)
 
 
 def reference_relation_rows(
@@ -189,6 +194,27 @@ class AttentionRelationContractTest(unittest.TestCase):
         second = balancer.update((parameter - 3.0) ** 2, parameter**2, [parameter])
         self.assertAlmostEqual(second["candidate_weight"], 2.0)
         self.assertAlmostEqual(second["effective_weight"], math.sqrt(0.08 * 2.0))
+
+    def test_gradient_geometry_distinguishes_orthogonal_and_opposed_objectives(self) -> None:
+        parameter = torch.nn.Parameter(torch.tensor([2.0, 3.0]))
+        geometry = component_gradient_geometry(
+            {
+                "ce": parameter[0],
+                "orthogonal": parameter[1],
+                "opposed": -2.0 * parameter[0],
+                "constant": torch.tensor(0.0),
+            },
+            [parameter],
+        )
+
+        self.assertEqual(
+            geometry["norms"],
+            {"ce": 1.0, "orthogonal": 1.0, "opposed": 2.0, "constant": 0.0},
+        )
+        self.assertAlmostEqual(geometry["cosines"]["ce__orthogonal"], 0.0)
+        self.assertAlmostEqual(geometry["cosines"]["ce__opposed"], -1.0)
+        self.assertAlmostEqual(geometry["cosines"]["orthogonal__opposed"], 0.0)
+        self.assertIsNone(geometry["cosines"]["ce__constant"])
 
 
 if __name__ == "__main__":
