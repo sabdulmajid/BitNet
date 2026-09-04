@@ -361,6 +361,7 @@ def make_i2s_model_class(
                     self.gguf_writer.add_tensor(
                         new_name,
                         data,
+                        raw_shape=tuple(tensor.shape),
                         raw_dtype=gguf.GGMLQuantizationType.Q8_0,
                     )
                     embedding_q8 += 1
