@@ -1,6 +1,6 @@
 # BitDistill Attention-Relation Equivalence Audit
 
-Generated: `2026-09-04T04:54:47.801940+00:00`
+Generated: `2026-09-04T05:08:53.646746+00:00`
 
 Status: **published_specification_ambiguous**.
 
@@ -23,6 +23,9 @@ Equation 12 scales each dot product by the single factor sqrt(d_r), whereas Algo
 | cosine_definition_is_norm_invariant | pass |
 | scaled_dot_definition_is_not_norm_invariant | pass |
 | split_count_changes_objective | pass |
+| cosine_is_invariant_to_uniform_gqa_kv_repetition_within_fp32_tolerance | pass |
+| scaled_dot_changes_under_uniform_gqa_kv_repetition | pass |
+| scaled_dot_gqa_multiplier_matches_sqrt_repeat | pass |
 
 ## Deterministic Probe
 
@@ -46,6 +49,21 @@ Equation 12 scales each dot product by the single factor sqrt(d_r), whereas Algo
 | split8_vs_split1_gradient_cosine | 0.110220827 |
 | equation_rescaling_loss_ratio | 5.59465061 |
 | algorithm_rescaling_loss_ratio | 1 |
+
+## Grouped-Query Attention Contract
+
+For a uniform KV repetition factor r, normalized-cosine relations are unchanged because both the dot product and norm product scale by r. Equation-12 scaled-dot logits instead scale by r/sqrt(r)=sqrt(r), so repeating KV heads is not a neutral implementation choice.
+
+| quantity | value |
+| --- | --- |
+| kv_heads | 2 |
+| query_heads | 14 |
+| head_dim | 64 |
+| repeat_factor | 7 |
+| expected_scaled_dot_logit_multiplier | 2.64575131 |
+| cosine_probability_max_abs_diff | 1.1920929e-07 |
+| scaled_dot_probability_max_abs_diff | 0.000585794449 |
+| scaled_dot_multiplier_identity_max_abs_error | 2.13162821e-14 |
 
 ## Decision
 

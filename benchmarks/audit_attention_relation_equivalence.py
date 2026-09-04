@@ -16,7 +16,7 @@ import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from train_bitdistill import attention_relation_distillation_components
+from train_bitdistill import attention_relation_distillation_components, relation_rows
 
 
 DATE = os.environ.get("BITNET_REPORT_DATE") or datetime.now(timezone.utc).date().isoformat()
@@ -63,6 +63,43 @@ def public_result(result: dict[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in result.items() if key != "gradient"}
 
 
+def gqa_repeat_result(generator: torch.Generator, mask: torch.Tensor) -> dict[str, Any]:
+    kv_heads = 2
+    query_heads = 14
+    head_dim = 64
+    repeat_factor = query_heads // kv_heads
+    values = torch.randn(2, 11, kv_heads, head_dim, generator=generator, dtype=torch.float64)
+    flat = values.reshape(2, 11, kv_heads * head_dim)
+    repeated = values.repeat_interleave(repeat_factor, dim=2).reshape(2, 11, query_heads * head_dim)
+
+    cosine = relation_rows(flat, mask, split_heads=1, temperature=1.0, relation_mode="cosine")
+    repeated_cosine = relation_rows(repeated, mask, split_heads=1, temperature=1.0, relation_mode="cosine")
+    scaled_dot = relation_rows(flat, mask, split_heads=1, temperature=1.0, relation_mode="scaled_dot")
+    repeated_scaled_dot = relation_rows(
+        repeated,
+        mask,
+        split_heads=1,
+        temperature=1.0,
+        relation_mode="scaled_dot",
+    )
+
+    logits = flat @ flat.transpose(-1, -2) / math.sqrt(flat.shape[-1])
+    repeated_logits = repeated @ repeated.transpose(-1, -2) / math.sqrt(repeated.shape[-1])
+    expected_multiplier = math.sqrt(repeat_factor)
+    return {
+        "kv_heads": kv_heads,
+        "query_heads": query_heads,
+        "head_dim": head_dim,
+        "repeat_factor": repeat_factor,
+        "expected_scaled_dot_logit_multiplier": expected_multiplier,
+        "cosine_probability_max_abs_diff": float(torch.max(torch.abs(cosine - repeated_cosine))),
+        "scaled_dot_probability_max_abs_diff": float(torch.max(torch.abs(scaled_dot - repeated_scaled_dot))),
+        "scaled_dot_multiplier_identity_max_abs_error": float(
+            torch.max(torch.abs(repeated_logits - expected_multiplier * logits))
+        ),
+    }
+
+
 def build_report(seed: int) -> dict[str, Any]:
     generator = torch.Generator().manual_seed(seed)
     student = {
@@ -99,6 +136,7 @@ def build_report(seed: int) -> dict[str, Any]:
         relation_mode="scaled_dot",
         split_heads=1,
     )
+    gqa = gqa_repeat_result(generator, mask)
 
     checks = {
         "equation_and_pseudocode_losses_differ": not math.isclose(
@@ -114,6 +152,11 @@ def build_report(seed: int) -> dict[str, Any]:
         "split_count_changes_objective": not math.isclose(
             cosine_split1["loss"], cosine_split8["loss"], rel_tol=1e-3, abs_tol=1e-6
         ),
+        "cosine_is_invariant_to_uniform_gqa_kv_repetition_within_fp32_tolerance": (
+            gqa["cosine_probability_max_abs_diff"] < 1e-6
+        ),
+        "scaled_dot_changes_under_uniform_gqa_kv_repetition": gqa["scaled_dot_probability_max_abs_diff"] > 1e-6,
+        "scaled_dot_gqa_multiplier_matches_sqrt_repeat": gqa["scaled_dot_multiplier_identity_max_abs_error"] < 1e-10,
     }
     passed = all(checks.values())
     return {
@@ -157,6 +200,7 @@ def build_report(seed: int) -> dict[str, Any]:
             "equation_rescaling_loss_ratio": scaled_dot_rescaled["loss"] / scaled_dot_split1["loss"],
             "algorithm_rescaling_loss_ratio": cosine_rescaled["loss"] / cosine_split1["loss"],
         },
+        "gqa": gqa,
         "decision": (
             "Do not interpret gamma sweeps until relation_mode and split_heads are explicit. "
             "Run short telemetry pilots for cosine/split1, scaled_dot/split1, and the legacy "
@@ -185,6 +229,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         for name, row in report["results"].items()
     ]
     comparison_rows = [[key, value] for key, value in report["comparisons"].items()]
+    gqa_rows = [[key, value] for key, value in report["gqa"].items()]
     return "\n\n".join(
         [
             "# BitDistill Attention-Relation Equivalence Audit",
@@ -205,6 +250,13 @@ def render_markdown(report: dict[str, Any]) -> str:
             table(["variant", "mode", "split heads", "loss", "gradient norm"], result_rows),
             "## Comparisons",
             table(["quantity", "value"], comparison_rows),
+            "## Grouped-Query Attention Contract",
+            (
+                "For a uniform KV repetition factor r, normalized-cosine relations are unchanged because "
+                "both the dot product and norm product scale by r. Equation-12 scaled-dot logits instead "
+                "scale by r/sqrt(r)=sqrt(r), so repeating KV heads is not a neutral implementation choice."
+            ),
+            table(["quantity", "value"], gqa_rows),
             "## Decision",
             report["decision"],
             (
