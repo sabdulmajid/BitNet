@@ -39,6 +39,19 @@ DEFAULT_MODELS = {
         "bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr_q8_embedding_cls.gguf"
     ),
 }
+EXPECTED_SOURCE_DIFFERENCES = ["3rdparty/llama.cpp/ggml/src/ggml.c"]
+
+
+def changed_source_paths(
+    baseline: dict[str, Any], candidate: dict[str, Any]
+) -> list[str]:
+    baseline_sources = {row["path"]: row["sha256"] for row in baseline["source_files"]}
+    candidate_sources = {row["path"]: row["sha256"] for row in candidate["source_files"]}
+    return sorted(
+        path
+        for path in baseline_sources.keys() | candidate_sources.keys()
+        if baseline_sources.get(path) != candidate_sources.get(path)
+    )
 
 
 def render_markdown(report: dict[str, Any]) -> str:
@@ -85,6 +98,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Baseline llama.cpp: `{report['builds']['baseline']['repositories']['llama_cpp']['revision']}`",
         f"- Candidate BitNet: `{report['builds']['candidate']['repositories']['bitnet']['revision']}`",
         f"- Candidate llama.cpp: `{report['builds']['candidate']['repositories']['llama_cpp']['revision']}`",
+        f"- Fingerprinted source differences: `{', '.join(report['source_differences'])}`",
         "",
         "## Interpretation",
         "",
@@ -218,6 +232,12 @@ def main() -> int:
     }
     if builds["baseline"]["cmake_options"] != builds["candidate"]["cmake_options"]:
         errors.append("baseline and candidate CMake options differ")
+    source_differences = changed_source_paths(builds["baseline"], builds["candidate"])
+    if source_differences != EXPECTED_SOURCE_DIFFERENCES:
+        errors.append(
+            "fingerprinted source differences do not match the registered runtime change: "
+            f"{source_differences!r}"
+        )
     for implementation, build in builds.items():
         for repository, identity in build["repositories"].items():
             if identity["tracked_files_dirty"] is not False:
@@ -306,6 +326,7 @@ def main() -> int:
         "hardware": cpu_environment(args.threads),
         "benchmark_script": file_identity(Path(__file__).resolve(), candidate_root),
         "builds": builds,
+        "source_differences": source_differences,
         "artifacts": {name: file_identity(path, candidate_root) for name, path in models.items()},
         "runs": runs,
         "summaries": summaries,
