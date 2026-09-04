@@ -5,7 +5,7 @@
 #SBATCH --ntasks=1
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=12
-#SBATCH --mem=32G
+#SBATCH --mem=24G
 #SBATCH --time=06:00:00
 #SBATCH --array=0-5%2
 #SBATCH --output=/mnt/slurm_nfs/a6abdulm/projects/BitNet/logs/%x-%A_%a.out
