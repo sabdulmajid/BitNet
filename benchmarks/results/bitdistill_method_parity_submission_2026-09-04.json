@@ -1,11 +1,11 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "submitted_at_utc": "2026-09-04",
-  "source_revision": "bb8e92b",
-  "array_job_id": "10298",
-  "postprocess_job_id": "10299",
-  "partition": "midcard",
-  "array": "0-5%2",
+  "source_revision": "11419d53f62712a1a0ca170c5f47207a1b25ad3b",
+  "array_job_id": "10316",
+  "postprocess_job_id": "10317",
+  "partition": "dualcard",
+  "array": "0-5%1",
   "resources_per_pilot": {
     "gpus": 1,
     "cpus": 12,
@@ -31,5 +31,28 @@
     "causal-cosine-s1-adaptive"
   ],
   "claim_boundary": "Diagnostic method-selection pilots only; no full-validation quality claim is permitted.",
-  "launch_note": "The initial 32 GiB request was rejected before job creation because ece-nebula12 has 30000 MiB physical memory. Commit bb8e92b changed only the Slurm memory request to the previously proven 24 GiB envelope."
+  "launch_attempts": [
+    {
+      "result": "rejected_before_job_creation",
+      "partition": "midcard",
+      "memory_gib": 32,
+      "reason": "The node has 30000 MiB physical memory."
+    },
+    {
+      "array_job_id": "10298",
+      "postprocess_job_id": "10299",
+      "result": "failed_before_script_execution",
+      "partition": "midcard",
+      "memory_gib": 24,
+      "reason": "Compute-node probes 10309-10312 proved that the shared project path and log directory were absent or inaccessible on ece-nebula12. A control job writing only to /dev/null completed as job 10305."
+    },
+    {
+      "array_job_id": "10316",
+      "postprocess_job_id": "10317",
+      "result": "submitted",
+      "partition": "dualcard",
+      "memory_gib": 24,
+      "reason": "Compute-node probe 10315 verified that the shared BitNet project path exists on ece-nebula10."
+    }
+  ]
 }
