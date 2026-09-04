@@ -193,9 +193,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             payload["decision"],
             "",
-            "The inference is conditional on the current fixed-gamma, tensor-scale, Qwen2.5-0.5B MNLI recipe. "
-            "It does not rule out adaptive objective balancing, a different backbone, a different Stage-2 corpus, "
-            "or the paper's unreleased implementation details.",
+            "## Limitations",
+            "",
+            *[f"- {limitation}" for limitation in payload["limitations"]],
             "",
         ]
     )
@@ -310,6 +310,8 @@ def main() -> None:
             "Three observed budgets identify only two doubling gains.",
             "The geometric contraction model is an extrapolation assumption.",
             "The constant-gain sensitivity assumes future gains do not accelerate.",
+            "The paired bootstrap measures validation-example uncertainty conditional on fixed checkpoints, "
+            "not training-seed uncertainty.",
             "Token presentations are not proven equivalent to the paper's corpus-token accounting.",
             "The result applies to the fixed-gamma tensor-scale local recipe, not adaptive balancing or all BitDistill variants.",
         ],

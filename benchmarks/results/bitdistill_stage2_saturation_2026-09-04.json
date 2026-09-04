@@ -6,6 +6,7 @@
     "Three observed budgets identify only two doubling gains.",
     "The geometric contraction model is an extrapolation assumption.",
     "The constant-gain sensitivity assumes future gains do not accelerate.",
+    "The paired bootstrap measures validation-example uncertainty conditional on fixed checkpoints, not training-seed uncertainty.",
     "Token presentations are not proven equivalent to the paper's corpus-token accounting.",
     "The result applies to the fixed-gamma tensor-scale local recipe, not adaptive balancing or all BitDistill variants."
   ],

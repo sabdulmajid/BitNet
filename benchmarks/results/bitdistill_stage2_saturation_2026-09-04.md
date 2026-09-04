@@ -26,4 +26,11 @@ This is a conditional extrapolation from three paired MNLI runs, not a claim abo
 
 Under the fitted diminishing-returns model, Stage-2 budget alone does not close the local FP16 recovery gap: even the bootstrap upper bound `0.755819` is below the pre-registered recovery target `0.798151`. Even repeating the latest gain without further decay has bootstrap upper bound `0.795733`. Reaching the gate requires the average future gain per doubling to be `1.756x` the latest observed gain, reversing the measured diminishing-return trend. Change the training objective or method contract before scaling this fixed recipe.
 
-The inference is conditional on the current fixed-gamma, tensor-scale, Qwen2.5-0.5B MNLI recipe. It does not rule out adaptive objective balancing, a different backbone, a different Stage-2 corpus, or the paper's unreleased implementation details.
+## Limitations
+
+- Three observed budgets identify only two doubling gains.
+- The geometric contraction model is an extrapolation assumption.
+- The constant-gain sensitivity assumes future gains do not accelerate.
+- The paired bootstrap measures validation-example uncertainty conditional on fixed checkpoints, not training-seed uncertainty.
+- Token presentations are not proven equivalent to the paper's corpus-token accounting.
+- The result applies to the fixed-gamma tensor-scale local recipe, not adaptive balancing or all BitDistill variants.
