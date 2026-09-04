@@ -1,0 +1,976 @@
+{
+  "artifacts": {
+    "fp16_teacher": {
+      "path": "models/seqcls-native-baselines/Qwen-Qwen2.5-0.5B/mnli/fp16_sft_qwen2_f16_cls.gguf",
+      "sha256": "293431e5689485dd0bb66deb331ed1b7c912925bc92544253b4666be3290ed9c",
+      "size_bytes": 994164960
+    },
+    "i2_sr_q8_embedding_student": {
+      "path": "models/seqcls-native-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr_q8_embedding_cls.gguf",
+      "sha256": "2ea4723c829f496fc6f7c636560140934050cb7a129a409e8b5bf366e1e14e41",
+      "size_bytes": 242119936
+    },
+    "i2_sr_student": {
+      "path": "models/seqcls-native-i2sr/Qwen-Qwen2.5-0.5B/mnli/bitdistill-longwarmup-row-layer-8_bitnet_qwen_i2_sr_cls.gguf",
+      "sha256": "b8d285a6008750ab0852dc691d6d10f704cf7df7cf85ef212abf6c77249e13d7",
+      "size_bytes": 369746176
+    },
+    "q4_0_teacher": {
+      "path": "models/seqcls-native-baselines/Qwen-Qwen2.5-0.5B/mnli/fp16_sft_qwen2_q4_0_cls.gguf",
+      "sha256": "c6a3c5927f06176f1206de3373e287b85b5814e85701388759eb57ee0004473b",
+      "size_bytes": 352153824
+    }
+  },
+  "benchmark_script": {
+    "path": "benchmarks/benchmark_seqcls_native_cpu_repeated.py",
+    "sha256": "b5fe0e7d914128557f16e4ed03d51ed28f24383c56173eb2e7269924af9bed99",
+    "size_bytes": 13052
+  },
+  "cpu_affinity": "0-11",
+  "created_utc": "2026-09-04T09:58:10.443412+00:00",
+  "errors": [],
+  "examples": 128,
+  "hardware": {
+    "cpu_model": "Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz",
+    "isa_flags": {
+      "avx2": true,
+      "avx512bw": true,
+      "avx512dq": true,
+      "avx512f": true,
+      "avx512vl": true,
+      "bmi2": true,
+      "fma": true
+    },
+    "logical_cpus_cpuinfo": 24,
+    "logical_cpus_os": 24,
+    "physical_cores_cpuinfo": 12,
+    "platform": "Linux-5.15.0-190-generic-x86_64-with-glibc2.35",
+    "process_affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "python": "3.13.5",
+    "requested_threads": 12,
+    "scaling_governor": null
+  },
+  "interpretation": "All prediction and token-count contracts are stable across repetitions. Throughput comparisons may be reported with paired run-level intervals.",
+  "paired_speed_ratios_vs_fp16": {
+    "fp16_teacher": {
+      "geometric_mean": 1.0,
+      "geometric_mean_ci95_t": [
+        1.0,
+        1.0
+      ],
+      "paired_ratios": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "i2_sr_q8_embedding_student": {
+      "geometric_mean": 0.6046759076501249,
+      "geometric_mean_ci95_t": [
+        0.6026887483975174,
+        0.6066696188782019
+      ],
+      "paired_ratios": [
+        0.603909371594624,
+        0.604544733682231,
+        0.6064853794515872,
+        0.6037680306152488
+      ]
+    },
+    "i2_sr_student": {
+      "geometric_mean": 0.6495997233752449,
+      "geometric_mean_ci95_t": [
+        0.6464734159522143,
+        0.6527411494371277
+      ],
+      "paired_ratios": [
+        0.6500635670177987,
+        0.6511248555699042,
+        0.6504949368528843,
+        0.6467244854056747
+      ]
+    },
+    "q4_0_teacher": {
+      "geometric_mean": 0.8843157299109767,
+      "geometric_mean_ci95_t": [
+        0.878264616159974,
+        0.8904085349438026
+      ],
+      "paired_ratios": [
+        0.8817653468942971,
+        0.8857472983076191,
+        0.8890431220844237,
+        0.8807318674848849
+      ]
+    }
+  },
+  "repetitions": 4,
+  "runs": [
+    {
+      "accuracy": 0.734375,
+      "artifact": "fp16_teacher",
+      "host_load_average_end": [
+        4.34521484375,
+        3.0283203125,
+        5.68603515625
+      ],
+      "host_load_average_start": [
+        2.16650390625,
+        2.5654296875,
+        5.58251953125
+      ],
+      "load_time_ms": 492.17,
+      "order_index": 0,
+      "prediction_sha256": "53b156690c69f64684b3ae60b8fa1b91cc13a158bece159730996399abc89938",
+      "prompt_eval_ms": 10820.12,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": 440.48,
+      "repetition": 0,
+      "wall_seconds": 11.52501915000903
+    },
+    {
+      "accuracy": 0.5859375,
+      "artifact": "q4_0_teacher",
+      "host_load_average_end": [
+        6.04150390625,
+        3.46826171875,
+        5.7880859375
+      ],
+      "host_load_average_start": [
+        4.34521484375,
+        3.0283203125,
+        5.68603515625
+      ],
+      "load_time_ms": 408.03,
+      "order_index": 1,
+      "prediction_sha256": "969f42739000c334fbfc3d36c4b8e32511bd20fa38e9ab296a16ab0af6956638",
+      "prompt_eval_ms": 12270.84,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": 388.4,
+      "repetition": 0,
+      "wall_seconds": 12.870107309994637
+    },
+    {
+      "accuracy": 0.625,
+      "artifact": "i2_sr_student",
+      "host_load_average_end": [
+        7.04736328125,
+        3.84765625,
+        5.86279296875
+      ],
+      "host_load_average_start": [
+        6.04150390625,
+        3.46826171875,
+        5.7880859375
+      ],
+      "load_time_ms": 426.06,
+      "order_index": 2,
+      "prediction_sha256": "21f116a3db8a1083329d660188a27cde22cab2d5ca9c0e7f0eb86274c48e3a19",
+      "prompt_eval_ms": 16644.38,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": 286.34,
+      "repetition": 0,
+      "wall_seconds": 17.26544025800831
+    },
+    {
+      "accuracy": 0.640625,
+      "artifact": "i2_sr_q8_embedding_student",
+      "host_load_average_end": [
+        7.7734375,
+        4.203125,
+        5.93603515625
+      ],
+      "host_load_average_start": [
+        6.48291015625,
+        3.78369140625,
+        5.8310546875
+      ],
+      "load_time_ms": 417.57,
+      "order_index": 3,
+      "prediction_sha256": "635914f924156f5834ca89091d0b3a0090a62af14b5ac08480c271abc51c99cb",
+      "prompt_eval_ms": 17916.92,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": 266.01,
+      "repetition": 0,
+      "wall_seconds": 18.530193661004887
+    },
+    {
+      "accuracy": 0.5859375,
+      "artifact": "q4_0_teacher",
+      "host_load_average_end": [
+        7.89697265625,
+        4.39306640625,
+        5.9697265625
+      ],
+      "host_load_average_start": [
+        7.15087890625,
+        4.13330078125,
+        5.90380859375
+      ],
+      "load_time_ms": 408.95,
+      "order_index": 0,
+      "prediction_sha256": "969f42739000c334fbfc3d36c4b8e32511bd20fa38e9ab296a16ab0af6956638",
+      "prompt_eval_ms": 12190.46,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": 390.96,
+      "repetition": 1,
+      "wall_seconds": 12.787486058005015
+    },
+    {
+      "accuracy": 0.625,
+      "artifact": "i2_sr_student",
+      "host_load_average_end": [
+        8.31396484375,
+        4.69677734375,
+        6.03515625
+      ],
+      "host_load_average_start": [
+        7.26416015625,
+        4.31982421875,
+        5.9375
+      ],
+      "load_time_ms": 436.91,
+      "order_index": 1,
+      "prediction_sha256": "21f116a3db8a1083329d660188a27cde22cab2d5ca9c0e7f0eb86274c48e3a19",
+      "prompt_eval_ms": 16583.43,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": 287.4,
+      "repetition": 1,
+      "wall_seconds": 17.214431132990285
+    },
+    {
+      "accuracy": 0.640625,
+      "artifact": "i2_sr_q8_embedding_student",
+      "host_load_average_end": [
+        8.8837890625,
+        5.09716796875,
+        6.130859375
+      ],
+      "host_load_average_start": [
+        7.64794921875,
+        4.61865234375,
+        6.00244140625
+      ],
+      "load_time_ms": 408.79,
+      "order_index": 2,
+      "prediction_sha256": "635914f924156f5834ca89091d0b3a0090a62af14b5ac08480c271abc51c99cb",
+      "prompt_eval_ms": 17860.91,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": 266.84,
+      "repetition": 1,
+      "wall_seconds": 18.460189292993164
+    },
+    {
+      "accuracy": 0.734375,
+      "artifact": "fp16_teacher",
+      "host_load_average_end": [
+        9.5751953125,
+        5.435546875,
+        6.2255859375
+      ],
+      "host_load_average_start": [
+        8.8837890625,
+        5.09716796875,
+        6.130859375
+      ],
+      "load_time_ms": 481.74,
+      "order_index": 3,
+      "prediction_sha256": "53b156690c69f64684b3ae60b8fa1b91cc13a158bece159730996399abc89938",
+      "prompt_eval_ms": 10797.8,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": 441.39,
+      "repetition": 1,
+      "wall_seconds": 11.490565219006385
+    },
+    {
+      "accuracy": 0.625,
+      "artifact": "i2_sr_student",
+      "host_load_average_end": [
+        10.26416015625,
+        5.86181640625,
+        6.349609375
+      ],
+      "host_load_average_start": [
+        9.5751953125,
+        5.435546875,
+        6.2255859375
+      ],
+      "load_time_ms": 432.0,
+      "order_index": 0,
+      "prediction_sha256": "21f116a3db8a1083329d660188a27cde22cab2d5ca9c0e7f0eb86274c48e3a19",
+      "prompt_eval_ms": 16672.73,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": 285.86,
+      "repetition": 2,
+      "wall_seconds": 17.297493072997895
+    },
+    {
+      "accuracy": 0.640625,
+      "artifact": "i2_sr_q8_embedding_student",
+      "host_load_average_end": [
+        10.75732421875,
+        6.26025390625,
+        6.47119140625
+      ],
+      "host_load_average_start": [
+        10.26416015625,
+        5.86181640625,
+        6.349609375
+      ],
+      "load_time_ms": 414.53,
+      "order_index": 1,
+      "prediction_sha256": "635914f924156f5834ca89091d0b3a0090a62af14b5ac08480c271abc51c99cb",
+      "prompt_eval_ms": 17882.39,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": 266.52,
+      "repetition": 2,
+      "wall_seconds": 18.484395424995455
+    },
+    {
+      "accuracy": 0.734375,
+      "artifact": "fp16_teacher",
+      "host_load_average_end": [
+        10.2197265625,
+        6.34912109375,
+        6.49609375
+      ],
+      "host_load_average_start": [
+        9.8955078125,
+        6.15625,
+        6.43603515625
+      ],
+      "load_time_ms": 499.29,
+      "order_index": 2,
+      "prediction_sha256": "53b156690c69f64684b3ae60b8fa1b91cc13a158bece159730996399abc89938",
+      "prompt_eval_ms": 10845.47,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": 439.45,
+      "repetition": 2,
+      "wall_seconds": 11.558215073004249
+    },
+    {
+      "accuracy": 0.5859375,
+      "artifact": "q4_0_teacher",
+      "host_load_average_end": [
+        9.86865234375,
+        6.44970703125,
+        6.52587890625
+      ],
+      "host_load_average_start": [
+        10.2197265625,
+        6.34912109375,
+        6.49609375
+      ],
+      "load_time_ms": 414.18,
+      "order_index": 3,
+      "prediction_sha256": "969f42739000c334fbfc3d36c4b8e32511bd20fa38e9ab296a16ab0af6956638",
+      "prompt_eval_ms": 12198.89,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": 390.69,
+      "repetition": 2,
+      "wall_seconds": 12.80611154800863
+    },
+    {
+      "accuracy": 0.640625,
+      "artifact": "i2_sr_q8_embedding_student",
+      "host_load_average_end": [
+        9.72607421875,
+        6.62060546875,
+        6.57958984375
+      ],
+      "host_load_average_start": [
+        9.078125,
+        6.34228515625,
+        6.49072265625
+      ],
+      "load_time_ms": 409.26,
+      "order_index": 0,
+      "prediction_sha256": "635914f924156f5834ca89091d0b3a0090a62af14b5ac08480c271abc51c99cb",
+      "prompt_eval_ms": 17875.02,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": 266.63,
+      "repetition": 3,
+      "wall_seconds": 18.465973899001256
+    },
+    {
+      "accuracy": 0.734375,
+      "artifact": "fp16_teacher",
+      "host_load_average_end": [
+        9.41650390625,
+        6.69140625,
+        6.60302734375
+      ],
+      "host_load_average_start": [
+        8.94677734375,
+        6.51025390625,
+        6.5439453125
+      ],
+      "load_time_ms": 486.27,
+      "order_index": 1,
+      "prediction_sha256": "53b156690c69f64684b3ae60b8fa1b91cc13a158bece159730996399abc89938",
+      "prompt_eval_ms": 10792.45,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": 441.61,
+      "repetition": 3,
+      "wall_seconds": 11.492446439006017
+    },
+    {
+      "accuracy": 0.5859375,
+      "artifact": "q4_0_teacher",
+      "host_load_average_end": [
+        9.17578125,
+        6.75927734375,
+        6.6259765625
+      ],
+      "host_load_average_start": [
+        8.662109375,
+        6.580078125,
+        6.5673828125
+      ],
+      "load_time_ms": 411.3,
+      "order_index": 2,
+      "prediction_sha256": "969f42739000c334fbfc3d36c4b8e32511bd20fa38e9ab296a16ab0af6956638",
+      "prompt_eval_ms": 12253.79,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": 388.94,
+      "repetition": 3,
+      "wall_seconds": 12.854244002999621
+    },
+    {
+      "accuracy": 0.625,
+      "artifact": "i2_sr_student",
+      "host_load_average_end": [
+        9.2294921875,
+        6.90966796875,
+        6.677734375
+      ],
+      "host_load_average_start": [
+        8.44091796875,
+        6.64697265625,
+        6.59033203125
+      ],
+      "load_time_ms": 429.44,
+      "order_index": 3,
+      "prediction_sha256": "21f116a3db8a1083329d660188a27cde22cab2d5ca9c0e7f0eb86274c48e3a19",
+      "prompt_eval_ms": 16687.61,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": 285.6,
+      "repetition": 3,
+      "wall_seconds": 17.31165917700855
+    }
+  ],
+  "runtime_build": {
+    "build_dir": "build-portable-avx2",
+    "cmake_cache": {
+      "path": "build-portable-avx2/CMakeCache.txt",
+      "sha256": "a7b46a0e21300f6c91090e636d46fb44086ab43281607b4f45dfdf4cded1dd51",
+      "size_bytes": 24775
+    },
+    "cmake_options": {
+      "BITNET_ARM_TL1": "OFF",
+      "BITNET_X86_TL2": "OFF",
+      "BUILD_SHARED_LIBS": "ON",
+      "CMAKE_BUILD_TYPE": "Release",
+      "CMAKE_CXX_COMPILER": "/usr/bin/c++",
+      "CMAKE_C_COMPILER": "/usr/bin/cc",
+      "GGML_AVX": "ON",
+      "GGML_AVX2": "ON",
+      "GGML_AVX512": "OFF",
+      "GGML_AVX512_BF16": "OFF",
+      "GGML_AVX512_VBMI": "OFF",
+      "GGML_AVX512_VNNI": "OFF",
+      "GGML_FMA": "ON",
+      "GGML_NATIVE": "OFF",
+      "GGML_OPENMP": "ON"
+    },
+    "compile_commands": {
+      "path": "build-portable-avx2/compile_commands.json",
+      "sha256": "25c22ccb5b270c1f088eb0ffb8c4feca9613df3b132ba7f40568376ce1326bb2",
+      "size_bytes": 54206
+    },
+    "compile_units": [
+      {
+        "command": "/usr/bin/cc -DGGML_BUILD -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_LLAMAFILE -DGGML_USE_OPENMP -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_EXPORTS -I$REPO_ROOT/3rdparty/llama.cpp/ggml/src/../include -I$REPO_ROOT/3rdparty/llama.cpp/ggml/src/../../../../include -I$REPO_ROOT/3rdparty/llama.cpp/ggml/src/. -O3 -DNDEBUG -fPIC -fpermissive -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wdouble-promotion -mf16c -mfma -mavx -mavx2 -fopenmp -std=gnu11 -o CMakeFiles/ggml.dir/ggml.c.o -c $REPO_ROOT/3rdparty/llama.cpp/ggml/src/ggml.c",
+        "command_sha256": "13cd35397fa0cd72df8e93a11c4499382ce3988cbcc5dff3ea932235d6c0e83b",
+        "file": "3rdparty/llama.cpp/ggml/src/ggml.c"
+      },
+      {
+        "command": "/usr/bin/c++ -DGGML_BUILD -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_LLAMAFILE -DGGML_USE_OPENMP -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_EXPORTS -I$REPO_ROOT/3rdparty/llama.cpp/ggml/src/../include -I$REPO_ROOT/3rdparty/llama.cpp/ggml/src/../../../../include -I$REPO_ROOT/3rdparty/llama.cpp/ggml/src/. -O3 -DNDEBUG -fPIC -fpermissive -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wno-array-bounds -Wno-format-truncation -Wextra-semi -mf16c -mfma -mavx -mavx2 -fopenmp -std=gnu++11 -o CMakeFiles/ggml.dir/__/__/__/__/src/ggml-bitnet-mad.cpp.o -c $REPO_ROOT/src/ggml-bitnet-mad.cpp",
+        "command_sha256": "7a26893295c8e49fbd04d783dbe4c9f0baf63288c8f8e8168961296b2cfd8244",
+        "file": "src/ggml-bitnet-mad.cpp"
+      },
+      {
+        "command": "/usr/bin/c++ -DLLAMA_BUILD -DLLAMA_SHARED -Dllama_EXPORTS -I$REPO_ROOT/3rdparty/llama.cpp/src/. -I$REPO_ROOT/3rdparty/llama.cpp/src/../include -I$REPO_ROOT/3rdparty/llama.cpp/ggml/src/../include -I$REPO_ROOT/3rdparty/llama.cpp/ggml/src/../../../../include -O3 -DNDEBUG -fPIC -fpermissive -o CMakeFiles/llama.dir/llama.cpp.o -c $REPO_ROOT/3rdparty/llama.cpp/src/llama.cpp",
+        "command_sha256": "8daa75176bd1eeec729e1f24d769a8bbaf3685444451a3074a3fe0a31c44d594",
+        "file": "3rdparty/llama.cpp/src/llama.cpp"
+      },
+      {
+        "command": "/usr/bin/c++  -I$REPO_ROOT/3rdparty/llama.cpp/examples -I$REPO_ROOT/3rdparty/llama.cpp/common/. -I$REPO_ROOT/3rdparty/llama.cpp/src/. -I$REPO_ROOT/3rdparty/llama.cpp/src/../include -I$REPO_ROOT/3rdparty/llama.cpp/ggml/src/../include -I$REPO_ROOT/3rdparty/llama.cpp/ggml/src/../../../../include -O3 -DNDEBUG -fpermissive -o CMakeFiles/llama-embedding.dir/embedding.cpp.o -c $REPO_ROOT/3rdparty/llama.cpp/examples/embedding/embedding.cpp",
+        "command_sha256": "9fd0fa36eba059910d63d5fb955c3178c3d43c9dc8cce3c15d90ee53b09a45eb",
+        "file": "3rdparty/llama.cpp/examples/embedding/embedding.cpp"
+      }
+    ],
+    "fingerprint_components": {
+      "cmake_cache_sha256": "a7b46a0e21300f6c91090e636d46fb44086ab43281607b4f45dfdf4cded1dd51",
+      "cmake_options": {
+        "BITNET_ARM_TL1": "OFF",
+        "BITNET_X86_TL2": "OFF",
+        "BUILD_SHARED_LIBS": "ON",
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_COMPILER": "/usr/bin/c++",
+        "CMAKE_C_COMPILER": "/usr/bin/cc",
+        "GGML_AVX": "ON",
+        "GGML_AVX2": "ON",
+        "GGML_AVX512": "OFF",
+        "GGML_AVX512_BF16": "OFF",
+        "GGML_AVX512_VBMI": "OFF",
+        "GGML_AVX512_VNNI": "OFF",
+        "GGML_FMA": "ON",
+        "GGML_NATIVE": "OFF",
+        "GGML_OPENMP": "ON"
+      },
+      "compile_commands_sha256": "25c22ccb5b270c1f088eb0ffb8c4feca9613df3b132ba7f40568376ce1326bb2",
+      "compile_units": [
+        {
+          "command_sha256": "13cd35397fa0cd72df8e93a11c4499382ce3988cbcc5dff3ea932235d6c0e83b",
+          "file": "3rdparty/llama.cpp/ggml/src/ggml.c"
+        },
+        {
+          "command_sha256": "7a26893295c8e49fbd04d783dbe4c9f0baf63288c8f8e8168961296b2cfd8244",
+          "file": "src/ggml-bitnet-mad.cpp"
+        },
+        {
+          "command_sha256": "8daa75176bd1eeec729e1f24d769a8bbaf3685444451a3074a3fe0a31c44d594",
+          "file": "3rdparty/llama.cpp/src/llama.cpp"
+        },
+        {
+          "command_sha256": "9fd0fa36eba059910d63d5fb955c3178c3d43c9dc8cce3c15d90ee53b09a45eb",
+          "file": "3rdparty/llama.cpp/examples/embedding/embedding.cpp"
+        }
+      ],
+      "linked_libraries": [
+        {
+          "path": "build-portable-avx2/3rdparty/llama.cpp/src/libllama.so",
+          "sha256": "fff26f16029a982bbd75fe2762cc8945b5e8191178c064852851318633087aa8",
+          "size_bytes": 1901288
+        },
+        {
+          "path": "build-portable-avx2/3rdparty/llama.cpp/ggml/src/libggml.so",
+          "sha256": "a415141520262043d3417971a9b9aa7e523793acc434ac005773e50a67bd2362",
+          "size_bytes": 921304
+        },
+        {
+          "path": "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30",
+          "sha256": null,
+          "size_bytes": 2260296
+        },
+        {
+          "path": "/usr/lib/x86_64-linux-gnu/libm.so.6",
+          "sha256": null,
+          "size_bytes": 940560
+        },
+        {
+          "path": "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+          "sha256": null,
+          "size_bytes": 125488
+        },
+        {
+          "path": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+          "sha256": null,
+          "size_bytes": 2220400
+        },
+        {
+          "path": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+          "sha256": null,
+          "size_bytes": 240936
+        },
+        {
+          "path": "/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0",
+          "sha256": null,
+          "size_bytes": 298776
+        }
+      ],
+      "source_files": [
+        {
+          "path": "src/ggml-bitnet-mad.cpp",
+          "sha256": "e54f9cd30ec0ee5975a6402472ff29c158f91f8072d2e1997af340cebc1977b2",
+          "size_bytes": 47095
+        },
+        {
+          "path": "include/gemm-config.h",
+          "sha256": "f8d0071e60c4909db1d7d51f9aef692a4e4d8c4e854ac9e28573bd069d1ed0e0",
+          "size_bytes": 922
+        },
+        {
+          "path": "3rdparty/llama.cpp/ggml/src/ggml.c",
+          "sha256": "384da92b0b888e6a207c5c61eea881029b44cb83f7d7304d78e2756fe467e4e1",
+          "size_bytes": 822212
+        },
+        {
+          "path": "3rdparty/llama.cpp/src/llama.cpp",
+          "sha256": "86d17378d1c9b9092a004274a59b82270044f633a639569b27552087f905e1d0",
+          "size_bytes": 967593
+        },
+        {
+          "path": "3rdparty/llama.cpp/examples/embedding/embedding.cpp",
+          "sha256": "d3308f4c2d1037c5794622b90c5f3b5d9c8733822bba2950abfd9ef70194d908",
+          "size_bytes": 14365
+        }
+      ]
+    },
+    "ldd": "linux-vdso.so.1 (0xADDR)\n\tlibllama.so => $REPO_ROOT/build-portable-avx2/3rdparty/llama.cpp/src/libllama.so (0xADDR)\n\tlibggml.so => $REPO_ROOT/build-portable-avx2/3rdparty/llama.cpp/ggml/src/libggml.so (0xADDR)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0xADDR)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0xADDR)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0xADDR)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0xADDR)\n\t/lib64/ld-linux-x86-64.so.2 (0xADDR)\n\tlibgomp.so.1 => /lib/x86_64-linux-gnu/libgomp.so.1 (0xADDR)",
+    "linked_libraries": [
+      {
+        "path": "build-portable-avx2/3rdparty/llama.cpp/src/libllama.so",
+        "sha256": "fff26f16029a982bbd75fe2762cc8945b5e8191178c064852851318633087aa8",
+        "size_bytes": 1901288
+      },
+      {
+        "path": "build-portable-avx2/3rdparty/llama.cpp/ggml/src/libggml.so",
+        "sha256": "a415141520262043d3417971a9b9aa7e523793acc434ac005773e50a67bd2362",
+        "size_bytes": 921304
+      },
+      {
+        "path": "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30",
+        "sha256": null,
+        "size_bytes": 2260296
+      },
+      {
+        "path": "/usr/lib/x86_64-linux-gnu/libm.so.6",
+        "sha256": null,
+        "size_bytes": 940560
+      },
+      {
+        "path": "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+        "sha256": null,
+        "size_bytes": 125488
+      },
+      {
+        "path": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+        "sha256": null,
+        "size_bytes": 2220400
+      },
+      {
+        "path": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+        "sha256": null,
+        "size_bytes": 240936
+      },
+      {
+        "path": "/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0",
+        "sha256": null,
+        "size_bytes": 298776
+      }
+    ],
+    "repositories": {
+      "bitnet": {
+        "path": ".",
+        "revision": "cc50a5c56dc2949e525c75fa518b1ded668b97ea",
+        "tracked_files_dirty": false
+      },
+      "llama_cpp": {
+        "path": "3rdparty/llama.cpp",
+        "revision": "d0223354b78e96656bcbe46d86b7808e90706df3",
+        "tracked_files_dirty": false
+      }
+    },
+    "sha256": "1a4275ecf6538e92acca85cf9fbd6ce95e603aabb7b6c9af2d1a4f007582c927",
+    "source_files": [
+      {
+        "path": "src/ggml-bitnet-mad.cpp",
+        "sha256": "e54f9cd30ec0ee5975a6402472ff29c158f91f8072d2e1997af340cebc1977b2",
+        "size_bytes": 47095
+      },
+      {
+        "path": "include/gemm-config.h",
+        "sha256": "f8d0071e60c4909db1d7d51f9aef692a4e4d8c4e854ac9e28573bd069d1ed0e0",
+        "size_bytes": 922
+      },
+      {
+        "path": "3rdparty/llama.cpp/ggml/src/ggml.c",
+        "sha256": "384da92b0b888e6a207c5c61eea881029b44cb83f7d7304d78e2756fe467e4e1",
+        "size_bytes": 822212
+      },
+      {
+        "path": "3rdparty/llama.cpp/src/llama.cpp",
+        "sha256": "86d17378d1c9b9092a004274a59b82270044f633a639569b27552087f905e1d0",
+        "size_bytes": 967593
+      },
+      {
+        "path": "3rdparty/llama.cpp/examples/embedding/embedding.cpp",
+        "sha256": "d3308f4c2d1037c5794622b90c5f3b5d9c8733822bba2950abfd9ef70194d908",
+        "size_bytes": 14365
+      }
+    ]
+  },
+  "schema": "seqcls-native-cpu-repeated-v1",
+  "status": "valid",
+  "summaries": {
+    "fp16_teacher": {
+      "accuracy": 0.734375,
+      "load_time_ms": {
+        "maximum": 499.29,
+        "mean": 489.8675,
+        "mean_ci95_t": [
+          477.78276575350435,
+          501.95223424649566
+        ],
+        "median": 489.22,
+        "minimum": 481.74,
+        "n": 4,
+        "sample_standard_deviation": 7.595684630104132,
+        "values": [
+          492.17,
+          481.74,
+          499.29,
+          486.27
+        ]
+      },
+      "prediction_sha256": "53b156690c69f64684b3ae60b8fa1b91cc13a158bece159730996399abc89938",
+      "predictions_stable": true,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": {
+        "maximum": 441.61,
+        "mean": 440.7325,
+        "mean_ci95_t": [
+          439.1653111599773,
+          442.2996888400227
+        ],
+        "median": 440.935,
+        "minimum": 439.45,
+        "n": 4,
+        "sample_standard_deviation": 0.9850338403662462,
+        "values": [
+          440.48,
+          441.39,
+          439.45,
+          441.61
+        ]
+      },
+      "wall_seconds": {
+        "maximum": 11.558215073004249,
+        "mean": 11.51656147025642,
+        "mean_ci95_t": [
+          11.465716678184705,
+          11.567406262328134
+        ],
+        "median": 11.508732794507523,
+        "minimum": 11.490565219006385,
+        "n": 4,
+        "sample_standard_deviation": 0.031957757430366864,
+        "values": [
+          11.52501915000903,
+          11.490565219006385,
+          11.558215073004249,
+          11.492446439006017
+        ]
+      }
+    },
+    "i2_sr_q8_embedding_student": {
+      "accuracy": 0.640625,
+      "load_time_ms": {
+        "maximum": 417.57,
+        "mean": 412.5375,
+        "mean_ci95_t": [
+          405.7823433861759,
+          419.29265661382414
+        ],
+        "median": 411.895,
+        "minimum": 408.79,
+        "n": 4,
+        "sample_standard_deviation": 4.245855822642424,
+        "values": [
+          417.57,
+          408.79,
+          414.53,
+          409.26
+        ]
+      },
+      "prediction_sha256": "635914f924156f5834ca89091d0b3a0090a62af14b5ac08480c271abc51c99cb",
+      "predictions_stable": true,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": {
+        "maximum": 266.84,
+        "mean": 266.5,
+        "mean_ci95_t": [
+          265.93899857011473,
+          267.06100142988527
+        ],
+        "median": 266.575,
+        "minimum": 266.01,
+        "n": 4,
+        "sample_standard_deviation": 0.352609321109539,
+        "values": [
+          266.01,
+          266.84,
+          266.52,
+          266.63
+        ]
+      },
+      "wall_seconds": {
+        "maximum": 18.530193661004887,
+        "mean": 18.48518806949869,
+        "mean_ci95_t": [
+          18.434706675549595,
+          18.535669463447785
+        ],
+        "median": 18.475184661998355,
+        "minimum": 18.460189292993164,
+        "n": 4,
+        "sample_standard_deviation": 0.03172934880521454,
+        "values": [
+          18.530193661004887,
+          18.460189292993164,
+          18.484395424995455,
+          18.465973899001256
+        ]
+      }
+    },
+    "i2_sr_student": {
+      "accuracy": 0.625,
+      "load_time_ms": {
+        "maximum": 436.91,
+        "mean": 431.1025,
+        "mean_ci95_t": [
+          423.82765213755243,
+          438.3773478624476
+        ],
+        "median": 430.72,
+        "minimum": 426.06,
+        "n": 4,
+        "sample_standard_deviation": 4.572500227811195,
+        "values": [
+          426.06,
+          436.91,
+          432.0,
+          429.44
+        ]
+      },
+      "prediction_sha256": "21f116a3db8a1083329d660188a27cde22cab2d5ca9c0e7f0eb86274c48e3a19",
+      "predictions_stable": true,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": {
+        "maximum": 287.4,
+        "mean": 286.3,
+        "mean_ci95_t": [
+          285.0354468837834,
+          287.56455311621664
+        ],
+        "median": 286.1,
+        "minimum": 285.6,
+        "n": 4,
+        "sample_standard_deviation": 0.7948165406767158,
+        "values": [
+          286.34,
+          287.4,
+          285.86,
+          285.6
+        ]
+      },
+      "wall_seconds": {
+        "maximum": 17.31165917700855,
+        "mean": 17.27225591025126,
+        "mean_ci95_t": [
+          17.203641619307724,
+          17.340870201194797
+        ],
+        "median": 17.281466665503103,
+        "minimum": 17.214431132990285,
+        "n": 4,
+        "sample_standard_deviation": 0.04312651850630711,
+        "values": [
+          17.26544025800831,
+          17.214431132990285,
+          17.297493072997895,
+          17.31165917700855
+        ]
+      }
+    },
+    "q4_0_teacher": {
+      "accuracy": 0.5859375,
+      "load_time_ms": {
+        "maximum": 414.18,
+        "mean": 410.615,
+        "mean_ci95_t": [
+          406.2450179350139,
+          414.9849820649861
+        ],
+        "median": 410.125,
+        "minimum": 408.03,
+        "n": 4,
+        "sample_standard_deviation": 2.7466889157675065,
+        "values": [
+          408.03,
+          408.95,
+          414.18,
+          411.3
+        ]
+      },
+      "prediction_sha256": "969f42739000c334fbfc3d36c4b8e32511bd20fa38e9ab296a16ab0af6956638",
+      "predictions_stable": true,
+      "prompt_tokens": 4766,
+      "prompt_tokens_per_second": {
+        "maximum": 390.96,
+        "mean": 389.7475,
+        "mean_ci95_t": [
+          387.72952591623226,
+          391.76547408376774
+        ],
+        "median": 389.815,
+        "minimum": 388.4,
+        "n": 4,
+        "sample_standard_deviation": 1.2683683744611962,
+        "values": [
+          388.4,
+          390.96,
+          390.69,
+          388.94
+        ]
+      },
+      "wall_seconds": {
+        "maximum": 12.870107309994637,
+        "mean": 12.829487229751976,
+        "mean_ci95_t": [
+          12.767367493242958,
+          12.891606966260994
+        ],
+        "median": 12.830177775504126,
+        "minimum": 12.787486058005015,
+        "n": 4,
+        "sample_standard_deviation": 0.03904446040793084,
+        "values": [
+          12.870107309994637,
+          12.787486058005015,
+          12.80611154800863,
+          12.854244002999621
+        ]
+      }
+    }
+  },
+  "threads": 12
+}
