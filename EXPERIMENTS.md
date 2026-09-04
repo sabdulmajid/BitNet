@@ -357,3 +357,19 @@ predictions, and exact old/new logits. The controlled result is:
 benchmarks/results/seqcls_i2sr_runtime_ab_2026-09-04.json
 benchmarks/results/seqcls_i2sr_runtime_ab_2026-09-04.md
 ```
+
+Profile activation quantization separately from packed I2 arithmetic at the
+four Qwen2.5-0.5B projection shapes:
+
+```bash
+python benchmarks/benchmark_i2_kernel_profile.py \
+  --build-dir build-portable-avx2 \
+  --tokens 32 \
+  --inner-iterations 31 \
+  --outer-repetitions 5 \
+  --cpu-affinity 0
+```
+
+The profiler validates every raw accumulator against a scalar decoder before
+reporting timings. Its projection-weighted aggregate is a bottleneck diagnostic,
+not an end-to-end throughput estimate.
