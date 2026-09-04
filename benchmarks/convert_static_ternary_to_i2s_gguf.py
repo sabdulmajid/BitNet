@@ -11,6 +11,7 @@ Row-scale ternary checkpoints are rejected unless --row-scale-prototype or
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import json
 import sys
@@ -20,6 +21,14 @@ from typing import Any
 
 import numpy as np
 import torch
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 class NamedInt(int):
@@ -259,6 +268,7 @@ def make_i2s_model_class(
             ternary_packed = 0
             copied_tensors = 0
             output_f16 = 0
+            embedding_q8 = 0
             row_scale_rejected = 0
             row_scale_packed = 0
             packed_bytes = 0
@@ -268,6 +278,7 @@ def make_i2s_model_class(
                 output_tensor_name = self.format_tensor_name(gguf.MODEL_TENSOR.OUTPUT)
             except ValueError:
                 output_tensor_name = None
+            token_embedding_name = self.format_tensor_name(gguf.MODEL_TENSOR.TOKEN_EMBD)
 
             for key, tensor in state.items():
                 if args.weight_format == "f16" and (
@@ -344,6 +355,16 @@ def make_i2s_model_class(
 
                 mapped_key = normalize_bitdistill_subln_name(key) if args.bitdistill_subln else key
                 new_name = self.map_tensor_name(mapped_key)
+                if args.embedding_qtype == "q8_0" and new_name == token_embedding_name:
+                    data = tensor.to(dtype=torch.float32).cpu().numpy()
+                    data = gguf.quants.quantize(data, gguf.GGMLQuantizationType.Q8_0)
+                    self.gguf_writer.add_tensor(
+                        new_name,
+                        data,
+                        raw_dtype=gguf.GGMLQuantizationType.Q8_0,
+                    )
+                    embedding_q8 += 1
+                    continue
                 if torch.is_floating_point(tensor):
                     if tensor.ndim <= 1 or new_name.endswith("_norm.weight"):
                         data = tensor.to(dtype=torch.float32).squeeze().numpy()
@@ -372,6 +393,7 @@ def make_i2s_model_class(
                     "classifier_head_gguf": bool(classifier_gguf_tensors),
                     "classifier_head_gguf_tensors": sorted(classifier_gguf_tensors),
                     "output_f16_tensors": output_f16,
+                    "embedding_q8_tensors": embedding_q8,
                     "row_scale_rejected": row_scale_rejected,
                     "packed_i2s_bytes": packed_bytes,
                     "output_tensors": ternary_packed + copied_tensors + output_f16,
@@ -433,6 +455,15 @@ def main() -> None:
     )
     parser.add_argument("--validate-codes", action="store_true")
     parser.add_argument("--keep-output-f16", action="store_true", default=True)
+    parser.add_argument(
+        "--embedding-qtype",
+        choices=["f16", "q8_0"],
+        default="f16",
+        help=(
+            "Storage type for the token embedding. q8_0 is a mixed-precision option that "
+            "reduces high-vocabulary models without changing BitLinear I2_S/I2_SR tensors."
+        ),
+    )
     parser.add_argument(
         "--gguf-arch",
         choices=["source", "bitnet-25", "bitnet-qwen"],
@@ -524,12 +555,16 @@ def main() -> None:
     summary: dict[str, Any] = {
         "checkpoint_dir": str(args.checkpoint_dir),
         "state": str(state_path),
+        "state_size_bytes": state_path.stat().st_size,
+        "state_sha256": sha256_file(state_path),
         "ternary_state": str(state_path) if args.weight_format == "ternary" else None,
         "weight_format": args.weight_format,
         "architecture": architecture,
         "converter_architecture": converter_architecture,
         "outfile": str(args.outfile),
         "converter": str(args.converter),
+        "converter_sha256": sha256_file(args.converter),
+        "exporter_sha256": sha256_file(Path(__file__)),
         "format_scope": (
             "latent dense F16 diagnostic; not the QAT ternary function"
             if args.weight_format == "f16"
@@ -563,6 +598,7 @@ def main() -> None:
         "synthetic_vocab_for_smoke": bool(args.synthetic_vocab_for_smoke),
         "classifier_head_npz": str(args.classifier_head_npz) if args.classifier_head_npz is not None else None,
         "classifier_head_gguf_requested": bool(args.classifier_head_gguf),
+        "embedding_qtype": args.embedding_qtype,
     }
 
     model_cls = make_i2s_model_class(base_cls, state, converter, args, summary, i2_s_dtype, i2_sr_dtype, config)
@@ -588,6 +624,7 @@ def main() -> None:
             raise SystemExit(f"expected {args.expect_ternary_keys} ternary keys, produced {produced}")
     if args.outfile.exists():
         summary["outfile_size_bytes"] = args.outfile.stat().st_size
+        summary["outfile_sha256"] = sha256_file(args.outfile)
 
     if args.summary_json is not None:
         args.summary_json.parent.mkdir(parents=True, exist_ok=True)
