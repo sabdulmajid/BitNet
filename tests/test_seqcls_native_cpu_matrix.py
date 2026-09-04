@@ -62,6 +62,7 @@ def test_matrix_validation_rejects_runtime_build_mismatch() -> None:
             "fp16_teacher": reference,
             "q4_0_teacher": q4,
             "i2_sr_student": ternary,
+            "i2_sr_q8_embedding_student": deepcopy(ternary),
         }
     )
 
@@ -79,6 +80,7 @@ def test_matrix_validation_rejects_dirty_source() -> None:
             "fp16_teacher": reference,
             "q4_0_teacher": q4,
             "i2_sr_student": ternary,
+            "i2_sr_q8_embedding_student": deepcopy(ternary),
         }
     )
 

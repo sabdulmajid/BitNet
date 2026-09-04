@@ -3,7 +3,7 @@
 
 The audit keeps two estimands separate:
 
-* a same-teacher format effect, such as Q4_0 versus F16; and
+* a same-model format effect, such as Q4_0 versus F16; and
 * a deployed-model effect, such as a trained I2_SR student versus its teacher.
 
 Those are not interchangeable: the latter includes training-recipe differences.
@@ -31,11 +31,15 @@ DEFAULT_ARTIFACTS = {
     "fp16_teacher": Path("benchmark_results/seqcls_native_fp16_teacher_cpu_mnli_512_xeon_2026-09-04.json"),
     "q4_0_teacher": Path("benchmark_results/seqcls_native_fp16_teacher_q4_0_cpu_mnli_512_xeon_2026-09-04.json"),
     "i2_sr_student": Path("benchmark_results/seqcls_native_i2sr_cpu_mnli_512_xeon_2026-09-04.json"),
+    "i2_sr_q8_embedding_student": Path(
+        "benchmark_results/seqcls_native_i2sr_q8_embedding_cpu_mnli_512_xeon_2026-09-04.json"
+    ),
 }
 SEMANTIC_FAMILY = {
     "fp16_teacher": "fp16_teacher",
     "q4_0_teacher": "fp16_teacher",
     "i2_sr_student": "qat_student",
+    "i2_sr_q8_embedding_student": "qat_student",
 }
 
 
@@ -265,21 +269,28 @@ def main() -> int:
     labels = [int(value) for value in reference.get("labels", [])]
     comparisons: dict[str, Any] = {}
     if labels and all(len(value.get("predictions", [])) == len(labels) for value in artifacts.values()):
-        for offset, name in enumerate(("q4_0_teacher", "i2_sr_student")):
-            same_function = SEMANTIC_FAMILY[name] == SEMANTIC_FAMILY["fp16_teacher"]
-            comparisons[f"{name}_vs_fp16_teacher"] = {
+        comparison_specs = (
+            ("q4_0_teacher", "fp16_teacher"),
+            ("i2_sr_student", "fp16_teacher"),
+            ("i2_sr_q8_embedding_student", "fp16_teacher"),
+            ("i2_sr_q8_embedding_student", "i2_sr_student"),
+        )
+        for offset, (name, reference_name) in enumerate(comparison_specs):
+            comparison_reference = artifacts[reference_name]
+            same_function = SEMANTIC_FAMILY[name] == SEMANTIC_FAMILY[reference_name]
+            comparisons[f"{name}_vs_{reference_name}"] = {
                 "candidate": name,
-                "reference": "fp16_teacher",
-                "estimand": "same-teacher format effect" if same_function else "deployed-model effect",
+                "reference": reference_name,
+                "estimand": "same-model format effect" if same_function else "deployed-model effect",
                 "same_predeployment_function": same_function,
                 "quality": paired_quality(
                     [int(value) for value in artifacts[name]["predictions"]],
-                    [int(value) for value in reference["predictions"]],
+                    [int(value) for value in comparison_reference["predictions"]],
                     labels,
                     bootstrap_samples=args.bootstrap_samples,
                     seed=args.bootstrap_seed + offset,
                 ),
-                "system": system_effect(artifacts[name], reference),
+                "system": system_effect(artifacts[name], comparison_reference),
             }
 
     artifact_summary = {
