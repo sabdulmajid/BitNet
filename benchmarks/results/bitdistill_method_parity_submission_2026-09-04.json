@@ -1,9 +1,9 @@
 {
   "schema_version": 4,
   "submitted_at_utc": "2026-09-04",
-  "source_revision": "6d54884f2c0a5a64eaabeb04ea1ee11dc5613a23",
-  "array_job_id": "10387",
-  "postprocess_job_id": "10388",
+  "source_revision": "526ede7b2c3f33c6a9638de54bdae91e8afe39c6",
+  "array_job_id": "10389",
+  "postprocess_job_id": "10390",
   "status": "queued_reference_environment",
   "partition": "dualcard",
   "array": "0-5%1",
@@ -104,10 +104,19 @@
     {
       "array_job_id": "10387",
       "postprocess_job_id": "10388",
-      "result": "queued_reference_environment",
+      "result": "cancelled_before_start",
       "partition": "dualcard",
       "source_revision": "6d54884f2c0a5a64eaabeb04ea1ee11dc5613a23",
-      "reason": "Live array runs from a detached immutable worktree; the audit uses afterany and fails closed if any case, telemetry schedule, or prediction trace is incomplete."
+      "reason": "A provenance review found that the wrapper did not explicitly forward or serialize the random seed. No training step ran."
+    },
+    {
+      "array_job_id": "10389",
+      "postprocess_job_id": "10390",
+      "result": "queued_reference_environment",
+      "partition": "dualcard",
+      "source_revision": "526ede7b2c3f33c6a9638de54bdae91e8afe39c6",
+      "seed": 1234,
+      "reason": "Live array runs from a detached immutable worktree; the launcher passes seed 1234 explicitly, and the audit fails closed if any case, seed, telemetry schedule, or prediction trace is incomplete."
     }
   ]
 }

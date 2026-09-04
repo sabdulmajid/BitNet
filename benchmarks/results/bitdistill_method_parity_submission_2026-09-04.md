@@ -1,8 +1,8 @@
 # BitDistill method-parity pilot submission
 
 - Status: reference-environment array queued
-- Source revision: `6d54884f2c0a5a64eaabeb04ea1ee11dc5613a23`
-- Reference array: `10387`; fail-closed audit: `10388`
+- Source revision: `526ede7b2c3f33c6a9638de54bdae91e8afe39c6`
+- Reference array: `10389`; fail-closed audit: `10390`
 - Target array: `0-5%1` on `dualcard`
 - Postprocessor: fail-closed and dependent on the complete array
 - Per-pilot resources: 1 GPU, 12 CPUs, 24 GiB RAM, 6-hour limit
@@ -25,4 +25,4 @@ Attempts to use the non-NFS GPU nodes were treated as infrastructure probes, not
 
 Midcard job `10368` reached the first model forward and exposed a PyTorch 2.6 portability defect: FP32 SubLN output could feed a BF16 projection. Commit `18ec2c9` makes `SubLNLinear` preserve the incoming activation dtype and adds a forced-promotion regression test. The corrected exploratory jobs `10373` and `10376`-`10380` then completed all six contracts on the RTX A4500. Their cross-environment diagnostic is published separately in [bitdistill_method_parity_midcard_exploratory_2026-09-04.md](bitdistill_method_parity_midcard_exploratory_2026-09-04.md); it carries no task-quality claim.
 
-Pending dualcard array `10331` and audit `10332` were cancelled before allocation when the validated dtype fix and stricter prediction auditor superseded their source revision. The live reference jobs `10387` and `10388` run from a detached worktree pinned to `6d54884f2c0a5a64eaabeb04ea1ee11dc5613a23`, with symlinks only to the shared checkpoint and Hugging Face caches. Advancing `main` therefore cannot alter their source tree.
+Pending dualcard array `10331` and audit `10332` were cancelled before allocation when the validated dtype fix and stricter prediction auditor superseded their source revision. Replacement jobs `10387` and `10388` were also cancelled before allocation after a provenance review found that the wrapper did not explicitly forward or serialize the random seed. The completed exploratory runs used the parser default `1234`; the inaccurate `42` manifest entry was corrected. The live reference jobs `10389` and `10390` explicitly set and validate seed `1234` and run from a detached worktree pinned to `526ede7b2c3f33c6a9638de54bdae91e8afe39c6`, with symlinks only to the shared checkpoint and Hugging Face caches. Advancing `main` therefore cannot alter their source tree.
