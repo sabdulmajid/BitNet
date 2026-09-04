@@ -49,7 +49,40 @@ def mean_ci95(values: list[float]) -> list[float]:
         raise ValueError("cannot summarize an empty sample")
     if len(values) == 1:
         return [values[0], values[0]]
-    t_critical = {2: 12.706, 3: 4.303, 4: 3.182, 5: 2.776}.get(len(values), 1.96)
+    # Two-sided 95% Student-t critical values indexed by degrees of freedom.
+    t_critical_by_df = {
+        1: 12.706,
+        2: 4.303,
+        3: 3.182,
+        4: 2.776,
+        5: 2.571,
+        6: 2.447,
+        7: 2.365,
+        8: 2.306,
+        9: 2.262,
+        10: 2.228,
+        11: 2.201,
+        12: 2.179,
+        13: 2.160,
+        14: 2.145,
+        15: 2.131,
+        16: 2.120,
+        17: 2.110,
+        18: 2.101,
+        19: 2.093,
+        20: 2.086,
+        21: 2.080,
+        22: 2.074,
+        23: 2.069,
+        24: 2.064,
+        25: 2.060,
+        26: 2.056,
+        27: 2.052,
+        28: 2.048,
+        29: 2.045,
+        30: 2.042,
+    }
+    t_critical = t_critical_by_df.get(len(values) - 1, 1.96)
     mean = statistics.fmean(values)
     half = t_critical * statistics.stdev(values) / math.sqrt(len(values))
     return [mean - half, mean + half]
@@ -121,7 +154,7 @@ def render_markdown(report: dict[str, Any]) -> str:
             "",
             "## Claim Boundary",
             "",
-            "- Intervals use a two-sided Student-t interval over four execution repetitions; they quantify run variability, not model-quality uncertainty.",
+            f"- Intervals use a two-sided Student-t interval over {report['repetitions']} execution repetitions; they quantify run variability, not model-quality uncertainty.",
             "- Ratios are paired by repetition and summarized on the log scale.",
             "- The I2_SR artifacts are trained students; speed comparisons are valid deployed-artifact comparisons, not isolated kernel microbenchmarks.",
             "- Results apply to this CPU, affinity, executable, shared libraries, prompt set, and sequence-isolated classifier path.",
@@ -261,6 +294,7 @@ def main() -> int:
         "cpu_affinity": args.cpu_affinity,
         "hardware": cpu_environment(args.threads),
         "runtime_build": runtime_build_contract(binary, root),
+        "benchmark_script": file_identity(Path(__file__).resolve(), root),
         "artifacts": {name: file_identity(path, root) for name, path in model_paths.items()},
         "runs": runs,
         "summaries": summaries,

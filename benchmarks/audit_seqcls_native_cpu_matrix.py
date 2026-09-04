@@ -182,6 +182,8 @@ def system_effect(candidate: dict[str, Any], reference: dict[str, Any]) -> dict[
 
 def fmt(value: Any) -> str:
     if isinstance(value, float):
+        if value != 0.0 and abs(value) < 1e-4:
+            return f"{value:.3e}"
         return f"{value:.6f}"
     return str(value)
 
@@ -216,6 +218,8 @@ def render_markdown(report: dict[str, Any]) -> str:
                 comparison["estimand"],
                 quality["delta_candidate_minus_reference"],
                 quality["paired_bootstrap_ci95"],
+                f"{quality['candidate_wins']} / {quality['reference_wins']}",
+                quality["prediction_agreement"],
                 quality["mcnemar_exact_p"],
                 system["size_ratio_reference_over_candidate"],
                 system["throughput_ratio_candidate_over_reference"],
@@ -232,7 +236,17 @@ def render_markdown(report: dict[str, Any]) -> str:
             ),
             "## Paired Comparisons",
             table(
-                ["comparison", "estimand", "accuracy delta", "paired 95% CI", "McNemar p", "size factor", "speed factor"],
+                [
+                    "comparison",
+                    "estimand",
+                    "accuracy delta",
+                    "paired 95% CI",
+                    "wins / losses",
+                    "prediction agreement",
+                    "McNemar p",
+                    "size factor",
+                    "speed factor",
+                ],
                 comparison_rows,
             ),
             "## Interpretation",
@@ -323,6 +337,10 @@ def main() -> int:
     report = {
         "schema": "seqcls-native-cpu-matrix-v1",
         "created_utc": datetime.now(timezone.utc).isoformat(),
+        "audit_script": {
+            "path": str(Path(__file__).resolve().relative_to(Path(__file__).resolve().parents[1])),
+            "sha256": sha256_file(Path(__file__).resolve()),
+        },
         "status": status,
         "errors": errors,
         "artifacts": artifact_summary,

@@ -167,7 +167,7 @@ def file_identity(path: Path, root: Path) -> dict[str, Any]:
     }
 
 
-def git_identity(path: Path) -> dict[str, Any]:
+def git_identity(path: Path, *, display_path: str | None = None) -> dict[str, Any]:
     def git(*args: str) -> str:
         result = subprocess.run(
             ["git", "-C", str(path), *args],
@@ -181,9 +181,13 @@ def git_identity(path: Path) -> dict[str, Any]:
         revision = git("rev-parse", "HEAD")
         status = git("status", "--short", "--untracked-files=no")
     except (OSError, subprocess.CalledProcessError):
-        return {"path": str(path), "revision": None, "tracked_files_dirty": None}
+        return {
+            "path": display_path or str(path),
+            "revision": None,
+            "tracked_files_dirty": None,
+        }
     return {
-        "path": str(path.resolve()),
+        "path": display_path or str(path.resolve()),
         "revision": revision,
         "tracked_files_dirty": bool(status),
     }
@@ -192,6 +196,11 @@ def git_identity(path: Path) -> dict[str, Any]:
 def normalize_ldd_output(value: str) -> str:
     """Remove randomized load addresses while preserving library identities."""
     return re.sub(r"\(0x[0-9a-fA-F]+\)", "(0xADDR)", value.strip())
+
+
+def normalize_repo_paths(value: str, root: Path) -> str:
+    """Replace the local checkout prefix in public provenance text."""
+    return value.replace(str(root.resolve()), "$REPO_ROOT")
 
 
 def runtime_build_contract(binary: Path, root: Path) -> dict[str, Any]:
@@ -286,17 +295,18 @@ def runtime_build_contract(binary: Path, root: Path) -> dict[str, Any]:
             command = entry.get("command")
             if not isinstance(command, str) and isinstance(entry.get("arguments"), list):
                 command = shlex.join(str(value) for value in entry["arguments"])
+            normalized_command = normalize_repo_paths(str(command), root)
             compile_units.append(
                 {
                     "file": maybe_relative(Path(source), root),
-                    "command": command,
-                    "command_sha256": hashlib.sha256(str(command).encode("utf-8")).hexdigest(),
+                    "command": normalized_command,
+                    "command_sha256": hashlib.sha256(normalized_command.encode("utf-8")).hexdigest(),
                 }
             )
 
     repositories = {
-        "bitnet": git_identity(root),
-        "llama_cpp": git_identity(root / "3rdparty/llama.cpp"),
+        "bitnet": git_identity(root, display_path="."),
+        "llama_cpp": git_identity(root / "3rdparty/llama.cpp", display_path="3rdparty/llama.cpp"),
     }
     contract: dict[str, Any] = {
         "build_dir": maybe_relative(build_dir, root),
@@ -305,7 +315,7 @@ def runtime_build_contract(binary: Path, root: Path) -> dict[str, Any]:
         "compile_commands": file_identity(compile_commands, root) if compile_commands.exists() else None,
         "compile_units": compile_units,
         "linked_libraries": linked_libraries,
-        "ldd": ldd_text,
+        "ldd": normalize_repo_paths(ldd_text, root),
         "source_files": source_files,
         "repositories": repositories,
     }
