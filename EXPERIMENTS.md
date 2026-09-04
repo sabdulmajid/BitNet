@@ -4,6 +4,26 @@ This document records the active experiment workflow. It is intentionally
 narrow: use manifests, keep paper-style tensor-scale rows separate from
 row-scale retrofit variants, and mark missing downstream results as pending.
 
+## Run Provenance
+
+`train_bitdistill.py` writes `run_contract.json` before loading models or
+starting optimization. It records the resolved CLI arguments, Git revision and
+tracked-dirty state, Python/package versions, visible accelerator hardware, and
+allowlisted Slurm variables. Final metrics contain the contract path and
+SHA-256.
+
+For publication runs with local model and checkpoint paths, enable immutable
+input fingerprints:
+
+```bash
+HASH_INPUT_ARTIFACTS=1 sbatch ... slurm_bitdistill_glue.sh
+```
+
+This hashes every file in local model directories and can add startup I/O. A
+remote Hugging Face identifier is recorded but cannot be content-hashed; stage
+the exact revision locally or use a separately pinned asset manifest when an
+immutable input claim is required.
+
 ## Stage-2 Manifest
 
 The completed 327.68M-token Stage-2 producer is job `10070`.
@@ -59,6 +79,7 @@ GRAD_ACCUM_STEPS=4 \
 LR=2e-5 \
 SAVE_EVERY_STEPS=0 \
 SAVE_MODEL_ARTIFACTS=0 \
+HASH_INPUT_ARTIFACTS=1 \
 OUTPUT_DIR=checkpoints/bitdistill-glue-seqcls-recovery/Qwen-Qwen2.5-0.5B/mnli/bitdistill-tensor-40kwarmup-steps10000-lr2em5-papergamma-headinit-rerun \
 sbatch --partition=midcard slurm_bitdistill_glue.sh
 ```

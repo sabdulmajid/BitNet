@@ -248,6 +248,9 @@ successful experiment.
 - A llama.cpp fork with a packed `I2_SR` row-scale CPU runtime path.
 - Manifest-based checkpoint handoff for long Stage-2 jobs, so downstream runs
   consume the actual snapshot state dict instead of guessed paths.
+- Pre-training run contracts that record the resolved recipe, source state,
+  software/hardware environment, Slurm context, and optional content hashes for
+  local model and checkpoint inputs.
 - Fail-closed evidence reporting: missing artifacts and `0/0` reports are
   treated as incomplete rather than successful.
 

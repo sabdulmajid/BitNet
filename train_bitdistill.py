@@ -21,14 +21,19 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import itertools
 import json
 import math
+import os
+import platform
 import random
 import subprocess
+import sys
 import time
 from contextlib import contextmanager
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterator
 
@@ -217,6 +222,170 @@ def source_revision() -> str:
         text=True,
     )
     return result.stdout.strip() if result.returncode == 0 else "unknown"
+
+
+def source_tracked_dirty() -> bool | None:
+    commands = (["git", "diff", "--quiet"], ["git", "diff", "--cached", "--quiet"])
+    for command in commands:
+        result = subprocess.run(command, check=False, capture_output=True)
+        if result.returncode == 1:
+            return True
+        if result.returncode != 0:
+            return None
+    return False
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def reference_fingerprint(value: str, *, hash_contents: bool) -> dict[str, Any]:
+    path = Path(value).expanduser() if value else None
+    result: dict[str, Any] = {"reference": value, "local": bool(path and path.exists())}
+    if path is None or not path.exists():
+        return result
+    resolved = path.resolve()
+    result["resolved_path"] = str(resolved)
+    if resolved.is_file():
+        result.update({"kind": "file", "size_bytes": resolved.stat().st_size})
+        if hash_contents:
+            result["sha256"] = file_sha256(resolved)
+        return result
+    if not resolved.is_dir():
+        result["kind"] = "other"
+        return result
+
+    files = sorted(candidate for candidate in resolved.rglob("*") if candidate.is_file())
+    result.update(
+        {
+            "kind": "directory",
+            "file_count": len(files),
+            "size_bytes": sum(candidate.stat().st_size for candidate in files),
+        }
+    )
+    if hash_contents:
+        tree_digest = hashlib.sha256()
+        for candidate in files:
+            relative = candidate.relative_to(resolved).as_posix()
+            digest = file_sha256(candidate)
+            tree_digest.update(relative.encode("utf-8"))
+            tree_digest.update(b"\0")
+            tree_digest.update(digest.encode("ascii"))
+            tree_digest.update(b"\n")
+        result["tree_sha256"] = tree_digest.hexdigest()
+    return result
+
+
+def package_version(name: str) -> str | None:
+    try:
+        from importlib.metadata import version
+
+        return version(name)
+    except Exception:
+        return None
+
+
+def hardware_contract() -> dict[str, Any]:
+    cuda_available = torch.cuda.is_available()
+    devices: list[dict[str, Any]] = []
+    if cuda_available:
+        for index in range(torch.cuda.device_count()):
+            properties = torch.cuda.get_device_properties(index)
+            devices.append(
+                {
+                    "index": index,
+                    "name": properties.name,
+                    "total_memory_bytes": properties.total_memory,
+                    "compute_capability": [properties.major, properties.minor],
+                }
+            )
+    return {
+        "platform": platform.platform(),
+        "hostname": platform.node(),
+        "machine": platform.machine(),
+        "cuda_available": cuda_available,
+        "cuda_runtime": torch.version.cuda,
+        "cuda_devices": devices,
+    }
+
+
+def build_run_contract(args: argparse.Namespace) -> dict[str, Any]:
+    resolved_args = {
+        key: str(value) if isinstance(value, Path) else value
+        for key, value in sorted(vars(args).items())
+        if not key.startswith("_")
+    }
+    slurm_keys = (
+        "SLURM_JOB_ID",
+        "SLURM_JOB_NAME",
+        "SLURM_CLUSTER_NAME",
+        "SLURM_JOB_PARTITION",
+        "SLURM_JOB_NODELIST",
+        "SLURM_CPUS_PER_TASK",
+        "CUDA_VISIBLE_DEVICES",
+    )
+    return {
+        "schema": "bitdistill-run-contract-v1",
+        "created_utc": datetime.now(timezone.utc).isoformat(),
+        "source": {
+            "revision": source_revision(),
+            "tracked_dirty": source_tracked_dirty(),
+        },
+        "command": [sys.executable, *sys.argv],
+        "resolved_arguments": resolved_args,
+        "environment": {
+            "python": platform.python_version(),
+            "torch": torch.__version__,
+            "transformers": package_version("transformers"),
+            "datasets": package_version("datasets"),
+            "accelerate": package_version("accelerate"),
+            "slurm": {key: os.environ[key] for key in slurm_keys if key in os.environ},
+        },
+        "hardware": hardware_contract(),
+        "inputs": {
+            "student_model": reference_fingerprint(
+                args.student_model, hash_contents=args.hash_input_artifacts
+            ),
+            "teacher_model": reference_fingerprint(
+                args.teacher_model, hash_contents=args.hash_input_artifacts
+            ),
+            "init_state_dict": reference_fingerprint(
+                args.init_state_dict, hash_contents=args.hash_input_artifacts
+            ),
+            "init_state_manifest": reference_fingerprint(
+                args.init_state_manifest, hash_contents=args.hash_input_artifacts
+            ),
+        },
+    }
+
+
+def write_run_contract(args: argparse.Namespace) -> dict[str, Any] | None:
+    if not args.output_dir or not args.write_run_contract:
+        return None
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    path = output_dir / "run_contract.json"
+    contract = build_run_contract(args)
+    payload = json.dumps(contract, indent=2, sort_keys=True) + "\n"
+    temporary = path.with_suffix(".json.tmp")
+    temporary.write_text(payload, encoding="utf-8")
+    temporary.replace(path)
+    reference = {
+        "path": str(path),
+        "sha256": hashlib.sha256(payload.encode("utf-8")).hexdigest(),
+    }
+    args._run_contract_reference = reference
+    print(f"RUN_CONTRACT={path} SHA256={reference['sha256']}", flush=True)
+    return contract
+
+
+def run_contract_reference(args: argparse.Namespace) -> dict[str, Any] | None:
+    value = getattr(args, "_run_contract_reference", None)
+    return dict(value) if isinstance(value, dict) else None
 
 
 def move_batch(batch: dict[str, torch.Tensor], device: torch.device) -> dict[str, torch.Tensor]:
@@ -1857,6 +2026,7 @@ def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
             if args.save_every_steps > 0 and step % args.save_every_steps == 0:
                 snapshot_metrics = {
                     "source_revision": source_revision(),
+                    "run_contract": run_contract_reference(args),
                     "seed": args.seed,
                     "stage": args.stage,
                     "method": args.method,
@@ -1883,6 +2053,7 @@ def train_continued_pretrain(args: argparse.Namespace) -> dict[str, Any]:
 
     metrics = {
         "source_revision": source_revision(),
+        "run_contract": run_contract_reference(args),
         "seed": args.seed,
         "stage": args.stage,
         "method": args.method,
@@ -2177,6 +2348,7 @@ def train_task(args: argparse.Namespace) -> dict[str, Any]:
         eval_metrics = evaluate_accuracy(student, eval_loader, device, prediction_path=eval_prediction_path(args))
     metrics = {
         "source_revision": source_revision(),
+        "run_contract": run_contract_reference(args),
         "seed": args.seed,
         "stage": args.stage,
         "method": args.method,
@@ -2323,6 +2495,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--telemetry-max-elements-per-layer", type=int, default=65536)
     parser.add_argument("--save-every-steps", type=int, default=0)
     parser.add_argument("--save-model-artifacts", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--write-run-contract", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--hash-input-artifacts", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--seed", type=int, default=1234)
     parser.add_argument("--smoke-test", action="store_true")
     args = parser.parse_args()
@@ -2350,6 +2524,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    write_run_contract(args)
     set_seed(args.seed)
     if args.stage == "continued_pretrain":
         metrics = train_continued_pretrain(args)

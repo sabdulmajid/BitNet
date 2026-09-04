@@ -97,6 +97,7 @@ INIT_OUTPUT_HEAD_FROM_TEACHER="${INIT_OUTPUT_HEAD_FROM_TEACHER:-0}"
 MAX_TRAIN_SAMPLES="${MAX_TRAIN_SAMPLES:-0}"
 MAX_EVAL_SAMPLES="${MAX_EVAL_SAMPLES:-0}"
 SAVE_MODEL_ARTIFACTS="${SAVE_MODEL_ARTIFACTS:-1}"
+HASH_INPUT_ARTIFACTS="${HASH_INPUT_ARTIFACTS:-0}"
 SEED="${SEED:-1234}"
 OUTPUT_ROOT="${OUTPUT_ROOT:-checkpoints/bitdistill-glue}"
 MODEL_SLUG="${MODEL//\//-}"
@@ -134,6 +135,7 @@ echo "INIT_OUTPUT_HEAD_FROM_TEACHER=$INIT_OUTPUT_HEAD_FROM_TEACHER"
 echo "MAX_SEQ_LEN=$MAX_SEQ_LEN MAX_STEPS=$MAX_STEPS PER_DEVICE_BATCH_SIZE=$PER_DEVICE_BATCH_SIZE GRAD_ACCUM_STEPS=$GRAD_ACCUM_STEPS LR=$LR LR_SCHEDULER=$LR_SCHEDULER"
 echo "SAVE_EVERY_STEPS=$SAVE_EVERY_STEPS"
 echo "SAVE_MODEL_ARTIFACTS=$SAVE_MODEL_ARTIFACTS"
+echo "HASH_INPUT_ARTIFACTS=$HASH_INPUT_ARTIFACTS"
 echo "SEED=$SEED"
 echo "OUTPUT_DIR=$OUTPUT_DIR"
 
@@ -157,6 +159,11 @@ fi
 SAVE_MODEL_ARGS=(--save-model-artifacts)
 if [ "$SAVE_MODEL_ARTIFACTS" = "0" ]; then
   SAVE_MODEL_ARGS=(--no-save-model-artifacts)
+fi
+
+HASH_INPUT_ARGS=(--no-hash-input-artifacts)
+if [ "$HASH_INPUT_ARTIFACTS" = "1" ]; then
+  HASH_INPUT_ARGS=(--hash-input-artifacts)
 fi
 
 TELEMETRY_ARGS=(--telemetry-every-steps "$TELEMETRY_EVERY_STEPS" --telemetry-max-elements-per-layer "$TELEMETRY_MAX_ELEMENTS_PER_LAYER" --no-telemetry-component-grad-norms)
@@ -238,6 +245,7 @@ fi
   --seed "$SEED" \
   --gradient-checkpointing \
   "${SAVE_MODEL_ARGS[@]}" \
+  "${HASH_INPUT_ARGS[@]}" \
   --output-dir "$OUTPUT_DIR" \
   --log-every-steps 10 \
   --save-every-steps "$SAVE_EVERY_STEPS"
