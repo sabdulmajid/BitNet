@@ -347,7 +347,7 @@ def main() -> int:
     parser.add_argument(
         "--controlled-curve",
         type=Path,
-        default=Path("benchmarks/results/bitdistill_controlled_curve_2026-05-20.json"),
+        default=Path("benchmarks/results/bitdistill_controlled_curve_2026-05-23.json"),
     )
     parser.add_argument(
         "--gamma-balance",

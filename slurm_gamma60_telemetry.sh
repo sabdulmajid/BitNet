@@ -53,13 +53,13 @@ Path("$STATUS_MD").write_text(
         f"Status: **{data['status']}**.",
         "Quality claim: **none**.",
         "| field | value |\\n| --- | --- |\\n"
-        f"| job_id | `{data['job_id']}` |\\n"
-        f"| exit_code | `{data['exit_code']}` |\\n"
-        f"| output_dir | `{data['output_dir']}` |\\n"
-        f"| telemetry_path | `{data['telemetry_path']}` |\\n"
-        f"| metrics_path | `{data['metrics_path']}` |\\n"
-        f"| attention_kd_weight | `{data['attention_kd_weight']}` |\\n"
-        f"| max_steps | `{data['max_steps']}` |",
+        f"| job_id | {data['job_id']} |\\n"
+        f"| exit_code | {data['exit_code']} |\\n"
+        f"| output_dir | {data['output_dir']} |\\n"
+        f"| telemetry_path | {data['telemetry_path']} |\\n"
+        f"| metrics_path | {data['metrics_path']} |\\n"
+        f"| attention_kd_weight | {data['attention_kd_weight']} |\\n"
+        f"| max_steps | {data['max_steps']} |",
         data["caveat"],
     ]) + "\\n",
     encoding="utf-8",

@@ -62,13 +62,13 @@ Path("$HANDOFF_MD").write_text(
         "# Stage-2 655.36M Handoff",
         "Status: **failed**.",
         "| field | value |\\n| --- | --- |\\n"
-        f"| stage2_job_id | `{data['stage2_job_id']}` |\\n"
-        f"| handoff_job_id | `{data['handoff_job_id']}` |\\n"
-        f"| exit_code | `{data['exit_code']}` |\\n"
-        f"| line | `{data['line']}` |\\n"
-        f"| manifest_json | `{data['manifest_json']}` |\\n"
-        f"| downstream_output_dir | `{data['downstream_output_dir']}` |\\n"
-        f"| postprocess_json | `{data['postprocess_json']}` |",
+        f"| stage2_job_id | {data['stage2_job_id']} |\\n"
+        f"| handoff_job_id | {data['handoff_job_id']} |\\n"
+        f"| exit_code | {data['exit_code']} |\\n"
+        f"| line | {data['line']} |\\n"
+        f"| manifest_json | {data['manifest_json']} |\\n"
+        f"| downstream_output_dir | {data['downstream_output_dir']} |\\n"
+        f"| postprocess_json | {data['postprocess_json']} |",
         "No quality claim should be updated from this failed handoff."
     ]) + "\\n",
     encoding="utf-8",
@@ -195,14 +195,14 @@ Path("$HANDOFF_MD").write_text(
         "# Stage-2 655.36M Handoff",
         "Status: **submitted_downstream**.",
         "| field | value |\\n| --- | --- |\\n"
-        f"| stage2_job_id | `{data['stage2_job_id']}` |\\n"
-        f"| handoff_job_id | `{data['handoff_job_id']}` |\\n"
-        f"| downstream_job_id | `{data['downstream_job_id']}` |\\n"
-        f"| postprocess_job_id | `{data['postprocess_job_id']}` |\\n"
-        f"| manifest_json | `{data['manifest_json']}` |\\n"
-        f"| downstream_output_dir | `{data['downstream_output_dir']}` |\\n"
-        f"| postprocess_json | `{data['postprocess_json']}` |",
-        "Do not update quality claims until the downstream directory has both `metrics.json` and `eval_predictions.jsonl`."
+        f"| stage2_job_id | {data['stage2_job_id']} |\\n"
+        f"| handoff_job_id | {data['handoff_job_id']} |\\n"
+        f"| downstream_job_id | {data['downstream_job_id']} |\\n"
+        f"| postprocess_job_id | {data['postprocess_job_id']} |\\n"
+        f"| manifest_json | {data['manifest_json']} |\\n"
+        f"| downstream_output_dir | {data['downstream_output_dir']} |\\n"
+        f"| postprocess_json | {data['postprocess_json']} |",
+        "Do not update quality claims until the downstream directory has both metrics.json and eval_predictions.jsonl."
     ]) + "\\n",
     encoding="utf-8",
 )

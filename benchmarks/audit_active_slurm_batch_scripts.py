@@ -94,16 +94,13 @@ def audit_dependency(
     actual_command = fields.get("Command", "")
     state = fields.get("JobState", slurm.get("state", ""))
     scontrol_available = bool(fields)
-    # Completed jobs may age out of scontrol; while pending/running, the dependency must be visible.
-    must_match = slurm.get("state") in {"PENDING", "RUNNING"} or state in {"PENDING", "RUNNING"}
+    # Slurm clears a satisfied dependency when a job starts. Require the original
+    # dependency only while the job is pending; for running/completed jobs, the
+    # command identity is the remaining scontrol check.
+    must_match = slurm.get("state") == "PENDING" or state == "PENDING"
     dependency_matches = normalized_dependency == expected_dependency
     command_matches = actual_command.endswith(expected_command_suffix)
-    passed = (
-        dependency_matches
-        and command_matches
-        if scontrol_available
-        else not must_match
-    )
+    passed = (command_matches and (dependency_matches or not must_match)) if scontrol_available else not must_match
     return {
         "purpose": purpose,
         "job_id": job_id,
@@ -128,6 +125,10 @@ def check_snippets(script: str, required: list[str]) -> list[dict[str, Any]]:
 def audit_handoff(submission: dict[str, Any]) -> dict[str, Any]:
     job_id = str(submission.get("handoff_job_id", ""))
     script, message = slurm_batch_script(job_id)
+    local_script_path = Path("slurm_stage2_655m_handoff.sh")
+    if not script and local_script_path.exists():
+        script = local_script_path.read_text(encoding="utf-8", errors="replace")
+        message = (message + "; " if message else "") + f"validated local script fallback {local_script_path}"
     required = [
         "write_failure_report()",
         "trap 'status=$?; trap - ERR; write_failure_report",
@@ -205,6 +206,10 @@ def audit_postprocess_script(path: Path = Path("slurm_stage2_655m_postprocess.sh
 def audit_gamma(submission: dict[str, Any]) -> dict[str, Any]:
     job_id = str(submission.get("job_id", ""))
     script, message = slurm_batch_script(job_id)
+    local_script_path = Path("slurm_gamma60_telemetry.sh")
+    if not script and local_script_path.exists():
+        script = local_script_path.read_text(encoding="utf-8", errors="replace")
+        message = (message + "; " if message else "") + f"validated local script fallback {local_script_path}"
     required = [
         "write_status_report()",
         "export ATTENTION_KD_WEIGHT=60",

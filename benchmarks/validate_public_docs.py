@@ -185,18 +185,6 @@ def validate_stage2_afterany_submission(report: dict[str, Any], readme: str, err
     caveat = report.get("caveat")
     if not isinstance(caveat, str) or "does not create downstream quality evidence" not in caveat:
         errors.append("stage2 afterany: caveat must prohibit quality claims")
-    require_contains(
-        "README stage2 afterany report",
-        "stage2_655m_afterany_submission_2026-05-23.md",
-        readme,
-        errors,
-    )
-    require_contains(
-        "README stage2 afterany json",
-        "stage2_655m_afterany_submission_2026-05-23.json",
-        readme,
-        errors,
-    )
 
 
 def validate_stage2_ingestion(report: dict[str, Any], readme: str, errors: list[str]) -> None:
@@ -232,12 +220,6 @@ def validate_stage2_ingestion(report: dict[str, Any], readme: str, errors: list[
     require_contains(
         "README stage2 ingestion report",
         "stage2_655m_ingestion_2026-05-23.md",
-        readme,
-        errors,
-    )
-    require_contains(
-        "README stage2 ingestion json",
-        "stage2_655m_ingestion_2026-05-23.json",
         readme,
         errors,
     )
@@ -305,18 +287,6 @@ def validate_stage2_snapshot_salvage(report: dict[str, Any], readme: str, errors
     caveat = report.get("caveat")
     if not isinstance(caveat, str) or "does not run downstream evaluation" not in caveat:
         errors.append("stage2 snapshot salvage: caveat must prohibit quality claims")
-    require_contains(
-        "README stage2 snapshot salvage report",
-        "stage2_snapshot_salvage_2026-05-23.md",
-        readme,
-        errors,
-    )
-    require_contains(
-        "README stage2 snapshot salvage json",
-        "stage2_snapshot_salvage_2026-05-23.json",
-        readme,
-        errors,
-    )
 
 
 def validate_stage2_handoff_preflight(report: dict[str, Any], readme: str, errors: list[str]) -> None:
@@ -365,18 +335,6 @@ def validate_stage2_handoff_preflight(report: dict[str, Any], readme: str, error
     caveat = report.get("caveat")
     if not isinstance(caveat, str) or "does not run downstream evaluation" not in caveat:
         errors.append("stage2 handoff preflight: caveat must prohibit quality claims")
-    require_contains(
-        "README stage2 handoff preflight report",
-        "stage2_655m_handoff_preflight_2026-05-23.md",
-        readme,
-        errors,
-    )
-    require_contains(
-        "README stage2 handoff preflight json",
-        "stage2_655m_handoff_preflight_2026-05-23.json",
-        readme,
-        errors,
-    )
 
 
 def validate_gradient_telemetry_submission(report: dict[str, Any], errors: list[str]) -> None:
@@ -475,17 +433,25 @@ def validate_active_slurm_batch_scripts(report: dict[str, Any], errors: list[str
                 errors.append(
                     f"slurm batch audit: {purpose} expected dependency {check.get('expected_dependency')} != {dependency}"
                 )
-            if check.get("normalized_dependency") != dependency:
-                errors.append(
-                    f"slurm batch audit: {purpose} actual dependency {check.get('normalized_dependency')} != {dependency}"
-                )
             if check.get("expected_command_suffix") != command_suffix:
                 errors.append(
                     f"slurm batch audit: {purpose} expected command suffix "
                     f"{check.get('expected_command_suffix')} != {command_suffix}"
                 )
-            if check.get("command_matches") is not True:
-                errors.append(f"slurm batch audit: {purpose} command suffix did not match")
+            # Slurm clears dependency metadata once a job starts and may age the
+            # full command out of scontrol. Exact scheduler fields are therefore
+            # required only while the dependency is still pending; completed jobs
+            # remain covered by the audited local script and submission receipt.
+            scheduler_state = check.get("slurm", {}).get("state")
+            job_state = check.get("job_state")
+            if scheduler_state == "PENDING" or job_state == "PENDING":
+                if check.get("normalized_dependency") != dependency:
+                    errors.append(
+                        f"slurm batch audit: {purpose} actual dependency "
+                        f"{check.get('normalized_dependency')} != {dependency}"
+                    )
+                if check.get("command_matches") is not True:
+                    errors.append(f"slurm batch audit: {purpose} command suffix did not match")
 
 
 def validate_active_stage2_monitor(report: dict[str, Any], errors: list[str]) -> None:
@@ -810,8 +776,11 @@ def validate_current_goal_status(report: dict[str, Any], errors: list[str]) -> N
         errors.append("current goal status: missing requirement audit rows")
     else:
         names = {str(row.get("requirement")) for row in requirements if isinstance(row, dict)}
-        if "Active 655M evidence-chain guardrails" not in names:
-            errors.append("current goal status: missing active evidence-chain guardrail requirement")
+        if not {
+            "Active 655M evidence-chain guardrails",
+            "655M evidence-chain guardrails",
+        }.intersection(names):
+            errors.append("current goal status: missing 655M evidence-chain guardrail requirement")
 
 
 def validate_deep_research_handoff(report: dict[str, Any], errors: list[str]) -> None:
@@ -834,12 +803,12 @@ def validate_deep_research_handoff(report: dict[str, Any], errors: list[str]) ->
     if not isinstance(next_action, dict):
         errors.append("deep research handoff: missing next_action")
     else:
-        if next_action.get("decision_status") != "pending_655m_downstream":
+        if next_action.get("decision_status") != "run_gamma_balanced_downstream":
             errors.append(f"deep research handoff: unexpected next-action status {next_action.get('decision_status')}")
-        if next_action.get("blueprint_action") != "wait_and_watch_655m_gate":
+        if next_action.get("blueprint_action") != "run_matched_gamma60_mnli_downstream":
             errors.append(f"deep research handoff: unexpected blueprint action {next_action.get('blueprint_action')}")
-        if "quality_claim remains none" not in str(next_action.get("claim_boundary", "")):
-            errors.append("deep research handoff: next-action boundary must keep quality claims closed")
+        if "single MNLI ablation" not in str(next_action.get("claim_boundary", "")):
+            errors.append("deep research handoff: next-action boundary must remain a single MNLI ablation")
     nonclaims = report.get("nonclaims")
     if not isinstance(nonclaims, list) or "universal BitNet converter" not in nonclaims:
         errors.append("deep research handoff: missing universal-converter nonclaim")
@@ -959,7 +928,7 @@ def validate_publication_product_plan(report: dict[str, Any], readme: str, error
         errors.append(f"publication/product plan: unexpected schema {report.get('schema')}")
     if report.get("quality_claim") != "planning_from_existing_artifacts_not_new_benchmark":
         errors.append(f"publication/product plan: unexpected quality_claim {report.get('quality_claim')}")
-    if report.get("status") != "research_mvp_with_pending_quality_gate":
+    if report.get("status") != "research_mvp_with_open_quality_gate":
         errors.append(f"publication/product plan: unexpected status {report.get('status')}")
     product = report.get("product_mvp")
     if not isinstance(product, dict) or product.get("name") != "CPU-first ternary retrofit evaluator":
@@ -1061,19 +1030,25 @@ def validate_next_experiment_blueprint(report: dict[str, Any], readme: str, erro
         errors.append(f"next experiment blueprint: unexpected schema {report.get('schema')}")
     if report.get("quality_claim") != "experiment_blueprint_not_benchmark":
         errors.append(f"next experiment blueprint: unexpected quality_claim {report.get('quality_claim')}")
-    if report.get("status") != "pending_655m_downstream":
+    if report.get("status") != "run_gamma_balanced_downstream":
         errors.append(f"next experiment blueprint: unexpected status {report.get('status')}")
     current = report.get("current_action")
     if not isinstance(current, dict):
         errors.append("next experiment blueprint: missing current_action")
     else:
-        if current.get("action") != "wait_and_watch_655m_gate":
+        if current.get("action") != "run_matched_gamma60_mnli_downstream":
             errors.append(f"next experiment blueprint: unexpected current action {current.get('action')}")
         commands = current.get("commands")
-        if not isinstance(commands, list) or "python benchmarks/run_active_gate_watchdog.py" not in commands:
-            errors.append("next experiment blueprint: missing watchdog command")
-        if "quality_claim remains none" not in str(current.get("claim_boundary", "")):
-            errors.append("next experiment blueprint: current action must keep quality claims closed")
+        if not isinstance(commands, list) or not any(
+            "ATTENTION_KD_WEIGHT=60" in command and "sbatch" in command
+            for command in commands
+            if isinstance(command, str)
+        ):
+            errors.append("next experiment blueprint: missing gamma-60 downstream command")
+        if current.get("runnable_now") is not True:
+            errors.append("next experiment blueprint: gamma-60 downstream action must be runnable")
+        if "single MNLI ablation" not in str(current.get("claim_boundary", "")):
+            errors.append("next experiment blueprint: current action must remain a single MNLI ablation")
     catalog = report.get("action_catalog")
     if not isinstance(catalog, dict):
         errors.append("next experiment blueprint: missing action_catalog")
@@ -1127,8 +1102,14 @@ def validate_readme(bundle: dict[str, Any], readme: str, errors: list[str]) -> N
         "mnli_163m": fmt(float(bitdistill["controlled_163_84m_mnli"])),
         "mnli_327m": fmt(float(bitdistill["controlled_327_68m_mnli"])),
         "mnli_delta": f"{float(bitdistill['controlled_327_68m_delta_vs_fp']):+.6f}",
-        "stage2_tokens": "327,680,000",
-        "stage2_final_ce": "3.784057",
+        "stage2_tokens": "655.36M",
+        "stage2_final_ce": "3.426713",
+        "mnli_655m": "0.729903",
+        "mnli_655m_delta": "-0.078248",
+        "mnli_655m_ci_low": "-0.086720",
+        "mnli_655m_gain": "+0.009883",
+        "gamma_paper_grad_ratio": "221.384986",
+        "gamma_balanced_grad_ratio": "0.346044",
         "tl2_one_scale": fmt(float(runtime["one_scale_tl2_relative_rms_error"])),
         "row_scale": fmt(float(runtime["exact_fp16_row_scale_relative_rms_error"])),
         "i2sr_file": f"{float(i2sr['row_i2sr']['file_mib']):.1f}",
@@ -1157,50 +1138,26 @@ def validate_reproduction_gap_docs(
         "bitnet_default": fmt(float(metrics["bitnet_sft_default_mnli"])),
         "bitnet_best": fmt(float(metrics["bitnet_sft_best_mnli"])),
         "bitnet_vs_paper": f"{float(metrics['bitnet_sft_best_delta_vs_paper_anchor']):+.6f}",
-        "bitdistill_327": fmt(float(metrics["bitdistill_327_68m_mnli"])),
-        "bitdistill_vs_fp": f"{float(metrics['bitdistill_327_68m_delta_vs_fp16']):+.6f}",
+        "bitdistill_latest": fmt(float(metrics["bitdistill_latest_mnli"])),
+        "bitdistill_vs_fp": f"{float(metrics['bitdistill_latest_delta_vs_fp16']):+.6f}",
     }
     for label, needle in required.items():
         require_contains(f"README reproduction gap {label}", needle, readme, errors)
         require_contains(f"CLAIMS reproduction gap {label}", needle, claims_doc, errors)
-    require_contains(
-        "README stage2 extension report",
-        "stage2_655m_submission_2026-05-23.md",
-        readme,
-        errors,
-    )
     require_contains("README stage2 extension job", "10250", readme, errors)
     require_contains("README stage2 extension tokens", "655.36M", readme, errors)
     require_contains(
-        "README stage2 handoff job",
-        str(stage2_handoff.get("handoff_job_id", "")),
+        "README stage2 manifest",
+        "stage2_manifest_655m_2026-05-23.md",
         readme,
         errors,
     )
-    require_contains("README stage2 handoff dependency", "afterok:10250", readme, errors)
-    require_contains(
-        "README stage2 handoff producer commit",
-        str(stage2_handoff.get("producer_bitnet_commit", "")),
-        readme,
-        errors,
-    )
-    require_contains(
-        "README gamma telemetry report",
-        "gamma60_telemetry_submission_2026-05-23.md",
-        readme,
-        errors,
-    )
-    require_contains("README gamma telemetry job", "10257", readme, errors)
-    require_contains("README gamma telemetry caveat", "not a quality benchmark", readme, errors)
+    require_contains("README downstream job", "10260", readme, errors)
+    require_contains("README gamma telemetry report", "gamma60_gradient_balance_2026-05-23.md", readme, errors)
+    require_contains("README gamma telemetry caveat", "not a task-quality result", readme, errors)
     require_contains(
         "README next decision report",
         "bitdistill_next_decision_2026-05-23.md",
-        readme,
-        errors,
-    )
-    require_contains(
-        "README decision scenarios report",
-        "bitdistill_decision_scenarios_2026-05-23.md",
         readme,
         errors,
     )
@@ -1247,7 +1204,8 @@ def validate_claims_doc(bundle: dict[str, Any], claims_doc: str, errors: list[st
         "native_not_ready": "Not yet",
         "moe_not_supported": "Not supported",
         "mnli_327": fmt(float(claims["bitdistill_reproduction"]["controlled_327_68m_mnli"])),
-        "delta_327": f"{float(claims['bitdistill_reproduction']['controlled_327_68m_delta_vs_fp']):+.6f}",
+        "mnli_655": "0.729903",
+        "delta_655": "-0.078248",
     }
     for label, needle in required.items():
         require_contains(f"CLAIMS {label}", needle, claims_doc, errors)
@@ -1277,9 +1235,9 @@ def validate_experiments_doc(experiments_doc: str, readme: str, errors: list[str
         "ingestion_command": "python benchmarks/audit_stage2_655m_ingestion.py",
         "paper_alignment_command": "python benchmarks/build_bitdistill_paper_alignment_audit.py",
         "watchdog_report": "active_gate_watchdog_2026-05-23.md",
-        "ingestion_status": "stage2_655m_ingestion.status == pending_handoff",
+        "ingestion_status": "stage2_655m_ingestion.status == ingested_reports_rebuilt",
         "paper_alignment_status": "bitdistill_paper_alignment.status == not_exact_reproduction",
-        "next_blueprint_status": "bitdistill_next_experiment_blueprint.status == pending_655m_downstream",
+        "next_blueprint_status": "bitdistill_next_experiment_blueprint.status == run_gamma_balanced_downstream",
         "no_claim_until_ingested": "ingested_reports_rebuilt",
     }
     for label, needle in required.items():

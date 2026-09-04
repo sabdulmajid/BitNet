@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
+import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -40,7 +41,7 @@ def file_info(path: Path) -> dict[str, Any]:
 def run(command: list[str]) -> dict[str, Any]:
     result = subprocess.run(command, check=False, capture_output=True, text=True)
     return {
-        "command": command,
+        "command": ["python" if part == sys.executable else part for part in command],
         "returncode": result.returncode,
         "passed": result.returncode == 0,
         "stdout": result.stdout[-4000:],
@@ -149,7 +150,7 @@ def manifest_command(
     output_md: Path,
 ) -> list[str]:
     return [
-        "python",
+        sys.executable,
         "benchmarks/build_stage2_manifest.py",
         "--output-dir",
         str(output_dir),
@@ -183,7 +184,7 @@ def manifest_command(
 def dry_run_manifest(command: list[str], output_json: Path) -> dict[str, Any]:
     build = run(command)
     validate = (
-        run(["python", "benchmarks/validate_stage2_manifest.py", str(output_json)])
+        run([sys.executable, "benchmarks/validate_stage2_manifest.py", str(output_json)])
         if build["passed"] and output_json.exists()
         else {
             "command": ["python", "benchmarks/validate_stage2_manifest.py", str(output_json)],
@@ -274,7 +275,10 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
 
     preflight_checks = [
         check_file("parent manifest exists", parent_manifest),
-        check_command("parent manifest validates", ["python", "benchmarks/validate_stage2_manifest.py", str(parent_manifest)]),
+        check_command(
+            "parent manifest validates",
+            [sys.executable, "benchmarks/validate_stage2_manifest.py", str(parent_manifest)],
+        ),
         check_file("build_stage2_manifest.py exists", Path("benchmarks/build_stage2_manifest.py")),
         check_file("validate_stage2_manifest.py exists", Path("benchmarks/validate_stage2_manifest.py")),
         check_file("handoff script exists", Path(handoff_submission["script"])),
@@ -376,8 +380,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "final_artifact_checks": final_artifact_checks,
         "preflight_checks": preflight_checks,
         "training_save_contract": save_contract,
-        "expected_manifest_command": expected_command,
-        "dry_run_manifest_command": dry_run_command,
+        "expected_manifest_command": ["python" if part == sys.executable else part for part in expected_command],
+        "dry_run_manifest_command": ["python" if part == sys.executable else part for part in dry_run_command],
         "dry_run": dry_run,
         "expected_manifest_json": str(manifest_json),
         "expected_manifest_md": str(manifest_md),

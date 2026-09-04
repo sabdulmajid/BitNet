@@ -89,6 +89,10 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     row_contract = claims["row_scale_runtime_contract"]
     i2sr = claims["i2sr_cpu"]
     native = claims["native_classifier"]
+    latest_controlled = next_decision["latest_controlled_row"]
+    latest_tokens = int(latest_controlled["stage2_token_presentations"])
+    latest_mnli = float(latest_controlled["accuracy"])
+    latest_delta = float(latest_controlled["delta_vs_fp16"])
 
     publishable_units = [
         {
@@ -115,7 +119,13 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         {
             "unit": "BitDistill reproduction gap",
             "claim": "Local BitDistill-style training is improving but has not reproduced paper-level GLUE quality.",
-            "evidence": find_headline(scoreboard, "BitDistill reproduction")["evidence"],
+            "evidence": (
+                f"MNLI 40.96M {bitdistill['controlled_40_96m_mnli']:.6f}; "
+                f"163.84M {bitdistill['controlled_163_84m_mnli']:.6f}; "
+                f"327.68M {bitdistill['controlled_327_68m_mnli']:.6f}; "
+                f"{latest_tokens / 1_000_000:.2f}M {latest_mnli:.6f}; "
+                f"latest delta vs FP16 {latest_delta:+.6f}"
+            ),
             "publishable_now": True,
             "risk": "Must frame as a reproduction-gap study until a within-1pt row is reproduced.",
         },
@@ -153,7 +163,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
 
     gates = [
         {
-            "gate": "655M Stage-2 downstream MNLI",
+            "gate": "Completed 655M Stage-2 downstream MNLI",
             "status": next_decision["status"],
             "decision_rule": next_decision["recommendation"],
             "success_condition": "Meaningful marginal gain or within-1pt FP recovery gate.",
@@ -200,7 +210,9 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             "content": (
                 f"Current MNLI curve: 40.96M {bitdistill['controlled_40_96m_mnli']:.6f}, "
                 f"163.84M {bitdistill['controlled_163_84m_mnli']:.6f}, "
-                f"327.68M {bitdistill['controlled_327_68m_mnli']:.6f}; 655M pending."
+                f"327.68M {bitdistill['controlled_327_68m_mnli']:.6f}, "
+                f"{latest_tokens / 1_000_000:.2f}M {latest_mnli:.6f}; "
+                f"latest delta vs FP16 {latest_delta:+.6f}."
             ),
         },
         {
@@ -224,7 +236,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "schema": "bitdistill-publication-product-plan-v1",
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "quality_claim": "planning_from_existing_artifacts_not_new_benchmark",
-        "status": "research_mvp_with_pending_quality_gate",
+        "status": "research_mvp_with_open_quality_gate",
         "executive_verdict": (
             "The work is publishable as a rigorous boundary study and systems-contract prototype, "
             "not as a universal BitNet converter and not yet as a complete BitDistill reproduction."
@@ -246,8 +258,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                 "Kimi/MoE supported",
             ],
             "minimum_for_stronger_claim": [
-                "655M downstream paired trace and decision report",
-                "gamma-balance telemetry report",
+                "matched 10k-step gamma-60 MNLI quality run from the 655M checkpoint",
                 "replicated within-1pt MNLI recovery row",
                 "QNLI/SST2 rows only after MNLI gate",
                 "same-artifact task quality and CPU runtime proof",

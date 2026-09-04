@@ -74,17 +74,17 @@ Path("$REPORT_JSON").write_text(json.dumps(data, indent=2, sort_keys=True) + "\\
 Path("$REPORT_MD").write_text(
     "\\n\\n".join([
         "# Stage-2 655.36M Afterany Audit",
-        f"Generated: `{data['created_utc']}`",
+        f"Generated: {data['created_utc']}",
         f"Status: **{data['status']}**.",
         "Quality claim: **none**.",
         data["caveat"],
         "| field | value |\\n| --- | --- |\\n"
-        f"| stage2_job_id | `{data['stage2_job_id']}` |\\n"
-        f"| afterany_job_id | `{data['afterany_job_id']}` |\\n"
-        f"| dependency | `{data['dependency']}` |\\n"
-        f"| snapshot_salvage_rc | `{data['returncodes']['snapshot_salvage']}` |\\n"
-        f"| ingestion_rc | `{data['returncodes']['ingestion']}` |\\n"
-        f"| watchdog_rc | `{data['returncodes']['watchdog']}` |",
+        f"| stage2_job_id | {data['stage2_job_id']} |\\n"
+        f"| afterany_job_id | {data['afterany_job_id']} |\\n"
+        f"| dependency | {data['dependency']} |\\n"
+        f"| snapshot_salvage_rc | {data['returncodes']['snapshot_salvage']} |\\n"
+        f"| ingestion_rc | {data['returncodes']['ingestion']} |\\n"
+        f"| watchdog_rc | {data['returncodes']['watchdog']} |",
     ]) + "\\n",
     encoding="utf-8",
 )

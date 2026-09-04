@@ -183,16 +183,30 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         },
     ]
 
-    next_gates = [
-        {
+    if latest_tokens >= 655_360_000:
+        budget_gate = {
+            "gate": "Gamma-balanced downstream MNLI",
+            "why": (
+                "The 327.68M to 655.36M gain is modest while paper-gamma attention gradients "
+                "dominate CE under the local reductions."
+            ),
+            "minimum_next_point": (
+                "matched 10k-step MNLI from the 655.36M checkpoint with attention-KD gamma 60"
+            ),
+        }
+    else:
+        budget_gate = {
             "gate": "Stage-2 token-budget curve",
             "why": "Determine whether MNLI continues improving toward FP or saturates far below it.",
             "minimum_next_point": "655.36M cumulative token presentations with the same downstream recipe",
-        },
+        }
+
+    next_gates = [
+        budget_gate,
         {
             "gate": "Loss-normalization/gradient-balance sweep",
             "why": "Paper gamma is only comparable if CE, logits KD, and attention KD reductions match.",
-            "minimum_next_point": "component-gradient telemetry for gamma near equalized and paper values",
+            "minimum_next_point": "full-quality comparison of gamma 60 versus paper gamma with all other axes fixed",
         },
         {
             "gate": "Same-artifact runtime quality",

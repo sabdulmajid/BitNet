@@ -112,6 +112,11 @@ def build_status(args: argparse.Namespace) -> dict[str, Any]:
     stage2 = monitor["stage2"]
     downstream = monitor["downstream"]
     telemetry = monitor["telemetry"]
+    stage2_gate_complete = (
+        latest_tokens >= 655_360_000
+        and downstream.get("complete") is True
+        and downstream.get("status") == "complete_artifacts_present"
+    )
     log_health = stage2.get("log_health", {}) if isinstance(stage2.get("log_health"), dict) else {}
     producer_config = stage2.get("producer_config", {}) if isinstance(stage2.get("producer_config"), dict) else {}
     time_limit_gate = stage2.get("time_limit_gate", {}) if isinstance(stage2.get("time_limit_gate"), dict) else {}
@@ -135,7 +140,12 @@ def build_status(args: argparse.Namespace) -> dict[str, Any]:
                 f"latest {latest_tokens / 1_000_000:.2f}M BitDistill {latest_mnli:.6f}; "
                 f"delta {latest_delta_vs_fp:+.6f}"
             ),
-            "remaining_gap": "655.36M downstream MNLI is pending behind the active Stage-2 producer.",
+            "remaining_gap": (
+                f"The completed 655.36M row remains {abs(latest_delta_vs_fp) * 100:.3f} "
+                "accuracy points below FP16."
+                if stage2_gate_complete
+                else "655.36M downstream MNLI is pending behind the active Stage-2 producer."
+            ),
         },
         {
             "requirement": "BitNet-SFT baseline sanity",
@@ -182,14 +192,25 @@ def build_status(args: argparse.Namespace) -> dict[str, Any]:
             "remaining_gap": "Needs real routed model mapping, quality, and CPU runtime evidence.",
         },
         {
-            "requirement": "Active 655M evidence-chain guardrails",
-            "status": "watching_no_quality_claim",
+            "requirement": "655M evidence-chain guardrails",
+            "status": "completed_with_paired_trace" if stage2_gate_complete else "watching_no_quality_claim",
             "evidence": (
-                f"producer_config {producer_config.get('status')}; log_health {log_health.get('status')}; "
-                f"snapshot_salvage {snapshot_salvage.get('status')}; afterany job "
-                f"{afterany_submission.get('job_id')} {afterany_submission.get('status')}"
+                (
+                    f"producer_config {producer_config.get('status')}; four complete snapshots; "
+                    "655M manifest verified; downstream metrics and paired predictions complete"
+                )
+                if stage2_gate_complete
+                else (
+                    f"producer_config {producer_config.get('status')}; log_health {log_health.get('status')}; "
+                    f"snapshot_salvage {snapshot_salvage.get('status')}; afterany job "
+                    f"{afterany_submission.get('job_id')} {afterany_submission.get('status')}"
+                )
             ),
-            "remaining_gap": "These are integrity controls only; MNLI quality still requires downstream metrics and paired predictions.",
+            "remaining_gap": (
+                "The evidence chain is complete; the quality gate itself failed."
+                if stage2_gate_complete
+                else "These are integrity controls only; MNLI quality still requires downstream metrics and paired predictions."
+            ),
         },
     ]
 
@@ -212,7 +233,11 @@ def build_status(args: argparse.Namespace) -> dict[str, Any]:
         "steps_to_next_snapshot": stage2["snapshot_status"].get("steps_to_next_snapshot"),
         "next_snapshot_eta_hours": stage2["snapshot_status"].get("next_snapshot_eta_hours"),
         "afterany_job_id": afterany_submission.get("job_id"),
-        "afterany_status": afterany_submission.get("status"),
+        "afterany_status": (
+            "historical_audit_failed_later_watchdog_passed"
+            if stage2_gate_complete
+            else afterany_submission.get("status")
+        ),
         "afterany_dependency": afterany_submission.get("dependency"),
         "latest_complete_snapshot_step": stage2["latest_complete_snapshot_step"],
         "downstream_status": downstream["status"],
@@ -243,11 +268,20 @@ def build_status(args: argparse.Namespace) -> dict[str, Any]:
         "git_head": git_head(),
         "objective_achieved": False,
         "completion_status": "in_progress",
-        "quality_claim": "mixed_completed_evidence_plus_active_pending_gate",
+        "quality_claim": (
+            "completed_655m_evidence_with_unmet_quality_gate"
+            if stage2_gate_complete
+            else "mixed_completed_evidence_plus_active_pending_gate"
+        ),
         "current_verdict": (
             "Blind ternary PTQ is rejected for the tested dense-Qwen setup. "
-            f"BitDistill-style recovery status is {gap.get('status')}; the active 655.36M "
-            "Stage-2 gate is testing whether recovery continues with more tokens."
+            f"BitDistill-style recovery status is {gap.get('status')}; "
+            + (
+                f"the completed 655.36M row reaches {latest_mnli:.6f} MNLI, "
+                f"{latest_delta_vs_fp:+.6f} versus FP16, so the next controlled gate is loss balance."
+                if stage2_gate_complete
+                else "the active 655.36M Stage-2 gate is testing whether recovery continues with more tokens."
+            )
         ),
         "artifacts": {
             "canonical_bundle": artifact(args.canonical_bundle),
@@ -268,6 +302,7 @@ def build_status(args: argparse.Namespace) -> dict[str, Any]:
             "bitdistill_latest_stage2_tokens": latest_tokens,
             "bitdistill_latest_mnli": latest_mnli,
             "bitdistill_latest_delta_vs_fp": latest_delta_vs_fp,
+            "bitdistill_latest_gain_vs_327_68m": latest_mnli - float(bitdistill["controlled_327_68m_mnli"]),
             "bitdistill_655_36m_status": downstream["status"],
         },
         "requirements": requirements,
@@ -282,6 +317,11 @@ def render_markdown(report: dict[str, Any]) -> str:
     active = report["active_gate"]
     headline = report["headline_metrics"]
     scope = report["publishable_scope"]
+    gate_heading = (
+        "## Completed 655M Gate"
+        if active.get("downstream_complete") is True
+        else "## Active 655M Gate"
+    )
     return "\n\n".join(
         [
             "# Current Goal Status",
@@ -304,7 +344,7 @@ def render_markdown(report: dict[str, Any]) -> str:
                     for row in requirements
                 ],
             ),
-            "## Active 655M Gate",
+            gate_heading,
             md_table(["field", "value"], [[key, value] for key, value in active.items()]),
             "## Next Gates",
             md_table(

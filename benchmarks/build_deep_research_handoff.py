@@ -106,6 +106,12 @@ def build_handoff(args: argparse.Namespace) -> dict[str, Any]:
     latest_delta_vs_fp = float(
         gap_metrics.get("bitdistill_latest_delta_vs_fp16", bitdistill["controlled_327_68m_delta_vs_fp"])
     )
+    latest_gain_vs_327m = latest_mnli - float(bitdistill["controlled_327_68m_mnli"])
+    gamma_balance = (
+        next_decision.get("gamma_balance", {})
+        if isinstance(next_decision.get("gamma_balance"), dict)
+        else {}
+    )
 
     thesis = {
         "original_question": "Can arbitrary pretrained FP16/BF16 models be post-hoc converted to BitNet-style W1.58A8 CPU inference?",
@@ -146,7 +152,10 @@ def build_handoff(args: argparse.Namespace) -> dict[str, Any]:
                 f"latest {latest_tokens / 1_000_000:.2f}M BitDistill {latest_mnli:.6f}; "
                 f"delta {latest_delta_vs_fp:+.6f}; status {gap.get('status')}."
             ),
-            "interpretation": "The local implementation remains below the paper recovery gate; more Stage-2 budget is being tested.",
+            "interpretation": (
+                f"The 655.36M row is complete; its marginal gain over 327.68M is "
+                f"{latest_gain_vs_327m:+.6f}, so loss balance is the next controlled variable."
+            ),
         },
         {
             "finding": "The earlier weak BitNet-SFT baseline was mostly undertraining, not the main blocker.",
@@ -213,14 +222,21 @@ def build_handoff(args: argparse.Namespace) -> dict[str, Any]:
     }
     open_questions = [
         {
-            "question": "Does the Stage-2 token-budget curve keep improving at 655.36M tokens?",
-            "evidence_needed": "Completed 655M Stage-2 manifest plus downstream MNLI metrics.json and eval_predictions.jsonl.",
-            "current_state": f"{active_gate['stage2_status']}; step {active_gate['latest_step']}/{active_gate['max_steps']}; downstream {active_gate['downstream_status']}.",
+            "question": "Did doubling Stage-2 from 327.68M to 655.36M close the MNLI gap?",
+            "evidence_needed": "Completed 655M paired prediction trace against the fixed FP16 reference.",
+            "current_state": (
+                f"Answered: gain {latest_gain_vs_327m:+.6f}; latest MNLI {latest_mnli:.6f}; "
+                f"delta vs FP16 {latest_delta_vs_fp:+.6f}."
+            ),
         },
         {
             "question": "Is the remaining BitDistill gap mostly compute budget or loss-normalization mismatch?",
-            "evidence_needed": "655M/longer budget curve and gamma-balanced component-gradient telemetry.",
-            "current_state": f"paper-gamma grad attention/CE {gap_metrics['final_grad_attention_to_ce']:.6f}; gamma-60 telemetry queued.",
+            "evidence_needed": "Matched 10k-step gamma-60 and paper-gamma MNLI runs from the same 655M checkpoint.",
+            "current_state": (
+                f"paper-gamma grad attention/CE {gap_metrics['final_grad_attention_to_ce']:.6f}; "
+                f"gamma-60 {float(gamma_balance.get('gamma60_final_grad_attention_to_ce', 0.0)):.6f}; "
+                "quality ablation not yet run."
+            ),
         },
         {
             "question": "Can the same artifact provide both quality and CPU runtime evidence?",
@@ -290,7 +306,7 @@ def render_markdown(report: dict[str, Any]) -> str:
                 ["classification", "description"],
                 [[row["item"], row["description"]] for row in report["novelty"]],
             ),
-            "## Active 655M Gate",
+            "## Completed 655M Gate",
             md_table(["field", "value"], [[key, value] for key, value in report["active_gate"].items()]),
             "## Next Action Policy",
             md_table(

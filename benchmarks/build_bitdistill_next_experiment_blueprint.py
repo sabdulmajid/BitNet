@@ -154,8 +154,11 @@ def build_catalog() -> dict[str, dict[str, Any]]:
         },
         "run_gamma_balanced_downstream": {
             "action": "run_matched_gamma60_mnli_downstream",
-            "runnable_now": False,
-            "why": "Only run this if the 655M curve saturates and gamma60 telemetry shows attention-KD updates are rebalanced.",
+            "runnable_now": True,
+            "why": (
+                "The completed 655M row has weak marginal gain and gamma60 telemetry shows "
+                "attention-KD updates are rebalanced, so the matched one-axis MNLI ablation is ready."
+            ),
             "evidence_required": [
                 "next-decision status run_gamma_balanced_downstream",
                 "stage2_manifest_655m_2026-05-23.json exists and validates",

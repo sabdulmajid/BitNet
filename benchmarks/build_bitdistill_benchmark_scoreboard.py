@@ -117,6 +117,14 @@ def headline_rows(
     i2sr = claims["i2sr_cpu"]
     native = claims["native_classifier"]
     moe_claim = claims["moe_kimi"]
+    latest_controlled = (
+        next_decision.get("latest_controlled_row", {})
+        if isinstance(next_decision.get("latest_controlled_row"), dict)
+        else {}
+    )
+    latest_tokens = int(latest_controlled.get("stage2_token_presentations", 327_680_000))
+    latest_accuracy = float(latest_controlled.get("accuracy", bitdistill["controlled_327_68m_mnli"]))
+    latest_delta = float(latest_controlled.get("delta_vs_fp16", bitdistill["controlled_327_68m_delta_vs_fp"]))
     runtime = matrix.get("cpu_runtime", {}) if isinstance(matrix.get("cpu_runtime"), dict) else {}
     q4_vs_i2sr = runtime.get("q4_vs_i2sr", {}) if isinstance(runtime.get("q4_vs_i2sr"), dict) else {}
     seq_native = (
@@ -157,9 +165,10 @@ def headline_rows(
                 f"MNLI 40.96M {bitdistill['controlled_40_96m_mnli']:.6f}; "
                 f"163.84M {bitdistill['controlled_163_84m_mnli']:.6f}; "
                 f"327.68M {bitdistill['controlled_327_68m_mnli']:.6f}; "
-                f"delta vs FP {bitdistill['controlled_327_68m_delta_vs_fp']:+.6f}"
+                f"{latest_tokens / 1_000_000:.2f}M {latest_accuracy:.6f}; "
+                f"latest delta vs FP {latest_delta:+.6f}"
             ),
-            "impact": "Paper-level BitDistill quality is not reproduced yet; the curve is still improving.",
+            "impact": "Paper-level BitDistill quality is not reproduced; the 655M marginal gain is modest.",
             "limitation": bitdistill["caveat"],
         },
         {
@@ -228,7 +237,7 @@ def headline_rows(
                 f"{coverage.get('check_count')} coverage checks; failed checks {len(coverage.get('failed', []))}"
             ),
             "impact": "The current negative and partial-recovery claims are backed by broad audited coverage.",
-            "limitation": "This coverage predates the active 655M Stage-2 extension.",
+            "limitation": "The broad coverage predates 655M, but the paired 655M MNLI row is included in the controlled curve.",
         },
         {
             "area": "Product scope",
@@ -251,7 +260,7 @@ def headline_rows(
                 f"gamma status {next_decision.get('gamma_balance', {}).get('status')}"
             ),
             "impact": next_decision.get("recommendation"),
-            "limitation": "Decision is pending until the 655M downstream row and gamma-60 telemetry complete.",
+            "limitation": "The next result must be a matched quality run; the 200-step gamma-60 trace is diagnostic only.",
         },
     ]
 
@@ -343,10 +352,10 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             "No claim that Kimi or real MoE CPU ternary quality is supported.",
         ],
         "next_steps": [
-            "Wait for the active 655.36M Stage-2 extension, downstream MNLI row, and postprocess reports.",
-            "Use gamma-60 component-gradient telemetry to determine whether the next run should extend Stage-2 or rebalance the attention-KD coefficient.",
-            "If 655M shows meaningful marginal gain, continue the controlled Stage-2 token curve before broadening tasks.",
-            "If 655M saturates, audit recipe alignment and loss normalization before spending more compute.",
+            "Run the matched 10k-step gamma-60 MNLI ablation from the verified 655.36M checkpoint.",
+            "Compare the gamma-60 paired prediction trace directly against FP16 and the paper-gamma 655M row.",
+            "Only continue Stage-2 scaling if the loss-balanced result fails and a pre-registered budget hypothesis remains justified.",
+            "Do not expand to QNLI/SST2 until MNLI reaches and replicates the within-1-point recovery gate.",
             "Keep MoE/Kimi work outside the main claim path until dense quality/runtime evidence is resolved.",
         ],
         "source_paths": {

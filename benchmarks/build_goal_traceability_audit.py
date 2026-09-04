@@ -223,6 +223,15 @@ def requirement_rows(
     i2sr = claims["i2sr_cpu"]
     native = claims["native_classifier"]
     latest = latest_controlled_accuracy(controlled_curve)
+    latest_tokens = int(latest.get("stage2_token_presentations", 0))
+    latest_mnli = float(latest.get("metric_accuracy", 0.0))
+    latest_delta = float(
+        reproduction_gap["metrics"].get(
+            "bitdistill_latest_delta_vs_fp16",
+            bitdistill["controlled_327_68m_delta_vs_fp"],
+        )
+    )
+    stage2_gate_complete = latest_tokens >= 655_360_000
     source_passed = {check["label"]: check["passed"] for check in checks}
     seq_native = seqcls_gap.get("seqcls_native_cpu_benchmark", {})
     live_stage2 = live.get("stage2", {})
@@ -256,21 +265,29 @@ def requirement_rows(
                 f"default row {reproduction_gap['metrics']['bitnet_sft_default_mnli']:.6f}"
             ),
             "remaining_gap": "Implementation exists, but paper-level BitDistill recovery is not proven.",
-            "next_action": "Use 655M and gamma telemetry to decide whether to continue budget scaling or audit recipe alignment.",
+            "next_action": str(next_decision.get("recommendation")),
         },
         {
             "requirement": "Stage-2 continued pretraining",
             "requested_scope": "Run controlled continued-pretraining budgets before downstream distillation.",
-            "status": "active_extension_running",
-            "proof_strength": "completed 327.68M row plus live 655.36M job",
+            "status": "completed_655m_curve" if stage2_gate_complete else "active_extension_running",
+            "proof_strength": (
+                "completed 655.36M row with paired predictions"
+                if stage2_gate_complete
+                else "completed 327.68M row plus live 655.36M job"
+            ),
             "evidence": (
-                f"completed latest tokens {int(latest.get('stage2_token_presentations')):,}; "
-                f"latest MNLI {latest.get('metric_accuracy'):.6f}; "
+                f"completed latest tokens {latest_tokens:,}; "
+                f"latest MNLI {latest_mnli:.6f}; "
                 f"live job {live_jobs.get('10250', {}).get('state')}; "
                 f"live step {live_stage2.get('latest_step')}; ETA hours {float(live_stage2.get('eta_hours')):.2f}"
             ),
-            "remaining_gap": "655.36M downstream MNLI and paired prediction trace are pending.",
-            "next_action": "Wait for job 10250, handoff 10255, and postprocess before changing experiment axes.",
+            "remaining_gap": (
+                f"The completed row remains {abs(latest_delta) * 100:.3f} accuracy points below FP16."
+                if stage2_gate_complete
+                else "655.36M downstream MNLI and paired prediction trace are pending."
+            ),
+            "next_action": str(next_decision.get("recommendation")),
         },
         {
             "requirement": "Stage-3 downstream CE + logits KL + attention-relation KD",
@@ -280,11 +297,11 @@ def requirement_rows(
             "evidence": (
                 f"loss source check {source_passed.get('Stage-3 loss combines CE, logits KD, and attention KD')}; "
                 f"FP16-SFT MNLI {bitdistill['fp16_sft_mnli']:.6f}; "
-                f"327.68M BitDistill MNLI {bitdistill['controlled_327_68m_mnli']:.6f}; "
-                f"delta {bitdistill['controlled_327_68m_delta_vs_fp']:+.6f}"
+                f"{latest_tokens / 1_000_000:.2f}M BitDistill MNLI {latest_mnli:.6f}; "
+                f"delta {latest_delta:+.6f}"
             ),
             "remaining_gap": "Not within the 0.5-1.0 point FP recovery target.",
-            "next_action": "Do not expand to claims; use the next decision gate after 655M/gamma evidence.",
+            "next_action": str(next_decision.get("recommendation")),
         },
         {
             "requirement": "MNLI/QNLI/SST2 paper-style baseline reproduction",
@@ -294,7 +311,7 @@ def requirement_rows(
             "evidence": (
                 f"FP16-SFT MNLI {bitdistill['fp16_sft_mnli']:.6f}; "
                 f"BitNet-SFT best MNLI {reproduction_gap['metrics']['bitnet_sft_best_mnli']:.6f}; "
-                f"BitDistill latest MNLI {bitdistill['controlled_327_68m_mnli']:.6f}; "
+                f"BitDistill latest MNLI {latest_mnli:.6f}; "
                 f"scoreboard status {scoreboard['status']}"
             ),
             "remaining_gap": "QNLI/SST2 should be run only after a credible MNLI recovery row or recipe fix.",
@@ -338,8 +355,12 @@ def requirement_rows(
                 f"coverage checks {scoreboard['coverage']['coverage_check_count']}; "
                 f"failed checks {len(scoreboard['coverage']['coverage_failed'])}"
             ),
-            "remaining_gap": "These benchmarks do not include the active 655M BitDistill row.",
-            "next_action": "Append 655M downstream evidence after postprocess, do not preclaim it.",
+            "remaining_gap": (
+                "The 655M paired MNLI row is now included; broader task coverage remains gated on recovery."
+                if stage2_gate_complete
+                else "These benchmarks do not include the active 655M BitDistill row."
+            ),
+            "next_action": "Keep the 655M result in the controlled curve and preserve task-specific claim boundaries.",
         },
         {
             "requirement": "MoE/Kimi feasibility",
@@ -434,12 +455,6 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         live=live,
         checks=checks,
     )
-    for row in requirements:
-        if row.get("requirement") == "Stage-2 continued pretraining":
-            row["next_action"] = (
-                f"Wait for job {args.stage2_job_id}, handoff {handoff_job_id}, "
-                "and postprocess before changing experiment axes."
-            )
     status_counts: dict[str, int] = {}
     for row in requirements:
         status_counts[str(row["status"])] = status_counts.get(str(row["status"]), 0) + 1
@@ -452,8 +467,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "completion_status": "in_progress",
         "verdict": (
             "The original universal retrofit thesis is disproven for the tested dense-Qwen setup. "
-            "The active goal is now a bounded BitDistill/row-scale runtime study, and it is not complete "
-            "until the 655M downstream gate and gamma-balance telemetry land."
+            "The active goal is now a bounded BitDistill/row-scale runtime study. The completed 655M "
+            "gate remains below FP16, so the next test is a matched gamma-balanced downstream run."
         ),
         "live_state": live,
         "active_job_ids": {
@@ -473,8 +488,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                 "MoE/Kimi is correctly scoped as not supported beyond tiny fixtures.",
             ],
             "what_is_being_tested_now": [
-                "Whether 655.36M cumulative Stage-2 token presentations continue the MNLI recovery curve.",
-                "Whether gamma-60 component-gradient telemetry fixes the local attention-KD imbalance.",
+                "Whether gamma-60's measured gradient rebalance improves full 10k-step MNLI quality from the 655M checkpoint.",
+                "Whether loss normalization, rather than more Stage-2 tokens, explains the remaining FP16 gap.",
             ],
             "next_decision_rule": next_decision.get("recommendation"),
             "publishability": scoreboard["publishability_assessment"],
@@ -567,7 +582,7 @@ def main() -> int:
     parser.add_argument("--canonical-bundle", type=Path, default=Path("benchmarks/results/canonical_evidence_bundle_2026-05-20.json"))
     parser.add_argument("--scoreboard", type=Path, default=Path("benchmarks/results/bitdistill_benchmark_scoreboard_2026-05-23.json"))
     parser.add_argument("--reproduction-gap", type=Path, default=Path("benchmarks/results/bitdistill_reproduction_gap_2026-05-23.json"))
-    parser.add_argument("--controlled-curve", type=Path, default=Path("benchmarks/results/bitdistill_controlled_curve_2026-05-20.json"))
+    parser.add_argument("--controlled-curve", type=Path, default=Path("benchmarks/results/bitdistill_controlled_curve_2026-05-23.json"))
     parser.add_argument("--product-scope", type=Path, default=Path("benchmark_results/product_scope_gate_2026-05-15.json"))
     parser.add_argument("--seqcls-gap", type=Path, default=Path("benchmark_results/seqcls_runtime_gap_2026-05-15.json"))
     parser.add_argument("--moe-support", type=Path, default=Path("benchmark_results/moe_support_audit_2026-05-15.json"))

@@ -42,7 +42,7 @@ def run_command(label: str, command: list[str]) -> dict[str, Any]:
     elapsed = time.time() - start
     return {
         "label": label,
-        "command": command,
+        "command": ["python" if part == sys.executable else part for part in command],
         "returncode": result.returncode,
         "elapsed_seconds": elapsed,
         "passed": result.returncode == 0,

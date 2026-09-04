@@ -61,13 +61,13 @@ Path("$POSTPROCESS_MD").write_text(
         "# Stage-2 655.36M Postprocess",
         f"Status: **{data['status']}**.",
         "| field | value |\\n| --- | --- |\\n"
-        f"| postprocess_job_id | `{data['postprocess_job_id']}` |\\n"
-        f"| downstream_job_id | `{data['downstream_job_id']}` |\\n"
-        f"| metrics_exists | `{data['metrics_exists']}` |\\n"
-        f"| predictions_exists | `{data['predictions_exists']}` |\\n"
-        f"| controlled_curve_json | `{data['controlled_curve_json']}` |\\n"
-        f"| reproduction_gap_json | `{data['reproduction_gap_json']}` |\\n"
-        f"| next_decision_json | `{data['next_decision_json']}` |",
+        f"| postprocess_job_id | {data['postprocess_job_id']} |\\n"
+        f"| downstream_job_id | {data['downstream_job_id']} |\\n"
+        f"| metrics_exists | {data['metrics_exists']} |\\n"
+        f"| predictions_exists | {data['predictions_exists']} |\\n"
+        f"| controlled_curve_json | {data['controlled_curve_json']} |\\n"
+        f"| reproduction_gap_json | {data['reproduction_gap_json']} |\\n"
+        f"| next_decision_json | {data['next_decision_json']} |",
         data["caveat"],
     ]) + "\\n",
     encoding="utf-8",
@@ -81,11 +81,12 @@ echo "DOWNSTREAM_OUTPUT_DIR=$DOWNSTREAM_OUTPUT_DIR"
 
 if [[ ! -s "$METRICS_JSON" || ! -s "$PREDICTIONS_JSONL" ]]; then
   python benchmarks/monitor_active_stage2_extension.py
-  python benchmarks/build_current_goal_status.py
-  python benchmarks/build_deep_research_handoff.py
   python benchmarks/build_bitdistill_next_decision.py \
     --output-json "$DECISION_JSON" \
     --output-md "$DECISION_MD"
+  python benchmarks/build_bitdistill_next_experiment_blueprint.py
+  python benchmarks/build_current_goal_status.py
+  python benchmarks/build_deep_research_handoff.py
   write_postprocess_report \
     "downstream_incomplete" \
     "Downstream metrics or prediction traces are missing. No quality reports were rebuilt."
@@ -120,13 +121,14 @@ python benchmarks/build_reproduction_gap_report.py \
   --output-md "$GAP_MD"
 
 python benchmarks/monitor_active_stage2_extension.py
-python benchmarks/build_current_goal_status.py
-python benchmarks/build_deep_research_handoff.py
 python benchmarks/build_bitdistill_next_decision.py \
   --reproduction-gap "$GAP_JSON" \
   --controlled-curve "$CONTROLLED_JSON" \
   --output-json "$DECISION_JSON" \
   --output-md "$DECISION_MD"
+python benchmarks/build_bitdistill_next_experiment_blueprint.py
+python benchmarks/build_current_goal_status.py
+python benchmarks/build_deep_research_handoff.py
 
 write_postprocess_report \
   "reports_rebuilt" \
