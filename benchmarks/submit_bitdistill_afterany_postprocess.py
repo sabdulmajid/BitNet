@@ -95,6 +95,10 @@ def write_json(path: Path, data: dict[str, Any]) -> None:
     path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def markdown_cell(value: Any) -> str:
+    return str(value).replace("|", "\\|")
+
+
 def write_markdown(path: Path, data: dict[str, Any]) -> None:
     existing_rows = data["existing_afterany_jobs"] or [{"job_id": "none", "state": "-", "reason": "-"}]
     lines = [
@@ -119,7 +123,7 @@ def write_markdown(path: Path, data: dict[str, Any]) -> None:
         "| --- | --- | --- |",
     ]
     lines.extend(
-        f"| {row.get('job_id', '-')} | {row.get('state', '-')} | {str(row.get('reason', '-')).replace('|', '\\|')} |"
+        f"| {row.get('job_id', '-')} | {row.get('state', '-')} | {markdown_cell(row.get('reason', '-'))} |"
         for row in existing_rows
     )
     lines.extend(
