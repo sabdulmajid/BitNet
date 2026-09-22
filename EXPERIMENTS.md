@@ -1,8 +1,30 @@
 # Experiments
 
-This document records the active experiment workflow. It is intentionally
-narrow: use manifests, keep paper-style tensor-scale rows separate from
-row-scale retrofit variants, and mark missing downstream results as pending.
+This document preserves exact commands and provenance for completed and
+historical experiment waves. The current conclusions and next protocol live in
+[`docs/RESEARCH_STATUS.md`](docs/RESEARCH_STATUS.md) and
+[`docs/ROADMAP.md`](docs/ROADMAP.md). Status prose below a dated heading is an
+experiment-time record, not the current queue state.
+
+## Current Snapshot
+
+```bash
+python3 benchmarks/build_current_evidence_snapshot.py \
+  --created-utc 2026-09-22T00:00:00+00:00
+python3 benchmarks/validate_public_docs.py
+```
+
+The matched adaptive-versus-fixed-60 gate is complete. Adaptive minus fixed is
+`-0.001698`, seed-level paired 95% CI `[-0.010898, 0.007502]`; the formal
+recommendation is inconclusive and both arms fail FP16 recovery. Do not submit
+more controller or gamma sweeps from this runbook. The next active experiment
+is the advanced-PTQ matrix in [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
+Public artifacts:
+
+- `benchmarks/results/current_evidence_2026-09-22.json`
+- `benchmarks/results/bitdistill_adaptive_vs_fixed_matched_audit_2026-09-22.json`
+- `benchmarks/results/bitdistill_matched_prediction_bundle_2026-09-22.json`
 
 ## Run Provenance
 
@@ -245,35 +267,45 @@ script contents:
 python benchmarks/audit_active_slurm_batch_scripts.py
 ```
 
-The node-local matched fixed-`gamma=60` recovery chain is submitted with:
+### Historical matched-control submission
+
+The node-local matched fixed-`gamma=60` recovery chain was submitted with:
 
 ```bash
 bash benchmarks/resubmit_bitdistill_fixed60.sh
 ```
 
-The launcher passes shell-sensitive values through `sbatch --export`, pins the
+The chain completed. Its recovered audit is
+`benchmarks/results/bitdistill_adaptive_vs_fixed_matched_audit_2026-09-22.json`;
+do not resubmit it unless intentionally reproducing the experiment. The
+launcher passes shell-sensitive values through `sbatch --export`, pins the
 verified offline Hugging Face cache, runs seeds `1234-1236` serially, and
 schedules `audit_bitdistill_adaptive_vs_fixed.py` with an `afterany`
-dependency. Do not interpret a queued or running chain as method evidence; the
-audit must return `status=complete` and a non-pending recommendation.
+dependency.
 
 To publish independently auditable paired predictions without logits or input
 text, pass every aligned trace as `MODEL_ID=PATH`:
 
 ```bash
-python benchmarks/build_compact_prediction_bundle.py \
+python3 benchmarks/build_compact_prediction_bundle.py \
   --trace fp16=/path/to/fp16/eval_predictions.jsonl \
   --trace fixed_gamma_655m=/path/to/fixed/eval_predictions.jsonl \
   --trace historical_gamma60_163m=/path/to/gamma60/eval_predictions.jsonl \
   --trace adaptive_seed1234=/path/to/seed1234/eval_predictions.jsonl \
   --trace adaptive_seed1235=/path/to/seed1235/eval_predictions.jsonl \
-  --trace adaptive_seed1236=/path/to/seed1236/eval_predictions.jsonl
+  --trace adaptive_seed1236=/path/to/adaptive-seed1236/eval_predictions.jsonl \
+  --trace fixed60_seed1234=/path/to/fixed-seed1234/eval_predictions.jsonl \
+  --trace fixed60_seed1235=/path/to/fixed-seed1235/eval_predictions.jsonl \
+  --trace fixed60_seed1236=/path/to/fixed-seed1236/eval_predictions.jsonl \
+  --output-json benchmarks/results/bitdistill_matched_prediction_bundle_2026-09-22.json \
+  --output-md benchmarks/results/bitdistill_matched_prediction_bundle_2026-09-22.md
 ```
 
 The builder rejects duplicate/noncontiguous indices, incorrect correctness
 flags, label misalignment, row-count mismatches, and duplicate model IDs. Its
 compact JSON is the public source for recomputing adaptive accuracy and paired
-tests.
+tests. The published matched bundle contains FP16, two historical references,
+three adaptive seeds, and three fixed-60 seeds.
 
 ## Reviewer Reproduction Checklist
 

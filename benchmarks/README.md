@@ -1,18 +1,58 @@
-# BitNet Retrofit Benchmark Plan
+# Benchmark and Evidence Guide
 
-This directory contains reusable benchmark harnesses for comparing:
+This directory contains the executable benchmark, statistical-audit, export,
+and evidence-building tools for the fork. Start with the current snapshot,
+rather than selecting a result from the dated archive:
+
+```bash
+python3 benchmarks/build_current_evidence_snapshot.py \
+  --created-utc 2026-09-22T00:00:00+00:00
+python3 benchmarks/validate_public_docs.py
+```
+
+- Current summary: [`results/current_evidence_2026-09-22.md`](results/current_evidence_2026-09-22.md)
+- Matched BitDistill control: [`results/bitdistill_adaptive_vs_fixed_matched_audit_2026-09-22.md`](results/bitdistill_adaptive_vs_fixed_matched_audit_2026-09-22.md)
+- Public aligned predictions: [`results/bitdistill_matched_prediction_bundle_2026-09-22.md`](results/bitdistill_matched_prediction_bundle_2026-09-22.md)
+- Research interpretation: [`../docs/RESEARCH_STATUS.md`](../docs/RESEARCH_STATUS.md)
+- Next protocol: [`../docs/ROADMAP.md`](../docs/ROADMAP.md)
+
+The hundreds of older reports under `results/` are an append-only experiment
+record. They are not equally current. A report marked `pending`, `running`,
+`pilot`, `sample`, or `submission` cannot override a later completed audit.
+
+## Current Decision
+
+The matched three-seed MNLI control is complete. Adaptive loss balancing does
+not beat fixed `gamma=60`: mean delta `-0.001698`, seed-level 95% CI
+`[-0.010898, 0.007502]`. Both arms remain over five accuracy points below
+FP16. Further local gamma/controller sweeps are stopped; the next benchmark is
+an independent advanced-PTQ comparison against PT2-LLM and CAT-Q/ScaleQ.
+
+## Compared Model Classes
+
+The harnesses compare:
 
 1. original Hugging Face FP checkpoints,
 2. QAT/distilled W1.58A8 ternary checkpoints,
 3. naive-PTQ W1.58A8 ternary checkpoints,
-4. GGUF/CPU-runtime baselines.
+4. optimized external ternary PTQ checkpoints,
+5. GGUF/CPU-runtime baselines.
 
-## Rules
+Keep algorithm, representation, and runtime effects as separate rows. In
+particular, a trained ternary student versus an FP teacher is not a pure file
+format comparison.
+
+## Evidence Rules
 
 - Use the same tokenizer and packed text blocks for every model in a comparison.
 - Report checkpoint path, git commit, hardware, dtype, sequence length, block count, and wall-clock throughput.
 - Treat prompt generation as a sanity check only. Publishable claims require heldout perplexity and task accuracy.
 - Do not compare PyTorch ternary throughput to `bitnet.cpp` throughput as a final CPU speed claim; PyTorch simulates the math but does not use packed TL/I2 kernels.
+
+## Historical Runbook
+
+The sections below retain the exact commands used by earlier experiment waves.
+Some status prose is historical; use the current snapshot above for conclusions.
 
 ## Benchmark Tiers
 
@@ -557,7 +597,7 @@ by Git. To make pruning reproducible, generate the dry-run artifact plan before
 deleting anything:
 
 ```bash
-TMPDIR=/mnt/slurm_nfs/a6abdulm/tmp python benchmarks/plan_artifact_pruning.py
+TMPDIR=/tmp python3 benchmarks/plan_artifact_pruning.py
 ```
 
 The current plan is

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Validate public docs against the canonical evidence bundle.
+"""Validate current public claims against completed, hashed evidence.
 
-This is intentionally conservative: it checks that the headline README,
-CLAIMS, and runtime-contract numbers are still backed by the canonical JSON
-bundle and that every artifact referenced by the bundle exists.
+Historical reports remain append-only, but this entry point validates only the
+current public narrative. In particular, a stale queue or submission receipt
+cannot override a later completed audit.
 """
 
 from __future__ import annotations
@@ -1523,7 +1523,247 @@ def validate_current_phase_docs(
             errors.append(f"current public evidence exposes private path prefix: {private_prefix}")
 
 
-def main() -> int:
+def validate_current_evidence_docs(
+    snapshot: dict[str, Any],
+    canonical: dict[str, Any],
+    matched: dict[str, Any],
+    predictions: dict[str, Any],
+    tl2sr: dict[str, Any],
+    cpu_matrix: dict[str, Any],
+    cpu_repeated: dict[str, Any],
+    initializer: dict[str, Any],
+    i2_profile: dict[str, Any],
+    docs: dict[str, str],
+    errors: list[str],
+) -> None:
+    """Validate the compact 2026-09 public claim surface."""
+
+    if snapshot.get("schema") != "bitnet-current-evidence-v1":
+        errors.append(f"current evidence: unexpected schema {snapshot.get('schema')}")
+    sources = snapshot.get("sources")
+    if not isinstance(sources, dict) or not sources:
+        errors.append("current evidence: missing source receipts")
+    else:
+        for label, receipt in sources.items():
+            if not isinstance(receipt, dict):
+                errors.append(f"current evidence source {label}: malformed receipt")
+                continue
+            raw_path = receipt.get("path")
+            if not isinstance(raw_path, str) or not raw_path:
+                errors.append(f"current evidence source {label}: missing path")
+                continue
+            path = Path(raw_path)
+            if not path.is_file():
+                errors.append(f"current evidence source {label}: missing file {path}")
+                continue
+            actual = sha256(path)
+            if receipt.get("sha256") != actual:
+                errors.append(
+                    f"current evidence source {label}: sha256 mismatch "
+                    f"{receipt.get('sha256')} != {actual}"
+                )
+
+    if matched.get("schema") != "bitdistill-adaptive-vs-fixed-matched-audit-v1":
+        errors.append(f"matched control: unexpected schema {matched.get('schema')}")
+    if matched.get("status") != "complete":
+        errors.append(f"matched control: unexpected status {matched.get('status')}")
+    expected_decisions = {
+        "adaptive_superiority_gate": "fail",
+        "fixed_simplicity_gate": "fail",
+        "adaptive_paper_recovery_gate": "fail",
+        "fixed60_paper_recovery_gate": "fail",
+        "recommended_method": "inconclusive",
+    }
+    decisions = matched.get("decisions", {})
+    for key, expected in expected_decisions.items():
+        if decisions.get(key) != expected:
+            errors.append(
+                f"matched control: decision {key}={decisions.get(key)!r}, expected {expected!r}"
+            )
+    provenance = matched.get("provenance", {})
+    if provenance.get("stage2_valid") is not True:
+        errors.append("matched control: Stage-2 provenance is not valid")
+    if provenance.get("stage2_sha256") != provenance.get("expected_stage2_sha256"):
+        errors.append("matched control: Stage-2 hash does not match preregistration")
+
+    runs = matched.get("runs", {})
+    for arm in ("adaptive", "fixed60"):
+        arm_runs = runs.get(arm, []) if isinstance(runs, dict) else []
+        if len(arm_runs) != 3:
+            errors.append(f"matched control: expected three {arm} runs")
+            continue
+        if {run.get("seed") for run in arm_runs} != {1234, 1235, 1236}:
+            errors.append(f"matched control: unexpected {arm} seeds")
+        for run in arm_runs:
+            if run.get("status") != "complete" or run.get("blockers") not in ([], None):
+                errors.append(f"matched control: incomplete {arm} seed {run.get('seed')}")
+
+    if predictions.get("schema") != "compact-classification-predictions-v1":
+        errors.append(f"matched predictions: unexpected schema {predictions.get('schema')}")
+    labels = predictions.get("labels", [])
+    model_predictions = predictions.get("predictions", {})
+    model_metadata = predictions.get("models", {})
+    if predictions.get("examples") != 9815 or len(labels) != 9815:
+        errors.append("matched predictions: expected 9,815 labels")
+    expected_hashes: dict[str, str | None] = {}
+    if isinstance(runs, dict):
+        for arm in ("adaptive", "fixed60"):
+            for run in runs.get(arm, []):
+                expected_hashes[f"{arm}_seed{run.get('seed')}"] = run.get("sha256", {}).get(
+                    "predictions"
+                )
+    for model_id, expected_hash in expected_hashes.items():
+        values = model_predictions.get(model_id, [])
+        metadata = model_metadata.get(model_id, {})
+        if len(values) != len(labels) or not labels:
+            errors.append(f"matched predictions: unaligned model {model_id}")
+            continue
+        if metadata.get("source_sha256") != expected_hash:
+            errors.append(f"matched predictions: source hash mismatch for {model_id}")
+        measured = sum(
+            prediction == label
+            for prediction, label in zip(values, labels, strict=True)
+        ) / len(labels)
+        if metadata.get("accuracy") != measured:
+            errors.append(f"matched predictions: accuracy mismatch for {model_id}")
+
+    verdicts = snapshot.get("verdicts", {})
+    current_matched = verdicts.get("matched_bitdistill_mnli", {})
+    aggregate = matched.get("aggregate", {})
+    fp_accuracy = model_metadata.get("fp16", {}).get("accuracy")
+    cross_checks = {
+        "fp16_accuracy": fp_accuracy,
+        "adaptive_mean_accuracy": aggregate.get("adaptive_mean_accuracy"),
+        "fixed60_mean_accuracy": aggregate.get("fixed60_mean_accuracy"),
+        "adaptive_minus_fixed60": aggregate.get("mean_adaptive_minus_fixed60"),
+        "adaptive_minus_fixed60_seed_ci95": aggregate.get("seed_level_paired_t_ci95"),
+    }
+    for key, expected in cross_checks.items():
+        if current_matched.get(key) != expected:
+            errors.append(
+                f"current evidence matched field {key}={current_matched.get(key)!r}, "
+                f"expected {expected!r}"
+            )
+    if current_matched.get("decision") != "inconclusive":
+        errors.append("current evidence: matched decision must be inconclusive")
+
+    blind = canonical.get("claims", {}).get("blind_ptq", {})
+    current_blind = verdicts.get("blind_absmean_ptq", {})
+    for current_key, canonical_key in (
+        ("fp_wikitext_ppl", "fp_wikitext_ppl"),
+        ("ptq_wikitext_ppl", "ptq_wikitext_ppl"),
+        ("fp_ten_task_mean", "fp_ten_task_mean"),
+        ("ptq_ten_task_mean", "ptq_ten_task_mean"),
+    ):
+        if current_blind.get(current_key) != blind.get(canonical_key):
+            errors.append(f"current evidence: blind PTQ mismatch for {current_key}")
+
+    if tl2sr.get("schema") != "tl2sr-evidence-audit-v1" or tl2sr.get("status") != "valid_runtime_no_speed_win":
+        errors.append("TL2_SR audit: expected valid_runtime_no_speed_win")
+    if tl2sr.get("gates", {}).get("speed_superiority_proven") is not False:
+        errors.append("TL2_SR audit: speed superiority must remain rejected")
+    if cpu_matrix.get("schema") != "seqcls-native-cpu-matrix-v1" or cpu_matrix.get("status") != "valid_sample_matrix":
+        errors.append("CPU matrix: expected valid_sample_matrix")
+    if cpu_matrix.get("errors") != []:
+        errors.append("CPU matrix: evidence contains errors")
+    if cpu_repeated.get("schema") != "seqcls-native-cpu-repeated-v1" or cpu_repeated.get("status") != "valid":
+        errors.append("CPU repeated: expected valid evidence")
+    if cpu_repeated.get("errors") != []:
+        errors.append("CPU repeated: evidence contains errors")
+    if initializer.get("status") != "synthetic_promising_task_quality_rejected":
+        errors.append("initializer audit: task-quality rejection is missing")
+    if i2_profile.get("status") != "valid" or i2_profile.get("maximum_abs_error") != 0.0:
+        errors.append("I2 profile: expected valid scalar-exact evidence")
+
+    combined_docs = "\n".join(docs.values())
+    required_anywhere = (
+        "3,813,121.803",
+        "0.499459",
+        "0.755340",
+        "0.757039",
+        "-0.001698",
+        "-0.010898",
+        "0.007502",
+        "1.904230",
+        "0.000197",
+        "0.650x",
+        "12.862%",
+        "CAT-Q",
+        "ScaleQ-1.58",
+        "PT2-LLM",
+        "BITCOS",
+    )
+    for needle in required_anywhere:
+        require_contains("current public docs", needle, combined_docs, errors)
+
+    readme = docs["README"]
+    claims_doc = docs["CLAIMS"]
+    research = docs["RESEARCH_STATUS"]
+    literature = docs["LITERATURE_REVIEW"]
+    roadmap = docs["ROADMAP"]
+    experiments = docs["EXPERIMENTS"]
+    for label, document, needles in (
+        (
+            "README",
+            readme,
+            (
+                "BitNet Retrofit Lab",
+                "not an acceptable",
+                "universal",
+                "current_evidence_2026-09-22.json",
+                "bitdistill_adaptive_vs_fixed_matched_audit_2026-09-22.md",
+            ),
+        ),
+        (
+            "CLAIMS",
+            claims_doc,
+            ("Claim Ledger", "Adaptive minus fixed", "Independent reproduction"),
+        ),
+        (
+            "RESEARCH_STATUS",
+            research,
+            ("What Is Solved", "What Is Not Solved", "Impact and Publishability"),
+        ),
+        (
+            "LITERATURE_REVIEW",
+            literature,
+            ("Cutoff: 2026-09-22", "ICML 2026 oral", "W1.58A16", "AVX-512"),
+        ),
+        (
+            "ROADMAP",
+            roadmap,
+            ("95%", "1.10x", "Qwen3-30B-A3B", "Immediate Work Queue"),
+        ),
+        (
+            "EXPERIMENTS",
+            experiments,
+            ("matched adaptive-versus-fixed-60 gate is complete", "current_evidence_2026-09-22.json"),
+        ),
+    ):
+        for needle in needles:
+            require_contains(label, needle, document, errors)
+
+    for label in ("README", "CLAIMS", "RESEARCH_STATUS", "LITERATURE_REVIEW", "ROADMAP"):
+        document = docs[label]
+        for stale in (
+            "matched attribution pending",
+            "Jobs `10440-10442` now run",
+            "matched fixed-60 jobs `10440-10442` and fail-closed audit `10443` are still running",
+        ):
+            if stale in document:
+                errors.append(f"{label}: stale active-gate text remains: {stale}")
+
+    public_payload = json.dumps(
+        {"snapshot": snapshot, "matched": matched, "predictions": predictions},
+        sort_keys=True,
+    ) + combined_docs
+    for private_prefix in ("/mnt/slurm_nfs/", "/local/a6abdulm/"):
+        if private_prefix in public_payload:
+            errors.append(f"public evidence exposes private path prefix: {private_prefix}")
+
+
+def legacy_main() -> int:
+    """Validate the superseded May/September queue-era report graph."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--bundle",
@@ -1753,7 +1993,116 @@ def main() -> int:
         for error in errors:
             print(f"ERROR: {error}")
         return 1
-    print(f"validated public docs against {args.bundle}")
+    print(f"validated legacy public docs against {args.bundle}")
+    return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--canonical",
+        "--bundle",
+        dest="canonical",
+        type=Path,
+        default=Path("benchmarks/results/canonical_evidence_bundle_2026-05-20.json"),
+    )
+    parser.add_argument(
+        "--current-evidence",
+        type=Path,
+        default=Path("benchmarks/results/current_evidence_2026-09-22.json"),
+    )
+    parser.add_argument(
+        "--matched-audit",
+        type=Path,
+        default=Path(
+            "benchmarks/results/bitdistill_adaptive_vs_fixed_matched_audit_2026-09-22.json"
+        ),
+    )
+    parser.add_argument(
+        "--matched-predictions",
+        type=Path,
+        default=Path("benchmarks/results/bitdistill_matched_prediction_bundle_2026-09-22.json"),
+    )
+    parser.add_argument(
+        "--tl2sr-evidence",
+        type=Path,
+        default=Path("benchmarks/results/tl2sr_evidence_audit_2026-09-04.json"),
+    )
+    parser.add_argument(
+        "--cpu-matrix",
+        type=Path,
+        default=Path("benchmarks/results/seqcls_native_cpu_matrix_2026-09-04.json"),
+    )
+    parser.add_argument(
+        "--cpu-repeated",
+        type=Path,
+        default=Path("benchmarks/results/seqcls_native_cpu_repeated_inplace_2026-09-04.json"),
+    )
+    parser.add_argument(
+        "--initializer-audit",
+        type=Path,
+        default=Path("benchmark_results/second_order_ternary_init_2026-05-15.json"),
+    )
+    parser.add_argument(
+        "--i2-kernel-profile",
+        type=Path,
+        default=Path("benchmarks/results/i2_kernel_profile_2026-09-04.json"),
+    )
+    parser.add_argument("--readme", type=Path, default=Path("README.md"))
+    parser.add_argument("--claims", type=Path, default=Path("CLAIMS.md"))
+    parser.add_argument("--experiments", type=Path, default=Path("EXPERIMENTS.md"))
+    parser.add_argument("--runtime-contract", type=Path, default=Path("RUNTIME_CONTRACT.md"))
+    parser.add_argument(
+        "--research-status", type=Path, default=Path("docs/RESEARCH_STATUS.md")
+    )
+    parser.add_argument(
+        "--literature-review", type=Path, default=Path("docs/LITERATURE_REVIEW.md")
+    )
+    parser.add_argument("--roadmap", type=Path, default=Path("docs/ROADMAP.md"))
+    args = parser.parse_args()
+
+    canonical = load_json(args.canonical)
+    snapshot = load_json(args.current_evidence)
+    matched = load_json(args.matched_audit)
+    predictions = load_json(args.matched_predictions)
+    tl2sr = load_json(args.tl2sr_evidence)
+    cpu_matrix = load_json(args.cpu_matrix)
+    cpu_repeated = load_json(args.cpu_repeated)
+    initializer = load_json(args.initializer_audit)
+    i2_profile = load_json(args.i2_kernel_profile)
+    runtime_doc = read_text(args.runtime_contract)
+    docs = {
+        "README": read_text(args.readme),
+        "CLAIMS": read_text(args.claims),
+        "EXPERIMENTS": read_text(args.experiments),
+        "RESEARCH_STATUS": read_text(args.research_status),
+        "LITERATURE_REVIEW": read_text(args.literature_review),
+        "ROADMAP": read_text(args.roadmap),
+        "RUNTIME_CONTRACT": runtime_doc,
+    }
+
+    errors: list[str] = []
+    validate_artifacts(canonical, errors)
+    validate_current_evidence_docs(
+        snapshot,
+        canonical,
+        matched,
+        predictions,
+        tl2sr,
+        cpu_matrix,
+        cpu_repeated,
+        initializer,
+        i2_profile,
+        docs,
+        errors,
+    )
+    validate_runtime_doc(canonical, runtime_doc, errors)
+
+    if errors:
+        for error in errors:
+            print(f"ERROR: {error}")
+        return 1
+    print(f"validated current public docs against {args.current_evidence}")
     return 0
 
 
