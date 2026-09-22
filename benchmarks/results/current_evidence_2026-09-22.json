@@ -1,0 +1,234 @@
+{
+  "schema": "bitnet-current-evidence-v1",
+  "created_utc": "2026-09-22T00:00:00+00:00",
+  "scope": "Dense Qwen retrofit experiments and matching CPU runtime artifacts. Results do not establish universal model or MoE support.",
+  "verdicts": {
+    "blind_absmean_ptq": {
+      "status": "rejected_in_tested_setup",
+      "model": "Qwen2.5-1.5B",
+      "fp_wikitext_ppl": 13.901475466625362,
+      "ptq_wikitext_ppl": 3813121.80332679,
+      "fp_ten_task_mean": 0.6441691641219306,
+      "ptq_ten_task_mean": 0.34867101715441434,
+      "boundary": "Dense Qwen2.5-1.5B tested setup; not a theorem for every architecture."
+    },
+    "qat_distillation": {
+      "status": "partial_recovery_not_fp_quality",
+      "best_row_scale_ten_task_mean": 0.49945920048238823,
+      "gain_vs_naive_ptq": 0.1507881833279739,
+      "gap_vs_fp": -0.14470996363954236,
+      "boundary": "Row-scale QAT is a retrofit variant, not standard BitDistill."
+    },
+    "matched_bitdistill_mnli": {
+      "status": "not_reproduced",
+      "model": "Qwen2.5-0.5B",
+      "examples": 9815,
+      "training_seeds": 3,
+      "fp16_accuracy": 0.8081507896077432,
+      "adaptive_mean_accuracy": 0.75534046527424,
+      "adaptive_seed_mean_ci95": [
+        0.7508105880583942,
+        0.7598703424900859
+      ],
+      "adaptive_gap_vs_fp16": -0.05281032433350319,
+      "fixed60_mean_accuracy": 0.7570385464425199,
+      "fixed60_seed_mean_ci95": [
+        0.7514341212968745,
+        0.7626429715881653
+      ],
+      "fixed60_gap_vs_fp16": -0.05111224316522334,
+      "adaptive_minus_fixed60": -0.0016980811682798438,
+      "adaptive_minus_fixed60_seed_ci95": [
+        -0.01089816023013155,
+        0.007501997893571862
+      ],
+      "decision": "inconclusive",
+      "paper_recovery_floor": 0.7981509999999999,
+      "boundary": "Matched three-seed, cross-environment MNLI method comparison. It is not a paper-exact reproduction and does not establish generalization beyond this setup."
+    },
+    "least_squares_initializer": {
+      "status": "rejected_by_task_quality",
+      "absmean_mnli_accuracy": 0.6289353031074886,
+      "ls_mnli_accuracy": 0.36189505858380033,
+      "diag_ls_mnli_accuracy": 0.3509933774834437,
+      "boundary": "Lower synthetic layer-output error did not transfer to MNLI quality; this does not test modern end-to-end asymmetric PTQ methods."
+    },
+    "row_scale_runtime_contract": {
+      "status": "supported",
+      "one_scale_relative_rms_error": 1.9042302114103853,
+      "exact_row_scale_relative_rms_error": 0.00019744640689756221
+    },
+    "causal_i2sr_cpu": {
+      "status": "working_not_q4_quality_or_size_competitive",
+      "fp16": {
+        "decode_tok_s": 5.555998,
+        "file_mib": 2950.3500366210938,
+        "ppl": 12.2808,
+        "prompt_tok_s": 114.468162
+      },
+      "q4_k_m": {
+        "decode_tok_s": 16.013125,
+        "file_mib": 940.3661499023438,
+        "ppl": 12.8112,
+        "prompt_tok_s": 92.077037
+      },
+      "i2_sr": {
+        "decode_tok_s": 19.065496,
+        "file_mib": 1211.3169555664062,
+        "ppl": 38.8477,
+        "prompt_tok_s": 211.668328
+      },
+      "boundary": "I2_SR is a speed-oriented proof of row-scale ternary runtime semantics. It improves decode speed versus FP16 and is faster than Q4_K_M in the audited run, but it is larger than Q4_K_M and has much worse PPL. It should not be claimed as a quality/storage win over mature Q4 quantization."
+    },
+    "sequence_classifier_cpu": {
+      "status": "smaller_but_slower_than_fp16",
+      "hardware": "Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz",
+      "threads": 12,
+      "i2_sr_speed_ratio_vs_fp16": {
+        "geometric_mean": 0.6495997233752449,
+        "geometric_mean_ci95_t": [
+          0.6464734159522143,
+          0.6527411494371277
+        ],
+        "paired_ratios": [
+          0.6500635670177987,
+          0.6511248555699042,
+          0.6504949368528843,
+          0.6467244854056747
+        ]
+      },
+      "mixed_i2_sr_q8_speed_ratio_vs_fp16": {
+        "geometric_mean": 0.6046759076501249,
+        "geometric_mean_ci95_t": [
+          0.6026887483975174,
+          0.6066696188782019
+        ],
+        "paired_ratios": [
+          0.603909371594624,
+          0.604544733682231,
+          0.6064853794515872,
+          0.6037680306152488
+        ]
+      },
+      "mixed_file_mib": 230.903564453125,
+      "mixed_size_ratio_fp16_over_candidate": 4.106084680280107,
+      "mixed_vs_i2sr_accuracy_delta": -0.001953125,
+      "boundary": [
+        "The fixed sample is the first N MNLI validation_matched rows; it is not a randomized benchmark sample.",
+        "Accuracy intervals are paired over examples; throughput is a single-run measurement and has no timing confidence interval.",
+        "I2_SR is a separately trained QAT student, so its comparison with the FP16 teacher includes training and format effects.",
+        "Peak RSS includes runtime overhead and shared libraries; GGUF bytes are the cleaner storage measurement.",
+        "General language-model quality, other tasks, other CPUs, and energy use are outside this matrix."
+      ]
+    },
+    "tl2_sr": {
+      "status": "fidelity_and_storage_supported_speed_rejected",
+      "kernel_cases": [
+        18,
+        18
+      ],
+      "full_validation": {
+        "accuracy_delta_ci95_paired_bootstrap": [
+          -0.0009169638308711156,
+          0.003871625063678044
+        ],
+        "accuracy_delta_right_minus_left": 0.0014263881813550983,
+        "disagreements": 171,
+        "exact_mcnemar_p_two_sided": 0.27861454634422106,
+        "examples": 9815,
+        "first_disagreement_indices": [
+          15,
+          63,
+          93,
+          136,
+          184,
+          372,
+          563,
+          585,
+          651,
+          837,
+          855,
+          861,
+          922,
+          1048,
+          1142,
+          1189,
+          1206,
+          1249,
+          1385,
+          1620
+        ],
+        "left_accuracy": 0.6514518593988793,
+        "left_only_correct": 65,
+        "paired_bootstrap_samples": 100000,
+        "paired_bootstrap_seed": 1234,
+        "prediction_agreement": 0.9825776872134488,
+        "right_accuracy": 0.6528782475802344,
+        "right_only_correct": 79
+      },
+      "projection_storage_reduction": 0.1286175267423838,
+      "whole_file_reduction": 0.03154250336317199,
+      "speed_ratios_vs_i2sr": [
+        {
+          "tile_bm": 128,
+          "ratio": 0.8530191976603707,
+          "ci95": [
+            0.8479787149001708,
+            0.8580896416283338
+          ]
+        },
+        {
+          "tile_bm": 64,
+          "ratio": 0.8655167719482085,
+          "ci95": [
+            0.8349454452618185,
+            0.8972074604092748
+          ]
+        },
+        {
+          "tile_bm": 32,
+          "ratio": 0.9188231117746861,
+          "ci95": [
+            0.916672629156392,
+            0.9209786393516104
+          ]
+        }
+      ],
+      "boundary": "TL2_SR is a functionally valid row-scale ternary storage/runtime contract for the tested Qwen student. It reduces packed projection storage, but no tested tile layout proves a CPU throughput advantage over I2_SR."
+    },
+    "moe_kimi": {
+      "status": "not_proven",
+      "boundary": "Only tiny Qwen2MoE plumbing exists; no Kimi checkpoint, quality, or routed CPU benchmark exists."
+    }
+  },
+  "sources": {
+    "canonical": {
+      "path": "benchmarks/results/canonical_evidence_bundle_2026-05-20.json",
+      "sha256": "af9ec2e35931986c7caf63c178b7c482c3e93406f8d880774bbf8d114f27824c"
+    },
+    "matched_audit": {
+      "path": "benchmarks/results/bitdistill_adaptive_vs_fixed_matched_audit_2026-09-22.json",
+      "sha256": "be15cd6ebfe896aef49b1b2612aea3018a30abd7f9992de75829c120b9c0ba8c"
+    },
+    "prediction_bundle": {
+      "path": "benchmarks/results/bitdistill_matched_prediction_bundle_2026-09-22.json",
+      "sha256": "85b16708f2ee668532b149f7edcdc0c08fcb66570d77ceaf0b7ac56393bdf0f0"
+    },
+    "tl2_audit": {
+      "path": "benchmarks/results/tl2sr_evidence_audit_2026-09-04.json",
+      "sha256": "26465812e790533fde486340df635d7367f99060b538365205265bc8f648733b"
+    },
+    "cpu_matrix": {
+      "path": "benchmarks/results/seqcls_native_cpu_matrix_2026-09-04.json",
+      "sha256": "cd9e9a41629ba1324555af1786927efa8a12cf9f2069f6eb2034bcc331eaa96d"
+    },
+    "cpu_repeated": {
+      "path": "benchmarks/results/seqcls_native_cpu_repeated_inplace_2026-09-04.json",
+      "sha256": "a81d5595ef6bec9d10dbb863a649c0c98921d5fa0029bfc69deb49cf74de2e40"
+    },
+    "initializer_audit": {
+      "path": "benchmark_results/second_order_ternary_init_2026-05-15.json",
+      "sha256": "838a3013ee5b191b3a64a5013e0f520562e965c37fbbff567de809d2e330576f"
+    }
+  }
+}
