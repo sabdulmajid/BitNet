@@ -165,8 +165,9 @@ publication status, and what each paper changes in this project.
 The next experiment is not another local loss-weight sweep. It is a controlled
 advanced-PTQ falsification study:
 
-1. Reproduce released CAT-Q/ScaleQ and PT2-LLM checkpoints on a common Qwen3
-   backbone and calibration corpus.
+1. Evaluate the released CAT-Q Qwen3 checkpoints, reproduce PT2-LLM from its
+   public implementation, and run ScaleQ only when its promised code or
+   artifacts are available.
 2. Compare FP16, naive absmean, PT2-LLM, CAT-Q/ScaleQ, Q4_K_M, and the best local
    QAT artifact on the same PPL, seven-task zero-shot, and reasoning suites.
 3. Report true end-to-end bits per weight, file size, RSS, prompt/decode speed,

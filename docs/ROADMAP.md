@@ -39,7 +39,7 @@ unchanged recipe remains below the preregistered recovery floor.
 | Symmetric absmean ternary | Destructive control |
 | PT2-LLM | Asymmetric, activation-aware, Hessian-compensated PTQ |
 | CAT-Q | Learned modulation and softened ternarization |
-| ScaleQ-1.58 | CAT-Q with self-generated reasoning calibration |
+| ScaleQ-1.58 | CAT-Q with self-generated reasoning calibration; pending public implementation/artifacts at the review cutoff |
 | Local best QAT | Training-based comparison, clearly labeled non-equivalent |
 
 Every external repository must be commit-pinned, license-recorded, and run in
@@ -155,8 +155,8 @@ size, and index-storage precision.
 
 ## Phase 5: MoE Boundary
 
-Start with Qwen3-30B-A3B because CAT-Q/ScaleQ publish an MoE reference. Do not
-start with Kimi.
+Start with Qwen3-30B-A3B because CAT-Q releases and ScaleQ reports results for
+that Qwen3 MoE family. Do not start with Kimi.
 
 Required milestones:
 
@@ -213,7 +213,8 @@ analysis, and end-to-end CPU results. Kimi claims require actual Kimi evidence.
    published checkpoints.
 2. Add an external-checkpoint adapter to the existing PPL and `lm-eval`
    harness without changing method implementations.
-3. Evaluate released Qwen3-1.7B artifacts before launching calibration jobs.
+3. Evaluate released CAT-Q Qwen3-1.7B artifacts before launching calibration
+   jobs; keep ScaleQ pending until its implementation or artifacts are public.
 4. Freeze a common dataset manifest and generation configuration.
 5. Publish Phase-1 preregistration, then run the calibration ladder.
 6. Rebase runtime comparisons against current upstream BitNet/llama.cpp before

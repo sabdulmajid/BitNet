@@ -120,6 +120,9 @@ Critical boundaries:
 
 - ScaleQ-1.58 is a recent preprint; this repository has not independently
   reproduced it.
+- At this review cutoff, the paper points to forthcoming ScaleQ code in
+  BitTern; the repository's released checkpoints and deployment code are for
+  CAT-Q. Do not describe ScaleQ artifacts as public until that changes.
 - Its default is W1.58A16, not the W1.58A8 BitNet path tested locally.
 - Its MoE evidence is Qwen3 MoE, not Kimi/DeepSeek MLA compatibility.
 - Reported conversion still consumes hours on eight A100-80GB GPUs; “PTQ” does
@@ -127,10 +130,11 @@ Critical boundaries:
 - Group-wise learned scales and thresholds require a matching storage and
   kernel contract.
 
-Implication: CAT-Q/ScaleQ is now the highest-priority external baseline. If its
-released Qwen3 artifacts retain quality under our independent suite, the
+Implication: CAT-Q/ScaleQ is now the highest-priority external baseline. If the
+released CAT-Q Qwen3 artifacts retain quality under our independent suite, the
 project should integrate their representation rather than continue tuning the
-weaker local BitDistill controller.
+weaker local BitDistill controller. ScaleQ remains a protocol target until its
+implementation or artifacts are public.
 
 ## TWLA
 
